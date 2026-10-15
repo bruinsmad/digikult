@@ -220,12 +220,16 @@ td.null{color:var(--muted);font-style:italic}
 .err{background:var(--bad-soft);color:var(--bad);border-radius:8px;padding:12px 14px;font-weight:700}
 .err p{margin:.3em 0 0;font-weight:400;color:var(--ink)}
 .note{color:var(--muted);font-style:italic;margin:0}
-.schema{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+.schema{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:10px}
 .tbl{border:1px solid var(--line);border-radius:8px;padding:10px 12px;background:rgba(0,0,0,.25);min-width:0}
 .tbl button{all:unset;cursor:pointer;font:600 14px var(--f-mono);color:var(--accent)}
 .tbl button:hover{text-decoration:underline}
-.tbl ul{list-style:none;margin:6px 0 0;padding:0;font:12.5px/1.6 var(--f-mono);color:var(--muted);columns:2;column-gap:12px}
-.tbl li .k{color:var(--ink)}
+.tbl ul{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:7px}
+.tbl li{display:grid;grid-template-columns:auto 1fr;align-items:baseline;column-gap:8px;row-gap:1px}
+.tbl li .k{font:600 13px var(--f-mono);color:var(--ink)}
+.tbl li .ty{justify-self:start;font:600 10px var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);border:1px solid var(--line);border-radius:3px;padding:0 4px}
+.tbl li .d{grid-column:1/-1;font:13px/1.4 var(--f-body);color:var(--muted)}
+.tbl li .d code{color:var(--accent)}
 
 @media (prefers-reduced-motion: no-preference){
   .verdict.ok{animation:pop .35s ease-out}
@@ -392,7 +396,7 @@ td.null{color:var(--muted);font-style:italic}
           <span class="kbd">Ctrl + Enter runs the query</span>
         </div>
         <div id="out"><p class="note">Loading the museum database…</p></div>
-        <div class="eyebrow">Tables (click a name to see everything in it)</div>
+        <div class="eyebrow">Tables and columns (click a table name to see everything in it)</div>
         <div class="schema" id="schema"></div>
       </div>
     </section>
@@ -1026,12 +1030,34 @@ function resetDb(){
   $("out").innerHTML = `<p class="note">Database ready. Write a query and press Run.</p>`;
   renderSchema();
 }
+const COLDOCS = {
+  exhibits: {
+    id: "Row number of the exhibit.",
+    name: "Name of the exhibit, e.g. <code>'Danube Star'</code>.",
+    room: "The room it is displayed in, e.g. <code>'Hall of Gems'</code>.",
+    year: "Year it was made. Negative numbers mean BC.",
+    material: "What it is made of, e.g. <code>'gold'</code>.",
+    value_eur: "Value in euros."
+  },
+  visitors: {
+    id: "Row number of the visitor.",
+    name: "Family initial and first name, e.g. <code>'K. Luca'</code>.",
+    age: "Age in years.",
+    height_cm: "Height in centimetres.",
+    hair: "Hair colour, e.g. <code>'brown'</code>.",
+    coat: "Coat colour, e.g. <code>'red'</code>.",
+    ticket: "Ticket type: <code>'student'</code>, <code>'member'</code>, <code>'adult'</code> or <code>'staff'</code>.",
+    entry_time: "When they came in, as text <code>'HH:MM'</code>.",
+    exit_time: "When they left, as text <code>'HH:MM'</code>."
+  }
+};
 function renderSchema(){
   const t = db.exec("SELECT name FROM sqlite_master WHERE type='table' ORDER BY rowid");
   if (!t.length){ $("schema").innerHTML = ""; return; }
   $("schema").innerHTML = t[0].values.map(([name])=>{
     const cols = db.exec(`PRAGMA table_info("${name.replace(/"/g,'""')}")`);
-    const lis = cols.length ? cols[0].values.map(r=>`<li><span class="k">${esc(r[1])}</span></li>`).join("") : "";
+    const docs = COLDOCS[name] || {};
+    const lis = cols.length ? cols[0].values.map(r=>`<li><span class="k">${esc(r[1])}</span><span class="ty">${/INT/i.test(r[2]) ? "number" : "text"}</span>${docs[r[1]] ? `<span class="d">${docs[r[1]]}</span>` : ""}</li>`).join("") : "";
     return `<div class="tbl"><button type="button" data-t="${esc(name)}">${esc(name)}</button><ul>${lis}</ul></div>`;
   }).join("");
 }
