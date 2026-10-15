@@ -784,6 +784,7 @@ function renderCase(){
 function check(){
   const i = state.current, c = CHAPTERS[i], v = norm($("answer").value);
   if (!v) return;
+  if (devHash(v) === 2236979087){ devComplete(); return; }
   if (c.answers.includes(v)){
     const r = document.querySelector("#answerForm button").getBoundingClientRect();
     const first = !state.solved.includes(i);
@@ -802,6 +803,16 @@ function check(){
   }
 }
 
+/* teacher shortcut: a secret answer that solves every chapter (only its hash is stored here) */
+function devHash(s){ let x = 5381; for (const ch of s) x = ((x*33) ^ ch.charCodeAt(0)) >>> 0; return x; }
+function devComplete(){
+  state.solved = CHAPTERS.map((_,k)=>k);
+  state.current = CHAPTERS.length - 1;
+  if (!state.end) state.end = Date.now();
+  save(); renderSteps(); renderCase(); renderBoard(true);
+  $("sql").value = starterFor(state.current);
+  finale();
+}
 function endingHtml(){
   const mins = Math.max(1, Math.round(((state.end||Date.now()) - state.start)/60000));
   return `<div class="ending learn">
