@@ -27,6 +27,7 @@
 }
 *{box-sizing:border-box}
 [hidden]{display:none!important}
+*,*::before,*::after{font-feature-settings:"calt" 0,"liga" 0}
 html,body{margin:0}
 body{color:var(--ink);font:16px/1.55 var(--f-body);
   background:
@@ -155,6 +156,7 @@ mark{background:linear-gradient(transparent 35%, #ffe45c 35%, #ffe45c 88%, trans
 .task{border-left:4px solid #d2333f;padding:4px 0 4px 14px;display:grid;gap:4px}
 .task h3{font:700 22px var(--f-hand);color:#d2333f}
 .task p{margin:0;font-weight:700;font-size:17px}
+.hint.locked{border:2px dashed #c9d2df;border-radius:8px;padding:8px 12px;font:600 12.5px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:#8a95a8;background:repeating-linear-gradient(135deg,rgba(201,210,223,.25) 0 8px,transparent 8px 16px)}
 details.hint{border:2px dashed #9db0cc;border-radius:8px;padding:8px 12px;background:rgba(230,236,251,.65)}
 details.hint summary{cursor:pointer;font:600 12.5px var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:#3b4f78}
 details.hint[open] summary{margin-bottom:6px}
@@ -642,7 +644,7 @@ WHERE ticket &lt;&gt; 'student';</pre>`,
   ],
   answers:["3","three"],
   placeholder:"a number",
-  success:"Three suspects: M. Anna Petra, L. Ágnes Abigél and L. Laura."
+  success:"Three suspects left. Keep your query: the next clue narrows it down to one."
 },
 {
   title:"The torn ticket",
@@ -730,9 +732,10 @@ function goTo(i){
 function renderCase(){
   const i = state.current, c = CHAPTERS[i], solved = state.solved.includes(i);
   const hints = c.hints.map((h,k)=>{
-    const label = typeof h === "string" ? "Evidence bag 1 · hint" : "Evidence bag 2 · a working query";
-    const body = typeof h === "string" ? `<p>${esc(h)}</p>` : `<pre>${esc(h.sql)}</pre>`;
-    return `<details class="hint"><summary>${label}</summary>${body}</details>`;
+    if (typeof h === "string") return `<details class="hint"><summary>Evidence bag 1 · hint</summary><p>${esc(h)}</p></details>`;
+    const tries = (state.wrong && state.wrong[i]) || 0;
+    if (!solved && tries < 2) return `<div class="hint locked">Evidence bag 2 · sealed. It opens after ${2 - tries} more wrong answer${2 - tries === 1 ? "" : "s"}.</div>`;
+    return `<details class="hint"><summary>Evidence bag 2 · a working query</summary><pre>${esc(h.sql)}</pre></details>`;
   }).join("");
   const last = i === CHAPTERS.length - 1;
   $("case").innerHTML = `
@@ -772,6 +775,8 @@ function check(){
     if (finished) finale();
     else if (first) chapterWin(r.left + r.width/2, r.top + r.height/2, i);
   } else {
+    state.wrong = state.wrong || {}; state.wrong[i] = (state.wrong[i] || 0) + 1; save();
+    if (state.wrong[i] <= 2){ renderCase(); $("answer").focus(); }
     $("verdict").innerHTML = `<div class="verdict bad">Not quite.<p>Look at your result again. Check every condition, and check whether the task asks for a number or a name.</p></div>`;
   }
 }
@@ -990,7 +995,7 @@ function mugSvg(coat, girl){
     <path d="M0 16H60M0 32H60M0 48H60" stroke="#9fb0bb" stroke-width="1"/>
     ${girl ? `<path d="M17 27C15 9 45 9 43 27L46 45C38 41 22 41 14 45Z" fill="#2f3842"/><circle cx="41" cy="14" r="3.2" fill="#e2577a"/><circle cx="46" cy="12" r="3.2" fill="#e2577a"/><circle cx="43.5" cy="13" r="1.6" fill="#ffd0dc"/>` : ""}
     <circle cx="30" cy="24" r="11" fill="#2f3842"/>
-    <path d="M7 64C9 45 19 38 30 38S51 45 53 64Z" fill="${COATS[coat]||"#888"}"/></svg>`;
+    <path d="M7 64C9 45 19 38 30 38S51 45 53 64Z" fill="#5d6b78"/></svg>`;
 }
 function renderBoard(animate){
   if (!refDb) return;
@@ -1004,7 +1009,7 @@ function renderBoard(animate){
   $("board").innerHTML = people.map(([id,name,coat])=>{
     const st = status(id), fresh = animate && st==="out" && !prevOut.has(id);
     const r = ((id*37) % 7 - 3) * 0.9;
-    return `<div class="mug ${st}${fresh?" fresh-out":""}" style="--r:${r}deg" title="${esc(name)}">${mugSvg(coat, GIRLS.has(id))}<span class="nm">${esc(name.split(" ")[1] || name)}</span></div>`;
+    return `<div class="mug ${st}${fresh?" fresh-out":""}" style="--r:${r}deg">${mugSvg(coat, GIRLS.has(id))}<span class="nm">${esc(name.split(" ")[1] || name)}</span></div>`;
   }).join("");
   [...$("board").querySelectorAll(".fresh-out")].forEach((m,k)=> m.style.animationDelay = (k*0.04)+"s");
   prevOut = nowOut;
