@@ -1,0 +1,537 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>body{margin:0}</style>
+<title>CSS First Steps</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: lesson steps on top; left column = explanation, live controls, code editor; right column = rendered result (sticky on wide screens). */
+:root {
+  --bg: #EDF0F6;
+  --surface: #FFFFFF;
+  --surface-2: #F4F6FB;
+  --fg: #16203A;
+  --muted: #58647F;
+  --line: #D3D9E6;
+  --accent: #2F4BFF;
+  --accent-fg: #FFFFFF;
+  --accent-soft: #E2E7FF;
+  --t-sel: #6B4EE6;
+  --t-prop: #1F52D6;
+  --t-val: #B25400;
+  --code-bg: #0F1629;
+  --code-fg: #E6EAF5;
+  --code-line: #232C47;
+  --syn-sel: #B9A8FF;
+  --syn-prop: #86B6FF;
+  --syn-val: #FFBB70;
+  --syn-pun: #7D8AAB;
+  --paper: #FFFFFF;
+  --bm-m: #FFE2C2; --bm-m-fg: #6B3600;
+  --bm-b: #16203A; --bm-b-fg: #FFFFFF;
+  --bm-p: #CDEFD9; --bm-p-fg: #0B5B3A;
+  --bm-c: #CFE0FF; --bm-c-fg: #1B3FA8;
+  --display: 'Bricolage Grotesque', 'Segoe UI', system-ui, sans-serif;
+  --body: 'Hanken Grotesk', system-ui, 'Segoe UI', sans-serif;
+  --mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  --code-size: 16px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0B1120; --surface: #141C2F; --surface-2: #1A2339; --fg: #E8ECF7; --muted: #9AA6C3; --line: #28324D;
+    --accent: #7C92FF; --accent-fg: #0B1120; --accent-soft: #232F66;
+    --t-sel: #B9A8FF; --t-prop: #86B6FF; --t-val: #FFBB70;
+    --code-bg: #0A0F1E; --code-line: #202945;
+    --bm-m: #5A3A17; --bm-m-fg: #FFD9A8;
+    --bm-b: #AEB8D6; --bm-b-fg: #0B1120;
+    --bm-p: #1D4A36; --bm-p-fg: #BFEBD2;
+    --bm-c: #26357A; --bm-c-fg: #D2DEFF;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0B1120; --surface: #141C2F; --surface-2: #1A2339; --fg: #E8ECF7; --muted: #9AA6C3; --line: #28324D;
+  --accent: #7C92FF; --accent-fg: #0B1120; --accent-soft: #232F66;
+  --t-sel: #B9A8FF; --t-prop: #86B6FF; --t-val: #FFBB70;
+  --code-bg: #0A0F1E; --code-line: #202945;
+  --bm-m: #5A3A17; --bm-m-fg: #FFD9A8;
+  --bm-b: #AEB8D6; --bm-b-fg: #0B1120;
+  --bm-p: #1D4A36; --bm-p-fg: #BFEBD2;
+  --bm-c: #26357A; --bm-c-fg: #D2DEFF;
+  color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font: 400 16px/1.5 var(--body);
+  padding-block: 24px 48px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+.wrap { max-width: 1180px; margin: 0 auto; }
+.eyebrow { font: 500 12px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 0 0 12px; }
+.title { font: 700 clamp(34px, 5.4vw, 56px)/1.02 var(--display); letter-spacing: -.02em; margin: 0 0 12px; text-wrap: balance; }
+.lede { max-width: 62ch; color: var(--muted); margin: 0; }
+
+.steps { list-style: none; display: flex; flex-wrap: wrap; gap: 8px; padding: 0; margin: 24px 0; }
+.tab {
+  display: flex; align-items: center; gap: 8px;
+  font: 500 14px/1 var(--body); color: var(--fg);
+  background: var(--surface); border: 1px solid var(--line); border-radius: 8px;
+  padding: 9px 12px 9px 9px; cursor: pointer;
+}
+.tab .n { font: 500 12px/1 var(--mono); background: var(--surface-2); color: var(--muted); border-radius: 5px; padding: 5px 7px; }
+.tab[aria-current="step"] { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); }
+.tab[aria-current="step"] .n { background: rgba(255,255,255,.22); color: inherit; }
+
+.grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; align-items: start; }
+@media (min-width: 861px) { .col-result { position: sticky; top: max(16px, env(safe-area-inset-top, 0px)); } }
+@media (max-width: 860px) { .grid { grid-template-columns: minmax(0, 1fr); } }
+
+.step { font: 500 12px/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--accent); margin: 0 0 8px; }
+.ltitle { font: 700 clamp(26px, 3.4vw, 34px)/1.1 var(--display); letter-spacing: -.01em; margin: 0 0 10px; text-wrap: balance; }
+.ltext { max-width: 62ch; margin: 0; line-height: 1.6; }
+#lnote:not(:empty) { margin-top: 14px; }
+
+.anatomy { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; display: flex; flex-wrap: wrap; gap: 14px 28px; align-items: center; }
+.anatomy pre { margin: 0; font: 500 16px/1.6 var(--mono); }
+.a-s { color: var(--t-sel); } .a-p { color: var(--t-prop); } .a-v { color: var(--t-val); } .a-n { color: var(--muted); }
+.legend { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; font-size: 14px; min-width: 0; }
+.legend b { font: 500 13px var(--mono); }
+.sel-list { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 6px 14px; margin: 0; padding: 12px 14px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; font-size: 14px; }
+.sel-list dt, .sel-list dd { margin: 0; }
+code { font-family: var(--mono); font-size: .92em; }
+
+.controls { display: grid; gap: 12px; padding: 14px 16px; margin: 16px 0; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; }
+.ctl-title { font: 500 12px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.ctl { display: grid; grid-template-columns: minmax(120px, 180px) minmax(0, 1fr); gap: 8px 12px; align-items: center; }
+@media (max-width: 520px) { .ctl { grid-template-columns: minmax(0, 1fr); } }
+.ctl-name { display: flex; flex-wrap: wrap; gap: 4px 8px; font: 500 12.5px var(--mono); }
+.c-sel { color: var(--t-sel); } .c-prop { color: var(--t-prop); }
+.seg { display: flex; flex-wrap: wrap; gap: 6px; }
+.seg button { font: 500 13px/1 var(--mono); color: var(--fg); background: var(--surface-2); border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); }
+.seg button.sw { width: 30px; height: 30px; padding: 0; border-radius: 50%; border: 2px solid var(--line); }
+.seg button.sw[aria-pressed="true"] { border-color: var(--surface); outline: 2px solid var(--accent); }
+.rng { display: flex; align-items: center; gap: 12px; }
+.rng input { flex: 1; min-width: 0; accent-color: var(--accent); }
+.rng output { font: 500 13px var(--mono); min-width: 6ch; text-align: right; }
+
+.editor { background: var(--code-bg); border-radius: 10px; overflow: hidden; }
+.ed-bar { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; padding: 8px 10px 8px 16px; border-bottom: 1px solid var(--code-line); }
+.file { font: 500 12px var(--mono); color: var(--syn-pun); }
+.ed-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+.mini { font: 500 12px/1 var(--mono); color: var(--code-fg); background: transparent; border: 1px solid var(--code-line); border-radius: 6px; padding: 7px 10px; cursor: pointer; }
+.mini:hover { background: rgba(255,255,255,.07); }
+.ed-body { position: relative; height: 340px; }
+.ed-body:focus-within { outline: 2px solid var(--syn-prop); outline-offset: -2px; }
+.layer {
+  position: absolute; inset: 0; margin: 0; border: 0; padding: 14px 16px;
+  font: 400 var(--code-size)/1.6 var(--mono); letter-spacing: 0; font-variant-ligatures: none;
+  tab-size: 2; white-space: pre; -webkit-text-size-adjust: 100%;
+}
+pre.layer { overflow: hidden; color: var(--code-fg); pointer-events: none; }
+textarea.layer { background: transparent; color: transparent; caret-color: var(--code-fg); resize: none; outline: none; overflow: auto; -webkit-appearance: none; border-radius: 0; }
+textarea.layer::selection { background: rgba(124, 146, 255, .38); color: transparent; }
+.t-s { color: var(--syn-sel); } .t-p { color: var(--syn-prop); } .t-v { color: var(--syn-val); } .t-n { color: var(--syn-pun); }
+
+.pager { display: flex; justify-content: space-between; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
+.nav-btn { font: 500 14px/1 var(--body); color: var(--fg); background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 11px 14px; cursor: pointer; }
+.nav-btn.primary { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); }
+.nav-btn:disabled { opacity: .4; cursor: default; }
+
+.result-card { border: 1px solid var(--line); background: var(--surface); border-radius: 10px; overflow: hidden; }
+.r-bar { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 10px 14px; border-bottom: 1px solid var(--line); font: 500 12px var(--mono); color: var(--muted); }
+.r-bar .lbl { letter-spacing: .08em; text-transform: uppercase; }
+
+.stage {
+  position: relative; contain: layout paint;
+  background: var(--paper); color: #1B1B1B;
+  font: 16px/1.5 system-ui, -apple-system, 'Segoe UI', sans-serif;
+  padding: 20px; min-height: 300px; overflow: auto;
+}
+.stage, .stage *, .stage *::before, .stage *::after { box-sizing: content-box; }
+.stage .frame { outline: 1px dashed #98A2B8; display: flow-root; }
+
+.html-view { margin-top: 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+.html-view summary { padding: 11px 14px; font: 500 13px var(--mono); cursor: pointer; }
+.html-view pre { margin: 0; padding: 0 14px 14px; font: 400 13px/1.6 var(--mono); overflow-x: auto; }
+
+.diagram { margin-top: 12px; padding: 14px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+.diagram h3 { font: 500 12px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 0 0 12px; }
+.diagram .scroll { overflow-x: auto; }
+.bm { width: max-content; min-width: 100%; }
+.bm div { position: relative; padding: var(--t); }
+.bm span { position: absolute; top: 4px; left: 8px; font: 500 11px/1 var(--mono); }
+.bm .bm-m { background: var(--bm-m); color: var(--bm-m-fg); }
+.bm .bm-b { background: var(--bm-b); color: var(--bm-b-fg); }
+.bm .bm-p { background: var(--bm-p); color: var(--bm-p-fg); }
+.bm .bm-c { background: var(--bm-c); color: var(--bm-c-fg); padding: 14px 10px; text-align: center; font: 500 12px var(--mono); }
+.diagram p { margin: 10px 0 0; font-size: 13px; color: var(--muted); }
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <p class="eyebrow">Introductory CSS &middot; live lessons</p>
+    <h1 class="title">CSS First Steps</h1>
+    <p class="lede">Edit the CSS and watch the page change as you type. Five short lessons cover color, text, spacing, borders and size.</p>
+  </header>
+
+  <nav aria-label="Lessons"><ol class="steps" id="steps"></ol></nav>
+
+  <main class="grid">
+    <section class="col-lesson" aria-labelledby="ltitle">
+      <p class="step" id="step"></p>
+      <h2 class="ltitle" id="ltitle"></h2>
+      <p class="ltext" id="ltext"></p>
+      <div id="lnote"></div>
+
+      <div class="controls" id="controls"></div>
+
+      <div class="editor">
+        <div class="ed-bar">
+          <span class="file">style.css</span>
+          <div class="ed-actions">
+            <button type="button" class="mini" id="smaller" aria-label="Smaller code text">A&minus;</button>
+            <button type="button" class="mini" id="bigger" aria-label="Larger code text">A+</button>
+            <button type="button" class="mini" id="reset">Reset</button>
+            <button type="button" class="mini" id="copy">Copy</button>
+          </div>
+        </div>
+        <div class="ed-body">
+          <pre class="layer" id="hl" aria-hidden="true"></pre>
+          <textarea class="layer" id="code" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" aria-label="CSS code"></textarea>
+        </div>
+      </div>
+
+      <div class="pager">
+        <button type="button" class="nav-btn" id="prev">&larr; Previous</button>
+        <button type="button" class="nav-btn primary" id="next">Next</button>
+      </div>
+    </section>
+
+    <section class="col-result" aria-label="Result">
+      <div class="result-card">
+        <div class="r-bar"><span class="lbl">Result</span><span id="hint"></span></div>
+        <div class="stage" id="stage"></div>
+      </div>
+      <details class="html-view">
+        <summary>See the HTML</summary>
+        <pre id="htmlsrc"></pre>
+      </details>
+      <div class="diagram" id="diagram" hidden></div>
+    </section>
+  </main>
+  <span class="sr" role="status" id="status"></span>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  var LESSONS = [
+    {
+      id: 'color', title: 'Color',
+      text: 'CSS is a list of settings written as property: value. Each setting changes one thing about how the page looks. Start with the two color properties: color for the text and background for the area behind it.',
+      note: '<div class="anatomy"><pre aria-label="Example CSS setting"><span class="a-p">color</span><span class="a-n">:</span> <span class="a-v">blue</span><span class="a-n">;</span></pre><ul class="legend"><li><b class="a-p">property</b> what to change</li><li><b class="a-v">value</b> what to change it to</li><li><b class="a-n">;</b> ends the setting</li></ul></div>',
+      hint: 'Change a value and the page updates as you type.',
+      html: '<div class="target">\n  <h2>Hello, CSS!</h2>\n  <p>This is plain HTML. CSS changes how it looks.</p>\n</div>',
+      css: 'color: #16203a;\nbackground: #e4ecff;\npadding: 20px;\n',
+      controls: [
+        { type: 'swatch', prop: 'color', options: ['#16203a', '#d6336c', '#0b8a5f', '#2f4bff'] },
+        { type: 'swatch', prop: 'background', options: ['#e4ecff', '#ffe3ec', '#dff5e8', '#fff1c9', '#16203a'] }
+      ]
+    },
+    {
+      id: 'text', title: 'Text',
+      text: 'Text has its own settings: the font, the size, how bold it is, where it lines up and how much space sits between lines.',
+      hint: 'These settings apply to the heading and the paragraph.',
+      html: '<div class="target">\n  <h2>Autumn trip</h2>\n  <p>We leave on Friday morning. Bring warm clothes and a camera.</p>\n</div>',
+      css: 'color: #2b2b2b;\nbackground: #e4ecff;\npadding: 20px;\nfont-family: Georgia, serif;\nfont-size: 18px;\nfont-weight: normal;\nline-height: 1.5;\ntext-align: left;\n',
+      controls: [
+        { type: 'seg', prop: 'font-family', options: [
+          { label: 'Serif', value: 'Georgia, serif' },
+          { label: 'Sans', value: 'system-ui, sans-serif' },
+          { label: 'Mono', value: '"Courier New", monospace' } ] },
+        { type: 'range', prop: 'font-size', min: 14, max: 32, unit: 'px' },
+        { type: 'seg', prop: 'font-weight', options: ['normal', 'bold'] },
+        { type: 'seg', prop: 'text-align', options: ['left', 'center', 'right'] },
+        { type: 'range', prop: 'line-height', min: 1, max: 2.2, step: 0.1, unit: '' }
+      ]
+    },
+    {
+      id: 'spacing', title: 'Spacing',
+      text: 'Padding is the space inside a box, between its content and its border. Margin is the space outside, between the box and whatever is around it. Drag the sliders and watch the diagram.',
+      hint: 'The dashed line is the outer box, so you can see the margin.',
+      diagram: true,
+      html: '<div class="frame">\n  <div class="target">Content</div>\n</div>',
+      css: 'color: #16203a;\nbackground: #e4ecff;\nborder-width: 4px;\nborder-style: solid;\nborder-color: #2f4bff;\npadding: 16px;\nmargin: 16px;\n',
+      controls: [
+        { type: 'range', prop: 'padding', min: 0, max: 48, unit: 'px' },
+        { type: 'range', prop: 'margin', min: 0, max: 48, unit: 'px' }
+      ]
+    },
+    {
+      id: 'borders', title: 'Borders',
+      text: 'A border needs three settings: how thick it is, what style it has and what color it is. border-radius rounds the corners.',
+      hint: 'A border with width 0 is invisible, whatever its style.',
+      diagram: true,
+      html: '<div class="frame">\n  <div class="target">Content</div>\n</div>',
+      css: 'color: #16203a;\nbackground: #e4ecff;\npadding: 16px;\nmargin: 16px;\nborder-width: 4px;\nborder-style: solid;\nborder-color: #2f4bff;\nborder-radius: 8px;\n',
+      controls: [
+        { type: 'range', prop: 'border-width', min: 0, max: 16, unit: 'px' },
+        { type: 'seg', prop: 'border-style', options: ['solid', 'dashed', 'dotted', 'double'] },
+        { type: 'swatch', prop: 'border-color', options: ['#2f4bff', '#d6336c', '#0b8a5f', '#16203a'] },
+        { type: 'range', prop: 'border-radius', min: 0, max: 40, unit: 'px' }
+      ]
+    },
+    {
+      id: 'size', title: 'Size and effects',
+      text: 'width sets how wide a box is. opacity makes it see-through, from 1 (solid) down to 0 (invisible). box-shadow adds a shadow behind it.',
+      hint: 'On a narrow screen the result area scrolls sideways.',
+      html: '<div class="target">\n  <h2>Ticket</h2>\n  <p>Admit one</p>\n</div>',
+      css: 'color: #16203a;\nbackground: #e4ecff;\npadding: 16px;\nwidth: 240px;\nopacity: 1;\nbox-shadow: none;\n',
+      controls: [
+        { type: 'range', prop: 'width', min: 120, max: 400, unit: 'px' },
+        { type: 'range', prop: 'opacity', min: 0.2, max: 1, step: 0.1, unit: '' },
+        { type: 'seg', prop: 'box-shadow', options: [
+          { label: 'none', value: 'none' },
+          { label: 'soft', value: '0 4px 12px rgba(0,0,0,0.2)' },
+          { label: 'hard', value: '6px 6px 0 #16203a' } ] }
+      ]
+    }
+  ];
+
+  var $ = function (s) { return document.querySelector(s); };
+  var ta = $('#code'), hl = $('#hl'), stage = $('#stage');
+  var styleEl = document.createElement('style');
+  document.head.appendChild(styleEl);
+  var cur = 0, ctls = [], tabBtns = [];
+
+  /* ---------- text helpers ---------- */
+  function esc(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+  function escRe(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+  function norm(s) { return (s || '').toLowerCase().replace(/["'\s]/g, ''); }
+
+  function findRule(css, sel) {
+    var re = new RegExp('(^|\\})(\\s*)(' + escRe(sel) + ')(\\s*)\\{([^}]*)\\}');
+    return { re: re, m: re.exec(css) };
+  }
+  function getDecl(css, sel, prop) {
+    var r = findRule(css, sel);
+    if (!r.m) return '';
+    var d = new RegExp('(^|[;\\s])' + escRe(prop) + '\\s*:\\s*([^;]*)', 'i').exec(r.m[5]);
+    return d ? d[2].trim() : '';
+  }
+  function setDecl(css, sel, prop, val) {
+    var r = findRule(css, sel), m = r.m;
+    if (!m) {
+      return css.replace(/\s*$/, '') + '\n\n' + sel + ' {\n  ' + prop + ': ' + val + ';\n}\n';
+    }
+    var body = m[5];
+    var dre = new RegExp('(^|[;\\s])' + escRe(prop) + '\\s*:\\s*[^;]*;?', 'i');
+    if (dre.test(body)) {
+      body = body.replace(dre, function (all, p1) { return p1 + prop + ': ' + val + ';'; });
+    } else {
+      body = body.replace(/\s*$/, '');
+      if (body.trim() && !/;$/.test(body)) body += ';';
+      body += '\n  ' + prop + ': ' + val + ';\n';
+    }
+    return css.slice(0, m.index) + m[1] + m[2] + m[3] + m[4] + '{' + body + '}' + css.slice(m.index + m[0].length);
+  }
+
+  /* ---------- preview scoping: every rule is limited to #stage ---------- */
+  function scope(css) {
+    css = css.replace(/\/\*[\s\S]*?\*\//g, '').replace(/@[a-z-]+[^;]*;?/gi, '').replace(/[{}]/g, '');
+    return '#stage .target {' + css + '}';
+  }
+
+  /* ---------- syntax highlighting ---------- */
+  function hb(b) {
+    var o = '', last = 0, m, re = /([^;:{}]+)(:)([^;]*)(;?)/g;
+    while ((m = re.exec(b))) {
+      o += esc(b.slice(last, m.index));
+      o += '<span class="t-p">' + esc(m[1]) + '</span><span class="t-n">:</span><span class="t-v">' + esc(m[3]) + '</span><span class="t-n">' + m[4] + '</span>';
+      last = re.lastIndex;
+    }
+    return o + esc(b.slice(last));
+  }
+  function highlight(src) { return hb(src) + '\n'; }
+
+  /* ---------- controls ---------- */
+  function wrapC(t) { return 'x {\n' + t + '}'; }
+  function flatGet(prop) { return getDecl(wrapC(ta.value), 'x', prop); }
+  function apply(sel, prop, val) {
+    var w = setDecl(wrapC(ta.value), 'x', prop, val);
+    var t = w.slice(3, w.length - 1).replace(/^\n/, '').replace(/^[ \t]+/gm, '');
+    ta.value = t.replace(/\s*$/, '') + '\n';
+    render();
+  }
+  function buildControls(l) {
+    var box = $('#controls');
+    box.innerHTML = '';
+    ctls = [];
+    box.hidden = !(l.controls && l.controls.length);
+    if (box.hidden) return;
+    var title = document.createElement('div');
+    title.className = 'ctl-title';
+    title.textContent = 'Try it';
+    box.appendChild(title);
+
+    l.controls.forEach(function (c, i) {
+      var row = document.createElement('div');
+      row.className = 'ctl';
+      var name = document.createElement('div');
+      name.className = 'ctl-name';
+      name.innerHTML = '<code class="c-prop">' + esc(c.prop) + '</code>';
+      var wrap = document.createElement('div');
+      var update;
+
+      if (c.type === 'range') {
+        wrap.className = 'rng';
+        var input = document.createElement('input');
+        input.type = 'range'; input.id = 'ctl-' + i;
+        input.min = c.min; input.max = c.max; input.step = c.step || 1;
+        input.setAttribute('aria-label', c.prop);
+        var out = document.createElement('output');
+        out.htmlFor = input.id;
+        input.addEventListener('input', function () { apply(c.sel, c.prop, input.value + (c.unit || '')); });
+        wrap.appendChild(input); wrap.appendChild(out);
+        update = function () {
+          var v = parseFloat(flatGet(c.prop));
+          if (!isNaN(v)) { input.value = v; out.textContent = v + (c.unit || ''); } else { out.textContent = '—'; }
+        };
+      } else {
+        wrap.className = 'seg';
+        var btns = c.options.map(function (o) {
+          var opt = typeof o === 'string' ? { label: o, value: o } : o;
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.setAttribute('aria-pressed', 'false');
+          if (c.type === 'swatch') { b.className = 'sw'; b.style.background = opt.value; b.setAttribute('aria-label', opt.value); b.title = opt.value; }
+          else b.textContent = opt.label;
+          b.addEventListener('click', function () { apply(c.sel, c.prop, opt.value); });
+          wrap.appendChild(b);
+          return { el: b, value: opt.value };
+        });
+        update = function () {
+          var now = norm(flatGet(c.prop));
+          btns.forEach(function (b) { b.el.setAttribute('aria-pressed', String(norm(b.value) === now)); });
+        };
+      }
+      row.appendChild(name); row.appendChild(wrap);
+      box.appendChild(row);
+      ctls.push(update);
+    });
+  }
+
+  /* ---------- box model diagram ---------- */
+  function drawDiagram() {
+    var d = $('#diagram'), l = LESSONS[cur];
+    if (!l.diagram) return;
+    var el = stage.querySelector('.target');
+    if (!el) { d.innerHTML = '<h3>Box model</h3><p>Nothing to measure here.</p>'; return; }
+    var cs = getComputedStyle(el);
+    var m = parseFloat(cs.marginTop) || 0, b = parseFloat(cs.borderTopWidth) || 0, p = parseFloat(cs.paddingTop) || 0;
+    function T(v) { return (18 + v * 0.55).toFixed(1); }
+    d.innerHTML = '<h3>Box model</h3><div class="scroll"><div class="bm">' +
+      '<div class="bm-m" style="--t:' + T(m) + 'px"><span>margin ' + m + 'px</span>' +
+      '<div class="bm-b" style="--t:' + T(b) + 'px"><span>border ' + b + 'px</span>' +
+      '<div class="bm-p" style="--t:' + T(p) + 'px"><span>padding ' + p + 'px</span>' +
+      '<div class="bm-c">content</div></div></div></div></div></div>' +
+      '<p>Layer thickness grows with the value. The numbers are the real values.</p>';
+  }
+
+  /* ---------- render / navigation ---------- */
+  function render() {
+    hl.innerHTML = highlight(ta.value);
+    styleEl.textContent = scope(ta.value);
+    ctls.forEach(function (u) { u(); });
+    drawDiagram();
+  }
+
+  function go(i) {
+    cur = i;
+    var l = LESSONS[i];
+    tabBtns.forEach(function (b, k) {
+      if (k === i) b.setAttribute('aria-current', 'step'); else b.removeAttribute('aria-current');
+    });
+    $('#step').textContent = 'Lesson ' + (i + 1) + ' of ' + LESSONS.length;
+    $('#ltitle').textContent = l.title;
+    $('#ltext').textContent = l.text;
+    $('#lnote').innerHTML = l.note || '';
+    $('#hint').textContent = l.hint || '';
+    $('#htmlsrc').textContent = l.html.replace(/ class="[^"]*"/g, '');
+    $('#diagram').hidden = !l.diagram;
+    $('#prev').disabled = i === 0;
+    var nx = $('#next');
+    nx.disabled = i === LESSONS.length - 1;
+    nx.textContent = i < LESSONS.length - 1 ? 'Next: ' + LESSONS[i + 1].title + ' →' : 'Last lesson';
+    buildControls(l);
+    stage.innerHTML = l.html;
+    ta.value = l.css;
+    ta.scrollTop = 0; ta.scrollLeft = 0;
+    render();
+    try { history.replaceState(null, '', '#' + l.id); } catch (e) {}
+  }
+
+  LESSONS.forEach(function (l, i) {
+    var li = document.createElement('li');
+    var b = document.createElement('button');
+    b.type = 'button'; b.className = 'tab';
+    b.innerHTML = '<span class="n">' + (i + 1) + '</span>' + esc(l.title);
+    b.addEventListener('click', function () { go(i); });
+    li.appendChild(b);
+    $('#steps').appendChild(li);
+    tabBtns.push(b);
+  });
+
+  ta.addEventListener('input', render);
+  ta.addEventListener('scroll', function () { hl.scrollTop = ta.scrollTop; hl.scrollLeft = ta.scrollLeft; });
+  $('#prev').addEventListener('click', function () { if (cur > 0) go(cur - 1); });
+  $('#next').addEventListener('click', function () { if (cur < LESSONS.length - 1) go(cur + 1); });
+  $('#reset').addEventListener('click', function () { go(cur); });
+
+  var status = $('#status');
+  $('#copy').addEventListener('click', function () {
+    var btn = this;
+    function done(msg) {
+      btn.textContent = msg; status.textContent = msg;
+      setTimeout(function () { btn.textContent = 'Copy'; }, 1500);
+    }
+    try {
+      navigator.clipboard.writeText(ta.value).then(function () { done('Copied'); }, function () { ta.select(); done('Press Ctrl+C'); });
+    } catch (e) { ta.select(); done('Press Ctrl+C'); }
+  });
+
+  /* code text size, handy on a projector */
+  var size = 16;
+  try { var saved = parseInt(localStorage.getItem('css-first-steps-size'), 10); if (saved >= 13 && saved <= 30) size = saved; } catch (e) {}
+  function setSize(n) {
+    size = Math.max(13, Math.min(30, n));
+    document.documentElement.style.setProperty('--code-size', size + 'px');
+    try { localStorage.setItem('css-first-steps-size', String(size)); } catch (e) {}
+  }
+  setSize(size);
+  $('#smaller').addEventListener('click', function () { setSize(size - 2); });
+  $('#bigger').addEventListener('click', function () { setSize(size + 2); });
+
+  var start = 0, h = (location.hash || '').slice(1);
+  LESSONS.forEach(function (l, i) { if (l.id === h) start = i; });
+  go(start);
+})();
+</script>
+</body>
+</html>
