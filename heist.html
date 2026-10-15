@@ -83,7 +83,9 @@ header.top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-
   font:400 18px var(--f-display);color:#2a1d05;
   background:radial-gradient(circle at 35% 30%,#fff3c4,var(--brass) 48%,#7a5410 100%);
   box-shadow:0 3px 0 #5a3d08, 0 8px 16px rgba(0,0,0,.55)}
-.step .t{max-width:100%;font:700 15px/1.15 var(--f-hand);color:var(--muted);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.step .t{max-width:100%;padding:0 3px;font:700 13px/1.2 var(--f-body);color:#b9c6cc;text-align:center;text-wrap:balance;overflow-wrap:break-word;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.step-caption{display:none;text-align:center;font:700 15px/1.3 var(--f-body);color:#fff1cc}
+.step-caption span{font:600 11px var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-right:6px}
 .step:not(:last-child)::after{content:"";position:absolute;z-index:1;top:22px;left:50%;width:100%;height:22px;
   border-bottom:7px solid var(--velvet);border-radius:0 0 50% 50% / 0 0 100% 100%;
   filter:drop-shadow(0 5px 3px rgba(0,0,0,.5))}
@@ -95,9 +97,10 @@ header.top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-
   background:radial-gradient(ellipse 50% 70% at 50% 0,rgba(255,240,190,.38),transparent 75%);pointer-events:none}
 .step.locked{cursor:not-allowed}
 .step.locked .n{filter:grayscale(.9) brightness(.55)}
-.step.locked .t{opacity:.5}
+.step.locked .t{color:#7f8d95}
 .step:focus-visible .n{outline:3px solid var(--accent);outline-offset:3px}
-@media (max-width:900px){ .step .t{display:none} .step .n{width:30px;height:30px;font-size:14px} .step:not(:last-child)::after{top:16px;height:16px;border-bottom-width:5px} .step.current::before{width:70px} }
+@media (max-width:1150px){ .step .t{font-size:11.5px} }
+@media (max-width:900px){ .step-caption{display:block} .step .t{display:none} .step .n{width:30px;height:30px;font-size:14px} .step:not(:last-child)::after{top:16px;height:16px;border-bottom-width:5px} .step.current::before{width:70px} }
 
 /* cork suspect board */
 .board{border:10px solid var(--cork-frame);border-radius:6px;padding:14px 16px 18px;display:grid;gap:12px;
@@ -378,6 +381,7 @@ td.null{color:var(--muted);font-style:italic}
   </header>
 
   <nav class="steps" id="steps" aria-label="Chapters"></nav>
+  <div class="step-caption" id="stepCaption" aria-hidden="true"></div>
 
   <section class="board" aria-label="Suspect board">
     <div class="board-head"><h2>Suspect board</h2><p id="boardNote">30 visitors were in the museum on Saturday.</p></div>
@@ -731,6 +735,7 @@ function renderSteps(){
     return `<button type="button" class="${cls.join(" ")}" data-i="${i}" ${isUnlocked(i)?"":"aria-disabled=\"true\""} title="${esc(c.title)}">
       <span class="n">${c.refresher ? "R" : num(i)}</span><span class="t">${esc(c.title)}</span></button>`;
   }).join("");
+  { const cc = CHAPTERS[state.current]; $("stepCaption").innerHTML = `<span>${cc.refresher ? "Refresher" : `Chapter ${num(state.current)} of ${NCH}`}</span>${esc(cc.title)}`; }
   $("solvedCount").textContent = `${state.solved.filter(i=>!CHAPTERS[i].refresher).length} / ${NCH} chapters solved`;
   const st = $("stamp"); st.textContent = allDone() ? "Case closed" : "Open case"; st.classList.toggle("closed", allDone());
 }
