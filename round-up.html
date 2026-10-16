@@ -1,0 +1,1221 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Bodri's Round-Up</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bree+Serif&family=Cabin+Sketch:wght@700&family=Kalam:wght@400;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<script src="https://cdn.jsdelivr.net/npm/sql.js@1.10.3/dist/sql-asm.js"></script>
+<style>
+/* Layout: the Hungarian puszta at dusk with a storm rolling in. A painted farm sign, a pasture strip where Bodri
+   runs from fence post to fence post, then the shepherd's ledger (story + task) beside the barn chalkboard (SQL). */
+:root{
+  --sky:#1c2a38; --sky-2:#2c4052; --ink:#eef3f1; --muted:#a8b8b4; --line:#33485a;
+  --grass:#5f8f3b; --grass-dark:#3c6224; --wheat:#e7b84a; --wheat-soft:#3b3017; --barn:#b5332e; --barn-dark:#7c1f1b;
+  --accent:#e7b84a; --ok:#6ed39a; --ok-soft:#173a26; --bad:#ff8a80; --bad-soft:#3a1714;
+  --paper:#f7f9f4; --paper-ink:#20291f; --paper-line:#d5e2cf; --paper-muted:#5e6b5c; --pen:#2c5aa0;
+  --chalk-bg:#21382d; --chalk:#eef5ec; --chalk-dim:#a9c3b2; --chalk-line:#3d5b4b;
+  --f-display:"Bree Serif", Georgia, serif;
+  --f-chalk:"Cabin Sketch", "Bree Serif", Georgia, serif;
+  --f-body:"Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono:"JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --f-hand:"Kalam", "Comic Sans MS", "Segoe Print", cursive;
+  --fx-night:#0d1a14; --fx-gold:#f5c542; --fx-ruby:#ff4d6d; --fx-sapphire:#4d8dff; --fx-emerald:#2fd39a; --fx-ice:#bdf6ff; --fx-white:#ffffff;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+*,*::before,*::after{font-feature-settings:"calt" 0,"liga" 0}
+html,body{margin:0}
+body{color:var(--ink);font:16px/1.55 var(--f-body);
+  background:
+    radial-gradient(ellipse 60% 40% at 85% -5%, rgba(231,184,74,.18), transparent 70%),
+    radial-gradient(ellipse 50% 35% at 10% 0%, rgba(120,140,170,.25), transparent 70%),
+    linear-gradient(to bottom, var(--sky) 0%, var(--sky-2) 55%, #33452f 100%);
+  background-attachment:fixed;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));padding-block:22px 48px}
+.wrap{max-width:1240px;margin:0 auto;display:grid;gap:20px}
+h1,h2,h3{font-family:var(--f-display);font-weight:400;text-wrap:balance;margin:0;line-height:1.15}
+code,kbd,pre,textarea{font-family:var(--f-mono)}
+code{font-size:.92em}
+:focus-visible{outline:3px solid var(--wheat);outline-offset:2px}
+.eyebrow{font:600 12px/1.2 var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+
+.btn{font:700 14px var(--f-body);border:1px solid var(--line);background:#24364a;color:var(--ink);padding:8px 14px;border-radius:6px;cursor:pointer;transition:transform .12s, box-shadow .12s}
+.btn:hover{border-color:var(--wheat)}
+.btn:active{transform:translateY(1px)}
+.btn.primary{background:var(--wheat);border-color:var(--wheat);color:#2a1f05;box-shadow:0 3px 0 #9c7a22}
+.btn.small{padding:5px 10px;font-size:13px}
+.btn.danger{color:var(--bad)}
+.btn:disabled{opacity:.5;cursor:default}
+
+/* header: painted farm sign under a storm cloud */
+header.top{position:relative;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px 24px}
+.sign{position:relative;display:flex;align-items:center;gap:16px;padding:14px 26px 14px 16px;max-width:100%;min-width:0;
+  background:repeating-linear-gradient(0deg, #8a5a2b 0 22px, #7a4e24 22px 24px), #8a5a2b;
+  border:4px solid #5a3818;border-radius:8px;box-shadow:0 14px 30px rgba(0,0,0,.45), inset 0 2px 0 rgba(255,220,170,.25)}
+.sign::before,.sign::after{content:"";position:absolute;top:10px;width:8px;height:8px;border-radius:50%;background:#3a2410;box-shadow:0 0 0 2px #c9a46a}
+.sign::before{left:8px}.sign::after{right:8px}
+.sign h1{font-size:clamp(28px,4.6vw,48px);color:#fff4d9;text-shadow:0 2px 0 #4a2c10, 0 0 18px rgba(0,0,0,.3)}
+.sign .eyebrow{color:#f5dfae}
+.dog-badge{flex:none;width:64px;height:58px}
+.dog-badge svg{width:100%;height:100%}
+.stamp{display:inline-block;font:700 13px/1 var(--f-mono);letter-spacing:.12em;text-transform:uppercase;white-space:nowrap;
+  color:#fff4d9;border:3px double #fff4d9;padding:6px 9px;border-radius:4px;transform:rotate(-8deg)}
+.stamp.closed{color:var(--ok);border-color:var(--ok)}
+.storm{position:absolute;right:max(4px, 6%);top:-14px;width:150px;height:70px;pointer-events:none;opacity:.9}
+.meta{display:flex;gap:10px 18px;align-items:center;flex-wrap:wrap;font-variant-numeric:tabular-nums}
+.meta-item{display:grid;gap:1px}
+.meta-item .lbl{font:600 10.5px var(--f-mono);letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.meta-item b{font:400 20px var(--f-display);color:#fff4d9}
+
+/* pasture strip: fence posts are the chapters, Bodri stands at the current one */
+.field{position:relative;border-radius:14px;padding:44px 10px 8px;overflow:hidden;
+  background:linear-gradient(to bottom, transparent 0 40%, rgba(0,0,0,.08) 40%), linear-gradient(to bottom, #6f9c46 0%, var(--grass) 45%, var(--grass-dark) 100%);
+  box-shadow:inset 0 -10px 20px rgba(0,0,0,.25), 0 12px 26px rgba(0,0,0,.35)}
+.field::before{content:"";position:absolute;left:0;right:70px;top:58px;height:6px;background:#8a6a3c;box-shadow:0 14px 0 #8a6a3c}
+.steps{position:relative;display:grid;grid-template-columns:repeat(10,minmax(0,1fr));margin-right:70px}
+.barn{position:absolute;right:6px;bottom:8px;width:64px;height:78px}
+.step{all:unset;position:relative;display:grid;justify-items:center;gap:4px;cursor:pointer;padding:0 2px 2px;min-width:0}
+.step .post{position:relative;z-index:1;width:30px;height:40px;display:grid;place-items:center;border-radius:4px 4px 2px 2px;
+  font:400 16px var(--f-display);color:#3a2410;background:linear-gradient(90deg,#c99a5b,#e2bb7f 45%,#b08046);box-shadow:0 3px 0 #6a4a22}
+.step .post::before{content:"";position:absolute;top:-7px;left:4px;right:4px;height:9px;background:#c99a5b;clip-path:polygon(0 100%,50% 0,100% 100%)}
+.step .t{max-width:100%;padding:0 2px;font:700 12.5px/1.2 var(--f-body);color:#f4f8ec;text-align:center;text-shadow:0 1px 2px rgba(0,0,0,.6);
+  text-wrap:balance;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.step .who{position:absolute;bottom:calc(100% - 4px);left:50%;transform:translateX(-50%);width:46px;height:40px;pointer-events:none}
+.step .who svg{width:100%;height:100%}
+.step.done .post{background:linear-gradient(90deg,#d9b46e,#f3d79a 45%,#c49a55)}
+.step.current .post{outline:3px solid #fff4d9;outline-offset:2px}
+.step.locked{cursor:not-allowed}
+.step.locked .post{filter:grayscale(.6) brightness(.75)}
+.step.locked .t{color:#d4dcc8;opacity:.7}
+.step:focus-visible .post{outline:3px solid var(--wheat);outline-offset:3px}
+.step-caption{display:none;text-align:center;font:700 15px/1.3 var(--f-body);color:#fff4d9}
+.step-caption span{font:600 11px var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-right:6px}
+@media (max-width:1150px){ .step .t{font-size:11px} }
+@media (max-width:900px){ .step-caption{display:block} .step .t{display:none} .step .post{width:24px;height:32px;font-size:13px} .step .who{width:34px;height:30px} .field{padding-top:36px} .field::before{top:50px} }
+
+/* main grid */
+main{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:26px;align-items:start}
+@media (max-width:960px){ main{grid-template-columns:minmax(0,1fr)} }
+.panel{min-width:0}
+
+/* the shepherd's ledger */
+.case{
+  --ink:var(--paper-ink); --muted:var(--paper-muted); --line:#cfdcc9; --code-bg:#eef3ea; --accent:var(--pen);
+  --ok:#16774a; --ok-soft:#dff1e6; --bad:#b0291f; --bad-soft:#fbe5e2;
+  color-scheme:light;color:var(--ink);position:relative;display:grid;gap:16px;padding:26px 22px 26px 46px;border-radius:6px 10px 10px 6px;
+  background:linear-gradient(to right, #6b4423 0 22px, #8a5a2e 22px 26px, transparent 26px),
+    repeating-linear-gradient(to bottom, transparent 0 29px, var(--paper-line) 29px 30px), var(--paper);
+  box-shadow:0 24px 50px rgba(0,0,0,.5), 0 3px 0 #dfe6d8}
+@media (max-width:560px){ .case{padding-left:36px;background:linear-gradient(to right, #6b4423 0 14px, #8a5a2e 14px 17px, transparent 17px), repeating-linear-gradient(to bottom, transparent 0 29px, var(--paper-line) 29px 30px), var(--paper)} }
+.case > .eyebrow{font:700 17px var(--f-hand);letter-spacing:0;text-transform:none;color:var(--pen)}
+.case h2{font-size:32px;color:#1c2a1a}
+.story p{margin:0 0 .7em;max-width:62ch}
+.story p:last-child{margin-bottom:0}
+mark{background:linear-gradient(transparent 35%, #ffe066 35%, #ffe066 88%, transparent 88%);color:inherit;padding:0 .1em}
+.learn{position:relative;background:#fdf3c2;border-radius:2px;padding:20px 16px 14px;display:grid;gap:8px;transform:rotate(.5deg);box-shadow:0 8px 16px rgba(30,30,10,.22)}
+.learn::before{content:"";position:absolute;top:-9px;left:50%;width:84px;height:20px;margin-left:-42px;background:rgba(220,230,220,.8);transform:rotate(-3deg)}
+.learn h3{font:700 20px var(--f-hand);color:#6d5300}
+.learn p{margin:0}
+.learn pre{margin:0;background:#fff;border:1px solid #eadf9e;border-radius:4px;padding:10px 12px;overflow-x:auto;font-size:13.5px;line-height:1.5}
+.task{border-left:4px solid var(--barn);padding:4px 0 4px 14px;display:grid;gap:4px}
+.task h3{font:700 22px var(--f-hand);color:var(--barn)}
+.task p{margin:0;font-weight:700;font-size:17px}
+details.hint{border:2px dashed #a9bf9c;border-radius:8px;padding:8px 12px;background:rgba(223,236,214,.6)}
+details.hint summary{cursor:pointer;font:600 12.5px var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:#3d5a33}
+details.hint[open] summary{margin-bottom:6px}
+details.hint p{margin:0}
+details.hint pre{margin:6px 0 0;overflow-x:auto;background:#fff;padding:8px 10px;border-radius:5px;font-size:13px}
+.hint.locked{border:2px dashed #c6d2c0;border-radius:8px;padding:8px 12px;font:600 12.5px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:#87947f;
+  background:repeating-linear-gradient(135deg,rgba(198,210,192,.3) 0 8px,transparent 8px 16px)}
+form.answer{display:flex;gap:10px;flex-wrap:wrap;align-items:end}
+form.answer input{flex:1 1 180px;min-width:0;font:700 22px var(--f-hand);color:var(--pen);padding:4px 4px 2px;border:none;border-bottom:2px solid var(--pen);border-radius:0;background:transparent}
+form.answer input::placeholder{color:#8f9b8a;font-weight:400}
+form.answer input:focus-visible{outline:none;border-bottom-width:3px;background:rgba(44,90,160,.06)}
+.case .btn{background:#fff;border-color:#c9d6c3;color:var(--ink)}
+.case .btn.primary{background:var(--pen);border-color:var(--pen);color:#fff;box-shadow:0 3px 0 #1c3b6c}
+.verdict{border-radius:6px;padding:10px 14px;font-weight:700}
+.verdict.ok{background:var(--ok-soft);color:var(--ok);border:3px double var(--ok);transform:rotate(-1deg)}
+.verdict.bad{background:var(--bad-soft);color:var(--bad)}
+.verdict p{margin:0;font-weight:400;color:var(--ink)}
+.navrow{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.anatomy{display:grid;border:1px solid var(--line);border-radius:8px;overflow:hidden;margin:4px 0 12px;background:#fff}
+.anatomy > div{display:grid;grid-template-columns:minmax(0,17ch) minmax(0,1fr);gap:14px;padding:9px 12px;border-bottom:1px solid var(--line);align-items:baseline}
+.anatomy > div:last-child{border-bottom:none}
+.anatomy code{font-weight:600;color:var(--pen);white-space:nowrap}
+.anatomy span{font-size:15px}
+@media (max-width:480px){ .anatomy > div{grid-template-columns:minmax(0,1fr);gap:2px} }
+.rules{margin:0;padding-left:1.2em;display:grid;gap:4px;max-width:62ch}
+table.ops{background:#fff;border:1px solid #eadf9e;border-radius:4px;font-size:14px}
+.case table th{position:static;background:#fffbe0;color:#6b5a1a}
+.tries{display:flex;flex-direction:column;gap:6px;align-items:flex-start}
+.try{font:13px var(--f-mono);text-align:left;background:#fff;color:var(--ink);border:1px solid #eadf9e;border-radius:4px;padding:6px 10px;cursor:pointer;max-width:100%;white-space:normal}
+.try:hover{border-color:var(--pen);color:var(--pen)}
+.ending{display:grid;gap:12px}
+.ending ol{margin:0;padding-left:1.3em;display:grid;gap:6px}
+.export{display:grid;gap:8px;background:#fff;border:2px solid var(--pen);border-radius:6px;padding:14px 16px;transform:rotate(-.4deg)}
+.export h3{font:700 20px var(--f-hand);color:var(--pen)}
+.export label{font:600 12px var(--f-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.export input{font:700 22px var(--f-hand);color:var(--pen);padding:4px 4px 2px;border:none;border-bottom:2px solid var(--pen);background:transparent;min-width:0}
+.export input:focus-visible{outline:none;border-bottom-width:3px;background:rgba(44,90,160,.06)}
+.export-btns{display:flex;gap:8px;flex-wrap:wrap}
+.export-steps{margin:0;padding-left:1.3em;display:grid;gap:4px;font-size:15px;color:var(--ink)}
+.export-note{margin:0;font-weight:700;color:var(--ok);min-height:1.2em}
+
+/* the barn chalkboard */
+.board-frame{background:linear-gradient(#8a5a2e,#6b4423);border-radius:12px;padding:12px;box-shadow:0 24px 50px rgba(0,0,0,.55), inset 0 2px 0 rgba(255,220,170,.25)}
+.chalk{--ink:var(--chalk); --muted:var(--chalk-dim); --line:var(--chalk-line); --code-bg:#1a2e24;
+  position:relative;display:grid;gap:12px;padding:18px;border-radius:6px;color:var(--ink);
+  background:radial-gradient(ellipse at 30% 20%, rgba(255,255,255,.06), transparent 60%), radial-gradient(ellipse at 80% 90%, rgba(255,255,255,.04), transparent 50%), var(--chalk-bg);
+  box-shadow:inset 0 0 40px rgba(0,0,0,.45)}
+.chalk-head{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.chalk-head h2{font:700 26px var(--f-chalk);color:var(--chalk);letter-spacing:.02em}
+.chalk-head .rule{font-size:13px;color:var(--muted)}
+textarea#sql{width:100%;min-height:150px;resize:vertical;font-size:15px;line-height:1.55;padding:12px 14px;border:1px solid var(--line);border-radius:8px;
+  background:#172a20;color:#f4fbef;caret-color:var(--wheat);tab-size:2}
+textarea#sql:focus-visible{outline:2px solid var(--wheat);outline-offset:0}
+.run-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.run-row .kbd{font:12px var(--f-mono);color:var(--muted)}
+.chalk .btn:not(.primary){background:transparent;color:var(--ink);border-color:var(--line)}
+#out{min-height:60px}
+.result-meta{font:600 13px var(--f-mono);color:var(--wheat);margin-bottom:6px}
+.tablebox{overflow-x:auto;max-height:440px;overflow-y:auto;border:1px solid var(--line);border-radius:8px;background:rgba(0,0,0,.15)}
+table{border-collapse:collapse;width:100%;font-size:14px;font-variant-numeric:tabular-nums}
+th,td{text-align:left;padding:6px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+th{position:sticky;top:0;background:#1d3328;font:600 12.5px var(--f-mono);color:var(--wheat)}
+tr:last-child td{border-bottom:none}
+.chalk tbody tr:hover td{background:rgba(255,255,255,.05)}
+td.num{text-align:right}
+td.null{color:var(--muted);font-style:italic}
+.err{background:var(--bad-soft);color:var(--bad);border-radius:8px;padding:12px 14px;font-weight:700}
+.err p{margin:.3em 0 0;font-weight:400;color:var(--ink)}
+.note{color:var(--muted);font-style:italic;margin:0}
+.schema{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:10px}
+.tbl{border:1px solid var(--line);border-radius:8px;padding:10px 12px;background:rgba(0,0,0,.15);min-width:0}
+.tbl button{all:unset;cursor:pointer;font:600 14px var(--f-mono);color:var(--wheat)}
+.tbl button:hover{text-decoration:underline}
+.tbl ul{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:7px}
+.tbl li{display:grid;grid-template-columns:auto 1fr;align-items:baseline;column-gap:8px;row-gap:1px}
+.tbl li .k{font:600 13px var(--f-mono);color:var(--ink)}
+.tbl li .ty{justify-self:start;font:600 10px var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);border:1px solid var(--line);border-radius:3px;padding:0 4px}
+.tbl li .d{grid-column:1/-1;font:13px/1.4 var(--f-body);color:var(--muted)}
+.tbl li .d code{color:var(--wheat)}
+
+@media (prefers-reduced-motion: no-preference){
+  .verdict.ok{animation:pop .35s ease-out}
+  @keyframes pop{from{transform:scale(.9) rotate(-4deg);opacity:.3}to{transform:rotate(-1deg);opacity:1}}
+  .storm .bolt{animation:bolt 5s infinite}
+  @keyframes bolt{0%,88%,100%{opacity:0}89%{opacity:1}91%{opacity:0}93%{opacity:.9}95%{opacity:0}}
+  .step.current .who{animation:dogbob .6s ease-in-out infinite alternate}
+  @keyframes dogbob{from{transform:translateX(-50%) translateY(0)}to{transform:translateX(-50%) translateY(-4px)}}
+  .step.just .who{animation:dogjump .7s ease-out}
+  @keyframes dogjump{30%{transform:translateX(-50%) translateY(-22px) rotate(-12deg)}100%{transform:translateX(-50%)}}
+}
+
+/* ---------- celebrations ---------- */
+#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:60}
+.plus{position:fixed;z-index:61;pointer-events:none;font:400 34px var(--f-display);color:var(--wheat);text-shadow:0 2px 0 #4a2c10;animation:plus 1.2s ease-out forwards}
+@keyframes plus{0%{transform:translate(-50%,0) scale(.4);opacity:0}20%{transform:translate(-50%,-20px) scale(1.4);opacity:1}100%{transform:translate(-50%,-110px) scale(1);opacity:0}}
+.shake{animation:shake .6s cubic-bezier(.36,.07,.19,.97)}
+@keyframes shake{10%,90%{transform:translate(-2px,1px)}20%,80%{transform:translate(4px,-2px)}30%,50%,70%{transform:translate(-8px,3px) rotate(-.4deg)}40%,60%{transform:translate(8px,-3px) rotate(.4deg)}}
+#finale{position:fixed;inset:0;z-index:55;display:grid;place-items:center;overflow:auto;
+  background:linear-gradient(to bottom, #2b4a66 0%, #4f7a5a 60%, #3c6224 100%);color:var(--fx-white);
+  padding:max(20px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) max(20px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px))}
+#finale .flash{position:absolute;inset:0;background:var(--fx-white);opacity:0;pointer-events:none}
+.rainbow{position:absolute;left:50%;top:6%;width:min(120vw,1100px);aspect-ratio:2/1;transform:translateX(-50%);border-radius:100% 100% 0 0;pointer-events:none;opacity:.55;
+  background:radial-gradient(circle at 50% 100%, transparent 0 52%, #8b5cf6 52% 55%, #3b82f6 55% 58%, #22c55e 58% 61%, #facc15 61% 64%, #fb923c 64% 67%, #ef4444 67% 70%, transparent 70%)}
+.finale-inner{position:relative;z-index:2;display:grid;justify-items:center;gap:14px;text-align:center;max-width:780px;width:100%}
+.hero-dog{width:170px;height:150px}
+.hero-dog svg{width:100%;height:100%;filter:drop-shadow(0 10px 18px rgba(0,0,0,.4))}
+.big-stamp{font:400 clamp(34px,9vw,88px)/1 var(--f-display);color:var(--fx-gold);white-space:nowrap;border:6px solid var(--fx-gold);border-radius:10px;padding:10px 24px;transform:rotate(-6deg);
+  text-shadow:0 3px 0 rgba(0,0,0,.35);box-shadow:0 0 40px rgba(245,197,66,.35), inset 0 0 30px rgba(245,197,66,.2);background:rgba(0,0,0,.15)}
+.finale-sub{margin:6px 0 0;font:700 clamp(18px,3vw,24px) var(--f-body);text-shadow:0 2px 4px rgba(0,0,0,.4)}
+.finale-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;width:100%}
+.finale-stats > div{border:1px solid rgba(255,255,255,.25);border-radius:8px;padding:10px 8px;background:rgba(0,0,0,.2);display:grid;gap:2px}
+.finale-stats span{font:600 11px var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:#dff3c8}
+.finale-stats b{font:400 clamp(18px,3.4vw,26px) var(--f-display);color:var(--fx-white);font-variant-numeric:tabular-nums}
+.caught{font:600 14px var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:#fff4d9;background:rgba(0,0,0,.2);border:1px solid rgba(255,244,217,.5);padding:8px 14px;border-radius:4px}
+.finale-btns{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+#finale .btn{background:var(--fx-gold);border-color:var(--fx-gold);color:#2a1f05;font-size:16px;padding:12px 20px;box-shadow:none}
+#finale .btn.ghost{background:rgba(0,0,0,.2);color:var(--fx-white);border-color:rgba(255,255,255,.45)}
+@media (max-width:480px){ .finale-stats{grid-template-columns:minmax(0,1fr)} .hero-dog{width:130px;height:115px} }
+@media (prefers-reduced-motion: no-preference){
+  #finale{animation:fadein .4s ease-out}
+  #finale .flash{animation:flash .9s ease-out .85s}
+  .rainbow{animation:rainbowin 2s ease-out .6s both}
+  .hero-dog{animation:herojump 1s cubic-bezier(.2,1.6,.4,1) both, heroboing .9s ease-in-out 1.1s infinite alternate}
+  .big-stamp{animation:slam .45s cubic-bezier(.6,-0.3,.7,1.2) .5s both}
+  .finale-inner.shake{animation:shake .6s cubic-bezier(.36,.07,.19,.97) .95s}
+  .finale-sub,.finale-stats > div,.caught,.finale-btns{animation:rise .6s ease-out both}
+  .finale-sub{animation-delay:1.3s}
+  .finale-stats > div:nth-child(1){animation-delay:1.55s}
+  .finale-stats > div:nth-child(2){animation-delay:1.7s}
+  .finale-stats > div:nth-child(3){animation-delay:1.85s}
+  .caught{animation-delay:2.1s}
+  .finale-btns{animation-delay:2.5s}
+  .field.wave .step{animation:wave .7s ease-out both}
+}
+@keyframes fadein{from{opacity:0}to{opacity:1}}
+@keyframes flash{0%{opacity:.85}100%{opacity:0}}
+@keyframes rainbowin{from{opacity:0;transform:translateX(-50%) scale(.8)}to{opacity:.55;transform:translateX(-50%)}}
+@keyframes herojump{0%{transform:translateY(-120vh) rotate(-30deg)}100%{transform:none}}
+@keyframes heroboing{from{transform:translateY(0) rotate(-4deg)}to{transform:translateY(-12px) rotate(4deg)}}
+@keyframes slam{0%{transform:scale(5) rotate(-20deg);opacity:0}70%{transform:scale(.92) rotate(-5deg);opacity:1}100%{transform:scale(1) rotate(-6deg);opacity:1}}
+@keyframes rise{from{transform:translateY(24px);opacity:0}to{transform:none;opacity:1}}
+@keyframes wave{0%{transform:none}40%{transform:translateY(-12px) scale(1.1)}100%{transform:none}}
+
+/* dancing sheep */
+.disco-wrap{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:1}
+.disco-lights{position:absolute;inset:-60%;opacity:.6;mix-blend-mode:screen;background:
+  radial-gradient(circle at 30% 35%, rgba(255,77,109,.55) 0 1.2%, transparent 1.6%),
+  radial-gradient(circle at 62% 28%, rgba(77,141,255,.55) 0 1.2%, transparent 1.6%),
+  radial-gradient(circle at 45% 62%, rgba(245,197,66,.55) 0 1.2%, transparent 1.6%),
+  radial-gradient(circle at 70% 58%, rgba(47,211,154,.55) 0 1.2%, transparent 1.6%),
+  radial-gradient(circle at 38% 48%, rgba(255,255,255,.45) 0 .8%, transparent 1.2%),
+  radial-gradient(circle at 56% 44%, rgba(255,255,255,.45) 0 .8%, transparent 1.2%),
+  radial-gradient(circle at 52% 70%, rgba(255,77,109,.5) 0 1%, transparent 1.4%),
+  radial-gradient(circle at 34% 72%, rgba(77,141,255,.5) 0 1%, transparent 1.4%)}
+.discoball{position:absolute;top:0;left:15%;width:76px;height:126px;margin-left:-38px}
+.discoball::before{content:"";position:absolute;left:37px;top:0;width:2px;height:52px;background:#cfd6dc}
+.discoball .ball{position:absolute;left:6px;top:50px;width:64px;height:64px;border-radius:50%;
+  background:radial-gradient(circle at 32% 30%, rgba(255,255,255,.95) 0 8%, transparent 22%),
+    repeating-linear-gradient(0deg, rgba(0,0,0,.35) 0 1px, transparent 1px 8px),
+    repeating-linear-gradient(90deg, #eef2f5 0 7px, #8d99a5 7px 8px, #c9d1d8 8px 15px, #6f7b87 15px 16px);
+  box-shadow:0 0 26px rgba(255,255,255,.55), inset -10px -12px 18px rgba(0,0,0,.45)}
+.danceline{position:relative;display:flex;flex-wrap:wrap;justify-content:center;align-items:flex-end;gap:6px 12px;padding:0 10px;border-radius:12px}
+.danceline.floor{padding:8px 14px 10px;background:linear-gradient(to bottom, rgba(0,0,0,.35), transparent 45%),
+  repeating-conic-gradient(rgba(245,197,66,.35) 0 25%, rgba(95,143,59,.45) 0 50%) 0 0/34px 34px;box-shadow:inset 0 0 26px rgba(245,197,66,.25)}
+.dancer{position:relative;width:96px;flex:none;cursor:pointer;-webkit-tap-highlight-color:transparent;filter:drop-shadow(0 8px 10px rgba(0,0,0,.45))}
+.dancer svg{display:block;width:100%;height:auto;overflow:visible}
+.dancer-name{display:block;margin-top:1px;font:700 14px/1.1 var(--f-hand);color:#fff4d9;text-align:center;white-space:nowrap;text-shadow:0 1px 2px #000}
+.dancer:focus-visible{outline:2px solid var(--fx-gold);outline-offset:3px;border-radius:8px}
+@media (prefers-reduced-motion: no-preference){
+  .discoball{animation:balldrop 1.1s cubic-bezier(.3,1.5,.5,1) both}
+  .discoball .ball{animation:ballshine 1s steps(4) infinite}
+  .disco-lights{animation:lightspin 7s linear infinite}
+  .danceline.floor{animation:floorflash 1s steps(2) infinite}
+  .dancer{animation:dancerin .7s cubic-bezier(.2,1.6,.4,1) both}
+  .dancer svg{transform-origin:50% 100%}
+  .dancer .head{transform-origin:50px 62px}
+  .dancer .arm-l{transform-origin:38px 72px}
+  .dancer .arm-r{transform-origin:62px 72px}
+  .dancer .leg-l{transform-origin:43px 103px}
+  .dancer .leg-r{transform-origin:57px 103px}
+  .dancer .tail{transform-origin:72px 88px;animation:wag .25s ease-in-out infinite alternate}
+  .dancer .eyes{transform-origin:50px 42px;animation:blink 3.4s infinite}
+  .d-disco svg{animation:sway 1s ease-in-out infinite}
+  .d-disco .bod{animation:hop .5s ease-in-out infinite alternate}
+  .d-disco .arm-r{animation:point 1s steps(1) infinite}
+  .d-disco .arm-l{transform:rotate(-105deg)}
+  .d-headbang .head{animation:bang .25s ease-in-out infinite alternate}
+  .d-headbang .bod{animation:hop .25s ease-in-out infinite alternate}
+  .d-headbang .arm-l{animation:clawL .5s ease-in-out infinite alternate}
+  .d-headbang .arm-r{animation:clawR .5s ease-in-out infinite alternate}
+  .d-spin svg{animation:spin360 2s cubic-bezier(.5,0,.5,1) infinite}
+  .d-spin .arm-l{animation:armL .5s ease-in-out infinite alternate}
+  .d-spin .arm-r{animation:armR .5s ease-in-out infinite alternate}
+  .d-wave svg{animation:sway 2s ease-in-out infinite}
+  .d-wave .head{animation:tilt 1s ease-in-out infinite}
+  .d-wave .arm-l{animation:waveL .5s ease-in-out infinite alternate}
+  .d-wave .arm-r{animation:waveR .5s ease-in-out infinite alternate}
+  .d-shuffle svg{animation:slide 1s ease-in-out infinite}
+  .d-shuffle .leg-l{animation:kickL .5s ease-in-out infinite alternate}
+  .d-shuffle .leg-r{animation:kickR .5s ease-in-out infinite alternate}
+  .d-shuffle .arm-l{animation:armL .5s ease-in-out infinite alternate-reverse}
+  .d-shuffle .arm-r{animation:armR .5s ease-in-out infinite alternate}
+  .dancer.boing svg{animation:boing .8s cubic-bezier(.3,1.5,.5,1)!important}
+}
+@keyframes dancerin{0%{transform:translateY(-60vh) rotate(-540deg) scale(.3)}100%{transform:none}}
+@keyframes balldrop{0%{transform:translateY(-140px)}100%{transform:none}}
+@keyframes ballshine{0%{filter:brightness(1)}25%{filter:brightness(1.25) hue-rotate(20deg)}50%{filter:brightness(.95)}75%{filter:brightness(1.3) hue-rotate(-20deg)}}
+@keyframes lightspin{to{transform:rotate(360deg)}}
+@keyframes floorflash{50%{background-position:0 0,17px 0}}
+@keyframes sway{0%,100%{transform:rotate(-7deg)}50%{transform:rotate(7deg)}}
+@keyframes hop{from{transform:translateY(0)}to{transform:translateY(-9px)}}
+@keyframes armL{from{transform:rotate(0)}to{transform:rotate(-70deg)}}
+@keyframes armR{from{transform:rotate(-20deg)}to{transform:rotate(70deg)}}
+@keyframes wag{from{transform:rotate(-14deg)}to{transform:rotate(16deg)}}
+@keyframes tilt{0%,100%{transform:rotate(-10deg)}50%{transform:rotate(10deg)}}
+@keyframes point{0%{transform:rotate(-38deg)}50%{transform:rotate(95deg)}}
+@keyframes bang{from{transform:rotate(-6deg)}to{transform:rotate(22deg) translateY(3px)}}
+@keyframes clawL{from{transform:rotate(-15deg)}to{transform:rotate(-45deg)}}
+@keyframes clawR{from{transform:rotate(15deg)}to{transform:rotate(45deg)}}
+@keyframes spin360{0%{transform:rotateY(0)}25%{transform:rotateY(0) translateY(-6px)}60%{transform:rotateY(360deg) translateY(-16px)}100%{transform:rotateY(360deg)}}
+@keyframes waveL{from{transform:rotate(-45deg)}to{transform:rotate(-5deg)}}
+@keyframes waveR{from{transform:rotate(5deg)}to{transform:rotate(45deg)}}
+@keyframes slide{0%,100%{transform:translateX(-10px) rotate(-3deg)}50%{transform:translateX(10px) rotate(3deg)}}
+@keyframes kickL{from{transform:rotate(0)}to{transform:rotate(38deg)}}
+@keyframes kickR{from{transform:rotate(0)}to{transform:rotate(-38deg)}}
+@keyframes blink{0%,90%,100%{transform:scaleY(1)}94%{transform:scaleY(.1)}}
+@keyframes boing{0%{transform:none}45%{transform:translateY(-42px) rotate(360deg) scale(1.15)}100%{transform:none}}
+/* pasture view: Bodri herds the sheep the way the query groups them */
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="sign">
+      <div class="dog-badge" aria-hidden="true" id="badgeDog"></div>
+      <div>
+        <div class="eyebrow">Hortobágy puszta · Gazsi bácsi's farm · Storm warning</div>
+        <h1>Bodri's Round-Up</h1>
+      </div>
+      <span class="stamp" id="stamp">Storm coming</span>
+    </div>
+    <svg class="storm" viewBox="0 0 150 70" aria-hidden="true">
+      <path class="bolt" d="M86 40L76 58H84L78 70L96 50H87L93 40Z" fill="#ffe066" opacity="0"/>
+      <ellipse cx="50" cy="32" rx="34" ry="18" fill="#56677a"/><ellipse cx="88" cy="26" rx="34" ry="22" fill="#68798c"/><ellipse cx="118" cy="36" rx="26" ry="14" fill="#56677a"/>
+      <rect x="20" y="34" width="120" height="14" rx="7" fill="#4b5b6d"/>
+    </svg>
+    <div class="meta">
+      <span class="meta-item"><span class="lbl">Time</span><b id="timer">00:00</b></span>
+      <span class="meta-item"><span class="lbl">Progress</span><b id="solvedCount">0 / 9 chapters solved</b></span>
+      <button class="btn small" id="soundToggle" type="button" aria-pressed="true">Sound: on</button>
+      <button class="btn small danger" id="resetProgress" type="button">Start over</button>
+    </div>
+  </header>
+
+  <div class="field" id="field">
+    <nav class="steps" id="steps" aria-label="Chapters"></nav>
+    <svg class="barn" viewBox="0 0 64 78" aria-hidden="true">
+      <path d="M4 32L32 8L60 32V78H4Z" fill="#b5332e"/><path d="M0 34L32 6L64 34" stroke="#f3efe6" stroke-width="5" fill="none" stroke-linejoin="round"/>
+      <rect x="20" y="44" width="24" height="34" fill="#7c1f1b"/><path d="M20 44L44 78M44 44L20 78" stroke="#f3efe6" stroke-width="3"/>
+      <rect x="27" y="22" width="10" height="10" fill="#f5dfae"/>
+    </svg>
+  </div>
+  <div class="step-caption" id="stepCaption" aria-hidden="true"></div>
+
+  <main>
+    <section class="panel case" id="case" aria-live="polite"></section>
+
+    <section class="panel board-frame">
+      <div class="chalk">
+        <div class="chalk-head">
+          <h2>Barn chalkboard</h2>
+          <span class="rule">Squash many rows into one answer: COUNT, SUM, AVG, MIN, MAX, GROUP BY</span>
+        </div>
+        <label for="sql" class="eyebrow">Your SQL query</label>
+        <textarea id="sql" spellcheck="false" autocapitalize="off" autocomplete="off"></textarea>
+        <div class="run-row">
+          <button class="btn primary" id="run" type="button">Run query</button>
+          <button class="btn" id="resetDb" type="button">Restore data</button>
+          <span class="kbd">Ctrl + Enter runs the query</span>
+        </div>
+        <div id="out"><p class="note">Loading the shepherd's ledger…</p></div>
+        <div class="eyebrow">Tables and columns (click a table name to see everything in it)</div>
+        <div class="schema" id="schema"></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<canvas id="fx" aria-hidden="true"></canvas>
+<div id="finale" hidden role="dialog" aria-modal="true" aria-labelledby="finaleTitle">
+  <div class="rainbow"></div>
+  <div class="disco-wrap" id="disco" hidden aria-hidden="true"><div class="disco-lights"></div><div class="discoball"><div class="ball"></div></div></div>
+  <div class="finale-inner" id="finaleInner">
+    <div class="hero-dog" id="heroDog" aria-hidden="true"></div>
+    <div class="big-stamp" id="finaleTitle">ALL HOME!</div>
+    <p class="finale-sub">All 48 sheep are safe in the barn, and the storm can do its worst.</p>
+    <div class="finale-stats">
+      <div><span>Time</span><b id="fTime">–</b></div>
+      <div><span>Queries run</span><b id="fQueries">–</b></div>
+      <div><span>Rank</span><b id="fRank">–</b></div>
+    </div>
+    <div class="caught">Pamacs the lamb · rescued from the reeds</div>
+    <div class="finale-btns">
+      <button class="btn" id="finaleClose" type="button">See bonus tasks</button>
+      <button class="btn ghost" id="finaleAgain" type="button">More wool confetti</button>
+      <button class="btn ghost" id="danceBtn" type="button">Dancing sheep</button>
+      <button class="btn ghost" id="finaleSave" type="button">Save answers</button>
+    </div>
+    <div class="danceline" id="danceline" aria-hidden="true"></div>
+  </div>
+  <div class="flash"></div>
+</div>
+
+<script>
+/*SEED*/
+const SEED = `
+CREATE TABLE sheep (id INTEGER PRIMARY KEY, name TEXT, breed TEXT, colour TEXT, pasture TEXT, age INTEGER, weight_kg INTEGER, wool_kg REAL, in_barn INTEGER);
+INSERT INTO sheep VALUES
+(1,'Málna','Cigája','brown','Windmill Hill',1,55,3.1,1),
+(2,'Pamacs','Racka','white','Stork Pond',0,14,0.0,0),
+(3,'Gyapjas','Racka','white','Far Meadow',1,58,3.0,1),
+(4,'Kifli','Suffolk','white','Well Meadow',3,90,3.2,1),
+(5,'Sajt','Racka','black','Stork Pond',8,44,3.3,1),
+(6,'Manó','Racka','white','Stork Pond',8,53,2.7,1),
+(7,'Mákos','Racka','white','Well Meadow',8,51,3.1,1),
+(8,'Füge','Cigája','white','Windmill Hill',1,61,3.7,1),
+(9,'Levendula','Suffolk','white','Poplar Row',8,82,3.2,1),
+(10,'Pöttyös','Merino','white','Far Meadow',1,71,4.8,1),
+(11,'Túró','Suffolk','white','Well Meadow',2,83,3.5,1),
+(12,'Brumi','Cigája','white','Stork Pond',5,59,3.8,1),
+(13,'Vatta','Merino','white','Well Meadow',8,72,5.2,1),
+(14,'Pihe','Merino','white','Well Meadow',8,71,6.1,1),
+(15,'Szöszi','Suffolk','white','Windmill Hill',3,89,3.4,1),
+(16,'Fahéj','Racka','black','Poplar Row',7,50,3.4,1),
+(17,'Bolyhos','Racka','white','Windmill Hill',2,53,3.1,1),
+(18,'Perec','Cigája','brown','Well Meadow',8,58,3.0,1),
+(19,'Bodorka','Suffolk','white','Windmill Hill',9,85,3.1,1),
+(20,'Lángos','Racka','black','Well Meadow',2,52,2.8,1),
+(21,'Hópehely','Cigája','white','Well Meadow',4,64,3.2,1),
+(22,'Fodor','Cigája','brown','Stork Pond',2,59,3.1,1),
+(23,'Kakaó','Cigája','white','Well Meadow',4,53,3.7,1),
+(24,'Bari','Racka','black','Windmill Hill',6,46,2.9,1),
+(25,'Durci','Cigája','white','Stork Pond',2,52,3.9,1),
+(26,'Gombóc','Racka','white','Windmill Hill',1,44,3.3,1),
+(27,'Csoki','Racka','black','Well Meadow',9,57,3.4,1),
+(28,'Göndör','Suffolk','white','Windmill Hill',9,83,3.6,1),
+(29,'Tincs','Merino','white','Poplar Row',5,62,6.0,1),
+(30,'Zsemle','Merino','white','Windmill Hill',2,71,4.6,1),
+(31,'Babóca','Merino','white','Well Meadow',2,59,5.7,1),
+(32,'Öreg Bandi','Racka','white','Windmill Hill',11,57,3.1,1),
+(33,'Mazsola','Merino','white','Windmill Hill',7,71,4.6,1),
+(34,'Csengő','Racka','white','Windmill Hill',4,53,2.6,1),
+(35,'Bocskor','Racka','black','Far Meadow',9,49,2.9,1),
+(36,'Vanília','Racka','white','Poplar Row',7,50,3.2,1),
+(37,'Picur','Suffolk','white','Stork Pond',7,91,3.0,1),
+(38,'Pogácsa','Merino','white','Windmill Hill',2,65,5.8,1),
+(39,'Dió','Cigája','white','Poplar Row',6,62,4.1,1),
+(40,'Mogyoró','Cigája','white','Poplar Row',4,54,3.1,1),
+(41,'Zizi','Merino','white','Far Meadow',9,68,6.4,1),
+(42,'Rétes','Racka','white','Stork Pond',6,57,3.1,1),
+(43,'Rozmaring','Merino','white','Poplar Row',7,70,6.3,1),
+(44,'Szellő','Cigája','brown','Far Meadow',6,62,4.1,1),
+(45,'Szusza','Merino','white','Stork Pond',5,72,5.1,1),
+(46,'Felhő','Racka','black','Windmill Hill',9,48,2.5,1),
+(47,'Kökény','Cigája','white','Far Meadow',3,64,3.3,1),
+(48,'Bárányka','Racka','black','Poplar Row',3,49,3.2,1);
+`;
+/*END SEED*/
+
+const CHAPTERS = [
+{
+  refresher:true,
+  title:"Quick refresher",
+  story:`<p>Before the storm, a 3-minute reminder of the basics. Every query starts with the same parts, always in this order.</p>
+  <div class="anatomy" role="table" aria-label="Parts of a query">
+    <div role="row"><code role="cell">SELECT name, age</code><span role="cell">which <b>columns</b> to show. <code>*</code> means all of them.</span></div>
+    <div role="row"><code role="cell">FROM sheep</code><span role="cell">which <b>table</b> to read</span></div>
+    <div role="row"><code role="cell">WHERE age &gt; 5</code><span role="cell">which <b>rows</b> to keep</span></div>
+    <div role="row"><code role="cell">ORDER BY age DESC;</code><span role="cell">how to <b>sort</b> the result. <code>DESC</code> means biggest first.</span></div>
+  </div>
+  <ul class="rules">
+    <li>Text values go in single quotes: <code>'black'</code>. Numbers don't: <code>5</code>.</li>
+    <li>Combine conditions with <code>AND</code> and <code>OR</code>.</li>
+    <li>Today's new idea: <b>aggregate functions</b> squash many rows into one answer.</li>
+  </ul>`,
+  learn:`<p>One row in the <code>sheep</code> table is one sheep. Click one to load and run it:</p>
+  <div class="tries">
+    <button type="button" class="try" data-sql="SELECT * FROM sheep;">SELECT * FROM sheep;</button>
+    <button type="button" class="try" data-sql="SELECT name, breed FROM sheep WHERE pasture = 'Poplar Row';">SELECT name, breed FROM sheep WHERE pasture = 'Poplar Row';</button>
+    <button type="button" class="try" data-sql="SELECT name, age FROM sheep ORDER BY age DESC;">SELECT name, age FROM sheep ORDER BY age DESC;</button>
+  </div>`,
+  task:"Warm-up: what breed is the sheep called Mazsola?",
+  hints:[
+    "Use WHERE name = 'Mazsola' and look at the breed column.",
+    {sql:"SELECT name, breed FROM sheep\nWHERE name = 'Mazsola';"}
+  ],
+  answers:["merino"],
+  placeholder:"breed",
+  success:"Merino, the woolliest breed on the farm. You're ready. Look at the sky…",
+  starter:"SELECT * FROM sheep;"
+},
+{
+  title:"Storm on the horizon",
+  story:`<p>Saturday evening on the Hortobágy puszta. Old Gazsi bácsi, the shepherd, looks west: black clouds, and they're coming fast. In <mark>one hour</mark> the storm will hit.</p>
+  <p>Every sheep has to be in the barn by then. That's a job for <b>Bodri</b>, his puli: a Hungarian herding dog with a coat like a mop and the brain of a professor. First, how many sheep is Bodri looking for?</p>`,
+  learn:`<p><code>COUNT(*)</code> counts rows. Instead of a list of sheep, you get a single number.</p>
+  <pre>SELECT COUNT(*) FROM sheep;</pre>
+  <p>Give the result column a nicer name with <code>AS</code>:</p>
+  <pre>SELECT COUNT(*) AS flock_size FROM sheep;</pre>`,
+  task:"How many sheep must Bodri bring home?",
+  hints:[
+    "One row is one sheep, so count all rows of the sheep table.",
+    {sql:"SELECT COUNT(*) AS flock_size FROM sheep;"}
+  ],
+  answers:["48","forty eight","fortyeight"],
+  placeholder:"a number",
+  success:"48 sheep. Bodri barks twice, which in puli means: easy."
+},
+{
+  title:"Black sheep in the dark",
+  story:`<p>The clouds swallow the sun. In this light, <mark>black sheep</mark> are almost invisible against the dark grass, so Bodri needs to know how many of them to look out for.</p>`,
+  learn:`<p>Put a <code>WHERE</code> before counting. SQL first throws away the rows that don't match, then counts what's left.</p>
+  <pre>SELECT COUNT(*) AS lambs
+FROM sheep
+WHERE age &lt; 2;</pre>`,
+  task:"How many black sheep are in the flock?",
+  hints:[
+    "COUNT(*) with WHERE colour = 'black'.",
+    {sql:"SELECT COUNT(*) AS black_sheep\nFROM sheep\nWHERE colour = 'black';"}
+  ],
+  answers:["8","eight"],
+  placeholder:"a number",
+  success:"8 black sheep. Bodri will sniff them out instead of looking for them."
+},
+{
+  title:"Biggest group first",
+  story:`<p>The sheep are spread over five pastures. Gazsi bácsi's rule: <mark>start with the biggest group</mark>, because that's where the most can go wrong.</p>`,
+  learn:`<p><code>GROUP BY</code> sorts the rows into piles with the same value, and the aggregate runs once for each pile. You get one row per pile.</p>
+  <pre>SELECT breed, COUNT(*) AS how_many
+FROM sheep
+GROUP BY breed;</pre>
+  <p>You can sort by the count, too: <code>ORDER BY COUNT(*) DESC</code>.</p>`,
+  task:"Which pasture has the most sheep?",
+  hints:[
+    "GROUP BY pasture, and show pasture next to COUNT(*). Add ORDER BY COUNT(*) DESC to put the biggest first.",
+    {sql:"SELECT pasture, COUNT(*) AS how_many\nFROM sheep\nGROUP BY pasture\nORDER BY COUNT(*) DESC;"}
+  ],
+  answers:["windmill hill","windmill"],
+  placeholder:"pasture name",
+  success:"Windmill Hill, with 14 sheep. Bodri is already running up the hill."
+},
+{
+  title:"The old bridge",
+  story:`<p>The Far Meadow sheep have to cross the old wooden bridge over the river. Gazsi bácsi painted a warning on it years ago: <mark>400 kg at a time</mark>. Can they all cross together, or does Bodri have to split them up?</p>`,
+  learn:`<p><code>SUM(column)</code> adds up a number column. Combine it with <code>WHERE</code> to add up only some rows.</p>
+  <pre>SELECT SUM(wool_kg) AS brown_wool
+FROM sheep
+WHERE colour = 'brown';</pre>`,
+  task:"What is the total weight of the Far Meadow sheep, in kg?",
+  hints:[
+    "SUM(weight_kg) with WHERE pasture = 'Far Meadow'.",
+    {sql:"SELECT SUM(weight_kg) AS total_kg\nFROM sheep\nWHERE pasture = 'Far Meadow';"}
+  ],
+  answers:["372","372 kg","372kg"],
+  placeholder:"a number",
+  success:"372 kg, safely under 400. The bridge creaks, but all six cross in one go."
+},
+{
+  title:"Slow walkers",
+  story:`<p>Heavy sheep walk slowly, and slow sheep get caught in the rain. Bodri wants to give the <mark>heaviest breed</mark> a head start. Not the heaviest sheep: the breed that is heaviest <i>on average</i>.</p>`,
+  learn:`<p><code>AVG(column)</code> gives the average. <code>ROUND(value, 1)</code> keeps one decimal place. Together with <code>GROUP BY</code> you get one average per group.</p>
+  <pre>SELECT colour, ROUND(AVG(age), 1) AS avg_age
+FROM sheep
+GROUP BY colour;</pre>`,
+  task:"Which breed has the highest average weight?",
+  hints:[
+    "GROUP BY breed and show ROUND(AVG(weight_kg), 1). If you only get one number, you forgot GROUP BY.",
+    {sql:"SELECT breed, ROUND(AVG(weight_kg), 1) AS avg_kg\nFROM sheep\nGROUP BY breed\nORDER BY AVG(weight_kg) DESC;"}
+  ],
+  answers:["suffolk"],
+  placeholder:"breed",
+  success:"The Suffolks, at about 86 kg each. Bodri nudges them towards the barn first."
+},
+{
+  title:"Follow the bell",
+  story:`<p>A flock follows its <mark>bellwether</mark>: the oldest sheep, who wears a bell. If the bellwether walks into the barn, the others follow. Bodri needs to find it.</p>`,
+  learn:`<p><code>MAX(column)</code> gives the biggest value, <code>MIN(column)</code> the smallest.</p>
+  <pre>SELECT MIN(weight_kg), MAX(weight_kg) FROM sheep;</pre>
+  <p>Careful: <code>MAX</code> only tells you the <b>number</b>. To find out <b>who</b> it is, use that number in a second query with <code>WHERE</code>.</p>`,
+  task:"What is the name of the oldest sheep?",
+  hints:[
+    "First run SELECT MAX(age) FROM sheep. Then find the sheep with WHERE age = that number.",
+    {sql:"SELECT MAX(age) FROM sheep;\n\nSELECT name, age, pasture FROM sheep\nWHERE age = 11;"}
+  ],
+  answers:["oreg bandi","bandi","oreg"],
+  placeholder:"name",
+  success:"Öreg Bandi, 11 years old. His bell clangs, and the whole of Windmill Hill trots after him."
+},
+{
+  title:"Two trips",
+  story:`<p>Bodri is clever, but he only has four legs. He can keep <mark>at most 10 sheep</mark> together in one go. A pasture with more than 10 sheep needs a second trip.</p>`,
+  learn:`<p><code>HAVING</code> filters the groups, after <code>GROUP BY</code>. <code>WHERE</code> filters single rows <i>before</i> grouping, so it can't use <code>COUNT(*)</code>.</p>
+  <pre>SELECT breed, COUNT(*)
+FROM sheep
+GROUP BY breed
+HAVING COUNT(*) &gt; 12;</pre>`,
+  task:"How many pastures have more than 10 sheep?",
+  hints:[
+    "GROUP BY pasture, then HAVING COUNT(*) > 10. Count the rows you get back.",
+    {sql:"SELECT pasture, COUNT(*) AS how_many\nFROM sheep\nGROUP BY pasture\nHAVING COUNT(*) > 10;"}
+  ],
+  answers:["2","two"],
+  placeholder:"a number",
+  success:"Two: Windmill Hill and Well Meadow. Bodri does both twice, panting but happy."
+},
+{
+  title:"Counting at the gate",
+  story:`<p>Thunder. The first big drops hit the barn roof as the last sheep run in. A scanner at the barn gate sets <code>in_barn</code> to <code>1</code> for every sheep that walks through.</p>
+  <p>Gazsi bácsi checks the numbers and goes pale. <mark>One pasture is not complete.</mark></p>`,
+  learn:`<p>You can use several aggregates in one query. Because <code>in_barn</code> is 1 or 0, <code>SUM(in_barn)</code> counts the sheep that are inside.</p>
+  <pre>SELECT colour, COUNT(*) AS total, SUM(in_barn) AS inside
+FROM sheep
+GROUP BY colour;</pre>
+  <p>And <code>HAVING</code> can compare two aggregates: <code>HAVING SUM(in_barn) &lt; COUNT(*)</code>.</p>`,
+  task:"Which pasture is not complete?",
+  hints:[
+    "GROUP BY pasture and show COUNT(*) and SUM(in_barn) next to each other. Look for the pasture where they differ.",
+    {sql:"SELECT pasture, COUNT(*) AS total, SUM(in_barn) AS inside\nFROM sheep\nGROUP BY pasture\nHAVING SUM(in_barn) < COUNT(*);"}
+  ],
+  answers:["stork pond","stork"],
+  placeholder:"pasture name",
+  success:"Stork Pond: 9 sheep, but only 8 are inside. Bodri is already out of the door."
+},
+{
+  title:"Lost in the reeds",
+  story:`<p>Rain is pouring. Bodri races to Stork Pond, where the tall reeds hide everything. He has to know <mark>who</mark> he is looking for.</p>`,
+  learn:`<p>You've found the group, so now go back to single rows. <code>WHERE</code> with <code>AND</code> narrows it down to the missing sheep.</p>
+  <pre>SELECT name, age FROM sheep
+WHERE pasture = 'Poplar Row' AND age &lt; 3;</pre>`,
+  task:"What is the name of the sheep that is still outside?",
+  hints:[
+    "WHERE pasture = 'Stork Pond' AND in_barn = 0.",
+    {sql:"SELECT name, breed, age FROM sheep\nWHERE pasture = 'Stork Pond' AND in_barn = 0;"}
+  ],
+  answers:["pamacs"],
+  placeholder:"name",
+  success:"Pamacs, a lamb born this spring. Bodri dives into the reeds and comes back with a soaking wet, very relieved lamb."
+}
+];
+
+const BONUS = [
+  "Which colour of sheep gives the most wool in total? (SUM and GROUP BY)",
+  "How many different breeds are on the farm? Try COUNT(DISTINCT breed).",
+  "What is the average age in each pasture? Round it to 1 decimal place.",
+  "Which breeds give more than 4 kg of wool on average? (HAVING)",
+  "Who is the heaviest sheep, and which pasture does it live in?"
+];
+
+const COLDOCS = {
+  sheep: {
+    id: "Row number of the sheep.",
+    name: "The sheep's name, e.g. <code>'Mazsola'</code>.",
+    breed: "<code>'Racka'</code>, <code>'Merino'</code>, <code>'Cigája'</code> or <code>'Suffolk'</code>.",
+    colour: "<code>'white'</code>, <code>'black'</code> or <code>'brown'</code>.",
+    pasture: "Where it grazes, e.g. <code>'Windmill Hill'</code>.",
+    age: "Age in years. 0 means born this year.",
+    weight_kg: "Weight in kilograms.",
+    wool_kg: "Wool from the last shearing, in kilograms.",
+    in_barn: "<code>1</code> if the barn gate scanner saw it come in, <code>0</code> if not."
+  }
+};
+
+/* ---------- state ---------- */
+const KEY = "round-up-v1";
+let state = { solved: [], current: 0, start: Date.now(), end: null, drafts: {} };
+try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && Array.isArray(s.solved)) state = Object.assign(state, s); } catch(e){}
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(state)); } catch(e){} }
+const num = i => CHAPTERS[0].refresher ? i : i+1;
+const NCH = CHAPTERS.filter(c=>!c.refresher).length;
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const norm = s => s.normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().replace(/[^a-z0-9 ]/g," ").replace(/\s+/g," ").trim();
+const isUnlocked = i => i === 0 || state.solved.includes(i-1);
+const allDone = () => state.solved.length === CHAPTERS.length;
+const starterFor = i => CHAPTERS[i].starter || `-- Chapter ${num(i)}: ${CHAPTERS[i].title}\n`;
+
+/* ---------- drawings ---------- */
+function puliSvg(){
+  return `<svg viewBox="0 0 64 56" aria-hidden="true">
+    <path d="M52 22C60 16 62 24 56 28" stroke="#1d1d1f" stroke-width="5" fill="none" stroke-linecap="round"/>
+    <ellipse cx="34" cy="32" rx="20" ry="13" fill="#1d1d1f"/>
+    <path d="M18 34V48M24 36V50M42 36V50M48 34V48" stroke="#1d1d1f" stroke-width="5" stroke-linecap="round"/>
+    <path d="M18 26Q20 40 22 44M26 24Q27 38 28 46M34 22Q34 38 34 46M42 24Q41 38 40 46M49 27Q47 38 46 44" stroke="#3a3a3e" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+    <circle cx="14" cy="24" r="11" fill="#1d1d1f"/>
+    <path d="M6 18Q7 28 6 34M10 15Q11 27 10 35M15 14Q15 26 15 35M20 16Q19 27 20 33" stroke="#3a3a3e" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <ellipse cx="6" cy="28" rx="3" ry="2.4" fill="#0b0b0c"/>
+    <path d="M9 31Q10 37 13 35" fill="#ff8fa3"/><path d="M9 31Q10 37 13 35Q12 32 9 31Z" fill="#ff8fa3"/>
+    <circle cx="11" cy="21" r="1.4" fill="#e9eef2" opacity=".85"/>
+  </svg>`;
+}
+function sheepIcon(){
+  return `<svg viewBox="0 0 40 32" aria-hidden="true">
+    <path d="M10 22V30M16 23V31M25 23V31M31 22V30" stroke="#2b2b2b" stroke-width="3" stroke-linecap="round"/>
+    <g fill="#f3f4f1"><circle cx="12" cy="16" r="7"/><circle cx="20" cy="12" r="8"/><circle cx="28" cy="16" r="7"/><circle cx="20" cy="20" r="8"/></g>
+    <ellipse cx="34" cy="13" rx="5" ry="6" fill="#2b2b2b"/><circle cx="35.5" cy="11.5" r="1" fill="#fff"/>
+  </svg>`;
+}
+$("badgeDog").innerHTML = puliSvg();
+$("heroDog").innerHTML = puliSvg();
+
+/* ---------- pasture strip ---------- */
+function renderSteps(){
+  $("steps").innerHTML = CHAPTERS.map((c,i)=>{
+    const cls = ["step"];
+    if (state.solved.includes(i)) cls.push("done");
+    if (i === state.current) cls.push("current");
+    if (!isUnlocked(i)) cls.push("locked");
+    const who = i === state.current ? puliSvg() : (state.solved.includes(i) ? sheepIcon() : "");
+    return `<button type="button" class="${cls.join(" ")}" data-i="${i}" ${isUnlocked(i)?"":"aria-disabled=\"true\""} title="${esc(c.title)}">
+      <span class="who">${who}</span><span class="post">${c.refresher ? "R" : num(i)}</span><span class="t">${esc(c.title)}</span></button>`;
+  }).join("");
+  { const cc = CHAPTERS[state.current]; $("stepCaption").innerHTML = `<span>${cc.refresher ? "Refresher" : `Chapter ${num(state.current)} of ${NCH}`}</span>${esc(cc.title)}`; }
+  $("solvedCount").textContent = `${state.solved.filter(i=>!CHAPTERS[i].refresher).length} / ${NCH} chapters solved`;
+  const st = $("stamp"); st.textContent = allDone() ? "All home" : "Storm coming"; st.classList.toggle("closed", allDone());
+}
+$("steps").addEventListener("click", e=>{
+  const b = e.target.closest(".step"); if (!b) return;
+  const i = +b.dataset.i; if (isUnlocked(i)) goTo(i);
+});
+$("case").addEventListener("click", e=>{
+  const b = e.target.closest("button.try"); if (!b) return;
+  $("sql").value = b.dataset.sql; run();
+});
+
+function goTo(i){
+  state.drafts[state.current] = $("sql").value;
+  state.current = i; save();
+  renderSteps(); renderCase();
+  $("sql").value = state.drafts[i] ?? starterFor(i);
+}
+
+/* ---------- ledger ---------- */
+function renderCase(){
+  const i = state.current, c = CHAPTERS[i], solved = state.solved.includes(i);
+  const hints = c.hints.map(h=>{
+    if (typeof h === "string") return `<details class="hint"><summary>Clue 1 · hint</summary><p>${esc(h)}</p></details>`;
+    const tries = (state.wrong && state.wrong[i]) || 0;
+    if (!solved && tries < 2) return `<div class="hint locked">Clue 2 · sealed. It opens after ${2 - tries} more wrong answer${2 - tries === 1 ? "" : "s"}.</div>`;
+    return `<details class="hint"><summary>Clue 2 · a working query</summary><pre>${esc(h.sql)}</pre></details>`;
+  }).join("");
+  const last = i === CHAPTERS.length - 1;
+  $("case").innerHTML = `
+    <div class="eyebrow">${c.refresher ? "Before the storm · about 3 minutes" : `Chapter ${num(i)} of ${NCH}`}</div>
+    <h2>${esc(c.title)}</h2>
+    <div class="story">${c.story}</div>
+    <div class="learn"><h3>${c.refresher ? "Try it" : "SQL for this step"}</h3>${c.learn}</div>
+    <div class="task"><h3>Your task</h3><p>${esc(c.task)}</p></div>
+    ${hints}
+    <form class="answer" id="answerForm" autocomplete="off">
+      <input id="answer" type="text" placeholder="Answer: ${esc(c.placeholder)}" aria-label="Your answer" ${solved?"disabled":""}>
+      <button class="btn primary" type="submit" ${solved?"disabled":""}>Check answer</button>
+    </form>
+    <div id="verdict">${solved ? `<div class="verdict ok">Correct.<p>${esc(c.success)}</p></div>` : ""}</div>
+    <div class="navrow">
+      <button class="btn" type="button" id="prev" ${i===0?"hidden":""}>Previous chapter</button>
+      <button class="btn primary" type="button" id="next" ${solved && !last ? "" : "hidden"}>${c.refresher ? "Start the round-up" : "Next chapter"}</button>
+    </div>
+    ${allDone() && last ? endingHtml() : ""}`;
+  $("answerForm").addEventListener("submit", e=>{ e.preventDefault(); check(); });
+  $("prev").onclick = ()=> goTo(i-1);
+  $("next").onclick = ()=> goTo(i+1);
+}
+
+function check(){
+  const i = state.current, c = CHAPTERS[i], v = norm($("answer").value);
+  if (!v) return;
+  if (devHash(v) === 2236979087){ devComplete(); return; }
+  if (c.answers.includes(v)){
+    if (!state.solved.includes(i)){
+      state.answers = state.answers || {}; state.answers[i] = $("answer").value.trim();
+      state.solvedSql = state.solvedSql || {}; state.solvedSql[i] = $("sql").value;
+    }
+    const r = document.querySelector("#answerForm button").getBoundingClientRect();
+    const first = !state.solved.includes(i);
+    if (first) state.solved.push(i);
+    const finished = first && allDone();
+    if (allDone() && !state.end) state.end = Date.now();
+    save(); renderSteps(); renderCase();
+    const n = $("next"); if (n && !n.hidden) n.focus();
+    if (finished) finale();
+    else if (first) chapterWin(r.left + r.width/2, r.top + r.height/2, i);
+  } else {
+    state.wrong = state.wrong || {}; state.wrong[i] = (state.wrong[i] || 0) + 1; save();
+    if (state.wrong[i] <= 2){ renderCase(); $("answer").focus(); }
+    $("verdict").innerHTML = `<div class="verdict bad">Not quite.<p>Look at your result again. Check whether the task asks for a number or a name, and whether you need GROUP BY.</p></div>`;
+  }
+}
+
+/* teacher shortcut: a secret answer that solves every chapter (only its hash is stored here) */
+function devHash(s){ let x = 5381; for (const ch of s) x = ((x*33) ^ ch.charCodeAt(0)) >>> 0; return x; }
+function devComplete(){
+  state.dev = true;
+  state.solved = CHAPTERS.map((_,k)=>k);
+  state.current = CHAPTERS.length - 1;
+  if (!state.end) state.end = Date.now();
+  save(); renderSteps(); renderCase();
+  $("sql").value = starterFor(state.current);
+  finale();
+}
+function endingHtml(){
+  const mins = Math.max(1, Math.round(((state.end||Date.now()) - state.start)/60000));
+  return `<div class="ending learn">
+    <h3>All home</h3>
+    <p>All 48 sheep are dry in the barn, Pamacs is wrapped in a blanket, and Bodri gets a sausage. You finished the round-up in about <b>${mins} minutes</b> using COUNT, SUM, AVG, MAX, GROUP BY and HAVING.</p>
+    <p><b>Bonus tasks</b> for fast shepherds:</p>
+    <ol>${BONUS.map(b=>`<li>${esc(b)}</li>`).join("")}</ol>
+    <div class="export">
+      <h3>Hand in your answers</h3>
+      <ol class="export-steps">
+        <li>Write your name below.</li>
+        <li>Click <b>Save answers (.txt)</b>. The file goes to your Downloads folder.</li>
+        <li>Open the assignment in <b>Google Classroom</b>, upload the file under <b>Add or create → File</b>, then press <b>Turn in</b>.</li>
+      </ol>
+      <label for="studentName">Your name</label>
+      <input id="studentName" type="text" autocomplete="off" placeholder="Write your name here" value="${esc(state.student || "")}">
+      <div class="export-btns">
+        <button class="btn primary" type="button" id="saveTxt">Save answers (.txt)</button>
+        <button class="btn" type="button" id="copyTxt">Copy as text</button>
+      </div>
+      <p class="export-note" id="exportNote" aria-live="polite"></p>
+    </div>
+    <div><button class="btn" type="button" id="replayFinale">Replay the celebration</button></div>
+  </div>`;
+}
+$("case").addEventListener("click", e=>{
+  if (e.target.id === "replayFinale") finale();
+  if (e.target.id === "saveTxt") exportAnswers("save");
+  if (e.target.id === "copyTxt") exportAnswers("copy");
+});
+$("case").addEventListener("input", e=>{ if (e.target.id === "studentName"){ state.student = e.target.value; save(); } });
+
+/* ---------- answer sheet export ---------- */
+function fmtTime(ms){ const m = Math.floor(ms/60000), s = Math.floor(ms/1000)%60; return `${m}:${String(s).padStart(2,"0")}`; }
+function buildReport(){
+  const pad = n => String(n).padStart(2,"0"), d = new Date(state.end || Date.now());
+  const L = [];
+  L.push("BODRI'S ROUND-UP - ANSWER SHEET");
+  L.push("===============================");
+  L.push(`Name: ${(state.student || "").trim()}`);
+  L.push(`Finished: ${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`);
+  L.push(`Time taken: ${fmtTime((state.end || Date.now()) - state.start)}`);
+  L.push(`Queries run: ${state.queries || 0}`);
+  if (state.dev) L.push("NOTE: completed with the teacher code, so some answers may be missing.");
+  L.push("");
+  CHAPTERS.forEach((c,i)=>{
+    L.push(`${c.refresher ? "Refresher" : "Chapter " + num(i)}: ${c.title}`);
+    L.push("-".repeat(40));
+    L.push(`Task: ${c.task}`);
+    L.push(`Answer: ${(state.answers && state.answers[i]) || (state.solved.includes(i) ? "(skipped)" : "(not solved)")}`);
+    L.push(`Wrong answers: ${(state.wrong && state.wrong[i]) || 0}`);
+    const q = ((state.solvedSql && state.solvedSql[i]) || "").trim();
+    L.push("Query:");
+    L.push(q ? q.split("\n").map(x=>"    " + x).join("\n") : "    (none saved)");
+    L.push("");
+  });
+  return L.join("\r\n");
+}
+function exportAnswers(mode){
+  const note = $("exportNote"), nameEl = $("studentName");
+  const name = (state.student || "").trim();
+  if (!name){ note.textContent = "Write your name first."; nameEl.focus(); return; }
+  const text = buildReport();
+  if (mode === "copy"){
+    const done = ()=> note.textContent = "Copied. Paste it into the assignment in Google Classroom as a private comment, then press Turn in.";
+    const fallback = ()=>{ const t = document.createElement("textarea"); t.value = text; document.body.appendChild(t); t.select();
+      try { document.execCommand("copy"); done(); } catch(e){ note.textContent = "Copying is blocked here. Use Save answers instead."; } t.remove(); };
+    try { navigator.clipboard.writeText(text).then(done, fallback); } catch(e){ fallback(); }
+    return;
+  }
+  const slug = name.normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[^A-Za-z0-9]+/g,"-").replace(/^-|-$/g,"") || "student";
+  const file = `round-up-${slug}.txt`;
+  try {
+    const url = URL.createObjectURL(new Blob(["﻿" + text], {type:"text/plain;charset=utf-8"}));
+    const a = document.createElement("a"); a.href = url; a.download = file; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=> URL.revokeObjectURL(url), 2000);
+    note.textContent = `Saved as ${file}. Now upload it to the assignment in Google Classroom and press Turn in.`;
+  } catch(e){ note.textContent = "Saving is blocked here. Use Copy as text instead."; }
+}
+
+/* ---------- timer + reset ---------- */
+function tick(){
+  const ms = (state.end || Date.now()) - state.start;
+  const m = Math.floor(ms/60000), s = Math.floor(ms/1000)%60;
+  $("timer").textContent = `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+}
+setInterval(tick, 1000); tick();
+let resetArmed = null;
+$("resetProgress").onclick = ()=>{
+  const b = $("resetProgress");
+  if (!resetArmed){
+    b.textContent = "Click again to erase progress";
+    resetArmed = setTimeout(()=>{ b.textContent = "Start over"; resetArmed = null; }, 3000);
+    return;
+  }
+  clearTimeout(resetArmed); resetArmed = null; b.textContent = "Start over";
+  state = { solved: [], current: 0, start: Date.now(), end: null, drafts: {} };
+  save(); renderSteps(); renderCase(); $("sql").value = starterFor(0); resetDb();
+};
+
+/* ---------- celebrations ---------- */
+const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const FXC = ["#f5c542","#ff4d6d","#4d8dff","#2fd39a","#ffffff","#f3f4f1"];
+const fx = { c: $("fx"), ctx: $("fx").getContext("2d"), parts: [], raf: 0, w: 0, h: 0 };
+function fxSize(){ const d = devicePixelRatio || 1; fx.w = innerWidth; fx.h = innerHeight;
+  fx.c.width = fx.w*d; fx.c.height = fx.h*d; fx.ctx.setTransform(d,0,0,d,0,0); }
+addEventListener("resize", fxSize); fxSize();
+const rnd = (a,b) => a + Math.random()*(b-a);
+function spawn(p){ fx.parts.push(p); if (!fx.raf) fx.raf = requestAnimationFrame(fxLoop); }
+function fxLoop(){
+  const g = fx.ctx; g.clearRect(0,0,fx.w,fx.h);
+  fx.parts = fx.parts.filter(p => p.life > 0 && p.y < fx.h + 60);
+  for (const p of fx.parts){
+    p.vx *= p.drag; p.vy = p.vy*p.drag + p.g; p.x += p.vx; p.y += p.vy; p.rot += p.vr; p.life--;
+    const a = Math.min(1, p.life / 30);
+    g.save(); g.globalAlpha = a; g.translate(p.x, p.y); g.rotate(p.rot); g.fillStyle = p.color;
+    if (p.type === "confetti"){ g.scale(1, Math.cos(p.life*0.2)); g.fillRect(-p.s/2, -p.s/4, p.s, p.s/2); }
+    else if (p.type === "wool"){ g.beginPath(); g.arc(-p.s*.4,0,p.s*.55,0,6.283); g.arc(p.s*.4,0,p.s*.55,0,6.283); g.arc(0,-p.s*.35,p.s*.6,0,6.283); g.fill(); }
+    else { g.globalCompositeOperation = "lighter"; g.beginPath(); g.arc(0,0,p.s,0,6.283); g.fill(); }
+    g.restore();
+  }
+  fx.raf = fx.parts.length ? requestAnimationFrame(fxLoop) : 0;
+}
+function burst(x, y, n, power=9){
+  for (let k=0; k<n; k++){
+    const ang = rnd(0, Math.PI*2), sp = rnd(power*.3, power), wool = Math.random() < .4;
+    spawn({ type: wool ? "wool" : "confetti", x, y, vx: Math.cos(ang)*sp, vy: Math.sin(ang)*sp - power*.5,
+      g: .25, drag: .985, rot: rnd(0,6), vr: rnd(-.3,.3), s: rnd(7,13), color: wool ? "#f3f4f1" : FXC[k % 4], life: rnd(70,120) });
+  }
+}
+function firework(x, y){
+  const col = FXC[Math.floor(rnd(0, 4))], n = 90;
+  for (let k=0; k<n; k++){
+    const ang = k/n*Math.PI*2, sp = rnd(3,7.5);
+    spawn({ type:"spark", x, y, vx: Math.cos(ang)*sp, vy: Math.sin(ang)*sp, g:.06, drag:.975, rot:0, vr:0, s: rnd(1.6,3.2), color: col, life: rnd(60,95) });
+  }
+  tone(rnd(90,160), .35, "sawtooth", .05, 40);
+}
+function rain(ms){
+  const end = performance.now() + ms;
+  (function drop(){
+    for (let k=0; k<6; k++){ const wool = Math.random() < .5;
+      spawn({ type: wool ? "wool" : "confetti", x: rnd(0, fx.w), y: -20, vx: rnd(-1.5,1.5), vy: rnd(2,5),
+        g:.05, drag:.995, rot: rnd(0,6), vr: rnd(-.2,.2), s: rnd(8,14), color: wool ? "#f3f4f1" : FXC[Math.floor(rnd(0,4))], life: 400 }); }
+    if (performance.now() < end) setTimeout(drop, 60);
+  })();
+}
+function fireworkShow(count){
+  for (let k=0; k<count; k++) setTimeout(()=> firework(rnd(fx.w*.12, fx.w*.88), rnd(fx.h*.1, fx.h*.5)), 400 + k*rnd(280,420));
+}
+
+let soundOn = true;
+try { soundOn = localStorage.getItem(KEY+"-sound") !== "off"; } catch(e){}
+function paintSound(){ const b = $("soundToggle"); b.textContent = `Sound: ${soundOn?"on":"off"}`; b.setAttribute("aria-pressed", soundOn); }
+paintSound();
+$("soundToggle").onclick = ()=>{ soundOn = !soundOn; paintSound(); try { localStorage.setItem(KEY+"-sound", soundOn?"on":"off"); } catch(e){} };
+let actx = null;
+function tone(freq, dur, type="triangle", vol=.12, slideTo=null, delay=0){
+  if (!soundOn) return;
+  try {
+    actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+    const t = actx.currentTime + delay, o = actx.createOscillator(), g = actx.createGain();
+    o.type = type; o.frequency.setValueAtTime(freq, t);
+    if (slideTo) o.frequency.exponentialRampToValueAtTime(slideTo, t + dur);
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + .02); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(g).connect(actx.destination); o.start(t); o.stop(t + dur + .05);
+  } catch(e){}
+}
+function bark(){ tone(420, .09, "square", .08, 260, 0); tone(460, .1, "square", .08, 280, .14); }
+function baa(delay=0){ for (let k=0; k<6; k++) tone(k%2 ? 300 : 330, .08, "sawtooth", .05, null, delay + k*.07); }
+function fanfare(){
+  const notes = [392,523,659,784,659,784,1047];
+  const at    = [0.2,0.35,0.5,0.65,0.95,1.1,1.25];
+  notes.forEach((f,k)=>{ tone(f, k===notes.length-1?1.2:.22, "triangle", .14, null, at[k]); tone(f/2, k===notes.length-1?1.2:.22, "square", .04, null, at[k]); });
+  baa(1.9); setTimeout(bark, 2600);
+}
+
+function chapterWin(x, y, i){
+  bark();
+  const el = document.createElement("div"); el.className = "plus"; el.textContent = CHAPTERS[i].refresher ? "Ready!" : "Good dog!";
+  el.style.left = x+"px"; el.style.top = (y-30)+"px"; document.body.appendChild(el); setTimeout(()=>el.remove(), 1300);
+  const s = document.querySelector(`.step[data-i="${i}"]`);
+  if (s){ s.classList.add("just"); }
+  if (reduceMotion) return;
+  burst(x, y, 60);
+  const wrap = document.querySelector(".wrap"); wrap.classList.remove("shake"); void wrap.offsetWidth; wrap.classList.add("shake");
+}
+
+function rankFor(min){ return min <= 20 ? "Golden Puli" : min <= 28 ? "Head Shepherd" : min <= 35 ? "Shepherd" : "Apprentice"; }
+function finale(){
+  const ms = (state.end || Date.now()) - state.start;
+  const mins = Math.floor(ms/60000), secs = Math.floor(ms/1000)%60;
+  $("fTime").textContent = `${mins}:${String(secs).padStart(2,"0")}`;
+  $("fQueries").textContent = state.queries || 0;
+  $("fRank").textContent = rankFor(ms/60000);
+  const f = $("finale"); f.hidden = true; void f.offsetWidth; f.hidden = false;
+  const inner = $("finaleInner"); inner.classList.remove("shake"); void inner.offsetWidth; inner.classList.add("shake");
+  fanfare();
+  $("finaleClose").focus();
+  if (reduceMotion) return;
+  setTimeout(()=>{ burst(fx.w/2, fx.h*.35, 160, 16); }, 950);
+  setTimeout(()=> rain(5000), 1200);
+  setTimeout(()=> fireworkShow(8), 1400);
+}
+function closeFinale(){
+  $("finale").hidden = true;
+  const st = $("field"); st.classList.remove("wave");
+  [...$("steps").children].forEach((b,k)=> b.style.animationDelay = (k*.08)+"s");
+  void st.offsetWidth; st.classList.add("wave");
+  const end = document.querySelector(".ending"); if (end) end.scrollIntoView({behavior: reduceMotion?"auto":"smooth", block:"center"});
+}
+$("finaleClose").onclick = closeFinale;
+$("finaleSave").onclick = ()=>{ closeFinale(); setTimeout(()=>{ const n = $("studentName"); if (n){ n.scrollIntoView({block:"center"}); n.focus(); } }, 400); };
+$("finaleAgain").onclick = ()=>{ if (reduceMotion) return; fireworkShow(6); rain(2500); baa(); };
+addEventListener("keydown", e=>{ if (e.key === "Escape" && !$("finale").hidden) closeFinale(); });
+
+/* ---------- dancing sheep (and one puli) ---------- */
+const DANCERS = [
+  {kind:"sheep", wool:"#f3f4f1", face:"#2b2b2b", gear:"bell",   dance:"wave",     name:"Öreg Bandi"},
+  {kind:"sheep", wool:"#2f2f33", face:"#1a1a1c", gear:"shades", dance:"disco",    name:"Kakaó"},
+  {kind:"sheep", wool:"#f3f4f1", face:"#2b2b2b", gear:"horns",  dance:"headbang", name:"Racka Rita"},
+  {kind:"sheep", wool:"#f3f4f1", face:"#2b2b2b", gear:"bow",    dance:"spin",     name:"Pamacs", small:true},
+  {kind:"sheep", wool:"#a8724a", face:"#3a2414", gear:"phones", dance:"shuffle",  name:"DJ Gombóc"},
+  {kind:"sheep", wool:"#f3f4f1", face:"#2b2b2b", gear:"crown",  dance:"disco",    name:"Mazsola Mercury"},
+  {kind:"puli",  dance:"headbang", name:"Bodri"}
+];
+let danceCount = 0, beatUntil = 0;
+function dancerSvg(o){
+  if (o.kind === "puli"){
+    const f = "#1d1d1f", c = "#3a3a3e";
+    return `<svg viewBox="0 0 100 122" aria-hidden="true">
+      <path class="tail" d="M70 86C88 80 90 64 80 58" stroke="${f}" stroke-width="8" fill="none" stroke-linecap="round"/>
+      <g class="bod">
+        <g class="leg-l"><path d="M43 103L40 116" stroke="${f}" stroke-width="9" stroke-linecap="round"/></g>
+        <g class="leg-r"><path d="M57 103L60 116" stroke="${f}" stroke-width="9" stroke-linecap="round"/></g>
+        <g class="arm-l"><path d="M38 72L24 58" stroke="${f}" stroke-width="9" stroke-linecap="round"/></g>
+        <g class="arm-r"><path d="M62 72L76 58" stroke="${f}" stroke-width="9" stroke-linecap="round"/></g>
+        <ellipse cx="50" cy="84" rx="21" ry="24" fill="${f}"/>
+        <path d="M34 72Q36 92 36 104M42 66Q43 90 43 106M50 64V108M58 66Q57 90 57 106M66 72Q64 92 64 104" stroke="${c}" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+        <g class="head">
+          <circle cx="50" cy="42" r="21" fill="${f}"/>
+          <path d="M33 30Q34 48 32 58M40 24Q42 46 40 60M50 22V60M60 24Q58 46 60 60M67 30Q66 48 68 58" stroke="${c}" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+          <ellipse cx="50" cy="50" rx="5" ry="3.6" fill="#0b0b0c"/>
+          <path d="M46 55Q50 66 54 55Z" fill="#ff8fa3"/>
+          <circle cx="43" cy="40" r="1.6" fill="#e9eef2" opacity=".9"/><circle cx="57" cy="40" r="1.6" fill="#e9eef2" opacity=".9"/>
+          <path d="M36 18L50 6L64 18Z" fill="#ff4d6d"/><circle cx="50" cy="6" r="3.4" fill="#f5c542"/>
+        </g>
+      </g></svg>`;
+  }
+  const w = o.wool, fc = o.face;
+  const s = o.small ? 0.82 : 1;
+  const gear = {
+    bell:   `<path d="M44 64H56L58 74H42Z" fill="#f5c542" stroke="#b8860b" stroke-width="1.2"/><circle cx="50" cy="76" r="2.4" fill="#b8860b"/><path d="M38 62Q50 68 62 62" stroke="#8a5a2e" stroke-width="3" fill="none"/>`,
+    shades: `<rect x="35" y="36" width="13" height="8" rx="3" fill="#111318" stroke="#f5c542" stroke-width="1.5"/><rect x="52" y="36" width="13" height="8" rx="3" fill="#111318" stroke="#f5c542" stroke-width="1.5"/><path d="M48 40H52" stroke="#f5c542" stroke-width="1.5"/>`,
+    horns:  `<path d="M36 30C22 26 20 12 30 10C38 9 38 18 32 18" stroke="#c9b27c" stroke-width="5" fill="none" stroke-linecap="round"/><path d="M64 30C78 26 80 12 70 10C62 9 62 18 68 18" stroke="#c9b27c" stroke-width="5" fill="none" stroke-linecap="round"/>`,
+    bow:    `<path d="M50 24L40 18V30Z M50 24L60 18V30Z" fill="#ff6fa0"/><circle cx="50" cy="24" r="3" fill="#e0457c"/>`,
+    phones: `<path d="M30 40A20 20 0 0 1 70 40" stroke="#222" stroke-width="4.5" fill="none"/><rect x="25" y="35" width="9" height="14" rx="4" fill="#ff4d6d"/><rect x="66" y="35" width="9" height="14" rx="4" fill="#ff4d6d"/>`,
+    crown:  `<path d="M38 24L38 12L44 18L50 8L56 18L62 12L62 24Z" fill="#f5c542" stroke="#b8860b" stroke-width="1.2"/><circle cx="50" cy="17" r="2" fill="#ff4d6d"/>`
+  }[o.gear];
+  const eyes = o.gear === "shades" ? "" : `<g class="eyes"><ellipse cx="43" cy="41" rx="3.6" ry="4.2" fill="#fff"/><ellipse cx="57" cy="41" rx="3.6" ry="4.2" fill="#fff"/><circle cx="43.6" cy="41.8" r="2" fill="#111"/><circle cx="57.6" cy="41.8" r="2" fill="#111"/></g>`;
+  return `<svg viewBox="0 0 100 122" aria-hidden="true"><g transform="translate(${50-50*s} ${122-122*s}) scale(${s})">
+    <circle class="tail" cx="74" cy="86" r="7" fill="${w}"/>
+    <g class="bod">
+      <g class="leg-l"><path d="M43 103L40 116" stroke="${fc}" stroke-width="7" stroke-linecap="round"/></g>
+      <g class="leg-r"><path d="M57 103L60 116" stroke="${fc}" stroke-width="7" stroke-linecap="round"/></g>
+      <g class="arm-l"><path d="M38 72L24 58" stroke="${fc}" stroke-width="7" stroke-linecap="round"/></g>
+      <g class="arm-r"><path d="M62 72L76 58" stroke="${fc}" stroke-width="7" stroke-linecap="round"/></g>
+      <g fill="${w}"><circle cx="36" cy="80" r="12"/><circle cx="50" cy="72" r="13"/><circle cx="64" cy="80" r="12"/><circle cx="40" cy="95" r="12"/><circle cx="60" cy="95" r="12"/><circle cx="50" cy="86" r="14"/></g>
+      <g class="head">
+        <g fill="${w}"><circle cx="40" cy="26" r="7"/><circle cx="50" cy="22" r="8"/><circle cx="60" cy="26" r="7"/></g>
+        <path d="M30 34Q22 30 22 38Q27 40 32 38Z M70 34Q78 30 78 38Q73 40 68 38Z" fill="${fc}"/>
+        <ellipse cx="50" cy="44" rx="15" ry="18" fill="${fc}"/>
+        ${eyes}
+        <ellipse cx="46" cy="55" rx="1.6" ry="1.2" fill="#000"/><ellipse cx="54" cy="55" rx="1.6" ry="1.2" fill="#000"/>
+        <path d="M46 59Q50 62 54 59" stroke="#ff9fb2" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+        ${gear}
+      </g>
+    </g></g></svg>`;
+}
+function discoBeat(seconds){
+  if (!soundOn) return;
+  const step = 0.25, steps = Math.round(seconds/step);
+  const bass = [110,110,165,147,110,110,196,165];
+  for (let k=0; k<steps; k++){
+    const t = k*step;
+    if (k%2===0) tone(140, .18, "sine", .22, 45, t);
+    else tone(7000, .04, "square", .015, null, t);
+    if (k%2===0) tone(bass[(k/2)%bass.length], .2, "sawtooth", .045, null, t);
+  }
+}
+function addDancer(){
+  const line = $("danceline");
+  if (!line.classList.contains("floor")){ line.classList.add("floor"); $("disco").hidden = false; }
+  if (line.children.length >= 7) line.firstElementChild.remove();
+  const o = DANCERS[danceCount++ % DANCERS.length];
+  const d = document.createElement("div");
+  d.className = `dancer d-${o.dance}`; d.tabIndex = 0; d.setAttribute("role","button"); d.setAttribute("aria-label", `${o.name}, click to make it jump`);
+  d.innerHTML = dancerSvg(o) + `<span class="dancer-name">${esc(o.name)}</span>`;
+  line.appendChild(d);
+  o.kind === "puli" ? bark() : baa();
+  const now = performance.now();
+  if (now > beatUntil){ discoBeat(8); beatUntil = now + 8000; }
+  if (!reduceMotion){ const r = d.getBoundingClientRect(); setTimeout(()=> burst(r.left + r.width/2, r.top + 20, 40, 8), 650); }
+}
+function boing(el){
+  el.querySelector(".dancer-name").textContent === "Bodri" ? bark() : baa();
+  el.classList.remove("boing"); void el.offsetWidth; el.classList.add("boing");
+  setTimeout(()=> el.classList.remove("boing"), 850);
+  if (!reduceMotion){ const r = el.getBoundingClientRect(); burst(r.left + r.width/2, r.top + 10, 18, 6); }
+}
+$("danceline").addEventListener("click", e=>{ const c = e.target.closest(".dancer"); if (c) boing(c); });
+$("danceline").addEventListener("keydown", e=>{ const c = e.target.closest(".dancer"); if (c && (e.key === "Enter" || e.key === " ")){ e.preventDefault(); boing(c); } });
+$("danceBtn").onclick = addDancer;
+
+/* ---------- database ---------- */
+let SQL = null, db = null;
+function resetDb(){
+  if (!SQL) return;
+  if (db) db.close();
+  db = new SQL.Database(); db.run(SEED);
+  $("out").innerHTML = `<p class="note">Ledger ready. Write a query and press Run.</p>`;
+  renderSchema();
+}
+function renderSchema(){
+  const t = db.exec("SELECT name FROM sqlite_master WHERE type='table' ORDER BY rowid");
+  if (!t.length){ $("schema").innerHTML = ""; return; }
+  $("schema").innerHTML = t[0].values.map(([name])=>{
+    const cols = db.exec(`PRAGMA table_info("${name.replace(/"/g,'""')}")`);
+    const docs = COLDOCS[name] || {};
+    const lis = cols.length ? cols[0].values.map(r=>`<li><span class="k">${esc(r[1])}</span><span class="ty">${/INT|REAL/i.test(r[2]) ? "number" : "text"}</span>${docs[r[1]] ? `<span class="d">${docs[r[1]]}</span>` : ""}</li>`).join("") : "";
+    return `<div class="tbl"><button type="button" data-t="${esc(name)}">${esc(name)}</button><ul>${lis}</ul></div>`;
+  }).join("");
+}
+$("schema").addEventListener("click", e=>{
+  const b = e.target.closest("button[data-t]"); if (!b) return;
+  $("sql").value = `SELECT * FROM ${b.dataset.t};`; run();
+});
+function fmt(x){ return typeof x === "number" && !Number.isInteger(x) ? String(Math.round(x*1000)/1000) : String(x); }
+function run(){
+  if (!db) return;
+  const sql = $("sql").value;
+  state.drafts[state.current] = sql; state.queries = (state.queries||0) + 1; save();
+  const bare = sql.replace(/--[^\n]*/g," ").replace(/\/\*[\s\S]*?\*\//g," ").trim();
+  if (!bare){ $("out").innerHTML = `<p class="note">The board is empty. Type a query first.</p>`; return; }
+  try {
+    const res = db.exec(sql);
+    renderSchema();
+    if (!res.length){ $("out").innerHTML = `<p class="note">0 rows. No sheep match all of your conditions. Check the spelling of text values.</p>`; return; }
+    $("out").innerHTML = res.map(r=>`<div class="result-meta">${r.values.length} row${r.values.length===1?"":"s"}</div>
+      <div class="tablebox"><table><thead><tr>${r.columns.map(c=>`<th>${esc(c)}</th>`).join("")}</tr></thead>
+      <tbody>${r.values.map(v=>`<tr>${v.map(x=> x===null ? `<td class="null">NULL</td>` : `<td${typeof x==="number"?' class="num"':""}>${esc(fmt(x))}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`).join("");
+  } catch(e){
+    let tip = "Check spelling, commas, brackets and quotes. Text values need single quotes, like 'black'.";
+    if (/no such column/i.test(e.message)) tip = "That column name doesn't exist. Check the column list under the board. Did you forget quotes around a text value?";
+    if (/no such table/i.test(e.message)) tip = "That table doesn't exist. The table is called sheep.";
+    if (/misuse of aggregate/i.test(e.message)) tip = "You can't use COUNT, SUM, AVG, MIN or MAX inside WHERE. Use HAVING after GROUP BY instead.";
+    if (/GROUP BY/i.test(e.message)) tip = "Check your GROUP BY. It comes after WHERE and before HAVING and ORDER BY.";
+    $("out").innerHTML = `<div class="err">The query has an error.<p>${esc(e.message)}</p><p>${tip}</p></div>`;
+  }
+}
+$("run").onclick = run;
+$("resetDb").onclick = resetDb;
+$("sql").addEventListener("keydown", e=>{
+  if ((e.ctrlKey || e.metaKey) && e.key === "Enter"){ e.preventDefault(); run(); }
+  if (e.key === "Tab" && !e.shiftKey){
+    e.preventDefault(); const t = e.target, s = t.selectionStart;
+    t.value = t.value.slice(0,s) + "  " + t.value.slice(t.selectionEnd); t.selectionStart = t.selectionEnd = s + 2;
+  }
+});
+
+/* ---------- boot ---------- */
+if (state.current >= CHAPTERS.length || !isUnlocked(state.current)) state.current = 0;
+renderSteps(); renderCase();
+$("sql").value = state.drafts[state.current] ?? starterFor(state.current);
+if (typeof initSqlJs !== "function"){
+  $("out").innerHTML = `<div class="err">The SQL engine could not load.<p>Check the internet connection and reload the page.</p></div>`;
+} else {
+  initSqlJs().then(s=>{ SQL = s; resetDb(); })
+    .catch(e=>{ $("out").innerHTML = `<div class="err">The SQL engine could not start.<p>${esc(e.message)}</p></div>`; });
+}
+</script>
+</body>
+</html>
