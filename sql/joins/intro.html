@@ -98,6 +98,12 @@ pre.code{margin:12px 0;background:var(--code-bg);color:var(--code-ink);border-ra
 .ex-tag .kb{font-weight:400;color:var(--chalk-dim);letter-spacing:0}
 .ex textarea{display:block;width:100%;border:0;resize:vertical;min-height:52px;padding:12px 14px;font-size:15px;line-height:1.55;background:var(--code-bg);color:var(--code-ink);caret-color:var(--yellow);tab-size:2}
 .ex textarea:focus{outline:none;box-shadow:inset 0 0 0 3px var(--yellow)}
+/* the editor is highlighted too: coloured copy underneath, see-through textarea on top */
+.edw{position:relative;background:var(--code-bg)}
+.edw .ov{position:absolute;inset:0;margin:0;padding:12px 14px;font:15px/1.55 var(--f-mono);color:var(--code-ink);white-space:pre-wrap;overflow-wrap:break-word;pointer-events:none;tab-size:2;overflow:hidden}
+.edw .ov .k{color:var(--kw)}.edw .ov .s{color:var(--str)}.edw .ov .d{color:var(--num)}.edw .ov .f{color:var(--fn)}
+.edw textarea{position:relative;background:transparent;color:transparent;-webkit-text-fill-color:transparent;font:15px/1.55 var(--f-mono);white-space:pre-wrap;overflow-wrap:break-word}
+.edw textarea::selection{background:rgba(242,210,100,.35)}
 .ex-bar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:8px 10px;background:#f3f1e7;border-top:1px solid var(--line)}
 .btn{font:700 15px var(--f-body);border:0;border-radius:8px;padding:7px 14px;cursor:pointer;background:var(--ink);color:#fff}
 .btn:hover{background:#000}
@@ -239,7 +245,7 @@ footer.end{max-width:980px;margin:0 auto;padding:0 22px 60px;color:var(--chalk-d
   <h1>Joining tables</h1>
   <p class="lead">In a good database every piece of data lives in <b>exactly one place</b>, and tables refer to each other with numbers. When a question needs several tables, you list them after <code>FROM</code> and say in <code>WHERE</code> which row belongs to which.</p>
   <div class="meta"><span>⏱ about 15 minutes</span><span>🧪 every example can be run</span><span>✅ 4 questions at the end</span></div>
-  <ul class="toc"><li><a href="#tables">The example tables</a></li><li><a href="#reference">Why just a number?</a></li><li><a href="#cross">FROM a, b: every row with every row</a></li><li><a href="#rule">The matching rule</a></li><li><a href="#filters">Rule + filters</a></li><li><a href="#three">Three tables</a></li><li><a href="#types">Kinds of links</a></li><li><a href="#mistakes">Common mistakes</a></li><li><a href="#quiz">Check yourself</a></li><li><a href="#practice">Practise</a></li></ul>
+  <ul class="toc"><li><a href="#tables">The example tables</a></li><li><a href="#reference">Why just a number?</a></li><li><a href="#cross">Two tables after FROM: every row with every row</a></li><li><a href="#rule">The matching rule</a></li><li><a href="#filters">Rule + filters</a></li><li><a href="#three">Three tables</a></li><li><a href="#types">Kinds of links</a></li><li><a href="#mistakes">Common mistakes</a></li><li><a href="#quiz">Check yourself</a></li><li><a href="#practice">Practise</a></li></ul>
 </section>
 
 <main class="sheet">
@@ -255,7 +261,7 @@ footer.end{max-width:980px;margin:0 auto;padding:0 22px 60px;color:var(--chalk-d
 WHERE day = &#x27;Saturday&#x27; AND start_time = &#x27;22:00&#x27;;
 
 SELECT name FROM bands WHERE id = 3;</textarea><div class="ex-bar"><button type="button" class="btn run">Run ▸</button><button type="button" class="btn ghost reset">Reset</button></div><div class="ex-out" aria-live="polite"></div></div>
-<div class="idea"><span class="i" aria-hidden="true">💡</span><p>Two queries for one name is slow. In the next steps a single query does the lookup for you.</p></div></section><section class="sec" id="cross"><h2><span class="n">3</span>FROM a, b: every row with every row</h2>
+<div class="idea"><span class="i" aria-hidden="true">💡</span><p>Two queries for one name is slow. In the next steps a single query does the lookup for you.</p></div></section><section class="sec" id="cross"><h2><span class="n">3</span>Two tables after FROM: every row with every row</h2>
 <p>When you write two tables after <code>FROM</code>, SQL pairs <b>every</b> row of the first with <b>every</b> row of the second. 6 concerts × 4 bands = 24 pairs, and most of them are nonsense (like a Velvet Locomotive concert with the Paprika Punks' name).</p>
 <div class="ex"><div class="ex-tag"><span class="t">Try it – you can edit it</span><span class="kb">Ctrl + Enter</span></div><textarea spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="SQL">SELECT COUNT(*)
 FROM concerts, bands;</textarea><div class="ex-bar"><button type="button" class="btn run">Run ▸</button><button type="button" class="btn ghost reset">Reset</button></div><div class="ex-out" aria-live="polite"></div></div>
@@ -357,7 +363,10 @@ function runInto(sql, out){
 function setupExamples(){
   $$(".ex").forEach(ex=>{
     const ta = $("textarea", ex), out = $(".ex-out", ex), orig = ta.value;
-    const fit = ()=>{ ta.style.height = "auto"; ta.style.height = (ta.scrollHeight + 2) + "px"; };
+    const w = document.createElement("div"); w.className = "edw"; ta.before(w);
+    const ov = document.createElement("pre"); ov.className = "ov"; ov.setAttribute("aria-hidden", "true"); w.append(ov, ta);
+    const paint = ()=>{ ov.innerHTML = hl(ta.value) + "\n"; };
+    const fit = ()=>{ ta.style.height = "auto"; ta.style.height = (ta.scrollHeight + 2) + "px"; paint(); };
     fit(); ta.addEventListener("input", fit);
     $(".run", ex).onclick = ()=> runInto(ta.value, out);
     $(".reset", ex).onclick = ()=>{ ta.value = orig; fit(); out.innerHTML = ""; };
