@@ -98,6 +98,12 @@ pre.code{margin:12px 0;background:var(--code-bg);color:var(--code-ink);border-ra
 .ex-tag .kb{font-weight:400;color:var(--chalk-dim);letter-spacing:0}
 .ex textarea{display:block;width:100%;border:0;resize:vertical;min-height:52px;padding:12px 14px;font-size:15px;line-height:1.55;background:var(--code-bg);color:var(--code-ink);caret-color:var(--yellow);tab-size:2}
 .ex textarea:focus{outline:none;box-shadow:inset 0 0 0 3px var(--yellow)}
+/* the editor is highlighted too: coloured copy underneath, see-through textarea on top */
+.edw{position:relative;background:var(--code-bg)}
+.edw .ov{position:absolute;inset:0;margin:0;padding:12px 14px;font:15px/1.55 var(--f-mono);color:var(--code-ink);white-space:pre-wrap;overflow-wrap:break-word;pointer-events:none;tab-size:2;overflow:hidden}
+.edw .ov .k{color:var(--kw)}.edw .ov .s{color:var(--str)}.edw .ov .d{color:var(--num)}.edw .ov .f{color:var(--fn)}
+.edw textarea{position:relative;background:transparent;color:transparent;-webkit-text-fill-color:transparent;font:15px/1.55 var(--f-mono);white-space:pre-wrap;overflow-wrap:break-word}
+.edw textarea::selection{background:rgba(242,210,100,.35)}
 .ex-bar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:8px 10px;background:#f3f1e7;border-top:1px solid var(--line)}
 .btn{font:700 15px var(--f-body);border:0;border-radius:8px;padding:7px 14px;cursor:pointer;background:var(--ink);color:#fff}
 .btn:hover{background:#000}
@@ -352,7 +358,10 @@ function runInto(sql, out){
 function setupExamples(){
   $$(".ex").forEach(ex=>{
     const ta = $("textarea", ex), out = $(".ex-out", ex), orig = ta.value;
-    const fit = ()=>{ ta.style.height = "auto"; ta.style.height = (ta.scrollHeight + 2) + "px"; };
+    const w = document.createElement("div"); w.className = "edw"; ta.before(w);
+    const ov = document.createElement("pre"); ov.className = "ov"; ov.setAttribute("aria-hidden", "true"); w.append(ov, ta);
+    const paint = ()=>{ ov.innerHTML = hl(ta.value) + "\n"; };
+    const fit = ()=>{ ta.style.height = "auto"; ta.style.height = (ta.scrollHeight + 2) + "px"; paint(); };
     fit(); ta.addEventListener("input", fit);
     $(".run", ex).onclick = ()=> runInto(ta.value, out);
     $(".reset", ex).onclick = ()=>{ ta.value = orig; fit(); out.innerHTML = ""; };
