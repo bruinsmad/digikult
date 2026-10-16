@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="hu" data-digikult-home>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Digitális kultúra</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+:root{
+  --bg:#0e141d; --bg-2:#131b27; --card:#172131; --card-hi:#1d2a3d;
+  --ink:#eef3f1; --muted:#a3b1b8; --line:#2a3647;
+  --f-display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body:"Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono:"JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+*,*::before,*::after{font-feature-settings:"calt" 0,"liga" 0}
+html,body{margin:0}
+body{
+  background:
+    radial-gradient(1200px 500px at 85% -10%, rgba(231,184,74,.10), transparent 60%),
+    radial-gradient(900px 500px at -10% 30%, rgba(127,156,255,.08), transparent 60%),
+    linear-gradient(var(--bg), var(--bg));
+  color:var(--ink); font:17px/1.55 var(--f-body); min-height:100vh;
+}
+/* faint squared-paper grid, like an exercise book */
+body::before{content:"";position:fixed;inset:0;pointer-events:none;
+  background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);
+  background-size:28px 28px;}
+.wrap{position:relative;max-width:1080px;margin:0 auto;padding:28px 20px 80px}
+a{color:inherit}
+:focus-visible{outline:3px solid #e7b84a;outline-offset:3px;border-radius:6px}
+
+/* ---- top bar ---- */
+.top{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.brand{display:flex;align-items:center;gap:10px;font:700 15px var(--f-mono);letter-spacing:.04em;color:var(--muted)}
+.brand b{display:grid;place-items:center;width:34px;height:34px;border-radius:9px;background:var(--ink);color:var(--bg);font:800 17px var(--f-display)}
+.lang{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:3px;background:var(--bg-2)}
+.lang button{border:0;background:none;color:var(--muted);font:700 13px var(--f-mono);padding:6px 12px;border-radius:999px;cursor:pointer}
+.lang button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+
+/* ---- hero ---- */
+.hero{padding:56px 0 34px}
+.hero h1{margin:0;font:800 clamp(40px,7vw,76px)/1 var(--f-display);letter-spacing:-.02em}
+.hero p{margin:16px 0 0;max-width:40ch;font-size:clamp(18px,2.2vw,21px);color:var(--muted)}
+.jump{display:flex;flex-wrap:wrap;gap:10px;margin-top:28px}
+.jump a{display:inline-flex;align-items:center;gap:9px;text-decoration:none;padding:9px 15px;border-radius:999px;
+  border:1px solid var(--line);background:var(--bg-2);font-weight:700}
+.jump a i{width:10px;height:10px;border-radius:3px;background:var(--a)}
+.jump a span{font:400 13px var(--f-mono);color:var(--muted)}
+.jump a:hover{border-color:var(--a)}
+
+/* ---- topic ---- */
+.topic{margin-top:46px;scroll-margin-top:20px}
+.topic-head{display:grid;grid-template-columns:auto 1fr;gap:4px 16px;align-items:baseline;padding-bottom:14px;border-bottom:2px solid var(--a)}
+.topic-head .num{grid-row:span 2;font:800 44px/1 var(--f-display);color:var(--a)}
+.topic-head h2{margin:0;font:800 clamp(26px,3.4vw,34px)/1.1 var(--f-display)}
+.topic-head p{margin:0;color:var(--muted)}
+
+.les{margin-top:26px}
+.les h3{margin:0 0 12px;display:flex;align-items:center;gap:10px;font:600 14px var(--f-mono);color:var(--ink)}
+.les h3 .n{display:grid;place-items:center;min-width:26px;height:26px;padding:0 6px;border-radius:7px;background:color-mix(in srgb,var(--a) 20%,transparent);color:var(--a)}
+
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:14px}
+.card{position:relative;display:flex;flex-direction:column;gap:8px;padding:18px 18px 16px;border-radius:14px;
+  background:var(--card);border:1px solid var(--line);box-shadow:0 1px 0 rgba(255,255,255,.04) inset;
+  transition:transform .15s,border-color .15s,background .15s}
+.card:hover{transform:translateY(-2px);border-color:color-mix(in srgb,var(--a) 60%,var(--line));background:var(--card-hi)}
+.kind{align-self:flex-start;font:700 11px var(--f-mono);letter-spacing:.1em;text-transform:uppercase;padding:3px 8px;border-radius:6px}
+.kind.story{background:color-mix(in srgb,var(--a) 22%,transparent);color:var(--a)}
+.kind.demo{background:rgba(110,217,155,.16);color:#7fe0a8}
+.kind.lesson{background:rgba(127,156,255,.18);color:#a9bcff}
+.card h4{margin:2px 0 0;font:800 22px/1.2 var(--f-display)}
+.card h4 a{text-decoration:none}
+.card h4 a::after{content:"";position:absolute;inset:0;border-radius:14px}  /* whole card clickable */
+.card p{margin:0;color:var(--muted);font-size:15.5px}
+.meta{margin-top:auto;padding-top:8px;display:flex;flex-wrap:wrap;align-items:center;gap:8px;font:13px var(--f-mono);color:var(--muted)}
+.meta .alt{position:relative;z-index:1;text-decoration:none;border:1px solid var(--line);border-radius:6px;padding:1px 7px;color:var(--ink)}
+.meta .alt:hover{border-color:var(--a)}
+.meta .cur{color:var(--ink);border:1px solid var(--ink);border-radius:6px;padding:1px 7px}
+
+footer{margin-top:70px;padding-top:18px;border-top:1px solid var(--line);color:var(--muted);font:13px var(--f-mono)}
+
+@media (max-width:560px){
+  .hero{padding:36px 0 20px}
+  .topic-head .num{font-size:34px}
+  .cards{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:reduce){.card{transition:none}.card:hover{transform:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand"><b>D</b><span>digikult</span></div>
+    <div class="lang" role="group" aria-label="Nyelv / Language">
+      <button type="button" data-l="hu">HU</button><button type="button" data-l="en">EN</button>
+    </div>
+  </header>
+
+  <section class="hero">
+    <h1 id="name"></h1>
+    <p id="tagline"></p>
+    <nav class="jump" id="jump"></nav>
+  </section>
+
+  <main id="map"></main>
+
+  <footer id="foot"></footer>
+</div>
+
+<script src="nav.js"></script>
+<script>
+(function(){
+  const D = window.DIGIKULT;
+  const $ = s => document.querySelector(s);
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+  const TXT = {
+    hu:{ pages:n=>`${n} oldal`, min:"perc", foot:"Minden oldal bal alsó sarkában ott az „Oldalak” menü – onnan bármikor visszajutsz ide." },
+    en:{ pages:n=>`${n} page${n===1?"":"s"}`, min:"min", foot:"Every page has a “Pages” menu in the bottom-left corner that brings you back here." }
+  };
+  const LNAME = { hu:"magyar", en:"English" };
+
+  function draw(){
+    const L = D.lang, T = TXT[L];
+    document.documentElement.lang = L;
+    document.title = D.t(D.SITE.name);
+    $("#name").textContent = D.t(D.SITE.name);
+    $("#tagline").textContent = D.t(D.SITE.tagline);
+    document.querySelectorAll(".lang button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.l === L)));
+
+    const count = tp => tp.lessons.reduce((s,l) => s + l.pages.length, 0);
+    $("#jump").innerHTML = D.SITE.topics.map(tp =>
+      `<a href="#${tp.id}" style="--a:${tp.accent}"><i></i>${esc(D.t(tp.title))} <span>${T.pages(count(tp))}</span></a>`).join("");
+
+    $("#map").innerHTML = D.SITE.topics.map((tp, ti) => `
+      <section class="topic" id="${tp.id}" style="--a:${tp.accent}">
+        <div class="topic-head">
+          <span class="num">${String(ti+1).padStart(2,"0")}</span>
+          <h2>${esc(D.t(tp.title))}</h2>
+          <p>${esc(D.t(tp.blurb))}</p>
+        </div>
+        ${tp.lessons.map((ls, li) => `
+          <div class="les" id="${tp.id}-${ls.id}">
+            <h3><span class="n">${ti+1}.${li+1}</span>${esc(D.t(ls.title))}</h3>
+            <div class="cards">
+              ${ls.pages.map(p => {
+                const main = D.fileFor(p);
+                const langs = Object.keys(p.files);
+                const mainLang = p.files[L] ? L : langs[0];
+                const others = langs.filter(k => k !== mainLang);
+                return `<article class="card">
+                  <span class="kind ${p.kind}">${esc(D.t(D.KIND[p.kind]))}</span>
+                  <h4><a href="${D.url(main)}">${esc(D.t(p.title))}</a></h4>
+                  <p>${esc(D.t(p.desc))}</p>
+                  <div class="meta">
+                    ${p.minutes ? `<span>⏱ ${p.minutes} ${T.min}</span><span>·</span>` : ""}
+                    <span class="cur" title="${LNAME[mainLang]}">${mainLang.toUpperCase()}</span>
+                    ${others.map(k => `<a class="alt" href="${D.url(p.files[k])}" title="${LNAME[k]}">${k.toUpperCase()}</a>`).join("")}
+                  </div>
+                </article>`;
+              }).join("")}
+            </div>
+          </div>`).join("")}
+      </section>`).join("");
+
+    $("#foot").textContent = T.foot;
+  }
+
+  document.querySelectorAll(".lang button").forEach(b => b.addEventListener("click", () => D.setLang(b.dataset.l)));
+  D.onLang(draw);
+  draw();
+})();
+</script>
+</body>
+</html>
