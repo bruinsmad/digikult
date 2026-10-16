@@ -1,0 +1,860 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Broken Pact</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<script src="https://cdn.jsdelivr.net/npm/sql.js@1.10.3/dist/sql-asm.js"></script>
+<style>
+/* Layout: a castle at night. A parchment banner with the royal crest as the header, the chapter strip as
+   a row of tower shields, then the scribe's parchment (story + task) beside the leather-bound royal ledger (SQL). */
+:root{
+  --night:#15110d; --night-2:#241b12; --ink:#f5ecd8; --muted:#c2b08f; --line:#4d3c28;
+  --pink:#e0525b; --cyan:#9cc2ff; --lime:#b5d97a; --gold:#e8b84a; --bad:#ff8a80; --bad-soft:#3e1715; --ok:#b5d97a; --ok-soft:#1d2a12;
+  --paper:#f3e6c6; --paper-ink:#2f2210; --paper-muted:#7a6544; --paper-line:#e0cfa6;
+  --laptop:#120e09;
+  --f-display:"Cinzel", Georgia, "Times New Roman", serif;
+  --f-body:"Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono:"JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+*,*::before,*::after{font-feature-settings:"calt" 0,"liga" 0}
+html,body{margin:0}
+body{color:var(--ink);font:16px/1.55 var(--f-body);min-height:100vh;
+  background:
+    radial-gradient(700px 380px at 8% -4%, rgba(255,160,60,.20), transparent 65%),
+    radial-gradient(700px 380px at 92% -4%, rgba(255,160,60,.16), transparent 65%),
+    radial-gradient(900px 520px at 50% 115%, rgba(184,50,58,.16), transparent 60%),
+    repeating-linear-gradient(0deg, rgba(0,0,0,.18) 0 2px, transparent 2px 46px),
+    repeating-linear-gradient(90deg, rgba(0,0,0,.12) 0 2px, transparent 2px 92px),
+    linear-gradient(var(--night), var(--night-2));
+  background-attachment:fixed;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));padding-block:18px 48px}
+.wrap{max-width:1280px;margin:0 auto;display:grid;gap:18px}
+.wrap{grid-template-columns:minmax(0,1fr)} .wrap>*{min-width:0}
+@media (max-width:640px){ .sign{flex-wrap:wrap} .sign .stamp{order:3} .sign h1{font-size:26px} .sign::before,.sign::after{display:none} }
+h1,h2,h3{font-family:var(--f-display);font-weight:700;margin:0;line-height:1.15;text-wrap:balance}
+code,pre,textarea{font-family:var(--f-mono)}
+:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.eyebrow{font:600 12px/1.2 var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.btn{font:700 15px var(--f-body);border:1px solid var(--line);background:#3a2c1c;color:var(--ink);padding:9px 15px;border-radius:8px;cursor:pointer}
+.btn:hover{border-color:var(--gold)}
+.btn.primary{background:#b8323a;border-color:#b8323a;color:#fff7e6;box-shadow:0 3px 0 #6e1a20}
+.btn.small{padding:6px 10px;font-size:13px}
+.btn.danger{color:#ffb3a8}
+.btn.ghost{background:transparent}
+
+/* ---- header: parchment banner with crest ---- */
+header.top{position:relative;z-index:2;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px 20px}
+.sign{position:relative;display:flex;align-items:center;gap:16px;padding:14px 24px 14px 16px;max-width:100%;
+  background:radial-gradient(ellipse at 30% 20%, #fbf2da, #ecd9ad 70%, #dcc28a);color:#2f2210;border-radius:6px;
+  box-shadow:0 14px 34px rgba(0,0,0,.5), inset 0 0 0 2px #c9a55a, inset 0 0 0 5px #fbf2da, inset 0 0 0 6px #c9a55a}
+.sign::before,.sign::after{content:"";position:absolute;bottom:-26px;width:20px;height:30px;background:#b8323a;clip-path:polygon(0 0,100% 0,100% 100%,50% 75%,0 100%);box-shadow:0 2px 4px rgba(0,0,0,.4)}
+.sign::before{left:34px}.sign::after{left:58px;background:#2f5aa0}
+.sign .hole{display:none}
+.sign h1{font-size:clamp(26px,3.6vw,40px);color:#3a1d0c;letter-spacing:.02em}
+.sign .eyebrow{color:#8a6a3a}
+.guitar{flex:none;width:58px;height:58px}
+.stamp{font:800 12px var(--f-mono);letter-spacing:.1em;text-transform:uppercase;color:#fff3e0;background:radial-gradient(circle at 35% 35%, #d9434c, #8e1f27);border-radius:999px;padding:7px 12px;transform:rotate(-6deg);box-shadow:0 2px 0 #5a1016, inset 0 0 0 2px rgba(255,255,255,.18)}
+.stamp.closed{background:radial-gradient(circle at 35% 35%, #4f9a55, #24572a);box-shadow:0 2px 0 #163a1a, inset 0 0 0 2px rgba(255,255,255,.18)}
+.meta{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px}
+.meta-item{display:flex;flex-direction:column;gap:2px}
+.meta-item .lbl{font:600 11px/1 var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.meta-item b{font:700 22px/1 var(--f-display)}
+
+/* ---- chapter strip: tower shields above the battlements ---- */
+.field{position:relative;border-radius:10px;padding:16px 16px 18px;background:linear-gradient(#2a2016,#1a140d);border:1px solid var(--line);box-shadow:inset 0 0 0 1px rgba(255,255,255,.03)}
+.field::after{content:"";position:absolute;left:0;right:0;bottom:0;height:10px;border-radius:0 0 10px 10px;background:repeating-linear-gradient(90deg,#6b5a44 0 26px,transparent 26px 40px);opacity:.9}
+.steps{display:flex;gap:6px;overflow-x:auto;padding-bottom:10px;scrollbar-width:thin}
+.step{flex:1 0 96px;min-width:96px;display:grid;justify-items:center;gap:6px;padding:10px 6px 8px;border-radius:10px 10px 40% 40% / 10px 10px 26% 26%;border:1px solid var(--line);background:#2b2117;color:var(--ink);cursor:pointer;font:inherit;position:relative}
+.step .post{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:#3a2c1c;border:2px solid var(--line);font:700 15px var(--f-display)}
+.step .t{font:600 12px/1.25 var(--f-body);text-align:center;color:var(--muted);text-wrap:balance}
+.step .who{height:18px;font-size:16px;line-height:18px}
+.step.done .post{background:var(--gold);border-color:var(--gold);color:#3a2408}
+.step.current{border-color:var(--gold);box-shadow:0 0 0 3px rgba(232,184,74,.25), 0 0 24px rgba(255,160,60,.28)}
+.step.current .t{color:var(--ink)}
+.step.locked{opacity:.45;cursor:not-allowed}
+.step.just .post{animation:pop .6s ease-out}
+@keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.35)}100%{transform:scale(1)}}
+.field.wave .step{animation:wave .9s ease-in-out}
+@keyframes wave{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
+.step-caption{font:600 14px var(--f-body);color:var(--muted);display:flex;gap:10px;align-items:baseline;padding:0 4px}
+.step-caption span{font:600 11px var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--gold)}
+
+/* ---- main ---- */
+main{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:18px;align-items:start}
+@media (max-width:980px){ main{grid-template-columns:minmax(0,1fr)} }
+.panel{border-radius:10px}
+.case{color:var(--paper-ink);padding:22px 24px 20px;box-shadow:0 14px 34px rgba(0,0,0,.5), inset 0 0 40px rgba(140,100,40,.25);
+  background:radial-gradient(ellipse at 20% 10%, #fbf2da, transparent 60%), radial-gradient(ellipse at 90% 95%, #e2c991, transparent 55%), var(--paper)}
+.case .eyebrow{color:var(--paper-muted)}
+.case h2{font-size:clamp(23px,2.8vw,30px);margin:4px 0 10px;color:#3a1d0c}
+.case p{margin:.5em 0}
+.case mark{background:#f7d77a;color:#3a2b00;padding:0 4px;border-radius:3px}
+.case code{background:#ead7ac;color:#5a2410;padding:1px 5px;border-radius:4px;font-size:.92em}
+.case pre{background:var(--laptop);color:#f5ecd8;padding:12px 14px;border-radius:8px;overflow:auto;font-size:14px;line-height:1.5;margin:8px 0}
+.learn{margin-top:14px;padding:12px 14px;border-left:4px solid #2f5aa0;background:rgba(47,90,160,.09);border-radius:0 8px 8px 0}
+.learn h3,.task h3{font:700 14px var(--f-display);letter-spacing:.08em;text-transform:uppercase;color:#2a4f8f;margin-bottom:4px}
+.task{margin-top:14px;padding:12px 14px;border-left:4px solid #b8323a;background:rgba(184,50,58,.09);border-radius:0 8px 8px 0}
+.task h3{color:#9a2028}
+.task p{font-weight:700;font-size:17px}
+.anatomy{display:grid;gap:4px;margin:8px 0}
+.anatomy [role=row]{display:grid;grid-template-columns:minmax(0,auto) 1fr;gap:10px;align-items:baseline}
+.anatomy code{white-space:nowrap}
+.rules{margin:6px 0 0;padding-left:20px}
+.tries{display:grid;gap:6px;margin-top:8px}
+.try{text-align:left;font:600 13px var(--f-mono);background:var(--laptop);color:#f5ecd8;border:1px solid #6b4a28;border-radius:6px;padding:8px 10px;cursor:pointer}
+.try:hover{border-color:var(--gold)}
+details.hint{margin-top:10px;border:1px dashed #b49a6a;border-radius:8px;padding:8px 12px;background:rgba(255,255,255,.35)}
+details.hint summary{cursor:pointer;font-weight:700;color:#5a3a14}
+.hint.locked{margin-top:10px;border:1px dashed #b49a6a;border-radius:8px;padding:8px 12px;color:var(--paper-muted);background:rgba(0,0,0,.04)}
+.answer{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.answer input{flex:1 1 180px;font:16px var(--f-body);padding:10px 12px;border:2px solid #c9b07a;border-radius:8px;background:#fffaf0;color:var(--paper-ink)}
+.answer input:focus{border-color:#b8323a;outline:none}
+.verdict{margin-top:10px;padding:10px 12px;border-radius:8px;font-weight:700}
+.verdict.ok{background:#e3f0d2;color:#2c4a12}
+.verdict.bad{background:#f8dcd6;color:#8a1c1c}
+.verdict p{font-weight:400;margin:.3em 0 0}
+.navrow{display:flex;justify-content:space-between;gap:8px;margin-top:16px}
+.ending{margin-top:18px}
+.export{margin-top:14px;padding:12px 14px;border:2px solid #c9b07a;border-radius:10px;background:#fffaf0}
+.export h3{font-size:16px;margin-bottom:6px}
+.export-steps{padding-left:20px;margin:6px 0 10px}
+.export label{display:block;font-weight:700;margin-bottom:4px}
+.export input{width:100%;font:16px var(--f-body);padding:10px 12px;border:2px solid #c9b07a;border-radius:8px;background:#fff;color:var(--paper-ink);margin-bottom:10px}
+.export-btns{display:flex;gap:8px;flex-wrap:wrap}
+.export-note{min-height:1.4em;font-size:14px;color:#2a4f8f;margin:8px 0 0}
+
+/* ---- royal ledger ---- */
+.board-frame{background:linear-gradient(#5a3b22,#3b2614);padding:10px;border:1px solid #2a1a0c;box-shadow:0 14px 34px rgba(0,0,0,.5), inset 0 0 0 3px rgba(232,184,74,.25)}
+.chalk{display:grid;gap:10px;padding:16px;border-radius:6px;background:var(--laptop);box-shadow:inset 0 0 0 1px #3a2c1c, inset 0 0 60px rgba(255,160,60,.05);min-width:0}
+.chalk-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:6px 14px}
+.chalk h2{font-size:22px;color:var(--gold)}
+.rule{font-size:13px;color:var(--muted)}
+textarea#sql{width:100%;min-height:150px;resize:vertical;font-size:16px;line-height:1.5;padding:12px 14px;border:1px solid var(--line);border-radius:8px;background:#0a0805;color:#f5ecd8;caret-color:var(--gold)}
+.run-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.kbd{font:12px var(--f-mono);color:var(--muted)}
+.result-meta{font:600 13px var(--f-mono);color:var(--gold);margin-bottom:6px}
+.tablebox{overflow-x:auto;max-height:360px;overflow-y:auto;border:1px solid var(--line);border-radius:8px;background:rgba(255,255,255,.03)}
+table{border-collapse:collapse;width:100%;font-size:15px;font-variant-numeric:tabular-nums}
+th,td{text-align:left;padding:7px 12px;border-bottom:1px solid var(--line);white-space:nowrap}
+th{position:sticky;top:0;background:#20180f;font:600 13px var(--f-mono);color:var(--gold)}
+td.num{text-align:right}
+td.null{color:var(--muted);font-style:italic}
+tr:last-child td{border-bottom:none}
+.err{background:var(--bad-soft);color:var(--bad);border-radius:8px;padding:12px 14px;font-weight:700}
+.err p{margin:.3em 0 0;font-weight:400;color:var(--ink)}
+.note{color:var(--muted);font-style:italic;margin:0}
+.schema{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
+.tbl{border:1px solid var(--line);border-radius:8px;padding:10px 12px;background:rgba(255,255,255,.03)}
+.tbl button{font:700 15px var(--f-mono);background:none;border:0;color:var(--gold);cursor:pointer;padding:0}
+.tbl button:hover{text-decoration:underline}
+.tbl ul{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:7px}
+.tbl li{display:grid;grid-template-columns:auto 1fr;align-items:baseline;column-gap:8px;row-gap:1px}
+.tbl li .k{font:600 13px var(--f-mono);color:var(--ink)}
+.tbl li .k.fk{color:var(--cyan)}
+.tbl li .ty{justify-self:start;font:600 10px var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);border:1px solid var(--line);border-radius:3px;padding:0 4px}
+.tbl li .d{grid-column:1/-1;font:13px/1.4 var(--f-body);color:var(--muted)}
+.tbl li .d code{color:var(--gold)}
+
+/* ---- celebrations ---- */
+#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:60}
+.plus{position:fixed;z-index:61;pointer-events:none;font:700 30px var(--f-display);color:var(--gold);text-shadow:0 2px 0 #000;animation:plus 1.2s ease-out forwards;transform:translate(-50%,-50%)}
+@keyframes plus{0%{opacity:0;transform:translate(-50%,-50%) scale(.6)}20%{opacity:1;transform:translate(-50%,-70%) scale(1.15)}100%{opacity:0;transform:translate(-50%,-160%) scale(1)}}
+.shake{animation:shake .45s}
+@keyframes shake{0%,100%{transform:translate(0)}20%{transform:translate(-5px,2px)}40%{transform:translate(5px,-2px)}60%{transform:translate(-4px,1px)}80%{transform:translate(4px,-1px)}}
+#finale{position:fixed;inset:0;z-index:55;display:grid;place-items:center;overflow:auto;
+  background:radial-gradient(ellipse at 50% 30%, #6a2a14 0%, #241b12 60%, #0c0905 100%)}
+#finale .beams{position:absolute;inset:-20%;background:
+  conic-gradient(from 0deg at 50% 0%, transparent 0 10deg, rgba(232,184,74,.20) 10deg 14deg, transparent 14deg 40deg, rgba(255,140,60,.16) 40deg 44deg, transparent 44deg 70deg, rgba(232,184,74,.18) 70deg 74deg, transparent 74deg 100deg, rgba(255,220,150,.14) 100deg 104deg, transparent 104deg 360deg);
+  animation:beams 6s linear infinite;transform-origin:50% 0}
+@keyframes beams{from{transform:rotate(-20deg)}50%{transform:rotate(20deg)}to{transform:rotate(-20deg)}}
+.finale-inner{position:relative;text-align:center;padding:28px 20px;max-width:760px}
+.big-stamp{display:inline-block;font:700 clamp(40px,8vw,88px)/1.05 var(--f-display);color:#fff4d6;
+  text-shadow:0 0 18px rgba(232,184,74,.9), 0 0 42px rgba(232,184,74,.5), 0 4px 0 #6e1a20;transform:rotate(-3deg);animation:stampin .6s cubic-bezier(.2,1.6,.3,1) both}
+@keyframes stampin{from{transform:rotate(-20deg) scale(3);opacity:0}to{transform:rotate(-3deg) scale(1);opacity:1}}
+.finale-sub{font-size:clamp(17px,2.4vw,22px);color:var(--ink);margin:16px auto 0;max-width:40ch}
+.finale-stats{display:flex;justify-content:center;gap:28px;margin-top:22px;flex-wrap:wrap}
+.finale-stats div{display:grid;gap:2px}
+.finale-stats span{font:600 11px var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.finale-stats b{font:700 28px var(--f-display);color:var(--gold)}
+.caught{margin-top:18px;display:inline-block;padding:8px 14px;border:2px dashed var(--gold);border-radius:8px;color:var(--gold);font:600 14px var(--f-mono)}
+.finale-btns{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:24px}
+.hero-guitar{width:150px;height:150px;margin:0 auto;animation:swing 1.8s ease-in-out infinite;transform-origin:50% 10%}
+@keyframes swing{0%,100%{transform:rotate(-5deg)}50%{transform:rotate(5deg)}}
+.flash{position:absolute;inset:0;background:#fff4d6;opacity:0;pointer-events:none;animation:flash .5s ease-out}
+@keyframes flash{0%{opacity:.9}100%{opacity:0}}
+@media (prefers-reduced-motion:reduce){ .big-stamp,.hero-guitar,.flash,#finale .beams,.step.just .post,.field.wave .step,.shake{animation:none} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="sign">
+            <svg class="guitar" viewBox="0 0 64 64" aria-hidden="true">
+        <path d="M13 17h38v16c0 13-9 21-19 26-10-5-19-13-19-26z" fill="#b8323a" stroke="#6e1a20" stroke-width="2.5" stroke-linejoin="round"/>
+        <path d="M32 17v41M13 31h38" stroke="#e8b84a" stroke-width="4"/>
+        <path d="M19 15l3-11 6 6 4-8 4 8 6-6 3 11z" fill="#e8b84a" stroke="#8a6414" stroke-width="1.5" stroke-linejoin="round"/>
+        <circle cx="32" cy="9" r="1.8" fill="#b8323a"/><circle cx="23" cy="11" r="1.4" fill="#2f5aa0"/><circle cx="41" cy="11" r="1.4" fill="#2f5aa0"/>
+      </svg>
+      <div>
+        <div class="eyebrow">Frostburg Castle · the Great Council · 1214</div>
+        <h1>The Broken Pact</h1>
+      </div>
+      <span class="stamp" id="stamp">Traitor at large</span>
+    </div>
+    <div class="meta">
+      <span class="meta-item"><span class="lbl">Time</span><b id="timer">00:00</b></span>
+      <span class="meta-item"><span class="lbl">Progress</span><b id="solvedCount">–</b></span>
+      <button class="btn small" id="soundToggle" type="button" aria-pressed="true">Sound: on</button>
+      <button class="btn small danger" id="resetProgress" type="button">Start over</button>
+    </div>
+  </header>
+
+  <div class="field" id="field">
+    <nav class="steps" id="steps" aria-label="Chapters"></nav>
+  </div>
+  <div class="step-caption" id="stepCaption" aria-hidden="true"></div>
+
+  <main>
+    <section class="panel case" id="case" aria-live="polite"></section>
+    <section class="panel board-frame">
+      <div class="chalk">
+        <div class="chalk-head">
+          <h2>Royal ledger</h2>
+          <span class="rule">Read two or more tables in one query: FROM a, b WHERE a.x_id = b.id</span>
+        </div>
+        <label for="sql" class="eyebrow">Your SQL query</label>
+        <textarea id="sql" spellcheck="false" autocapitalize="off" autocomplete="off"></textarea>
+        <div class="run-row">
+          <button class="btn primary" id="run" type="button">Run query</button>
+          <button class="btn" id="resetDb" type="button">Restore data</button>
+          <span class="kbd">Ctrl + Enter runs the query</span>
+        </div>
+        <div id="out"><p class="note">Unrolling the royal ledger…</p></div>
+        <div class="eyebrow">Tables and columns (click a table name to see everything in it)</div>
+        <div class="schema" id="schema"></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<canvas id="fx" aria-hidden="true"></canvas>
+<div id="finale" hidden role="dialog" aria-modal="true" aria-labelledby="finaleTitle">
+  <div class="beams" aria-hidden="true"></div>
+  <div class="finale-inner" id="finaleInner">
+    <div class="hero-guitar" id="heroGuitar" aria-hidden="true"></div>
+    <div class="big-stamp" id="finaleTitle">TRAITOR CAUGHT!</div>
+    <p class="finale-sub">The bells of Frostburg ring at midnight. The Silver Pact holds.</p>
+    <div class="finale-stats">
+      <div><span>Time</span><b id="fTime">–</b></div>
+      <div><span>Queries run</span><b id="fQueries">–</b></div>
+      <div><span>Rank</span><b id="fRank">–</b></div>
+    </div>
+    <div class="caught">S. Bálint Máté · caught at the stables, black wax on his fingers</div>
+    <div class="finale-btns">
+      <button class="btn" id="finaleClose" type="button">See bonus tasks</button>
+      <button class="btn ghost" id="finaleAgain" type="button">Ring the bells!</button>
+      <button class="btn ghost" id="finaleSave" type="button">Save answers</button>
+    </div>
+  </div>
+  <div class="flash"></div>
+</div>
+
+<script>
+const SEED = `
+CREATE TABLE kingdoms (id INTEGER PRIMARY KEY, name TEXT, capital TEXT, banner TEXT, army INTEGER);
+CREATE TABLE rulers (id INTEGER PRIMARY KEY, name TEXT, title TEXT, kingdom_id INTEGER, crowned INTEGER);
+CREATE TABLE knights (id INTEGER PRIMARY KEY, name TEXT, kingdom_id INTEGER, rank TEXT, weapon TEXT);
+CREATE TABLE alliances (id INTEGER PRIMARY KEY, name TEXT, founded INTEGER, purpose TEXT);
+CREATE TABLE pacts (id INTEGER PRIMARY KEY, alliance_id INTEGER, kingdom_id INTEGER, joined INTEGER);
+CREATE TABLE letters (id INTEGER PRIMARY KEY, knight_id INTEGER, ruler_id INTEGER, time TEXT, wax TEXT);
+INSERT INTO kingdoms VALUES (1,'Northmark','Frostburg','white wolf',1200);
+INSERT INTO kingdoms VALUES (2,'Riverland','Willowford','silver swan',900);
+INSERT INTO kingdoms VALUES (3,'Sunvale','Goldenfield','golden sun',800);
+INSERT INTO kingdoms VALUES (4,'Ironhill','Anvilrock','black bear',2000);
+INSERT INTO kingdoms VALUES (5,'Mistwood','Shadowmere','grey owl',700);
+INSERT INTO kingdoms VALUES (6,'Goldcoast','Seagate','red ship',1100);
+INSERT INTO rulers VALUES (1,'L. Laura','queen',5,1201);
+INSERT INTO rulers VALUES (2,'B. Dániel','king',1,1196);
+INSERT INTO rulers VALUES (3,'M. Márk','king',4,1199);
+INSERT INTO rulers VALUES (4,'F. Lilianna','queen',2,1205);
+INSERT INTO rulers VALUES (5,'R. Benjámin Laurence','king',6,1208);
+INSERT INTO rulers VALUES (6,'L. Mária Éva','queen',3,1203);
+INSERT INTO knights VALUES (1,'K. Kamilla',1,'champion','lance');
+INSERT INTO knights VALUES (2,'S. Bálint Máté',2,'knight','bow');
+INSERT INTO knights VALUES (3,'H. Hunor József',4,'champion','axe');
+INSERT INTO knights VALUES (4,'B. Rozália',5,'knight','bow');
+INSERT INTO knights VALUES (5,'É. Bence',3,'knight','sword');
+INSERT INTO knights VALUES (6,'L. Ágnes Abigél',6,'knight','sword');
+INSERT INTO knights VALUES (7,'H. Viktor',1,'commander','sword');
+INSERT INTO knights VALUES (8,'W. Jay',4,'knight','mace');
+INSERT INTO knights VALUES (9,'F. Réka',2,'champion','lance');
+INSERT INTO knights VALUES (10,'M. Anna Petra',5,'champion','sword');
+INSERT INTO knights VALUES (11,'L. Zorka',3,'champion','lance');
+INSERT INTO knights VALUES (12,'K. Nóra',6,'champion','lance');
+INSERT INTO knights VALUES (13,'B. Mihály',1,'knight','axe');
+INSERT INTO knights VALUES (14,'L. Zsombor Attila',4,'knight','sword');
+INSERT INTO knights VALUES (15,'C. Balázs',2,'knight','sword');
+INSERT INTO knights VALUES (16,'S. Eliza',5,'knight','mace');
+INSERT INTO knights VALUES (17,'N. Boglárka',3,'knight','bow');
+INSERT INTO knights VALUES (18,'P. Petra Patrícia',6,'knight','axe');
+INSERT INTO knights VALUES (19,'O. Benjámin Ádám',1,'squire','bow');
+INSERT INTO knights VALUES (20,'K. Luca',4,'squire','bow');
+INSERT INTO knights VALUES (21,'P. Hanna',2,'squire','mace');
+INSERT INTO knights VALUES (22,'Z. Zalán Benedek',5,'squire','axe');
+INSERT INTO knights VALUES (23,'S. Fruzsina',3,'squire','sword');
+INSERT INTO knights VALUES (24,'W. Bianka Kinga',6,'squire','mace');
+INSERT INTO alliances VALUES (1,'Silver Pact',1203,'defence');
+INSERT INTO alliances VALUES (2,'Iron League',1207,'conquest');
+INSERT INTO alliances VALUES (3,'Sea Accord',1198,'trade');
+INSERT INTO pacts VALUES (1,1,1,1203);
+INSERT INTO pacts VALUES (2,1,2,1203);
+INSERT INTO pacts VALUES (3,1,3,1204);
+INSERT INTO pacts VALUES (4,1,5,1209);
+INSERT INTO pacts VALUES (5,2,4,1207);
+INSERT INTO pacts VALUES (6,2,5,1208);
+INSERT INTO pacts VALUES (7,2,6,1210);
+INSERT INTO pacts VALUES (8,3,2,1198);
+INSERT INTO pacts VALUES (9,3,6,1198);
+INSERT INTO pacts VALUES (10,3,3,1201);
+INSERT INTO letters VALUES (1,7,2,'18:10','white');
+INSERT INTO letters VALUES (2,6,5,'18:20','red');
+INSERT INTO letters VALUES (3,5,6,'18:30','gold');
+INSERT INTO letters VALUES (4,15,4,'18:45','blue');
+INSERT INTO letters VALUES (5,18,3,'18:50','black');
+INSERT INTO letters VALUES (6,1,2,'19:15','white');
+INSERT INTO letters VALUES (7,10,1,'19:20','grey');
+INSERT INTO letters VALUES (8,8,3,'19:40','black');
+INSERT INTO letters VALUES (9,9,6,'19:50','blue');
+INSERT INTO letters VALUES (10,13,4,'20:05','white');
+INSERT INTO letters VALUES (11,12,5,'20:15','red');
+INSERT INTO letters VALUES (12,20,3,'20:30','black');
+INSERT INTO letters VALUES (13,11,2,'20:40','gold');
+INSERT INTO letters VALUES (14,4,1,'20:55','grey');
+INSERT INTO letters VALUES (15,3,1,'21:05','black');
+INSERT INTO letters VALUES (16,16,2,'21:15','grey');
+INSERT INTO letters VALUES (17,2,4,'21:30','blue');
+INSERT INTO letters VALUES (18,17,4,'21:50','gold');
+INSERT INTO letters VALUES (19,21,2,'22:05','blue');
+INSERT INTO letters VALUES (20,14,3,'22:15','black');
+INSERT INTO letters VALUES (21,24,1,'22:30','red');
+INSERT INTO letters VALUES (22,22,5,'22:40','black');
+INSERT INTO letters VALUES (23,4,3,'22:50','black');
+INSERT INTO letters VALUES (24,23,6,'23:05','gold');
+INSERT INTO letters VALUES (25,2,3,'23:20','black');
+INSERT INTO letters VALUES (26,19,2,'23:40','white');
+`;
+const CHAPTERS = [
+ {
+  "refresher": true,
+  "title": "Quick refresher",
+  "story": "<p>Before the council, a 3-minute reminder of the basics. Every query has the same parts, always in this order.</p>\n  <div class=\"anatomy\" role=\"table\" aria-label=\"Parts of a query\">\n    <div role=\"row\"><code role=\"cell\">SELECT name, army</code><span role=\"cell\">which <b>columns</b> to show. <code>*</code> means all of them.</span></div>\n    <div role=\"row\"><code role=\"cell\">FROM kingdoms</code><span role=\"cell\">which <b>table</b> to read</span></div>\n    <div role=\"row\"><code role=\"cell\">WHERE army &gt; 1000</code><span role=\"cell\">which <b>rows</b> to keep</span></div>\n    <div role=\"row\"><code role=\"cell\">ORDER BY army DESC;</code><span role=\"cell\">how to <b>sort</b> the result</span></div>\n  </div>\n  <ul class=\"rules\">\n    <li>Text values go in single quotes: <code>'Northmark'</code>. Numbers don't: <code>1000</code>.</li>\n    <li>Combine conditions with <code>AND</code> and <code>OR</code>.</li>\n    <li>Today's new idea: one query can read <b>two or more tables</b> at once.</li>\n  </ul>",
+  "learn": "<p>One row in <code>kingdoms</code> is one kingdom. Click one to load and run it:</p>\n  <div class=\"tries\">\n    <button type=\"button\" class=\"try\" data-sql=\"SELECT * FROM kingdoms;\">SELECT * FROM kingdoms;</button>\n    <button type=\"button\" class=\"try\" data-sql=\"SELECT name, capital FROM kingdoms WHERE army &gt; 1000;\">SELECT name, capital FROM kingdoms WHERE army &gt; 1000;</button>\n    <button type=\"button\" class=\"try\" data-sql=\"SELECT * FROM alliances ORDER BY founded;\">SELECT * FROM alliances ORDER BY founded;</button>\n  </div>",
+  "task": "Warm-up: which kingdom has the largest army?",
+  "hints": [
+   "Sort the kingdoms by army, largest first: ORDER BY army DESC.",
+   {
+    "sql": "SELECT name, army FROM kingdoms\nORDER BY army DESC;"
+   }
+  ],
+  "answers": [
+   "ironhill"
+  ],
+  "placeholder": "kingdom",
+  "success": "Ironhill: 2,000 soldiers under the black bear banner. Their king, M. Márk, leads the Iron League. Remember his name.",
+  "starter": "SELECT * FROM kingdoms;"
+ },
+ {
+  "title": "Numbers instead of names",
+  "story": "<p>The year 1214, Frostburg Castle, the night before the Great Council. King <b>B. Dániel</b> of Northmark hosts the kingdoms of the <b>Silver Pact</b>. At dawn they will seal their secret battle plan against the Iron League.</p>\n  <p>But the plan has leaked: Iron League scouts were seen riding exactly where it says. <mark>Someone inside the castle is writing to the enemy.</mark> Lord Commander H. Viktor unrolls the royal ledger in front of you, the young royal scribe. \"Find the traitor before the bells ring midnight.\"</p>\n  <p>You open the <code>rulers</code> table and find no kingdom names at all. Only numbers in a column called <code>kingdom_id</code>.</p>",
+  "learn": "<p>A database keeps each thing in <b>one</b> place. A kingdom's name lives in <code>kingdoms</code>; <code>rulers</code> only stores the kingdom's <code>id</code>. That number is a <b>reference</b>: <code>kingdom_id = 1</code> means \"the kingdom whose id is 1\". For now, look it up by hand with two queries.</p>\n  <pre>SELECT * FROM rulers;\n\nSELECT name FROM kingdoms WHERE id = 1;</pre>",
+  "task": "Which kingdom does King R. Benjámin Laurence rule?",
+  "hints": [
+   "Find his row in rulers and note his kingdom_id. Then look that id up in the kingdoms table.",
+   {
+    "sql": "SELECT kingdom_id FROM rulers\nWHERE name = 'R. Benjámin Laurence';\n\nSELECT name FROM kingdoms WHERE id = 6;"
+   }
+  ],
+  "answers": [
+   "goldcoast",
+   "gold coast"
+  ],
+  "placeholder": "kingdom",
+  "success": "Goldcoast, the kingdom of the red ship. But two queries for one name is slow, and the candles are burning down. There's a faster way."
+ },
+ {
+  "title": "The multiplication mistake",
+  "story": "<p>You try to list every knight <i>with</i> the name of their kingdom in one go, and write <code>FROM knights, kingdoms</code>. The scroll keeps unrolling. K. Kamilla seems to serve every kingdom in the land at once. <mark>Something has gone very wrong.</mark> Or has it?</p>",
+  "learn": "<p>Naming two tables in <code>FROM</code> pairs up <b>every row of the first with every row of the second</b>. 24 knights × 6 kingdoms = 144 rows, and most of them are nonsense. That's not a bug: it's the raw material. The next step throws the wrong pairs away.</p>\n  <pre>SELECT * FROM knights, kingdoms;</pre>",
+  "task": "How many rows do you get from FROM knights, kingdoms with no WHERE?",
+  "hints": [
+   "COUNT(*) over the two tables, with nothing else. Or count the rows of each table and multiply.",
+   {
+    "sql": "SELECT COUNT(*) FROM knights, kingdoms;"
+   }
+  ],
+  "answers": [
+   "144",
+   "one hundred forty four",
+   "one hundred and forty four"
+  ],
+  "placeholder": "a number",
+  "success": "144 rows: every knight paired with every kingdom. Now let's keep only the pairs that belong together."
+ },
+ {
+  "title": "The matching rule",
+  "story": "<p>H. Viktor taps the ledger. \"A knight serves a kingdom when the knight's <code>kingdom_id</code> equals the kingdom's <code>id</code>. <mark>Tell the ledger that.</mark>\"</p>",
+  "learn": "<p>Add a <code>WHERE</code> condition that compares the two id columns. Write <code>table.column</code> so SQL knows which <code>id</code> and which <code>name</code> you mean. Other conditions follow with <code>AND</code>.</p>\n  <pre>SELECT knights.name, knights.rank, kingdoms.name\nFROM knights, kingdoms\nWHERE knights.kingdom_id = kingdoms.id;</pre>\n  <p>24 rows now: one per knight, each with the right kingdom. Many knights share one kingdom: this is a <b>many-to-one</b> link.</p>",
+  "task": "Who is the champion of Ironhill?",
+  "hints": [
+   "Start with the matching rule WHERE knights.kingdom_id = kingdoms.id, then add AND kingdoms.name = 'Ironhill' AND knights.rank = 'champion'.",
+   {
+    "sql": "SELECT knights.name, knights.rank, kingdoms.name\nFROM knights, kingdoms\nWHERE knights.kingdom_id = kingdoms.id\n  AND kingdoms.name = 'Ironhill'\n  AND knights.rank = 'champion';"
+   }
+  ],
+  "answers": [
+   "h hunor jozsef",
+   "hunor jozsef",
+   "hunor jozsef h",
+   "h hunor",
+   "hunor"
+  ],
+  "placeholder": "name",
+  "success": "H. Hunor József, the axe-swinging champion of Ironhill. He came to the council as a guest of honour. Keep an eye on Ironhill."
+ },
+ {
+  "title": "Three tables, short names",
+  "story": "<p>You keep losing track of who serves whom. A knight belongs to a kingdom, and every kingdom has a ruler. <mark>Three tables, one query.</mark></p>",
+  "learn": "<p>Give each table a short <b>alias</b> right after its name in <code>FROM</code>: <code>knights n, kingdoms k, rulers r</code>. Then write <code>n.kingdom_id</code> instead of <code>knights.kingdom_id</code>. Every extra table needs its own matching rule, joined with <code>AND</code>.</p>\n  <pre>SELECT n.name, k.name, r.name\nFROM knights n, kingdoms k, rulers r\nWHERE n.kingdom_id = k.id\n  AND r.kingdom_id = k.id;</pre>\n  <p>Each kingdom has exactly one ruler and each ruler one kingdom: a <b>one-to-one</b> link.</p>",
+  "task": "Which ruler does the champion M. Anna Petra serve?",
+  "hints": [
+   "Two matching rules: n.kingdom_id = k.id AND r.kingdom_id = k.id. Then AND n.name = 'M. Anna Petra'.",
+   {
+    "sql": "SELECT n.name, k.name, r.title, r.name\nFROM knights n, kingdoms k, rulers r\nWHERE n.kingdom_id = k.id\n  AND r.kingdom_id = k.id\n  AND n.name = 'M. Anna Petra';"
+   }
+  ],
+  "answers": [
+   "l laura",
+   "laura",
+   "laura l",
+   "queen l laura"
+  ],
+  "placeholder": "ruler's name",
+  "success": "Queen L. Laura of Mistwood, the kingdom of the grey owl. Mistwood is a member of the Silver Pact, so its people know the plan."
+ },
+ {
+  "title": "A table made of pairs",
+  "story": "<p>Who even knew the battle plan? Only the members of the Silver Pact. But kingdoms are never in just one alliance: <mark>one kingdom can join many alliances, and one alliance has many kingdoms.</mark></p>",
+  "learn": "<p>No single column can hold a <b>many-to-many</b> link, so it gets its own table. Every row of <code>pacts</code> is one membership: an <code>alliance_id</code> and a <code>kingdom_id</code>. To read it, match it to both sides.</p>\n  <pre>SELECT a.name, p.joined\nFROM alliances a, pacts p\nWHERE p.alliance_id = a.id;</pre>",
+  "task": "How many kingdoms have signed the Silver Pact?",
+  "hints": [
+   "Join alliances and pacts with p.alliance_id = a.id, then AND a.name = 'Silver Pact'. Count the rows.",
+   {
+    "sql": "SELECT COUNT(*)\nFROM alliances a, pacts p\nWHERE p.alliance_id = a.id\n  AND a.name = 'Silver Pact';"
+   }
+  ],
+  "answers": [
+   "4",
+   "four"
+  ],
+  "placeholder": "a number",
+  "success": "Four kingdoms share the plan: Northmark, Riverland, Sunvale and Mistwood. The traitor is somewhere among their people."
+ },
+ {
+  "title": "Two banners",
+  "story": "<p>H. Viktor lowers his voice. \"One of our own allies also flies the banner of the <b>Iron League</b>. <mark>Find out which.</mark>\"</p>",
+  "learn": "<p>Three tables: <code>alliances → pacts → kingdoms</code>. Everything you know still works after a join, including <code>GROUP BY</code> and <code>HAVING</code>: SQL matches the tables first, then groups the result.</p>\n  <pre>SELECT k.name, a.name\nFROM alliances a, pacts p, kingdoms k\nWHERE p.alliance_id = a.id\n  AND p.kingdom_id = k.id\nORDER BY k.name;</pre>",
+  "task": "Which kingdom is a member of both the Silver Pact and the Iron League?",
+  "hints": [
+   "Join the three tables and keep only the two alliances: AND a.name IN ('Silver Pact', 'Iron League'). Which kingdom appears twice?",
+   {
+    "sql": "SELECT k.name, COUNT(*) AS alliances\nFROM alliances a, pacts p, kingdoms k\nWHERE p.alliance_id = a.id\n  AND p.kingdom_id = k.id\n  AND a.name IN ('Silver Pact', 'Iron League')\nGROUP BY k.name\nHAVING COUNT(*) = 2;"
+   }
+  ],
+  "answers": [
+   "mistwood",
+   "mist wood"
+  ],
+  "placeholder": "kingdom",
+  "success": "Mistwood. But Queen L. Laura never hid it: she told the whole council on the first day. Her knights write to Ironhill openly every night. That's diplomacy, not treason."
+ },
+ {
+  "title": "The black seal",
+  "story": "<p>The Iron League seals its letters with <mark>black wax</mark>. The castle's messengers write down every letter that leaves Frostburg tonight: who sent it (<code>knight_id</code>), which ruler it goes to (<code>ruler_id</code>), the time and the wax.</p>",
+  "learn": "<p><code>letters</code> points to two tables at once: <code>letters.knight_id</code> to <code>knights.id</code>, and <code>letters.ruler_id</code> to <code>rulers.id</code>. Join only what you need, then group.</p>\n  <pre>SELECT r.name, COUNT(*) AS letters\nFROM letters l, rulers r\nWHERE l.ruler_id = r.id\nGROUP BY r.name\nORDER BY COUNT(*) DESC;</pre>",
+  "task": "Which ruler received the most black-wax letters tonight?",
+  "hints": [
+   "Join letters and rulers, add AND l.wax = 'black', then GROUP BY r.name and sort by COUNT(*) DESC.",
+   {
+    "sql": "SELECT r.name, COUNT(*) AS black_letters\nFROM letters l, rulers r\nWHERE l.ruler_id = r.id\n  AND l.wax = 'black'\nGROUP BY r.name\nORDER BY COUNT(*) DESC;"
+   }
+  ],
+  "answers": [
+   "m mark",
+   "mark",
+   "mark m",
+   "king m mark"
+  ],
+  "placeholder": "ruler's name",
+  "success": "King M. Márk of Ironhill: six black seals tonight. The Iron League's war chief is very busy."
+ },
+ {
+  "title": "After the evening bell",
+  "story": "<p>The battle plan lay on the council table until the evening bell at <mark>22:00</mark>. It was copied after that, when the chamber was locked. Whoever wrote to King M. Márk late tonight has some explaining to do.</p>",
+  "learn": "<p>Times are stored as text like <code>'22:15'</code>. Because they always have the same shape, you can compare them with <code>&gt;=</code>. Join <code>knights</code> too, so you can see who sent each letter.</p>\n  <pre>SELECT n.name, r.name, l.time\nFROM letters l, rulers r, knights n\nWHERE l.ruler_id = r.id\n  AND l.knight_id = n.id\n  AND l.time &gt;= '21:00';</pre>",
+  "task": "How many black-wax letters reached King M. Márk at 22:00 or later?",
+  "hints": [
+   "Join letters, rulers and knights, then AND r.name = 'M. Márk' AND l.wax = 'black' AND l.time >= '22:00'. Count the rows.",
+   {
+    "sql": "SELECT n.name, l.time\nFROM letters l, rulers r, knights n\nWHERE l.ruler_id = r.id\n  AND l.knight_id = n.id\n  AND r.name = 'M. Márk'\n  AND l.wax = 'black'\n  AND l.time >= '22:00';"
+   }
+  ],
+  "answers": [
+   "3",
+   "three"
+  ],
+  "placeholder": "a number",
+  "success": "Three letters, three senders. One of them is the traitor."
+ },
+ {
+  "title": "The traitor",
+  "story": "<p>Three names, and the bells will ring soon. Think about where each sender comes from. A knight of <b>Ironhill</b> writing to his own king is no traitor. <b>Mistwood</b> openly belongs to both alliances. <mark>The traitor serves a kingdom that is in the Silver Pact only.</mark></p>",
+  "learn": "<p>Four tables: <code>letters → rulers</code>, <code>letters → knights → kingdoms</code>. Three matching rules, then your filters.</p>\n  <pre>SELECT n.name, k.name, l.time\nFROM letters l, rulers r, knights n, kingdoms k\nWHERE l.ruler_id = r.id\n  AND l.knight_id = n.id\n  AND n.kingdom_id = k.id;</pre>",
+  "task": "Which knight is the traitor?",
+  "hints": [
+   "Take your chapter 8 query, add kingdoms with AND n.kingdom_id = k.id, and show k.name. Compare the three kingdoms with what you found in chapter 6.",
+   {
+    "sql": "SELECT n.name, k.name AS kingdom, l.time\nFROM letters l, rulers r, knights n, kingdoms k\nWHERE l.ruler_id = r.id\n  AND l.knight_id = n.id\n  AND n.kingdom_id = k.id\n  AND r.name = 'M. Márk'\n  AND l.wax = 'black'\n  AND l.time >= '22:00';"
+   }
+  ],
+  "answers": [
+   "s balint mate",
+   "balint mate",
+   "balint mate s",
+   "s balint",
+   "balint"
+  ],
+  "placeholder": "name",
+  "success": "S. Bálint Máté, a knight of Riverland. At the stroke of midnight Champion K. Kamilla finds him at the stables, a black-wax letter in his boot and a copy of the battle plan in his saddlebag. At dawn the Silver Pact seals a new plan, and this one stays secret."
+ }
+];
+const BONUS = ["List every knight next to the name of the ruler they serve. (knights → kingdoms → rulers)", "Which alliance has the largest combined army? (alliances → pacts → kingdoms, SUM(army))", "How many letters did the knights of each kingdom send tonight?", "Which kingdoms belong to exactly two alliances? (GROUP BY + HAVING)", "Which queen received the most letters tonight, whatever the wax?", "Hard: list every pair of kingdoms that share an alliance. Use the pacts table twice, with two aliases: p1 and p2."];
+const COLDOCS = {"kingdoms": {"id": "Row number of the kingdom.", "name": "<code>'Northmark'</code>, <code>'Riverland'</code>, <code>'Sunvale'</code>, <code>'Ironhill'</code>, <code>'Mistwood'</code> or <code>'Goldcoast'</code>.", "capital": "The capital city, e.g. <code>'Frostburg'</code>.", "banner": "The animal or sign on the banner, e.g. <code>'white wolf'</code>.", "army": "How many soldiers the kingdom has."}, "rulers": {"id": "Row number of the ruler.", "name": "The ruler's name, e.g. <code>'B. Dániel'</code>.", "title": "<code>'king'</code> or <code>'queen'</code>.", "kingdom_id": "Which kingdom they rule: the <code>id</code> of a row in <code>kingdoms</code>. Every kingdom has exactly one ruler.", "crowned": "The year they were crowned."}, "knights": {"id": "Row number of the knight.", "name": "The knight's name.", "kingdom_id": "Which kingdom they serve: the <code>id</code> of a row in <code>kingdoms</code>.", "rank": "<code>'squire'</code>, <code>'knight'</code>, <code>'champion'</code> or <code>'commander'</code>.", "weapon": "<code>'sword'</code>, <code>'lance'</code>, <code>'bow'</code>, <code>'axe'</code> or <code>'mace'</code>."}, "alliances": {"id": "Row number of the alliance.", "name": "<code>'Silver Pact'</code>, <code>'Iron League'</code> or <code>'Sea Accord'</code>.", "founded": "The year it was founded.", "purpose": "<code>'defence'</code>, <code>'conquest'</code> or <code>'trade'</code>."}, "pacts": {"id": "Row number of the membership.", "alliance_id": "Which alliance: the <code>id</code> of a row in <code>alliances</code>.", "kingdom_id": "Which kingdom joined it: the <code>id</code> of a row in <code>kingdoms</code>.", "joined": "The year the kingdom joined."}, "letters": {"id": "Row number of the letter.", "knight_id": "Who sent it: the <code>id</code> of a row in <code>knights</code>.", "ruler_id": "Who received it: the <code>id</code> of a row in <code>rulers</code>.", "time": "When it left the castle tonight, as text <code>'HH:MM'</code>.", "wax": "Colour of the wax seal: <code>'black'</code>, <code>'white'</code>, <code>'blue'</code>, <code>'gold'</code>, <code>'grey'</code> or <code>'red'</code>."}};
+const HAND_STEPS = ["Write your name below.", "Click <b>Save answers (.txt)</b>. The file goes to your Downloads folder.", "Open the assignment in <b>Google Classroom</b>, upload the file under <b>Add or create → File</b>, then press <b>Turn in</b>."];
+const RANKS = ["Royal Spymaster", "Lord Chancellor", "Knight of the Realm", "Squire"];
+const T = {
+  refresher:"Refresher", before:"Before the council · about 3 minutes", chapter:(i,n)=>`Chapter ${i} of ${n}`, solved:(n,t)=>`${n} / ${t} chapters solved`, sealed:n=>`Clue 2 · sealed. It opens after ${n} more wrong answer${n===1?'':'s'}.`, rows:n=>`${n} row${n===1?'':'s'}`,
+  try_:"Try it", learn:"SQL for this step", task:"Your task", hint1:"Clue 1 · hint", hint2:"Clue 2 · a working query", answer:"Answer", check:"Check answer",
+  correct:"Correct.", wrong:"Not quite.", wrongTip:"Look at your result again. Did you include the matching rule (WHERE … = …) for every pair of tables? Check whether the task asks for a number or a name.", prev:"Previous chapter", next:"Next chapter", start:"Begin the hunt", yourans:"Your answer",
+  ready:"The ledger is open. Write a query and press Run.", empty:"The query box is empty. Type a query first.", zero:"0 rows. No rows match all of your conditions. Check the spelling of text values and your matching rule.", sound:"Sound", reset:"Start over", reset2:"Click again to erase progress",
+  errGeneric:"Check spelling, commas, brackets and quotes. Text values need single quotes, like 'black'.", errCol:"That column name doesn't exist, or it's ambiguous. When two tables have a column with the same name (like id or name), write table.id or alias.id.", errTab:"That table doesn't exist. The tables are: kingdoms, rulers, knights, alliances, pacts, letters.", errAmb:"Ambiguous column: both tables have a column with that name. Write the table name or alias in front of it, like knights.name or n.name.", sqlErr:"The query has an error.", engFail:"The SQL engine could not load.", engFail2:"Check the internet connection and reload the page.", engStart:"The SQL engine could not start.",
+  endH:"The Pact holds", endP:m=>`The traitor sits in the north tower, the new battle plan is sealed, and the bells of Frostburg ring for the Silver Pact. You unmasked him in about <b>${m} minutes</b>, joining up to four tables with FROM, aliases and matching rules in WHERE.`, endBonus:"Bonus tasks for fast spymasters:", handH:"Hand in your answers", name:"Your name", namePh:"Write your name here", save:"Save answers (.txt)", copy:"Copy as text", replay:"Replay the celebration",
+  xNameFirst:"Write your name first.", xCopied:"Copied. Paste it into the assignment in Google Classroom as a private comment, then press Turn in.", xBlocked:"Copying is blocked here. Use Save answers instead.", xSaved:f=>`Saved as ${f}. Now upload it to the assignment in Google Classroom and press Turn in.`, xSaveBlocked:"Saving is blocked here. Use Copy as text instead.",
+  filePrefix:"broken-pact", reportTitle:"THE BROKEN PACT - ANSWER SHEET", rName:"Name", rFinished:"Finished", rTime:"Time taken", rQueries:"Queries run", rDev:"NOTE: completed with the teacher code, so some answers may be missing.",
+  rTask:"Task", rAnswer:"Answer", rSkipped:"(skipped)", rUnsolved:"(not solved)", rWrong:"Wrong answers", rQuery:"Query", rNone:"(none saved)",
+  stampOpen:"Traitor at large", stampDone:"Traitor caught", plusReady:"Ready!", plusGood:"Well done!", num:"number", text:"text"
+};
+
+/* ---------- state ---------- */
+const KEY = "pact-en-v1";
+let state = { solved: [], current: 0, start: Date.now(), end: null, drafts: {} };
+try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && Array.isArray(s.solved)) state = Object.assign(state, s); } catch(e){}
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(state)); } catch(e){} }
+const num = i => CHAPTERS[0].refresher ? i : i+1;
+const NCH = CHAPTERS.filter(c=>!c.refresher).length;
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const norm = s => s.normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().replace(/[^a-z0-9 ]/g," ").replace(/\s+/g," ").trim();
+const isUnlocked = i => i === 0 || state.solved.includes(i-1);
+const allDone = () => state.solved.length === CHAPTERS.length;
+const starterFor = i => CHAPTERS[i].starter || `-- ${CHAPTERS[i].refresher ? T.refresher : num(i)}: ${CHAPTERS[i].title}\n`;
+const crestSvg = () => document.querySelector(".guitar").outerHTML.replace('class="guitar"', 'width="100%" height="100%"');
+$("heroGuitar").innerHTML = crestSvg();
+
+/* ---------- line-up strip ---------- */
+function renderSteps(){
+  $("steps").innerHTML = CHAPTERS.map((c,i)=>{
+    const cls = ["step"];
+    if (state.solved.includes(i)) cls.push("done");
+    if (i === state.current) cls.push("current");
+    if (!isUnlocked(i)) cls.push("locked");
+    const who = i === state.current ? "🕯️" : (state.solved.includes(i) ? "👑" : "");
+    return `<button type="button" class="${cls.join(" ")}" data-i="${i}" ${isUnlocked(i)?"":"aria-disabled=\"true\""} title="${esc(c.title)}">
+      <span class="who" aria-hidden="true">${who}</span><span class="post">${c.refresher ? "R" : num(i)}</span><span class="t">${esc(c.title)}</span></button>`;
+  }).join("");
+  { const cc = CHAPTERS[state.current]; $("stepCaption").innerHTML = `<span>${cc.refresher ? T.refresher : T.chapter(num(state.current), NCH)}</span>${esc(cc.title)}`; }
+  $("solvedCount").textContent = T.solved(state.solved.filter(i=>!CHAPTERS[i].refresher).length, NCH);
+  const st = $("stamp"); st.textContent = allDone() ? T.stampDone : T.stampOpen; st.classList.toggle("closed", allDone());
+}
+$("steps").addEventListener("click", e=>{ const b = e.target.closest(".step"); if (!b) return; const i = +b.dataset.i; if (isUnlocked(i)) goTo(i); });
+$("case").addEventListener("click", e=>{ const b = e.target.closest("button.try"); if (!b) return; $("sql").value = b.dataset.sql; run(); });
+function goTo(i){ state.drafts[state.current] = $("sql").value; state.current = i; save(); renderSteps(); renderCase(); $("sql").value = state.drafts[i] ?? starterFor(i); }
+
+/* ---------- notebook ---------- */
+function renderCase(){
+  const i = state.current, c = CHAPTERS[i], solved = state.solved.includes(i);
+  const hints = c.hints.map(h=>{
+    if (typeof h === "string") return `<details class="hint"><summary>${T.hint1}</summary><p>${esc(h)}</p></details>`;
+    const tries = (state.wrong && state.wrong[i]) || 0;
+    if (!solved && tries < 2) return `<div class="hint locked">${T.sealed(2 - tries)}</div>`;
+    return `<details class="hint"><summary>${T.hint2}</summary><pre>${esc(h.sql)}</pre></details>`;
+  }).join("");
+  const last = i === CHAPTERS.length - 1;
+  $("case").innerHTML = `
+    <div class="eyebrow">${c.refresher ? T.before : T.chapter(num(i), NCH)}</div>
+    <h2>${esc(c.title)}</h2>
+    <div class="story">${c.story}</div>
+    <div class="learn"><h3>${c.refresher ? T.try_ : T.learn}</h3>${c.learn}</div>
+    <div class="task"><h3>${T.task}</h3><p>${esc(c.task)}</p></div>
+    ${hints}
+    <form class="answer" id="answerForm" autocomplete="off">
+      <input id="answer" type="text" placeholder="${T.answer}: ${esc(c.placeholder)}" aria-label="${T.yourans}" ${solved?"disabled":""}>
+      <button class="btn primary" type="submit" ${solved?"disabled":""}>${T.check}</button>
+    </form>
+    <div id="verdict">${solved ? `<div class="verdict ok">${T.correct}<p>${esc(c.success)}</p></div>` : ""}</div>
+    <div class="navrow">
+      <button class="btn" type="button" id="prev" ${i===0?"hidden":""}>${T.prev}</button>
+      <button class="btn primary" type="button" id="next" ${solved && !last ? "" : "hidden"}>${c.refresher ? T.start : T.next}</button>
+    </div>
+    ${allDone() && last ? endingHtml() : ""}`;
+  $("answerForm").addEventListener("submit", e=>{ e.preventDefault(); check(); });
+  $("prev").onclick = ()=> goTo(i-1);
+  $("next").onclick = ()=> goTo(i+1);
+}
+function check(){
+  const i = state.current, c = CHAPTERS[i], v = norm($("answer").value);
+  if (!v) return;
+  if (devHash(v) === 2236979087){ devComplete(); return; }
+  if (c.answers.map(norm).includes(v)){
+    if (!state.solved.includes(i)){ state.answers = state.answers || {}; state.answers[i] = $("answer").value.trim(); state.solvedSql = state.solvedSql || {}; state.solvedSql[i] = $("sql").value; }
+    const r = document.querySelector("#answerForm button").getBoundingClientRect();
+    const first = !state.solved.includes(i);
+    if (first) state.solved.push(i);
+    const finished = first && allDone();
+    if (allDone() && !state.end) state.end = Date.now();
+    save(); renderSteps(); renderCase();
+    const n = $("next"); if (n && !n.hidden) n.focus();
+    if (finished) finale(); else if (first) chapterWin(r.left + r.width/2, r.top + r.height/2, i);
+  } else {
+    state.wrong = state.wrong || {}; state.wrong[i] = (state.wrong[i] || 0) + 1; save();
+    if (state.wrong[i] <= 2){ renderCase(); $("answer").focus(); }
+    $("verdict").innerHTML = `<div class="verdict bad">${T.wrong}<p>${T.wrongTip}</p></div>`;
+  }
+}
+/* teacher shortcut: a secret answer that solves every chapter (only its hash is stored here) */
+function devHash(s){ let x = 5381; for (const ch of s) x = ((x*33) ^ ch.charCodeAt(0)) >>> 0; return x; }
+function devComplete(){ state.dev = true; state.solved = CHAPTERS.map((_,k)=>k); state.current = CHAPTERS.length - 1; if (!state.end) state.end = Date.now(); save(); renderSteps(); renderCase(); $("sql").value = starterFor(state.current); finale(); }
+function endingHtml(){
+  const mins = Math.max(1, Math.round(((state.end||Date.now()) - state.start)/60000));
+  return `<div class="ending learn">
+    <h3>${T.endH}</h3><p>${T.endP(mins)}</p>
+    <p><b>${T.endBonus}</b></p><ol>${BONUS.map(b=>`<li>${esc(b)}</li>`).join("")}</ol>
+    <div class="export">
+      <h3>${T.handH}</h3>
+      <ol class="export-steps">${HAND_STEPS.map(s=>`<li>${s}</li>`).join("")}</ol>
+      <label for="studentName">${T.name}</label>
+      <input id="studentName" type="text" autocomplete="off" placeholder="${T.namePh}" value="${esc(state.student || "")}">
+      <div class="export-btns"><button class="btn primary" type="button" id="saveTxt">${T.save}</button><button class="btn" type="button" id="copyTxt">${T.copy}</button></div>
+      <p class="export-note" id="exportNote" aria-live="polite"></p>
+    </div>
+    <div><button class="btn" type="button" id="replayFinale">${T.replay}</button></div>
+  </div>`;
+}
+$("case").addEventListener("click", e=>{ if (e.target.id === "replayFinale") finale(); if (e.target.id === "saveTxt") exportAnswers("save"); if (e.target.id === "copyTxt") exportAnswers("copy"); });
+$("case").addEventListener("input", e=>{ if (e.target.id === "studentName"){ state.student = e.target.value; save(); } });
+
+/* ---------- answer sheet export ---------- */
+function fmtTime(ms){ const m = Math.floor(ms/60000), s = Math.floor(ms/1000)%60; return `${m}:${String(s).padStart(2,"0")}`; }
+function buildReport(){
+  const pad = n => String(n).padStart(2,"0"), d = new Date(state.end || Date.now()), L = [];
+  L.push(T.reportTitle); L.push("=".repeat(T.reportTitle.length));
+  L.push(`${T.rName}: ${(state.student || "").trim()}`);
+  L.push(`${T.rFinished}: ${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`);
+  L.push(`${T.rTime}: ${fmtTime((state.end || Date.now()) - state.start)}`);
+  L.push(`${T.rQueries}: ${state.queries || 0}`);
+  if (state.dev) L.push(T.rDev);
+  L.push("");
+  CHAPTERS.forEach((c,i)=>{
+    L.push(`${c.refresher ? T.refresher : T.chapter(num(i), NCH)}: ${c.title}`); L.push("-".repeat(40));
+    L.push(`${T.rTask}: ${c.task}`);
+    L.push(`${T.rAnswer}: ${(state.answers && state.answers[i]) || (state.solved.includes(i) ? T.rSkipped : T.rUnsolved)}`);
+    L.push(`${T.rWrong}: ${(state.wrong && state.wrong[i]) || 0}`);
+    const q = ((state.solvedSql && state.solvedSql[i]) || "").trim();
+    L.push(`${T.rQuery}:`); L.push(q ? q.split("\n").map(x=>"    " + x).join("\n") : "    " + T.rNone); L.push("");
+  });
+  return L.join("\r\n");
+}
+function exportAnswers(mode){
+  const note = $("exportNote"), nameEl = $("studentName"), name = (state.student || "").trim();
+  if (!name){ note.textContent = T.xNameFirst; nameEl.focus(); return; }
+  const text = buildReport();
+  if (mode === "copy"){
+    const done = ()=> note.textContent = T.xCopied;
+    const fallback = ()=>{ const t = document.createElement("textarea"); t.value = text; document.body.appendChild(t); t.select(); try { document.execCommand("copy"); done(); } catch(e){ note.textContent = T.xBlocked; } t.remove(); };
+    try { navigator.clipboard.writeText(text).then(done, fallback); } catch(e){ fallback(); }
+    return;
+  }
+  const slug = name.normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[^A-Za-z0-9]+/g,"-").replace(/^-|-$/g,"") || "student";
+  const file = `${T.filePrefix}-${slug}.txt`;
+  try {
+    const url = URL.createObjectURL(new Blob(["﻿" + text], {type:"text/plain;charset=utf-8"}));
+    const a = document.createElement("a"); a.href = url; a.download = file; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=> URL.revokeObjectURL(url), 2000);
+    note.textContent = T.xSaved(file);
+  } catch(e){ note.textContent = T.xSaveBlocked; }
+}
+
+/* ---------- timer + reset ---------- */
+function tick(){ const ms = (state.end || Date.now()) - state.start; const m = Math.floor(ms/60000), s = Math.floor(ms/1000)%60; $("timer").textContent = `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`; }
+setInterval(tick, 1000); tick();
+let resetArmed = null;
+$("resetProgress").onclick = ()=>{
+  const b = $("resetProgress");
+  if (!resetArmed){ b.textContent = T.reset2; resetArmed = setTimeout(()=>{ b.textContent = T.reset; resetArmed = null; }, 3000); return; }
+  clearTimeout(resetArmed); resetArmed = null; b.textContent = T.reset;
+  state = { solved: [], current: 0, start: Date.now(), end: null, drafts: {} };
+  save(); renderSteps(); renderCase(); $("sql").value = starterFor(0); resetDb();
+};
+
+/* ---------- celebrations ---------- */
+const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const FXC = ["#d9434c","#e8b84a","#4a7fd4","#f3e6c6","#4f9a55"];
+const fx = { c: $("fx"), ctx: $("fx").getContext("2d"), parts: [], raf: 0, w: 0, h: 0 };
+function fxSize(){ const d = devicePixelRatio || 1; fx.w = innerWidth; fx.h = innerHeight; fx.c.width = fx.w*d; fx.c.height = fx.h*d; fx.ctx.setTransform(d,0,0,d,0,0); }
+addEventListener("resize", fxSize); fxSize();
+const rnd = (a,b) => a + Math.random()*(b-a);
+function spawn(p){ fx.parts.push(p); if (!fx.raf) fx.raf = requestAnimationFrame(fxLoop); }
+function fxLoop(){
+  const g = fx.ctx; g.clearRect(0,0,fx.w,fx.h);
+  fx.parts = fx.parts.filter(p => p.life > 0 && p.y < fx.h + 60);
+  for (const p of fx.parts){
+    p.vx *= p.drag; p.vy = p.vy*p.drag + p.g; p.x += p.vx; p.y += p.vy; p.rot += p.vr; p.life--;
+    g.save(); g.globalAlpha = Math.min(1, p.life/30); g.translate(p.x, p.y); g.rotate(p.rot); g.fillStyle = p.color;
+    if (p.type === "confetti"){ g.scale(1, Math.cos(p.life*0.2)); g.fillRect(-p.s/2, -p.s/4, p.s, p.s/2); }
+    else if (p.type === "note"){ g.font = `${p.s*2}px serif`; g.textAlign = "center"; g.fillText("⚜", 0, p.s); }
+    else { g.globalCompositeOperation = "lighter"; g.beginPath(); g.arc(0,0,p.s,0,6.283); g.fill(); }
+    g.restore();
+  }
+  fx.raf = fx.parts.length ? requestAnimationFrame(fxLoop) : 0;
+}
+function burst(x, y, n, power=9){
+  for (let k=0; k<n; k++){ const ang = rnd(0, Math.PI*2), sp = rnd(power*.3, power), note = Math.random() < .3;
+    spawn({ type: note ? "note" : "confetti", x, y, vx: Math.cos(ang)*sp, vy: Math.sin(ang)*sp - power*.5, g: .25, drag: .985, rot: rnd(0,6), vr: rnd(-.3,.3), s: rnd(7,13), color: FXC[k % FXC.length], life: rnd(70,120) }); }
+}
+function firework(x, y){
+  const col = FXC[Math.floor(rnd(0, 4))], n = 90;
+  for (let k=0; k<n; k++){ const ang = k/n*Math.PI*2, sp = rnd(3,7.5);
+    spawn({ type:"spark", x, y, vx: Math.cos(ang)*sp, vy: Math.sin(ang)*sp, g:.06, drag:.975, rot:0, vr:0, s: rnd(1.6,3.2), color: col, life: rnd(60,95) }); }
+  tone(rnd(90,160), .35, "sawtooth", .05, 40);
+}
+function rain(ms){
+  const end = performance.now() + ms;
+  (function drop(){ for (let k=0; k<6; k++){ const note = Math.random() < .35;
+      spawn({ type: note ? "note" : "confetti", x: rnd(0, fx.w), y: -20, vx: rnd(-1.5,1.5), vy: rnd(2,5), g:.05, drag:.995, rot: rnd(0,6), vr: rnd(-.2,.2), s: rnd(8,14), color: FXC[Math.floor(rnd(0,5))], life: 400 }); }
+    if (performance.now() < end) setTimeout(drop, 60); })();
+}
+function fireworkShow(count){ for (let k=0; k<count; k++) setTimeout(()=> firework(rnd(fx.w*.12, fx.w*.88), rnd(fx.h*.1, fx.h*.5)), 400 + k*rnd(280,420)); }
+
+let soundOn = true;
+try { soundOn = localStorage.getItem(KEY+"-sound") !== "off"; } catch(e){}
+function paintSound(){ const b = $("soundToggle"); b.textContent = `${T.sound}: ${soundOn?"on":"off"}`; b.setAttribute("aria-pressed", soundOn); }
+paintSound();
+$("soundToggle").onclick = ()=>{ soundOn = !soundOn; paintSound(); try { localStorage.setItem(KEY+"-sound", soundOn?"on":"off"); } catch(e){} };
+let actx = null;
+function tone(freq, dur, type="triangle", vol=.12, slideTo=null, delay=0){
+  if (!soundOn) return;
+  try { actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+    const t = actx.currentTime + delay, o = actx.createOscillator(), g = actx.createGain();
+    o.type = type; o.frequency.setValueAtTime(freq, t); if (slideTo) o.frequency.exponentialRampToValueAtTime(slideTo, t + dur);
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + .02); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(g).connect(actx.destination); o.start(t); o.stop(t + dur + .05); } catch(e){}
+}
+function riff(){ [392,523,659,523,784].forEach((f,k)=>{ tone(f, .17, "square", .045, null, k*.12); tone(f, .17, "triangle", .08, null, k*.12); }); }
+function powerChord(){ [196,247,294,392,494].forEach(f=>{ tone(f, 1.5, "triangle", .07, null, 0); tone(f, 1.5, "square", .025, null, 0); }); tone(70, .45, "sine", .25, 40, 0); tone(70, .45, "sine", .2, 40, .22); tone(70, .6, "sine", .25, 40, .44); }
+function fanfare(){ riff(); setTimeout(powerChord, 520); setTimeout(()=>{ [392,523,659,784,1047].forEach((f,k)=> tone(f, k===4?1.2:.2, "triangle", .12, null, k*.14)); }, 1400); }
+function chapterWin(x, y, i){
+  riff();
+  const el = document.createElement("div"); el.className = "plus"; el.textContent = CHAPTERS[i].refresher ? T.plusReady : T.plusGood;
+  el.style.left = x+"px"; el.style.top = (y-30)+"px"; document.body.appendChild(el); setTimeout(()=>el.remove(), 1300);
+  const s = document.querySelector(`.step[data-i="${i+1}"]`) || document.querySelector(`.step[data-i="${i}"]`); if (s) s.classList.add("just");
+  if (reduceMotion) return;
+  burst(x, y, 60);
+  const wrap = document.querySelector(".wrap"); wrap.classList.remove("shake"); void wrap.offsetWidth; wrap.classList.add("shake");
+}
+function rankFor(min){ return min <= 20 ? RANKS[0] : min <= 28 ? RANKS[1] : min <= 35 ? RANKS[2] : RANKS[3]; }
+function finale(){
+  const ms = (state.end || Date.now()) - state.start, mins = Math.floor(ms/60000), secs = Math.floor(ms/1000)%60;
+  $("fTime").textContent = `${mins}:${String(secs).padStart(2,"0")}`; $("fQueries").textContent = state.queries || 0; $("fRank").textContent = rankFor(ms/60000);
+  const f = $("finale"); f.hidden = true; void f.offsetWidth; f.hidden = false;
+  const inner = $("finaleInner"); inner.classList.remove("shake"); void inner.offsetWidth; inner.classList.add("shake");
+  fanfare(); $("finaleClose").focus();
+  if (reduceMotion) return;
+  setTimeout(()=>{ burst(fx.w/2, fx.h*.35, 160, 16); }, 950); setTimeout(()=> rain(5000), 1200); setTimeout(()=> fireworkShow(8), 1400);
+}
+function closeFinale(){
+  $("finale").hidden = true;
+  const st = $("field"); st.classList.remove("wave"); [...$("steps").children].forEach((b,k)=> b.style.animationDelay = (k*.08)+"s"); void st.offsetWidth; st.classList.add("wave");
+  const end = document.querySelector(".ending"); if (end) end.scrollIntoView({behavior: reduceMotion?"auto":"smooth", block:"center"});
+}
+$("finaleClose").onclick = closeFinale;
+$("finaleSave").onclick = ()=>{ closeFinale(); setTimeout(()=>{ const n = $("studentName"); if (n){ n.scrollIntoView({block:"center"}); n.focus(); } }, 400); };
+$("finaleAgain").onclick = ()=>{ powerChord(); if (reduceMotion) return; fireworkShow(6); rain(2500); };
+addEventListener("keydown", e=>{ if (e.key === "Escape" && !$("finale").hidden) closeFinale(); });
+
+/* ---------- database ---------- */
+let SQL = null, db = null;
+function resetDb(){ if (!SQL) return; if (db) db.close(); db = new SQL.Database(); db.run(SEED); $("out").innerHTML = `<p class="note">${T.ready}</p>`; renderSchema(); }
+function renderSchema(){
+  const t = db.exec("SELECT name FROM sqlite_master WHERE type='table' ORDER BY rowid");
+  if (!t.length){ $("schema").innerHTML = ""; return; }
+  $("schema").innerHTML = t[0].values.map(([name])=>{
+    const cols = db.exec(`PRAGMA table_info("${name.replace(/"/g,'""')}")`), docs = COLDOCS[name] || {};
+    const lis = cols.length ? cols[0].values.map(r=>`<li><span class="k${/_id$/.test(r[1]) ? " fk" : ""}">${esc(r[1])}</span><span class="ty">${/INT|REAL/i.test(r[2]) ? T.num : T.text}</span>${docs[r[1]] ? `<span class="d">${docs[r[1]]}</span>` : ""}</li>`).join("") : "";
+    return `<div class="tbl"><button type="button" data-t="${esc(name)}">${esc(name)}</button><ul>${lis}</ul></div>`;
+  }).join("");
+}
+$("schema").addEventListener("click", e=>{ const b = e.target.closest("button[data-t]"); if (!b) return; $("sql").value = `SELECT * FROM ${b.dataset.t};`; run(); });
+function fmt(x){ return typeof x === "number" && !Number.isInteger(x) ? String(Math.round(x*1000)/1000) : String(x); }
+function run(){
+  if (!db) return;
+  const sql = $("sql").value;
+  state.drafts[state.current] = sql; state.queries = (state.queries||0) + 1; save();
+  const bare = sql.replace(/--[^\n]*/g," ").replace(/\/\*[\s\S]*?\*\//g," ").trim();
+  if (!bare){ $("out").innerHTML = `<p class="note">${T.empty}</p>`; return; }
+  try {
+    const res = db.exec(sql);
+    renderSchema();
+    if (!res.length){ $("out").innerHTML = `<p class="note">${T.zero}</p>`; return; }
+    $("out").innerHTML = res.map(r=>`<div class="result-meta">${T.rows(r.values.length)}</div>
+      <div class="tablebox"><table><thead><tr>${r.columns.map(c=>`<th>${esc(c)}</th>`).join("")}</tr></thead>
+      <tbody>${r.values.map(v=>`<tr>${v.map(x=> x===null ? `<td class="null">NULL</td>` : `<td${typeof x==="number"?' class="num"':""}>${esc(fmt(x))}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`).join("");
+  } catch(e){
+    let tip = T.errGeneric;
+    if (/no such column/i.test(e.message)) tip = T.errCol;
+    if (/ambiguous column/i.test(e.message)) tip = T.errAmb;
+    if (/no such table/i.test(e.message)) tip = T.errTab;
+    $("out").innerHTML = `<div class="err">${T.sqlErr}<p>${esc(e.message)}</p><p>${tip}</p></div>`;
+  }
+}
+$("run").onclick = run; $("resetDb").onclick = resetDb;
+$("sql").addEventListener("keydown", e=>{
+  if ((e.ctrlKey || e.metaKey) && e.key === "Enter"){ e.preventDefault(); run(); }
+  if (e.key === "Tab" && !e.shiftKey){ e.preventDefault(); const t = e.target, s = t.selectionStart; t.value = t.value.slice(0,s) + "  " + t.value.slice(t.selectionEnd); t.selectionStart = t.selectionEnd = s + 2; }
+});
+
+/* ---------- boot ---------- */
+if (state.current >= CHAPTERS.length || !isUnlocked(state.current)) state.current = 0;
+renderSteps(); renderCase();
+$("sql").value = state.drafts[state.current] ?? starterFor(state.current);
+if (typeof initSqlJs !== "function"){ $("out").innerHTML = `<div class="err">${T.engFail}<p>${T.engFail2}</p></div>`; }
+else { initSqlJs().then(s=>{ SQL = s; resetDb(); }).catch(e=>{ $("out").innerHTML = `<div class="err">${T.engStart}<p>${esc(e.message)}</p></div>`; }); }
+</script>
+<script src="../../nav.js" defer></script>
+</body>
+</html>
