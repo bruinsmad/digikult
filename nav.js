@@ -101,7 +101,7 @@
           },
           {
             id: "joins",
-            title: { hu: "Táblák összekapcsolása: FROM a, b WHERE a.x_id = b.id", en: "Joining tables: FROM a, b WHERE a.x_id = b.id" },
+            title: { hu: "Táblák összekapcsolása: FROM koncertek, zenekarok WHERE koncertek.zenekar_id = zenekarok.id", en: "Joining tables: FROM concerts, bands WHERE concerts.band_id = bands.id" },
             pages: [
               {
                 id: "joins-intro",
@@ -127,16 +127,6 @@
                 progress: { chapters: 9, keys: { en: "backstage-en-v2", hu: "backstage-hu-v2" } }
               },
               {
-                id: "matchmaker",
-                kind: "demo",
-                title: { hu: "A párosító", en: "The Matchmaker" },
-                desc: {
-                  hu: "Kivetítős bemutató: kábelek kötik össze a táblákat, és kiderül, 1:1, 1:N vagy N:N a kapcsolat – vagy hibás.",
-                  en: "Projector demo: cables connect the tables and show whether a link is 1:1, 1:N, N:N – or a mistake."
-                },
-                files: { en: "sql/joins/matchmaker.html", hu: "sql/joins/matchmaker-hu.html" }
-              },
-              {
                 id: "pact",
                 kind: "story",
                 minutes: 35,
@@ -147,6 +137,16 @@
                 },
                 files: { en: "sql/joins/pact.html", hu: "sql/joins/pact-hu.html" },
                 progress: { chapters: 9, keys: { en: "pact-en-v2", hu: "pact-hu-v2" } }
+              },
+              {
+                id: "matchmaker",
+                kind: "demo",
+                title: { hu: "A párosító", en: "The Matchmaker" },
+                desc: {
+                  hu: "Kivetítős bemutató: kábelek kötik össze a táblákat, és kiderül, 1:1, 1:N vagy N:N a kapcsolat – vagy hibás.",
+                  en: "Projector demo: cables connect the tables and show whether a link is 1:1, 1:N, N:N – or a mistake."
+                },
+                files: { en: "sql/joins/matchmaker.html", hu: "sql/joins/matchmaker-hu.html" }
               }
             ]
           }
@@ -224,6 +224,12 @@
   if (window.__digikultNav) return;
   window.__digikultNav = true;
 
+  /* On a page that exists in both languages, the menu speaks the page's language. */
+  SITE.topics.forEach(tp => tp.lessons.forEach(ls => ls.pages.forEach(p => {
+    if (!p.files.hu || !p.files.en) return;
+    for (const k of ["hu", "en"]) if (norm(new URL(p.files[k], BASE).pathname) === herePath) lang = k;
+  })));
+
   /* ---------- floating menu ---------- */
   const host = document.createElement("div");
   host.id = "digikult-nav";
@@ -240,6 +246,12 @@
     background: rgba(26,42,36,.94); border: 1px solid rgba(255,255,255,.22); font-weight: 600;
     box-shadow: 0 6px 18px rgba(0,0,0,.35); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); transition: transform .15s, background .15s; }
   .toggle:hover { background: rgba(36,58,49,.98); transform: translateY(-1px); }
+  /* once the reader scrolls, the button shrinks to a round icon so it hides less of the page */
+  .lbl { display: inline-block; max-width: 8em; overflow: hidden; white-space: nowrap; transition: max-width .2s, opacity .2s; }
+  .wrap.mini .toggle { gap: 0; padding: 12px; }
+  .wrap.mini .lbl { max-width: 0; opacity: 0; }
+  .wrap.mini .toggle:hover, .wrap.mini .toggle:focus-visible, .wrap.mini .toggle[aria-expanded="true"] { gap: 8px; padding: 9px 14px 9px 12px; }
+  .wrap.mini .toggle:hover .lbl, .wrap.mini .toggle:focus-visible .lbl, .wrap.mini .toggle[aria-expanded="true"] .lbl { max-width: 8em; opacity: 1; }
   :focus-visible { outline: 3px solid #f2d264; outline-offset: 2px; }
   .bars { width: 16px; height: 12px; display: grid; align-content: space-between; }
   .bars i { display: block; height: 2px; border-radius: 2px; background: currentColor; }
@@ -270,7 +282,7 @@
   .kd { font-size: 11px; color: #b4c4b8; white-space: nowrap; }
   .hr { grid-column: 1 / -1; font-size: 11px; color: #f2d264; }
   a.pg[aria-current="page"] { background: rgba(242,210,100,.14); box-shadow: inset 3px 0 0 #f2d264; }
-  @media (prefers-reduced-motion: reduce) { .panel { animation: none; } .toggle { transition: none; } }
+  @media (prefers-reduced-motion: reduce) { .panel { animation: none; } .toggle, .lbl { transition: none; } }
   @media print { .wrap { display: none; } }`;
 
   function render() {
@@ -289,7 +301,7 @@
       </section>`).join("");
     const open = root.querySelector(".panel") && !root.querySelector(".panel").hidden;
     root.innerHTML = `<style>${style}</style>
-    <nav class="wrap" aria-label="${u.btn}">
+    <nav class="wrap${scrollY > 160 ? " mini" : ""}" aria-label="${u.btn}">
       <div class="panel" id="p"${open ? "" : " hidden"}>
         <div class="head">
           <a class="home" href="${url("./")}">⌂ ${u.home}</a>
@@ -300,7 +312,7 @@
         </div>
         ${topics}
       </div>
-      <button class="toggle" type="button" aria-expanded="${open}" aria-controls="p"><span class="bars" aria-hidden="true"><i></i><i></i><i></i></span>${u.btn}</button>
+      <button class="toggle" type="button" aria-expanded="${open}" aria-controls="p"><span class="bars" aria-hidden="true"><i></i><i></i><i></i></span><span class="lbl">${u.btn}</span></button>
     </nav>`;
     wire();
   }
@@ -319,6 +331,7 @@
   root.addEventListener("keydown", e => { if (e.key === "Escape") { setOpen(false); root.querySelector(".toggle").focus(); } });
   document.addEventListener("click", e => { if (!e.composedPath().includes(host)) setOpen(false); });
   listeners.push(render);
+  addEventListener("scroll", () => { const w = root.querySelector(".wrap"); if (w) w.classList.toggle("mini", scrollY > 160); }, { passive: true });
 
   render();
   const mount = () => document.body.appendChild(host);
