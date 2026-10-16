@@ -1,0 +1,902 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Backstage Blues</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600..800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<script src="https://cdn.jsdelivr.net/npm/sql.js@1.10.3/dist/sql-asm.js"></script>
+<style>
+/* Layout: a festival at night. A laminated backstage pass as the header, the stage line-up as the chapter strip,
+   then the detective's notebook (story + task) beside the security laptop (SQL). */
+:root{
+  --night:#120d24; --night-2:#1d1438; --ink:#f3eefb; --muted:#b3a8cc; --line:#3a2d63;
+  --pink:#ff4fa3; --cyan:#4fe3ff; --lime:#b8ff5c; --gold:#ffd166; --bad:#ff7a7a; --bad-soft:#3b1522; --ok:#7dffb0; --ok-soft:#10301f;
+  --paper:#fbf7ef; --paper-ink:#241a3a; --paper-muted:#6a5f82; --paper-line:#e6dfd0;
+  --laptop:#0d0a1a;
+  --f-display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body:"Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono:"JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+*,*::before,*::after{font-feature-settings:"calt" 0,"liga" 0}
+html,body{margin:0}
+body{color:var(--ink);font:16px/1.55 var(--f-body);min-height:100vh;
+  background:
+    radial-gradient(900px 420px at 15% -5%, rgba(255,79,163,.22), transparent 65%),
+    radial-gradient(800px 420px at 85% 0%, rgba(79,227,255,.18), transparent 65%),
+    radial-gradient(700px 500px at 50% 110%, rgba(184,255,92,.10), transparent 60%),
+    linear-gradient(var(--night), var(--night-2));
+  background-attachment:fixed;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));padding-block:18px 48px}
+.wrap{max-width:1280px;margin:0 auto;display:grid;gap:18px}
+h1,h2,h3{font-family:var(--f-display);font-weight:800;margin:0;line-height:1.12;text-wrap:balance;letter-spacing:-.01em}
+code,pre,textarea{font-family:var(--f-mono)}
+:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.eyebrow{font:600 12px/1.2 var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.btn{font:700 15px var(--f-body);border:1px solid var(--line);background:#2a2050;color:var(--ink);padding:9px 15px;border-radius:8px;cursor:pointer}
+.btn:hover{border-color:var(--pink)}
+.btn.primary{background:var(--pink);border-color:var(--pink);color:#2b0a1b;box-shadow:0 3px 0 #a3235f}
+.btn.small{padding:6px 10px;font-size:13px}
+.btn.danger{color:#ffb3b3}
+.btn.ghost{background:transparent}
+
+/* ---- header: laminated pass ---- */
+header.top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px 20px}
+.sign{position:relative;display:flex;align-items:center;gap:16px;padding:14px 22px 14px 16px;max-width:100%;
+  background:linear-gradient(135deg,#ffffff,#f1ecff);color:#1a1230;border-radius:14px;
+  box-shadow:0 14px 34px rgba(0,0,0,.45), inset 0 0 0 3px #fff, inset 0 0 0 5px #d8cff5}
+.sign::before{content:"";position:absolute;top:-22px;left:40px;width:14px;height:34px;border-radius:7px;background:linear-gradient(var(--pink),#c0237a);box-shadow:0 2px 4px rgba(0,0,0,.4)}
+.sign .hole{position:absolute;top:8px;left:42px;width:10px;height:10px;border-radius:50%;background:#1a1230;box-shadow:inset 0 1px 2px #000}
+.sign h1{font-size:clamp(26px,3.6vw,40px);color:#1a1230}
+.sign .eyebrow{color:#7a6aa6}
+.guitar{flex:none;width:58px;height:58px}
+.stamp{font:800 13px var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:#b3123f;border:3px solid #b3123f;border-radius:6px;padding:4px 8px;transform:rotate(-6deg);opacity:.9}
+.stamp.closed{color:#1f8f4e;border-color:#1f8f4e}
+.meta{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px}
+.meta-item{display:flex;flex-direction:column;gap:2px}
+.meta-item .lbl{font:600 11px/1 var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.meta-item b{font:700 22px/1 var(--f-display)}
+
+/* ---- chapter strip: the line-up ---- */
+.field{position:relative;border-radius:14px;padding:16px 16px 10px;background:linear-gradient(#17112f,#100b22);border:1px solid var(--line);box-shadow:inset 0 0 0 1px rgba(255,255,255,.03)}
+.field::after{content:"";position:absolute;left:0;right:0;bottom:0;height:6px;border-radius:0 0 14px 14px;background:repeating-linear-gradient(90deg,var(--pink) 0 40px,var(--cyan) 40px 80px,var(--lime) 80px 120px,var(--gold) 120px 160px);opacity:.75}
+.steps{display:flex;gap:6px;overflow-x:auto;padding-bottom:10px;scrollbar-width:thin}
+.step{flex:1 0 96px;min-width:96px;display:grid;justify-items:center;gap:6px;padding:10px 6px 8px;border-radius:10px;border:1px solid var(--line);background:#1a1333;color:var(--ink);cursor:pointer;font:inherit;position:relative}
+.step .post{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:#2a2050;border:2px solid var(--line);font:800 15px var(--f-display)}
+.step .t{font:600 12px/1.25 var(--f-body);text-align:center;color:var(--muted);text-wrap:balance}
+.step .who{height:18px;font-size:16px;line-height:18px}
+.step.done .post{background:var(--lime);border-color:var(--lime);color:#17260a}
+.step.current{border-color:var(--pink);box-shadow:0 0 0 3px rgba(255,79,163,.25), 0 0 24px rgba(255,79,163,.25)}
+.step.current .t{color:var(--ink)}
+.step.locked{opacity:.45;cursor:not-allowed}
+.step.just .post{animation:pop .6s ease-out}
+@keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.35)}100%{transform:scale(1)}}
+.field.wave .step{animation:wave .9s ease-in-out}
+@keyframes wave{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
+.step-caption{font:600 14px var(--f-body);color:var(--muted);display:flex;gap:10px;align-items:baseline;padding:0 4px}
+.step-caption span{font:600 11px var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--pink)}
+
+/* ---- main ---- */
+main{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:18px;align-items:start}
+@media (max-width:980px){ main{grid-template-columns:minmax(0,1fr)} }
+.panel{border-radius:14px}
+.case{background:var(--paper);color:var(--paper-ink);padding:22px 24px 20px;box-shadow:0 14px 34px rgba(0,0,0,.4);
+  background-image:repeating-linear-gradient(transparent 0 27px, var(--paper-line) 27px 28px);background-position:0 8px}
+.case .eyebrow{color:var(--paper-muted)}
+.case h2{font-size:clamp(24px,3vw,32px);margin:4px 0 10px}
+.case p{margin:.5em 0}
+.case mark{background:#ffe9a8;color:#3a2b00;padding:0 4px;border-radius:3px}
+.case code{background:#ede7ff;color:#3b2a7a;padding:1px 5px;border-radius:4px;font-size:.92em}
+.case pre{background:var(--laptop);color:#e9f5ff;padding:12px 14px;border-radius:8px;overflow:auto;font-size:14px;line-height:1.5;margin:8px 0}
+.learn{margin-top:14px;padding:12px 14px;border-left:4px solid var(--cyan);background:rgba(79,227,255,.08);border-radius:0 8px 8px 0}
+.learn h3,.task h3{font-size:14px;letter-spacing:.08em;text-transform:uppercase;color:#1e7f99;margin-bottom:4px}
+.task{margin-top:14px;padding:12px 14px;border-left:4px solid var(--pink);background:rgba(255,79,163,.08);border-radius:0 8px 8px 0}
+.task h3{color:#b3123f}
+.task p{font-weight:700;font-size:17px}
+.anatomy{display:grid;gap:4px;margin:8px 0}
+.anatomy [role=row]{display:grid;grid-template-columns:minmax(0,auto) 1fr;gap:10px;align-items:baseline}
+.anatomy code{white-space:nowrap}
+.rules{margin:6px 0 0;padding-left:20px}
+.tries{display:grid;gap:6px;margin-top:8px}
+.try{text-align:left;font:600 13px var(--f-mono);background:var(--laptop);color:#e9f5ff;border:1px solid #3b2a7a;border-radius:6px;padding:8px 10px;cursor:pointer}
+.try:hover{border-color:var(--cyan)}
+details.hint{margin-top:10px;border:1px dashed #b9b0d6;border-radius:8px;padding:8px 12px;background:rgba(255,255,255,.5)}
+details.hint summary{cursor:pointer;font-weight:700;color:#4a3a80}
+.hint.locked{margin-top:10px;border:1px dashed #b9b0d6;border-radius:8px;padding:8px 12px;color:var(--paper-muted);background:rgba(0,0,0,.03)}
+.answer{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.answer input{flex:1 1 180px;font:16px var(--f-body);padding:10px 12px;border:2px solid #cfc6e8;border-radius:8px;background:#fff;color:var(--paper-ink)}
+.answer input:focus{border-color:var(--pink);outline:none}
+.verdict{margin-top:10px;padding:10px 12px;border-radius:8px;font-weight:700}
+.verdict.ok{background:#dff7e6;color:#145a2e}
+.verdict.bad{background:#ffe3e3;color:#8a1c1c}
+.verdict p{font-weight:400;margin:.3em 0 0}
+.navrow{display:flex;justify-content:space-between;gap:8px;margin-top:16px}
+.ending{margin-top:18px}
+.export{margin-top:14px;padding:12px 14px;border:2px solid #cfc6e8;border-radius:10px;background:#fff}
+.export h3{font-size:16px;margin-bottom:6px}
+.export-steps{padding-left:20px;margin:6px 0 10px}
+.export label{display:block;font-weight:700;margin-bottom:4px}
+.export input{width:100%;font:16px var(--f-body);padding:10px 12px;border:2px solid #cfc6e8;border-radius:8px;background:#fff;color:var(--paper-ink);margin-bottom:10px}
+.export-btns{display:flex;gap:8px;flex-wrap:wrap}
+.export-note{min-height:1.4em;font-size:14px;color:#1e7f99;margin:8px 0 0}
+
+/* ---- laptop ---- */
+.board-frame{background:linear-gradient(#2a2250,#1a1333);padding:10px;border:1px solid var(--line);box-shadow:0 14px 34px rgba(0,0,0,.45)}
+.chalk{display:grid;gap:10px;padding:16px;border-radius:8px;background:var(--laptop);box-shadow:inset 0 0 0 1px #2a2050, inset 0 0 60px rgba(79,227,255,.05);min-width:0}
+.chalk-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:6px 14px}
+.chalk h2{font-size:22px;color:#fff}
+.rule{font-size:13px;color:var(--muted)}
+textarea#sql{width:100%;min-height:150px;resize:vertical;font-size:16px;line-height:1.5;padding:12px 14px;border:1px solid var(--line);border-radius:8px;background:#07050f;color:#e9f5ff;caret-color:var(--pink)}
+.run-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.kbd{font:12px var(--f-mono);color:var(--muted)}
+.result-meta{font:600 13px var(--f-mono);color:var(--cyan);margin-bottom:6px}
+.tablebox{overflow-x:auto;max-height:360px;overflow-y:auto;border:1px solid var(--line);border-radius:8px;background:rgba(255,255,255,.03)}
+table{border-collapse:collapse;width:100%;font-size:15px;font-variant-numeric:tabular-nums}
+th,td{text-align:left;padding:7px 12px;border-bottom:1px solid var(--line);white-space:nowrap}
+th{position:sticky;top:0;background:#16102c;font:600 13px var(--f-mono);color:var(--cyan)}
+td.num{text-align:right}
+td.null{color:var(--muted);font-style:italic}
+tr:last-child td{border-bottom:none}
+.err{background:var(--bad-soft);color:var(--bad);border-radius:8px;padding:12px 14px;font-weight:700}
+.err p{margin:.3em 0 0;font-weight:400;color:var(--ink)}
+.note{color:var(--muted);font-style:italic;margin:0}
+.schema{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
+.tbl{border:1px solid var(--line);border-radius:8px;padding:10px 12px;background:rgba(255,255,255,.03)}
+.tbl button{font:700 15px var(--f-mono);background:none;border:0;color:var(--gold);cursor:pointer;padding:0}
+.tbl button:hover{text-decoration:underline}
+.tbl ul{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:7px}
+.tbl li{display:grid;grid-template-columns:auto 1fr;align-items:baseline;column-gap:8px;row-gap:1px}
+.tbl li .k{font:600 13px var(--f-mono);color:var(--ink)}
+.tbl li .k.fk{color:var(--cyan)}
+.tbl li .ty{justify-self:start;font:600 10px var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);border:1px solid var(--line);border-radius:3px;padding:0 4px}
+.tbl li .d{grid-column:1/-1;font:13px/1.4 var(--f-body);color:var(--muted)}
+.tbl li .d code{color:var(--gold)}
+
+/* ---- celebrations ---- */
+#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:60}
+.plus{position:fixed;z-index:61;pointer-events:none;font:800 30px var(--f-display);color:var(--lime);text-shadow:0 2px 0 #000;animation:plus 1.2s ease-out forwards;transform:translate(-50%,-50%)}
+@keyframes plus{0%{opacity:0;transform:translate(-50%,-50%) scale(.6)}20%{opacity:1;transform:translate(-50%,-70%) scale(1.15)}100%{opacity:0;transform:translate(-50%,-160%) scale(1)}}
+.shake{animation:shake .45s}
+@keyframes shake{0%,100%{transform:translate(0)}20%{transform:translate(-5px,2px)}40%{transform:translate(5px,-2px)}60%{transform:translate(-4px,1px)}80%{transform:translate(4px,-1px)}}
+#finale{position:fixed;inset:0;z-index:55;display:grid;place-items:center;overflow:auto;
+  background:radial-gradient(ellipse at 50% 30%, #3a1a66 0%, #120d24 60%, #07050f 100%)}
+#finale .beams{position:absolute;inset:-20%;background:
+  conic-gradient(from 0deg at 50% 0%, transparent 0 10deg, rgba(255,79,163,.18) 10deg 14deg, transparent 14deg 40deg, rgba(79,227,255,.18) 40deg 44deg, transparent 44deg 70deg, rgba(184,255,92,.16) 70deg 74deg, transparent 74deg 100deg, rgba(255,209,102,.16) 100deg 104deg, transparent 104deg 360deg);
+  animation:beams 6s linear infinite;transform-origin:50% 0}
+@keyframes beams{from{transform:rotate(-20deg)}50%{transform:rotate(20deg)}to{transform:rotate(-20deg)}}
+.finale-inner{position:relative;text-align:center;padding:28px 20px;max-width:760px}
+.big-stamp{display:inline-block;font:800 clamp(44px,9vw,96px)/1 var(--f-display);color:#fff;letter-spacing:-.02em;
+  text-shadow:0 0 18px var(--pink), 0 0 42px rgba(255,79,163,.6), 0 4px 0 #7a1248;transform:rotate(-4deg);animation:stampin .6s cubic-bezier(.2,1.6,.3,1) both}
+@keyframes stampin{from{transform:rotate(-20deg) scale(3);opacity:0}to{transform:rotate(-4deg) scale(1);opacity:1}}
+.finale-sub{font-size:clamp(17px,2.4vw,22px);color:var(--ink);margin:16px auto 0;max-width:40ch}
+.finale-stats{display:flex;justify-content:center;gap:28px;margin-top:22px;flex-wrap:wrap}
+.finale-stats div{display:grid;gap:2px}
+.finale-stats span{font:600 11px var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.finale-stats b{font:800 30px var(--f-display);color:var(--gold)}
+.caught{margin-top:18px;display:inline-block;padding:8px 14px;border:2px dashed var(--lime);border-radius:8px;color:var(--lime);font:600 14px var(--f-mono)}
+.finale-btns{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:24px}
+.hero-guitar{width:150px;height:150px;margin:0 auto;animation:swing 1.8s ease-in-out infinite;transform-origin:50% 10%}
+@keyframes swing{0%,100%{transform:rotate(-7deg)}50%{transform:rotate(7deg)}}
+.flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none;animation:flash .5s ease-out}
+@keyframes flash{0%{opacity:.9}100%{opacity:0}}
+@media (prefers-reduced-motion:reduce){ .big-stamp,.hero-guitar,.flash,#finale .beams,.step.just .post,.field.wave .step,.shake{animation:none} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="sign">
+      <span class="hole" aria-hidden="true"></span>
+      <svg class="guitar" viewBox="0 0 64 64" aria-hidden="true">
+        <path d="M44 8l12 12-20 20-12-12z" fill="#2b1a0e"/><path d="M50 6l8 8" stroke="#ffd166" stroke-width="3" stroke-linecap="round"/>
+        <path d="M30 26c-6-6-18-4-20 4-2 6 2 10 6 12-4 2-8 6-6 12 2 8 14 10 20 4 6-6 4-14 0-18 4-4 6-10 0-14z" fill="#d81b60"/>
+        <path d="M30 26c-6-6-18-4-20 4-2 6 2 10 6 12-4 2-8 6-6 12 2 8 14 10 20 4 6-6 4-14 0-18 4-4 6-10 0-14z" fill="none" stroke="#7a1248" stroke-width="2"/>
+        <circle cx="21" cy="40" r="5" fill="#2b1a0e"/><path d="M14 44h14" stroke="#ffd166" stroke-width="1.5"/>
+        <path d="M18 36L44 10" stroke="#f3eefb" stroke-width="1"/><path d="M20 38L46 12" stroke="#f3eefb" stroke-width="1"/>
+      </svg>
+      <div>
+        <div class="eyebrow">Zengő Festival · Tisza bank · Saturday night</div>
+        <h1>Backstage Blues</h1>
+      </div>
+      <span class="stamp" id="stamp">Guitar missing</span>
+    </div>
+    <div class="meta">
+      <span class="meta-item"><span class="lbl">Time</span><b id="timer">00:00</b></span>
+      <span class="meta-item"><span class="lbl">Progress</span><b id="solvedCount">–</b></span>
+      <button class="btn small" id="soundToggle" type="button" aria-pressed="true">Sound: on</button>
+      <button class="btn small danger" id="resetProgress" type="button">Start over</button>
+    </div>
+  </header>
+
+  <div class="field" id="field">
+    <nav class="steps" id="steps" aria-label="Chapters"></nav>
+  </div>
+  <div class="step-caption" id="stepCaption" aria-hidden="true"></div>
+
+  <main>
+    <section class="panel case" id="case" aria-live="polite"></section>
+    <section class="panel board-frame">
+      <div class="chalk">
+        <div class="chalk-head">
+          <h2>Security laptop</h2>
+          <span class="rule">Read two or more tables in one query: FROM a, b WHERE a.x_id = b.id</span>
+        </div>
+        <label for="sql" class="eyebrow">Your SQL query</label>
+        <textarea id="sql" spellcheck="false" autocapitalize="off" autocomplete="off"></textarea>
+        <div class="run-row">
+          <button class="btn primary" id="run" type="button">Run query</button>
+          <button class="btn" id="resetDb" type="button">Restore data</button>
+          <span class="kbd">Ctrl + Enter runs the query</span>
+        </div>
+        <div id="out"><p class="note">Opening the festival database…</p></div>
+        <div class="eyebrow">Tables and columns (click a table name to see everything in it)</div>
+        <div class="schema" id="schema"></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<canvas id="fx" aria-hidden="true"></canvas>
+<div id="finale" hidden role="dialog" aria-modal="true" aria-labelledby="finaleTitle">
+  <div class="beams" aria-hidden="true"></div>
+  <div class="finale-inner" id="finaleInner">
+    <div class="hero-guitar" id="heroGuitar" aria-hidden="true"></div>
+    <div class="big-stamp" id="finaleTitle">SHOW'S ON!</div>
+    <p class="finale-sub">Cherry is back on the Main Stage. Velvet Locomotive start at 22:00 sharp.</p>
+    <div class="finale-stats">
+      <div><span>Time</span><b id="fTime">–</b></div>
+      <div><span>Queries run</span><b id="fQueries">–</b></div>
+      <div><span>Rank</span><b id="fRank">–</b></div>
+    </div>
+    <div class="caught">Rozi Rab · caught on the Silent Disco stage, mid air-guitar</div>
+    <div class="finale-btns">
+      <button class="btn" id="finaleClose" type="button">See bonus tasks</button>
+      <button class="btn ghost" id="finaleAgain" type="button">Encore!</button>
+      <button class="btn ghost" id="finaleSave" type="button">Save answers</button>
+    </div>
+  </div>
+  <div class="flash"></div>
+</div>
+
+<script>
+const SEED = `
+CREATE TABLE bands (id INTEGER PRIMARY KEY, name TEXT, genre TEXT, country TEXT, members INTEGER);
+CREATE TABLE stages (id INTEGER PRIMARY KEY, name TEXT, capacity INTEGER, area TEXT);
+CREATE TABLE concerts (id INTEGER PRIMARY KEY, band_id INTEGER, stage_id INTEGER, day TEXT, start_time TEXT, end_time TEXT);
+CREATE TABLE crew (id INTEGER PRIMARY KEY, name TEXT, job TEXT, stage_id INTEGER, radio_channel INTEGER);
+CREATE TABLE passes (id INTEGER PRIMARY KEY, crew_id INTEGER, zone TEXT, time TEXT);
+CREATE TABLE managers (id INTEGER PRIMARY KEY, band_id INTEGER, name TEXT, phone TEXT);
+INSERT INTO bands VALUES (1,'Paprika Punks','punk','Hungary',4);
+INSERT INTO bands VALUES (2,'Danube Drift','indie','Hungary',5);
+INSERT INTO bands VALUES (3,'Velvet Locomotive','rock','UK',4);
+INSERT INTO bands VALUES (4,'Csárdás Collective','folk','Hungary',6);
+INSERT INTO bands VALUES (5,'Neon Gulyás','electro','Hungary',2);
+INSERT INTO bands VALUES (6,'The Baltic Owls','indie','Estonia',3);
+INSERT INTO bands VALUES (7,'Karol & the Krakow Brass','jazz','Poland',7);
+INSERT INTO bands VALUES (8,'Lady Lavender','pop','Austria',1);
+INSERT INTO bands VALUES (9,'Tokaj Thunder','metal','Hungary',5);
+INSERT INTO bands VALUES (10,'Bratislava Beat Club','electro','Slovakia',3);
+INSERT INTO bands VALUES (11,'Hollóház Choir','folk','Hungary',9);
+INSERT INTO bands VALUES (12,'Mango Tango','pop','Spain',4);
+INSERT INTO bands VALUES (13,'Zebra Crossing','rock','Germany',4);
+INSERT INTO bands VALUES (14,'Pusztawave','electro','Hungary',1);
+INSERT INTO bands VALUES (15,'Fruzsi Fülöp','pop','Hungary',1);
+INSERT INTO bands VALUES (16,'The Rusty Trams','punk','Czechia',4);
+INSERT INTO stages VALUES (1,'Main Stage',12000,'north');
+INSERT INTO stages VALUES (2,'Dune Tent',3000,'north');
+INSERT INTO stages VALUES (3,'Riverbank',5000,'river');
+INSERT INTO stages VALUES (4,'Folk Barn',1500,'south');
+INSERT INTO stages VALUES (5,'Silent Disco',800,'south');
+INSERT INTO concerts VALUES (1,1,3,'Friday','17:00','18:00');
+INSERT INTO concerts VALUES (2,6,2,'Friday','18:00','19:00');
+INSERT INTO concerts VALUES (3,12,1,'Friday','18:30','19:30');
+INSERT INTO concerts VALUES (4,4,4,'Friday','19:00','20:00');
+INSERT INTO concerts VALUES (5,7,3,'Friday','19:00','20:00');
+INSERT INTO concerts VALUES (6,5,2,'Friday','20:00','21:00');
+INSERT INTO concerts VALUES (7,2,1,'Friday','20:00','21:15');
+INSERT INTO concerts VALUES (8,16,3,'Friday','20:30','21:30');
+INSERT INTO concerts VALUES (9,10,5,'Friday','22:00','23:30');
+INSERT INTO concerts VALUES (10,8,1,'Friday','22:00','23:30');
+INSERT INTO concerts VALUES (11,14,5,'Friday','23:30','23:59');
+INSERT INTO concerts VALUES (12,11,4,'Saturday','16:00','17:00');
+INSERT INTO concerts VALUES (13,15,3,'Saturday','17:00','18:00');
+INSERT INTO concerts VALUES (14,13,1,'Saturday','17:30','18:30');
+INSERT INTO concerts VALUES (15,7,2,'Saturday','18:00','19:00');
+INSERT INTO concerts VALUES (16,1,3,'Saturday','18:30','19:30');
+INSERT INTO concerts VALUES (17,6,1,'Saturday','19:00','20:00');
+INSERT INTO concerts VALUES (18,4,4,'Saturday','19:30','20:30');
+INSERT INTO concerts VALUES (19,9,1,'Saturday','20:30','21:30');
+INSERT INTO concerts VALUES (20,5,5,'Saturday','21:00','22:00');
+INSERT INTO concerts VALUES (21,16,3,'Saturday','21:00','22:00');
+INSERT INTO concerts VALUES (22,3,1,'Saturday','22:00','23:30');
+INSERT INTO concerts VALUES (23,10,2,'Saturday','22:30','23:30');
+INSERT INTO concerts VALUES (24,14,5,'Saturday','22:30','23:59');
+INSERT INTO concerts VALUES (25,11,3,'Sunday','15:00','16:00');
+INSERT INTO concerts VALUES (26,15,1,'Sunday','16:00','17:00');
+INSERT INTO concerts VALUES (27,4,4,'Sunday','17:00','18:00');
+INSERT INTO concerts VALUES (28,12,3,'Sunday','18:00','19:00');
+INSERT INTO concerts VALUES (29,13,2,'Sunday','19:00','20:00');
+INSERT INTO concerts VALUES (30,2,3,'Sunday','20:00','21:00');
+INSERT INTO concerts VALUES (31,8,1,'Sunday','21:00','22:30');
+INSERT INTO concerts VALUES (32,9,3,'Sunday','21:30','22:30');
+INSERT INTO crew VALUES (1,'Gergő Hámori','roadie',1,3);
+INSERT INTO crew VALUES (2,'Bea Szalai','sound',1,3);
+INSERT INTO crew VALUES (3,'Máté Orbán','lights',1,3);
+INSERT INTO crew VALUES (4,'Nóra Kiss','security',1,1);
+INSERT INTO crew VALUES (5,'Dávid Bakos','sound',2,4);
+INSERT INTO crew VALUES (6,'Lilla Fehér','roadie',2,4);
+INSERT INTO crew VALUES (7,'Ákos Tar','security',3,1);
+INSERT INTO crew VALUES (8,'Petra Nagy','sound',3,5);
+INSERT INTO crew VALUES (9,'Zoli Berki','lights',3,5);
+INSERT INTO crew VALUES (10,'Hanna Rózsa','roadie',4,6);
+INSERT INTO crew VALUES (11,'Bence Varga','sound',4,6);
+INSERT INTO crew VALUES (12,'Rozi Rab','runner',5,7);
+INSERT INTO crew VALUES (13,'Emma Lukács','sound',5,7);
+INSERT INTO crew VALUES (14,'Tomi Sós','security',5,1);
+INSERT INTO passes VALUES (1,4,'Main backstage','18:40');
+INSERT INTO passes VALUES (2,1,'Main backstage','18:55');
+INSERT INTO passes VALUES (3,2,'Main backstage','19:02');
+INSERT INTO passes VALUES (4,6,'Dune backstage','19:10');
+INSERT INTO passes VALUES (5,5,'Dune backstage','19:12');
+INSERT INTO passes VALUES (6,8,'Riverbank backstage','19:30');
+INSERT INTO passes VALUES (7,12,'Catering','19:45');
+INSERT INTO passes VALUES (8,10,'Catering','19:50');
+INSERT INTO passes VALUES (9,3,'Main backstage','20:05');
+INSERT INTO passes VALUES (10,7,'Riverbank backstage','20:10');
+INSERT INTO passes VALUES (11,13,'Catering','20:20');
+INSERT INTO passes VALUES (12,9,'Riverbank backstage','20:25');
+INSERT INTO passes VALUES (13,1,'Catering','20:40');
+INSERT INTO passes VALUES (14,3,'Main backstage','20:55');
+INSERT INTO passes VALUES (15,11,'Crew parking','21:00');
+INSERT INTO passes VALUES (16,14,'Catering','21:05');
+INSERT INTO passes VALUES (17,1,'Main backstage','21:12');
+INSERT INTO passes VALUES (18,6,'Dune backstage','21:20');
+INSERT INTO passes VALUES (19,12,'Main backstage','21:23');
+INSERT INTO passes VALUES (20,2,'Main backstage','21:30');
+INSERT INTO passes VALUES (21,8,'Riverbank backstage','21:33');
+INSERT INTO passes VALUES (22,5,'Crew parking','21:38');
+INSERT INTO passes VALUES (23,4,'Main backstage','21:45');
+INSERT INTO passes VALUES (24,12,'Catering','21:52');
+INSERT INTO passes VALUES (25,3,'Main backstage','21:58');
+INSERT INTO passes VALUES (26,13,'Crew parking','22:05');
+INSERT INTO passes VALUES (27,9,'Riverbank backstage','22:10');
+INSERT INTO passes VALUES (28,1,'Main backstage','22:15');
+INSERT INTO passes VALUES (29,10,'Catering','22:20');
+INSERT INTO passes VALUES (30,7,'Riverbank backstage','22:30');
+INSERT INTO passes VALUES (31,6,'Catering','22:40');
+INSERT INTO passes VALUES (32,2,'Main backstage','22:48');
+INSERT INTO passes VALUES (33,14,'Crew parking','23:00');
+INSERT INTO passes VALUES (34,11,'Catering','23:10');
+INSERT INTO passes VALUES (35,12,'Crew parking','23:20');
+INSERT INTO passes VALUES (36,4,'Main backstage','23:40');
+INSERT INTO managers VALUES (1,1,'Ilona Pék','+36 30 111 2233');
+INSERT INTO managers VALUES (2,2,'Marci Dobó','+36 20 222 3344');
+INSERT INTO managers VALUES (3,3,'Harriet Cole','+44 7700 900123');
+INSERT INTO managers VALUES (4,4,'Teri Juhász','+36 70 333 4455');
+INSERT INTO managers VALUES (5,5,'Olivér Kun','+36 30 444 5566');
+INSERT INTO managers VALUES (6,6,'Kai Tamm','+372 5555 1234');
+INSERT INTO managers VALUES (7,7,'Agnieszka Lis','+48 600 123 456');
+INSERT INTO managers VALUES (8,8,'Felix Baumann','+43 660 123 4567');
+INSERT INTO managers VALUES (9,9,'Zsolt Erdős','+36 20 555 6677');
+INSERT INTO managers VALUES (10,10,'Jana Horváthová','+421 900 123 456');
+INSERT INTO managers VALUES (11,11,'Bori Szép','+36 70 666 7788');
+INSERT INTO managers VALUES (12,12,'Lucía Marín','+34 600 123 456');
+INSERT INTO managers VALUES (13,13,'Anke Vogel','+49 170 1234567');
+INSERT INTO managers VALUES (14,14,'Dénes Varga','+36 30 777 8899');
+INSERT INTO managers VALUES (15,15,'Panni Tóth','+36 20 888 9900');
+INSERT INTO managers VALUES (16,16,'Petr Dvořák','+420 601 123 456');
+`;
+const CHAPTERS = [
+ {
+  "refresher": true,
+  "title": "Quick refresher",
+  "story": "<p>Before the show, a 3-minute reminder of the basics. Every query has the same parts, always in this order.</p>\n  <div class=\"anatomy\" role=\"table\" aria-label=\"Parts of a query\">\n    <div role=\"row\"><code role=\"cell\">SELECT name, country</code><span role=\"cell\">which <b>columns</b> to show. <code>*</code> means all of them.</span></div>\n    <div role=\"row\"><code role=\"cell\">FROM bands</code><span role=\"cell\">which <b>table</b> to read</span></div>\n    <div role=\"row\"><code role=\"cell\">WHERE members &gt; 4</code><span role=\"cell\">which <b>rows</b> to keep</span></div>\n    <div role=\"row\"><code role=\"cell\">ORDER BY name;</code><span role=\"cell\">how to <b>sort</b> the result</span></div>\n  </div>\n  <ul class=\"rules\">\n    <li>Text values go in single quotes: <code>'Hungary'</code>. Numbers don't: <code>4</code>.</li>\n    <li>Combine conditions with <code>AND</code> and <code>OR</code>.</li>\n    <li>Today's new idea: one query can read <b>two or more tables</b> at once.</li>\n  </ul>",
+  "learn": "<p>One row in <code>bands</code> is one band. Click one to load and run it:</p>\n  <div class=\"tries\">\n    <button type=\"button\" class=\"try\" data-sql=\"SELECT * FROM bands;\">SELECT * FROM bands;</button>\n    <button type=\"button\" class=\"try\" data-sql=\"SELECT name, genre FROM bands WHERE country = 'Hungary';\">SELECT name, genre FROM bands WHERE country = 'Hungary';</button>\n    <button type=\"button\" class=\"try\" data-sql=\"SELECT * FROM stages ORDER BY capacity DESC;\">SELECT * FROM stages ORDER BY capacity DESC;</button>\n  </div>",
+  "task": "Warm-up: which country are Velvet Locomotive from?",
+  "hints": [
+   "Use WHERE name = 'Velvet Locomotive' and look at the country column.",
+   {
+    "sql": "SELECT name, country FROM bands\nWHERE name = 'Velvet Locomotive';"
+   }
+  ],
+  "answers": [
+   "uk",
+   "united kingdom",
+   "the uk",
+   "the united kingdom",
+   "england",
+   "britain",
+   "great britain"
+  ],
+  "placeholder": "country",
+  "success": "The UK. They're tonight's headliner, and their guitarist Vic plays a cherry-red guitar she calls Cherry. Remember that name.",
+  "starter": "SELECT * FROM bands;"
+ },
+ {
+  "title": "Numbers instead of names",
+  "story": "<p>Saturday, <mark>21:45</mark>, Zengő Festival on the Tisza bank. Fifteen minutes before the headliner, Vic's guitar <b>Cherry</b> is gone from the Main Stage backstage. The head of security shoves a laptop at you: the festival database. \"Find it before 22:00.\"</p>\n  <p>You open the <code>concerts</code> table and see no band names at all. Only numbers in a column called <code>band_id</code>.</p>",
+  "learn": "<p>A database keeps each thing in <b>one</b> place. A band's name lives in <code>bands</code>; <code>concerts</code> only stores the band's <code>id</code>. That number is a <b>reference</b>: <code>band_id = 3</code> means \"the band whose id is 3\". For now, look it up by hand with two queries.</p>\n  <pre>SELECT * FROM concerts WHERE day = 'Saturday';\n\nSELECT name FROM bands WHERE id = 3;</pre>",
+  "task": "Which band is the Saturday 22:00 headliner on stage 1?",
+  "hints": [
+   "Find the concert row with day 'Saturday' and start_time '22:00'. Note its band_id, then look that id up in the bands table.",
+   {
+    "sql": "SELECT band_id FROM concerts\nWHERE day = 'Saturday' AND start_time = '22:00' AND stage_id = 1;\n\nSELECT name FROM bands WHERE id = 3;"
+   }
+  ],
+  "answers": [
+   "velvet locomotive",
+   "the velvet locomotive"
+  ],
+  "placeholder": "band name",
+  "success": "Velvet Locomotive, of course. But two queries for one question is slow, and it's 21:47. There's a faster way."
+ },
+ {
+  "title": "The multiplication mistake",
+  "story": "<p>You try to list the concerts <i>with</i> band names in one go, and write <code>FROM concerts, bands</code>. The result scrolls on and on. Paprika Punks seem to be playing every concert of the weekend. <mark>Something has gone very wrong.</mark> Or has it?</p>",
+  "learn": "<p>Naming two tables in <code>FROM</code> pairs up <b>every row of the first with every row of the second</b>. 32 concerts × 16 bands = 512 rows, and most of them are nonsense. That's not a bug: it's the raw material. The next step throws the wrong pairs away.</p>\n  <pre>SELECT * FROM concerts, bands;</pre>",
+  "task": "How many rows do you get from FROM concerts, bands with no WHERE?",
+  "hints": [
+   "COUNT(*) over the two tables, with nothing else. Or count the rows of each table and multiply.",
+   {
+    "sql": "SELECT COUNT(*) FROM concerts, bands;"
+   }
+  ],
+  "answers": [
+   "512",
+   "five hundred twelve",
+   "five hundred and twelve"
+  ],
+  "placeholder": "a number",
+  "success": "512 rows: every concert paired with every band. Now let's keep only the pairs that belong together."
+ },
+ {
+  "title": "The matching rule",
+  "story": "<p>The head of security leans over your shoulder. \"A concert belongs to a band when the concert's <code>band_id</code> equals the band's <code>id</code>. <mark>Tell the database that.</mark>\"</p>",
+  "learn": "<p>Add a <code>WHERE</code> condition that compares the two id columns. Write <code>table.column</code> so SQL knows which <code>id</code> you mean. Any other conditions go after it with <code>AND</code>.</p>\n  <pre>SELECT concerts.day, concerts.start_time, bands.name\nFROM concerts, bands\nWHERE concerts.band_id = bands.id;</pre>\n  <p>32 rows now: one per concert, each with the right band's name.</p>",
+  "task": "Which band played on Friday at 20:00 on stage 2, the Dune Tent?",
+  "hints": [
+   "Start with the matching rule WHERE concerts.band_id = bands.id, then add AND day = 'Friday' AND start_time = '20:00' AND stage_id = 2.",
+   {
+    "sql": "SELECT bands.name, concerts.day, concerts.start_time\nFROM concerts, bands\nWHERE concerts.band_id = bands.id\n  AND concerts.day = 'Friday'\n  AND concerts.start_time = '20:00'\n  AND concerts.stage_id = 2;"
+   }
+  ],
+  "answers": [
+   "neon gulyas",
+   "neon gulyás",
+   "neongulyas"
+  ],
+  "placeholder": "band name",
+  "success": "Neon Gulyás. Their singer swears she saw a black guitar case being hurried past the Dune Tent at about 21:30. Keep going."
+ },
+ {
+  "title": "Three tables, short names",
+  "story": "<p>Stage numbers are getting annoying: you keep forgetting which one is the Dune Tent. The <code>stages</code> table has the names. <mark>Three tables, one query.</mark></p>",
+  "learn": "<p>Give each table a short <b>alias</b> right after its name in <code>FROM</code>: <code>concerts c, bands b, stages s</code>. Then write <code>c.band_id</code> instead of <code>concerts.band_id</code>. Every extra table needs its own matching rule, joined with <code>AND</code>.</p>\n  <pre>SELECT c.day, c.start_time, b.name, s.name\nFROM concerts c, bands b, stages s\nWHERE c.band_id = b.id\n  AND c.stage_id = s.id;</pre>",
+  "task": "On which stage do the Csárdás Collective play on Sunday?",
+  "hints": [
+   "Two matching rules: c.band_id = b.id AND c.stage_id = s.id. Then AND b.name = 'Csárdás Collective' AND c.day = 'Sunday'.",
+   {
+    "sql": "SELECT s.name, c.day, c.start_time\nFROM concerts c, bands b, stages s\nWHERE c.band_id = b.id\n  AND c.stage_id = s.id\n  AND b.name = 'Csárdás Collective'\n  AND c.day = 'Sunday';"
+   }
+  ],
+  "answers": [
+   "folk barn",
+   "the folk barn",
+   "folkbarn"
+  ],
+  "placeholder": "stage name",
+  "success": "The Folk Barn. The dancers there have looked at nothing but their own feet all weekend. Not a witness among them."
+ },
+ {
+  "title": "The band before",
+  "story": "<p>Cherry was last seen at <mark>21:10</mark>, propped on its stand while the previous act was still on. Whoever packed up after that set walked right past it.</p>",
+  "learn": "<p>Matching rules and ordinary filters mix freely in <code>WHERE</code>. A good habit: matching rules first, then the filters.</p>\n  <pre>SELECT b.name, c.start_time, c.end_time\nFROM concerts c, bands b, stages s\nWHERE c.band_id = b.id AND c.stage_id = s.id\n  AND s.name = 'Riverbank' AND c.day = 'Sunday';</pre>",
+  "task": "Which band's concert ended on the Main Stage at 21:30 on Saturday?",
+  "hints": [
+   "Join all three tables, then filter: s.name = 'Main Stage', c.day = 'Saturday', c.end_time = '21:30'.",
+   {
+    "sql": "SELECT b.name\nFROM concerts c, bands b, stages s\nWHERE c.band_id = b.id\n  AND c.stage_id = s.id\n  AND s.name = 'Main Stage'\n  AND c.day = 'Saturday'\n  AND c.end_time = '21:30';"
+   }
+  ],
+  "answers": [
+   "tokaj thunder"
+  ],
+  "placeholder": "band name",
+  "success": "Tokaj Thunder. Five metalheads and zero missing guitars: they counted theirs twice, loudly. Not them."
+ },
+ {
+  "title": "The busiest stage",
+  "story": "<p>The festival director grabs you. \"While you're in there: which stage had the most concerts? For the press release.\" <mark>Not relevant to the guitar.</mark> But she's the director.</p>",
+  "learn": "<p>Everything you already know still works after a join: <code>GROUP BY</code>, <code>COUNT</code>, <code>ORDER BY</code>. SQL matches the tables first, then groups the result.</p>\n  <pre>SELECT s.name, COUNT(*) AS concerts\nFROM concerts c, stages s\nWHERE c.stage_id = s.id\nGROUP BY s.name\nORDER BY COUNT(*) DESC;</pre>",
+  "task": "Which stage hosts the most concerts over the weekend?",
+  "hints": [
+   "Join concerts and stages, GROUP BY s.name, and sort by COUNT(*) DESC.",
+   {
+    "sql": "SELECT s.name, COUNT(*) AS concerts\nFROM concerts c, stages s\nWHERE c.stage_id = s.id\nGROUP BY s.name\nORDER BY COUNT(*) DESC;"
+   }
+  ],
+  "answers": [
+   "riverbank",
+   "the riverbank",
+   "river bank"
+  ],
+  "placeholder": "stage name",
+  "success": "The Riverbank, with 10. The director is delighted. 21:52. Back to the guitar."
+ },
+ {
+  "title": "Who works where",
+  "story": "<p>Only crew with a Main Stage lanyard are allowed backstage there. The <code>crew</code> table says who is assigned to which stage, again by <code>stage_id</code>.</p>",
+  "learn": "<p>The same trick works for any two tables that share an id: <code>crew.stage_id</code> refers to <code>stages.id</code>.</p>\n  <pre>SELECT c.name, c.job, s.name\nFROM crew c, stages s\nWHERE c.stage_id = s.id;</pre>",
+  "task": "What is the name of the roadie assigned to the Main Stage?",
+  "hints": [
+   "Join crew and stages, then AND s.name = 'Main Stage' AND c.job = 'roadie'.",
+   {
+    "sql": "SELECT c.name, c.job\nFROM crew c, stages s\nWHERE c.stage_id = s.id\n  AND s.name = 'Main Stage'\n  AND c.job = 'roadie';"
+   }
+  ],
+  "answers": [
+   "gergo hamori",
+   "gergő hámori",
+   "hamori gergo",
+   "gergo"
+  ],
+  "placeholder": "name",
+  "success": "Gergő Hámori. Nine years on the Main Stage crew, and he cried when Cherry went missing. Probably not him either."
+ },
+ {
+  "title": "The scan log",
+  "story": "<p>Every backstage door has a card reader. The <code>passes</code> table logs every scan on Saturday: who (<code>crew_id</code>), which door, what time. Cherry vanished <mark>between 21:10 and 21:40</mark>.</p>",
+  "learn": "<p>Times are stored as text like <code>'21:23'</code>. Because they always have the same shape, you can compare them with <code>&gt;=</code> and <code>&lt;=</code>.</p>\n  <pre>SELECT c.name, p.zone, p.time\nFROM passes p, crew c\nWHERE p.crew_id = c.id\n  AND p.time &gt;= '20:00' AND p.time &lt;= '20:30';</pre>",
+  "task": "How many different people scanned into 'Main backstage' between 21:10 and 21:40?",
+  "hints": [
+   "Join passes and crew, then AND p.zone = 'Main backstage' AND p.time >= '21:10' AND p.time <= '21:40'. Count the names you get.",
+   {
+    "sql": "SELECT c.name, p.time\nFROM passes p, crew c\nWHERE p.crew_id = c.id\n  AND p.zone = 'Main backstage'\n  AND p.time >= '21:10'\n  AND p.time <= '21:40';"
+   }
+  ],
+  "answers": [
+   "3",
+   "three"
+  ],
+  "placeholder": "a number",
+  "success": "Three people. Two of them belong there. One of them doesn't."
+ },
+ {
+  "title": "The wrong lanyard",
+  "story": "<p>Three names, and the clock says <mark>21:58</mark>. One more table: <code>stages</code>, through <code>crew.stage_id</code>. Whoever scanned into the Main backstage but is assigned to a <b>different</b> stage has some explaining to do.</p>",
+  "learn": "<p>Three tables again: <code>passes → crew → stages</code>. Two matching rules, then your filters. <code>&lt;&gt;</code> means \"not equal\".</p>\n  <pre>SELECT c.name, s.name, p.time\nFROM passes p, crew c, stages s\nWHERE p.crew_id = c.id\n  AND c.stage_id = s.id\n  AND s.name &lt;&gt; 'Main Stage';</pre>",
+  "task": "Who scanned into 'Main backstage' between 21:10 and 21:40 without being Main Stage crew?",
+  "hints": [
+   "Take your chapter 8 query, add stages with AND c.stage_id = s.id, and add AND s.name <> 'Main Stage'.",
+   {
+    "sql": "SELECT c.name, s.name AS their_stage, p.time\nFROM passes p, crew c, stages s\nWHERE p.crew_id = c.id\n  AND c.stage_id = s.id\n  AND p.zone = 'Main backstage'\n  AND p.time >= '21:10'\n  AND p.time <= '21:40'\n  AND s.name <> 'Main Stage';"
+   }
+  ],
+  "answers": [
+   "rozi rab",
+   "rab rozi",
+   "rozi"
+  ],
+  "placeholder": "name",
+  "success": "Rozi Rab, runner at the Silent Disco. Security sprints over: Rozi is on the Silent Disco stage with Cherry, 800 people in headphones watching her play air guitar to a song only she can hear. She \"borrowed it for one song\". Cherry is back on the Main Stage at 21:59. The show starts on time."
+ }
+];
+const BONUS = ["List every band together with the stages it plays on, without repeats. Try SELECT DISTINCT.", "Which country's bands play the most concerts over the weekend?", "How many musicians stand on the Main Stage in total on Sunday? (join + SUM(members))", "Which crew members use radio channel 1, and which stage is each of them on?", "Which concert on another stage overlaps with the headliner? (same day, starts before 23:30, ends after 22:00)", "Which manager should security phone about the Saturday 22:00 concert? (concerts → bands → managers)"];
+const COLDOCS = {"bands": {"id": "Row number of the band.", "name": "Band name, e.g. <code>'Paprika Punks'</code>.", "genre": "<code>'punk'</code>, <code>'rock'</code>, <code>'pop'</code>, <code>'folk'</code>, <code>'electro'</code>, <code>'jazz'</code>, <code>'metal'</code> or <code>'indie'</code>.", "country": "Where the band is from, e.g. <code>'Hungary'</code>.", "members": "How many people are in the band."}, "stages": {"id": "Row number of the stage.", "name": "<code>'Main Stage'</code>, <code>'Dune Tent'</code>, <code>'Riverbank'</code>, <code>'Folk Barn'</code> or <code>'Silent Disco'</code>.", "capacity": "How many people fit in front of it.", "area": "Part of the festival site: <code>'north'</code>, <code>'river'</code> or <code>'south'</code>."}, "concerts": {"id": "Row number of the concert.", "band_id": "Which band plays: the <code>id</code> of a row in <code>bands</code>.", "stage_id": "Where: the <code>id</code> of a row in <code>stages</code>.", "day": "<code>'Friday'</code>, <code>'Saturday'</code> or <code>'Sunday'</code>.", "start_time": "Start, as text <code>'HH:MM'</code>.", "end_time": "End, as text <code>'HH:MM'</code>."}, "crew": {"id": "Row number of the crew member.", "name": "Their name.", "job": "<code>'roadie'</code>, <code>'sound'</code>, <code>'lights'</code>, <code>'security'</code> or <code>'runner'</code>.", "stage_id": "The stage they are assigned to: the <code>id</code> of a row in <code>stages</code>.", "radio_channel": "Walkie-talkie channel number."}, "passes": {"id": "Row number of the scan.", "crew_id": "Who scanned their card: the <code>id</code> of a row in <code>crew</code>.", "zone": "Which door: e.g. <code>'Main backstage'</code> or <code>'Catering'</code>.", "time": "When, on Saturday, as text <code>'HH:MM'</code>."}, "managers": {"id": "Row number of the manager.", "band_id": "Whose manager: the <code>id</code> of a row in <code>bands</code>. Every band has exactly one.", "name": "The manager's name.", "phone": "Phone number, as text."}};
+const HAND_STEPS = ["Write your name below.", "Click <b>Save answers (.txt)</b>. The file goes to your Downloads folder.", "Open the assignment in <b>Google Classroom</b>, upload the file under <b>Add or create → File</b>, then press <b>Turn in</b>."];
+const RANKS = ["Festival Legend", "Head of Security", "Security", "Volunteer"];
+const T = {
+  refresher:"Refresher", before:"Before the show · about 3 minutes", chapter:(i,n)=>`Chapter ${i} of ${n}`, solved:(n,t)=>`${n} / ${t} chapters solved`, sealed:n=>`Clue 2 · sealed. It opens after ${n} more wrong answer${n===1?'':'s'}.`, rows:n=>`${n} row${n===1?'':'s'}`,
+  try_:"Try it", learn:"SQL for this step", task:"Your task", hint1:"Clue 1 · hint", hint2:"Clue 2 · a working query", answer:"Answer", check:"Check answer",
+  correct:"Correct.", wrong:"Not quite.", wrongTip:"Look at your result again. Did you include the matching rule (WHERE … = …) for every pair of tables? Check whether the task asks for a number or a name.", prev:"Previous chapter", next:"Next chapter", start:"Start the search", yourans:"Your answer",
+  ready:"Database ready. Write a query and press Run.", empty:"The query box is empty. Type a query first.", zero:"0 rows. No rows match all of your conditions. Check the spelling of text values and your matching rule.", sound:"Sound", reset:"Start over", reset2:"Click again to erase progress",
+  errGeneric:"Check spelling, commas, brackets and quotes. Text values need single quotes, like 'Saturday'.", errCol:"That column name doesn't exist, or it's ambiguous. When two tables have a column with the same name (like id), write table.id or alias.id.", errTab:"That table doesn't exist. The tables are: bands, stages, concerts, crew, passes, managers.", errAmb:"Ambiguous column: both tables have a column with that name. Write the table name in front of it, like concerts.id or c.id.", sqlErr:"The query has an error.", engFail:"The SQL engine could not load.", engFail2:"Check the internet connection and reload the page.", engStart:"The SQL engine could not start.",
+  endH:"Show's on", endP:m=>`Cherry is back in Vic's hands, Rozi Rab is banished to the merch tent, and 12,000 people are screaming at the Main Stage. You found the guitar in about <b>${m} minutes</b>, joining up to three tables with FROM, aliases and matching rules in WHERE.`, endBonus:"Bonus tasks for fast detectives:", handH:"Hand in your answers", name:"Your name", namePh:"Write your name here", save:"Save answers (.txt)", copy:"Copy as text", replay:"Replay the celebration",
+  xNameFirst:"Write your name first.", xCopied:"Copied. Paste it into the assignment in Google Classroom as a private comment, then press Turn in.", xBlocked:"Copying is blocked here. Use Save answers instead.", xSaved:f=>`Saved as ${f}. Now upload it to the assignment in Google Classroom and press Turn in.`, xSaveBlocked:"Saving is blocked here. Use Copy as text instead.",
+  filePrefix:"backstage", reportTitle:"BACKSTAGE BLUES - ANSWER SHEET", rName:"Name", rFinished:"Finished", rTime:"Time taken", rQueries:"Queries run", rDev:"NOTE: completed with the teacher code, so some answers may be missing.",
+  rTask:"Task", rAnswer:"Answer", rSkipped:"(skipped)", rUnsolved:"(not solved)", rWrong:"Wrong answers", rQuery:"Query", rNone:"(none saved)",
+  stampOpen:"Guitar missing", stampDone:"Guitar found", plusReady:"Ready!", plusGood:"Nice one!", num:"number", text:"text"
+};
+
+/* ---------- state ---------- */
+const KEY = "backstage-en-v1";
+let state = { solved: [], current: 0, start: Date.now(), end: null, drafts: {} };
+try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && Array.isArray(s.solved)) state = Object.assign(state, s); } catch(e){}
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(state)); } catch(e){} }
+const num = i => CHAPTERS[0].refresher ? i : i+1;
+const NCH = CHAPTERS.filter(c=>!c.refresher).length;
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const norm = s => s.normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().replace(/[^a-z0-9 ]/g," ").replace(/\s+/g," ").trim();
+const isUnlocked = i => i === 0 || state.solved.includes(i-1);
+const allDone = () => state.solved.length === CHAPTERS.length;
+const starterFor = i => CHAPTERS[i].starter || `-- ${CHAPTERS[i].refresher ? T.refresher : num(i)}: ${CHAPTERS[i].title}\n`;
+const guitarSvg = () => document.querySelector(".guitar").outerHTML.replace('class="guitar"', 'width="100%" height="100%"');
+$("heroGuitar").innerHTML = guitarSvg();
+
+/* ---------- line-up strip ---------- */
+function renderSteps(){
+  $("steps").innerHTML = CHAPTERS.map((c,i)=>{
+    const cls = ["step"];
+    if (state.solved.includes(i)) cls.push("done");
+    if (i === state.current) cls.push("current");
+    if (!isUnlocked(i)) cls.push("locked");
+    const who = i === state.current ? "🔎" : (state.solved.includes(i) ? "🎸" : "");
+    return `<button type="button" class="${cls.join(" ")}" data-i="${i}" ${isUnlocked(i)?"":"aria-disabled=\"true\""} title="${esc(c.title)}">
+      <span class="who" aria-hidden="true">${who}</span><span class="post">${c.refresher ? "R" : num(i)}</span><span class="t">${esc(c.title)}</span></button>`;
+  }).join("");
+  { const cc = CHAPTERS[state.current]; $("stepCaption").innerHTML = `<span>${cc.refresher ? T.refresher : T.chapter(num(state.current), NCH)}</span>${esc(cc.title)}`; }
+  $("solvedCount").textContent = T.solved(state.solved.filter(i=>!CHAPTERS[i].refresher).length, NCH);
+  const st = $("stamp"); st.textContent = allDone() ? T.stampDone : T.stampOpen; st.classList.toggle("closed", allDone());
+}
+$("steps").addEventListener("click", e=>{ const b = e.target.closest(".step"); if (!b) return; const i = +b.dataset.i; if (isUnlocked(i)) goTo(i); });
+$("case").addEventListener("click", e=>{ const b = e.target.closest("button.try"); if (!b) return; $("sql").value = b.dataset.sql; run(); });
+function goTo(i){ state.drafts[state.current] = $("sql").value; state.current = i; save(); renderSteps(); renderCase(); $("sql").value = state.drafts[i] ?? starterFor(i); }
+
+/* ---------- notebook ---------- */
+function renderCase(){
+  const i = state.current, c = CHAPTERS[i], solved = state.solved.includes(i);
+  const hints = c.hints.map(h=>{
+    if (typeof h === "string") return `<details class="hint"><summary>${T.hint1}</summary><p>${esc(h)}</p></details>`;
+    const tries = (state.wrong && state.wrong[i]) || 0;
+    if (!solved && tries < 2) return `<div class="hint locked">${T.sealed(2 - tries)}</div>`;
+    return `<details class="hint"><summary>${T.hint2}</summary><pre>${esc(h.sql)}</pre></details>`;
+  }).join("");
+  const last = i === CHAPTERS.length - 1;
+  $("case").innerHTML = `
+    <div class="eyebrow">${c.refresher ? T.before : T.chapter(num(i), NCH)}</div>
+    <h2>${esc(c.title)}</h2>
+    <div class="story">${c.story}</div>
+    <div class="learn"><h3>${c.refresher ? T.try_ : T.learn}</h3>${c.learn}</div>
+    <div class="task"><h3>${T.task}</h3><p>${esc(c.task)}</p></div>
+    ${hints}
+    <form class="answer" id="answerForm" autocomplete="off">
+      <input id="answer" type="text" placeholder="${T.answer}: ${esc(c.placeholder)}" aria-label="${T.yourans}" ${solved?"disabled":""}>
+      <button class="btn primary" type="submit" ${solved?"disabled":""}>${T.check}</button>
+    </form>
+    <div id="verdict">${solved ? `<div class="verdict ok">${T.correct}<p>${esc(c.success)}</p></div>` : ""}</div>
+    <div class="navrow">
+      <button class="btn" type="button" id="prev" ${i===0?"hidden":""}>${T.prev}</button>
+      <button class="btn primary" type="button" id="next" ${solved && !last ? "" : "hidden"}>${c.refresher ? T.start : T.next}</button>
+    </div>
+    ${allDone() && last ? endingHtml() : ""}`;
+  $("answerForm").addEventListener("submit", e=>{ e.preventDefault(); check(); });
+  $("prev").onclick = ()=> goTo(i-1);
+  $("next").onclick = ()=> goTo(i+1);
+}
+function check(){
+  const i = state.current, c = CHAPTERS[i], v = norm($("answer").value);
+  if (!v) return;
+  if (devHash(v) === 2236979087){ devComplete(); return; }
+  if (c.answers.map(norm).includes(v)){
+    if (!state.solved.includes(i)){ state.answers = state.answers || {}; state.answers[i] = $("answer").value.trim(); state.solvedSql = state.solvedSql || {}; state.solvedSql[i] = $("sql").value; }
+    const r = document.querySelector("#answerForm button").getBoundingClientRect();
+    const first = !state.solved.includes(i);
+    if (first) state.solved.push(i);
+    const finished = first && allDone();
+    if (allDone() && !state.end) state.end = Date.now();
+    save(); renderSteps(); renderCase();
+    const n = $("next"); if (n && !n.hidden) n.focus();
+    if (finished) finale(); else if (first) chapterWin(r.left + r.width/2, r.top + r.height/2, i);
+  } else {
+    state.wrong = state.wrong || {}; state.wrong[i] = (state.wrong[i] || 0) + 1; save();
+    if (state.wrong[i] <= 2){ renderCase(); $("answer").focus(); }
+    $("verdict").innerHTML = `<div class="verdict bad">${T.wrong}<p>${T.wrongTip}</p></div>`;
+  }
+}
+/* teacher shortcut: a secret answer that solves every chapter (only its hash is stored here) */
+function devHash(s){ let x = 5381; for (const ch of s) x = ((x*33) ^ ch.charCodeAt(0)) >>> 0; return x; }
+function devComplete(){ state.dev = true; state.solved = CHAPTERS.map((_,k)=>k); state.current = CHAPTERS.length - 1; if (!state.end) state.end = Date.now(); save(); renderSteps(); renderCase(); $("sql").value = starterFor(state.current); finale(); }
+function endingHtml(){
+  const mins = Math.max(1, Math.round(((state.end||Date.now()) - state.start)/60000));
+  return `<div class="ending learn">
+    <h3>${T.endH}</h3><p>${T.endP(mins)}</p>
+    <p><b>${T.endBonus}</b></p><ol>${BONUS.map(b=>`<li>${esc(b)}</li>`).join("")}</ol>
+    <div class="export">
+      <h3>${T.handH}</h3>
+      <ol class="export-steps">${HAND_STEPS.map(s=>`<li>${s}</li>`).join("")}</ol>
+      <label for="studentName">${T.name}</label>
+      <input id="studentName" type="text" autocomplete="off" placeholder="${T.namePh}" value="${esc(state.student || "")}">
+      <div class="export-btns"><button class="btn primary" type="button" id="saveTxt">${T.save}</button><button class="btn" type="button" id="copyTxt">${T.copy}</button></div>
+      <p class="export-note" id="exportNote" aria-live="polite"></p>
+    </div>
+    <div><button class="btn" type="button" id="replayFinale">${T.replay}</button></div>
+  </div>`;
+}
+$("case").addEventListener("click", e=>{ if (e.target.id === "replayFinale") finale(); if (e.target.id === "saveTxt") exportAnswers("save"); if (e.target.id === "copyTxt") exportAnswers("copy"); });
+$("case").addEventListener("input", e=>{ if (e.target.id === "studentName"){ state.student = e.target.value; save(); } });
+
+/* ---------- answer sheet export ---------- */
+function fmtTime(ms){ const m = Math.floor(ms/60000), s = Math.floor(ms/1000)%60; return `${m}:${String(s).padStart(2,"0")}`; }
+function buildReport(){
+  const pad = n => String(n).padStart(2,"0"), d = new Date(state.end || Date.now()), L = [];
+  L.push(T.reportTitle); L.push("=".repeat(T.reportTitle.length));
+  L.push(`${T.rName}: ${(state.student || "").trim()}`);
+  L.push(`${T.rFinished}: ${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`);
+  L.push(`${T.rTime}: ${fmtTime((state.end || Date.now()) - state.start)}`);
+  L.push(`${T.rQueries}: ${state.queries || 0}`);
+  if (state.dev) L.push(T.rDev);
+  L.push("");
+  CHAPTERS.forEach((c,i)=>{
+    L.push(`${c.refresher ? T.refresher : T.chapter(num(i), NCH)}: ${c.title}`); L.push("-".repeat(40));
+    L.push(`${T.rTask}: ${c.task}`);
+    L.push(`${T.rAnswer}: ${(state.answers && state.answers[i]) || (state.solved.includes(i) ? T.rSkipped : T.rUnsolved)}`);
+    L.push(`${T.rWrong}: ${(state.wrong && state.wrong[i]) || 0}`);
+    const q = ((state.solvedSql && state.solvedSql[i]) || "").trim();
+    L.push(`${T.rQuery}:`); L.push(q ? q.split("\n").map(x=>"    " + x).join("\n") : "    " + T.rNone); L.push("");
+  });
+  return L.join("\r\n");
+}
+function exportAnswers(mode){
+  const note = $("exportNote"), nameEl = $("studentName"), name = (state.student || "").trim();
+  if (!name){ note.textContent = T.xNameFirst; nameEl.focus(); return; }
+  const text = buildReport();
+  if (mode === "copy"){
+    const done = ()=> note.textContent = T.xCopied;
+    const fallback = ()=>{ const t = document.createElement("textarea"); t.value = text; document.body.appendChild(t); t.select(); try { document.execCommand("copy"); done(); } catch(e){ note.textContent = T.xBlocked; } t.remove(); };
+    try { navigator.clipboard.writeText(text).then(done, fallback); } catch(e){ fallback(); }
+    return;
+  }
+  const slug = name.normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[^A-Za-z0-9]+/g,"-").replace(/^-|-$/g,"") || "student";
+  const file = `${T.filePrefix}-${slug}.txt`;
+  try {
+    const url = URL.createObjectURL(new Blob(["﻿" + text], {type:"text/plain;charset=utf-8"}));
+    const a = document.createElement("a"); a.href = url; a.download = file; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=> URL.revokeObjectURL(url), 2000);
+    note.textContent = T.xSaved(file);
+  } catch(e){ note.textContent = T.xSaveBlocked; }
+}
+
+/* ---------- timer + reset ---------- */
+function tick(){ const ms = (state.end || Date.now()) - state.start; const m = Math.floor(ms/60000), s = Math.floor(ms/1000)%60; $("timer").textContent = `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`; }
+setInterval(tick, 1000); tick();
+let resetArmed = null;
+$("resetProgress").onclick = ()=>{
+  const b = $("resetProgress");
+  if (!resetArmed){ b.textContent = T.reset2; resetArmed = setTimeout(()=>{ b.textContent = T.reset; resetArmed = null; }, 3000); return; }
+  clearTimeout(resetArmed); resetArmed = null; b.textContent = T.reset;
+  state = { solved: [], current: 0, start: Date.now(), end: null, drafts: {} };
+  save(); renderSteps(); renderCase(); $("sql").value = starterFor(0); resetDb();
+};
+
+/* ---------- celebrations ---------- */
+const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const FXC = ["#ff4fa3","#4fe3ff","#b8ff5c","#ffd166","#ffffff"];
+const fx = { c: $("fx"), ctx: $("fx").getContext("2d"), parts: [], raf: 0, w: 0, h: 0 };
+function fxSize(){ const d = devicePixelRatio || 1; fx.w = innerWidth; fx.h = innerHeight; fx.c.width = fx.w*d; fx.c.height = fx.h*d; fx.ctx.setTransform(d,0,0,d,0,0); }
+addEventListener("resize", fxSize); fxSize();
+const rnd = (a,b) => a + Math.random()*(b-a);
+function spawn(p){ fx.parts.push(p); if (!fx.raf) fx.raf = requestAnimationFrame(fxLoop); }
+function fxLoop(){
+  const g = fx.ctx; g.clearRect(0,0,fx.w,fx.h);
+  fx.parts = fx.parts.filter(p => p.life > 0 && p.y < fx.h + 60);
+  for (const p of fx.parts){
+    p.vx *= p.drag; p.vy = p.vy*p.drag + p.g; p.x += p.vx; p.y += p.vy; p.rot += p.vr; p.life--;
+    g.save(); g.globalAlpha = Math.min(1, p.life/30); g.translate(p.x, p.y); g.rotate(p.rot); g.fillStyle = p.color;
+    if (p.type === "confetti"){ g.scale(1, Math.cos(p.life*0.2)); g.fillRect(-p.s/2, -p.s/4, p.s, p.s/2); }
+    else if (p.type === "note"){ g.font = `${p.s*2}px serif`; g.textAlign = "center"; g.fillText("♪", 0, p.s); }
+    else { g.globalCompositeOperation = "lighter"; g.beginPath(); g.arc(0,0,p.s,0,6.283); g.fill(); }
+    g.restore();
+  }
+  fx.raf = fx.parts.length ? requestAnimationFrame(fxLoop) : 0;
+}
+function burst(x, y, n, power=9){
+  for (let k=0; k<n; k++){ const ang = rnd(0, Math.PI*2), sp = rnd(power*.3, power), note = Math.random() < .3;
+    spawn({ type: note ? "note" : "confetti", x, y, vx: Math.cos(ang)*sp, vy: Math.sin(ang)*sp - power*.5, g: .25, drag: .985, rot: rnd(0,6), vr: rnd(-.3,.3), s: rnd(7,13), color: FXC[k % FXC.length], life: rnd(70,120) }); }
+}
+function firework(x, y){
+  const col = FXC[Math.floor(rnd(0, 4))], n = 90;
+  for (let k=0; k<n; k++){ const ang = k/n*Math.PI*2, sp = rnd(3,7.5);
+    spawn({ type:"spark", x, y, vx: Math.cos(ang)*sp, vy: Math.sin(ang)*sp, g:.06, drag:.975, rot:0, vr:0, s: rnd(1.6,3.2), color: col, life: rnd(60,95) }); }
+  tone(rnd(90,160), .35, "sawtooth", .05, 40);
+}
+function rain(ms){
+  const end = performance.now() + ms;
+  (function drop(){ for (let k=0; k<6; k++){ const note = Math.random() < .35;
+      spawn({ type: note ? "note" : "confetti", x: rnd(0, fx.w), y: -20, vx: rnd(-1.5,1.5), vy: rnd(2,5), g:.05, drag:.995, rot: rnd(0,6), vr: rnd(-.2,.2), s: rnd(8,14), color: FXC[Math.floor(rnd(0,5))], life: 400 }); }
+    if (performance.now() < end) setTimeout(drop, 60); })();
+}
+function fireworkShow(count){ for (let k=0; k<count; k++) setTimeout(()=> firework(rnd(fx.w*.12, fx.w*.88), rnd(fx.h*.1, fx.h*.5)), 400 + k*rnd(280,420)); }
+
+let soundOn = true;
+try { soundOn = localStorage.getItem(KEY+"-sound") !== "off"; } catch(e){}
+function paintSound(){ const b = $("soundToggle"); b.textContent = `${T.sound}: ${soundOn?"on":"off"}`; b.setAttribute("aria-pressed", soundOn); }
+paintSound();
+$("soundToggle").onclick = ()=>{ soundOn = !soundOn; paintSound(); try { localStorage.setItem(KEY+"-sound", soundOn?"on":"off"); } catch(e){} };
+let actx = null;
+function tone(freq, dur, type="triangle", vol=.12, slideTo=null, delay=0){
+  if (!soundOn) return;
+  try { actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+    const t = actx.currentTime + delay, o = actx.createOscillator(), g = actx.createGain();
+    o.type = type; o.frequency.setValueAtTime(freq, t); if (slideTo) o.frequency.exponentialRampToValueAtTime(slideTo, t + dur);
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + .02); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(g).connect(actx.destination); o.start(t); o.stop(t + dur + .05); } catch(e){}
+}
+function riff(){ [196,247,294,392].forEach((f,k)=>{ tone(f, .16, "sawtooth", .08, null, k*.11); tone(f*2, .16, "square", .03, null, k*.11); }); }
+function powerChord(){ [82.4,123.5,164.8,246.9,329.6].forEach(f=>{ tone(f, 1.4, "sawtooth", .07, null, 0); tone(f*1.005, 1.4, "square", .035, null, 0); }); tone(60, .5, "sine", .2, 30, 0); }
+function fanfare(){ riff(); setTimeout(powerChord, 520); setTimeout(()=>{ [392,523,659,784,1047].forEach((f,k)=> tone(f, k===4?1.2:.2, "triangle", .12, null, k*.14)); }, 1400); }
+function chapterWin(x, y, i){
+  riff();
+  const el = document.createElement("div"); el.className = "plus"; el.textContent = CHAPTERS[i].refresher ? T.plusReady : T.plusGood;
+  el.style.left = x+"px"; el.style.top = (y-30)+"px"; document.body.appendChild(el); setTimeout(()=>el.remove(), 1300);
+  const s = document.querySelector(`.step[data-i="${i+1}"]`) || document.querySelector(`.step[data-i="${i}"]`); if (s) s.classList.add("just");
+  if (reduceMotion) return;
+  burst(x, y, 60);
+  const wrap = document.querySelector(".wrap"); wrap.classList.remove("shake"); void wrap.offsetWidth; wrap.classList.add("shake");
+}
+function rankFor(min){ return min <= 20 ? RANKS[0] : min <= 28 ? RANKS[1] : min <= 35 ? RANKS[2] : RANKS[3]; }
+function finale(){
+  const ms = (state.end || Date.now()) - state.start, mins = Math.floor(ms/60000), secs = Math.floor(ms/1000)%60;
+  $("fTime").textContent = `${mins}:${String(secs).padStart(2,"0")}`; $("fQueries").textContent = state.queries || 0; $("fRank").textContent = rankFor(ms/60000);
+  const f = $("finale"); f.hidden = true; void f.offsetWidth; f.hidden = false;
+  const inner = $("finaleInner"); inner.classList.remove("shake"); void inner.offsetWidth; inner.classList.add("shake");
+  fanfare(); $("finaleClose").focus();
+  if (reduceMotion) return;
+  setTimeout(()=>{ burst(fx.w/2, fx.h*.35, 160, 16); }, 950); setTimeout(()=> rain(5000), 1200); setTimeout(()=> fireworkShow(8), 1400);
+}
+function closeFinale(){
+  $("finale").hidden = true;
+  const st = $("field"); st.classList.remove("wave"); [...$("steps").children].forEach((b,k)=> b.style.animationDelay = (k*.08)+"s"); void st.offsetWidth; st.classList.add("wave");
+  const end = document.querySelector(".ending"); if (end) end.scrollIntoView({behavior: reduceMotion?"auto":"smooth", block:"center"});
+}
+$("finaleClose").onclick = closeFinale;
+$("finaleSave").onclick = ()=>{ closeFinale(); setTimeout(()=>{ const n = $("studentName"); if (n){ n.scrollIntoView({block:"center"}); n.focus(); } }, 400); };
+$("finaleAgain").onclick = ()=>{ powerChord(); if (reduceMotion) return; fireworkShow(6); rain(2500); };
+addEventListener("keydown", e=>{ if (e.key === "Escape" && !$("finale").hidden) closeFinale(); });
+
+/* ---------- database ---------- */
+let SQL = null, db = null;
+function resetDb(){ if (!SQL) return; if (db) db.close(); db = new SQL.Database(); db.run(SEED); $("out").innerHTML = `<p class="note">${T.ready}</p>`; renderSchema(); }
+function renderSchema(){
+  const t = db.exec("SELECT name FROM sqlite_master WHERE type='table' ORDER BY rowid");
+  if (!t.length){ $("schema").innerHTML = ""; return; }
+  $("schema").innerHTML = t[0].values.map(([name])=>{
+    const cols = db.exec(`PRAGMA table_info("${name.replace(/"/g,'""')}")`), docs = COLDOCS[name] || {};
+    const lis = cols.length ? cols[0].values.map(r=>`<li><span class="k${/_id$/.test(r[1]) ? " fk" : ""}">${esc(r[1])}</span><span class="ty">${/INT|REAL/i.test(r[2]) ? T.num : T.text}</span>${docs[r[1]] ? `<span class="d">${docs[r[1]]}</span>` : ""}</li>`).join("") : "";
+    return `<div class="tbl"><button type="button" data-t="${esc(name)}">${esc(name)}</button><ul>${lis}</ul></div>`;
+  }).join("");
+}
+$("schema").addEventListener("click", e=>{ const b = e.target.closest("button[data-t]"); if (!b) return; $("sql").value = `SELECT * FROM ${b.dataset.t};`; run(); });
+function fmt(x){ return typeof x === "number" && !Number.isInteger(x) ? String(Math.round(x*1000)/1000) : String(x); }
+function run(){
+  if (!db) return;
+  const sql = $("sql").value;
+  state.drafts[state.current] = sql; state.queries = (state.queries||0) + 1; save();
+  const bare = sql.replace(/--[^\n]*/g," ").replace(/\/\*[\s\S]*?\*\//g," ").trim();
+  if (!bare){ $("out").innerHTML = `<p class="note">${T.empty}</p>`; return; }
+  try {
+    const res = db.exec(sql);
+    renderSchema();
+    if (!res.length){ $("out").innerHTML = `<p class="note">${T.zero}</p>`; return; }
+    $("out").innerHTML = res.map(r=>`<div class="result-meta">${T.rows(r.values.length)}</div>
+      <div class="tablebox"><table><thead><tr>${r.columns.map(c=>`<th>${esc(c)}</th>`).join("")}</tr></thead>
+      <tbody>${r.values.map(v=>`<tr>${v.map(x=> x===null ? `<td class="null">NULL</td>` : `<td${typeof x==="number"?' class="num"':""}>${esc(fmt(x))}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`).join("");
+  } catch(e){
+    let tip = T.errGeneric;
+    if (/no such column/i.test(e.message)) tip = T.errCol;
+    if (/ambiguous column/i.test(e.message)) tip = T.errAmb;
+    if (/no such table/i.test(e.message)) tip = T.errTab;
+    $("out").innerHTML = `<div class="err">${T.sqlErr}<p>${esc(e.message)}</p><p>${tip}</p></div>`;
+  }
+}
+$("run").onclick = run; $("resetDb").onclick = resetDb;
+$("sql").addEventListener("keydown", e=>{
+  if ((e.ctrlKey || e.metaKey) && e.key === "Enter"){ e.preventDefault(); run(); }
+  if (e.key === "Tab" && !e.shiftKey){ e.preventDefault(); const t = e.target, s = t.selectionStart; t.value = t.value.slice(0,s) + "  " + t.value.slice(t.selectionEnd); t.selectionStart = t.selectionEnd = s + 2; }
+});
+
+/* ---------- boot ---------- */
+if (state.current >= CHAPTERS.length || !isUnlocked(state.current)) state.current = 0;
+renderSteps(); renderCase();
+$("sql").value = state.drafts[state.current] ?? starterFor(state.current);
+if (typeof initSqlJs !== "function"){ $("out").innerHTML = `<div class="err">${T.engFail}<p>${T.engFail2}</p></div>`; }
+else { initSqlJs().then(s=>{ SQL = s; resetDb(); }).catch(e=>{ $("out").innerHTML = `<div class="err">${T.engStart}<p>${esc(e.message)}</p></div>`; }); }
+</script>
+<script src="../../nav.js" defer></script>
+</body>
+</html>
