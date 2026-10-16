@@ -201,6 +201,7 @@ table.ops{background:#fff;border:1px solid #e5d98a;border-radius:4px;font-size:1
 .export input{font:700 22px var(--f-hand);color:var(--pen);padding:4px 4px 2px;border:none;border-bottom:2px solid var(--pen);background:transparent;min-width:0}
 .export input:focus-visible{outline:none;border-bottom-width:3px;background:rgba(37,70,184,.06)}
 .export-btns{display:flex;gap:8px;flex-wrap:wrap}
+.export-steps{margin:0;padding-left:1.3em;display:grid;gap:4px;font-size:15px;color:var(--ink)}
 .export-note{margin:0;font-weight:700;color:var(--ok);min-height:1.2em}
 
 /* security camera monitor */
@@ -840,6 +841,11 @@ function endingHtml(){
     <ol>${BONUS.map(b=>`<li>${esc(b)}</li>`).join("")}</ol>
     <div class="export">
       <h3>Hand in your answers</h3>
+      <ol class="export-steps">
+        <li>Write your name below.</li>
+        <li>Click <b>Save answers (.txt)</b>. The file goes to your Downloads folder.</li>
+        <li>Open the assignment in <b>Google Classroom</b>, upload the file under <b>Add or create → File</b>, then press <b>Turn in</b>.</li>
+      </ol>
       <label for="studentName">Your name</label>
       <input id="studentName" type="text" autocomplete="off" placeholder="Write your name here" value="${esc(state.student || "")}">
       <div class="export-btns">
@@ -890,7 +896,7 @@ function exportAnswers(mode){
   if (!name){ note.textContent = "Write your name first."; nameEl.focus(); return; }
   const text = buildReport();
   if (mode === "copy"){
-    const done = ()=> note.textContent = "Copied. Paste it wherever your teacher asks.";
+    const done = ()=> note.textContent = "Copied. Paste it into the assignment in Google Classroom as a private comment, then press Turn in.";
     const fallback = ()=>{ const t = document.createElement("textarea"); t.value = text; document.body.appendChild(t); t.select();
       try { document.execCommand("copy"); done(); } catch(e){ note.textContent = "Copying is blocked here. Use Save answers instead."; } t.remove(); };
     try { navigator.clipboard.writeText(text).then(done, fallback); } catch(e){ fallback(); }
@@ -902,7 +908,7 @@ function exportAnswers(mode){
     const url = URL.createObjectURL(new Blob(["\ufeff" + text], {type:"text/plain;charset=utf-8"}));
     const a = document.createElement("a"); a.href = url; a.download = file; document.body.appendChild(a); a.click(); a.remove();
     setTimeout(()=> URL.revokeObjectURL(url), 2000);
-    note.textContent = `Saved as ${file}. Check your Downloads folder.`;
+    note.textContent = `Saved as ${file}. Now upload it to the assignment in Google Classroom and press Turn in.`;
   } catch(e){ note.textContent = "Saving is blocked here. Use Copy as text instead."; }
 }
 
