@@ -146,6 +146,13 @@ a{color:inherit}
 .demo h4 a{text-decoration:none}
 .demo h4 a::after{content:"";position:absolute;inset:0}
 .demo p{margin:0 0 4px;color:var(--chalk-dim);font-size:15px}
+/* a demo left alone on a new row lies flat across it instead of leaving a hole */
+@media (min-width:1000px){
+  .items>.demo:nth-child(3n+1):last-child{grid-column:1/-1;display:grid;grid-template-columns:minmax(0,300px) 1fr;grid-template-rows:auto auto 1fr;column-gap:22px;align-items:start}
+  .items>.demo:nth-child(3n+1):last-child .cover{grid-row:1/4}
+  .items>.demo:nth-child(3n+1):last-child .kind{margin-top:4px;justify-self:start}
+  .items>.demo:nth-child(3n+1):last-child p{max-width:52ch}
+}
 
 /* ---------- chalk tray (footer) ---------- */
 .tray{margin-top:40px;background:linear-gradient(var(--wood-hi),var(--wood) 40%,var(--wood-lo));box-shadow:0 -3px 0 rgba(0,0,0,.2) inset}
@@ -302,7 +309,7 @@ a{color:inherit}
       <g fill="none" stroke-width="2" stroke="#4fe3ff" opacity=".9">${[80,96,112,128,144].map((y,i)=>`<path d="M247 ${y}C260 ${y} 260 ${i<3?100:116} 274 ${i<3?100:116}"/>`).join("")}</g>
       <g stroke-width="4" fill="none" stroke-linecap="round"><path d="M60 66V24h120v42" stroke="#ff4fa3"/><path d="M200 66V24h120v42" stroke="#4fe3ff"/></g>
       <g font-family="Kalam,cursive" font-weight="700" font-size="18" text-anchor="middle"><text x="120" y="20" fill="#ff4fa3">1 : N</text><text x="260" y="20" fill="#4fe3ff">N : 1</text></g>
-      <g font-family="Kalam,cursive" font-size="16" fill="#b8ff5c"><text x="200" y="186" text-anchor="middle">✓ WHERE a.x_id = b.id</text></g>
+      <g font-family="Kalam,cursive" font-size="16" fill="#b8ff5c"><text x="200" y="186" text-anchor="middle">✓ WHERE …_id = …id</text></g>
     </svg>`,
     pact:`<svg viewBox="0 0 400 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
       <defs><radialGradient id="pk" cx=".5" cy=".2" r=".9"><stop offset="0" stop-color="#4a3420"/><stop offset="1" stop-color="#15110d"/></radialGradient></defs>
