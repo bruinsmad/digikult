@@ -76,6 +76,34 @@
                 files: { en: "sql/group-by/pasture.html" }
               }
             ]
+          },
+          {
+            id: "joins",
+            title: { hu: "Táblák összekapcsolása: FROM a, b WHERE a.x_id = b.id", en: "Joining tables: FROM a, b WHERE a.x_id = b.id" },
+            pages: [
+              {
+                id: "backstage",
+                kind: "story",
+                minutes: 35,
+                title: { hu: "Backstage: az eltűnt gitár", en: "Backstage: The Missing Guitar" },
+                desc: {
+                  hu: "Fesztiválon vagyunk, és a főzenekar gitárja eltűnt. Hat tábla, egy éjszaka – kösd össze őket és találd meg a tettest.",
+                  en: "A festival night and the headliner's guitar is gone. Six tables, one night – connect them and find the culprit."
+                },
+                files: { en: "sql/joins/backstage.html", hu: "sql/joins/backstage-hu.html" },
+                progress: { chapters: 9, keys: { en: "backstage-en-v1", hu: "backstage-hu-v1" } }
+              },
+              {
+                id: "matchmaker",
+                kind: "demo",
+                title: { hu: "A párosító", en: "The Matchmaker" },
+                desc: {
+                  hu: "Kivetítős bemutató: kábelek kötik össze a táblákat, és kiderül, 1:1, 1:N vagy N:N a kapcsolat – vagy hibás.",
+                  en: "Projector demo: cables connect the tables and show whether a link is 1:1, 1:N, N:N – or a mistake."
+                },
+                files: { en: "sql/joins/matchmaker.html", hu: "sql/joins/matchmaker-hu.html" }
+              }
+            ]
           }
         ]
       },
