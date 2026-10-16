@@ -34,6 +34,8 @@ body{color:var(--ink);font:16px/1.55 var(--f-body);min-height:100vh;
   background-attachment:fixed;
   padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));padding-block:18px 48px}
 .wrap{max-width:1280px;margin:0 auto;display:grid;gap:18px}
+.wrap{grid-template-columns:minmax(0,1fr)} .wrap>*{min-width:0}
+@media (max-width:640px){ .sign{flex-wrap:wrap} .sign .stamp{order:3} .sign h1{font-size:26px} }
 h1,h2,h3{font-family:var(--f-display);font-weight:800;margin:0;line-height:1.12;text-wrap:balance;letter-spacing:-.01em}
 code,pre,textarea{font-family:var(--f-mono)}
 :focus-visible{outline:3px solid var(--gold);outline-offset:2px}
