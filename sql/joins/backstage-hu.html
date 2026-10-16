@@ -97,6 +97,31 @@ main{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:18px;ali
 .case pre{background:var(--laptop);color:#e9f5ff;padding:12px 14px;border-radius:8px;overflow:auto;font-size:14px;line-height:1.5;margin:8px 0}
 .learn{margin-top:14px;padding:12px 14px;border-left:4px solid var(--cyan);background:rgba(79,227,255,.08);border-radius:0 8px 8px 0}
 .learn h3,.task h3{font-size:14px;letter-spacing:.08em;text-transform:uppercase;color:#1e7f99;margin-bottom:4px}
+.links{margin-top:14px;padding:12px 14px 10px;border-radius:10px;border:1px solid var(--lk-border);background:var(--lk-bg)}
+.links h3{font-size:14px;letter-spacing:.08em;text-transform:uppercase;color:var(--lk-title);margin-bottom:2px}
+.lk-board{position:relative;display:flex;flex-wrap:nowrap;justify-content:center;align-items:flex-start;column-gap:46px;row-gap:30px;padding:16px 4px 8px}
+.lk-board.stack{flex-direction:column;align-items:flex-start;padding:10px 46px 8px 8px;width:max-content;max-width:100%;margin:0 auto}
+.lk-svg{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;overflow:visible;z-index:2}
+.lk-card{position:relative;z-index:1;flex:none;min-width:96px;border:2px solid var(--lk-head);border-radius:8px;background:var(--lk-card);font:13px/1.35 var(--f-mono);overflow:hidden;box-shadow:0 3px 0 rgba(0,0,0,.12)}
+.lk-board.stack .lk-card{min-width:170px}
+.lk-card .h{background:var(--lk-head);color:var(--lk-head-ink);padding:5px 8px;font-weight:700}
+.lk-card .r{padding:4px 8px;border-top:1px solid var(--paper-line);display:flex;gap:6px;align-items:center;color:var(--paper-ink)}
+.lk-card .r .ic{font-size:11px;width:14px;text-align:center;opacity:.75}
+.lk-card .r.k{font-weight:700}
+.lk-card .r.k, .lk-card .r[data-c$="_id"]{font-weight:700}
+.lk-card .r:not(.k):not([data-c$="_id"]){color:var(--paper-muted)}
+.lk-card .r.on{box-shadow:inset 5px 0 0 var(--c);font-weight:700;background:var(--lk-on)}
+.lk-card .r.more{color:var(--paper-muted);font:italic 12px var(--f-body);padding:3px 8px}
+.lk-end{font:700 14px var(--f-mono);paint-order:stroke;stroke:var(--lk-bg-solid);stroke-width:4px}
+.lk-mid{fill:var(--lk-bg-solid);stroke:var(--lk-loose);stroke-width:2}
+.lk-midt{font:700 14px var(--f-mono);fill:var(--lk-loose)}
+.lk-note{color:var(--paper-muted);font-size:14px;text-align:center;margin:2px 0 4px!important}
+.lk-rules{list-style:none;margin:6px 0 0;padding:0;display:grid;gap:5px;font-size:14px}
+.lk-rules li{display:flex;flex-wrap:wrap;gap:3px 10px;align-items:center}
+.lk-rules .sw{width:18px;height:4px;border-radius:2px;flex:none}
+.lk-rules .kind{color:var(--paper-muted)}
+@media (max-width:640px){ .links{padding:10px 8px} .lk-card{min-width:0;font-size:12px} .lk-card .r{padding:4px 8px} .lk-card .h{padding:5px 8px} }
+.links{--lk-bg:#fff;--lk-bg-solid:#fff;--lk-border:var(--paper-line);--lk-title:#5b3fa0;--lk-card:#fff;--lk-head:#241a3a;--lk-head-ink:#fff;--lk-on:#faf7ff;--lk-loose:#8a7fa3;--lk1:#e4572e;--lk2:#1f86b5;--lk3:#3c9a3a;--lk4:#b0369a;--lk5:#c48a00;--lk6:#555}
 .task{margin-top:14px;padding:12px 14px;border-left:4px solid var(--pink);background:rgba(255,79,163,.08);border-radius:0 8px 8px 0}
 .task h3{color:#b3123f}
 .task p{font-weight:700;font-size:17px}
@@ -226,7 +251,7 @@ tr:last-child td{border-bottom:none}
       <div class="chalk">
         <div class="chalk-head">
           <h2>Biztonsági laptop</h2>
-          <span class="rule">Két vagy több tábla egy lekérdezésben: FROM a, b WHERE a.x_id = b.id</span>
+          <span class="rule">Két vagy több tábla egy lekérdezésben: FROM koncertek, zenekarok WHERE koncertek.zenekar_id = zenekarok.id</span>
         </div>
         <label for="sql" class="eyebrow">A te SQL-lekérdezésed</label>
         <textarea id="sql" spellcheck="false" autocapitalize="off" autocomplete="off"></textarea>
@@ -255,7 +280,7 @@ tr:last-child td{border-bottom:none}
       <div><span>Lekérdezések</span><b id="fQueries">–</b></div>
       <div><span>Rang</span><b id="fRank">–</b></div>
     </div>
-    <div class="caught">Rozi Rab · a Néma diszkó színpadán, levegőgitározás közben elkapva</div>
+    <div class="caught">Pusztawave · a Néma diszkó mögött elkapva, Cseresznyét hangolva</div>
     <div class="finale-btns">
       <button class="btn" id="finaleClose" type="button">Bónuszfeladatok</button>
       <button class="btn ghost" id="finaleAgain" type="button">Ráadást!</button>
@@ -270,9 +295,6 @@ const SEED = `
 CREATE TABLE zenekarok (id INTEGER PRIMARY KEY, nev TEXT, mufaj TEXT, orszag TEXT, tagok INTEGER);
 CREATE TABLE szinpadok (id INTEGER PRIMARY KEY, nev TEXT, ferohely INTEGER, terulet TEXT);
 CREATE TABLE koncertek (id INTEGER PRIMARY KEY, zenekar_id INTEGER, szinpad_id INTEGER, nap TEXT, kezdes TEXT, vege TEXT);
-CREATE TABLE stab (id INTEGER PRIMARY KEY, nev TEXT, munka TEXT, szinpad_id INTEGER, radio INTEGER);
-CREATE TABLE belepesek (id INTEGER PRIMARY KEY, stab_id INTEGER, zona TEXT, ido TEXT);
-CREATE TABLE menedzserek (id INTEGER PRIMARY KEY, zenekar_id INTEGER, nev TEXT, telefon TEXT);
 INSERT INTO zenekarok VALUES (1,'Paprika Punks','punk','Magyarország',4);
 INSERT INTO zenekarok VALUES (2,'Danube Drift','indie','Magyarország',5);
 INSERT INTO zenekarok VALUES (3,'Velvet Locomotive','rock','Egyesült Királyság',4);
@@ -326,72 +348,6 @@ INSERT INTO koncertek VALUES (29,13,2,'vasárnap','19:00','20:00');
 INSERT INTO koncertek VALUES (30,2,3,'vasárnap','20:00','21:00');
 INSERT INTO koncertek VALUES (31,8,1,'vasárnap','21:00','22:30');
 INSERT INTO koncertek VALUES (32,9,3,'vasárnap','21:30','22:30');
-INSERT INTO stab VALUES (1,'Gergő Hámori','roadie',1,3);
-INSERT INTO stab VALUES (2,'Bea Szalai','hangmérnök',1,3);
-INSERT INTO stab VALUES (3,'Máté Orbán','fénytechnikus',1,3);
-INSERT INTO stab VALUES (4,'Nóra Kiss','biztonsági őr',1,1);
-INSERT INTO stab VALUES (5,'Dávid Bakos','hangmérnök',2,4);
-INSERT INTO stab VALUES (6,'Lilla Fehér','roadie',2,4);
-INSERT INTO stab VALUES (7,'Ákos Tar','biztonsági őr',3,1);
-INSERT INTO stab VALUES (8,'Petra Nagy','hangmérnök',3,5);
-INSERT INTO stab VALUES (9,'Zoli Berki','fénytechnikus',3,5);
-INSERT INTO stab VALUES (10,'Hanna Rózsa','roadie',4,6);
-INSERT INTO stab VALUES (11,'Bence Varga','hangmérnök',4,6);
-INSERT INTO stab VALUES (12,'Rozi Rab','futár',5,7);
-INSERT INTO stab VALUES (13,'Emma Lukács','hangmérnök',5,7);
-INSERT INTO stab VALUES (14,'Tomi Sós','biztonsági őr',5,1);
-INSERT INTO belepesek VALUES (1,4,'Nagyszínpad backstage','18:40');
-INSERT INTO belepesek VALUES (2,1,'Nagyszínpad backstage','18:55');
-INSERT INTO belepesek VALUES (3,2,'Nagyszínpad backstage','19:02');
-INSERT INTO belepesek VALUES (4,6,'Dűne backstage','19:10');
-INSERT INTO belepesek VALUES (5,5,'Dűne backstage','19:12');
-INSERT INTO belepesek VALUES (6,8,'Tiszapart backstage','19:30');
-INSERT INTO belepesek VALUES (7,12,'Étkező','19:45');
-INSERT INTO belepesek VALUES (8,10,'Étkező','19:50');
-INSERT INTO belepesek VALUES (9,3,'Nagyszínpad backstage','20:05');
-INSERT INTO belepesek VALUES (10,7,'Tiszapart backstage','20:10');
-INSERT INTO belepesek VALUES (11,13,'Étkező','20:20');
-INSERT INTO belepesek VALUES (12,9,'Tiszapart backstage','20:25');
-INSERT INTO belepesek VALUES (13,1,'Étkező','20:40');
-INSERT INTO belepesek VALUES (14,3,'Nagyszínpad backstage','20:55');
-INSERT INTO belepesek VALUES (15,11,'Stáb parkoló','21:00');
-INSERT INTO belepesek VALUES (16,14,'Étkező','21:05');
-INSERT INTO belepesek VALUES (17,1,'Nagyszínpad backstage','21:12');
-INSERT INTO belepesek VALUES (18,6,'Dűne backstage','21:20');
-INSERT INTO belepesek VALUES (19,12,'Nagyszínpad backstage','21:23');
-INSERT INTO belepesek VALUES (20,2,'Nagyszínpad backstage','21:30');
-INSERT INTO belepesek VALUES (21,8,'Tiszapart backstage','21:33');
-INSERT INTO belepesek VALUES (22,5,'Stáb parkoló','21:38');
-INSERT INTO belepesek VALUES (23,4,'Nagyszínpad backstage','21:45');
-INSERT INTO belepesek VALUES (24,12,'Étkező','21:52');
-INSERT INTO belepesek VALUES (25,3,'Nagyszínpad backstage','21:58');
-INSERT INTO belepesek VALUES (26,13,'Stáb parkoló','22:05');
-INSERT INTO belepesek VALUES (27,9,'Tiszapart backstage','22:10');
-INSERT INTO belepesek VALUES (28,1,'Nagyszínpad backstage','22:15');
-INSERT INTO belepesek VALUES (29,10,'Étkező','22:20');
-INSERT INTO belepesek VALUES (30,7,'Tiszapart backstage','22:30');
-INSERT INTO belepesek VALUES (31,6,'Étkező','22:40');
-INSERT INTO belepesek VALUES (32,2,'Nagyszínpad backstage','22:48');
-INSERT INTO belepesek VALUES (33,14,'Stáb parkoló','23:00');
-INSERT INTO belepesek VALUES (34,11,'Étkező','23:10');
-INSERT INTO belepesek VALUES (35,12,'Stáb parkoló','23:20');
-INSERT INTO belepesek VALUES (36,4,'Nagyszínpad backstage','23:40');
-INSERT INTO menedzserek VALUES (1,1,'Ilona Pék','+36 30 111 2233');
-INSERT INTO menedzserek VALUES (2,2,'Marci Dobó','+36 20 222 3344');
-INSERT INTO menedzserek VALUES (3,3,'Harriet Cole','+44 7700 900123');
-INSERT INTO menedzserek VALUES (4,4,'Teri Juhász','+36 70 333 4455');
-INSERT INTO menedzserek VALUES (5,5,'Olivér Kun','+36 30 444 5566');
-INSERT INTO menedzserek VALUES (6,6,'Kai Tamm','+372 5555 1234');
-INSERT INTO menedzserek VALUES (7,7,'Agnieszka Lis','+48 600 123 456');
-INSERT INTO menedzserek VALUES (8,8,'Felix Baumann','+43 660 123 4567');
-INSERT INTO menedzserek VALUES (9,9,'Zsolt Erdős','+36 20 555 6677');
-INSERT INTO menedzserek VALUES (10,10,'Jana Horváthová','+421 900 123 456');
-INSERT INTO menedzserek VALUES (11,11,'Bori Szép','+36 70 666 7788');
-INSERT INTO menedzserek VALUES (12,12,'Lucía Marín','+34 600 123 456');
-INSERT INTO menedzserek VALUES (13,13,'Anke Vogel','+49 170 1234567');
-INSERT INTO menedzserek VALUES (14,14,'Dénes Varga','+36 30 777 8899');
-INSERT INTO menedzserek VALUES (15,15,'Panni Tóth','+36 20 888 9900');
-INSERT INTO menedzserek VALUES (16,16,'Petr Dvořák','+420 601 123 456');
 `;
 const CHAPTERS = [
  {
@@ -472,17 +428,17 @@ const CHAPTERS = [
    "neongulyas"
   ],
   "placeholder": "zenekar neve",
-  "success": "Neon Gulyás. Az énekesnőjük esküszik, hogy 21:30 körül látott egy fekete gitártokot elsietni a Dűne sátor mellett. Tovább."
+  "success": "Neon Gulyás. Szép, de a gitárnak még nincs nyoma. Tovább."
  },
  {
-  "title": "Három tábla, rövid nevek",
+  "title": "Három tábla egyszerre",
   "story": "<p>A színpadszámok kezdenek idegesíteni: folyton elfelejted, melyik a Dűne sátor. A <code>szinpadok</code> táblában ott vannak a nevek. <mark>Három tábla, egy lekérdezés.</mark></p>",
-  "learn": "<p>Adj minden táblának egy rövid <b>álnevet</b> közvetlenül a neve után a <code>FROM</code>-ban: <code>koncertek k, zenekarok z, szinpadok s</code>. Ezután <code>k.zenekar_id</code>-t írhatsz <code>koncertek.zenekar_id</code> helyett. Minden további táblához saját párosítási szabály kell, <code>AND</code>-del kötve.</p>\n  <pre>SELECT k.nap, k.kezdes, z.nev, s.nev\nFROM koncertek k, zenekarok z, szinpadok s\nWHERE k.zenekar_id = z.id\n  AND k.szinpad_id = s.id;</pre>",
+  "learn": "<p>Sorold fel mindhárom táblát a <code>FROM</code> után, vesszővel elválasztva: <code>FROM koncertek, zenekarok, szinpadok</code>. Mindenhol a teljes <code>tábla.oszlop</code> nevet írd, így mindig látszik, melyik táblából jön az oszlop. Minden további táblához saját párosítási szabály kell, <code>AND</code>-del kötve. Három táblához két szabály kell.</p>\n  <pre>SELECT koncertek.nap, koncertek.kezdes, zenekarok.nev, szinpadok.nev\nFROM koncertek, zenekarok, szinpadok\nWHERE koncertek.zenekar_id = zenekarok.id\n  AND koncertek.szinpad_id = szinpadok.id;</pre>",
   "task": "Melyik színpadon játszik a Csárdás Collective vasárnap?",
   "hints": [
-   "Két párosítási szabály: k.zenekar_id = z.id AND k.szinpad_id = s.id. Majd AND z.nev = 'Csárdás Collective' AND k.nap = 'vasárnap'.",
+   "Két párosítási szabály: koncertek.zenekar_id = zenekarok.id AND koncertek.szinpad_id = szinpadok.id. Majd AND zenekarok.nev = 'Csárdás Collective' AND koncertek.nap = 'vasárnap'.",
    {
-    "sql": "SELECT s.nev, k.nap, k.kezdes\nFROM koncertek k, zenekarok z, szinpadok s\nWHERE k.zenekar_id = z.id\n  AND k.szinpad_id = s.id\n  AND z.nev = 'Csárdás Collective'\n  AND k.nap = 'vasárnap';"
+    "sql": "SELECT szinpadok.nev, koncertek.nap, koncertek.kezdes\nFROM koncertek, zenekarok, szinpadok\nWHERE koncertek.zenekar_id = zenekarok.id\n  AND koncertek.szinpad_id = szinpadok.id\n  AND zenekarok.nev = 'Csárdás Collective'\n  AND koncertek.nap = 'vasárnap';"
    }
   ],
   "answers": [
@@ -496,12 +452,12 @@ const CHAPTERS = [
  {
   "title": "Az előző zenekar",
   "story": "<p>Cseresznyét utoljára <mark>21:10</mark>-kor látták, az állványán, amíg az előző fellépő még a színpadon volt. Aki azután pakolt össze, pont elment mellette.</p>",
-  "learn": "<p>A párosítási szabályok és a hagyományos szűrések szabadon keverhetők a <code>WHERE</code>-ben. Jó szokás: előbb a párosítási szabályok, aztán a szűrők.</p>\n  <pre>SELECT z.nev, k.kezdes, k.vege\nFROM koncertek k, zenekarok z, szinpadok s\nWHERE k.zenekar_id = z.id AND k.szinpad_id = s.id\n  AND s.nev = 'Tiszapart' AND k.nap = 'vasárnap';</pre>",
+  "learn": "<p>A párosítási szabályok és a hagyományos szűrések szabadon keverhetők a <code>WHERE</code>-ben. Jó szokás: előbb a párosítási szabályok, aztán a szűrők.</p>\n  <pre>SELECT zenekarok.nev, koncertek.kezdes, koncertek.vege\nFROM koncertek, zenekarok, szinpadok\nWHERE koncertek.zenekar_id = zenekarok.id AND koncertek.szinpad_id = szinpadok.id\n  AND szinpadok.nev = 'Tiszapart' AND koncertek.nap = 'vasárnap';</pre>",
   "task": "Melyik zenekar koncertje ért véget a Nagyszínpadon szombaton 21:30-kor?",
   "hints": [
-   "Kapcsold össze mind a három táblát, majd szűrj: s.nev = 'Nagyszínpad', k.nap = 'szombat', k.vege = '21:30'.",
+   "Kapcsold össze mind a három táblát, majd szűrj: szinpadok.nev = 'Nagyszínpad', koncertek.nap = 'szombat', koncertek.vege = '21:30'.",
    {
-    "sql": "SELECT z.nev\nFROM koncertek k, zenekarok z, szinpadok s\nWHERE k.zenekar_id = z.id\n  AND k.szinpad_id = s.id\n  AND s.nev = 'Nagyszínpad'\n  AND k.nap = 'szombat'\n  AND k.vege = '21:30';"
+    "sql": "SELECT zenekarok.nev\nFROM koncertek, zenekarok, szinpadok\nWHERE koncertek.zenekar_id = zenekarok.id\n  AND koncertek.szinpad_id = szinpadok.id\n  AND szinpadok.nev = 'Nagyszínpad'\n  AND koncertek.nap = 'szombat'\n  AND koncertek.vege = '21:30';"
    }
   ],
   "answers": [
@@ -513,12 +469,12 @@ const CHAPTERS = [
  {
   "title": "A legforgalmasabb színpad",
   "story": "<p>A fesztiváligazgató elkap. „Ha már bent vagy: melyik színpadon volt a legtöbb koncert? A sajtóközleményhez.” <mark>Semmi köze a gitárhoz.</mark> De ő az igazgató.</p>",
-  "learn": "<p>Amit eddig tudtál, összekapcsolás után is működik: <code>GROUP BY</code>, <code>COUNT</code>, <code>ORDER BY</code>. Az SQL először párosítja a táblákat, aztán csoportosítja az eredményt.</p>\n  <pre>SELECT s.nev, COUNT(*) AS koncertek\nFROM koncertek k, szinpadok s\nWHERE k.szinpad_id = s.id\nGROUP BY s.nev\nORDER BY COUNT(*) DESC;</pre>",
+  "learn": "<p>Amit eddig tudtál, összekapcsolás után is működik: <code>GROUP BY</code>, <code>COUNT</code>, <code>ORDER BY</code>. Az SQL először párosítja a táblákat, aztán csoportosítja az eredményt.</p>\n  <pre>SELECT szinpadok.nev, COUNT(*) AS koncertek\nFROM koncertek, szinpadok\nWHERE koncertek.szinpad_id = szinpadok.id\nGROUP BY szinpadok.nev\nORDER BY COUNT(*) DESC;</pre>",
   "task": "Melyik színpadon van a legtöbb koncert a hétvégén?",
   "hints": [
-   "Kapcsold össze a koncertek és szinpadok táblát, GROUP BY s.nev, és rendezz COUNT(*) DESC szerint.",
+   "Kapcsold össze a koncertek és szinpadok táblát, GROUP BY szinpadok.nev, és rendezz COUNT(*) DESC szerint.",
    {
-    "sql": "SELECT s.nev, COUNT(*) AS koncertek\nFROM koncertek k, szinpadok s\nWHERE k.szinpad_id = s.id\nGROUP BY s.nev\nORDER BY COUNT(*) DESC;"
+    "sql": "SELECT szinpadok.nev, COUNT(*) AS koncertek\nFROM koncertek, szinpadok\nWHERE koncertek.szinpad_id = szinpadok.id\nGROUP BY szinpadok.nev\nORDER BY COUNT(*) DESC;"
    }
   ],
   "answers": [
@@ -530,35 +486,14 @@ const CHAPTERS = [
   "success": "A Tiszapart, 10 koncerttel. Az igazgató boldog. 21:52. Vissza a gitárhoz."
  },
  {
-  "title": "Ki hol dolgozik",
-  "story": "<p>Csak Nagyszínpad-os belépőkártyával lehet bemenni az ottani backstage-be. A <code>stab</code> tábla mondja meg, ki melyik színpadhoz tartozik, megint <code>szinpad_id</code>-vel.</p>",
-  "learn": "<p>Ugyanez a trükk működik bármely két táblára, amelyek osztoznak egy id-n: a <code>stab.szinpad_id</code> a <code>szinpadok.id</code>-re hivatkozik.</p>\n  <pre>SELECT t.nev, t.munka, s.nev\nFROM stab t, szinpadok s\nWHERE t.szinpad_id = s.id;</pre>",
-  "task": "Hogy hívják a Nagyszínpadhoz beosztott roadie-t?",
+  "title": "Ki állt színpadon",
+  "story": "<p>Egy hangtechnikus <mark>21:20</mark>-kor hallotta, hogy Cseresznye állványa felborul. Aki elvitte, abban a pillanatban nem volt színpadon. Minden zenekarnak, amelyik 21:20-kor <b>játszott</b>, tökéletes alibije van: több ezer szemtanú.</p>",
+  "learn": "<p>Az időpontok szövegként vannak tárolva, pl. <code>'21:20'</code>. Mivel mindig ugyanolyan alakúak, <code>&lt;=</code> és <code>&gt;=</code> jellel összehasonlíthatók. Egy koncert 21:20-kor zajlik, ha legkésőbb 21:20-kor kezdődött, és legkorábban 21:20-kor ér véget.</p>\n  <pre>SELECT zenekarok.nev, koncertek.kezdes, koncertek.vege\nFROM koncertek, zenekarok\nWHERE koncertek.zenekar_id = zenekarok.id\n  AND koncertek.nap = 'péntek'\n  AND koncertek.kezdes &lt;= '20:00'\n  AND koncertek.vege &gt;= '20:00';</pre>",
+  "task": "Hány zenekar állt színpadon szombaton 21:20-kor?",
   "hints": [
-   "Kapcsold össze a stab és szinpadok táblát, majd AND s.nev = 'Nagyszínpad' AND t.munka = 'roadie'.",
+   "Kapcsold össze a koncertek és zenekarok táblát, majd AND koncertek.nap = 'szombat' AND koncertek.kezdes <= '21:20' AND koncertek.vege >= '21:20'. Számold meg a sorokat.",
    {
-    "sql": "SELECT t.nev, t.munka\nFROM stab t, szinpadok s\nWHERE t.szinpad_id = s.id\n  AND s.nev = 'Nagyszínpad'\n  AND t.munka = 'roadie';"
-   }
-  ],
-  "answers": [
-   "gergo hamori",
-   "hamori gergo",
-   "gergő hámori",
-   "hámori gergő",
-   "gergo"
-  ],
-  "placeholder": "név",
-  "success": "Hámori Gergő. Kilenc éve a Nagyszínpad stábjában, és sírt, amikor Cseresznye eltűnt. Valószínűleg nem ő."
- },
- {
-  "title": "A beléptetési napló",
-  "story": "<p>Minden backstage-ajtón kártyaolvasó van. A <code>belepesek</code> tábla minden szombati lehúzást naplóz: ki (<code>stab_id</code>), melyik ajtó, mikor. Cseresznye <mark>21:10 és 21:40 között</mark> tűnt el.</p>",
-  "learn": "<p>Az időpontok szövegként vannak tárolva, pl. <code>'21:23'</code>. Mivel mindig ugyanolyan alakúak, <code>&gt;=</code> és <code>&lt;=</code> jelekkel hasonlíthatod össze őket.</p>\n  <pre>SELECT t.nev, b.zona, b.ido\nFROM belepesek b, stab t\nWHERE b.stab_id = t.id\n  AND b.ido &gt;= '20:00' AND b.ido &lt;= '20:30';</pre>",
-  "task": "Hány különböző ember lépett be a 'Nagyszínpad backstage' ajtón 21:10 és 21:40 között?",
-  "hints": [
-   "Kapcsold össze a belepesek és stab táblát, majd AND b.zona = 'Nagyszínpad backstage' AND b.ido >= '21:10' AND b.ido <= '21:40'. Számold meg a neveket.",
-   {
-    "sql": "SELECT t.nev, b.ido\nFROM belepesek b, stab t\nWHERE b.stab_id = t.id\n  AND b.zona = 'Nagyszínpad backstage'\n  AND b.ido >= '21:10'\n  AND b.ido <= '21:40';"
+    "sql": "SELECT zenekarok.nev, koncertek.kezdes, koncertek.vege\nFROM koncertek, zenekarok\nWHERE koncertek.zenekar_id = zenekarok.id\n  AND koncertek.nap = 'szombat'\n  AND koncertek.kezdes <= '21:20'\n  AND koncertek.vege >= '21:20';"
    }
   ],
   "answers": [
@@ -566,30 +501,47 @@ const CHAPTERS = [
    "harom"
   ],
   "placeholder": "egy szám",
-  "success": "Három ember. Kettő odatartozik. Egy nem."
+  "success": "Három zenekar: a Tokaj Thunder, a Neon Gulyás és a The Rusty Trams. Mind színpadon voltak, mind tiszták."
  },
  {
-  "title": "A rossz belépőkártya",
-  "story": "<p>Három név, és az óra <mark>21:58</mark>-at mutat. Még egy tábla: <code>szinpadok</code>, a <code>stab.szinpad_id</code>-n keresztül. Aki belépett a Nagyszínpad backstage-ébe, de <b>másik</b> színpadhoz tartozik, annak magyarázkodnia kell.</p>",
-  "learn": "<p>Megint három tábla: <code>belepesek → stab → szinpadok</code>. Két párosítási szabály, aztán a szűrők. A <code>&lt;&gt;</code> azt jelenti: „nem egyenlő”.</p>\n  <pre>SELECT t.nev, s.nev, b.ido\nFROM belepesek b, stab t, szinpadok s\nWHERE b.stab_id = t.id\n  AND t.szinpad_id = s.id\n  AND s.nev &lt;&gt; 'Nagyszínpad';</pre>",
-  "task": "Ki lépett be a 'Nagyszínpad backstage' ajtón 21:10 és 21:40 között úgy, hogy nem a Nagyszínpad stábjába tartozik?",
+  "title": "Dél felé",
+  "story": "<p>Egy őr a Dűne sátortól jelentkezik a rádión. 21:30 körül valaki <b>fellépő-karszalaggal</b> sietett el mellette egy fekete gitártokkal, <mark>a fesztivál déli része felé</mark>. A <code>szinpadok</code> tábla <code>terulet</code> oszlopa megmondja, mely színpadok vannak délen.</p>",
+  "learn": "<p>Használd mindhárom táblát: <code>zenekarok ← koncertek → szinpadok</code>. A <code>koncertek</code> tábla középen áll, és mindkettőre mutat. Két párosítási szabály, aztán a szűrők.</p>\n  <pre>SELECT zenekarok.nev, szinpadok.nev, szinpadok.terulet, koncertek.kezdes\nFROM koncertek, zenekarok, szinpadok\nWHERE koncertek.zenekar_id = zenekarok.id\n  AND koncertek.szinpad_id = szinpadok.id\n  AND koncertek.nap = 'szombat';</pre>",
+  "task": "Hány szombati koncert van a déli terület színpadain?",
   "hints": [
-   "Vedd a 8. fejezet lekérdezését, add hozzá a szinpadok táblát AND t.szinpad_id = s.id-vel, és írd hozzá: AND s.nev <> 'Nagyszínpad'.",
+   "Kapcsold össze mindhárom táblát, majd AND koncertek.nap = 'szombat' AND szinpadok.terulet = 'dél'. Számold meg a sorokat.",
    {
-    "sql": "SELECT t.nev, s.nev AS sajat_szinpad, b.ido\nFROM belepesek b, stab t, szinpadok s\nWHERE b.stab_id = t.id\n  AND t.szinpad_id = s.id\n  AND b.zona = 'Nagyszínpad backstage'\n  AND b.ido >= '21:10'\n  AND b.ido <= '21:40'\n  AND s.nev <> 'Nagyszínpad';"
+    "sql": "SELECT zenekarok.nev, szinpadok.nev, koncertek.kezdes\nFROM koncertek, zenekarok, szinpadok\nWHERE koncertek.zenekar_id = zenekarok.id\n  AND koncertek.szinpad_id = szinpadok.id\n  AND koncertek.nap = 'szombat'\n  AND szinpadok.terulet = 'dél';"
    }
   ],
   "answers": [
-   "rozi rab",
-   "rab rozi",
-   "rozi"
+   "4",
+   "negy"
   ],
-  "placeholder": "név",
-  "success": "Rab Rozi, a Néma diszkó futára. A biztonságiak rohannak: Rozi a Néma diszkó színpadán áll Cseresznyével, 800 fejhallgatós ember nézi, ahogy egy csak általa hallott dalra levegőgitározik. „Csak egy számra kértem kölcsön.” Cseresznye 21:59-kor visszakerül a Nagyszínpadra. A koncert időben kezdődik."
+  "placeholder": "egy szám",
+  "success": "Négy koncert délen szombaton. Két zenekar jóval 21:20 előtt végzett, a Neon Gulyásnak pedig alibije van a 7. fejezetből. Marad egy."
+ },
+ {
+  "title": "Az eltűnt gitár",
+  "story": "<p>Az óra <mark>21:58</mark>-at mutat. Gondolkodj a tolvaj fejével: miért kap fel valaki egy híres gitárt 21:20-kor, és fut vele dél felé? Hogy játsszon rajta. <b>A tolvajnak egy még el nem kezdődött fellépéshez kellett Cseresznye.</b></p>",
+  "learn": "<p>Ugyanaz a három tábla, ugyanaz a két párosítási szabály. Csak a szűrők változnak.</p>\n  <pre>SELECT zenekarok.nev, szinpadok.nev, koncertek.kezdes\nFROM koncertek, zenekarok, szinpadok\nWHERE koncertek.zenekar_id = zenekarok.id\n  AND koncertek.szinpad_id = szinpadok.id;</pre>",
+  "task": "Melyik fellépő játszik szombaton a déli területen, és kezd 21:40 után?",
+  "hints": [
+   "Vedd a 8. fejezet lekérdezését, és add hozzá: AND koncertek.kezdes > '21:40'.",
+   {
+    "sql": "SELECT zenekarok.nev, szinpadok.nev, koncertek.kezdes\nFROM koncertek, zenekarok, szinpadok\nWHERE koncertek.zenekar_id = zenekarok.id\n  AND koncertek.szinpad_id = szinpadok.id\n  AND koncertek.nap = 'szombat'\n  AND szinpadok.terulet = 'dél'\n  AND koncertek.kezdes > '21:40';"
+   }
+  ],
+  "answers": [
+   "pusztawave",
+   "puszta wave"
+  ],
+  "placeholder": "zenekar neve",
+  "success": "A Pusztawave, az egyszemélyes elektro-projekt, 22:30-kor a Néma diszkóban. A biztonságiak odarohannak, és a színpad mögött találják, ahogy épp Cseresznyét hangolja egy „meglepetés-gitárszólóhoz”. Csak „egy számra kölcsönözte”. 21:59-re Cseresznye visszakerül a Nagyszínpadra. A koncert időben kezdődik."
  }
 ];
-const BONUS = ["Listázd ki az összes zenekart a színpadokkal, ahol játszanak, ismétlés nélkül. Próbáld ki: SELECT DISTINCT.", "Melyik ország zenekarai adják a legtöbb koncertet a hétvégén?", "Hány zenész áll összesen a Nagyszínpadon vasárnap? (összekapcsolás + SUM(tagok))", "Mely stábtagok használják az 1-es rádiócsatornát, és melyik színpadon vannak?", "Melyik koncert fedi át a főfellépőt egy másik színpadon? (ugyanaz a nap, 23:30 előtt kezdődik, 22:00 után ér véget)", "Melyik menedzsert hívja fel a biztonsági szolgálat a szombat 22:00-s koncert miatt? (koncertek → zenekarok → menedzserek)"];
-const COLDOCS = {"zenekarok": {"id": "A zenekar sorszáma.", "nev": "A zenekar neve, pl. <code>'Paprika Punks'</code>.", "mufaj": "<code>'punk'</code>, <code>'rock'</code>, <code>'pop'</code>, <code>'népzene'</code>, <code>'elektro'</code>, <code>'jazz'</code>, <code>'metal'</code> vagy <code>'indie'</code>.", "orszag": "Honnan jött a zenekar, pl. <code>'Magyarország'</code>.", "tagok": "Hányan vannak a zenekarban."}, "szinpadok": {"id": "A színpad sorszáma.", "nev": "<code>'Nagyszínpad'</code>, <code>'Dűne sátor'</code>, <code>'Tiszapart'</code>, <code>'Táncpajta'</code> vagy <code>'Néma diszkó'</code>.", "ferohely": "Hány ember fér el előtte.", "terulet": "A fesztivál része: <code>'észak'</code>, <code>'folyópart'</code> vagy <code>'dél'</code>."}, "koncertek": {"id": "A koncert sorszáma.", "zenekar_id": "Melyik zenekar játszik: egy <code>zenekarok</code>-beli sor <code>id</code>-je.", "szinpad_id": "Hol: egy <code>szinpadok</code>-beli sor <code>id</code>-je.", "nap": "<code>'péntek'</code>, <code>'szombat'</code> vagy <code>'vasárnap'</code>.", "kezdes": "Kezdés, szövegként: <code>'ÓÓ:PP'</code>.", "vege": "Vége, szövegként: <code>'ÓÓ:PP'</code>."}, "stab": {"id": "A stábtag sorszáma.", "nev": "A neve.", "munka": "<code>'roadie'</code>, <code>'hangmérnök'</code>, <code>'fénytechnikus'</code>, <code>'biztonsági őr'</code> vagy <code>'futár'</code>.", "szinpad_id": "Melyik színpadhoz tartozik: egy <code>szinpadok</code>-beli sor <code>id</code>-je.", "radio": "A rádió csatornaszáma."}, "belepesek": {"id": "A belépés sorszáma.", "stab_id": "Ki húzta le a kártyáját: egy <code>stab</code>-beli sor <code>id</code>-je.", "zona": "Melyik ajtó, pl. <code>'Nagyszínpad backstage'</code> vagy <code>'Étkező'</code>.", "ido": "Mikor, szombaton, szövegként: <code>'ÓÓ:PP'</code>."}, "menedzserek": {"id": "A menedzser sorszáma.", "zenekar_id": "Kinek a menedzsere: egy <code>zenekarok</code>-beli sor <code>id</code>-je. Minden zenekarnak pontosan egy van.", "nev": "A menedzser neve.", "telefon": "Telefonszám, szövegként."}};
+const BONUS = ["Listázd ki az összes zenekart a színpadokkal, ahol játszanak, ismétlés nélkül. Próbáld ki: SELECT DISTINCT.", "Melyik ország zenekarai adják a legtöbb koncertet a hétvégén?", "Hány zenész áll összesen a Nagyszínpadon vasárnap? (összekapcsolás + SUM(tagok))", "Melyik zenekar játszik a legtöbb különböző színpadon? (COUNT(DISTINCT szinpadok.nev))", "Melyik koncert fedi át a főfellépőt egy másik színpadon? (ugyanaz a nap, 23:30 előtt kezdődik, 22:00 után ér véget)", "Melyik északi színpadon van a legtöbb koncert pénteken?"];
+const COLDOCS = {"zenekarok": {"id": "A zenekar sorszáma.", "nev": "A zenekar neve, pl. <code>'Paprika Punks'</code>.", "mufaj": "<code>'punk'</code>, <code>'rock'</code>, <code>'pop'</code>, <code>'népzene'</code>, <code>'elektro'</code>, <code>'jazz'</code>, <code>'metal'</code> vagy <code>'indie'</code>.", "orszag": "Honnan jött a zenekar, pl. <code>'Magyarország'</code>.", "tagok": "Hányan vannak a zenekarban."}, "szinpadok": {"id": "A színpad sorszáma.", "nev": "<code>'Nagyszínpad'</code>, <code>'Dűne sátor'</code>, <code>'Tiszapart'</code>, <code>'Táncpajta'</code> vagy <code>'Néma diszkó'</code>.", "ferohely": "Hány ember fér el előtte.", "terulet": "A fesztivál része: <code>'észak'</code>, <code>'folyópart'</code> vagy <code>'dél'</code>."}, "koncertek": {"id": "A koncert sorszáma.", "zenekar_id": "Melyik zenekar játszik: egy <code>zenekarok</code>-beli sor <code>id</code>-je.", "szinpad_id": "Hol: egy <code>szinpadok</code>-beli sor <code>id</code>-je.", "nap": "<code>'péntek'</code>, <code>'szombat'</code> vagy <code>'vasárnap'</code>.", "kezdes": "Kezdés, szövegként: <code>'ÓÓ:PP'</code>.", "vege": "Vége, szövegként: <code>'ÓÓ:PP'</code>."}};
 const HAND_STEPS = ["Írd be lent a neved.", "Kattints a <b>Válaszok mentése (.txt)</b> gombra. A fájl a Letöltések mappába kerül.", "Nyisd meg a feladatot a <b>Google Classroomban</b>, töltsd fel a fájlt a <b>Hozzáadás vagy létrehozás → Fájl</b> alatt, majd nyomd meg a <b>Beadás</b> gombot."];
 const RANKS = ["Fesztivállegenda", "Biztonsági főnök", "Biztonsági őr", "Önkéntes"];
 const T = {
@@ -597,8 +549,8 @@ const T = {
   try_:"Próbáld ki", learn:"SQL ehhez a lépéshez", task:"A feladatod", hint1:"1. nyom · segítség", hint2:"2. nyom · egy működő lekérdezés", answer:"Válasz", check:"Ellenőrzés",
   correct:"Helyes.", wrong:"Nem egészen.", wrongTip:"Nézd meg újra az eredményt. Minden táblapárhoz beírtad a párosítási szabályt (WHERE … = …)? Számot vagy nevet kér a feladat?", prev:"Előző fejezet", next:"Következő fejezet", start:"Kezdődjön a nyomozás", yourans:"A válaszod",
   ready:"Az adatbázis kész. Írj egy lekérdezést, és nyomd meg a Futtatást.", empty:"Üres a lekérdezés. Először írj valamit.", zero:"0 sor. Egyetlen sor sem felel meg az összes feltételnek. Ellenőrizd a szövegek írásmódját és a párosítási szabályt.", sound:"Hang", reset:"Újrakezdés", reset2:"Kattints még egyszer a törléshez",
-  errGeneric:"Ellenőrizd a helyesírást, a vesszőket, a zárójeleket és az idézőjeleket. A szövegek egyszeres idézőjelbe kerülnek: 'szombat'.", errCol:"Ez az oszlop nem létezik, vagy nem egyértelmű. Ha két táblában is van ilyen nevű oszlop (pl. id), írd elé a tábla nevét: koncertek.id vagy k.id.", errTab:"Ez a tábla nem létezik. A táblák: zenekarok, szinpadok, koncertek, stab, belepesek, menedzserek.", errAmb:"Nem egyértelmű oszlop: mindkét táblában van ilyen nevű oszlop. Írd elé a tábla nevét, pl. koncertek.id vagy k.id.", sqlErr:"Hiba van a lekérdezésben.", engFail:"Az SQL-motor nem töltődött be.", engFail2:"Ellenőrizd az internetkapcsolatot, és töltsd újra az oldalt.", engStart:"Az SQL-motor nem indult el.",
-  endH:"Kezdődik a koncert", endP:m=>`Cseresznye újra Vic kezében, Rab Rozi a pólós sátorba száműzve, és 12 000 ember üvölt a Nagyszínpad előtt. Kb. <b>${m} perc</b> alatt találtad meg a gitárt: akár három táblát is összekapcsoltál a FROM, az álnevek és a WHERE-ben írt párosítási szabályok segítségével.`, endBonus:"Bónuszfeladatok gyors nyomozóknak:", handH:"Add be a válaszaidat", name:"A neved", namePh:"Írd ide a neved", save:"Válaszok mentése (.txt)", copy:"Másolás szövegként", replay:"Ünneplés újra",
+  errGeneric:"Ellenőrizd a helyesírást, a vesszőket, a zárójeleket és az idézőjeleket. A szövegek egyszeres idézőjelbe kerülnek: 'szombat'.", errCol:"Ez az oszlop nem létezik, vagy nem egyértelmű. Ha két táblában is van ilyen nevű oszlop (pl. id), írd elé a tábla nevét: koncertek.id.", errTab:"Ez a tábla nem létezik. A táblák: zenekarok, koncertek, szinpadok.", errAmb:"Nem egyértelmű oszlop: mindkét táblában van ilyen nevű oszlop. Írd elé a tábla nevét, pl. koncertek.id.", sqlErr:"Hiba van a lekérdezésben.", engFail:"Az SQL-motor nem töltődött be.", engFail2:"Ellenőrizd az internetkapcsolatot, és töltsd újra az oldalt.", engStart:"Az SQL-motor nem indult el.",
+  endH:"Kezdődik a koncert", endP:m=>`Cseresznye újra Vic kezében, a Pusztawave billentyűn játssza le a fellépését, mint mindenki más, és 12 000 ember üvölt a Nagyszínpad előtt. Kb. <b>${m} perc</b> alatt találtad meg a gitárt: akár három táblát is összekapcsoltál a FROM és a WHERE-ben írt párosítási szabályok segítségével.`, endBonus:"Bónuszfeladatok gyors nyomozóknak:", handH:"Add be a válaszaidat", name:"A neved", namePh:"Írd ide a neved", save:"Válaszok mentése (.txt)", copy:"Másolás szövegként", replay:"Ünneplés újra",
   xNameFirst:"Először írd be a neved.", xCopied:"Kimásolva. Illeszd be a Classroom-feladathoz privát megjegyzésként, majd nyomd meg a Beadást.", xBlocked:"A másolás itt le van tiltva. Használd a mentést.", xSaved:f=>`Mentve: ${f}. Most töltsd fel a Google Classroom feladathoz, és nyomd meg a Beadást.`, xSaveBlocked:"A mentés itt le van tiltva. Használd a másolást.",
   filePrefix:"backstage", reportTitle:"BACKSTAGE BLUES - VALASZLAP", rName:"Név", rFinished:"Befejezve", rTime:"Eltelt idő", rQueries:"Futtatott lekérdezések", rDev:"MEGJEGYZÉS: tanári kóddal lett befejezve, ezért hiányozhatnak válaszok.",
   rTask:"Feladat", rAnswer:"Válasz", rSkipped:"(kihagyva)", rUnsolved:"(nincs megoldva)", rWrong:"Rossz válaszok", rQuery:"Lekérdezés", rNone:"(nincs mentve)",
@@ -606,7 +558,7 @@ const T = {
 };
 
 /* ---------- state ---------- */
-const KEY = "backstage-hu-v1";
+const KEY = "backstage-hu-v2";
 let state = { solved: [], current: 0, start: Date.now(), end: null, drafts: {} };
 try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && Array.isArray(s.solved)) state = Object.assign(state, s); } catch(e){}
 function save(){ try { localStorage.setItem(KEY, JSON.stringify(state)); } catch(e){} }
@@ -655,6 +607,7 @@ function renderCase(){
     <h2>${esc(c.title)}</h2>
     <div class="story">${c.story}</div>
     <div class="learn"><h3>${c.refresher ? T.try_ : T.learn}</h3>${c.learn}</div>
+    <div class="links" id="links"></div>
     <div class="task"><h3>${T.task}</h3><p>${esc(c.task)}</p></div>
     ${hints}
     <form class="answer" id="answerForm" autocomplete="off">
@@ -667,10 +620,140 @@ function renderCase(){
       <button class="btn primary" type="button" id="next" ${solved && !last ? "" : "hidden"}>${c.refresher ? T.start : T.next}</button>
     </div>
     ${allDone() && last ? endingHtml() : ""}`;
+  renderLinks();
   $("answerForm").addEventListener("submit", e=>{ e.preventDefault(); check(); });
   $("prev").onclick = ()=> goTo(i-1);
   $("next").onclick = ()=> goTo(i+1);
 }
+/* ---------- connection map: which tables a chapter uses and how they plug together ---------- */
+const LT = document.documentElement.lang === "hu" ? {
+  h:"A fejezet táblái és kapcsolataik", hR:"Az adatbázis térképe · így kapcsolódnak a táblák",
+  noRule:"Még nincs párosítási szabály: minden sor minden sorral párosul.",
+  byHand:"Még nincs összekapcsolva: két külön lekérdezés, a számot kézzel viszed át.",
+  n1:(a,b)=>`N : 1 — ${az(a)} ${a} tábla sok sora mutathat ${az(b)} ${b} tábla egy sorára`,
+  one:(a,b)=>`1 : 1 — ${az(b)} ${b} tábla minden sorához pontosan egy sor tartozik ${az(a)} ${a} táblában`,
+  nn:(a,b,j)=>`${a} ↔ ${b}: N : N kapcsolat ${az(j)} ${j} táblán keresztül`, more:n=>`+${n} további`
+} : {
+  h:"Tables in this chapter and how they connect", hR:"Database map · how the tables connect",
+  noRule:"No matching rule yet: every row is paired with every row.",
+  byHand:"Not joined yet: two separate queries, and you carry the number across by hand.",
+  n1:(a,b)=>`N : 1 — many ${a} rows can point to the same ${b} row`,
+  one:(a,b)=>`1 : 1 — every ${b} row has exactly one ${a} row`,
+  nn:(a,b,j)=>`${a} ↔ ${b}: N : N, through the ${j} table`, more:n=>`+${n} more`
+};
+function az(w){ return /^[aáeéiíoóöőuúüű]/i.test(w) ? "az" : "a"; }
+const SCHEMA = (()=>{ const o = {}; for (const m of SEED.matchAll(/CREATE TABLE (\w+) \(([^)]*)\)/g)) o[m[1]] = m[2].split(",").map(x=>x.trim().split(/\s+/)[0]); return o; })();
+function chapterLinks(c){
+  const h = c.hints.find(x=>typeof x !== "string"); const sql = h ? h.sql : "";
+  const tables = [], froms = [];
+  for (const m of sql.matchAll(/FROM\s+([\w\s,]+?)(?=\s+WHERE|\s+GROUP|\s+ORDER|;|$)/gi)){
+    const list = m[1].split(",").map(x=>x.trim().split(/\s+/)[0]).filter(t=>SCHEMA[t]);
+    froms.push(list); list.forEach(t=>{ if (!tables.includes(t)) tables.push(t); });
+  }
+  const links = [];
+  for (const m of sql.matchAll(/(\w+)\.(\w+)\s*=\s*(\w+)\.(\w+)/g)){
+    let [ , ta, ca, tb, cb ] = m;
+    if (!SCHEMA[ta] || !SCHEMA[tb]) continue;
+    if (ca === "id" && cb !== "id") [ta, ca, tb, cb] = [tb, cb, ta, ca];   /* fk side first */
+    if (!links.some(l=>l.ft===ta && l.fc===ca && l.pt===tb)) links.push({ ft:ta, fc:ca, pt:tb, pc:cb });
+  }
+  return { tables, links, joined: froms.some(f=>f.length > 1) };
+}
+function mapFor(i){
+  const c = CHAPTERS[i];
+  if (!c.refresher) return chapterLinks(c);
+  const names = Object.keys(SCHEMA), all = { tables:names.slice(), links:[], joined:true, map:true };
+  Object.entries(SCHEMA).forEach(([t, cols])=>cols.forEach(col=>{
+    const m = col.match(/^(.+)_id$/); if (!m) return;
+    const pt = names.find(x=>x !== t && x.startsWith(m[1])); if (pt) all.links.push({ ft:t, fc:col, pt, pc:"id" }); }));
+  return all;
+}
+function chainOrder(tables, links){          /* line the tables up along their links: A — B — C */
+  if (!links.length) return tables;
+  const nb = t => links.filter(l=>l.ft===t || l.pt===t).map(l=>l.ft===t ? l.pt : l.ft);
+  const ends = tables.filter(t=>nb(t).length <= 1);
+  const start = ends.find(t=>links.some(l=>l.ft===t)) || ends[0] || tables[0];
+  const out = [start];
+  while (out.length < tables.length){ const nxt = nb(out[out.length-1]).find(t=>!out.includes(t)) || tables.find(t=>!out.includes(t)); out.push(nxt); }
+  return out;
+}
+const uniqCache = {};
+function isUnique(t, col){
+  const k = t + "." + col; if (k in uniqCache) return uniqCache[k]; if (!db) return null;
+  try { const r = db.exec(`SELECT COUNT(${col}) = COUNT(DISTINCT ${col}) FROM ${t}`); return uniqCache[k] = !!r[0].values[0][0]; } catch(e){ return null; }
+}
+function lkColor(k){ return `var(--lk${k % 6 + 1})`; }
+function renderLinks(){
+  const box = $("links"); if (!box) return;
+  const spec = mapFor(state.current);
+  if (!spec.tables.length){ box.hidden = true; return; }
+  box.hidden = false;
+  const tables = chainOrder(spec.tables, spec.links);
+  const used = {}; spec.links.forEach((l,k)=>{ (used[l.ft+"."+l.fc] ??= k); (used[l.pt+"."+l.pc] ??= k); });
+  const cards = tables.map(t=>{
+    const cols = SCHEMA[t], show = cols, more = 0;      /* every column of the table */
+    return `<div class="lk-card" data-t="${t}"><div class="h">${t}</div>${show.map(c=>{
+      const k = used[t+"."+c];
+      return `<div class="r${c==="id"?" k":""}${k!==undefined?" on":""}" data-c="${c}"${k!==undefined?` style="--c:${lkColor(k)}"`:""}><span class="ic">${c==="id"?"🔑":(/_id$/.test(c)?"→":"")}</span>${c}</div>`;
+    }).join("")}${more ? `<div class="r more">${LT.more(more)}</div>` : ""}</div>`;
+  }).join("");
+  const rules = spec.links.map((l,k)=>{
+    const u = isUnique(l.ft, l.fc);
+    const kind = u === null ? "" : `<span class="kind">${u ? LT.one(l.ft, l.pt) : LT.n1(l.ft, l.pt)}</span>`;
+    return `<li><span class="sw" style="background:${lkColor(k)}"></span><code>${l.ft}.${l.fc} = ${l.pt}.${l.pc}</code>${kind}</li>`;
+  });
+  let note = "";
+  if (!spec.links.length && tables.length > 1) note = `<p class="lk-note">${spec.joined ? LT.noRule : LT.byHand}</p>`;
+  box.innerHTML = `<h3>${spec.map ? LT.hR : LT.h}</h3><div class="lk-board"><svg class="lk-svg" aria-hidden="true"></svg>${cards}</div>${note}${rules.length ? `<ul class="lk-rules">${rules.join("")}</ul>` : ""}`;
+  box.dataset.spec = JSON.stringify({ links: spec.links, loose: !spec.links.length && tables.length > 1 ? [tables[0], tables[1], spec.joined ? "×" : "?"] : null });
+  requestAnimationFrame(drawLinks);
+}
+function drawLinks(){                        /* straight arrows: _id column → the id it points to */
+  const box = $("links"); if (!box || box.hidden || !box.dataset.spec) return;
+  const board = box.querySelector(".lk-board"), svg = box.querySelector(".lk-svg"); if (!board) return;
+  const spec = JSON.parse(box.dataset.spec);
+  const cardEls = [...board.querySelectorAll(".lk-card")];
+  board.classList.remove("stack");
+  const gap = parseFloat(getComputedStyle(board).columnGap) || 46;
+  const need = cardEls.reduce((s,c)=>s + c.getBoundingClientRect().width, 0) + gap * (cardEls.length - 1);
+  const stack = cardEls.length > 1 && need > board.clientWidth - 8;
+  board.classList.toggle("stack", stack);
+  const B = board.getBoundingClientRect(); if (!B.width) return;
+  svg.setAttribute("viewBox", `0 0 ${B.width} ${B.height}`);
+  const rel = el => { const r = el.getBoundingClientRect(); return { l:r.left-B.left, r:r.right-B.left, t:r.top-B.top, b:r.bottom-B.top, cy:(r.top+r.bottom)/2-B.top, cx:(r.left+r.right)/2-B.left }; };
+  const card = t => board.querySelector(`.lk-card[data-t="${t}"]`);
+  const head = (x, y, dx, dy, color)=>{ const L = 9, W = 5.5, px = -dy, py = dx;
+    return `<polygon points="${x},${y} ${x - dx*L + px*W},${y - dy*L + py*W} ${x - dx*L - px*W},${y - dy*L - py*W}" fill="${color}"/>`; };
+  const tag = (x, y, txt, color, anchor)=> txt ? `<text x="${x}" y="${y}" text-anchor="${anchor}" class="lk-end" fill="${color}">${txt}</text>` : "";
+  const right = Math.max(...cardEls.map(c=>rel(c).r));
+  let html = "";
+  spec.links.forEach((l,k)=>{
+    const A = card(l.ft), P = card(l.pt); if (!A || !P) return;
+    const a = rel(A.querySelector(`[data-c="${l.fc}"]`)), b = rel(P.querySelector(`[data-c="${l.pc}"]`)), ca = rel(A), cp = rel(P);
+    const color = lkColor(k), u = isUnique(l.ft, l.fc), la = u === null ? "" : (u ? "1" : "N"), lb = u === null ? "" : "1";
+    if (!stack){
+      const lr = ca.r <= cp.l, x1 = lr ? ca.r : ca.l, x2 = lr ? cp.l : cp.r, d = lr ? 1 : -1;
+      html += `<circle cx="${x1}" cy="${a.cy}" r="4" fill="${color}"/><line x1="${x1}" y1="${a.cy}" x2="${x2 - d*8}" y2="${b.cy}" stroke="${color}" stroke-width="3" stroke-linecap="round"/>`;
+      const len = Math.hypot(x2 - x1, b.cy - a.cy) || 1;
+      html += head(x2, b.cy, (x2 - x1)/len, (b.cy - a.cy)/len, color);
+      const up = b.cy < a.cy - 1;
+      html += tag(x1 + d*7, up ? a.cy + 18 : a.cy - 8, la, color, lr ? "start" : "end") + tag(x2 - d*12, up ? b.cy - 9 : b.cy + 19, lb, color, lr ? "end" : "start");
+    } else {
+      const X = right + 18;
+      html += `<circle cx="${ca.r}" cy="${a.cy}" r="4" fill="${color}"/><path d="M${ca.r},${a.cy} H${X} V${b.cy} H${cp.r + 8}" fill="none" stroke="${color}" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>`;
+      html += head(cp.r, b.cy, -1, 0, color);
+      html += tag(X + 6, a.cy + 5, la, color, "start") + tag(X + 6, b.cy + 5, lb, color, "start");
+    }
+  });
+  if (spec.loose){ const A = card(spec.loose[0]), P = card(spec.loose[1]);
+    if (A && P){ const ca = rel(A), cp = rel(P), ha = rel(A.querySelector(".h")), hp = rel(P.querySelector(".h"));
+      const [x1,y1,x2,y2] = stack ? [ca.cx, ca.b, cp.cx, cp.t] : [ca.r, ha.cy, cp.l, hp.cy], mx = (x1+x2)/2, my = (y1+y2)/2;
+      html += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="var(--lk-loose)" stroke-width="3" stroke-dasharray="6 6"/>`;
+      html += `<circle cx="${mx}" cy="${my}" r="11" class="lk-mid"/><text x="${mx}" y="${my+5}" text-anchor="middle" class="lk-midt">${spec.loose[2]}</text>`; } }
+  svg.innerHTML = html;
+}
+addEventListener("resize", ()=>requestAnimationFrame(drawLinks));
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(()=>drawLinks());
 function check(){
   const i = state.current, c = CHAPTERS[i], v = norm($("answer").value);
   if (!v) return;
@@ -853,7 +936,7 @@ addEventListener("keydown", e=>{ if (e.key === "Escape" && !$("finale").hidden) 
 
 /* ---------- database ---------- */
 let SQL = null, db = null;
-function resetDb(){ if (!SQL) return; if (db) db.close(); db = new SQL.Database(); db.run(SEED); $("out").innerHTML = `<p class="note">${T.ready}</p>`; renderSchema(); }
+function resetDb(){ if (!SQL) return; if (db) db.close(); db = new SQL.Database(); db.run(SEED); $("out").innerHTML = `<p class="note">${T.ready}</p>`; renderSchema(); renderLinks(); }
 function renderSchema(){
   const t = db.exec("SELECT name FROM sqlite_master WHERE type='table' ORDER BY rowid");
   if (!t.length){ $("schema").innerHTML = ""; return; }

@@ -97,6 +97,31 @@ main{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:18px;ali
 .case pre{background:var(--laptop);color:#e9f5ff;padding:12px 14px;border-radius:8px;overflow:auto;font-size:14px;line-height:1.5;margin:8px 0}
 .learn{margin-top:14px;padding:12px 14px;border-left:4px solid var(--cyan);background:rgba(79,227,255,.08);border-radius:0 8px 8px 0}
 .learn h3,.task h3{font-size:14px;letter-spacing:.08em;text-transform:uppercase;color:#1e7f99;margin-bottom:4px}
+.links{margin-top:14px;padding:12px 14px 10px;border-radius:10px;border:1px solid var(--lk-border);background:var(--lk-bg)}
+.links h3{font-size:14px;letter-spacing:.08em;text-transform:uppercase;color:var(--lk-title);margin-bottom:2px}
+.lk-board{position:relative;display:flex;flex-wrap:nowrap;justify-content:center;align-items:flex-start;column-gap:46px;row-gap:30px;padding:16px 4px 8px}
+.lk-board.stack{flex-direction:column;align-items:flex-start;padding:10px 46px 8px 8px;width:max-content;max-width:100%;margin:0 auto}
+.lk-svg{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;overflow:visible;z-index:2}
+.lk-card{position:relative;z-index:1;flex:none;min-width:96px;border:2px solid var(--lk-head);border-radius:8px;background:var(--lk-card);font:13px/1.35 var(--f-mono);overflow:hidden;box-shadow:0 3px 0 rgba(0,0,0,.12)}
+.lk-board.stack .lk-card{min-width:170px}
+.lk-card .h{background:var(--lk-head);color:var(--lk-head-ink);padding:5px 8px;font-weight:700}
+.lk-card .r{padding:4px 8px;border-top:1px solid var(--paper-line);display:flex;gap:6px;align-items:center;color:var(--paper-ink)}
+.lk-card .r .ic{font-size:11px;width:14px;text-align:center;opacity:.75}
+.lk-card .r.k{font-weight:700}
+.lk-card .r.k, .lk-card .r[data-c$="_id"]{font-weight:700}
+.lk-card .r:not(.k):not([data-c$="_id"]){color:var(--paper-muted)}
+.lk-card .r.on{box-shadow:inset 5px 0 0 var(--c);font-weight:700;background:var(--lk-on)}
+.lk-card .r.more{color:var(--paper-muted);font:italic 12px var(--f-body);padding:3px 8px}
+.lk-end{font:700 14px var(--f-mono);paint-order:stroke;stroke:var(--lk-bg-solid);stroke-width:4px}
+.lk-mid{fill:var(--lk-bg-solid);stroke:var(--lk-loose);stroke-width:2}
+.lk-midt{font:700 14px var(--f-mono);fill:var(--lk-loose)}
+.lk-note{color:var(--paper-muted);font-size:14px;text-align:center;margin:2px 0 4px!important}
+.lk-rules{list-style:none;margin:6px 0 0;padding:0;display:grid;gap:5px;font-size:14px}
+.lk-rules li{display:flex;flex-wrap:wrap;gap:3px 10px;align-items:center}
+.lk-rules .sw{width:18px;height:4px;border-radius:2px;flex:none}
+.lk-rules .kind{color:var(--paper-muted)}
+@media (max-width:640px){ .links{padding:10px 8px} .lk-card{min-width:0;font-size:12px} .lk-card .r{padding:4px 8px} .lk-card .h{padding:5px 8px} }
+.links{--lk-bg:#fff;--lk-bg-solid:#fff;--lk-border:var(--paper-line);--lk-title:#5b3fa0;--lk-card:#fff;--lk-head:#241a3a;--lk-head-ink:#fff;--lk-on:#faf7ff;--lk-loose:#8a7fa3;--lk1:#e4572e;--lk2:#1f86b5;--lk3:#3c9a3a;--lk4:#b0369a;--lk5:#c48a00;--lk6:#555}
 .task{margin-top:14px;padding:12px 14px;border-left:4px solid var(--pink);background:rgba(255,79,163,.08);border-radius:0 8px 8px 0}
 .task h3{color:#b3123f}
 .task p{font-weight:700;font-size:17px}
@@ -226,7 +251,7 @@ tr:last-child td{border-bottom:none}
       <div class="chalk">
         <div class="chalk-head">
           <h2>Security laptop</h2>
-          <span class="rule">Read two or more tables in one query: FROM a, b WHERE a.x_id = b.id</span>
+          <span class="rule">Read two or more tables in one query: FROM concerts, bands WHERE concerts.band_id = bands.id</span>
         </div>
         <label for="sql" class="eyebrow">Your SQL query</label>
         <textarea id="sql" spellcheck="false" autocapitalize="off" autocomplete="off"></textarea>
@@ -255,7 +280,7 @@ tr:last-child td{border-bottom:none}
       <div><span>Queries run</span><b id="fQueries">–</b></div>
       <div><span>Rank</span><b id="fRank">–</b></div>
     </div>
-    <div class="caught">Rozi Rab · caught on the Silent Disco stage, mid air-guitar</div>
+    <div class="caught">Pusztawave · caught behind the Silent Disco, tuning Cherry</div>
     <div class="finale-btns">
       <button class="btn" id="finaleClose" type="button">See bonus tasks</button>
       <button class="btn ghost" id="finaleAgain" type="button">Encore!</button>
@@ -270,9 +295,6 @@ const SEED = `
 CREATE TABLE bands (id INTEGER PRIMARY KEY, name TEXT, genre TEXT, country TEXT, members INTEGER);
 CREATE TABLE stages (id INTEGER PRIMARY KEY, name TEXT, capacity INTEGER, area TEXT);
 CREATE TABLE concerts (id INTEGER PRIMARY KEY, band_id INTEGER, stage_id INTEGER, day TEXT, start_time TEXT, end_time TEXT);
-CREATE TABLE crew (id INTEGER PRIMARY KEY, name TEXT, job TEXT, stage_id INTEGER, radio_channel INTEGER);
-CREATE TABLE passes (id INTEGER PRIMARY KEY, crew_id INTEGER, zone TEXT, time TEXT);
-CREATE TABLE managers (id INTEGER PRIMARY KEY, band_id INTEGER, name TEXT, phone TEXT);
 INSERT INTO bands VALUES (1,'Paprika Punks','punk','Hungary',4);
 INSERT INTO bands VALUES (2,'Danube Drift','indie','Hungary',5);
 INSERT INTO bands VALUES (3,'Velvet Locomotive','rock','UK',4);
@@ -326,72 +348,6 @@ INSERT INTO concerts VALUES (29,13,2,'Sunday','19:00','20:00');
 INSERT INTO concerts VALUES (30,2,3,'Sunday','20:00','21:00');
 INSERT INTO concerts VALUES (31,8,1,'Sunday','21:00','22:30');
 INSERT INTO concerts VALUES (32,9,3,'Sunday','21:30','22:30');
-INSERT INTO crew VALUES (1,'Gergő Hámori','roadie',1,3);
-INSERT INTO crew VALUES (2,'Bea Szalai','sound',1,3);
-INSERT INTO crew VALUES (3,'Máté Orbán','lights',1,3);
-INSERT INTO crew VALUES (4,'Nóra Kiss','security',1,1);
-INSERT INTO crew VALUES (5,'Dávid Bakos','sound',2,4);
-INSERT INTO crew VALUES (6,'Lilla Fehér','roadie',2,4);
-INSERT INTO crew VALUES (7,'Ákos Tar','security',3,1);
-INSERT INTO crew VALUES (8,'Petra Nagy','sound',3,5);
-INSERT INTO crew VALUES (9,'Zoli Berki','lights',3,5);
-INSERT INTO crew VALUES (10,'Hanna Rózsa','roadie',4,6);
-INSERT INTO crew VALUES (11,'Bence Varga','sound',4,6);
-INSERT INTO crew VALUES (12,'Rozi Rab','runner',5,7);
-INSERT INTO crew VALUES (13,'Emma Lukács','sound',5,7);
-INSERT INTO crew VALUES (14,'Tomi Sós','security',5,1);
-INSERT INTO passes VALUES (1,4,'Main backstage','18:40');
-INSERT INTO passes VALUES (2,1,'Main backstage','18:55');
-INSERT INTO passes VALUES (3,2,'Main backstage','19:02');
-INSERT INTO passes VALUES (4,6,'Dune backstage','19:10');
-INSERT INTO passes VALUES (5,5,'Dune backstage','19:12');
-INSERT INTO passes VALUES (6,8,'Riverbank backstage','19:30');
-INSERT INTO passes VALUES (7,12,'Catering','19:45');
-INSERT INTO passes VALUES (8,10,'Catering','19:50');
-INSERT INTO passes VALUES (9,3,'Main backstage','20:05');
-INSERT INTO passes VALUES (10,7,'Riverbank backstage','20:10');
-INSERT INTO passes VALUES (11,13,'Catering','20:20');
-INSERT INTO passes VALUES (12,9,'Riverbank backstage','20:25');
-INSERT INTO passes VALUES (13,1,'Catering','20:40');
-INSERT INTO passes VALUES (14,3,'Main backstage','20:55');
-INSERT INTO passes VALUES (15,11,'Crew parking','21:00');
-INSERT INTO passes VALUES (16,14,'Catering','21:05');
-INSERT INTO passes VALUES (17,1,'Main backstage','21:12');
-INSERT INTO passes VALUES (18,6,'Dune backstage','21:20');
-INSERT INTO passes VALUES (19,12,'Main backstage','21:23');
-INSERT INTO passes VALUES (20,2,'Main backstage','21:30');
-INSERT INTO passes VALUES (21,8,'Riverbank backstage','21:33');
-INSERT INTO passes VALUES (22,5,'Crew parking','21:38');
-INSERT INTO passes VALUES (23,4,'Main backstage','21:45');
-INSERT INTO passes VALUES (24,12,'Catering','21:52');
-INSERT INTO passes VALUES (25,3,'Main backstage','21:58');
-INSERT INTO passes VALUES (26,13,'Crew parking','22:05');
-INSERT INTO passes VALUES (27,9,'Riverbank backstage','22:10');
-INSERT INTO passes VALUES (28,1,'Main backstage','22:15');
-INSERT INTO passes VALUES (29,10,'Catering','22:20');
-INSERT INTO passes VALUES (30,7,'Riverbank backstage','22:30');
-INSERT INTO passes VALUES (31,6,'Catering','22:40');
-INSERT INTO passes VALUES (32,2,'Main backstage','22:48');
-INSERT INTO passes VALUES (33,14,'Crew parking','23:00');
-INSERT INTO passes VALUES (34,11,'Catering','23:10');
-INSERT INTO passes VALUES (35,12,'Crew parking','23:20');
-INSERT INTO passes VALUES (36,4,'Main backstage','23:40');
-INSERT INTO managers VALUES (1,1,'Ilona Pék','+36 30 111 2233');
-INSERT INTO managers VALUES (2,2,'Marci Dobó','+36 20 222 3344');
-INSERT INTO managers VALUES (3,3,'Harriet Cole','+44 7700 900123');
-INSERT INTO managers VALUES (4,4,'Teri Juhász','+36 70 333 4455');
-INSERT INTO managers VALUES (5,5,'Olivér Kun','+36 30 444 5566');
-INSERT INTO managers VALUES (6,6,'Kai Tamm','+372 5555 1234');
-INSERT INTO managers VALUES (7,7,'Agnieszka Lis','+48 600 123 456');
-INSERT INTO managers VALUES (8,8,'Felix Baumann','+43 660 123 4567');
-INSERT INTO managers VALUES (9,9,'Zsolt Erdős','+36 20 555 6677');
-INSERT INTO managers VALUES (10,10,'Jana Horváthová','+421 900 123 456');
-INSERT INTO managers VALUES (11,11,'Bori Szép','+36 70 666 7788');
-INSERT INTO managers VALUES (12,12,'Lucía Marín','+34 600 123 456');
-INSERT INTO managers VALUES (13,13,'Anke Vogel','+49 170 1234567');
-INSERT INTO managers VALUES (14,14,'Dénes Varga','+36 30 777 8899');
-INSERT INTO managers VALUES (15,15,'Panni Tóth','+36 20 888 9900');
-INSERT INTO managers VALUES (16,16,'Petr Dvořák','+420 601 123 456');
 `;
 const CHAPTERS = [
  {
@@ -473,17 +429,17 @@ const CHAPTERS = [
    "neongulyas"
   ],
   "placeholder": "band name",
-  "success": "Neon Gulyás. Their singer swears she saw a black guitar case being hurried past the Dune Tent at about 21:30. Keep going."
+  "success": "Neon Gulyás. Good, but no guitar yet. Keep going."
  },
  {
-  "title": "Three tables, short names",
+  "title": "Three tables at once",
   "story": "<p>Stage numbers are getting annoying: you keep forgetting which one is the Dune Tent. The <code>stages</code> table has the names. <mark>Three tables, one query.</mark></p>",
-  "learn": "<p>Give each table a short <b>alias</b> right after its name in <code>FROM</code>: <code>concerts c, bands b, stages s</code>. Then write <code>c.band_id</code> instead of <code>concerts.band_id</code>. Every extra table needs its own matching rule, joined with <code>AND</code>.</p>\n  <pre>SELECT c.day, c.start_time, b.name, s.name\nFROM concerts c, bands b, stages s\nWHERE c.band_id = b.id\n  AND c.stage_id = s.id;</pre>",
+  "learn": "<p>List all three tables in <code>FROM</code>, separated by commas: <code>FROM concerts, bands, stages</code>. Keep writing the full <code>table.column</code> name everywhere, so it is always clear which table a column comes from. Every extra table needs its own matching rule, joined with <code>AND</code>. Three tables need two rules.</p>\n  <pre>SELECT concerts.day, concerts.start_time, bands.name, stages.name\nFROM concerts, bands, stages\nWHERE concerts.band_id = bands.id\n  AND concerts.stage_id = stages.id;</pre>",
   "task": "On which stage do the Csárdás Collective play on Sunday?",
   "hints": [
-   "Two matching rules: c.band_id = b.id AND c.stage_id = s.id. Then AND b.name = 'Csárdás Collective' AND c.day = 'Sunday'.",
+   "Two matching rules: concerts.band_id = bands.id AND concerts.stage_id = stages.id. Then AND bands.name = 'Csárdás Collective' AND concerts.day = 'Sunday'.",
    {
-    "sql": "SELECT s.name, c.day, c.start_time\nFROM concerts c, bands b, stages s\nWHERE c.band_id = b.id\n  AND c.stage_id = s.id\n  AND b.name = 'Csárdás Collective'\n  AND c.day = 'Sunday';"
+    "sql": "SELECT stages.name, concerts.day, concerts.start_time\nFROM concerts, bands, stages\nWHERE concerts.band_id = bands.id\n  AND concerts.stage_id = stages.id\n  AND bands.name = 'Csárdás Collective'\n  AND concerts.day = 'Sunday';"
    }
   ],
   "answers": [
@@ -497,12 +453,12 @@ const CHAPTERS = [
  {
   "title": "The band before",
   "story": "<p>Cherry was last seen at <mark>21:10</mark>, propped on its stand while the previous act was still on. Whoever packed up after that set walked right past it.</p>",
-  "learn": "<p>Matching rules and ordinary filters mix freely in <code>WHERE</code>. A good habit: matching rules first, then the filters.</p>\n  <pre>SELECT b.name, c.start_time, c.end_time\nFROM concerts c, bands b, stages s\nWHERE c.band_id = b.id AND c.stage_id = s.id\n  AND s.name = 'Riverbank' AND c.day = 'Sunday';</pre>",
+  "learn": "<p>Matching rules and ordinary filters mix freely in <code>WHERE</code>. A good habit: matching rules first, then the filters.</p>\n  <pre>SELECT bands.name, concerts.start_time, concerts.end_time\nFROM concerts, bands, stages\nWHERE concerts.band_id = bands.id AND concerts.stage_id = stages.id\n  AND stages.name = 'Riverbank' AND concerts.day = 'Sunday';</pre>",
   "task": "Which band's concert ended on the Main Stage at 21:30 on Saturday?",
   "hints": [
-   "Join all three tables, then filter: s.name = 'Main Stage', c.day = 'Saturday', c.end_time = '21:30'.",
+   "Join all three tables, then filter: stages.name = 'Main Stage', concerts.day = 'Saturday', concerts.end_time = '21:30'.",
    {
-    "sql": "SELECT b.name\nFROM concerts c, bands b, stages s\nWHERE c.band_id = b.id\n  AND c.stage_id = s.id\n  AND s.name = 'Main Stage'\n  AND c.day = 'Saturday'\n  AND c.end_time = '21:30';"
+    "sql": "SELECT bands.name\nFROM concerts, bands, stages\nWHERE concerts.band_id = bands.id\n  AND concerts.stage_id = stages.id\n  AND stages.name = 'Main Stage'\n  AND concerts.day = 'Saturday'\n  AND concerts.end_time = '21:30';"
    }
   ],
   "answers": [
@@ -514,12 +470,12 @@ const CHAPTERS = [
  {
   "title": "The busiest stage",
   "story": "<p>The festival director grabs you. \"While you're in there: which stage had the most concerts? For the press release.\" <mark>Not relevant to the guitar.</mark> But she's the director.</p>",
-  "learn": "<p>Everything you already know still works after a join: <code>GROUP BY</code>, <code>COUNT</code>, <code>ORDER BY</code>. SQL matches the tables first, then groups the result.</p>\n  <pre>SELECT s.name, COUNT(*) AS concerts\nFROM concerts c, stages s\nWHERE c.stage_id = s.id\nGROUP BY s.name\nORDER BY COUNT(*) DESC;</pre>",
+  "learn": "<p>Everything you already know still works after a join: <code>GROUP BY</code>, <code>COUNT</code>, <code>ORDER BY</code>. SQL matches the tables first, then groups the result.</p>\n  <pre>SELECT stages.name, COUNT(*) AS concerts\nFROM concerts, stages\nWHERE concerts.stage_id = stages.id\nGROUP BY stages.name\nORDER BY COUNT(*) DESC;</pre>",
   "task": "Which stage hosts the most concerts over the weekend?",
   "hints": [
-   "Join concerts and stages, GROUP BY s.name, and sort by COUNT(*) DESC.",
+   "Join concerts and stages, GROUP BY stages.name, and sort by COUNT(*) DESC.",
    {
-    "sql": "SELECT s.name, COUNT(*) AS concerts\nFROM concerts c, stages s\nWHERE c.stage_id = s.id\nGROUP BY s.name\nORDER BY COUNT(*) DESC;"
+    "sql": "SELECT stages.name, COUNT(*) AS concerts\nFROM concerts, stages\nWHERE concerts.stage_id = stages.id\nGROUP BY stages.name\nORDER BY COUNT(*) DESC;"
    }
   ],
   "answers": [
@@ -531,34 +487,14 @@ const CHAPTERS = [
   "success": "The Riverbank, with 10. The director is delighted. 21:52. Back to the guitar."
  },
  {
-  "title": "Who works where",
-  "story": "<p>Only crew with a Main Stage lanyard are allowed backstage there. The <code>crew</code> table says who is assigned to which stage, again by <code>stage_id</code>.</p>",
-  "learn": "<p>The same trick works for any two tables that share an id: <code>crew.stage_id</code> refers to <code>stages.id</code>.</p>\n  <pre>SELECT c.name, c.job, s.name\nFROM crew c, stages s\nWHERE c.stage_id = s.id;</pre>",
-  "task": "What is the name of the roadie assigned to the Main Stage?",
+  "title": "Who was on stage",
+  "story": "<p>A sound tech heard Cherry's stand clatter at <mark>21:20</mark>. Whoever took it was off stage at that moment, so every band that was <b>playing</b> at 21:20 has a perfect alibi: thousands of witnesses.</p>",
+  "learn": "<p>Times are stored as text like <code>'21:20'</code>. Because they always have the same shape, you can compare them with <code>&lt;=</code> and <code>&gt;=</code>. A concert is on at 21:20 if it started at or before 21:20 and ends at or after 21:20.</p>\n  <pre>SELECT bands.name, concerts.start_time, concerts.end_time\nFROM concerts, bands\nWHERE concerts.band_id = bands.id\n  AND concerts.day = 'Friday'\n  AND concerts.start_time &lt;= '20:00'\n  AND concerts.end_time &gt;= '20:00';</pre>",
+  "task": "How many bands were on stage on Saturday at 21:20?",
   "hints": [
-   "Join crew and stages, then AND s.name = 'Main Stage' AND c.job = 'roadie'.",
+   "Join concerts and bands, then AND concerts.day = 'Saturday' AND concerts.start_time <= '21:20' AND concerts.end_time >= '21:20'. Count the rows.",
    {
-    "sql": "SELECT c.name, c.job\nFROM crew c, stages s\nWHERE c.stage_id = s.id\n  AND s.name = 'Main Stage'\n  AND c.job = 'roadie';"
-   }
-  ],
-  "answers": [
-   "gergo hamori",
-   "gergő hámori",
-   "hamori gergo",
-   "gergo"
-  ],
-  "placeholder": "name",
-  "success": "Gergő Hámori. Nine years on the Main Stage crew, and he cried when Cherry went missing. Probably not him either."
- },
- {
-  "title": "The scan log",
-  "story": "<p>Every backstage door has a card reader. The <code>passes</code> table logs every scan on Saturday: who (<code>crew_id</code>), which door, what time. Cherry vanished <mark>between 21:10 and 21:40</mark>.</p>",
-  "learn": "<p>Times are stored as text like <code>'21:23'</code>. Because they always have the same shape, you can compare them with <code>&gt;=</code> and <code>&lt;=</code>.</p>\n  <pre>SELECT c.name, p.zone, p.time\nFROM passes p, crew c\nWHERE p.crew_id = c.id\n  AND p.time &gt;= '20:00' AND p.time &lt;= '20:30';</pre>",
-  "task": "How many different people scanned into 'Main backstage' between 21:10 and 21:40?",
-  "hints": [
-   "Join passes and crew, then AND p.zone = 'Main backstage' AND p.time >= '21:10' AND p.time <= '21:40'. Count the names you get.",
-   {
-    "sql": "SELECT c.name, p.time\nFROM passes p, crew c\nWHERE p.crew_id = c.id\n  AND p.zone = 'Main backstage'\n  AND p.time >= '21:10'\n  AND p.time <= '21:40';"
+    "sql": "SELECT bands.name, concerts.start_time, concerts.end_time\nFROM concerts, bands\nWHERE concerts.band_id = bands.id\n  AND concerts.day = 'Saturday'\n  AND concerts.start_time <= '21:20'\n  AND concerts.end_time >= '21:20';"
    }
   ],
   "answers": [
@@ -566,30 +502,47 @@ const CHAPTERS = [
    "three"
   ],
   "placeholder": "a number",
-  "success": "Three people. Two of them belong there. One of them doesn't."
+  "success": "Three bands: Tokaj Thunder, Neon Gulyás and The Rusty Trams. All on stage, all in the clear."
  },
  {
-  "title": "The wrong lanyard",
-  "story": "<p>Three names, and the clock says <mark>21:58</mark>. One more table: <code>stages</code>, through <code>crew.stage_id</code>. Whoever scanned into the Main backstage but is assigned to a <b>different</b> stage has some explaining to do.</p>",
-  "learn": "<p>Three tables again: <code>passes → crew → stages</code>. Two matching rules, then your filters. <code>&lt;&gt;</code> means \"not equal\".</p>\n  <pre>SELECT c.name, s.name, p.time\nFROM passes p, crew c, stages s\nWHERE p.crew_id = c.id\n  AND c.stage_id = s.id\n  AND s.name &lt;&gt; 'Main Stage';</pre>",
-  "task": "Who scanned into 'Main backstage' between 21:10 and 21:40 without being Main Stage crew?",
+  "title": "Heading south",
+  "story": "<p>A guard at the Dune Tent radios in. At about 21:30 someone with an <b>artist wristband</b> hurried past him with a black guitar case, <mark>heading for the south end of the site</mark>. The <code>area</code> column of <code>stages</code> says which stages are in the south.</p>",
+  "learn": "<p>Use all three tables: <code>bands ← concerts → stages</code>. <code>concerts</code> sits in the middle and points to both. Two matching rules, then your filters.</p>\n  <pre>SELECT bands.name, stages.name, stages.area, concerts.start_time\nFROM concerts, bands, stages\nWHERE concerts.band_id = bands.id\n  AND concerts.stage_id = stages.id\n  AND concerts.day = 'Saturday';</pre>",
+  "task": "How many Saturday concerts take place on stages in the south area?",
   "hints": [
-   "Take your chapter 8 query, add stages with AND c.stage_id = s.id, and add AND s.name <> 'Main Stage'.",
+   "Join all three tables, then AND concerts.day = 'Saturday' AND stages.area = 'south'. Count the rows.",
    {
-    "sql": "SELECT c.name, s.name AS their_stage, p.time\nFROM passes p, crew c, stages s\nWHERE p.crew_id = c.id\n  AND c.stage_id = s.id\n  AND p.zone = 'Main backstage'\n  AND p.time >= '21:10'\n  AND p.time <= '21:40'\n  AND s.name <> 'Main Stage';"
+    "sql": "SELECT bands.name, stages.name, concerts.start_time\nFROM concerts, bands, stages\nWHERE concerts.band_id = bands.id\n  AND concerts.stage_id = stages.id\n  AND concerts.day = 'Saturday'\n  AND stages.area = 'south';"
    }
   ],
   "answers": [
-   "rozi rab",
-   "rab rozi",
-   "rozi"
+   "4",
+   "four"
   ],
-  "placeholder": "name",
-  "success": "Rozi Rab, runner at the Silent Disco. Security sprints over: Rozi is on the Silent Disco stage with Cherry, 800 people in headphones watching her play air guitar to a song only she can hear. She \"borrowed it for one song\". Cherry is back on the Main Stage at 21:59. The show starts on time."
+  "placeholder": "a number",
+  "success": "Four concerts in the south on Saturday. Two of those bands had finished long before 21:20, and Neon Gulyás has an alibi from chapter 7. That leaves one."
+ },
+ {
+  "title": "The missing guitar",
+  "story": "<p>The clock says <mark>21:58</mark>. Think like the thief: why grab a famous guitar at 21:20 and run south? To play it. <b>The thief needed Cherry for a set that hadn't started yet.</b></p>",
+  "learn": "<p>Same three tables, same two matching rules. Only the filters change.</p>\n  <pre>SELECT bands.name, stages.name, concerts.start_time\nFROM concerts, bands, stages\nWHERE concerts.band_id = bands.id\n  AND concerts.stage_id = stages.id;</pre>",
+  "task": "Which act plays in the south area on Saturday and starts after 21:40?",
+  "hints": [
+   "Take your chapter 8 query and add AND concerts.start_time > '21:40'.",
+   {
+    "sql": "SELECT bands.name, stages.name, concerts.start_time\nFROM concerts, bands, stages\nWHERE concerts.band_id = bands.id\n  AND concerts.stage_id = stages.id\n  AND concerts.day = 'Saturday'\n  AND stages.area = 'south'\n  AND concerts.start_time > '21:40';"
+   }
+  ],
+  "answers": [
+   "pusztawave",
+   "puszta wave"
+  ],
+  "placeholder": "band name",
+  "success": "Pusztawave, the one-person electro act on the Silent Disco at 22:30. Security sprints over and finds them behind the stage, tuning Cherry for a \"surprise guitar solo\". They only \"borrowed it for one song\". Cherry is back on the Main Stage at 21:59. The show starts on time."
  }
 ];
-const BONUS = ["List every band together with the stages it plays on, without repeats. Try SELECT DISTINCT.", "Which country's bands play the most concerts over the weekend?", "How many musicians stand on the Main Stage in total on Sunday? (join + SUM(members))", "Which crew members use radio channel 1, and which stage is each of them on?", "Which concert on another stage overlaps with the headliner? (same day, starts before 23:30, ends after 22:00)", "Which manager should security phone about the Saturday 22:00 concert? (concerts → bands → managers)"];
-const COLDOCS = {"bands": {"id": "Row number of the band.", "name": "Band name, e.g. <code>'Paprika Punks'</code>.", "genre": "<code>'punk'</code>, <code>'rock'</code>, <code>'pop'</code>, <code>'folk'</code>, <code>'electro'</code>, <code>'jazz'</code>, <code>'metal'</code> or <code>'indie'</code>.", "country": "Where the band is from, e.g. <code>'Hungary'</code>.", "members": "How many people are in the band."}, "stages": {"id": "Row number of the stage.", "name": "<code>'Main Stage'</code>, <code>'Dune Tent'</code>, <code>'Riverbank'</code>, <code>'Folk Barn'</code> or <code>'Silent Disco'</code>.", "capacity": "How many people fit in front of it.", "area": "Part of the festival site: <code>'north'</code>, <code>'river'</code> or <code>'south'</code>."}, "concerts": {"id": "Row number of the concert.", "band_id": "Which band plays: the <code>id</code> of a row in <code>bands</code>.", "stage_id": "Where: the <code>id</code> of a row in <code>stages</code>.", "day": "<code>'Friday'</code>, <code>'Saturday'</code> or <code>'Sunday'</code>.", "start_time": "Start, as text <code>'HH:MM'</code>.", "end_time": "End, as text <code>'HH:MM'</code>."}, "crew": {"id": "Row number of the crew member.", "name": "Their name.", "job": "<code>'roadie'</code>, <code>'sound'</code>, <code>'lights'</code>, <code>'security'</code> or <code>'runner'</code>.", "stage_id": "The stage they are assigned to: the <code>id</code> of a row in <code>stages</code>.", "radio_channel": "Walkie-talkie channel number."}, "passes": {"id": "Row number of the scan.", "crew_id": "Who scanned their card: the <code>id</code> of a row in <code>crew</code>.", "zone": "Which door: e.g. <code>'Main backstage'</code> or <code>'Catering'</code>.", "time": "When, on Saturday, as text <code>'HH:MM'</code>."}, "managers": {"id": "Row number of the manager.", "band_id": "Whose manager: the <code>id</code> of a row in <code>bands</code>. Every band has exactly one.", "name": "The manager's name.", "phone": "Phone number, as text."}};
+const BONUS = ["List every band together with the stages it plays on, without repeats. Try SELECT DISTINCT.", "Which country's bands play the most concerts over the weekend?", "How many musicians stand on the Main Stage in total on Sunday? (join + SUM(members))", "Which band plays on the most different stages? (COUNT(DISTINCT stages.name))", "Which concert on another stage overlaps with the headliner? (same day, starts before 23:30, ends after 22:00)", "Which stage in the north area has the most concerts on Friday?"];
+const COLDOCS = {"bands": {"id": "Row number of the band.", "name": "Band name, e.g. <code>'Paprika Punks'</code>.", "genre": "<code>'punk'</code>, <code>'rock'</code>, <code>'pop'</code>, <code>'folk'</code>, <code>'electro'</code>, <code>'jazz'</code>, <code>'metal'</code> or <code>'indie'</code>.", "country": "Where the band is from, e.g. <code>'Hungary'</code>.", "members": "How many people are in the band."}, "stages": {"id": "Row number of the stage.", "name": "<code>'Main Stage'</code>, <code>'Dune Tent'</code>, <code>'Riverbank'</code>, <code>'Folk Barn'</code> or <code>'Silent Disco'</code>.", "capacity": "How many people fit in front of it.", "area": "Part of the festival site: <code>'north'</code>, <code>'river'</code> or <code>'south'</code>."}, "concerts": {"id": "Row number of the concert.", "band_id": "Which band plays: the <code>id</code> of a row in <code>bands</code>.", "stage_id": "Where: the <code>id</code> of a row in <code>stages</code>.", "day": "<code>'Friday'</code>, <code>'Saturday'</code> or <code>'Sunday'</code>.", "start_time": "Start, as text <code>'HH:MM'</code>.", "end_time": "End, as text <code>'HH:MM'</code>."}};
 const HAND_STEPS = ["Write your name below.", "Click <b>Save answers (.txt)</b>. The file goes to your Downloads folder.", "Open the assignment in <b>Google Classroom</b>, upload the file under <b>Add or create → File</b>, then press <b>Turn in</b>."];
 const RANKS = ["Festival Legend", "Head of Security", "Security", "Volunteer"];
 const T = {
@@ -597,8 +550,8 @@ const T = {
   try_:"Try it", learn:"SQL for this step", task:"Your task", hint1:"Clue 1 · hint", hint2:"Clue 2 · a working query", answer:"Answer", check:"Check answer",
   correct:"Correct.", wrong:"Not quite.", wrongTip:"Look at your result again. Did you include the matching rule (WHERE … = …) for every pair of tables? Check whether the task asks for a number or a name.", prev:"Previous chapter", next:"Next chapter", start:"Start the search", yourans:"Your answer",
   ready:"Database ready. Write a query and press Run.", empty:"The query box is empty. Type a query first.", zero:"0 rows. No rows match all of your conditions. Check the spelling of text values and your matching rule.", sound:"Sound", reset:"Start over", reset2:"Click again to erase progress",
-  errGeneric:"Check spelling, commas, brackets and quotes. Text values need single quotes, like 'Saturday'.", errCol:"That column name doesn't exist, or it's ambiguous. When two tables have a column with the same name (like id), write table.id or alias.id.", errTab:"That table doesn't exist. The tables are: bands, stages, concerts, crew, passes, managers.", errAmb:"Ambiguous column: both tables have a column with that name. Write the table name in front of it, like concerts.id or c.id.", sqlErr:"The query has an error.", engFail:"The SQL engine could not load.", engFail2:"Check the internet connection and reload the page.", engStart:"The SQL engine could not start.",
-  endH:"Show's on", endP:m=>`Cherry is back in Vic's hands, Rozi Rab is banished to the merch tent, and 12,000 people are screaming at the Main Stage. You found the guitar in about <b>${m} minutes</b>, joining up to three tables with FROM, aliases and matching rules in WHERE.`, endBonus:"Bonus tasks for fast detectives:", handH:"Hand in your answers", name:"Your name", namePh:"Write your name here", save:"Save answers (.txt)", copy:"Copy as text", replay:"Replay the celebration",
+  errGeneric:"Check spelling, commas, brackets and quotes. Text values need single quotes, like 'Saturday'.", errCol:"That column name doesn't exist, or it's ambiguous. When two tables have a column with the same name (like id), write the table name in front: concerts.id.", errTab:"That table doesn't exist. The tables are: bands, concerts, stages.", errAmb:"Ambiguous column: both tables have a column with that name. Write the table name in front of it, like concerts.id.", sqlErr:"The query has an error.", engFail:"The SQL engine could not load.", engFail2:"Check the internet connection and reload the page.", engStart:"The SQL engine could not start.",
+  endH:"Show's on", endP:m=>`Cherry is back in Vic's hands, Pusztawave will play their set on a keyboard like everyone else, and 12,000 people are screaming at the Main Stage. You found the guitar in about <b>${m} minutes</b>, joining up to three tables with FROM and matching rules in WHERE.`, endBonus:"Bonus tasks for fast detectives:", handH:"Hand in your answers", name:"Your name", namePh:"Write your name here", save:"Save answers (.txt)", copy:"Copy as text", replay:"Replay the celebration",
   xNameFirst:"Write your name first.", xCopied:"Copied. Paste it into the assignment in Google Classroom as a private comment, then press Turn in.", xBlocked:"Copying is blocked here. Use Save answers instead.", xSaved:f=>`Saved as ${f}. Now upload it to the assignment in Google Classroom and press Turn in.`, xSaveBlocked:"Saving is blocked here. Use Copy as text instead.",
   filePrefix:"backstage", reportTitle:"BACKSTAGE BLUES - ANSWER SHEET", rName:"Name", rFinished:"Finished", rTime:"Time taken", rQueries:"Queries run", rDev:"NOTE: completed with the teacher code, so some answers may be missing.",
   rTask:"Task", rAnswer:"Answer", rSkipped:"(skipped)", rUnsolved:"(not solved)", rWrong:"Wrong answers", rQuery:"Query", rNone:"(none saved)",
@@ -606,7 +559,7 @@ const T = {
 };
 
 /* ---------- state ---------- */
-const KEY = "backstage-en-v1";
+const KEY = "backstage-en-v2";
 let state = { solved: [], current: 0, start: Date.now(), end: null, drafts: {} };
 try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && Array.isArray(s.solved)) state = Object.assign(state, s); } catch(e){}
 function save(){ try { localStorage.setItem(KEY, JSON.stringify(state)); } catch(e){} }
@@ -655,6 +608,7 @@ function renderCase(){
     <h2>${esc(c.title)}</h2>
     <div class="story">${c.story}</div>
     <div class="learn"><h3>${c.refresher ? T.try_ : T.learn}</h3>${c.learn}</div>
+    <div class="links" id="links"></div>
     <div class="task"><h3>${T.task}</h3><p>${esc(c.task)}</p></div>
     ${hints}
     <form class="answer" id="answerForm" autocomplete="off">
@@ -667,10 +621,140 @@ function renderCase(){
       <button class="btn primary" type="button" id="next" ${solved && !last ? "" : "hidden"}>${c.refresher ? T.start : T.next}</button>
     </div>
     ${allDone() && last ? endingHtml() : ""}`;
+  renderLinks();
   $("answerForm").addEventListener("submit", e=>{ e.preventDefault(); check(); });
   $("prev").onclick = ()=> goTo(i-1);
   $("next").onclick = ()=> goTo(i+1);
 }
+/* ---------- connection map: which tables a chapter uses and how they plug together ---------- */
+const LT = document.documentElement.lang === "hu" ? {
+  h:"A fejezet táblái és kapcsolataik", hR:"Az adatbázis térképe · így kapcsolódnak a táblák",
+  noRule:"Még nincs párosítási szabály: minden sor minden sorral párosul.",
+  byHand:"Még nincs összekapcsolva: két külön lekérdezés, a számot kézzel viszed át.",
+  n1:(a,b)=>`N : 1 — ${az(a)} ${a} tábla sok sora mutathat ${az(b)} ${b} tábla egy sorára`,
+  one:(a,b)=>`1 : 1 — ${az(b)} ${b} tábla minden sorához pontosan egy sor tartozik ${az(a)} ${a} táblában`,
+  nn:(a,b,j)=>`${a} ↔ ${b}: N : N kapcsolat ${az(j)} ${j} táblán keresztül`, more:n=>`+${n} további`
+} : {
+  h:"Tables in this chapter and how they connect", hR:"Database map · how the tables connect",
+  noRule:"No matching rule yet: every row is paired with every row.",
+  byHand:"Not joined yet: two separate queries, and you carry the number across by hand.",
+  n1:(a,b)=>`N : 1 — many ${a} rows can point to the same ${b} row`,
+  one:(a,b)=>`1 : 1 — every ${b} row has exactly one ${a} row`,
+  nn:(a,b,j)=>`${a} ↔ ${b}: N : N, through the ${j} table`, more:n=>`+${n} more`
+};
+function az(w){ return /^[aáeéiíoóöőuúüű]/i.test(w) ? "az" : "a"; }
+const SCHEMA = (()=>{ const o = {}; for (const m of SEED.matchAll(/CREATE TABLE (\w+) \(([^)]*)\)/g)) o[m[1]] = m[2].split(",").map(x=>x.trim().split(/\s+/)[0]); return o; })();
+function chapterLinks(c){
+  const h = c.hints.find(x=>typeof x !== "string"); const sql = h ? h.sql : "";
+  const tables = [], froms = [];
+  for (const m of sql.matchAll(/FROM\s+([\w\s,]+?)(?=\s+WHERE|\s+GROUP|\s+ORDER|;|$)/gi)){
+    const list = m[1].split(",").map(x=>x.trim().split(/\s+/)[0]).filter(t=>SCHEMA[t]);
+    froms.push(list); list.forEach(t=>{ if (!tables.includes(t)) tables.push(t); });
+  }
+  const links = [];
+  for (const m of sql.matchAll(/(\w+)\.(\w+)\s*=\s*(\w+)\.(\w+)/g)){
+    let [ , ta, ca, tb, cb ] = m;
+    if (!SCHEMA[ta] || !SCHEMA[tb]) continue;
+    if (ca === "id" && cb !== "id") [ta, ca, tb, cb] = [tb, cb, ta, ca];   /* fk side first */
+    if (!links.some(l=>l.ft===ta && l.fc===ca && l.pt===tb)) links.push({ ft:ta, fc:ca, pt:tb, pc:cb });
+  }
+  return { tables, links, joined: froms.some(f=>f.length > 1) };
+}
+function mapFor(i){
+  const c = CHAPTERS[i];
+  if (!c.refresher) return chapterLinks(c);
+  const names = Object.keys(SCHEMA), all = { tables:names.slice(), links:[], joined:true, map:true };
+  Object.entries(SCHEMA).forEach(([t, cols])=>cols.forEach(col=>{
+    const m = col.match(/^(.+)_id$/); if (!m) return;
+    const pt = names.find(x=>x !== t && x.startsWith(m[1])); if (pt) all.links.push({ ft:t, fc:col, pt, pc:"id" }); }));
+  return all;
+}
+function chainOrder(tables, links){          /* line the tables up along their links: A — B — C */
+  if (!links.length) return tables;
+  const nb = t => links.filter(l=>l.ft===t || l.pt===t).map(l=>l.ft===t ? l.pt : l.ft);
+  const ends = tables.filter(t=>nb(t).length <= 1);
+  const start = ends.find(t=>links.some(l=>l.ft===t)) || ends[0] || tables[0];
+  const out = [start];
+  while (out.length < tables.length){ const nxt = nb(out[out.length-1]).find(t=>!out.includes(t)) || tables.find(t=>!out.includes(t)); out.push(nxt); }
+  return out;
+}
+const uniqCache = {};
+function isUnique(t, col){
+  const k = t + "." + col; if (k in uniqCache) return uniqCache[k]; if (!db) return null;
+  try { const r = db.exec(`SELECT COUNT(${col}) = COUNT(DISTINCT ${col}) FROM ${t}`); return uniqCache[k] = !!r[0].values[0][0]; } catch(e){ return null; }
+}
+function lkColor(k){ return `var(--lk${k % 6 + 1})`; }
+function renderLinks(){
+  const box = $("links"); if (!box) return;
+  const spec = mapFor(state.current);
+  if (!spec.tables.length){ box.hidden = true; return; }
+  box.hidden = false;
+  const tables = chainOrder(spec.tables, spec.links);
+  const used = {}; spec.links.forEach((l,k)=>{ (used[l.ft+"."+l.fc] ??= k); (used[l.pt+"."+l.pc] ??= k); });
+  const cards = tables.map(t=>{
+    const cols = SCHEMA[t], show = cols, more = 0;      /* every column of the table */
+    return `<div class="lk-card" data-t="${t}"><div class="h">${t}</div>${show.map(c=>{
+      const k = used[t+"."+c];
+      return `<div class="r${c==="id"?" k":""}${k!==undefined?" on":""}" data-c="${c}"${k!==undefined?` style="--c:${lkColor(k)}"`:""}><span class="ic">${c==="id"?"🔑":(/_id$/.test(c)?"→":"")}</span>${c}</div>`;
+    }).join("")}${more ? `<div class="r more">${LT.more(more)}</div>` : ""}</div>`;
+  }).join("");
+  const rules = spec.links.map((l,k)=>{
+    const u = isUnique(l.ft, l.fc);
+    const kind = u === null ? "" : `<span class="kind">${u ? LT.one(l.ft, l.pt) : LT.n1(l.ft, l.pt)}</span>`;
+    return `<li><span class="sw" style="background:${lkColor(k)}"></span><code>${l.ft}.${l.fc} = ${l.pt}.${l.pc}</code>${kind}</li>`;
+  });
+  let note = "";
+  if (!spec.links.length && tables.length > 1) note = `<p class="lk-note">${spec.joined ? LT.noRule : LT.byHand}</p>`;
+  box.innerHTML = `<h3>${spec.map ? LT.hR : LT.h}</h3><div class="lk-board"><svg class="lk-svg" aria-hidden="true"></svg>${cards}</div>${note}${rules.length ? `<ul class="lk-rules">${rules.join("")}</ul>` : ""}`;
+  box.dataset.spec = JSON.stringify({ links: spec.links, loose: !spec.links.length && tables.length > 1 ? [tables[0], tables[1], spec.joined ? "×" : "?"] : null });
+  requestAnimationFrame(drawLinks);
+}
+function drawLinks(){                        /* straight arrows: _id column → the id it points to */
+  const box = $("links"); if (!box || box.hidden || !box.dataset.spec) return;
+  const board = box.querySelector(".lk-board"), svg = box.querySelector(".lk-svg"); if (!board) return;
+  const spec = JSON.parse(box.dataset.spec);
+  const cardEls = [...board.querySelectorAll(".lk-card")];
+  board.classList.remove("stack");
+  const gap = parseFloat(getComputedStyle(board).columnGap) || 46;
+  const need = cardEls.reduce((s,c)=>s + c.getBoundingClientRect().width, 0) + gap * (cardEls.length - 1);
+  const stack = cardEls.length > 1 && need > board.clientWidth - 8;
+  board.classList.toggle("stack", stack);
+  const B = board.getBoundingClientRect(); if (!B.width) return;
+  svg.setAttribute("viewBox", `0 0 ${B.width} ${B.height}`);
+  const rel = el => { const r = el.getBoundingClientRect(); return { l:r.left-B.left, r:r.right-B.left, t:r.top-B.top, b:r.bottom-B.top, cy:(r.top+r.bottom)/2-B.top, cx:(r.left+r.right)/2-B.left }; };
+  const card = t => board.querySelector(`.lk-card[data-t="${t}"]`);
+  const head = (x, y, dx, dy, color)=>{ const L = 9, W = 5.5, px = -dy, py = dx;
+    return `<polygon points="${x},${y} ${x - dx*L + px*W},${y - dy*L + py*W} ${x - dx*L - px*W},${y - dy*L - py*W}" fill="${color}"/>`; };
+  const tag = (x, y, txt, color, anchor)=> txt ? `<text x="${x}" y="${y}" text-anchor="${anchor}" class="lk-end" fill="${color}">${txt}</text>` : "";
+  const right = Math.max(...cardEls.map(c=>rel(c).r));
+  let html = "";
+  spec.links.forEach((l,k)=>{
+    const A = card(l.ft), P = card(l.pt); if (!A || !P) return;
+    const a = rel(A.querySelector(`[data-c="${l.fc}"]`)), b = rel(P.querySelector(`[data-c="${l.pc}"]`)), ca = rel(A), cp = rel(P);
+    const color = lkColor(k), u = isUnique(l.ft, l.fc), la = u === null ? "" : (u ? "1" : "N"), lb = u === null ? "" : "1";
+    if (!stack){
+      const lr = ca.r <= cp.l, x1 = lr ? ca.r : ca.l, x2 = lr ? cp.l : cp.r, d = lr ? 1 : -1;
+      html += `<circle cx="${x1}" cy="${a.cy}" r="4" fill="${color}"/><line x1="${x1}" y1="${a.cy}" x2="${x2 - d*8}" y2="${b.cy}" stroke="${color}" stroke-width="3" stroke-linecap="round"/>`;
+      const len = Math.hypot(x2 - x1, b.cy - a.cy) || 1;
+      html += head(x2, b.cy, (x2 - x1)/len, (b.cy - a.cy)/len, color);
+      const up = b.cy < a.cy - 1;
+      html += tag(x1 + d*7, up ? a.cy + 18 : a.cy - 8, la, color, lr ? "start" : "end") + tag(x2 - d*12, up ? b.cy - 9 : b.cy + 19, lb, color, lr ? "end" : "start");
+    } else {
+      const X = right + 18;
+      html += `<circle cx="${ca.r}" cy="${a.cy}" r="4" fill="${color}"/><path d="M${ca.r},${a.cy} H${X} V${b.cy} H${cp.r + 8}" fill="none" stroke="${color}" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>`;
+      html += head(cp.r, b.cy, -1, 0, color);
+      html += tag(X + 6, a.cy + 5, la, color, "start") + tag(X + 6, b.cy + 5, lb, color, "start");
+    }
+  });
+  if (spec.loose){ const A = card(spec.loose[0]), P = card(spec.loose[1]);
+    if (A && P){ const ca = rel(A), cp = rel(P), ha = rel(A.querySelector(".h")), hp = rel(P.querySelector(".h"));
+      const [x1,y1,x2,y2] = stack ? [ca.cx, ca.b, cp.cx, cp.t] : [ca.r, ha.cy, cp.l, hp.cy], mx = (x1+x2)/2, my = (y1+y2)/2;
+      html += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="var(--lk-loose)" stroke-width="3" stroke-dasharray="6 6"/>`;
+      html += `<circle cx="${mx}" cy="${my}" r="11" class="lk-mid"/><text x="${mx}" y="${my+5}" text-anchor="middle" class="lk-midt">${spec.loose[2]}</text>`; } }
+  svg.innerHTML = html;
+}
+addEventListener("resize", ()=>requestAnimationFrame(drawLinks));
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(()=>drawLinks());
 function check(){
   const i = state.current, c = CHAPTERS[i], v = norm($("answer").value);
   if (!v) return;
@@ -853,7 +937,7 @@ addEventListener("keydown", e=>{ if (e.key === "Escape" && !$("finale").hidden) 
 
 /* ---------- database ---------- */
 let SQL = null, db = null;
-function resetDb(){ if (!SQL) return; if (db) db.close(); db = new SQL.Database(); db.run(SEED); $("out").innerHTML = `<p class="note">${T.ready}</p>`; renderSchema(); }
+function resetDb(){ if (!SQL) return; if (db) db.close(); db = new SQL.Database(); db.run(SEED); $("out").innerHTML = `<p class="note">${T.ready}</p>`; renderSchema(); renderLinks(); }
 function renderSchema(){
   const t = db.exec("SELECT name FROM sqlite_master WHERE type='table' ORDER BY rowid");
   if (!t.length){ $("schema").innerHTML = ""; return; }

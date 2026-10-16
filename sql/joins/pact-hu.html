@@ -100,6 +100,32 @@ main{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:18px;ali
 .case pre{background:var(--laptop);color:#f5ecd8;padding:12px 14px;border-radius:8px;overflow:auto;font-size:14px;line-height:1.5;margin:8px 0}
 .learn{margin-top:14px;padding:12px 14px;border-left:4px solid #2f5aa0;background:rgba(47,90,160,.09);border-radius:0 8px 8px 0}
 .learn h3,.task h3{font:700 14px var(--f-display);letter-spacing:.08em;text-transform:uppercase;color:#2a4f8f;margin-bottom:4px}
+.links{margin-top:14px;padding:12px 14px 10px;border-radius:10px;border:1px solid var(--lk-border);background:var(--lk-bg)}
+.links h3{font-size:14px;letter-spacing:.08em;text-transform:uppercase;color:var(--lk-title);margin-bottom:2px}
+.lk-board{position:relative;display:flex;flex-wrap:nowrap;justify-content:center;align-items:flex-start;column-gap:46px;row-gap:30px;padding:16px 4px 8px}
+.lk-board.stack{flex-direction:column;align-items:flex-start;padding:10px 46px 8px 8px;width:max-content;max-width:100%;margin:0 auto}
+.lk-svg{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;overflow:visible;z-index:2}
+.lk-card{position:relative;z-index:1;flex:none;min-width:96px;border:2px solid var(--lk-head);border-radius:8px;background:var(--lk-card);font:13px/1.35 var(--f-mono);overflow:hidden;box-shadow:0 3px 0 rgba(0,0,0,.12)}
+.lk-board.stack .lk-card{min-width:170px}
+.lk-card .h{background:var(--lk-head);color:var(--lk-head-ink);padding:5px 8px;font-weight:700}
+.lk-card .r{padding:4px 8px;border-top:1px solid var(--paper-line);display:flex;gap:6px;align-items:center;color:var(--paper-ink)}
+.lk-card .r .ic{font-size:11px;width:14px;text-align:center;opacity:.75}
+.lk-card .r.k{font-weight:700}
+.lk-card .r.k, .lk-card .r[data-c$="_id"]{font-weight:700}
+.lk-card .r:not(.k):not([data-c$="_id"]){color:var(--paper-muted)}
+.lk-card .r.on{box-shadow:inset 5px 0 0 var(--c);font-weight:700;background:var(--lk-on)}
+.lk-card .r.more{color:var(--paper-muted);font:italic 12px var(--f-body);padding:3px 8px}
+.lk-end{font:700 14px var(--f-mono);paint-order:stroke;stroke:var(--lk-bg-solid);stroke-width:4px}
+.lk-mid{fill:var(--lk-bg-solid);stroke:var(--lk-loose);stroke-width:2}
+.lk-midt{font:700 14px var(--f-mono);fill:var(--lk-loose)}
+.lk-note{color:var(--paper-muted);font-size:14px;text-align:center;margin:2px 0 4px!important}
+.lk-rules{list-style:none;margin:6px 0 0;padding:0;display:grid;gap:5px;font-size:14px}
+.lk-rules li{display:flex;flex-wrap:wrap;gap:3px 10px;align-items:center}
+.lk-rules .sw{width:18px;height:4px;border-radius:2px;flex:none}
+.lk-rules .kind{color:var(--paper-muted)}
+@media (max-width:640px){ .links{padding:10px 8px} .lk-card{min-width:0;font-size:12px} .lk-card .r{padding:4px 8px} .lk-card .h{padding:5px 8px} }
+.links{--lk-bg:rgba(255,248,228,.75);--lk-bg-solid:#fbf2da;--lk-border:#c9b07a;--lk-title:#2a4f8f;--lk-card:#fffaf0;--lk-head:#4a2a12;--lk-head-ink:#f5e6c0;--lk-on:#fbf0d4;--lk-loose:#8a7350;--lk1:#b8323a;--lk2:#2f5aa0;--lk3:#3d7a3a;--lk4:#7a3f8f;--lk5:#b07a10;--lk6:#4d3c28}
+.links h3{font:700 14px var(--f-display);letter-spacing:.08em}
 .task{margin-top:14px;padding:12px 14px;border-left:4px solid #b8323a;background:rgba(184,50,58,.09);border-radius:0 8px 8px 0}
 .task h3{color:#9a2028}
 .task p{font-weight:700;font-size:17px}
@@ -227,7 +253,7 @@ tr:last-child td{border-bottom:none}
       <div class="chalk">
         <div class="chalk-head">
           <h2>Királyi főkönyv</h2>
-          <span class="rule">Két vagy több tábla egy lekérdezésben: FROM a, b WHERE a.x_id = b.id</span>
+          <span class="rule">Két vagy több tábla egy lekérdezésben: FROM lovagok, kiralysagok WHERE lovagok.kiralysag_id = kiralysagok.id</span>
         </div>
         <label for="sql" class="eyebrow">A te SQL-lekérdezésed</label>
         <textarea id="sql" spellcheck="false" autocapitalize="off" autocomplete="off"></textarea>
@@ -268,24 +294,15 @@ tr:last-child td{border-bottom:none}
 
 <script>
 const SEED = `
-CREATE TABLE kiralysagok (id INTEGER PRIMARY KEY, nev TEXT, fovaros TEXT, cimer TEXT, sereg INTEGER);
-CREATE TABLE uralkodok (id INTEGER PRIMARY KEY, nev TEXT, cim TEXT, kiralysag_id INTEGER, koronazas INTEGER);
+CREATE TABLE kiralysagok (id INTEGER PRIMARY KEY, nev TEXT, uralkodo TEXT, fovaros TEXT, sereg INTEGER, szovetseg TEXT);
 CREATE TABLE lovagok (id INTEGER PRIMARY KEY, nev TEXT, kiralysag_id INTEGER, rang TEXT, fegyver TEXT);
-CREATE TABLE szovetsegek (id INTEGER PRIMARY KEY, nev TEXT, alapitas INTEGER, cel TEXT);
-CREATE TABLE tagsagok (id INTEGER PRIMARY KEY, szovetseg_id INTEGER, kiralysag_id INTEGER, csatlakozas INTEGER);
-CREATE TABLE levelek (id INTEGER PRIMARY KEY, lovag_id INTEGER, uralkodo_id INTEGER, ido TEXT, pecset TEXT);
-INSERT INTO kiralysagok VALUES (1,'Északhon','Fagyvár','fehér farkas',1200);
-INSERT INTO kiralysagok VALUES (2,'Folyóföld','Fűzgázló','ezüst hattyú',900);
-INSERT INTO kiralysagok VALUES (3,'Napvölgy','Aranymező','arany nap',800);
-INSERT INTO kiralysagok VALUES (4,'Vashegy','Üllőkő','fekete medve',2000);
-INSERT INTO kiralysagok VALUES (5,'Ködliget','Árnyéktó','szürke bagoly',700);
-INSERT INTO kiralysagok VALUES (6,'Aranypart','Tengerkapu','vörös hajó',1100);
-INSERT INTO uralkodok VALUES (1,'L. Laura','királynő',5,1201);
-INSERT INTO uralkodok VALUES (2,'B. Dániel','király',1,1196);
-INSERT INTO uralkodok VALUES (3,'M. Márk','király',4,1199);
-INSERT INTO uralkodok VALUES (4,'F. Lilianna','királynő',2,1205);
-INSERT INTO uralkodok VALUES (5,'R. Benjámin Laurence','király',6,1208);
-INSERT INTO uralkodok VALUES (6,'L. Mária Éva','királynő',3,1203);
+CREATE TABLE levelek (id INTEGER PRIMARY KEY, lovag_id INTEGER, ido TEXT, pecset TEXT);
+INSERT INTO kiralysagok VALUES (1,'Északhon','B. Dániel','Fagyvár',1200,'Ezüst Szövetség');
+INSERT INTO kiralysagok VALUES (2,'Folyóföld','F. Lilianna','Fűzgázló',900,'Ezüst Szövetség');
+INSERT INTO kiralysagok VALUES (3,'Napvölgy','L. Mária Éva','Aranymező',800,'Ezüst Szövetség');
+INSERT INTO kiralysagok VALUES (4,'Vashegy','M. Márk','Üllőkő',2000,'Vas Liga');
+INSERT INTO kiralysagok VALUES (5,'Ködliget','L. Laura','Árnyéktó',700,'Vas Liga');
+INSERT INTO kiralysagok VALUES (6,'Aranypart','R. Benjámin Laurence','Tengerkapu',1100,'Vas Liga');
 INSERT INTO lovagok VALUES (1,'K. Kamilla',1,'bajnok','lándzsa');
 INSERT INTO lovagok VALUES (2,'S. Bálint Máté',2,'lovag','íj');
 INSERT INTO lovagok VALUES (3,'H. Hunor József',4,'bajnok','bárd');
@@ -310,52 +327,40 @@ INSERT INTO lovagok VALUES (21,'P. Hanna',2,'apród','buzogány');
 INSERT INTO lovagok VALUES (22,'Z. Zalán Benedek',5,'apród','bárd');
 INSERT INTO lovagok VALUES (23,'S. Fruzsina',3,'apród','kard');
 INSERT INTO lovagok VALUES (24,'W. Bianka Kinga',6,'apród','buzogány');
-INSERT INTO szovetsegek VALUES (1,'Ezüst Szövetség',1203,'védelem');
-INSERT INTO szovetsegek VALUES (2,'Vas Liga',1207,'hódítás');
-INSERT INTO szovetsegek VALUES (3,'Tengeri Egyezmény',1198,'kereskedelem');
-INSERT INTO tagsagok VALUES (1,1,1,1203);
-INSERT INTO tagsagok VALUES (2,1,2,1203);
-INSERT INTO tagsagok VALUES (3,1,3,1204);
-INSERT INTO tagsagok VALUES (4,1,5,1209);
-INSERT INTO tagsagok VALUES (5,2,4,1207);
-INSERT INTO tagsagok VALUES (6,2,5,1208);
-INSERT INTO tagsagok VALUES (7,2,6,1210);
-INSERT INTO tagsagok VALUES (8,3,2,1198);
-INSERT INTO tagsagok VALUES (9,3,6,1198);
-INSERT INTO tagsagok VALUES (10,3,3,1201);
-INSERT INTO levelek VALUES (1,7,2,'18:10','fehér');
-INSERT INTO levelek VALUES (2,6,5,'18:20','vörös');
-INSERT INTO levelek VALUES (3,5,6,'18:30','arany');
-INSERT INTO levelek VALUES (4,15,4,'18:45','kék');
-INSERT INTO levelek VALUES (5,18,3,'18:50','fekete');
-INSERT INTO levelek VALUES (6,1,2,'19:15','fehér');
-INSERT INTO levelek VALUES (7,10,1,'19:20','szürke');
-INSERT INTO levelek VALUES (8,8,3,'19:40','fekete');
-INSERT INTO levelek VALUES (9,9,6,'19:50','kék');
-INSERT INTO levelek VALUES (10,13,4,'20:05','fehér');
-INSERT INTO levelek VALUES (11,12,5,'20:15','vörös');
-INSERT INTO levelek VALUES (12,20,3,'20:30','fekete');
-INSERT INTO levelek VALUES (13,11,2,'20:40','arany');
-INSERT INTO levelek VALUES (14,4,1,'20:55','szürke');
-INSERT INTO levelek VALUES (15,3,1,'21:05','fekete');
-INSERT INTO levelek VALUES (16,16,2,'21:15','szürke');
-INSERT INTO levelek VALUES (17,2,4,'21:30','kék');
-INSERT INTO levelek VALUES (18,17,4,'21:50','arany');
-INSERT INTO levelek VALUES (19,21,2,'22:05','kék');
-INSERT INTO levelek VALUES (20,14,3,'22:15','fekete');
-INSERT INTO levelek VALUES (21,24,1,'22:30','vörös');
-INSERT INTO levelek VALUES (22,22,5,'22:40','fekete');
-INSERT INTO levelek VALUES (23,4,3,'22:50','fekete');
-INSERT INTO levelek VALUES (24,23,6,'23:05','arany');
-INSERT INTO levelek VALUES (25,2,3,'23:20','fekete');
-INSERT INTO levelek VALUES (26,19,2,'23:40','fehér');
+INSERT INTO levelek VALUES (1,7,'18:10','fehér');
+INSERT INTO levelek VALUES (2,6,'18:20','vörös');
+INSERT INTO levelek VALUES (3,5,'18:30','arany');
+INSERT INTO levelek VALUES (4,15,'18:45','kék');
+INSERT INTO levelek VALUES (5,18,'18:50','fekete');
+INSERT INTO levelek VALUES (6,1,'19:15','fehér');
+INSERT INTO levelek VALUES (7,10,'19:20','szürke');
+INSERT INTO levelek VALUES (8,8,'19:40','fekete');
+INSERT INTO levelek VALUES (9,9,'19:50','kék');
+INSERT INTO levelek VALUES (10,13,'20:05','fehér');
+INSERT INTO levelek VALUES (11,12,'20:15','vörös');
+INSERT INTO levelek VALUES (12,8,'20:30','fekete');
+INSERT INTO levelek VALUES (13,11,'20:40','arany');
+INSERT INTO levelek VALUES (14,4,'20:55','szürke');
+INSERT INTO levelek VALUES (15,3,'21:05','fekete');
+INSERT INTO levelek VALUES (16,16,'21:15','szürke');
+INSERT INTO levelek VALUES (17,2,'21:30','kék');
+INSERT INTO levelek VALUES (18,8,'21:40','fekete');
+INSERT INTO levelek VALUES (19,17,'21:50','arany');
+INSERT INTO levelek VALUES (20,21,'22:05','kék');
+INSERT INTO levelek VALUES (21,14,'22:15','fekete');
+INSERT INTO levelek VALUES (22,24,'22:30','vörös');
+INSERT INTO levelek VALUES (23,22,'22:40','szürke');
+INSERT INTO levelek VALUES (24,4,'22:50','fekete');
+INSERT INTO levelek VALUES (25,23,'23:05','arany');
+INSERT INTO levelek VALUES (26,2,'23:20','fekete');
+INSERT INTO levelek VALUES (27,19,'23:40','fehér');
 `;
 const CHAPTERS = [
  {
   "refresher": true,
   "title": "Gyors ismétlés",
-  "story": "<p>A tanács előtt 3 perc ismétlés. Minden lekérdezés ugyanazokból a részekből áll, mindig ebben a sorrendben.</p>\n  <div class=\"anatomy\" role=\"table\" aria-label=\"A lekérdezés részei\">\n    <div role=\"row\"><code role=\"cell\">SELECT nev, sereg</code><span role=\"cell\">mely <b>oszlopokat</b> mutassa. A <code>*</code> az összeset jelenti.</span></div>\n    <div role=\"row\"><code role=\"cell\">FROM kiralysagok</code><span role=\"cell\">melyik <b>táblából</b> olvasson</span></div>\n    <div role=\"row\"><code role=\"cell\">WHERE sereg &gt; 1000</code><span role=\"cell\">mely <b>sorokat</b> tartsa meg</span></div>\n    <div role=\"row\"><code role=\"cell\">ORDER BY sereg DESC;</code><span role=\"cell\">hogyan <b>rendezze</b> az eredményt</span></div>\n  </div>\n  <ul class=\"rules\">\n    <li>A szövegek egyszeres idézőjelbe kerülnek: <code>'Északhon'</code>. A számok nem: <code>1000</code>.</li>\n    <li>A feltételeket <code>AND</code> és <code>OR</code> köti össze.</li>\n    <li>A mai újdonság: egy lekérdezés <b>két vagy több táblát</b> is olvashat egyszerre.</li>\n  </ul>",
-  "learn": "<p>A <code>kiralysagok</code> tábla egy sora egy királyság. Kattints rá, és lefut:</p>\n  <div class=\"tries\">\n    <button type=\"button\" class=\"try\" data-sql=\"SELECT * FROM kiralysagok;\">SELECT * FROM kiralysagok;</button>\n    <button type=\"button\" class=\"try\" data-sql=\"SELECT nev, fovaros FROM kiralysagok WHERE sereg &gt; 1000;\">SELECT nev, fovaros FROM kiralysagok WHERE sereg &gt; 1000;</button>\n    <button type=\"button\" class=\"try\" data-sql=\"SELECT * FROM szovetsegek ORDER BY alapitas;\">SELECT * FROM szovetsegek ORDER BY alapitas;</button>\n  </div>",
+  "story": "<p>A tanács előtt 3 perc ismétlés. Minden lekérdezés ugyanazokból a részekből áll, mindig ebben a sorrendben.</p>\n  <div class=\"anatomy\" role=\"table\" aria-label=\"A lekérdezés részei\">\n    <div role=\"row\"><code role=\"cell\">SELECT nev, sereg</code><span role=\"cell\">mely <b>oszlopokat</b> mutassa. A <code>*</code> az összeset jelenti.</span></div>\n    <div role=\"row\"><code role=\"cell\">FROM kiralysagok</code><span role=\"cell\">melyik <b>táblából</b> olvasson</span></div>\n    <div role=\"row\"><code role=\"cell\">WHERE sereg &gt; 1000</code><span role=\"cell\">mely <b>sorokat</b> tartsa meg</span></div>\n    <div role=\"row\"><code role=\"cell\">ORDER BY sereg DESC;</code><span role=\"cell\">hogyan <b>rendezze</b> az eredményt</span></div>\n  </div>\n  <ul class=\"rules\">\n    <li>A szövegek egyszeres idézőjelbe kerülnek: <code>'Északhon'</code>. A számok nem: <code>1000</code>.</li>\n    <li>A feltételeket <code>AND</code> és <code>OR</code> köti össze.</li>\n    <li>A mai újdonság: egy lekérdezés <b>két vagy három táblát</b> is olvashat egyszerre.</li>\n  </ul>",
+  "learn": "<p>A <code>kiralysagok</code> tábla egy sora egy királyság. Kattints rá, és lefut:</p>\n  <div class=\"tries\">\n    <button type=\"button\" class=\"try\" data-sql=\"SELECT * FROM kiralysagok;\">SELECT * FROM kiralysagok;</button>\n    <button type=\"button\" class=\"try\" data-sql=\"SELECT nev, uralkodo FROM kiralysagok WHERE sereg &gt; 1000;\">SELECT nev, uralkodo FROM kiralysagok WHERE sereg &gt; 1000;</button>\n    <button type=\"button\" class=\"try\" data-sql=\"SELECT * FROM lovagok WHERE rang = 'bajnok';\">SELECT * FROM lovagok WHERE rang = 'bajnok';</button>\n  </div>",
   "task": "Bemelegítés: melyik királyságnak a legnagyobb a serege?",
   "hints": [
    "Rendezd a királyságokat a sereg szerint, a legnagyobbal kezdve: ORDER BY sereg DESC.",
@@ -367,18 +372,18 @@ const CHAPTERS = [
    "vashegy"
   ],
   "placeholder": "királyság",
-  "success": "Vashegy: 2000 katona a fekete medvés zászló alatt. Királyuk, M. Márk vezeti a Vas Ligát. Jegyezd meg a nevét.",
+  "success": "Vashegy: 2000 katona. Királya, M. Márk vezeti a Vas Ligát, az Ezüst Szövetség régi ellenségét. Jegyezd meg a nevét.",
   "starter": "SELECT * FROM kiralysagok;"
  },
  {
   "title": "Számok nevek helyett",
-  "story": "<p>1214-et írunk, Fagyvár, a Nagy Tanács előestéje. <b>B. Dániel</b>, Északhon királya látja vendégül az <b>Ezüst Szövetség</b> királyságait. Hajnalban pecsételik le titkos haditervüket a Vas Liga ellen.</p>\n  <p>A terv azonban kiszivárgott: a Vas Liga felderítőit pontosan ott látták lovagolni, ahol a terv szerint kellett. <mark>Valaki a várban az ellenségnek ír.</mark> H. Viktor parancsnok eléd teríti a királyi főkönyvet: te vagy a fiatal királyi írnok. „Találd meg az árulót, mielőtt a harang éjfélt üt.”</p>\n  <p>Megnyitod az <code>uralkodok</code> táblát, és egyetlen királyságnevet sem látsz. Csak számokat egy <code>kiralysag_id</code> nevű oszlopban.</p>",
-  "learn": "<p>Az adatbázis mindent <b>egy</b> helyen tárol. A királyság neve a <code>kiralysagok</code> táblában van; az <code>uralkodok</code> csak a királyság <code>id</code>-jét tárolja. Ez a szám egy <b>hivatkozás</b>: <code>kiralysag_id = 1</code> azt jelenti, „az a királyság, amelyiknek az id-je 1”. Egyelőre keresd ki kézzel, két lekérdezéssel.</p>\n  <pre>SELECT * FROM uralkodok;\n\nSELECT nev FROM kiralysagok WHERE id = 1;</pre>",
-  "task": "Melyik királyságot uralja R. Benjámin Laurence király?",
+  "story": "<p>1214-et írunk, Fagyvár, a Nagy Tanács előestéje. <b>B. Dániel</b>, Északhon királya látja vendégül az <b>Ezüst Szövetség</b> királyságait. A Vas Liga lovagjai is itt vannak, vendégként a béketárgyalásokra. Hajnalban az Ezüst Szövetség lepecsételi titkos haditervét.</p>\n  <p>A terv azonban kiszivárgott: a Vas Liga felderítőit pontosan ott látták lovagolni, ahol a terv szerint kellett. <mark>Valaki a várban az ellenségnek ír.</mark> H. Viktor parancsnok eléd teríti a királyi főkönyvet: te vagy a fiatal királyi írnok. „Találd meg az árulót, mielőtt a harang éjfélt üt.”</p>\n  <p>Megnyitod a <code>lovagok</code> táblát, és egyetlen királyságnevet sem látsz. Csak számokat egy <code>kiralysag_id</code> nevű oszlopban.</p>",
+  "learn": "<p>Az adatbázis mindent <b>egy</b> helyen tárol. A királyság neve a <code>kiralysagok</code> táblában van; a <code>lovagok</code> csak a királyság <code>id</code>-jét tárolja. Ez a szám egy <b>hivatkozás</b>: <code>kiralysag_id = 1</code> azt jelenti, „az a királyság, amelyiknek az id-je 1”. Egyelőre keresd ki kézzel, két lekérdezéssel.</p>\n  <pre>SELECT * FROM lovagok;\n\nSELECT nev FROM kiralysagok WHERE id = 1;</pre>",
+  "task": "Melyik királyságot szolgálja K. Nóra bajnok?",
   "hints": [
-   "Keresd meg a sorát az uralkodok táblában, és jegyezd meg a kiralysag_id-t. Aztán keresd ki ezt az id-t a kiralysagok táblában.",
+   "Keresd meg a sorát a lovagok táblában, és jegyezd meg a kiralysag_id-t. Aztán keresd ki ezt az id-t a kiralysagok táblában.",
    {
-    "sql": "SELECT kiralysag_id FROM uralkodok\nWHERE nev = 'R. Benjámin Laurence';\n\nSELECT nev FROM kiralysagok WHERE id = 6;"
+    "sql": "SELECT kiralysag_id FROM lovagok\nWHERE nev = 'K. Nóra';\n\nSELECT nev FROM kiralysagok WHERE id = 6;"
    }
   ],
   "answers": [
@@ -409,7 +414,7 @@ const CHAPTERS = [
  {
   "title": "A párosítási szabály",
   "story": "<p>H. Viktor a főkönyvre koppint. „Egy lovag akkor szolgál egy királyságot, ha a lovag <code>kiralysag_id</code>-je egyenlő a királyság <code>id</code>-jével. <mark>Ezt mondd meg a főkönyvnek.</mark>”</p>",
-  "learn": "<p>Írj egy <code>WHERE</code>-feltételt, ami a két id-oszlopot hasonlítja össze. Írd <code>tabla.oszlop</code> alakban, hogy az SQL tudja, melyik <code>id</code>-re és melyik <code>nev</code>-re gondolsz. A többi feltétel <code>AND</code>-del jön utána.</p>\n  <pre>SELECT lovagok.nev, lovagok.rang, kiralysagok.nev\nFROM lovagok, kiralysagok\nWHERE lovagok.kiralysag_id = kiralysagok.id;</pre>\n  <p>Most 24 sort kapsz: lovagonként egyet, mindegyiknél a jó királysággal. Sok lovag osztozik egy királyságon: ez <b>több az egyhez</b> kapcsolat.</p>",
+  "learn": "<p>Írj egy <code>WHERE</code>-feltételt, ami a két oszlopot hasonlítja össze. Mindkét táblában van <code>id</code> és <code>nev</code> oszlop, ezért írd <code>tabla.oszlop</code> alakban: így az SQL tudja, melyikre gondolsz. A többi feltétel <code>AND</code>-del jön utána.</p>\n  <pre>SELECT lovagok.nev, lovagok.rang, kiralysagok.nev\nFROM lovagok, kiralysagok\nWHERE lovagok.kiralysag_id = kiralysagok.id;</pre>\n  <p>Most 24 sort kapsz: lovagonként egyet, mindegyiknél a jó királysággal. Sok lovag osztozik egy királyságon: ez <b>több az egyhez</b> kapcsolat.</p>",
   "task": "Ki Vashegy bajnoka?",
   "hints": [
    "Kezdd a párosítási szabállyal: WHERE lovagok.kiralysag_id = kiralysagok.id, majd AND kiralysagok.nev = 'Vashegy' AND lovagok.rang = 'bajnok'.",
@@ -425,17 +430,17 @@ const CHAPTERS = [
    "hunor"
   ],
   "placeholder": "név",
-  "success": "H. Hunor József, Vashegy bárdforgató bajnoka. Díszvendégként jött a tanácsba. Tartsd szemmel Vashegyet."
+  "success": "H. Hunor József, Vashegy bárdforgató bajnoka. Díszvendégként jött a tanácsba. Tartsd szemmel a Vas Ligát."
  },
  {
-  "title": "Három tábla, rövid nevek",
-  "story": "<p>Kezded elveszíteni a fonalat, ki kit szolgál. Egy lovag egy királysághoz tartozik, és minden királyságnak van uralkodója. <mark>Három tábla, egy lekérdezés.</mark></p>",
-  "learn": "<p>Adj minden táblának egy rövid <b>álnevet</b> közvetlenül a neve után a <code>FROM</code>-ban: <code>lovagok l, kiralysagok k, uralkodok u</code>. Ezután <code>l.kiralysag_id</code>-t írhatsz <code>lovagok.kiralysag_id</code> helyett. Minden további táblához saját párosítási szabály kell, <code>AND</code>-del kötve.</p>\n  <pre>SELECT l.nev, k.nev, u.nev\nFROM lovagok l, kiralysagok k, uralkodok u\nWHERE l.kiralysag_id = k.id\n  AND u.kiralysag_id = k.id;</pre>\n  <p>Minden királyságnak pontosan egy uralkodója van, és minden uralkodónak egy királysága: ez <b>egy az egyhez</b> kapcsolat.</p>",
+  "title": "Ki viseli a koronát",
+  "story": "<p>A <code>kiralysagok</code> tábla minden sora az uralkodót is megnevezi. <mark>Ha egy lovagot párosítottál a királyságával, a királyság minden oszlopát olvashatod.</mark></p>",
+  "learn": "<p>A párosítási szabály után bármelyik tábla bármelyik oszlopát kiírhatod a <code>SELECT</code> után. A szabály ugyanaz marad, csak az oszloplista változik.</p>\n  <pre>SELECT lovagok.nev, kiralysagok.nev, kiralysagok.uralkodo\nFROM lovagok, kiralysagok\nWHERE lovagok.kiralysag_id = kiralysagok.id;</pre>",
   "task": "Melyik uralkodót szolgálja M. Anna Petra bajnok?",
   "hints": [
-   "Két párosítási szabály: l.kiralysag_id = k.id AND u.kiralysag_id = k.id. Majd AND l.nev = 'M. Anna Petra'.",
+   "Ugyanaz a párosítási szabály, mint eddig. Írasd ki a kiralysagok.uralkodo oszlopot, és add hozzá: AND lovagok.nev = 'M. Anna Petra'.",
    {
-    "sql": "SELECT l.nev, k.nev, u.cim, u.nev\nFROM lovagok l, kiralysagok k, uralkodok u\nWHERE l.kiralysag_id = k.id\n  AND u.kiralysag_id = k.id\n  AND l.nev = 'M. Anna Petra';"
+    "sql": "SELECT lovagok.nev, kiralysagok.nev, kiralysagok.uralkodo\nFROM lovagok, kiralysagok\nWHERE lovagok.kiralysag_id = kiralysagok.id\n  AND lovagok.nev = 'M. Anna Petra';"
    }
   ],
   "answers": [
@@ -445,73 +450,54 @@ const CHAPTERS = [
    "l laura kiralyno"
   ],
   "placeholder": "uralkodó neve",
-  "success": "L. Laura királynőt, Ködliget, a szürke bagoly királyságának uralkodóját. Ködliget tagja az Ezüst Szövetségnek, így az ottaniak ismerik a tervet."
+  "success": "L. Laura királynőt, Ködliget, a szürke bagoly királyságának uralkodóját. Ködliget a Vas Ligával tart."
  },
  {
-  "title": "Párokból álló tábla",
-  "story": "<p>Ki ismerte egyáltalán a haditervet? Csak az Ezüst Szövetség tagjai. A királyságok azonban sosincsenek egyetlen szövetségben: <mark>egy királyság több szövetségbe is beléphet, és egy szövetségnek több királyság a tagja.</mark></p>",
-  "learn": "<p>Egy <b>több a többhöz</b> kapcsolatot egyetlen oszlop sem tud tárolni, ezért saját táblát kap. A <code>tagsagok</code> minden sora egy tagság: egy <code>szovetseg_id</code> és egy <code>kiralysag_id</code>. Olvasáskor mindkét oldalhoz hozzá kell párosítani.</p>\n  <pre>SELECT s.nev, t.csatlakozas\nFROM szovetsegek s, tagsagok t\nWHERE t.szovetseg_id = s.id;</pre>",
-  "task": "Hány királyság írta alá az Ezüst Szövetséget?",
+  "title": "Barátok és ellenségek",
+  "story": "<p>A haditervet csak az Ezüst Szövetség királyságai ismerik. A <code>kiralysagok</code> tábla <code>szovetseg</code> oszlopa megmondja, melyik királyság melyik oldalon áll. <mark>Hány ellenséges lovag alszik ma éjjel a falak között?</mark></p>",
+  "learn": "<p>Amit eddig tudtál, összekapcsolás után is működik: <code>COUNT</code>, <code>GROUP BY</code>, <code>ORDER BY</code>. Az SQL először párosítja a táblákat, aztán számol.</p>\n  <pre>SELECT kiralysagok.szovetseg, COUNT(*) AS lovagok\nFROM lovagok, kiralysagok\nWHERE lovagok.kiralysag_id = kiralysagok.id\nGROUP BY kiralysagok.szovetseg;</pre>",
+  "task": "Hány lovag szolgál a várban a Vas Liga valamelyik királyságát?",
   "hints": [
-   "Kapcsold össze a szovetsegek és tagsagok táblát: t.szovetseg_id = s.id, majd AND s.nev = 'Ezüst Szövetség'. Számold meg a sorokat.",
+   "Kapcsold össze a lovagok és kiralysagok táblát, add hozzá: AND kiralysagok.szovetseg = 'Vas Liga', és számold meg a sorokat COUNT(*)-tal.",
    {
-    "sql": "SELECT COUNT(*)\nFROM szovetsegek s, tagsagok t\nWHERE t.szovetseg_id = s.id\n  AND s.nev = 'Ezüst Szövetség';"
+    "sql": "SELECT COUNT(*)\nFROM lovagok, kiralysagok\nWHERE lovagok.kiralysag_id = kiralysagok.id\n  AND kiralysagok.szovetseg = 'Vas Liga';"
    }
   ],
   "answers": [
-   "4",
-   "negy"
+   "12",
+   "tizenketto"
   ],
   "placeholder": "egy szám",
-  "success": "Négy királyság ismeri a tervet: Északhon, Folyóföld, Napvölgy és Ködliget. Az áruló valahol az ő embereik között van."
+  "success": "Tizenkettő: a várban lévő lovagok fele a Vas Ligát szolgálja. Nyíltan, vendégként vannak itt. Az áruló olyasvalaki, akinek a mi oldalunkon kellene állnia."
  },
  {
-  "title": "Két zászló",
-  "story": "<p>H. Viktor lehalkítja a hangját. „Az egyik saját szövetségesünk a <b>Vas Liga</b> zászlaját is lengeti. <mark>Derítsd ki, melyik.</mark>”</p>",
-  "learn": "<p>Három tábla: <code>szovetsegek → tagsagok → kiralysagok</code>. Amit eddig tudtál, összekapcsolás után is működik, a <code>GROUP BY</code> és a <code>HAVING</code> is: az SQL először párosítja a táblákat, aztán csoportosít.</p>\n  <pre>SELECT k.nev, s.nev\nFROM szovetsegek s, tagsagok t, kiralysagok k\nWHERE t.szovetseg_id = s.id\n  AND t.kiralysag_id = k.id\nORDER BY k.nev;</pre>",
-  "task": "Melyik királyság tagja az Ezüst Szövetségnek és a Vas Ligának is?",
+  "title": "A levélnapló",
+  "story": "<p>A Vas Liga <mark>fekete viasszal</mark> pecsételi a leveleit. A vár futárai a <code>levelek</code> táblába jegyeznek fel minden levelet, ami ma este elhagyja Fagyvárt: ki küldte (<code>lovag_id</code>), mikor, és milyen színű a pecsét.</p>",
+  "learn": "<p>A <code>levelek.lovag_id</code> a <code>lovagok.id</code>-re mutat: ugyanolyan kapcsolat, mint a <code>lovagok.kiralysag_id</code> és a <code>kiralysagok.id</code>. Előbb párosíts, aztán csoportosíts.</p>\n  <pre>SELECT lovagok.nev, COUNT(*) AS levelek\nFROM levelek, lovagok\nWHERE levelek.lovag_id = lovagok.id\nGROUP BY lovagok.nev\nORDER BY COUNT(*) DESC;</pre>",
+  "task": "Melyik lovag küldte a legtöbb fekete pecsétes levelet ma este?",
   "hints": [
-   "Kapcsold össze a három táblát, és csak a két szövetséget tartsd meg: AND s.nev IN ('Ezüst Szövetség', 'Vas Liga'). Melyik királyság szerepel kétszer?",
+   "Kapcsold össze a levelek és lovagok táblát, írd hozzá: AND levelek.pecset = 'fekete', majd GROUP BY lovagok.nev és rendezz COUNT(*) DESC szerint.",
    {
-    "sql": "SELECT k.nev, COUNT(*) AS szovetsegek\nFROM szovetsegek s, tagsagok t, kiralysagok k\nWHERE t.szovetseg_id = s.id\n  AND t.kiralysag_id = k.id\n  AND s.nev IN ('Ezüst Szövetség', 'Vas Liga')\nGROUP BY k.nev\nHAVING COUNT(*) = 2;"
+    "sql": "SELECT lovagok.nev, COUNT(*) AS fekete_levelek\nFROM levelek, lovagok\nWHERE levelek.lovag_id = lovagok.id\n  AND levelek.pecset = 'fekete'\nGROUP BY lovagok.nev\nORDER BY COUNT(*) DESC;"
    }
   ],
   "answers": [
-   "kodliget",
-   "kod liget"
+   "w jay",
+   "jay",
+   "jay w"
   ],
-  "placeholder": "királyság",
-  "success": "Ködliget. L. Laura királynő azonban sosem titkolta: már az első napon elmondta az egész tanácsnak. A lovagjai minden este nyíltan írnak Vashegyre. Ez diplomácia, nem árulás."
- },
- {
-  "title": "A fekete pecsét",
-  "story": "<p>A Vas Liga <mark>fekete viasszal</mark> pecsételi a leveleit. A vár futárai minden levelet feljegyeznek, ami ma este elhagyja Fagyvárt: ki küldte (<code>lovag_id</code>), melyik uralkodónak megy (<code>uralkodo_id</code>), mikor és milyen pecséttel.</p>",
-  "learn": "<p>A <code>levelek</code> tábla egyszerre két táblára mutat: a <code>levelek.lovag_id</code> a <code>lovagok.id</code>-re, a <code>levelek.uralkodo_id</code> az <code>uralkodok.id</code>-re. Csak azt kapcsold hozzá, amire szükséged van, aztán csoportosíts.</p>\n  <pre>SELECT u.nev, COUNT(*) AS levelek\nFROM levelek v, uralkodok u\nWHERE v.uralkodo_id = u.id\nGROUP BY u.nev\nORDER BY COUNT(*) DESC;</pre>",
-  "task": "Melyik uralkodó kapta a legtöbb fekete pecsétes levelet ma este?",
-  "hints": [
-   "Kapcsold össze a levelek és uralkodok táblát, írd hozzá: AND v.pecset = 'fekete', majd GROUP BY u.nev és rendezz COUNT(*) DESC szerint.",
-   {
-    "sql": "SELECT u.nev, COUNT(*) AS fekete_levelek\nFROM levelek v, uralkodok u\nWHERE v.uralkodo_id = u.id\n  AND v.pecset = 'fekete'\nGROUP BY u.nev\nORDER BY COUNT(*) DESC;"
-   }
-  ],
-  "answers": [
-   "m mark",
-   "mark",
-   "mark m",
-   "m mark kiraly"
-  ],
-  "placeholder": "uralkodó neve",
-  "success": "M. Márk, Vashegy királya: hat fekete pecsét ma este. A Vas Liga hadvezére nagyon elfoglalt."
+  "placeholder": "név",
+  "success": "W. Jay Vashegyről: három fekete pecsét. Egy Vas Liga-lovag, aki Vas Liga-viasszal ír haza. Szorgalmas, de ez nem árulás."
  },
  {
   "title": "Az esti harangszó után",
-  "story": "<p>A haditerv az esti harangszóig, <mark>22:00</mark>-ig a tanácsasztalon feküdt. Utána másolták le, amikor a termet már bezárták. Aki késő este M. Márk királynak írt, annak magyarázkodnia kell.</p>",
-  "learn": "<p>Az időpontok szövegként vannak tárolva, pl. <code>'22:15'</code>. Mivel mindig ugyanolyan alakúak, <code>&gt;=</code> jellel összehasonlíthatók. Kapcsold hozzá a <code>lovagok</code> táblát is, hogy lásd, ki küldte a leveleket.</p>\n  <pre>SELECT l.nev, u.nev, v.ido\nFROM levelek v, uralkodok u, lovagok l\nWHERE v.uralkodo_id = u.id\n  AND v.lovag_id = l.id\n  AND v.ido &gt;= '21:00';</pre>",
-  "task": "Hány fekete pecsétes levél érkezett M. Márk királyhoz 22:00-kor vagy később?",
+  "story": "<p>A haditerv az esti harangszóig, <mark>22:00</mark>-ig a tanácsasztalon feküdt. Utána másolták le, amikor a termet már bezárták. Aki késő este fekete viasszal pecsételt, annak magyarázkodnia kell.</p>",
+  "learn": "<p>Az időpontok szövegként vannak tárolva, pl. <code>'22:15'</code>. Mivel mindig ugyanolyan alakúak, <code>&gt;=</code> jellel összehasonlíthatók.</p>\n  <pre>SELECT lovagok.nev, levelek.ido, levelek.pecset\nFROM levelek, lovagok\nWHERE levelek.lovag_id = lovagok.id\n  AND levelek.ido &gt;= '21:00';</pre>",
+  "task": "Hány fekete pecsétes levél hagyta el a várat 22:00-kor vagy később?",
   "hints": [
-   "Kapcsold össze a levelek, uralkodok és lovagok táblát, majd AND u.nev = 'M. Márk' AND v.pecset = 'fekete' AND v.ido >= '22:00'. Számold meg a sorokat.",
+   "Kapcsold össze a levelek és lovagok táblát, majd AND levelek.pecset = 'fekete' AND levelek.ido >= '22:00'. Számold meg a sorokat.",
    {
-    "sql": "SELECT l.nev, v.ido\nFROM levelek v, uralkodok u, lovagok l\nWHERE v.uralkodo_id = u.id\n  AND v.lovag_id = l.id\n  AND u.nev = 'M. Márk'\n  AND v.pecset = 'fekete'\n  AND v.ido >= '22:00';"
+    "sql": "SELECT lovagok.nev, levelek.ido\nFROM levelek, lovagok\nWHERE levelek.lovag_id = lovagok.id\n  AND levelek.pecset = 'fekete'\n  AND levelek.ido >= '22:00';"
    }
   ],
   "answers": [
@@ -519,17 +505,35 @@ const CHAPTERS = [
    "harom"
   ],
   "placeholder": "egy szám",
-  "success": "Három levél, három küldő. Egyikük az áruló."
+  "success": "Három levél, három küldő. A nevekből még nem derül ki, ki az áruló. Azt kell tudnod, ki melyik oldalon áll."
+ },
+ {
+  "title": "Három tábla egy sorban",
+  "story": "<p>A levél tudja, ki a lovagja, a lovag pedig tudja, melyik a királysága. <mark>Kövesd a láncot: levelek → lovagok → kiralysagok.</mark> Három tábla, egy lekérdezés.</p>",
+  "learn": "<p>Sorold fel mindhárom táblát a <code>FROM</code> után, vesszővel elválasztva. A lánc minden szeméhez saját párosítási szabály kell, <code>AND</code>-del kötve. <b>Három táblához két szabály kell.</b></p>\n  <pre>SELECT lovagok.nev, kiralysagok.nev, kiralysagok.szovetseg, levelek.ido\nFROM levelek, lovagok, kiralysagok\nWHERE levelek.lovag_id = lovagok.id\n  AND lovagok.kiralysag_id = kiralysagok.id;</pre>",
+  "task": "Hány fekete pecsétes levelet küldtek ma este a Vas Liga királyságainak lovagjai?",
+  "hints": [
+   "Használd a fenti két párosítási szabályt, majd AND levelek.pecset = 'fekete' AND kiralysagok.szovetseg = 'Vas Liga'. Számold meg a sorokat.",
+   {
+    "sql": "SELECT COUNT(*)\nFROM levelek, lovagok, kiralysagok\nWHERE levelek.lovag_id = lovagok.id\n  AND lovagok.kiralysag_id = kiralysagok.id\n  AND levelek.pecset = 'fekete'\n  AND kiralysagok.szovetseg = 'Vas Liga';"
+   }
+  ],
+  "answers": [
+   "7",
+   "het"
+  ],
+  "placeholder": "egy szám",
+  "success": "A ma esti nyolc fekete pecsétből hetet Vas Liga-lovagok küldtek a saját oldaluknak. Ez várható volt. Nyolcból hét: marad egy."
  },
  {
   "title": "Az áruló",
-  "story": "<p>Három név, és hamarosan szól a harang. Gondold végig, honnan jön az egyes küldő. Egy <b>vashegyi</b> lovag, aki a saját királyának ír, nem áruló. <b>Ködliget</b> nyíltan mindkét szövetség tagja. <mark>Az áruló olyan királyságot szolgál, amely csak az Ezüst Szövetségben van benne.</mark></p>",
-  "learn": "<p>Négy tábla: <code>levelek → uralkodok</code> és <code>levelek → lovagok → kiralysagok</code>. Három párosítási szabály, aztán a szűrők.</p>\n  <pre>SELECT l.nev, k.nev, v.ido\nFROM levelek v, uralkodok u, lovagok l, kiralysagok k\nWHERE v.uralkodo_id = u.id\n  AND v.lovag_id = l.id\n  AND l.kiralysag_id = k.id;</pre>",
+  "story": "<p>Hamarosan szól a harang. <mark>Egy Ezüst Szövetség-beli lovagnak semmi keresnivalója a Vas Liga fekete viaszánál.</mark></p>",
+  "learn": "<p>Ugyanaz a lánc, ugyanaz a két párosítási szabály. Csak a szűrő változik.</p>\n  <pre>SELECT lovagok.nev, kiralysagok.nev, levelek.ido\nFROM levelek, lovagok, kiralysagok\nWHERE levelek.lovag_id = lovagok.id\n  AND lovagok.kiralysag_id = kiralysagok.id;</pre>",
   "task": "Melyik lovag az áruló?",
   "hints": [
-   "Vedd a 8. fejezet lekérdezését, add hozzá a kiralysagok táblát AND l.kiralysag_id = k.id-vel, és írasd ki a k.nev-et. Vesd össze a három királyságot azzal, amit a 6. fejezetben találtál.",
+   "Vedd a 8. fejezet lekérdezését, írasd ki a lovagok.nev-et, és a fekete leveleket az Ezüst Szövetség királyságaiból tartsd meg: AND kiralysagok.szovetseg = 'Ezüst Szövetség'.",
    {
-    "sql": "SELECT l.nev, k.nev AS kiralysag, v.ido\nFROM levelek v, uralkodok u, lovagok l, kiralysagok k\nWHERE v.uralkodo_id = u.id\n  AND v.lovag_id = l.id\n  AND l.kiralysag_id = k.id\n  AND u.nev = 'M. Márk'\n  AND v.pecset = 'fekete'\n  AND v.ido >= '22:00';"
+    "sql": "SELECT lovagok.nev, kiralysagok.nev AS kiralysag, levelek.ido\nFROM levelek, lovagok, kiralysagok\nWHERE levelek.lovag_id = lovagok.id\n  AND lovagok.kiralysag_id = kiralysagok.id\n  AND levelek.pecset = 'fekete'\n  AND kiralysagok.szovetseg = 'Ezüst Szövetség';"
    }
   ],
   "answers": [
@@ -540,11 +544,11 @@ const CHAPTERS = [
    "balint"
   ],
   "placeholder": "név",
-  "success": "S. Bálint Máté, Folyóföld lovagja. Éjfélkor K. Kamilla bajnok az istállóban talál rá: a csizmájában egy fekete pecsétes levél, a nyeregtáskájában a haditerv másolata. Hajnalban az Ezüst Szövetség új tervet pecsétel le, és ez már titokban marad."
+  "success": "S. Bálint Máté, Folyóföld lovagja, 23:20. Éjfélkor K. Kamilla bajnok az istállóban talál rá: a csizmájában egy fekete pecsétes levél, a nyeregtáskájában a haditerv másolata. Hajnalban az Ezüst Szövetség új tervet pecsétel le, és ez már titokban marad."
  }
 ];
-const BONUS = ["Listázd ki az összes lovagot annak az uralkodónak a nevével, akit szolgál. (lovagok → kiralysagok → uralkodok)", "Melyik szövetségnek a legnagyobb a közös serege? (szovetsegek → tagsagok → kiralysagok, SUM(sereg))", "Hány levelet küldtek ma este az egyes királyságok lovagjai?", "Mely királyságok tagjai pontosan két szövetségnek? (GROUP BY + HAVING)", "Melyik királynő kapta a legtöbb levelet ma este, bármilyen pecséttel?", "Nehéz: listázd ki az összes királyságpárt, amelyek közös szövetségben vannak. Használd kétszer a tagsagok táblát, két álnévvel: t1 és t2."];
-const COLDOCS = {"kiralysagok": {"id": "A királyság sorszáma.", "nev": "<code>'Északhon'</code>, <code>'Folyóföld'</code>, <code>'Napvölgy'</code>, <code>'Vashegy'</code>, <code>'Ködliget'</code> vagy <code>'Aranypart'</code>.", "fovaros": "A főváros, pl. <code>'Fagyvár'</code>.", "cimer": "Az állat vagy jel a zászlón, pl. <code>'fehér farkas'</code>.", "sereg": "Hány katonája van a királyságnak."}, "uralkodok": {"id": "Az uralkodó sorszáma.", "nev": "Az uralkodó neve, pl. <code>'B. Dániel'</code>.", "cim": "<code>'király'</code> vagy <code>'királynő'</code>.", "kiralysag_id": "Melyik királyságot uralja: egy <code>kiralysagok</code>-beli sor <code>id</code>-je. Minden királyságnak pontosan egy uralkodója van.", "koronazas": "A koronázás éve."}, "lovagok": {"id": "A lovag sorszáma.", "nev": "A lovag neve.", "kiralysag_id": "Melyik királyságot szolgálja: egy <code>kiralysagok</code>-beli sor <code>id</code>-je.", "rang": "<code>'apród'</code>, <code>'lovag'</code>, <code>'bajnok'</code> vagy <code>'parancsnok'</code>.", "fegyver": "<code>'kard'</code>, <code>'lándzsa'</code>, <code>'íj'</code>, <code>'bárd'</code> vagy <code>'buzogány'</code>."}, "szovetsegek": {"id": "A szövetség sorszáma.", "nev": "<code>'Ezüst Szövetség'</code>, <code>'Vas Liga'</code> vagy <code>'Tengeri Egyezmény'</code>.", "alapitas": "Az alapítás éve.", "cel": "<code>'védelem'</code>, <code>'hódítás'</code> vagy <code>'kereskedelem'</code>."}, "tagsagok": {"id": "A tagság sorszáma.", "szovetseg_id": "Melyik szövetség: egy <code>szovetsegek</code>-beli sor <code>id</code>-je.", "kiralysag_id": "Melyik királyság lépett be: egy <code>kiralysagok</code>-beli sor <code>id</code>-je.", "csatlakozas": "A belépés éve."}, "levelek": {"id": "A levél sorszáma.", "lovag_id": "Ki küldte: egy <code>lovagok</code>-beli sor <code>id</code>-je.", "uralkodo_id": "Ki kapta: egy <code>uralkodok</code>-beli sor <code>id</code>-je.", "ido": "Mikor hagyta el a várat ma este, szövegként: <code>'ÓÓ:PP'</code>.", "pecset": "A pecsétviasz színe: <code>'fekete'</code>, <code>'fehér'</code>, <code>'kék'</code>, <code>'arany'</code>, <code>'szürke'</code> vagy <code>'vörös'</code>."}};
+const BONUS = ["Melyik királyság lovagjai küldték a legtöbb levelet ma este, bármilyen pecséttel?", "Listázd ki az összes lovagot annak az uralkodónak a nevével, akit szolgál, uralkodó szerint rendezve.", "Melyik szövetségnek nagyobb a közös serege? (Ehhez egy tábla is elég: SUM(sereg), GROUP BY szovetseg.)", "Hány levelet küldtek 21:00 után az egyes szövetségek lovagjai?", "Milyen fegyvert hordanak a legtöbben azok közül, akik fekete pecsétes levelet küldtek?", "Nehéz: mely lovagok nem küldtek egyetlen levelet sem ma este? Tipp: lovagok.id NOT IN (SELECT lovag_id FROM levelek)."];
+const COLDOCS = {"kiralysagok": {"id": "A királyság sorszáma.", "nev": "<code>'Északhon'</code>, <code>'Folyóföld'</code>, <code>'Napvölgy'</code>, <code>'Vashegy'</code>, <code>'Ködliget'</code> vagy <code>'Aranypart'</code>.", "uralkodo": "A király vagy királynő, pl. <code>'B. Dániel'</code>.", "fovaros": "A főváros, pl. <code>'Fagyvár'</code>.", "sereg": "Hány katonája van a királyságnak.", "szovetseg": "<code>'Ezüst Szövetség'</code> vagy <code>'Vas Liga'</code>."}, "lovagok": {"id": "A lovag sorszáma.", "nev": "A lovag neve.", "kiralysag_id": "Melyik királyságot szolgálja: egy <code>kiralysagok</code>-beli sor <code>id</code>-je.", "rang": "<code>'apród'</code>, <code>'lovag'</code>, <code>'bajnok'</code> vagy <code>'parancsnok'</code>.", "fegyver": "<code>'kard'</code>, <code>'lándzsa'</code>, <code>'íj'</code>, <code>'bárd'</code> vagy <code>'buzogány'</code>."}, "levelek": {"id": "A levél sorszáma.", "lovag_id": "Ki küldte: egy <code>lovagok</code>-beli sor <code>id</code>-je.", "ido": "Mikor hagyta el a várat ma este, szövegként: <code>'ÓÓ:PP'</code>.", "pecset": "A pecsétviasz színe: <code>'fekete'</code>, <code>'fehér'</code>, <code>'kék'</code>, <code>'arany'</code>, <code>'szürke'</code> vagy <code>'vörös'</code>."}};
 const HAND_STEPS = ["Írd be lent a neved.", "Kattints a <b>Válaszok mentése (.txt)</b> gombra. A fájl a Letöltések mappába kerül.", "Nyisd meg a feladatot a <b>Google Classroomban</b>, töltsd fel a fájlt a <b>Hozzáadás vagy létrehozás → Fájl</b> alatt, majd nyomd meg a <b>Beadás</b> gombot."];
 const RANKS = ["Királyi kémfőnök", "Kancellár", "A birodalom lovagja", "Apród"];
 const T = {
@@ -552,8 +556,8 @@ const T = {
   try_:"Próbáld ki", learn:"SQL ehhez a lépéshez", task:"A feladatod", hint1:"1. nyom · segítség", hint2:"2. nyom · egy működő lekérdezés", answer:"Válasz", check:"Ellenőrzés",
   correct:"Helyes.", wrong:"Nem egészen.", wrongTip:"Nézd meg újra az eredményt. Minden táblapárhoz beírtad a párosítási szabályt (WHERE … = …)? Számot vagy nevet kér a feladat?", prev:"Előző fejezet", next:"Következő fejezet", start:"Kezdődjön a vadászat", yourans:"A válaszod",
   ready:"A főkönyv nyitva. Írj egy lekérdezést, és nyomd meg a Futtatást.", empty:"Üres a lekérdezés. Először írj valamit.", zero:"0 sor. Egyetlen sor sem felel meg az összes feltételnek. Ellenőrizd a szövegek írásmódját és a párosítási szabályt.", sound:"Hang", reset:"Újrakezdés", reset2:"Kattints még egyszer a törléshez",
-  errGeneric:"Ellenőrizd a helyesírást, a vesszőket, a zárójeleket és az idézőjeleket. A szövegek egyszeres idézőjelbe kerülnek: 'fekete'.", errCol:"Ez az oszlop nem létezik, vagy nem egyértelmű. Ha két táblában is van ilyen nevű oszlop (pl. id vagy nev), írd elé a tábla nevét vagy álnevét: lovagok.id vagy l.id.", errTab:"Ez a tábla nem létezik. A táblák: kiralysagok, uralkodok, lovagok, szovetsegek, tagsagok, levelek.", errAmb:"Nem egyértelmű oszlop: mindkét táblában van ilyen nevű oszlop. Írd elé a tábla nevét vagy álnevét, pl. lovagok.nev vagy l.nev.", sqlErr:"Hiba van a lekérdezésben.", engFail:"Az SQL-motor nem töltődött be.", engFail2:"Ellenőrizd az internetkapcsolatot, és töltsd újra az oldalt.", engStart:"Az SQL-motor nem indult el.",
-  endH:"A szövetség kitart", endP:m=>`Az áruló az északi toronyban ül, az új haditerv lepecsételve, és a fagyvári harangok az Ezüst Szövetségért szólnak. Kb. <b>${m} perc</b> alatt lepleztél le: akár négy táblát is összekapcsoltál a FROM, az álnevek és a WHERE-ben írt párosítási szabályok segítségével.`, endBonus:"Bónuszfeladatok gyors kémfőnököknek:", handH:"Add be a válaszaidat", name:"A neved", namePh:"Írd ide a neved", save:"Válaszok mentése (.txt)", copy:"Másolás szövegként", replay:"Ünneplés újra",
+  errGeneric:"Ellenőrizd a helyesírást, a vesszőket, a zárójeleket és az idézőjeleket. A szövegek egyszeres idézőjelbe kerülnek: 'fekete'.", errCol:"Ez az oszlop nem létezik, vagy nem egyértelmű. Ha két táblában is van ilyen nevű oszlop (pl. id vagy nev), írd elé a tábla nevét: lovagok.id.", errTab:"Ez a tábla nem létezik. A táblák: kiralysagok, lovagok, levelek.", errAmb:"Nem egyértelmű oszlop: mindkét táblában van ilyen nevű oszlop. Írd elé a tábla nevét, pl. lovagok.nev.", sqlErr:"Hiba van a lekérdezésben.", engFail:"Az SQL-motor nem töltődött be.", engFail2:"Ellenőrizd az internetkapcsolatot, és töltsd újra az oldalt.", engStart:"Az SQL-motor nem indult el.",
+  endH:"A szövetség kitart", endP:m=>`Az áruló az északi toronyban ül, az új haditerv lepecsételve, és a fagyvári harangok az Ezüst Szövetségért szólnak. Kb. <b>${m} perc</b> alatt lepleztél le: akár három táblát is összekapcsoltál a FROM és a WHERE-ben írt párosítási szabályok segítségével.`, endBonus:"Bónuszfeladatok gyors kémfőnököknek:", handH:"Add be a válaszaidat", name:"A neved", namePh:"Írd ide a neved", save:"Válaszok mentése (.txt)", copy:"Másolás szövegként", replay:"Ünneplés újra",
   xNameFirst:"Először írd be a neved.", xCopied:"Kimásolva. Illeszd be a Classroom-feladathoz privát megjegyzésként, majd nyomd meg a Beadást.", xBlocked:"A másolás itt le van tiltva. Használd a mentést.", xSaved:f=>`Mentve: ${f}. Most töltsd fel a Google Classroom feladathoz, és nyomd meg a Beadást.`, xSaveBlocked:"A mentés itt le van tiltva. Használd a másolást.",
   filePrefix:"megtort-szovetseg", reportTitle:"A MEGTORT SZOVETSEG - VALASZLAP", rName:"Név", rFinished:"Befejezve", rTime:"Eltelt idő", rQueries:"Futtatott lekérdezések", rDev:"MEGJEGYZÉS: tanári kóddal lett befejezve, ezért hiányozhatnak válaszok.",
   rTask:"Feladat", rAnswer:"Válasz", rSkipped:"(kihagyva)", rUnsolved:"(nincs megoldva)", rWrong:"Rossz válaszok", rQuery:"Lekérdezés", rNone:"(nincs mentve)",
@@ -561,7 +565,7 @@ const T = {
 };
 
 /* ---------- state ---------- */
-const KEY = "pact-hu-v1";
+const KEY = "pact-hu-v2";
 let state = { solved: [], current: 0, start: Date.now(), end: null, drafts: {} };
 try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && Array.isArray(s.solved)) state = Object.assign(state, s); } catch(e){}
 function save(){ try { localStorage.setItem(KEY, JSON.stringify(state)); } catch(e){} }
@@ -610,6 +614,7 @@ function renderCase(){
     <h2>${esc(c.title)}</h2>
     <div class="story">${c.story}</div>
     <div class="learn"><h3>${c.refresher ? T.try_ : T.learn}</h3>${c.learn}</div>
+    <div class="links" id="links"></div>
     <div class="task"><h3>${T.task}</h3><p>${esc(c.task)}</p></div>
     ${hints}
     <form class="answer" id="answerForm" autocomplete="off">
@@ -622,10 +627,140 @@ function renderCase(){
       <button class="btn primary" type="button" id="next" ${solved && !last ? "" : "hidden"}>${c.refresher ? T.start : T.next}</button>
     </div>
     ${allDone() && last ? endingHtml() : ""}`;
+  renderLinks();
   $("answerForm").addEventListener("submit", e=>{ e.preventDefault(); check(); });
   $("prev").onclick = ()=> goTo(i-1);
   $("next").onclick = ()=> goTo(i+1);
 }
+/* ---------- connection map: which tables a chapter uses and how they plug together ---------- */
+const LT = document.documentElement.lang === "hu" ? {
+  h:"A fejezet táblái és kapcsolataik", hR:"Az adatbázis térképe · így kapcsolódnak a táblák",
+  noRule:"Még nincs párosítási szabály: minden sor minden sorral párosul.",
+  byHand:"Még nincs összekapcsolva: két külön lekérdezés, a számot kézzel viszed át.",
+  n1:(a,b)=>`N : 1 — ${az(a)} ${a} tábla sok sora mutathat ${az(b)} ${b} tábla egy sorára`,
+  one:(a,b)=>`1 : 1 — ${az(b)} ${b} tábla minden sorához pontosan egy sor tartozik ${az(a)} ${a} táblában`,
+  nn:(a,b,j)=>`${a} ↔ ${b}: N : N kapcsolat ${az(j)} ${j} táblán keresztül`, more:n=>`+${n} további`
+} : {
+  h:"Tables in this chapter and how they connect", hR:"Database map · how the tables connect",
+  noRule:"No matching rule yet: every row is paired with every row.",
+  byHand:"Not joined yet: two separate queries, and you carry the number across by hand.",
+  n1:(a,b)=>`N : 1 — many ${a} rows can point to the same ${b} row`,
+  one:(a,b)=>`1 : 1 — every ${b} row has exactly one ${a} row`,
+  nn:(a,b,j)=>`${a} ↔ ${b}: N : N, through the ${j} table`, more:n=>`+${n} more`
+};
+function az(w){ return /^[aáeéiíoóöőuúüű]/i.test(w) ? "az" : "a"; }
+const SCHEMA = (()=>{ const o = {}; for (const m of SEED.matchAll(/CREATE TABLE (\w+) \(([^)]*)\)/g)) o[m[1]] = m[2].split(",").map(x=>x.trim().split(/\s+/)[0]); return o; })();
+function chapterLinks(c){
+  const h = c.hints.find(x=>typeof x !== "string"); const sql = h ? h.sql : "";
+  const tables = [], froms = [];
+  for (const m of sql.matchAll(/FROM\s+([\w\s,]+?)(?=\s+WHERE|\s+GROUP|\s+ORDER|;|$)/gi)){
+    const list = m[1].split(",").map(x=>x.trim().split(/\s+/)[0]).filter(t=>SCHEMA[t]);
+    froms.push(list); list.forEach(t=>{ if (!tables.includes(t)) tables.push(t); });
+  }
+  const links = [];
+  for (const m of sql.matchAll(/(\w+)\.(\w+)\s*=\s*(\w+)\.(\w+)/g)){
+    let [ , ta, ca, tb, cb ] = m;
+    if (!SCHEMA[ta] || !SCHEMA[tb]) continue;
+    if (ca === "id" && cb !== "id") [ta, ca, tb, cb] = [tb, cb, ta, ca];   /* fk side first */
+    if (!links.some(l=>l.ft===ta && l.fc===ca && l.pt===tb)) links.push({ ft:ta, fc:ca, pt:tb, pc:cb });
+  }
+  return { tables, links, joined: froms.some(f=>f.length > 1) };
+}
+function mapFor(i){
+  const c = CHAPTERS[i];
+  if (!c.refresher) return chapterLinks(c);
+  const names = Object.keys(SCHEMA), all = { tables:names.slice(), links:[], joined:true, map:true };
+  Object.entries(SCHEMA).forEach(([t, cols])=>cols.forEach(col=>{
+    const m = col.match(/^(.+)_id$/); if (!m) return;
+    const pt = names.find(x=>x !== t && x.startsWith(m[1])); if (pt) all.links.push({ ft:t, fc:col, pt, pc:"id" }); }));
+  return all;
+}
+function chainOrder(tables, links){          /* line the tables up along their links: A — B — C */
+  if (!links.length) return tables;
+  const nb = t => links.filter(l=>l.ft===t || l.pt===t).map(l=>l.ft===t ? l.pt : l.ft);
+  const ends = tables.filter(t=>nb(t).length <= 1);
+  const start = ends.find(t=>links.some(l=>l.ft===t)) || ends[0] || tables[0];
+  const out = [start];
+  while (out.length < tables.length){ const nxt = nb(out[out.length-1]).find(t=>!out.includes(t)) || tables.find(t=>!out.includes(t)); out.push(nxt); }
+  return out;
+}
+const uniqCache = {};
+function isUnique(t, col){
+  const k = t + "." + col; if (k in uniqCache) return uniqCache[k]; if (!db) return null;
+  try { const r = db.exec(`SELECT COUNT(${col}) = COUNT(DISTINCT ${col}) FROM ${t}`); return uniqCache[k] = !!r[0].values[0][0]; } catch(e){ return null; }
+}
+function lkColor(k){ return `var(--lk${k % 6 + 1})`; }
+function renderLinks(){
+  const box = $("links"); if (!box) return;
+  const spec = mapFor(state.current);
+  if (!spec.tables.length){ box.hidden = true; return; }
+  box.hidden = false;
+  const tables = chainOrder(spec.tables, spec.links);
+  const used = {}; spec.links.forEach((l,k)=>{ (used[l.ft+"."+l.fc] ??= k); (used[l.pt+"."+l.pc] ??= k); });
+  const cards = tables.map(t=>{
+    const cols = SCHEMA[t], show = cols, more = 0;      /* every column of the table */
+    return `<div class="lk-card" data-t="${t}"><div class="h">${t}</div>${show.map(c=>{
+      const k = used[t+"."+c];
+      return `<div class="r${c==="id"?" k":""}${k!==undefined?" on":""}" data-c="${c}"${k!==undefined?` style="--c:${lkColor(k)}"`:""}><span class="ic">${c==="id"?"🔑":(/_id$/.test(c)?"→":"")}</span>${c}</div>`;
+    }).join("")}${more ? `<div class="r more">${LT.more(more)}</div>` : ""}</div>`;
+  }).join("");
+  const rules = spec.links.map((l,k)=>{
+    const u = isUnique(l.ft, l.fc);
+    const kind = u === null ? "" : `<span class="kind">${u ? LT.one(l.ft, l.pt) : LT.n1(l.ft, l.pt)}</span>`;
+    return `<li><span class="sw" style="background:${lkColor(k)}"></span><code>${l.ft}.${l.fc} = ${l.pt}.${l.pc}</code>${kind}</li>`;
+  });
+  let note = "";
+  if (!spec.links.length && tables.length > 1) note = `<p class="lk-note">${spec.joined ? LT.noRule : LT.byHand}</p>`;
+  box.innerHTML = `<h3>${spec.map ? LT.hR : LT.h}</h3><div class="lk-board"><svg class="lk-svg" aria-hidden="true"></svg>${cards}</div>${note}${rules.length ? `<ul class="lk-rules">${rules.join("")}</ul>` : ""}`;
+  box.dataset.spec = JSON.stringify({ links: spec.links, loose: !spec.links.length && tables.length > 1 ? [tables[0], tables[1], spec.joined ? "×" : "?"] : null });
+  requestAnimationFrame(drawLinks);
+}
+function drawLinks(){                        /* straight arrows: _id column → the id it points to */
+  const box = $("links"); if (!box || box.hidden || !box.dataset.spec) return;
+  const board = box.querySelector(".lk-board"), svg = box.querySelector(".lk-svg"); if (!board) return;
+  const spec = JSON.parse(box.dataset.spec);
+  const cardEls = [...board.querySelectorAll(".lk-card")];
+  board.classList.remove("stack");
+  const gap = parseFloat(getComputedStyle(board).columnGap) || 46;
+  const need = cardEls.reduce((s,c)=>s + c.getBoundingClientRect().width, 0) + gap * (cardEls.length - 1);
+  const stack = cardEls.length > 1 && need > board.clientWidth - 8;
+  board.classList.toggle("stack", stack);
+  const B = board.getBoundingClientRect(); if (!B.width) return;
+  svg.setAttribute("viewBox", `0 0 ${B.width} ${B.height}`);
+  const rel = el => { const r = el.getBoundingClientRect(); return { l:r.left-B.left, r:r.right-B.left, t:r.top-B.top, b:r.bottom-B.top, cy:(r.top+r.bottom)/2-B.top, cx:(r.left+r.right)/2-B.left }; };
+  const card = t => board.querySelector(`.lk-card[data-t="${t}"]`);
+  const head = (x, y, dx, dy, color)=>{ const L = 9, W = 5.5, px = -dy, py = dx;
+    return `<polygon points="${x},${y} ${x - dx*L + px*W},${y - dy*L + py*W} ${x - dx*L - px*W},${y - dy*L - py*W}" fill="${color}"/>`; };
+  const tag = (x, y, txt, color, anchor)=> txt ? `<text x="${x}" y="${y}" text-anchor="${anchor}" class="lk-end" fill="${color}">${txt}</text>` : "";
+  const right = Math.max(...cardEls.map(c=>rel(c).r));
+  let html = "";
+  spec.links.forEach((l,k)=>{
+    const A = card(l.ft), P = card(l.pt); if (!A || !P) return;
+    const a = rel(A.querySelector(`[data-c="${l.fc}"]`)), b = rel(P.querySelector(`[data-c="${l.pc}"]`)), ca = rel(A), cp = rel(P);
+    const color = lkColor(k), u = isUnique(l.ft, l.fc), la = u === null ? "" : (u ? "1" : "N"), lb = u === null ? "" : "1";
+    if (!stack){
+      const lr = ca.r <= cp.l, x1 = lr ? ca.r : ca.l, x2 = lr ? cp.l : cp.r, d = lr ? 1 : -1;
+      html += `<circle cx="${x1}" cy="${a.cy}" r="4" fill="${color}"/><line x1="${x1}" y1="${a.cy}" x2="${x2 - d*8}" y2="${b.cy}" stroke="${color}" stroke-width="3" stroke-linecap="round"/>`;
+      const len = Math.hypot(x2 - x1, b.cy - a.cy) || 1;
+      html += head(x2, b.cy, (x2 - x1)/len, (b.cy - a.cy)/len, color);
+      const up = b.cy < a.cy - 1;
+      html += tag(x1 + d*7, up ? a.cy + 18 : a.cy - 8, la, color, lr ? "start" : "end") + tag(x2 - d*12, up ? b.cy - 9 : b.cy + 19, lb, color, lr ? "end" : "start");
+    } else {
+      const X = right + 18;
+      html += `<circle cx="${ca.r}" cy="${a.cy}" r="4" fill="${color}"/><path d="M${ca.r},${a.cy} H${X} V${b.cy} H${cp.r + 8}" fill="none" stroke="${color}" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>`;
+      html += head(cp.r, b.cy, -1, 0, color);
+      html += tag(X + 6, a.cy + 5, la, color, "start") + tag(X + 6, b.cy + 5, lb, color, "start");
+    }
+  });
+  if (spec.loose){ const A = card(spec.loose[0]), P = card(spec.loose[1]);
+    if (A && P){ const ca = rel(A), cp = rel(P), ha = rel(A.querySelector(".h")), hp = rel(P.querySelector(".h"));
+      const [x1,y1,x2,y2] = stack ? [ca.cx, ca.b, cp.cx, cp.t] : [ca.r, ha.cy, cp.l, hp.cy], mx = (x1+x2)/2, my = (y1+y2)/2;
+      html += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="var(--lk-loose)" stroke-width="3" stroke-dasharray="6 6"/>`;
+      html += `<circle cx="${mx}" cy="${my}" r="11" class="lk-mid"/><text x="${mx}" y="${my+5}" text-anchor="middle" class="lk-midt">${spec.loose[2]}</text>`; } }
+  svg.innerHTML = html;
+}
+addEventListener("resize", ()=>requestAnimationFrame(drawLinks));
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(()=>drawLinks());
 function check(){
   const i = state.current, c = CHAPTERS[i], v = norm($("answer").value);
   if (!v) return;
@@ -808,7 +943,7 @@ addEventListener("keydown", e=>{ if (e.key === "Escape" && !$("finale").hidden) 
 
 /* ---------- database ---------- */
 let SQL = null, db = null;
-function resetDb(){ if (!SQL) return; if (db) db.close(); db = new SQL.Database(); db.run(SEED); $("out").innerHTML = `<p class="note">${T.ready}</p>`; renderSchema(); }
+function resetDb(){ if (!SQL) return; if (db) db.close(); db = new SQL.Database(); db.run(SEED); $("out").innerHTML = `<p class="note">${T.ready}</p>`; renderSchema(); renderLinks(); }
 function renderSchema(){
   const t = db.exec("SELECT name FROM sqlite_master WHERE type='table' ORDER BY rowid");
   if (!t.length){ $("schema").innerHTML = ""; return; }

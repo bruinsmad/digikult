@@ -100,6 +100,32 @@ main{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:18px;ali
 .case pre{background:var(--laptop);color:#f5ecd8;padding:12px 14px;border-radius:8px;overflow:auto;font-size:14px;line-height:1.5;margin:8px 0}
 .learn{margin-top:14px;padding:12px 14px;border-left:4px solid #2f5aa0;background:rgba(47,90,160,.09);border-radius:0 8px 8px 0}
 .learn h3,.task h3{font:700 14px var(--f-display);letter-spacing:.08em;text-transform:uppercase;color:#2a4f8f;margin-bottom:4px}
+.links{margin-top:14px;padding:12px 14px 10px;border-radius:10px;border:1px solid var(--lk-border);background:var(--lk-bg)}
+.links h3{font-size:14px;letter-spacing:.08em;text-transform:uppercase;color:var(--lk-title);margin-bottom:2px}
+.lk-board{position:relative;display:flex;flex-wrap:nowrap;justify-content:center;align-items:flex-start;column-gap:46px;row-gap:30px;padding:16px 4px 8px}
+.lk-board.stack{flex-direction:column;align-items:flex-start;padding:10px 46px 8px 8px;width:max-content;max-width:100%;margin:0 auto}
+.lk-svg{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;overflow:visible;z-index:2}
+.lk-card{position:relative;z-index:1;flex:none;min-width:96px;border:2px solid var(--lk-head);border-radius:8px;background:var(--lk-card);font:13px/1.35 var(--f-mono);overflow:hidden;box-shadow:0 3px 0 rgba(0,0,0,.12)}
+.lk-board.stack .lk-card{min-width:170px}
+.lk-card .h{background:var(--lk-head);color:var(--lk-head-ink);padding:5px 8px;font-weight:700}
+.lk-card .r{padding:4px 8px;border-top:1px solid var(--paper-line);display:flex;gap:6px;align-items:center;color:var(--paper-ink)}
+.lk-card .r .ic{font-size:11px;width:14px;text-align:center;opacity:.75}
+.lk-card .r.k{font-weight:700}
+.lk-card .r.k, .lk-card .r[data-c$="_id"]{font-weight:700}
+.lk-card .r:not(.k):not([data-c$="_id"]){color:var(--paper-muted)}
+.lk-card .r.on{box-shadow:inset 5px 0 0 var(--c);font-weight:700;background:var(--lk-on)}
+.lk-card .r.more{color:var(--paper-muted);font:italic 12px var(--f-body);padding:3px 8px}
+.lk-end{font:700 14px var(--f-mono);paint-order:stroke;stroke:var(--lk-bg-solid);stroke-width:4px}
+.lk-mid{fill:var(--lk-bg-solid);stroke:var(--lk-loose);stroke-width:2}
+.lk-midt{font:700 14px var(--f-mono);fill:var(--lk-loose)}
+.lk-note{color:var(--paper-muted);font-size:14px;text-align:center;margin:2px 0 4px!important}
+.lk-rules{list-style:none;margin:6px 0 0;padding:0;display:grid;gap:5px;font-size:14px}
+.lk-rules li{display:flex;flex-wrap:wrap;gap:3px 10px;align-items:center}
+.lk-rules .sw{width:18px;height:4px;border-radius:2px;flex:none}
+.lk-rules .kind{color:var(--paper-muted)}
+@media (max-width:640px){ .links{padding:10px 8px} .lk-card{min-width:0;font-size:12px} .lk-card .r{padding:4px 8px} .lk-card .h{padding:5px 8px} }
+.links{--lk-bg:rgba(255,248,228,.75);--lk-bg-solid:#fbf2da;--lk-border:#c9b07a;--lk-title:#2a4f8f;--lk-card:#fffaf0;--lk-head:#4a2a12;--lk-head-ink:#f5e6c0;--lk-on:#fbf0d4;--lk-loose:#8a7350;--lk1:#b8323a;--lk2:#2f5aa0;--lk3:#3d7a3a;--lk4:#7a3f8f;--lk5:#b07a10;--lk6:#4d3c28}
+.links h3{font:700 14px var(--f-display);letter-spacing:.08em}
 .task{margin-top:14px;padding:12px 14px;border-left:4px solid #b8323a;background:rgba(184,50,58,.09);border-radius:0 8px 8px 0}
 .task h3{color:#9a2028}
 .task p{font-weight:700;font-size:17px}
@@ -227,7 +253,7 @@ tr:last-child td{border-bottom:none}
       <div class="chalk">
         <div class="chalk-head">
           <h2>Royal ledger</h2>
-          <span class="rule">Read two or more tables in one query: FROM a, b WHERE a.x_id = b.id</span>
+          <span class="rule">Read two or more tables in one query: FROM knights, kingdoms WHERE knights.kingdom_id = kingdoms.id</span>
         </div>
         <label for="sql" class="eyebrow">Your SQL query</label>
         <textarea id="sql" spellcheck="false" autocapitalize="off" autocomplete="off"></textarea>
@@ -268,24 +294,15 @@ tr:last-child td{border-bottom:none}
 
 <script>
 const SEED = `
-CREATE TABLE kingdoms (id INTEGER PRIMARY KEY, name TEXT, capital TEXT, banner TEXT, army INTEGER);
-CREATE TABLE rulers (id INTEGER PRIMARY KEY, name TEXT, title TEXT, kingdom_id INTEGER, crowned INTEGER);
+CREATE TABLE kingdoms (id INTEGER PRIMARY KEY, name TEXT, ruler TEXT, capital TEXT, army INTEGER, alliance TEXT);
 CREATE TABLE knights (id INTEGER PRIMARY KEY, name TEXT, kingdom_id INTEGER, rank TEXT, weapon TEXT);
-CREATE TABLE alliances (id INTEGER PRIMARY KEY, name TEXT, founded INTEGER, purpose TEXT);
-CREATE TABLE pacts (id INTEGER PRIMARY KEY, alliance_id INTEGER, kingdom_id INTEGER, joined INTEGER);
-CREATE TABLE letters (id INTEGER PRIMARY KEY, knight_id INTEGER, ruler_id INTEGER, time TEXT, wax TEXT);
-INSERT INTO kingdoms VALUES (1,'Northmark','Frostburg','white wolf',1200);
-INSERT INTO kingdoms VALUES (2,'Riverland','Willowford','silver swan',900);
-INSERT INTO kingdoms VALUES (3,'Sunvale','Goldenfield','golden sun',800);
-INSERT INTO kingdoms VALUES (4,'Ironhill','Anvilrock','black bear',2000);
-INSERT INTO kingdoms VALUES (5,'Mistwood','Shadowmere','grey owl',700);
-INSERT INTO kingdoms VALUES (6,'Goldcoast','Seagate','red ship',1100);
-INSERT INTO rulers VALUES (1,'L. Laura','queen',5,1201);
-INSERT INTO rulers VALUES (2,'B. Dániel','king',1,1196);
-INSERT INTO rulers VALUES (3,'M. Márk','king',4,1199);
-INSERT INTO rulers VALUES (4,'F. Lilianna','queen',2,1205);
-INSERT INTO rulers VALUES (5,'R. Benjámin Laurence','king',6,1208);
-INSERT INTO rulers VALUES (6,'L. Mária Éva','queen',3,1203);
+CREATE TABLE letters (id INTEGER PRIMARY KEY, knight_id INTEGER, time TEXT, wax TEXT);
+INSERT INTO kingdoms VALUES (1,'Northmark','B. Dániel','Frostburg',1200,'Silver Pact');
+INSERT INTO kingdoms VALUES (2,'Riverland','F. Lilianna','Willowford',900,'Silver Pact');
+INSERT INTO kingdoms VALUES (3,'Sunvale','L. Mária Éva','Goldenfield',800,'Silver Pact');
+INSERT INTO kingdoms VALUES (4,'Ironhill','M. Márk','Anvilrock',2000,'Iron League');
+INSERT INTO kingdoms VALUES (5,'Mistwood','L. Laura','Shadowmere',700,'Iron League');
+INSERT INTO kingdoms VALUES (6,'Goldcoast','R. Benjámin Laurence','Seagate',1100,'Iron League');
 INSERT INTO knights VALUES (1,'K. Kamilla',1,'champion','lance');
 INSERT INTO knights VALUES (2,'S. Bálint Máté',2,'knight','bow');
 INSERT INTO knights VALUES (3,'H. Hunor József',4,'champion','axe');
@@ -310,52 +327,40 @@ INSERT INTO knights VALUES (21,'P. Hanna',2,'squire','mace');
 INSERT INTO knights VALUES (22,'Z. Zalán Benedek',5,'squire','axe');
 INSERT INTO knights VALUES (23,'S. Fruzsina',3,'squire','sword');
 INSERT INTO knights VALUES (24,'W. Bianka Kinga',6,'squire','mace');
-INSERT INTO alliances VALUES (1,'Silver Pact',1203,'defence');
-INSERT INTO alliances VALUES (2,'Iron League',1207,'conquest');
-INSERT INTO alliances VALUES (3,'Sea Accord',1198,'trade');
-INSERT INTO pacts VALUES (1,1,1,1203);
-INSERT INTO pacts VALUES (2,1,2,1203);
-INSERT INTO pacts VALUES (3,1,3,1204);
-INSERT INTO pacts VALUES (4,1,5,1209);
-INSERT INTO pacts VALUES (5,2,4,1207);
-INSERT INTO pacts VALUES (6,2,5,1208);
-INSERT INTO pacts VALUES (7,2,6,1210);
-INSERT INTO pacts VALUES (8,3,2,1198);
-INSERT INTO pacts VALUES (9,3,6,1198);
-INSERT INTO pacts VALUES (10,3,3,1201);
-INSERT INTO letters VALUES (1,7,2,'18:10','white');
-INSERT INTO letters VALUES (2,6,5,'18:20','red');
-INSERT INTO letters VALUES (3,5,6,'18:30','gold');
-INSERT INTO letters VALUES (4,15,4,'18:45','blue');
-INSERT INTO letters VALUES (5,18,3,'18:50','black');
-INSERT INTO letters VALUES (6,1,2,'19:15','white');
-INSERT INTO letters VALUES (7,10,1,'19:20','grey');
-INSERT INTO letters VALUES (8,8,3,'19:40','black');
-INSERT INTO letters VALUES (9,9,6,'19:50','blue');
-INSERT INTO letters VALUES (10,13,4,'20:05','white');
-INSERT INTO letters VALUES (11,12,5,'20:15','red');
-INSERT INTO letters VALUES (12,20,3,'20:30','black');
-INSERT INTO letters VALUES (13,11,2,'20:40','gold');
-INSERT INTO letters VALUES (14,4,1,'20:55','grey');
-INSERT INTO letters VALUES (15,3,1,'21:05','black');
-INSERT INTO letters VALUES (16,16,2,'21:15','grey');
-INSERT INTO letters VALUES (17,2,4,'21:30','blue');
-INSERT INTO letters VALUES (18,17,4,'21:50','gold');
-INSERT INTO letters VALUES (19,21,2,'22:05','blue');
-INSERT INTO letters VALUES (20,14,3,'22:15','black');
-INSERT INTO letters VALUES (21,24,1,'22:30','red');
-INSERT INTO letters VALUES (22,22,5,'22:40','black');
-INSERT INTO letters VALUES (23,4,3,'22:50','black');
-INSERT INTO letters VALUES (24,23,6,'23:05','gold');
-INSERT INTO letters VALUES (25,2,3,'23:20','black');
-INSERT INTO letters VALUES (26,19,2,'23:40','white');
+INSERT INTO letters VALUES (1,7,'18:10','white');
+INSERT INTO letters VALUES (2,6,'18:20','red');
+INSERT INTO letters VALUES (3,5,'18:30','gold');
+INSERT INTO letters VALUES (4,15,'18:45','blue');
+INSERT INTO letters VALUES (5,18,'18:50','black');
+INSERT INTO letters VALUES (6,1,'19:15','white');
+INSERT INTO letters VALUES (7,10,'19:20','grey');
+INSERT INTO letters VALUES (8,8,'19:40','black');
+INSERT INTO letters VALUES (9,9,'19:50','blue');
+INSERT INTO letters VALUES (10,13,'20:05','white');
+INSERT INTO letters VALUES (11,12,'20:15','red');
+INSERT INTO letters VALUES (12,8,'20:30','black');
+INSERT INTO letters VALUES (13,11,'20:40','gold');
+INSERT INTO letters VALUES (14,4,'20:55','grey');
+INSERT INTO letters VALUES (15,3,'21:05','black');
+INSERT INTO letters VALUES (16,16,'21:15','grey');
+INSERT INTO letters VALUES (17,2,'21:30','blue');
+INSERT INTO letters VALUES (18,8,'21:40','black');
+INSERT INTO letters VALUES (19,17,'21:50','gold');
+INSERT INTO letters VALUES (20,21,'22:05','blue');
+INSERT INTO letters VALUES (21,14,'22:15','black');
+INSERT INTO letters VALUES (22,24,'22:30','red');
+INSERT INTO letters VALUES (23,22,'22:40','grey');
+INSERT INTO letters VALUES (24,4,'22:50','black');
+INSERT INTO letters VALUES (25,23,'23:05','gold');
+INSERT INTO letters VALUES (26,2,'23:20','black');
+INSERT INTO letters VALUES (27,19,'23:40','white');
 `;
 const CHAPTERS = [
  {
   "refresher": true,
   "title": "Quick refresher",
-  "story": "<p>Before the council, a 3-minute reminder of the basics. Every query has the same parts, always in this order.</p>\n  <div class=\"anatomy\" role=\"table\" aria-label=\"Parts of a query\">\n    <div role=\"row\"><code role=\"cell\">SELECT name, army</code><span role=\"cell\">which <b>columns</b> to show. <code>*</code> means all of them.</span></div>\n    <div role=\"row\"><code role=\"cell\">FROM kingdoms</code><span role=\"cell\">which <b>table</b> to read</span></div>\n    <div role=\"row\"><code role=\"cell\">WHERE army &gt; 1000</code><span role=\"cell\">which <b>rows</b> to keep</span></div>\n    <div role=\"row\"><code role=\"cell\">ORDER BY army DESC;</code><span role=\"cell\">how to <b>sort</b> the result</span></div>\n  </div>\n  <ul class=\"rules\">\n    <li>Text values go in single quotes: <code>'Northmark'</code>. Numbers don't: <code>1000</code>.</li>\n    <li>Combine conditions with <code>AND</code> and <code>OR</code>.</li>\n    <li>Today's new idea: one query can read <b>two or more tables</b> at once.</li>\n  </ul>",
-  "learn": "<p>One row in <code>kingdoms</code> is one kingdom. Click one to load and run it:</p>\n  <div class=\"tries\">\n    <button type=\"button\" class=\"try\" data-sql=\"SELECT * FROM kingdoms;\">SELECT * FROM kingdoms;</button>\n    <button type=\"button\" class=\"try\" data-sql=\"SELECT name, capital FROM kingdoms WHERE army &gt; 1000;\">SELECT name, capital FROM kingdoms WHERE army &gt; 1000;</button>\n    <button type=\"button\" class=\"try\" data-sql=\"SELECT * FROM alliances ORDER BY founded;\">SELECT * FROM alliances ORDER BY founded;</button>\n  </div>",
+  "story": "<p>Before the council, a 3-minute reminder of the basics. Every query has the same parts, always in this order.</p>\n  <div class=\"anatomy\" role=\"table\" aria-label=\"Parts of a query\">\n    <div role=\"row\"><code role=\"cell\">SELECT name, army</code><span role=\"cell\">which <b>columns</b> to show. <code>*</code> means all of them.</span></div>\n    <div role=\"row\"><code role=\"cell\">FROM kingdoms</code><span role=\"cell\">which <b>table</b> to read</span></div>\n    <div role=\"row\"><code role=\"cell\">WHERE army &gt; 1000</code><span role=\"cell\">which <b>rows</b> to keep</span></div>\n    <div role=\"row\"><code role=\"cell\">ORDER BY army DESC;</code><span role=\"cell\">how to <b>sort</b> the result</span></div>\n  </div>\n  <ul class=\"rules\">\n    <li>Text values go in single quotes: <code>'Northmark'</code>. Numbers don't: <code>1000</code>.</li>\n    <li>Combine conditions with <code>AND</code> and <code>OR</code>.</li>\n    <li>Today's new idea: one query can read <b>two or three tables</b> at once.</li>\n  </ul>",
+  "learn": "<p>One row in <code>kingdoms</code> is one kingdom. Click one to load and run it:</p>\n  <div class=\"tries\">\n    <button type=\"button\" class=\"try\" data-sql=\"SELECT * FROM kingdoms;\">SELECT * FROM kingdoms;</button>\n    <button type=\"button\" class=\"try\" data-sql=\"SELECT name, ruler FROM kingdoms WHERE army &gt; 1000;\">SELECT name, ruler FROM kingdoms WHERE army &gt; 1000;</button>\n    <button type=\"button\" class=\"try\" data-sql=\"SELECT * FROM knights WHERE rank = 'champion';\">SELECT * FROM knights WHERE rank = 'champion';</button>\n  </div>",
   "task": "Warm-up: which kingdom has the largest army?",
   "hints": [
    "Sort the kingdoms by army, largest first: ORDER BY army DESC.",
@@ -367,18 +372,18 @@ const CHAPTERS = [
    "ironhill"
   ],
   "placeholder": "kingdom",
-  "success": "Ironhill: 2,000 soldiers under the black bear banner. Their king, M. Márk, leads the Iron League. Remember his name.",
+  "success": "Ironhill: 2,000 soldiers. Its king, M. Márk, leads the Iron League, the old enemy of the Silver Pact. Remember that name.",
   "starter": "SELECT * FROM kingdoms;"
  },
  {
   "title": "Numbers instead of names",
-  "story": "<p>The year 1214, Frostburg Castle, the night before the Great Council. King <b>B. Dániel</b> of Northmark hosts the kingdoms of the <b>Silver Pact</b>. At dawn they will seal their secret battle plan against the Iron League.</p>\n  <p>But the plan has leaked: Iron League scouts were seen riding exactly where it says. <mark>Someone inside the castle is writing to the enemy.</mark> Lord Commander H. Viktor unrolls the royal ledger in front of you, the young royal scribe. \"Find the traitor before the bells ring midnight.\"</p>\n  <p>You open the <code>rulers</code> table and find no kingdom names at all. Only numbers in a column called <code>kingdom_id</code>.</p>",
-  "learn": "<p>A database keeps each thing in <b>one</b> place. A kingdom's name lives in <code>kingdoms</code>; <code>rulers</code> only stores the kingdom's <code>id</code>. That number is a <b>reference</b>: <code>kingdom_id = 1</code> means \"the kingdom whose id is 1\". For now, look it up by hand with two queries.</p>\n  <pre>SELECT * FROM rulers;\n\nSELECT name FROM kingdoms WHERE id = 1;</pre>",
-  "task": "Which kingdom does King R. Benjámin Laurence rule?",
+  "story": "<p>The year 1214, Frostburg Castle, the night before the Great Council. King <b>B. Dániel</b> of Northmark hosts the kingdoms of the <b>Silver Pact</b>. Knights of the Iron League are here too, as guests for the peace talks. At dawn the Silver Pact will seal its secret battle plan.</p>\n  <p>But the plan has leaked: Iron League scouts were seen riding exactly where it says. <mark>Someone inside the castle is writing to the enemy.</mark> Lord Commander H. Viktor unrolls the royal ledger in front of you, the young royal scribe. \"Find the traitor before the bells ring midnight.\"</p>\n  <p>You open the <code>knights</code> table and find no kingdom names at all. Only numbers in a column called <code>kingdom_id</code>.</p>",
+  "learn": "<p>A database keeps each thing in <b>one</b> place. A kingdom's name lives in <code>kingdoms</code>; <code>knights</code> only stores the kingdom's <code>id</code>. That number is a <b>reference</b>: <code>kingdom_id = 1</code> means \"the kingdom whose id is 1\". For now, look it up by hand with two queries.</p>\n  <pre>SELECT * FROM knights;\n\nSELECT name FROM kingdoms WHERE id = 1;</pre>",
+  "task": "Which kingdom does the champion K. Nóra serve?",
   "hints": [
-   "Find his row in rulers and note his kingdom_id. Then look that id up in the kingdoms table.",
+   "Find her row in knights and note her kingdom_id. Then look that id up in the kingdoms table.",
    {
-    "sql": "SELECT kingdom_id FROM rulers\nWHERE name = 'R. Benjámin Laurence';\n\nSELECT name FROM kingdoms WHERE id = 6;"
+    "sql": "SELECT kingdom_id FROM knights\nWHERE name = 'K. Nóra';\n\nSELECT name FROM kingdoms WHERE id = 6;"
    }
   ],
   "answers": [
@@ -410,7 +415,7 @@ const CHAPTERS = [
  {
   "title": "The matching rule",
   "story": "<p>H. Viktor taps the ledger. \"A knight serves a kingdom when the knight's <code>kingdom_id</code> equals the kingdom's <code>id</code>. <mark>Tell the ledger that.</mark>\"</p>",
-  "learn": "<p>Add a <code>WHERE</code> condition that compares the two id columns. Write <code>table.column</code> so SQL knows which <code>id</code> and which <code>name</code> you mean. Other conditions follow with <code>AND</code>.</p>\n  <pre>SELECT knights.name, knights.rank, kingdoms.name\nFROM knights, kingdoms\nWHERE knights.kingdom_id = kingdoms.id;</pre>\n  <p>24 rows now: one per knight, each with the right kingdom. Many knights share one kingdom: this is a <b>many-to-one</b> link.</p>",
+  "learn": "<p>Add a <code>WHERE</code> condition that compares the two columns. Both tables have an <code>id</code> and a <code>name</code>, so write <code>table.column</code>: then SQL knows which one you mean. Other conditions follow with <code>AND</code>.</p>\n  <pre>SELECT knights.name, knights.rank, kingdoms.name\nFROM knights, kingdoms\nWHERE knights.kingdom_id = kingdoms.id;</pre>\n  <p>24 rows now: one per knight, each with the right kingdom. Many knights share one kingdom: this is a <b>many-to-one</b> link.</p>",
   "task": "Who is the champion of Ironhill?",
   "hints": [
    "Start with the matching rule WHERE knights.kingdom_id = kingdoms.id, then add AND kingdoms.name = 'Ironhill' AND knights.rank = 'champion'.",
@@ -426,17 +431,17 @@ const CHAPTERS = [
    "hunor"
   ],
   "placeholder": "name",
-  "success": "H. Hunor József, the axe-swinging champion of Ironhill. He came to the council as a guest of honour. Keep an eye on Ironhill."
+  "success": "H. Hunor József, the axe-swinging champion of Ironhill. He came to the council as a guest of honour. Keep an eye on the Iron League."
  },
  {
-  "title": "Three tables, short names",
-  "story": "<p>You keep losing track of who serves whom. A knight belongs to a kingdom, and every kingdom has a ruler. <mark>Three tables, one query.</mark></p>",
-  "learn": "<p>Give each table a short <b>alias</b> right after its name in <code>FROM</code>: <code>knights n, kingdoms k, rulers r</code>. Then write <code>n.kingdom_id</code> instead of <code>knights.kingdom_id</code>. Every extra table needs its own matching rule, joined with <code>AND</code>.</p>\n  <pre>SELECT n.name, k.name, r.name\nFROM knights n, kingdoms k, rulers r\nWHERE n.kingdom_id = k.id\n  AND r.kingdom_id = k.id;</pre>\n  <p>Each kingdom has exactly one ruler and each ruler one kingdom: a <b>one-to-one</b> link.</p>",
+  "title": "Who wears the crown",
+  "story": "<p>Every row of <code>kingdoms</code> also names its ruler. <mark>Once a knight is matched to his kingdom, every column of that kingdom is yours to read.</mark></p>",
+  "learn": "<p>After the matching rule, you can <code>SELECT</code> any column from either table. The rule stays the same; only the column list changes.</p>\n  <pre>SELECT knights.name, kingdoms.name, kingdoms.ruler\nFROM knights, kingdoms\nWHERE knights.kingdom_id = kingdoms.id;</pre>",
   "task": "Which ruler does the champion M. Anna Petra serve?",
   "hints": [
-   "Two matching rules: n.kingdom_id = k.id AND r.kingdom_id = k.id. Then AND n.name = 'M. Anna Petra'.",
+   "Use the same matching rule as before, show kingdoms.ruler, and add AND knights.name = 'M. Anna Petra'.",
    {
-    "sql": "SELECT n.name, k.name, r.title, r.name\nFROM knights n, kingdoms k, rulers r\nWHERE n.kingdom_id = k.id\n  AND r.kingdom_id = k.id\n  AND n.name = 'M. Anna Petra';"
+    "sql": "SELECT knights.name, kingdoms.name, kingdoms.ruler\nFROM knights, kingdoms\nWHERE knights.kingdom_id = kingdoms.id\n  AND knights.name = 'M. Anna Petra';"
    }
   ],
   "answers": [
@@ -446,73 +451,54 @@ const CHAPTERS = [
    "queen l laura"
   ],
   "placeholder": "ruler's name",
-  "success": "Queen L. Laura of Mistwood, the kingdom of the grey owl. Mistwood is a member of the Silver Pact, so its people know the plan."
+  "success": "Queen L. Laura of Mistwood, the kingdom of the grey owl. Mistwood rides with the Iron League."
  },
  {
-  "title": "A table made of pairs",
-  "story": "<p>Who even knew the battle plan? Only the members of the Silver Pact. But kingdoms are never in just one alliance: <mark>one kingdom can join many alliances, and one alliance has many kingdoms.</mark></p>",
-  "learn": "<p>No single column can hold a <b>many-to-many</b> link, so it gets its own table. Every row of <code>pacts</code> is one membership: an <code>alliance_id</code> and a <code>kingdom_id</code>. To read it, match it to both sides.</p>\n  <pre>SELECT a.name, p.joined\nFROM alliances a, pacts p\nWHERE p.alliance_id = a.id;</pre>",
-  "task": "How many kingdoms have signed the Silver Pact?",
+  "title": "Friends and enemies",
+  "story": "<p>Only the kingdoms of the Silver Pact know the battle plan. The <code>alliance</code> column of <code>kingdoms</code> says which side each kingdom is on. <mark>How many enemy knights are sleeping inside these walls tonight?</mark></p>",
+  "learn": "<p>Everything you already know still works after a join: <code>COUNT</code>, <code>GROUP BY</code>, <code>ORDER BY</code>. SQL matches the tables first, then counts.</p>\n  <pre>SELECT kingdoms.alliance, COUNT(*) AS knights\nFROM knights, kingdoms\nWHERE knights.kingdom_id = kingdoms.id\nGROUP BY kingdoms.alliance;</pre>",
+  "task": "How many knights at the castle serve an Iron League kingdom?",
   "hints": [
-   "Join alliances and pacts with p.alliance_id = a.id, then AND a.name = 'Silver Pact'. Count the rows.",
+   "Join knights and kingdoms, add AND kingdoms.alliance = 'Iron League', and count the rows with COUNT(*).",
    {
-    "sql": "SELECT COUNT(*)\nFROM alliances a, pacts p\nWHERE p.alliance_id = a.id\n  AND a.name = 'Silver Pact';"
+    "sql": "SELECT COUNT(*)\nFROM knights, kingdoms\nWHERE knights.kingdom_id = kingdoms.id\n  AND kingdoms.alliance = 'Iron League';"
    }
   ],
   "answers": [
-   "4",
-   "four"
+   "12",
+   "twelve"
   ],
   "placeholder": "a number",
-  "success": "Four kingdoms share the plan: Northmark, Riverland, Sunvale and Mistwood. The traitor is somewhere among their people."
+  "success": "Twelve: half of the knights in the castle serve the Iron League. They're here openly, as guests. The traitor is someone who should be on our side."
  },
  {
-  "title": "Two banners",
-  "story": "<p>H. Viktor lowers his voice. \"One of our own allies also flies the banner of the <b>Iron League</b>. <mark>Find out which.</mark>\"</p>",
-  "learn": "<p>Three tables: <code>alliances → pacts → kingdoms</code>. Everything you know still works after a join, including <code>GROUP BY</code> and <code>HAVING</code>: SQL matches the tables first, then groups the result.</p>\n  <pre>SELECT k.name, a.name\nFROM alliances a, pacts p, kingdoms k\nWHERE p.alliance_id = a.id\n  AND p.kingdom_id = k.id\nORDER BY k.name;</pre>",
-  "task": "Which kingdom is a member of both the Silver Pact and the Iron League?",
+  "title": "The letter log",
+  "story": "<p>The Iron League seals its letters with <mark>black wax</mark>. The castle's messengers write down every letter that leaves Frostburg tonight in the <code>letters</code> table: who sent it (<code>knight_id</code>), when, and the colour of the wax.</p>",
+  "learn": "<p><code>letters.knight_id</code> refers to <code>knights.id</code>: the same kind of link as <code>knights.kingdom_id</code> and <code>kingdoms.id</code>. Match first, then group.</p>\n  <pre>SELECT knights.name, COUNT(*) AS letters\nFROM letters, knights\nWHERE letters.knight_id = knights.id\nGROUP BY knights.name\nORDER BY COUNT(*) DESC;</pre>",
+  "task": "Which knight sent the most black-wax letters tonight?",
   "hints": [
-   "Join the three tables and keep only the two alliances: AND a.name IN ('Silver Pact', 'Iron League'). Which kingdom appears twice?",
+   "Join letters and knights, add AND letters.wax = 'black', then GROUP BY knights.name and sort by COUNT(*) DESC.",
    {
-    "sql": "SELECT k.name, COUNT(*) AS alliances\nFROM alliances a, pacts p, kingdoms k\nWHERE p.alliance_id = a.id\n  AND p.kingdom_id = k.id\n  AND a.name IN ('Silver Pact', 'Iron League')\nGROUP BY k.name\nHAVING COUNT(*) = 2;"
+    "sql": "SELECT knights.name, COUNT(*) AS black_letters\nFROM letters, knights\nWHERE letters.knight_id = knights.id\n  AND letters.wax = 'black'\nGROUP BY knights.name\nORDER BY COUNT(*) DESC;"
    }
   ],
   "answers": [
-   "mistwood",
-   "mist wood"
+   "w jay",
+   "jay",
+   "jay w"
   ],
-  "placeholder": "kingdom",
-  "success": "Mistwood. But Queen L. Laura never hid it: she told the whole council on the first day. Her knights write to Ironhill openly every night. That's diplomacy, not treason."
- },
- {
-  "title": "The black seal",
-  "story": "<p>The Iron League seals its letters with <mark>black wax</mark>. The castle's messengers write down every letter that leaves Frostburg tonight: who sent it (<code>knight_id</code>), which ruler it goes to (<code>ruler_id</code>), the time and the wax.</p>",
-  "learn": "<p><code>letters</code> points to two tables at once: <code>letters.knight_id</code> to <code>knights.id</code>, and <code>letters.ruler_id</code> to <code>rulers.id</code>. Join only what you need, then group.</p>\n  <pre>SELECT r.name, COUNT(*) AS letters\nFROM letters l, rulers r\nWHERE l.ruler_id = r.id\nGROUP BY r.name\nORDER BY COUNT(*) DESC;</pre>",
-  "task": "Which ruler received the most black-wax letters tonight?",
-  "hints": [
-   "Join letters and rulers, add AND l.wax = 'black', then GROUP BY r.name and sort by COUNT(*) DESC.",
-   {
-    "sql": "SELECT r.name, COUNT(*) AS black_letters\nFROM letters l, rulers r\nWHERE l.ruler_id = r.id\n  AND l.wax = 'black'\nGROUP BY r.name\nORDER BY COUNT(*) DESC;"
-   }
-  ],
-  "answers": [
-   "m mark",
-   "mark",
-   "mark m",
-   "king m mark"
-  ],
-  "placeholder": "ruler's name",
-  "success": "King M. Márk of Ironhill: six black seals tonight. The Iron League's war chief is very busy."
+  "placeholder": "name",
+  "success": "W. Jay of Ironhill: three black seals. An Iron League knight writing home in Iron League wax. Busy, but that's not treason."
  },
  {
   "title": "After the evening bell",
-  "story": "<p>The battle plan lay on the council table until the evening bell at <mark>22:00</mark>. It was copied after that, when the chamber was locked. Whoever wrote to King M. Márk late tonight has some explaining to do.</p>",
-  "learn": "<p>Times are stored as text like <code>'22:15'</code>. Because they always have the same shape, you can compare them with <code>&gt;=</code>. Join <code>knights</code> too, so you can see who sent each letter.</p>\n  <pre>SELECT n.name, r.name, l.time\nFROM letters l, rulers r, knights n\nWHERE l.ruler_id = r.id\n  AND l.knight_id = n.id\n  AND l.time &gt;= '21:00';</pre>",
-  "task": "How many black-wax letters reached King M. Márk at 22:00 or later?",
+  "story": "<p>The battle plan lay on the council table until the evening bell at <mark>22:00</mark>. It was copied after that, when the chamber was locked. Whoever sent black wax late tonight has some explaining to do.</p>",
+  "learn": "<p>Times are stored as text like <code>'22:15'</code>. Because they always have the same shape, you can compare them with <code>&gt;=</code>.</p>\n  <pre>SELECT knights.name, letters.time, letters.wax\nFROM letters, knights\nWHERE letters.knight_id = knights.id\n  AND letters.time &gt;= '21:00';</pre>",
+  "task": "How many black-wax letters left the castle at 22:00 or later?",
   "hints": [
-   "Join letters, rulers and knights, then AND r.name = 'M. Márk' AND l.wax = 'black' AND l.time >= '22:00'. Count the rows.",
+   "Join letters and knights, then AND letters.wax = 'black' AND letters.time >= '22:00'. Count the rows.",
    {
-    "sql": "SELECT n.name, l.time\nFROM letters l, rulers r, knights n\nWHERE l.ruler_id = r.id\n  AND l.knight_id = n.id\n  AND r.name = 'M. Márk'\n  AND l.wax = 'black'\n  AND l.time >= '22:00';"
+    "sql": "SELECT knights.name, letters.time\nFROM letters, knights\nWHERE letters.knight_id = knights.id\n  AND letters.wax = 'black'\n  AND letters.time >= '22:00';"
    }
   ],
   "answers": [
@@ -520,17 +506,35 @@ const CHAPTERS = [
    "three"
   ],
   "placeholder": "a number",
-  "success": "Three letters, three senders. One of them is the traitor."
+  "success": "Three letters, three senders. Names alone won't tell you who is a traitor. You need to know whose side each sender is on."
+ },
+ {
+  "title": "Three tables in a row",
+  "story": "<p>A letter knows its knight, and a knight knows his kingdom. <mark>Follow the chain: letters → knights → kingdoms.</mark> Three tables, one query.</p>",
+  "learn": "<p>List all three tables in <code>FROM</code>, separated by commas. Every link in the chain needs its own matching rule, joined with <code>AND</code>. <b>Three tables need two rules.</b></p>\n  <pre>SELECT knights.name, kingdoms.name, kingdoms.alliance, letters.time\nFROM letters, knights, kingdoms\nWHERE letters.knight_id = knights.id\n  AND knights.kingdom_id = kingdoms.id;</pre>",
+  "task": "How many black-wax letters were sent tonight by knights of Iron League kingdoms?",
+  "hints": [
+   "Use the two matching rules above, then AND letters.wax = 'black' AND kingdoms.alliance = 'Iron League'. Count the rows.",
+   {
+    "sql": "SELECT COUNT(*)\nFROM letters, knights, kingdoms\nWHERE letters.knight_id = knights.id\n  AND knights.kingdom_id = kingdoms.id\n  AND letters.wax = 'black'\n  AND kingdoms.alliance = 'Iron League';"
+   }
+  ],
+  "answers": [
+   "7",
+   "seven"
+  ],
+  "placeholder": "a number",
+  "success": "Seven of tonight's eight black seals came from Iron League knights writing to their own side. That's expected. Eight minus seven leaves one."
  },
  {
   "title": "The traitor",
-  "story": "<p>Three names, and the bells will ring soon. Think about where each sender comes from. A knight of <b>Ironhill</b> writing to his own king is no traitor. <b>Mistwood</b> openly belongs to both alliances. <mark>The traitor serves a kingdom that is in the Silver Pact only.</mark></p>",
-  "learn": "<p>Four tables: <code>letters → rulers</code>, <code>letters → knights → kingdoms</code>. Three matching rules, then your filters.</p>\n  <pre>SELECT n.name, k.name, l.time\nFROM letters l, rulers r, knights n, kingdoms k\nWHERE l.ruler_id = r.id\n  AND l.knight_id = n.id\n  AND n.kingdom_id = k.id;</pre>",
+  "story": "<p>The bells will ring soon. <mark>A knight of the Silver Pact has no business using the Iron League's black wax.</mark></p>",
+  "learn": "<p>Same chain, same two matching rules. Only the filter changes.</p>\n  <pre>SELECT knights.name, kingdoms.name, letters.time\nFROM letters, knights, kingdoms\nWHERE letters.knight_id = knights.id\n  AND knights.kingdom_id = kingdoms.id;</pre>",
   "task": "Which knight is the traitor?",
   "hints": [
-   "Take your chapter 8 query, add kingdoms with AND n.kingdom_id = k.id, and show k.name. Compare the three kingdoms with what you found in chapter 6.",
+   "Take your chapter 8 query, show knights.name, and keep the black letters from Silver Pact kingdoms: AND kingdoms.alliance = 'Silver Pact'.",
    {
-    "sql": "SELECT n.name, k.name AS kingdom, l.time\nFROM letters l, rulers r, knights n, kingdoms k\nWHERE l.ruler_id = r.id\n  AND l.knight_id = n.id\n  AND n.kingdom_id = k.id\n  AND r.name = 'M. Márk'\n  AND l.wax = 'black'\n  AND l.time >= '22:00';"
+    "sql": "SELECT knights.name, kingdoms.name AS kingdom, letters.time\nFROM letters, knights, kingdoms\nWHERE letters.knight_id = knights.id\n  AND knights.kingdom_id = kingdoms.id\n  AND letters.wax = 'black'\n  AND kingdoms.alliance = 'Silver Pact';"
    }
   ],
   "answers": [
@@ -541,11 +545,11 @@ const CHAPTERS = [
    "balint"
   ],
   "placeholder": "name",
-  "success": "S. Bálint Máté, a knight of Riverland. At the stroke of midnight Champion K. Kamilla finds him at the stables, a black-wax letter in his boot and a copy of the battle plan in his saddlebag. At dawn the Silver Pact seals a new plan, and this one stays secret."
+  "success": "S. Bálint Máté, a knight of Riverland, 23:20. At the stroke of midnight Champion K. Kamilla finds him at the stables, a black-wax letter in his boot and a copy of the battle plan in his saddlebag. At dawn the Silver Pact seals a new plan, and this one stays secret."
  }
 ];
-const BONUS = ["List every knight next to the name of the ruler they serve. (knights → kingdoms → rulers)", "Which alliance has the largest combined army? (alliances → pacts → kingdoms, SUM(army))", "How many letters did the knights of each kingdom send tonight?", "Which kingdoms belong to exactly two alliances? (GROUP BY + HAVING)", "Which queen received the most letters tonight, whatever the wax?", "Hard: list every pair of kingdoms that share an alliance. Use the pacts table twice, with two aliases: p1 and p2."];
-const COLDOCS = {"kingdoms": {"id": "Row number of the kingdom.", "name": "<code>'Northmark'</code>, <code>'Riverland'</code>, <code>'Sunvale'</code>, <code>'Ironhill'</code>, <code>'Mistwood'</code> or <code>'Goldcoast'</code>.", "capital": "The capital city, e.g. <code>'Frostburg'</code>.", "banner": "The animal or sign on the banner, e.g. <code>'white wolf'</code>.", "army": "How many soldiers the kingdom has."}, "rulers": {"id": "Row number of the ruler.", "name": "The ruler's name, e.g. <code>'B. Dániel'</code>.", "title": "<code>'king'</code> or <code>'queen'</code>.", "kingdom_id": "Which kingdom they rule: the <code>id</code> of a row in <code>kingdoms</code>. Every kingdom has exactly one ruler.", "crowned": "The year they were crowned."}, "knights": {"id": "Row number of the knight.", "name": "The knight's name.", "kingdom_id": "Which kingdom they serve: the <code>id</code> of a row in <code>kingdoms</code>.", "rank": "<code>'squire'</code>, <code>'knight'</code>, <code>'champion'</code> or <code>'commander'</code>.", "weapon": "<code>'sword'</code>, <code>'lance'</code>, <code>'bow'</code>, <code>'axe'</code> or <code>'mace'</code>."}, "alliances": {"id": "Row number of the alliance.", "name": "<code>'Silver Pact'</code>, <code>'Iron League'</code> or <code>'Sea Accord'</code>.", "founded": "The year it was founded.", "purpose": "<code>'defence'</code>, <code>'conquest'</code> or <code>'trade'</code>."}, "pacts": {"id": "Row number of the membership.", "alliance_id": "Which alliance: the <code>id</code> of a row in <code>alliances</code>.", "kingdom_id": "Which kingdom joined it: the <code>id</code> of a row in <code>kingdoms</code>.", "joined": "The year the kingdom joined."}, "letters": {"id": "Row number of the letter.", "knight_id": "Who sent it: the <code>id</code> of a row in <code>knights</code>.", "ruler_id": "Who received it: the <code>id</code> of a row in <code>rulers</code>.", "time": "When it left the castle tonight, as text <code>'HH:MM'</code>.", "wax": "Colour of the wax seal: <code>'black'</code>, <code>'white'</code>, <code>'blue'</code>, <code>'gold'</code>, <code>'grey'</code> or <code>'red'</code>."}};
+const BONUS = ["Which kingdom's knights sent the most letters tonight, whatever the wax?", "List every knight next to the ruler they serve, sorted by ruler.", "Which alliance has the larger combined army? (One table is enough: SUM(army) with GROUP BY alliance.)", "How many letters did the knights of each alliance send after 21:00?", "Which weapon do the knights who sent black-wax letters carry most often?", "Hard: which knights sent no letter at all tonight? Hint: knights.id NOT IN (SELECT knight_id FROM letters)."];
+const COLDOCS = {"kingdoms": {"id": "Row number of the kingdom.", "name": "<code>'Northmark'</code>, <code>'Riverland'</code>, <code>'Sunvale'</code>, <code>'Ironhill'</code>, <code>'Mistwood'</code> or <code>'Goldcoast'</code>.", "ruler": "The king or queen, e.g. <code>'B. Dániel'</code>.", "capital": "The capital city, e.g. <code>'Frostburg'</code>.", "army": "How many soldiers the kingdom has.", "alliance": "<code>'Silver Pact'</code> or <code>'Iron League'</code>."}, "knights": {"id": "Row number of the knight.", "name": "The knight's name.", "kingdom_id": "Which kingdom they serve: the <code>id</code> of a row in <code>kingdoms</code>.", "rank": "<code>'squire'</code>, <code>'knight'</code>, <code>'champion'</code> or <code>'commander'</code>.", "weapon": "<code>'sword'</code>, <code>'lance'</code>, <code>'bow'</code>, <code>'axe'</code> or <code>'mace'</code>."}, "letters": {"id": "Row number of the letter.", "knight_id": "Who sent it: the <code>id</code> of a row in <code>knights</code>.", "time": "When it left the castle tonight, as text <code>'HH:MM'</code>.", "wax": "Colour of the wax seal: <code>'black'</code>, <code>'white'</code>, <code>'blue'</code>, <code>'gold'</code>, <code>'grey'</code> or <code>'red'</code>."}};
 const HAND_STEPS = ["Write your name below.", "Click <b>Save answers (.txt)</b>. The file goes to your Downloads folder.", "Open the assignment in <b>Google Classroom</b>, upload the file under <b>Add or create → File</b>, then press <b>Turn in</b>."];
 const RANKS = ["Royal Spymaster", "Lord Chancellor", "Knight of the Realm", "Squire"];
 const T = {
@@ -553,8 +557,8 @@ const T = {
   try_:"Try it", learn:"SQL for this step", task:"Your task", hint1:"Clue 1 · hint", hint2:"Clue 2 · a working query", answer:"Answer", check:"Check answer",
   correct:"Correct.", wrong:"Not quite.", wrongTip:"Look at your result again. Did you include the matching rule (WHERE … = …) for every pair of tables? Check whether the task asks for a number or a name.", prev:"Previous chapter", next:"Next chapter", start:"Begin the hunt", yourans:"Your answer",
   ready:"The ledger is open. Write a query and press Run.", empty:"The query box is empty. Type a query first.", zero:"0 rows. No rows match all of your conditions. Check the spelling of text values and your matching rule.", sound:"Sound", reset:"Start over", reset2:"Click again to erase progress",
-  errGeneric:"Check spelling, commas, brackets and quotes. Text values need single quotes, like 'black'.", errCol:"That column name doesn't exist, or it's ambiguous. When two tables have a column with the same name (like id or name), write table.id or alias.id.", errTab:"That table doesn't exist. The tables are: kingdoms, rulers, knights, alliances, pacts, letters.", errAmb:"Ambiguous column: both tables have a column with that name. Write the table name or alias in front of it, like knights.name or n.name.", sqlErr:"The query has an error.", engFail:"The SQL engine could not load.", engFail2:"Check the internet connection and reload the page.", engStart:"The SQL engine could not start.",
-  endH:"The Pact holds", endP:m=>`The traitor sits in the north tower, the new battle plan is sealed, and the bells of Frostburg ring for the Silver Pact. You unmasked him in about <b>${m} minutes</b>, joining up to four tables with FROM, aliases and matching rules in WHERE.`, endBonus:"Bonus tasks for fast spymasters:", handH:"Hand in your answers", name:"Your name", namePh:"Write your name here", save:"Save answers (.txt)", copy:"Copy as text", replay:"Replay the celebration",
+  errGeneric:"Check spelling, commas, brackets and quotes. Text values need single quotes, like 'black'.", errCol:"That column name doesn't exist, or it's ambiguous. When two tables have a column with the same name (like id or name), write the table name in front: knights.id.", errTab:"That table doesn't exist. The tables are: kingdoms, knights, letters.", errAmb:"Ambiguous column: both tables have a column with that name. Write the table name in front of it, like knights.name.", sqlErr:"The query has an error.", engFail:"The SQL engine could not load.", engFail2:"Check the internet connection and reload the page.", engStart:"The SQL engine could not start.",
+  endH:"The Pact holds", endP:m=>`The traitor sits in the north tower, the new battle plan is sealed, and the bells of Frostburg ring for the Silver Pact. You unmasked him in about <b>${m} minutes</b>, joining up to three tables with FROM and matching rules in WHERE.`, endBonus:"Bonus tasks for fast spymasters:", handH:"Hand in your answers", name:"Your name", namePh:"Write your name here", save:"Save answers (.txt)", copy:"Copy as text", replay:"Replay the celebration",
   xNameFirst:"Write your name first.", xCopied:"Copied. Paste it into the assignment in Google Classroom as a private comment, then press Turn in.", xBlocked:"Copying is blocked here. Use Save answers instead.", xSaved:f=>`Saved as ${f}. Now upload it to the assignment in Google Classroom and press Turn in.`, xSaveBlocked:"Saving is blocked here. Use Copy as text instead.",
   filePrefix:"broken-pact", reportTitle:"THE BROKEN PACT - ANSWER SHEET", rName:"Name", rFinished:"Finished", rTime:"Time taken", rQueries:"Queries run", rDev:"NOTE: completed with the teacher code, so some answers may be missing.",
   rTask:"Task", rAnswer:"Answer", rSkipped:"(skipped)", rUnsolved:"(not solved)", rWrong:"Wrong answers", rQuery:"Query", rNone:"(none saved)",
@@ -562,7 +566,7 @@ const T = {
 };
 
 /* ---------- state ---------- */
-const KEY = "pact-en-v1";
+const KEY = "pact-en-v2";
 let state = { solved: [], current: 0, start: Date.now(), end: null, drafts: {} };
 try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && Array.isArray(s.solved)) state = Object.assign(state, s); } catch(e){}
 function save(){ try { localStorage.setItem(KEY, JSON.stringify(state)); } catch(e){} }
@@ -611,6 +615,7 @@ function renderCase(){
     <h2>${esc(c.title)}</h2>
     <div class="story">${c.story}</div>
     <div class="learn"><h3>${c.refresher ? T.try_ : T.learn}</h3>${c.learn}</div>
+    <div class="links" id="links"></div>
     <div class="task"><h3>${T.task}</h3><p>${esc(c.task)}</p></div>
     ${hints}
     <form class="answer" id="answerForm" autocomplete="off">
@@ -623,10 +628,140 @@ function renderCase(){
       <button class="btn primary" type="button" id="next" ${solved && !last ? "" : "hidden"}>${c.refresher ? T.start : T.next}</button>
     </div>
     ${allDone() && last ? endingHtml() : ""}`;
+  renderLinks();
   $("answerForm").addEventListener("submit", e=>{ e.preventDefault(); check(); });
   $("prev").onclick = ()=> goTo(i-1);
   $("next").onclick = ()=> goTo(i+1);
 }
+/* ---------- connection map: which tables a chapter uses and how they plug together ---------- */
+const LT = document.documentElement.lang === "hu" ? {
+  h:"A fejezet táblái és kapcsolataik", hR:"Az adatbázis térképe · így kapcsolódnak a táblák",
+  noRule:"Még nincs párosítási szabály: minden sor minden sorral párosul.",
+  byHand:"Még nincs összekapcsolva: két külön lekérdezés, a számot kézzel viszed át.",
+  n1:(a,b)=>`N : 1 — ${az(a)} ${a} tábla sok sora mutathat ${az(b)} ${b} tábla egy sorára`,
+  one:(a,b)=>`1 : 1 — ${az(b)} ${b} tábla minden sorához pontosan egy sor tartozik ${az(a)} ${a} táblában`,
+  nn:(a,b,j)=>`${a} ↔ ${b}: N : N kapcsolat ${az(j)} ${j} táblán keresztül`, more:n=>`+${n} további`
+} : {
+  h:"Tables in this chapter and how they connect", hR:"Database map · how the tables connect",
+  noRule:"No matching rule yet: every row is paired with every row.",
+  byHand:"Not joined yet: two separate queries, and you carry the number across by hand.",
+  n1:(a,b)=>`N : 1 — many ${a} rows can point to the same ${b} row`,
+  one:(a,b)=>`1 : 1 — every ${b} row has exactly one ${a} row`,
+  nn:(a,b,j)=>`${a} ↔ ${b}: N : N, through the ${j} table`, more:n=>`+${n} more`
+};
+function az(w){ return /^[aáeéiíoóöőuúüű]/i.test(w) ? "az" : "a"; }
+const SCHEMA = (()=>{ const o = {}; for (const m of SEED.matchAll(/CREATE TABLE (\w+) \(([^)]*)\)/g)) o[m[1]] = m[2].split(",").map(x=>x.trim().split(/\s+/)[0]); return o; })();
+function chapterLinks(c){
+  const h = c.hints.find(x=>typeof x !== "string"); const sql = h ? h.sql : "";
+  const tables = [], froms = [];
+  for (const m of sql.matchAll(/FROM\s+([\w\s,]+?)(?=\s+WHERE|\s+GROUP|\s+ORDER|;|$)/gi)){
+    const list = m[1].split(",").map(x=>x.trim().split(/\s+/)[0]).filter(t=>SCHEMA[t]);
+    froms.push(list); list.forEach(t=>{ if (!tables.includes(t)) tables.push(t); });
+  }
+  const links = [];
+  for (const m of sql.matchAll(/(\w+)\.(\w+)\s*=\s*(\w+)\.(\w+)/g)){
+    let [ , ta, ca, tb, cb ] = m;
+    if (!SCHEMA[ta] || !SCHEMA[tb]) continue;
+    if (ca === "id" && cb !== "id") [ta, ca, tb, cb] = [tb, cb, ta, ca];   /* fk side first */
+    if (!links.some(l=>l.ft===ta && l.fc===ca && l.pt===tb)) links.push({ ft:ta, fc:ca, pt:tb, pc:cb });
+  }
+  return { tables, links, joined: froms.some(f=>f.length > 1) };
+}
+function mapFor(i){
+  const c = CHAPTERS[i];
+  if (!c.refresher) return chapterLinks(c);
+  const names = Object.keys(SCHEMA), all = { tables:names.slice(), links:[], joined:true, map:true };
+  Object.entries(SCHEMA).forEach(([t, cols])=>cols.forEach(col=>{
+    const m = col.match(/^(.+)_id$/); if (!m) return;
+    const pt = names.find(x=>x !== t && x.startsWith(m[1])); if (pt) all.links.push({ ft:t, fc:col, pt, pc:"id" }); }));
+  return all;
+}
+function chainOrder(tables, links){          /* line the tables up along their links: A — B — C */
+  if (!links.length) return tables;
+  const nb = t => links.filter(l=>l.ft===t || l.pt===t).map(l=>l.ft===t ? l.pt : l.ft);
+  const ends = tables.filter(t=>nb(t).length <= 1);
+  const start = ends.find(t=>links.some(l=>l.ft===t)) || ends[0] || tables[0];
+  const out = [start];
+  while (out.length < tables.length){ const nxt = nb(out[out.length-1]).find(t=>!out.includes(t)) || tables.find(t=>!out.includes(t)); out.push(nxt); }
+  return out;
+}
+const uniqCache = {};
+function isUnique(t, col){
+  const k = t + "." + col; if (k in uniqCache) return uniqCache[k]; if (!db) return null;
+  try { const r = db.exec(`SELECT COUNT(${col}) = COUNT(DISTINCT ${col}) FROM ${t}`); return uniqCache[k] = !!r[0].values[0][0]; } catch(e){ return null; }
+}
+function lkColor(k){ return `var(--lk${k % 6 + 1})`; }
+function renderLinks(){
+  const box = $("links"); if (!box) return;
+  const spec = mapFor(state.current);
+  if (!spec.tables.length){ box.hidden = true; return; }
+  box.hidden = false;
+  const tables = chainOrder(spec.tables, spec.links);
+  const used = {}; spec.links.forEach((l,k)=>{ (used[l.ft+"."+l.fc] ??= k); (used[l.pt+"."+l.pc] ??= k); });
+  const cards = tables.map(t=>{
+    const cols = SCHEMA[t], show = cols, more = 0;      /* every column of the table */
+    return `<div class="lk-card" data-t="${t}"><div class="h">${t}</div>${show.map(c=>{
+      const k = used[t+"."+c];
+      return `<div class="r${c==="id"?" k":""}${k!==undefined?" on":""}" data-c="${c}"${k!==undefined?` style="--c:${lkColor(k)}"`:""}><span class="ic">${c==="id"?"🔑":(/_id$/.test(c)?"→":"")}</span>${c}</div>`;
+    }).join("")}${more ? `<div class="r more">${LT.more(more)}</div>` : ""}</div>`;
+  }).join("");
+  const rules = spec.links.map((l,k)=>{
+    const u = isUnique(l.ft, l.fc);
+    const kind = u === null ? "" : `<span class="kind">${u ? LT.one(l.ft, l.pt) : LT.n1(l.ft, l.pt)}</span>`;
+    return `<li><span class="sw" style="background:${lkColor(k)}"></span><code>${l.ft}.${l.fc} = ${l.pt}.${l.pc}</code>${kind}</li>`;
+  });
+  let note = "";
+  if (!spec.links.length && tables.length > 1) note = `<p class="lk-note">${spec.joined ? LT.noRule : LT.byHand}</p>`;
+  box.innerHTML = `<h3>${spec.map ? LT.hR : LT.h}</h3><div class="lk-board"><svg class="lk-svg" aria-hidden="true"></svg>${cards}</div>${note}${rules.length ? `<ul class="lk-rules">${rules.join("")}</ul>` : ""}`;
+  box.dataset.spec = JSON.stringify({ links: spec.links, loose: !spec.links.length && tables.length > 1 ? [tables[0], tables[1], spec.joined ? "×" : "?"] : null });
+  requestAnimationFrame(drawLinks);
+}
+function drawLinks(){                        /* straight arrows: _id column → the id it points to */
+  const box = $("links"); if (!box || box.hidden || !box.dataset.spec) return;
+  const board = box.querySelector(".lk-board"), svg = box.querySelector(".lk-svg"); if (!board) return;
+  const spec = JSON.parse(box.dataset.spec);
+  const cardEls = [...board.querySelectorAll(".lk-card")];
+  board.classList.remove("stack");
+  const gap = parseFloat(getComputedStyle(board).columnGap) || 46;
+  const need = cardEls.reduce((s,c)=>s + c.getBoundingClientRect().width, 0) + gap * (cardEls.length - 1);
+  const stack = cardEls.length > 1 && need > board.clientWidth - 8;
+  board.classList.toggle("stack", stack);
+  const B = board.getBoundingClientRect(); if (!B.width) return;
+  svg.setAttribute("viewBox", `0 0 ${B.width} ${B.height}`);
+  const rel = el => { const r = el.getBoundingClientRect(); return { l:r.left-B.left, r:r.right-B.left, t:r.top-B.top, b:r.bottom-B.top, cy:(r.top+r.bottom)/2-B.top, cx:(r.left+r.right)/2-B.left }; };
+  const card = t => board.querySelector(`.lk-card[data-t="${t}"]`);
+  const head = (x, y, dx, dy, color)=>{ const L = 9, W = 5.5, px = -dy, py = dx;
+    return `<polygon points="${x},${y} ${x - dx*L + px*W},${y - dy*L + py*W} ${x - dx*L - px*W},${y - dy*L - py*W}" fill="${color}"/>`; };
+  const tag = (x, y, txt, color, anchor)=> txt ? `<text x="${x}" y="${y}" text-anchor="${anchor}" class="lk-end" fill="${color}">${txt}</text>` : "";
+  const right = Math.max(...cardEls.map(c=>rel(c).r));
+  let html = "";
+  spec.links.forEach((l,k)=>{
+    const A = card(l.ft), P = card(l.pt); if (!A || !P) return;
+    const a = rel(A.querySelector(`[data-c="${l.fc}"]`)), b = rel(P.querySelector(`[data-c="${l.pc}"]`)), ca = rel(A), cp = rel(P);
+    const color = lkColor(k), u = isUnique(l.ft, l.fc), la = u === null ? "" : (u ? "1" : "N"), lb = u === null ? "" : "1";
+    if (!stack){
+      const lr = ca.r <= cp.l, x1 = lr ? ca.r : ca.l, x2 = lr ? cp.l : cp.r, d = lr ? 1 : -1;
+      html += `<circle cx="${x1}" cy="${a.cy}" r="4" fill="${color}"/><line x1="${x1}" y1="${a.cy}" x2="${x2 - d*8}" y2="${b.cy}" stroke="${color}" stroke-width="3" stroke-linecap="round"/>`;
+      const len = Math.hypot(x2 - x1, b.cy - a.cy) || 1;
+      html += head(x2, b.cy, (x2 - x1)/len, (b.cy - a.cy)/len, color);
+      const up = b.cy < a.cy - 1;
+      html += tag(x1 + d*7, up ? a.cy + 18 : a.cy - 8, la, color, lr ? "start" : "end") + tag(x2 - d*12, up ? b.cy - 9 : b.cy + 19, lb, color, lr ? "end" : "start");
+    } else {
+      const X = right + 18;
+      html += `<circle cx="${ca.r}" cy="${a.cy}" r="4" fill="${color}"/><path d="M${ca.r},${a.cy} H${X} V${b.cy} H${cp.r + 8}" fill="none" stroke="${color}" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>`;
+      html += head(cp.r, b.cy, -1, 0, color);
+      html += tag(X + 6, a.cy + 5, la, color, "start") + tag(X + 6, b.cy + 5, lb, color, "start");
+    }
+  });
+  if (spec.loose){ const A = card(spec.loose[0]), P = card(spec.loose[1]);
+    if (A && P){ const ca = rel(A), cp = rel(P), ha = rel(A.querySelector(".h")), hp = rel(P.querySelector(".h"));
+      const [x1,y1,x2,y2] = stack ? [ca.cx, ca.b, cp.cx, cp.t] : [ca.r, ha.cy, cp.l, hp.cy], mx = (x1+x2)/2, my = (y1+y2)/2;
+      html += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="var(--lk-loose)" stroke-width="3" stroke-dasharray="6 6"/>`;
+      html += `<circle cx="${mx}" cy="${my}" r="11" class="lk-mid"/><text x="${mx}" y="${my+5}" text-anchor="middle" class="lk-midt">${spec.loose[2]}</text>`; } }
+  svg.innerHTML = html;
+}
+addEventListener("resize", ()=>requestAnimationFrame(drawLinks));
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(()=>drawLinks());
 function check(){
   const i = state.current, c = CHAPTERS[i], v = norm($("answer").value);
   if (!v) return;
@@ -809,7 +944,7 @@ addEventListener("keydown", e=>{ if (e.key === "Escape" && !$("finale").hidden) 
 
 /* ---------- database ---------- */
 let SQL = null, db = null;
-function resetDb(){ if (!SQL) return; if (db) db.close(); db = new SQL.Database(); db.run(SEED); $("out").innerHTML = `<p class="note">${T.ready}</p>`; renderSchema(); }
+function resetDb(){ if (!SQL) return; if (db) db.close(); db = new SQL.Database(); db.run(SEED); $("out").innerHTML = `<p class="note">${T.ready}</p>`; renderSchema(); renderLinks(); }
 function renderSchema(){
   const t = db.exec("SELECT name FROM sqlite_master WHERE type='table' ORDER BY rowid");
   if (!t.length){ $("schema").innerHTML = ""; return; }
