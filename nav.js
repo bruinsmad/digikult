@@ -36,6 +36,17 @@
             title: { hu: "Szűrés: SELECT … FROM … WHERE", en: "Filtering: SELECT … FROM … WHERE" },
             pages: [
               {
+                id: "where-intro",
+                kind: "theory",
+                minutes: 10,
+                title: { hu: "Szűrés – elmélet", en: "Filtering – explainer" },
+                desc: {
+                  hu: "SELECT, FROM, WHERE lépésről lépésre: összehasonlítás, AND/OR, NULL, LIKE. Kipróbálható példák és egy rövid kvíz.",
+                  en: "SELECT, FROM and WHERE step by step: comparisons, AND/OR, NULL, LIKE. Runnable examples and a short quiz."
+                },
+                files: { en: "sql/where/intro.html", hu: "sql/where/intro-hu.html" }
+              },
+              {
                 id: "heist",
                 kind: "story",
                 minutes: 35,
@@ -53,6 +64,17 @@
             id: "group-by",
             title: { hu: "Csoportosítás: GROUP BY és összesítő függvények", en: "Grouping: GROUP BY and aggregates" },
             pages: [
+              {
+                id: "group-by-intro",
+                kind: "theory",
+                minutes: 12,
+                title: { hu: "Csoportosítás – elmélet", en: "Grouping – explainer" },
+                desc: {
+                  hu: "COUNT, SUM, AVG, MIN, MAX, GROUP BY és HAVING: hogyan lesz sok sorból egy szám, csoportonként.",
+                  en: "COUNT, SUM, AVG, MIN, MAX, GROUP BY and HAVING: how many rows become one number, group by group."
+                },
+                files: { en: "sql/group-by/intro.html", hu: "sql/group-by/intro-hu.html" }
+              },
               {
                 id: "round-up",
                 kind: "story",
@@ -82,16 +104,27 @@
             title: { hu: "Táblák összekapcsolása: FROM a, b WHERE a.x_id = b.id", en: "Joining tables: FROM a, b WHERE a.x_id = b.id" },
             pages: [
               {
+                id: "joins-intro",
+                kind: "theory",
+                minutes: 15,
+                title: { hu: "Táblák összekapcsolása – elmélet", en: "Joining tables – explainer" },
+                desc: {
+                  hu: "Hivatkozások, minden sor minden sorral, a párosítási szabály, három tábla és a kapcsolattípusok.",
+                  en: "References, every row with every row, the matching rule, three tables and the kinds of links."
+                },
+                files: { en: "sql/joins/intro.html", hu: "sql/joins/intro-hu.html" }
+              },
+              {
                 id: "backstage",
                 kind: "story",
                 minutes: 35,
                 title: { hu: "Backstage: az eltűnt gitár", en: "Backstage: The Missing Guitar" },
                 desc: {
-                  hu: "Fesztiválon vagyunk, és a főzenekar gitárja eltűnt. Hat tábla, egy éjszaka – kösd össze őket és találd meg a tettest.",
-                  en: "A festival night and the headliner's guitar is gone. Six tables, one night – connect them and find the culprit."
+                  hu: "Fesztiválon vagyunk, és a főzenekar gitárja eltűnt. Három tábla, egy éjszaka – kösd össze őket és találd meg a tettest.",
+                  en: "A festival night and the headliner's guitar is gone. Three tables, one night – connect them and find the culprit."
                 },
                 files: { en: "sql/joins/backstage.html", hu: "sql/joins/backstage-hu.html" },
-                progress: { chapters: 9, keys: { en: "backstage-en-v1", hu: "backstage-hu-v1" } }
+                progress: { chapters: 9, keys: { en: "backstage-en-v2", hu: "backstage-hu-v2" } }
               },
               {
                 id: "matchmaker",
@@ -109,11 +142,11 @@
                 minutes: 35,
                 title: { hu: "A megtört szövetség", en: "The Broken Pact" },
                 desc: {
-                  hu: "1214, a Nagy Tanács éjszakája: királyok, királynők, lovagok és szövetségek. Valaki az ellenségnek ír. Kapcsold össze a táblákat, és leplezd le az árulót.",
-                  en: "1214, the night of the Great Council: kings, queens, knights and alliances. Someone is writing to the enemy. Join the tables and unmask the traitor."
+                  hu: "1214, a Nagy Tanács éjszakája: királyságok, lovagok és lepecsételt levelek. Valaki az ellenségnek ír. Kapcsold össze a táblákat, és leplezd le az árulót.",
+                  en: "1214, the night of the Great Council: kingdoms, knights and sealed letters. Someone is writing to the enemy. Join the tables and unmask the traitor."
                 },
                 files: { en: "sql/joins/pact.html", hu: "sql/joins/pact-hu.html" },
-                progress: { chapters: 9, keys: { en: "pact-en-v1", hu: "pact-hu-v1" } }
+                progress: { chapters: 9, keys: { en: "pact-en-v2", hu: "pact-hu-v2" } }
               }
             ]
           }
@@ -152,7 +185,8 @@
   const KIND = {
     story:  { hu: "Küldetés", en: "Mission" },
     demo:   { hu: "Bemutató", en: "Demo" },
-    lesson: { hu: "Lecke", en: "Lesson" }
+    lesson: { hu: "Lecke", en: "Lesson" },
+    theory: { hu: "Elmélet", en: "Explainer" }
   };
   const UI = {
     hu: { btn: "Oldalak", home: "Kezdőlap", close: "Bezárás", here: "itt vagy", min: "perc" },

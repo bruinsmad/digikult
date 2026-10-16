@@ -123,6 +123,19 @@ a{color:inherit}
 .foot a.other{position:relative;z-index:2;font-weight:700;color:var(--paper-ink)}
 .foot .tag{border:1px solid var(--paper-line);border-radius:6px;padding:0 6px}
 
+/* notes = the explainer for a lesson: a sheet torn from an exercise book */
+.notes{position:relative;background:var(--paper);color:var(--paper-ink);border-radius:4px;padding:16px 18px 16px 40px;
+  background-image:linear-gradient(90deg,transparent 0 26px,rgba(214,90,90,.4) 26px 28px,transparent 28px),repeating-linear-gradient(transparent 0 27px,#e7e4d8 27px 28px);
+  box-shadow:0 2px 0 rgba(0,0,0,.08),0 16px 28px rgba(0,0,0,.32);transform:rotate(var(--tilt,.5deg));transition:transform .18s ease, box-shadow .18s ease}
+.notes:hover{transform:rotate(0) translateY(-3px);box-shadow:0 2px 0 rgba(0,0,0,.08),0 22px 34px rgba(0,0,0,.38)}
+.notes .pin{position:absolute;top:-9px;left:50%;width:18px;height:18px;margin-left:-9px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#f7a6a6,#c0392b 60%,#7d1f17);box-shadow:0 2px 3px rgba(0,0,0,.35)}
+.notes .kind{--kbg:#e1f0dc;--kfg:#2f6a35}
+.notes .first{margin-left:8px;font:700 17px var(--f-chalk);color:#2f6a35}
+.notes h4{margin:8px 0 6px;font:700 23px/1.2 var(--f-body)}
+.notes h4 a{text-decoration:none}
+.notes h4 a::after{content:"";position:absolute;inset:0;z-index:1}
+.notes p{margin:0;color:var(--paper-muted);font-size:15.5px}
+
 /* demo = teacher's projector card: chalk-outlined, sits on the board rather than pinned */
 .demo{position:relative;border:2px dashed rgba(156,200,232,.55);border-radius:12px;padding:12px;background:rgba(0,0,0,.12);
   transition:border-color .18s, background .18s}
@@ -209,7 +222,7 @@ a{color:inherit}
       chapters:(d,n)=>`${d} / ${n} fejezet kész`, chaptersTotal:n=>`${n} fejezet`, min:n=>`kb. ${n} perc`,
       cont:"Folytatás", go:"Indítás", solved:"Megoldva ✓",
       enOnly:"angol nyelvű", other:{en:"English version", hu:"Magyar változat"},
-      demoNote:"Tanári bemutató, kivetítőre",
+      demoNote:"Tanári bemutató, kivetítőre", readFirst:"olvasd el először",
       foot:"Minden oldal bal alsó sarkában ott az „Oldalak” menü: onnan bármikor visszajutsz ide.",
       againAll:"Bármelyiket újrajátszhatod lent."
     },
@@ -219,7 +232,7 @@ a{color:inherit}
       chapters:(d,n)=>`${d} of ${n} chapters done`, chaptersTotal:n=>`${n} chapters`, min:n=>`about ${n} min`,
       cont:"Continue", go:"Start", solved:"Solved ✓",
       enOnly:"English only", huOnly:"Hungarian only", other:{en:"English version", hu:"Magyar változat"},
-      demoNote:"Teacher demo for the projector",
+      demoNote:"Teacher demo for the projector", readFirst:"read this first",
       foot:"Every page has a “Pages” menu in the bottom-left corner that brings you back here.",
       againAll:"Replay any of them below."
     }
@@ -391,7 +404,7 @@ a{color:inherit}
             <span class="dot" aria-hidden="true">${li + 1}</span>
             <div>
               <h3>${esc(D.t(ls.title)).replace(/(SELECT|FROM|WHERE|GROUP BY)/g, "<code>$1</code>")}</h3>
-              <div class="items">${ls.pages.map(p => p.kind === "demo" ? demoCard(p, tp, T) : poster(p, tp, T, TILTS[tilt++ % TILTS.length])).join("")}</div>
+              <div class="items">${ls.pages.map(p => p.kind === "demo" ? demoCard(p, tp, T) : p.kind === "theory" ? notesCard(p, tp, T) : poster(p, tp, T, TILTS[tilt++ % TILTS.length])).join("")}</div>
             </div>
           </li>`).join("")}
         </ol>
@@ -423,6 +436,17 @@ a{color:inherit}
         <p>${esc(D.t(p.desc))}</p>
         <div class="foot">${p.minutes ? `<span>⏱ ${T.min(p.minutes)}</span>` : ""}${prog}${langLine(p, T, L)}</div>
       </div>
+    </article>`;
+  }
+
+  function notesCard(p, tp, T){
+    const L = D.lang;
+    return `<article class="notes">
+      <span class="pin" aria-hidden="true"></span>
+      <span class="kind">📖 ${esc(D.t(D.KIND[p.kind]))}</span><span class="first">${esc(T.readFirst)}</span>
+      <h4><a href="${D.url(D.fileFor(p))}">${esc(D.t(p.title))}</a></h4>
+      <p>${esc(D.t(p.desc))}</p>
+      <div class="foot">${p.minutes ? `<span>⏱ ${T.min(p.minutes)}</span>` : ""}${langLine(p, T, L)}</div>
     </article>`;
   }
 
