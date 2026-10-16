@@ -102,6 +102,18 @@
                   en: "Projector demo: cables connect the tables and show whether a link is 1:1, 1:N, N:N – or a mistake."
                 },
                 files: { en: "sql/joins/matchmaker.html", hu: "sql/joins/matchmaker-hu.html" }
+              },
+              {
+                id: "pact",
+                kind: "story",
+                minutes: 35,
+                title: { hu: "A megtört szövetség", en: "The Broken Pact" },
+                desc: {
+                  hu: "1214, a Nagy Tanács éjszakája: királyok, királynők, lovagok és szövetségek. Valaki az ellenségnek ír. Kapcsold össze a táblákat, és leplezd le az árulót.",
+                  en: "1214, the night of the Great Council: kings, queens, knights and alliances. Someone is writing to the enemy. Join the tables and unmask the traitor."
+                },
+                files: { en: "sql/joins/pact.html", hu: "sql/joins/pact-hu.html" },
+                progress: { chapters: 9, keys: { en: "pact-en-v1", hu: "pact-hu-v1" } }
               }
             ]
           }
