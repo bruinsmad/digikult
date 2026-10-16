@@ -10,6 +10,8 @@
    2. Add it to SITE below (a new lesson or topic is just a new
       object in the right list).
    3. Add the <script src="../../nav.js" defer></script> line.
+   Optional per page: minutes, progress (localStorage key + chapter
+   count, shown on the landing page), cover (path to an image).
    The landing page and the menu update themselves.
    ============================================================ */
 (function () {
@@ -22,7 +24,7 @@
     topics: [
       {
         id: "sql",
-        accent: "#e7b84a",
+        accent: "#f2d264",
         title: { hu: "Adatbázisok – SQL", en: "Databases – SQL" },
         blurb: {
           hu: "Lekérdezések a böngészőben, igazi adatbázissal. Nyomozás, terelés, csoportosítás.",
@@ -42,7 +44,8 @@
                   hu: "Valaki ellopta az Éjféli Paprikát. 10 fejezet, egyetlen tábla – szűrd ki a tettest.",
                   en: "The Midnight Paprika is gone. Ten chapters, one table at a time: filter your way to the thief."
                 },
-                files: { en: "sql/where/heist.html", hu: "sql/where/heist-hu.html" }
+                files: { en: "sql/where/heist.html", hu: "sql/where/heist-hu.html" },
+                progress: { chapters: 10, keys: { en: "danube-star-v3", hu: "ejfeli-paprika-hu-v1" } }
               }
             ]
           },
@@ -59,7 +62,8 @@
                   hu: "Jön a vihar, Bodrinak be kell terelnie 48 birkát. COUNT, SUM, AVG, MAX és HAVING.",
                   en: "A storm is coming and Bodri has 48 sheep to herd. COUNT, SUM, AVG, MAX and HAVING."
                 },
-                files: { en: "sql/group-by/round-up.html" }
+                files: { en: "sql/group-by/round-up.html" },
+                progress: { chapters: 9, keys: { en: "round-up-v1" } }
               },
               {
                 id: "pasture",
@@ -106,7 +110,7 @@
   };
 
   const KIND = {
-    story:  { hu: "Feladat", en: "Mission" },
+    story:  { hu: "Küldetés", en: "Mission" },
     demo:   { hu: "Bemutató", en: "Demo" },
     lesson: { hu: "Lecke", en: "Lesson" }
   };
@@ -159,39 +163,39 @@
     z-index: 2147483000; font: 500 14px/1.3 "Segoe UI", system-ui, -apple-system, sans-serif; color: #eef3f1; }
   button { font: inherit; color: inherit; cursor: pointer; }
   .toggle { display: inline-flex; align-items: center; gap: 8px; padding: 9px 14px 9px 12px; border-radius: 999px;
-    background: rgba(18,26,38,.9); border: 1px solid rgba(255,255,255,.22); font-weight: 600;
+    background: rgba(26,42,36,.94); border: 1px solid rgba(255,255,255,.22); font-weight: 600;
     box-shadow: 0 6px 18px rgba(0,0,0,.35); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); transition: transform .15s, background .15s; }
-  .toggle:hover { background: rgba(30,42,60,.96); transform: translateY(-1px); }
-  :focus-visible { outline: 3px solid #e7b84a; outline-offset: 2px; }
+  .toggle:hover { background: rgba(36,58,49,.98); transform: translateY(-1px); }
+  :focus-visible { outline: 3px solid #f2d264; outline-offset: 2px; }
   .bars { width: 16px; height: 12px; display: grid; align-content: space-between; }
   .bars i { display: block; height: 2px; border-radius: 2px; background: currentColor; }
   .panel { position: absolute; left: 0; bottom: calc(100% + 10px); width: min(360px, calc(100vw - 24px));
     max-height: min(72vh, 620px); overflow: auto; overscroll-behavior: contain;
-    background: rgba(16,23,34,.98); border: 1px solid rgba(255,255,255,.18); border-radius: 14px;
+    background: rgba(30,48,41,.985); border: 1px solid rgba(255,255,255,.18); border-radius: 14px;
     box-shadow: 0 18px 40px rgba(0,0,0,.45); padding: 8px; animation: pop .16s ease-out; }
   .panel[hidden] { display: none; }
   @keyframes pop { from { opacity: 0; transform: translateY(6px) scale(.97); } to { opacity: 1; transform: none; } }
   .head { display: flex; align-items: center; gap: 8px; padding: 4px 4px 8px 6px; position: sticky; top: -8px;
-    background: rgba(16,23,34,.98); margin: -8px -8px 0; padding: 12px 12px 10px 14px; border-bottom: 1px solid rgba(255,255,255,.1); }
+    background: rgba(30,48,41,.985); margin: -8px -8px 0; padding: 12px 12px 10px 14px; border-bottom: 1px solid rgba(255,255,255,.1); }
   .home { flex: 1; color: #eef3f1; text-decoration: none; font-weight: 700; display: flex; align-items: center; gap: 8px; }
   .home:hover { color: #fff; text-decoration: underline; }
   .lang { display: inline-flex; border: 1px solid rgba(255,255,255,.22); border-radius: 999px; overflow: hidden; }
-  .lang button { background: none; border: 0; padding: 3px 9px; font-size: 12px; font-weight: 700; color: #a8b8b4; }
-  .lang button[aria-pressed="true"] { background: #eef3f1; color: #101722; }
-  .x { background: none; border: 0; color: #a8b8b4; font-size: 20px; line-height: 1; padding: 2px 6px; border-radius: 6px; }
+  .lang button { background: none; border: 0; padding: 3px 9px; font-size: 12px; font-weight: 700; color: #b4c4b8; }
+  .lang button[aria-pressed="true"] { background: #eef3f1; color: #1a2a24; }
+  .x { background: none; border: 0; color: #b4c4b8; font-size: 20px; line-height: 1; padding: 2px 6px; border-radius: 6px; }
   .x:hover { color: #fff; }
   .topic { margin-top: 10px; }
   .topic h3 { margin: 0; padding: 6px 8px 4px; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--a); display: flex; gap: 8px; align-items: center; }
   .topic h3::before { content: ""; width: 8px; height: 8px; border-radius: 2px; background: var(--a); }
-  .lesson { padding: 4px 8px 2px 24px; font-size: 12px; color: #a8b8b4; }
+  .lesson { padding: 4px 8px 2px 24px; font-size: 12px; color: #b4c4b8; }
   ul { list-style: none; margin: 0; padding: 0 0 0 16px; display: grid; gap: 1px; }
   a.pg { display: grid; grid-template-columns: 1fr auto; gap: 2px 10px; align-items: baseline;
     padding: 8px 10px; border-radius: 9px; color: #eef3f1; text-decoration: none; }
   a.pg:hover { background: rgba(255,255,255,.08); }
   .tt { font-weight: 600; }
-  .kd { font-size: 11px; color: #a8b8b4; white-space: nowrap; }
-  .hr { grid-column: 1 / -1; font-size: 11px; color: #e7b84a; }
-  a.pg[aria-current="page"] { background: rgba(231,184,74,.14); box-shadow: inset 3px 0 0 #e7b84a; }
+  .kd { font-size: 11px; color: #b4c4b8; white-space: nowrap; }
+  .hr { grid-column: 1 / -1; font-size: 11px; color: #f2d264; }
+  a.pg[aria-current="page"] { background: rgba(242,210,100,.14); box-shadow: inset 3px 0 0 #f2d264; }
   @media (prefers-reduced-motion: reduce) { .panel { animation: none; } .toggle { transition: none; } }
   @media print { .wrap { display: none; } }`;
 
