@@ -98,6 +98,12 @@ pre.code{margin:12px 0;background:var(--code-bg);color:var(--code-ink);border-ra
 .ex-tag .kb{font-weight:400;color:var(--chalk-dim);letter-spacing:0}
 .ex textarea{display:block;width:100%;border:0;resize:vertical;min-height:52px;padding:12px 14px;font-size:15px;line-height:1.55;background:var(--code-bg);color:var(--code-ink);caret-color:var(--yellow);tab-size:2}
 .ex textarea:focus{outline:none;box-shadow:inset 0 0 0 3px var(--yellow)}
+/* the editor is highlighted too: coloured copy underneath, see-through textarea on top */
+.edw{position:relative;background:var(--code-bg)}
+.edw .ov{position:absolute;inset:0;margin:0;padding:12px 14px;font:15px/1.55 var(--f-mono);color:var(--code-ink);white-space:pre-wrap;overflow-wrap:break-word;pointer-events:none;tab-size:2;overflow:hidden}
+.edw .ov .k{color:var(--kw)}.edw .ov .s{color:var(--str)}.edw .ov .d{color:var(--num)}.edw .ov .f{color:var(--fn)}
+.edw textarea{position:relative;background:transparent;color:transparent;-webkit-text-fill-color:transparent;font:15px/1.55 var(--f-mono);white-space:pre-wrap;overflow-wrap:break-word}
+.edw textarea::selection{background:rgba(242,210,100,.35)}
 .ex-bar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:8px 10px;background:#f3f1e7;border-top:1px solid var(--line)}
 .btn{font:700 15px var(--f-body);border:0;border-radius:8px;padding:7px 14px;cursor:pointer;background:var(--ink);color:#fff}
 .btn:hover{background:#000}
@@ -239,7 +245,7 @@ footer.end{max-width:980px;margin:0 auto;padding:0 22px 60px;color:var(--chalk-d
   <h1>Táblák összekapcsolása</h1>
   <p class="lead">Egy jó adatbázisban minden adat <b>egyetlen helyen</b> van, és a táblák számokkal hivatkoznak egymásra. Ha egy kérdéshez több tábla kell, a <code>FROM</code> után felsorolod őket, a <code>WHERE</code>-ben pedig megmondod, melyik sor melyikhez tartozik.</p>
   <div class="meta"><span>⏱ kb. 15 perc</span><span>🧪 minden példa kipróbálható</span><span>✅ a végén 4 kérdés</span></div>
-  <ul class="toc"><li><a href="#tablak">A példatáblák</a></li><li><a href="#hivatkozas">Miért csak egy szám?</a></li><li><a href="#szorzas">FROM a, b: minden sor minden sorral</a></li><li><a href="#szabaly">A párosítási szabály</a></li><li><a href="#szurok">Szabály + szűrők</a></li><li><a href="#harom">Három tábla</a></li><li><a href="#tipusok">Kapcsolattípusok</a></li><li><a href="#hibak">Gyakori hibák</a></li><li><a href="#kviz">Ellenőrizd magad</a></li><li><a href="#gyakorolj">Gyakorolj</a></li></ul>
+  <ul class="toc"><li><a href="#tablak">A példatáblák</a></li><li><a href="#hivatkozas">Miért csak egy szám?</a></li><li><a href="#szorzas">Két tábla a FROM után: minden sor minden sorral</a></li><li><a href="#szabaly">A párosítási szabály</a></li><li><a href="#szurok">Szabály + szűrők</a></li><li><a href="#harom">Három tábla</a></li><li><a href="#tipusok">Kapcsolattípusok</a></li><li><a href="#hibak">Gyakori hibák</a></li><li><a href="#kviz">Ellenőrizd magad</a></li><li><a href="#gyakorolj">Gyakorolj</a></li></ul>
 </section>
 
 <main class="sheet">
@@ -255,7 +261,7 @@ footer.end{max-width:980px;margin:0 auto;padding:0 22px 60px;color:var(--chalk-d
 WHERE nap = &#x27;szombat&#x27; AND kezdes = &#x27;22:00&#x27;;
 
 SELECT nev FROM zenekarok WHERE id = 3;</textarea><div class="ex-bar"><button type="button" class="btn run">Futtatás ▸</button><button type="button" class="btn ghost reset">Visszaállítás</button></div><div class="ex-out" aria-live="polite"></div></div>
-<div class="idea"><span class="i" aria-hidden="true">💡</span><p>Két lekérdezés egy névért lassú. A következő lépésekben egyetlen lekérdezés fogja elvégezni a kikeresést.</p></div></section><section class="sec" id="szorzas"><h2><span class="n">3</span>FROM a, b: minden sor minden sorral</h2>
+<div class="idea"><span class="i" aria-hidden="true">💡</span><p>Két lekérdezés egy névért lassú. A következő lépésekben egyetlen lekérdezés fogja elvégezni a kikeresést.</p></div></section><section class="sec" id="szorzas"><h2><span class="n">3</span>Két tábla a FROM után: minden sor minden sorral</h2>
 <p>Ha két táblát írsz a <code>FROM</code> után, az SQL az első tábla <b>minden</b> sorát párosítja a második <b>minden</b> sorával. 6 koncert × 4 zenekar = 24 pár, és ezek többsége értelmetlen (pl. a Velvet Locomotive koncertje a Paprika Punks nevével).</p>
 <div class="ex"><div class="ex-tag"><span class="t">Próbáld ki – át is írhatod</span><span class="kb">Ctrl + Enter</span></div><textarea spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="SQL">SELECT COUNT(*)
 FROM koncertek, zenekarok;</textarea><div class="ex-bar"><button type="button" class="btn run">Futtatás ▸</button><button type="button" class="btn ghost reset">Visszaállítás</button></div><div class="ex-out" aria-live="polite"></div></div>
@@ -357,7 +363,10 @@ function runInto(sql, out){
 function setupExamples(){
   $$(".ex").forEach(ex=>{
     const ta = $("textarea", ex), out = $(".ex-out", ex), orig = ta.value;
-    const fit = ()=>{ ta.style.height = "auto"; ta.style.height = (ta.scrollHeight + 2) + "px"; };
+    const w = document.createElement("div"); w.className = "edw"; ta.before(w);
+    const ov = document.createElement("pre"); ov.className = "ov"; ov.setAttribute("aria-hidden", "true"); w.append(ov, ta);
+    const paint = ()=>{ ov.innerHTML = hl(ta.value) + "\n"; };
+    const fit = ()=>{ ta.style.height = "auto"; ta.style.height = (ta.scrollHeight + 2) + "px"; paint(); };
     fit(); ta.addEventListener("input", fit);
     $(".run", ex).onclick = ()=> runInto(ta.value, out);
     $(".reset", ex).onclick = ()=>{ ta.value = orig; fit(); out.innerHTML = ""; };

@@ -132,6 +132,7 @@ main{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:18px;ali
 .anatomy{display:grid;gap:4px;margin:8px 0}
 .anatomy [role=row]{display:grid;grid-template-columns:minmax(0,auto) 1fr;gap:10px;align-items:baseline}
 .anatomy code{white-space:nowrap}
+@media (max-width:520px){ .anatomy [role=row]{grid-template-columns:minmax(0,1fr);gap:2px;margin-bottom:4px} .anatomy code{white-space:normal} }
 .rules{margin:6px 0 0;padding-left:20px}
 .tries{display:grid;gap:6px;margin-top:8px}
 .try{text-align:left;font:600 13px var(--f-mono);background:var(--laptop);color:#f5ecd8;border:1px solid #6b4a28;border-radius:6px;padding:8px 10px;cursor:pointer}
