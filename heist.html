@@ -715,7 +715,7 @@ WHERE age &gt;= 17;</pre>`,
 WHERE hair = 'black' AND age &lt; 17;</pre>`,
   task:"How many visitors left after 16:00 AND are taller than 180 cm?",
   hints:[
-    "Put your Chapter 3 and Chapter 4 conditions together with AND.",
+    "Put your Chapter 3 and Chapter 5 conditions together with AND.",
     {sql:"SELECT name, height_cm, exit_time FROM visitors\nWHERE exit_time > '16:00' AND height_cm > 180;"}
   ],
   answers:["8","eight"],
@@ -725,7 +725,7 @@ WHERE hair = 'black' AND age &lt; 17;</pre>`,
 {
   title:"Red or orange?",
   story:`<p>The tourists argue about the coat. Half of them say it was <mark>red</mark>, the other half say <mark>orange</mark>. You decide to keep both colours.</p>
-  <p>Careful: you still need the two clues from Chapter 5.</p>`,
+  <p>Careful: you still need the two clues from Chapter 6.</p>`,
   learn:`<p><code>OR</code> keeps a row if at least one condition is true. When you mix <code>AND</code> and <code>OR</code>, put the <code>OR</code> part in brackets. Without brackets SQL does the <code>AND</code> first and you get wrong rows.</p>
   <pre>SELECT name, hair FROM visitors
 WHERE age &gt; 16 AND (hair = 'blonde' OR hair = 'red');</pre>`,
@@ -747,7 +747,7 @@ WHERE age &gt; 16 AND (hair = 'blonde' OR hair = 'red');</pre>`,
 WHERE ticket &lt;&gt; 'student';</pre>`,
   task:"Add a condition that removes staff. How many suspects are left?",
   hints:[
-    "Add AND ticket <> 'staff' to your Chapter 6 query.",
+    "Add AND ticket <> 'staff' to your Chapter 7 query.",
     {sql:"SELECT name, coat, ticket FROM visitors\nWHERE exit_time > '16:00' AND height_cm > 180\n  AND (coat = 'red' OR coat = 'orange')\n  AND ticket <> 'staff';"}
   ],
   answers:["3","three"],
@@ -762,7 +762,7 @@ WHERE ticket &lt;&gt; 'student';</pre>`,
 WHERE name LIKE '%a';</pre>`,
   task:"Which of your three suspects has a name that starts with M? Give the full name.",
   hints:[
-    "Add AND name LIKE 'M%' to the Chapter 7 query. Using LIKE 'M%' on its own gives two people, and one of them isn't a suspect.",
+    "Add AND name LIKE 'M%' to the Chapter 8 query. Using LIKE 'M%' on its own gives two people, and one of them isn't a suspect.",
     {sql:"SELECT name, height_cm, coat, exit_time FROM visitors\nWHERE exit_time > '16:00' AND height_cm > 180\n  AND (coat = 'red' OR coat = 'orange')\n  AND ticket <> 'staff'\n  AND name LIKE 'M%';"}
   ],
   answers:["m anna petra","anna petra","anna petra m","m anna","anna"],
