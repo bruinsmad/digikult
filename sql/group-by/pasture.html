@@ -71,6 +71,50 @@ tr:last-child td{border-bottom:none}
 .pasture-caption .st.todo{opacity:.35}
 .pasture-caption .arrow{color:var(--muted)}
 @media (prefers-reduced-motion: no-preference){ .pasture-caption .st.new{animation:stpop .4s ease-out} @keyframes stpop{from{transform:scale(1.25)}to{transform:none}} }
+
+/* ---- the sheep table beside the pasture ---- */
+.field{display:grid;grid-template-columns:minmax(0,1fr) minmax(360px,32%);gap:16px}
+.ledgerboard{height:clamp(360px, 56vh, 640px);min-height:0}
+.ledgerchalk{height:100%;display:flex;flex-direction:column;gap:8px;padding:12px}
+.lhead{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:2px 10px}
+.lhead h2{font-size:22px;color:#fff4d9}
+.lhead h2 code{color:var(--wheat);font-size:.9em}
+.lmeta{font-size:13px;color:var(--muted)}
+.coldocs{flex:none;font-size:12.5px;line-height:1.3;background:rgba(0,0,0,.18);border:1px solid var(--line);border-radius:8px;padding:6px 10px}
+.coldocs summary{cursor:pointer;font-weight:700;color:#e7f2df}
+.coldocs dl{display:grid;grid-template-columns:auto 1fr;gap:2px 10px;margin:6px 0 2px;max-height:30vh;overflow:auto}
+.coldocs dt{font:600 12.5px var(--f-mono);color:var(--wheat);white-space:nowrap}
+.coldocs dt .ty{display:none;margin-left:5px;font:600 10px var(--f-body);color:var(--muted);border:1px solid var(--line);border-radius:4px;padding:0 4px;vertical-align:1px}
+.coldocs dd{margin:0;color:#d6e2d9}
+.coldocs dd code{color:var(--wheat);font-size:.95em}
+.tablebox.ledger{flex:1;min-height:0;max-height:none}
+.ledger table{font-size:13.5px}
+.ledger th,.ledger td{padding:4px 8px}
+.ledger th{font-size:12px;vertical-align:bottom}
+.ledger th.marked{color:#fff4d9;background:#2c4a39}
+.ledger th .tag{display:block;width:max-content;margin-top:2px;font:700 9.5px var(--f-body);letter-spacing:.04em;background:var(--wheat);color:#2a1f05;border-radius:4px;padding:0 4px}
+.ledger tr.grp td{background:rgba(0,0,0,.38);font-size:13px;padding:6px 8px;border-top:2px solid var(--g,#777)}
+.ledger tr.grp .sw{display:inline-block;width:11px;height:11px;border-radius:3px;background:var(--g,#888);margin-right:7px;vertical-align:-1px}
+.ledger tr.grp .n{margin-left:8px;color:var(--muted)}
+.ledger tr.grp .lab{margin-left:8px;color:var(--wheat);font-weight:700}
+.ledger tr.grp .drop{display:none;margin-left:8px;color:#ff8a80;font-weight:700}
+.ledger tr.grp.dropped .drop{display:inline}
+.ledger tr.grp.out{--g:#8b9a92}
+.ledger tr.grp.outerhdr td{background:rgba(0,0,0,.55);font-size:14px;border-top:3px solid var(--g);padding-top:8px;padding-bottom:8px}
+.ledger tr.grp.outerhdr .sw{width:13px;height:13px;border-radius:50%}
+.ledger tr.grp.inner td{padding-left:24px}
+.ledger tr.pend{opacity:.45}
+.ledger tr.in{background:color-mix(in srgb, var(--g) 18%, transparent)}
+.ledger tr.in td:first-child{box-shadow:inset 4px 0 0 var(--g)}
+.ledger tr.rest.in{opacity:.5;background:none}
+.ledger tr.dropped{opacity:.35}
+.ledger td.key{font-weight:700;color:#fff}
+.ledger td.agg{color:var(--wheat);font-weight:700}
+.ledger td.wh{text-decoration:underline dotted rgba(255,255,255,.45);text-underline-offset:3px}
+.ledger tr[data-id]{transition:background .25s, opacity .25s}
+.ledger tr.hi td{background:rgba(255,244,217,.2)}
+@media (max-width:1100px){ .field{grid-template-columns:minmax(0,1fr)} .ledgerboard{height:auto} .tablebox.ledger{max-height:420px} }
+@media (prefers-reduced-motion: reduce){ .ledger tr[data-id]{transition:none} }
 </style>
 
 </head>
@@ -91,7 +135,16 @@ tr:last-child td{border-bottom:none}
     </div>
   </header>
 
-  <canvas id="pv" aria-hidden="true"></canvas>
+  <div class="field">
+    <canvas id="pv" aria-hidden="true"></canvas>
+    <aside class="board ledgerboard" aria-label="The sheep table">
+      <div class="chalk ledgerchalk">
+        <div class="lhead"><h2>The <code>sheep</code> table</h2><span class="lmeta" id="ledgerMeta">Loading the flock…</span></div>
+        <details class="coldocs" open><summary>What the columns mean</summary><dl id="coldocs"></dl></details>
+        <div class="tablebox ledger" id="ledger"></div>
+      </div>
+    </aside>
+  </div>
   <p class="pasture-caption" id="pvCaption" aria-live="polite">Bodri is waiting. Pick an example or write a query, and he will round up the sheep the way your query sorts them.</p>
 
   <div class="below">
@@ -102,7 +155,7 @@ tr:last-child td{border-bottom:none}
         <label class="eyebrow" for="sql">SQL query</label>
         <textarea id="sql" spellcheck="false" autocapitalize="off" autocomplete="off"></textarea>
         <div class="controls"><button class="btn primary" id="run" type="button">Run query</button><span class="eyebrow" style="align-self:center">Ctrl + Enter runs it</span></div>
-        <div class="legend"><span><b>sheep</b>(id, name, breed, colour, pasture, age, weight_kg, wool_kg, in_barn)</span><span>Size grows with age until 4 · spectacles: 7+ years · walking stick: 9+ years</span></div>
+        <div class="legend"><span><b>sheep</b>(id, name, breed, colour, pasture, age, weight_kg, wool_kg, in_barn)</span><span>Hover a row to find that sheep, or a sheep to find its row</span><span>Size grows with age until 4 · spectacles: 7+ years · walking stick: 9+ years</span></div>
       </div>
     </section>
     <section class="board" aria-label="Result">
@@ -212,6 +265,14 @@ const pv = { c: $("pv"), ctx: $("pv").getContext("2d"), W: 0, H: 0, S: 1, slow: 
   rest: { ids: [], top: 0, title: "" }, dog: { x: 40, y: 300, path: [], face: 1, barkAt: -9999 },
   tufts: [], plan: null, steps: [], stepAt: [], shown: -1, dropAt: 0, allDoneAt: 0, lastBaa: 0, lastBark: 0 };
 const WOOL = { white:"#f3f4f1", black:"#2f2f33", brown:"#a8724a" };
+const PEN_COLS = ["#f5c542","#7fd3ff","#ff9eb5","#9be38a","#c9a2ff","#ffb36b","#6be0c8","#ff7b7b","#e7e08a","#a0b8ff","#f0a0e0","#b5e070"];
+function shade(hex, i, n){
+  if (n <= 1) return hex;
+  const h = hex.replace("#",""), rgb = [0,2,4].map(k=>parseInt(h.slice(k,k+2),16));
+  const f = (i/(n-1))*1.1 - .55;                     /* -0.55 (darker) .. +0.55 (lighter) */
+  const out = rgb.map(v=> Math.round(f < 0 ? v*(1+f*.75) : v + (255-v)*f*.8));
+  return "#" + out.map(v=>clamp(v,0,255).toString(16).padStart(2,"0")).join("");
+}
 const SLF = () => pv.slow ? 2.2 : 1;
 const clamp = (v,a,b) => Math.max(a, Math.min(b, v));
 
@@ -240,7 +301,7 @@ function pvLoad(){
   });
 }
 function pvWander(caption){
-  pv.plan = null; pv.pens = []; pv.rest = { ids: [], top: pv.H, title: "" }; pv.steps = []; pv.shown = -1;
+  pv.plan = null; pv.pens = []; pv.paddocks = []; pv.rest = { ids: [], top: pv.H, title: "" }; pv.steps = []; pv.shown = -1;
   pv.sheep.forEach(s=>{ s.alphaT = 1; s.pen = undefined; pickWander(s); });
   pv.dog.path = [{ x: 40*pv.S, y: pv.H - 30*pv.S }];
   if (caption) $("pvCaption").innerHTML = caption;
@@ -328,6 +389,16 @@ function buildPlan(sql, res){
     const keys = [...info.keys()].filter(k=>groups.has(k));
     for (const k of groups.keys()) if (!keys.includes(k)) keys.push(k);
     const pens = keys.map(k=>({ title: k, label: info.has(k) ? labelFrom(cols, info.get(k), skip) : "", ids: groups.get(k), dropped: kept ? !kept.has(k) : false }));
+    if (g >= 2){
+      const outerOf = k => k.split(" · ")[0], order = [];
+      pens.forEach(p=>{ const o = outerOf(p.title); if (!order.includes(o)) order.push(o); });
+      pens.sort((a,b)=>order.indexOf(outerOf(a.title)) - order.indexOf(outerOf(b.title)));
+      pens.forEach(p=>{ p.outer = outerOf(p.title); p.title = p.title.split(" · ").slice(1).join(" · "); });
+      const oc = gparts[0], ic = gparts.slice(1).join(", ");
+      const gi = steps.findIndex(x=>x.startsWith("GROUP BY"));
+      steps.splice(gi, 1, `GROUP BY ${short(oc, 22)}: ${order.length} paddock${order.length===1?"":"s"}`, `then ${short(ic, 22)}: ${groups.size} pen${groups.size===1?"":"s"}`);
+      return { pens, rest: restIds, steps, having: !!kept, nest: { outerCol: oc, innerCol: ic, outers: order } };
+    }
     return { pens, rest: restIds, steps, having: !!kept };
   }
   if (hasAgg){
@@ -346,45 +417,38 @@ function buildPlan(sql, res){
   return { pens: [{ title: "Your result", label: `${sel.size} sheep`, ids: [...sel] }], rest: all.filter(id=>!sel.has(id)), steps };
 }
 
-/* ---------- layout: pens in a grid that fills the pasture ---------- */
-function layout(){
-  const W = pv.W, H = pv.H, S = pv.S, n = pv.pens.length;
-  const restN = pv.rest.ids.length, restCell = 12*S, perRow = Math.max(1, Math.floor((W-24)/restCell));
-  const restRows = restN ? Math.ceil(restN/perRow) : 0;
-  pv.rest.top = restN ? H - 10 - restRows*restCell : H;
-  pv.rest.title = restN ? "Left out" : "";
-  pv.rest.cell = restCell; pv.rest.perRow = perRow;
-  if (!n) return;
-  const top = 8, bottom = restN ? pv.rest.top - 24*S : H - 46*S, areaH = bottom - top, areaW = W - 24;
-  const sizes = pv.pens.map(p=>Math.max(1, p.ids.length)), maxG = Math.max(...sizes);
-  const cap = Math.min(30*S, 46);
+/* ---------- layout: pens in a grid that fills the pasture (or a paddock) ---------- */
+function gridPens(pens, X, Y, AW, AH, cap){
+  const S = pv.S, n = pens.length;
+  if (!n || AW < 12 || AH < 12) return null;
+  const sizes = pens.map(p=>Math.max(1, p.ids.length)), maxG = Math.max(...sizes);
   let best = null;
   for (let r=1; r<=n; r++){
     const cols = Math.ceil(n/r);
     if (r > 1 && Math.ceil(n/(r-1)) === cols) continue;
     const rows = Math.ceil(n/cols);
-    const gap = cols > 8 ? 7 : 16*S;
-    const cw = (areaW - (cols-1)*gap)/cols, iw = cw - 10;
+    const gap = cols > 8 ? 7 : 14*S;
+    const cw = (AW - (cols-1)*gap)/cols, iw = cw - 10;
     if (iw < 12) continue;
-    const head = clamp((areaH/rows)*.16, 14, 26*S), lab = clamp((areaH/rows)*.16, 14, 30*S);
+    const head = clamp((AH/rows)*.16, 13, 24*S), lab = clamp((AH/rows)*.16, 13, 28*S);
     const fit = c => { const ncol = Math.max(1, Math.floor(iw/c)); let used = 0;
       for (let k=0; k<rows; k++){ const m = Math.max(...sizes.slice(k*cols, k*cols+cols)); used += head + lab + Math.ceil(m/ncol)*c + 8; }
       return { ncol, used: used + (rows-1)*gap }; };
     let c = cap, f = fit(c);
-    while (c > 5 && f.used > areaH){ c -= .5; f = fit(c); }
+    while (c > 5 && f.used > AH){ c -= .5; f = fit(c); }
     const contentW = Math.min(maxG, f.ncol)*c + 10, waste = Math.max(0, cw - contentW)/cw;
-    const score = c*1000 + head*40 - waste*400 - Math.max(0, f.used - areaH)*10;
+    const score = c*1000 + head*40 - waste*400 - Math.max(0, f.used - AH)*10;
     if (!best || score > best.score) best = { score, rows, cols, gap, cw, head, lab, c, ncol: f.ncol, used: f.used };
   }
-  if (!best){ const cw = areaW/n; best = { rows:1, cols:n, gap:2, cw, head:14, lab:14, c:5, ncol:Math.max(1,Math.floor((cw-10)/5)), used: areaH }; }
+  if (!best){ const cw = AW/n; best = { rows:1, cols:n, gap:2, cw, head:13, lab:13, c:5, ncol:Math.max(1,Math.floor((cw-10)/5)), used: AH }; }
   const { rows, cols, gap, cw, head, lab, c, ncol, used } = best;
-  let y = top + Math.max(0, (areaH - used)/2);
+  let y = Y + Math.max(0, (AH - used)/2);
   for (let row=0; row<rows; row++){
-    const rowPens = pv.pens.slice(row*cols, row*cols + cols), inRow = rowPens.length;
+    const rowPens = pens.slice(row*cols, row*cols + cols), inRow = rowPens.length;
     const m = Math.max(1, ...rowPens.map(p=>p.ids.length)), fh = Math.ceil(m/ncol)*c + 8;
-    const off = (areaW - (inRow*cw + (inRow-1)*gap))/2;
+    const off = (AW - (inRow*cw + (inRow-1)*gap))/2;
     rowPens.forEach((p,col)=>{
-      p.x = 12 + off + col*(cw+gap); p.y = y; p.w = cw; p.head = head; p.lab = lab;
+      p.x = X + off + col*(cw+gap); p.y = y; p.w = cw; p.head = head; p.lab = lab;
       p.fx = p.x + 2; p.fy = p.y + head; p.fw = cw - 4; p.fh = fh; p.c = c; p.ncol = ncol;
       const usedCols = Math.min(ncol, p.ids.length), gx = p.fx + (p.fw - usedCols*c)/2;
       p.slots = p.ids.map((_,j)=>({ x: gx + c/2 + (j % ncol)*c + (Math.random()-.5)*c*.12, y: p.fy + 4 + c/2 + Math.floor(j/ncol)*c + (Math.random()-.5)*c*.1 }));
@@ -393,14 +457,61 @@ function layout(){
     });
     y += head + fh + lab + gap;
   }
+  return best;
+}
+function layout(){
+  const W = pv.W, H = pv.H, S = pv.S, n = pv.pens.length;
+  const restN = pv.rest.ids.length, restCell = 12*S, perRow = Math.max(1, Math.floor((W-24)/restCell));
+  const restRows = restN ? Math.ceil(restN/perRow) : 0;
+  pv.rest.top = restN ? H - 10 - restRows*restCell : H;
+  pv.rest.title = restN ? "Left out" : "";
+  pv.rest.cell = restCell; pv.rest.perRow = perRow;
+  pv.paddocks = [];
+  if (!n) return;
+  const top = 8, bottom = restN ? pv.rest.top - 24*S : H - 46*S, areaH = bottom - top, areaW = W - 24;
+  const cap = Math.min(30*S, 46), nest = pv.plan && pv.plan.nest;
+  if (!nest){ gridPens(pv.pens, 12, top, areaW, areaH, cap); return; }
+  /* paddocks: one per value of the first GROUP BY column, pens for the rest inside */
+  const outers = nest.outers.map(o=>({ title: o, pens: pv.pens.filter(p=>p.outer === o) }));
+  const m = outers.length, sign = clamp(22*S, 18, 32), pad = 9*S, gapO = 14*S;
+  let best = null;
+  for (let cols=1; cols<=m; cols++){
+    const rows = Math.ceil(m/cols);
+    if (cols > 1 && Math.ceil(m/(cols-1)) === rows) continue;
+    const pw = (areaW - (cols-1)*gapO)/cols, ph = (areaH - (rows-1)*gapO)/rows;
+    if (pw < 50 || ph < 60) continue;
+    let minC = Infinity;
+    outers.forEach(o=>{ const b = gridPens(o.pens, 0, 0, pw - 2*pad, ph - sign - 2*pad, cap); minC = Math.min(minC, b ? b.c : 0); });
+    if (!best || minC > best.c) best = { c: minC, cols, rows, pw, ph };
+  }
+  if (!best) best = { c: 6, cols: m, rows: 1, pw: areaW/m, ph: areaH };
+  const { cols, rows, pw, ph } = best;
+  outers.forEach((o,i)=>{
+    const r = Math.floor(i/cols), col = i % cols, inRow = Math.min(cols, m - r*cols);
+    const offX = (areaW - (inRow*pw + (inRow-1)*gapO))/2;
+    const px = 12 + offX + col*(pw + gapO), py = top + r*(ph + gapO);
+    gridPens(o.pens, px + pad, py + sign + pad, pw - 2*pad, ph - sign - 2*pad, best.c);
+    /* shrink the wall to hug its pens */
+    const x0 = Math.min(...o.pens.map(p=>p.x)), x1 = Math.max(...o.pens.map(p=>p.x + p.w));
+    const y0 = Math.min(...o.pens.map(p=>p.y)), y1 = Math.max(...o.pens.map(p=>p.fy + p.fh + p.lab));
+    o.x = Math.max(px, x0 - pad); o.w = Math.min(px + pw, x1 + pad) - o.x;
+    o.y = Math.max(py, y0 - sign - pad*.6); o.h = Math.min(py + ph, y1 + pad*.6) - o.y;
+    o.sign = sign; o.pad = pad; o.gate = { x: o.x + o.w/2, y: o.y + o.h + 4*S };
+  });
+  pv.paddocks = outers;
 }
 
 /* ---------- running a herd ---------- */
 function pvApply(plan, animate){
   pv.plan = plan;
   pv.pens = plan.pens.map(p=>({ ...p, arrived: 0, doneAt: 0, appearAt: 0 }));
+  if (plan.nest){
+    plan.nest.outers.forEach((o,i)=>{ const inner = pv.pens.filter(p=>p.outer === o), base = PEN_COLS[i % PEN_COLS.length];
+      inner.forEach((p,j)=>{ p.col = shade(base, j, inner.length); }); });
+  } else pv.pens.forEach((p,k)=>{ p.col = PEN_COLS[k % PEN_COLS.length]; });
   pv.rest.ids = plan.rest || [];
   layout();
+  if (plan.nest) pv.paddocks.forEach((o,i)=>{ o.col = PEN_COLS[i % PEN_COLS.length]; o.appearAt = 0; });
   const now = performance.now(), SL = SLF(), S = pv.S, n = pv.pens.length, W = pv.W, H = pv.H;
   const byId = new Map(pv.sheep.map(s=>[s.id, s]));
   const inPen = new Set();
@@ -415,6 +526,7 @@ function pvApply(plan, animate){
   if (!animate || reduceMotion){
     pv.sheep.forEach(s=>{ const f = s.way[s.way.length-1]; s.x = f.x; s.y = f.y; s.sc = s.tsc; s.alpha = s.alphaT; s.mode = "home"; s.way = []; });
     pv.pens.forEach(p=>{ p.appearAt = now - 5000; p.arrived = p.ids.length; p.doneAt = now - 5000; });
+    pv.paddocks.forEach(o=>{ o.appearAt = now - 5000; });
     pv.allDoneAt = now - 5000; pv.dropAt = plan.having ? now - 5000 : 0;
     pv.pens.forEach(p=>{ if (p.dropped) p.ids.forEach(id=>{ const s = byId.get(id); if (s){ s.alphaT = s.alpha = .35; } }); });
     pv.stepAt = pv.steps.map(()=>now - 5000);
@@ -441,6 +553,7 @@ function pvApply(plan, animate){
     restSheep.forEach(s=>{ s.mode = "go"; s.at = herdStart + Math.random()*300*SL; s.speed = (3 + Math.random())*S/SL; });
     herdStart += 900*SL;
   } else if (hasWhere) pv.stepAt[1] = herdStart - 200;
+  if (plan.nest){ herdNested(byId, herdStart, now, SL, S, W, H); return; }
   /* 3. fences go up, 4. groups are herded in */
   const gi = pv.steps.findIndex(s=>s.startsWith("GROUP BY") || s.startsWith("no GROUP BY") || s.startsWith("SELECT"));
   if (gi >= 0) pv.stepAt[gi] = herdStart - 300*SL;
@@ -464,6 +577,54 @@ function pvApply(plan, animate){
       if (i % 2 === 0){ pv.dog.path.push({ x: a.gate.x, y: yy }, { x: b.gate.x, y: yy }); } else { pv.dog.path.push({ x: b.gate.x, y: yy }, { x: a.gate.x, y: yy }); } });
   }
   pv.dog.path.push({ x: W - 34*S, y: H - 26*S });
+}
+function herdNested(byId, herdStart, now, SL, S, W, H){
+  const P = pv.paddocks, m = P.length, n = pv.pens.length;
+  const gi = pv.steps.findIndex(x=>x.startsWith("GROUP BY"));
+  if (gi >= 0) pv.stepAt[gi] = herdStart - 300*SL;
+  P.forEach((o,i)=>{ o.appearAt = herdStart - 500*SL + i*140*SL; });
+  const per = clamp(3200/Math.max(1,m), 250, 1000)*SL;
+  const T2 = herdStart + m*per + 2400*SL;               /* everyone is in a paddock: inner fences go up */
+  if (gi >= 0) pv.stepAt[gi+1] = T2 - 150*SL;
+  pv.pens.forEach((p,k)=>{ p.appearAt = T2 - 450*SL + k*Math.min(90, 700/n)*SL; });
+  P.forEach((o,i)=>{
+    const sh = [];
+    o.pens.forEach(p=> p.ids.forEach((id,j)=>{ const s = byId.get(id); if (!s) return; sh.push(s);
+      const stay = { x: o.x + o.pad + Math.random()*(o.w - 2*o.pad), y: o.y + o.sign + o.pad + Math.random()*Math.max(4, o.h - o.sign - 2*o.pad), hold: T2 + Math.random()*600*SL };
+      s.way = [o.gate, stay, p.gate, p.slots[j]];
+      s.mode = "go"; s.at = herdStart + i*per + Math.random()*Math.min(400, per)*SL; s.speed = (4 + Math.random()*1.6)*S/SL; }));
+    if (!sh.length) return;
+    const gx = sh.reduce((a,s)=>a+(s.hx ?? s.x),0)/sh.length, gy = sh.reduce((a,s)=>a+(s.hy ?? s.y),0)/sh.length;
+    pv.dog.path.push({ x: clamp(gx + 30*S, 16, W-16), y: clamp(gy + 26*S, 16, H-16), cb: ()=>{ const t = performance.now(); sh.forEach(s=>{ s.at = Math.min(s.at, t + Math.random()*200*SL); }); dogBark(); } });
+    pv.dog.path.push({ x: o.gate.x, y: clamp(o.gate.y + 12*S, 16, H-16) });
+  });
+  /* second pass: Bodri trots past each paddock while the inner fences go up */
+  P.forEach(o=>pv.dog.path.push({ x: o.gate.x, y: clamp(o.gate.y + 12*S, 16, H-16) }));
+  pv.dog.path.push({ x: W - 34*S, y: H - 26*S });
+}
+function drawPaddock(g, o, t){
+  const a = clamp((t - o.appearAt)/(500*SLF()), 0, 1);
+  if (a <= 0 || !o.w) return;
+  const S = pv.S, r = 12*S;
+  const box = () => { g.beginPath(); g.roundRect ? g.roundRect(o.x, o.y, o.w, o.h, r) : g.rect(o.x, o.y, o.w, o.h); };
+  g.save(); g.globalAlpha = a;
+  box(); g.fillStyle = o.col + "22"; g.fill();
+  /* dry-stone wall */
+  g.lineJoin = "round"; box(); g.lineWidth = 7*S; g.strokeStyle = "#5e5a4e"; g.stroke();
+  box(); g.setLineDash([10*S, 4*S]); g.lineWidth = 5*S; g.strokeStyle = "#cfc7b0"; g.stroke(); g.setLineDash([]);
+  /* gate gap at the bottom */
+  g.fillStyle = "#6c9a45"; g.fillRect(o.gate.x - 10*S, o.y + o.h - 5*S, 20*S, 10*S);
+  /* wooden sign: column = value */
+  const fs = Math.round(o.sign*.6); g.font = `700 ${fs}px 'Atkinson Hyperlegible', system-ui, sans-serif`;
+  let txt = `${pv.plan.nest.outerCol} = ${o.title}`;
+  while (g.measureText(txt).width > o.w - 46*S && txt.length > 3) txt = txt.slice(0, -2);
+  if (txt !== `${pv.plan.nest.outerCol} = ${o.title}`) txt = txt.trimEnd() + "…";
+  const tw = g.measureText(txt).width, sx = o.x + 10*S, sy = o.y - o.sign*.45, sw = tw + fs*1.9, sh = o.sign;
+  g.fillStyle = "#8a5a2e"; g.strokeStyle = "#4a2c10"; g.lineWidth = 2;
+  g.beginPath(); g.roundRect ? g.roundRect(sx, sy, sw, sh, 4) : g.rect(sx, sy, sw, sh); g.fill(); g.stroke();
+  g.fillStyle = o.col; g.beginPath(); g.arc(sx + fs*.6, sy + sh/2, fs*.3, 0, 6.283); g.fill();
+  g.fillStyle = "#fff4d9"; g.textAlign = "left"; g.textBaseline = "middle"; g.fillText(txt, sx + fs*1.15, sy + sh/2 + 1);
+  g.restore();
 }
 function herd(sql, res){
   pvLoad();
@@ -655,6 +816,7 @@ function pvFrame(t){
     g.fillStyle = "rgba(255,255,255,.8)"; g.font = `600 ${Math.round(12*S)}px 'JetBrains Mono', monospace`; g.textAlign = "left"; g.textBaseline = "alphabetic";
     g.fillText(pv.rest.title.toUpperCase() + " · " + pv.rest.ids.length, 10, pv.rest.top - 13*S); g.restore();
   }
+  (pv.paddocks || []).forEach(o=>drawPaddock(g, o, t));
   pv.pens.forEach(p=>drawPen(g, p, t));
   /* sheep */
   const SL = SLF();
@@ -673,7 +835,7 @@ function pvFrame(t){
     }
     if (s.mode === "go" && t >= s.at && s.way && s.way.length){
       const p = s.way[0], dx = p.x - s.x, dy = p.y - s.y, d = Math.hypot(dx,dy);
-      if (d <= s.speed){ s.x = p.x; s.y = p.y; s.way.shift();
+      if (d <= s.speed){ s.x = p.x; s.y = p.y; if (!(p.hold && t < p.hold)) s.way.shift();
         if (!s.way.length){ s.mode = "home"; s.dir = 1; s.landAt = t;
           const pen = pv.pens[s.pen];
           if (pen){ pen.arrived++; if (pen.arrived === pen.ids.length){ pen.doneAt = t; sheepBaa();
@@ -702,6 +864,160 @@ function pvFrame(t){
 }
 if (window.ResizeObserver) new ResizeObserver(pvSize).observe(pv.c); else addEventListener("resize", pvSize);
 pvSize(); requestAnimationFrame(pvFrame);
+
+/* ---------- the flock ledger: the sheep table, kept in step with the pasture ---------- */
+const LG = { cols: [], rows: [], byId: new Map(), trs: new Map(), pending: new Set(), droppedDone: false, plan: null, hi: null };
+
+const COLDOCS = {
+  id: "row number of the sheep",
+  name: "the sheep's name, e.g. <code>'Mazsola'</code>",
+  breed: "<code>'Racka'</code>, <code>'Merino'</code>, <code>'Cigája'</code> or <code>'Suffolk'</code>",
+  colour: "<code>'white'</code>, <code>'black'</code> or <code>'brown'</code>",
+  pasture: "where it grazes, e.g. <code>'Windmill Hill'</code>",
+  age: "age in years (0 = born this year)",
+  weight_kg: "weight in kilograms",
+  wool_kg: "wool from the last shearing, in kg",
+  in_barn: "<code>1</code> = in the barn, <code>0</code> = still outside"
+};
+const plain = h => h.replace(/<[^>]+>/g, "");
+function renderColdocs(){
+  if ($("coldocs").childElementCount || !LG.cols.length) return;
+  const type = i => LG.rows.length && typeof LG.rows[0][i] === "number" ? "number" : "text";
+  $("coldocs").innerHTML = LG.cols.map((c,i)=>`<dt>${esc(c)}<span class="ty">${type(i)}</span></dt><dd>${COLDOCS[c] || ""}</dd>`).join("");
+}
+function ledgerData(){
+  try { const r = db.exec("SELECT * FROM sheep ORDER BY id"); if (r.length){ LG.cols = r[0].columns; LG.rows = r[0].values; } }
+  catch(e){ LG.cols = []; LG.rows = []; }
+  LG.byId = new Map(LG.rows.map(r=>[r[0], r]));
+}
+
+/* which columns the query touches, so the table can mark them */
+function columnRoles(sql){
+  const roles = {};
+  if (!sql) return roles;
+  let cl; try { cl = splitClauses(lastStatement(sql)); } catch(e){ return roles; }
+  const has = (txt, c) => txt && new RegExp(`\\b${c}\\b`, "i").test(txt);
+  const aggRe = c => new RegExp(`\\b(count|sum|avg|min|max|total|group_concat)\\s*\\([^)]*\\b${c}\\b`, "i");
+  LG.cols.forEach(c=>{
+    const r = [];
+    if (has(cl.where, c)) r.push("WHERE");
+    if (has(cl.group, c)) r.push("GROUP BY");
+    if (aggRe(c).test(cl.select || "") || aggRe(c).test(cl.having || "")) r.push((((cl.select||"") + " " + (cl.having||"")).match(aggRe(c)) || [,"AGG"])[1].toUpperCase());
+    if (r.length) roles[c] = r;
+  });
+  return roles;
+}
+
+function rowHtml(r, roles, cls){
+  return `<tr data-id="${r[0]}" class="${cls}">${r.map((v,i)=>{
+    const c = LG.cols[i], num = typeof v === "number";
+    const role = roles[c] ? (roles[c].includes("GROUP BY") ? " key" : (roles[c].some(x=>x!=="WHERE") ? " agg" : " wh")) : "";
+    return `<td class="${num ? "num" : ""}${role}">${v === null ? "NULL" : esc(fmt(v))}</td>`;
+  }).join("")}</tr>`;
+}
+
+function renderLedger(sql){
+  if (!db) return;
+  ledgerData();
+  const plan = pv.plan, roles = plan ? columnRoles(sql) : {};
+  LG.plan = plan; LG.trs.clear(); LG.pending.clear(); LG.droppedDone = false;
+  renderColdocs();
+  const head = `<thead><tr>${LG.cols.map(c=>`<th title="${esc(plain(COLDOCS[c] || ""))}"${roles[c] ? ' class="marked"' : ""}>${esc(c)}${roles[c] ? roles[c].map(x=>`<span class="tag">${esc(x)}</span>`).join("") : ""}</th>`).join("")}</tr></thead>`;
+  let body = "", meta;
+  if (!plan){
+    body = LG.rows.map(r=>rowHtml(r, roles, "")).join("");
+    meta = `${LG.rows.length} rows, one per sheep`;
+  } else {
+    const nest = plan.nest; let lastOuter = null;
+    pv.pens.forEach((p,k)=>{
+      const col = p.col || PEN_COLS[k % PEN_COLS.length];
+      if (nest && p.outer !== lastOuter){
+        lastOuter = p.outer;
+        const pi = nest.outers.indexOf(p.outer), n = pv.pens.filter(q=>q.outer === p.outer).reduce((a,q)=>a + q.ids.length, 0);
+        body += `<tr class="grp outerhdr" style="--g:${PEN_COLS[pi % PEN_COLS.length]}"><td colspan="${LG.cols.length}"><span class="sw"></span><b>${esc(nest.outerCol)} = ${esc(p.outer)}</b><span class="n">${n} sheep, paddock</span></td></tr>`;
+      }
+      body += `<tr class="grp${nest ? " inner" : ""}" data-pen="${k}" style="--g:${col}"><td colspan="${LG.cols.length}"><span class="sw"></span><b>${nest ? esc(nest.innerCol) + " = " : ""}${esc(p.title)}</b><span class="n">${p.ids.length} sheep</span>${p.label ? `<span class="lab">→ ${esc(p.label)}</span>` : ""}<span class="drop">dropped by HAVING</span></td></tr>`;
+      p.ids.forEach(id=>{ const r = LG.byId.get(id); if (r){ body += rowHtml(r, roles, "pend").replace("<tr ", `<tr style="--g:${col}" data-pen="${k}" `); LG.pending.add(id); } });
+    });
+    const rest = (pv.rest.ids || []).filter(id=>LG.byId.has(id));
+    if (rest.length){
+      const hasWhere = pv.steps.some(s=>s.startsWith("WHERE"));
+      body += `<tr class="grp out"><td colspan="${LG.cols.length}"><span class="sw"></span><b>${hasWhere ? "Left out by WHERE" : "Not in the result"}</b><span class="n">${rest.length} sheep</span></td></tr>`;
+      rest.forEach(id=>{ body += rowHtml(LG.byId.get(id), roles, "pend rest"); LG.pending.add(id); });
+    }
+    meta = `${LG.rows.length} rows, sorted the way Bodri groups them`;
+  }
+  $("ledgerMeta").textContent = meta;
+  $("ledger").innerHTML = `<table>${head}<tbody>${body}</tbody></table>`;
+  $("ledger").querySelectorAll("tr[data-id]").forEach(tr=>LG.trs.set(+tr.dataset.id, tr));
+  $("ledger").scrollTop = 0;
+}
+
+/* rows light up as their sheep arrive; dropped groups grey out with the pens */
+function ledgerTick(t){
+  requestAnimationFrame(ledgerTick);
+  if (LG.pending.size){
+    for (const id of LG.pending){
+      const s = pv.sheep.find(x=>x.id === id);
+      if (s && s.mode === "home"){ const tr = LG.trs.get(id); if (tr){ tr.classList.remove("pend"); tr.classList.add("in"); } LG.pending.delete(id); }
+    }
+  }
+  if (LG.plan && pv.dropAt && t >= pv.dropAt && !LG.droppedDone){
+    LG.droppedDone = true;
+    pv.pens.forEach((p,k)=>{ if (p.dropped) $("ledger").querySelectorAll(`tr[data-pen="${k}"]`).forEach(tr=>tr.classList.add("dropped")); });
+  }
+  /* ring the highlighted sheep on the pasture */
+  if (LG.hi != null && pv.W){
+    const s = pv.sheep.find(x=>x.id === LG.hi);
+    if (s){ const g = pv.ctx, r = 17*s.sc + Math.sin(t/180)*2.5;
+      g.save(); g.strokeStyle = "#fff4d9"; g.lineWidth = 3; g.shadowColor = "rgba(0,0,0,.6)"; g.shadowBlur = 6;
+      g.beginPath(); g.arc(s.x, s.y - 2*s.sc, r, 0, 6.283); g.stroke();
+      g.font = `700 ${Math.round(13*pv.S)}px 'Atkinson Hyperlegible', sans-serif`; g.textAlign = "center"; g.textBaseline = "bottom";
+      const label = `#${s.id} ${s.name}`, tw = g.measureText(label).width, ly = s.y - r - 6;
+      g.fillStyle = "rgba(0,0,0,.65)"; g.fillRect(s.x - tw/2 - 6, ly - 17*pv.S, tw + 12, 19*pv.S);
+      g.fillStyle = "#fff4d9"; g.shadowBlur = 0; g.fillText(label, s.x, ly);
+      g.restore(); }
+  }
+}
+
+function setHi(id, fromCanvas){
+  if (LG.hi === id) return;
+  const old = LG.trs.get(LG.hi); if (old) old.classList.remove("hi");
+  LG.hi = id;
+  const tr = LG.trs.get(id);
+  if (tr){ tr.classList.add("hi"); if (fromCanvas){ const box = $("ledger"), top = tr.offsetTop - box.clientHeight/2; box.scrollTo({ top, behavior: reduceMotion ? "auto" : "smooth" }); } }
+}
+$("ledger").addEventListener("mouseover", e=>{ const tr = e.target.closest("tr[data-id]"); setHi(tr ? +tr.dataset.id : null, false); });
+$("ledger").addEventListener("mouseleave", ()=>setHi(null, false));
+pv.c.addEventListener("mousemove", e=>{
+  const r = pv.c.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top;
+  let best = null, bd = Infinity;
+  pv.sheep.forEach(s=>{ const d = Math.hypot(s.x - x, s.y - y); if (d < bd){ bd = d; best = s; } });
+  const hit = best && bd < 20*best.sc ? best.id : null;
+  pv.c.style.cursor = hit != null ? "pointer" : "";
+  setHi(hit, true);
+});
+pv.c.addEventListener("mouseleave", ()=>setHi(null, false));
+
+/* tint each pen with its group colour so the pens and the table rows match */
+const _drawPen = drawPen;
+drawPen = function(g, p, t){
+  _drawPen(g, p, t);
+  const k = pv.pens.indexOf(p), a = clamp((t - p.appearAt)/(450*SLF()), 0, 1);
+  if (k < 0 || a <= 0) return;
+  const col = p.col || PEN_COLS[k % PEN_COLS.length], dropped = p.dropped && pv.dropAt && t >= pv.dropAt;
+  g.save(); g.globalAlpha = a * (dropped ? .35 : 1);
+  g.fillStyle = col + "26"; g.fillRect(p.fx, p.fy, p.fw, p.fh);
+  g.strokeStyle = col; g.lineWidth = clamp(p.c*.12, 1.5, 3.2*pv.S); g.lineCap = "round";
+  g.beginPath(); g.moveTo(p.fx, p.fy); g.lineTo(p.fx + p.fw*a, p.fy); g.stroke();
+  g.restore();
+};
+
+const _herd = herd;
+herd = function(sql, res){ _herd(sql, res); renderLedger(sql); };
+const _pvWander = pvWander;
+pvWander = function(caption){ _pvWander(caption); renderLedger(null); };
+requestAnimationFrame(ledgerTick);
 
 /* ---------- page wiring ---------- */
 $("presets").innerHTML = PRESETS.map(([label],k)=>`<button type="button" class="preset" data-k="${k}">${esc(label)}</button>`).join("");
