@@ -270,6 +270,27 @@ a{color:inherit}
       <g font-family="Kalam,cursive" font-size="24" font-weight="700" fill="#fff6e8" text-anchor="middle"><text x="77" y="166">6</text><text x="201" y="166">4</text><text x="325" y="166">2</text></g>
       <g transform="translate(262 128)"><ellipse rx="13" ry="7" fill="#1b1b1b"/><circle cx="-12" cy="-4" r="6" fill="#1b1b1b"/></g>
     </svg>`,
+    backstage:`<svg viewBox="0 0 400 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <defs><radialGradient id="bgl" cx=".5" cy=".1" r=".9"><stop offset="0" stop-color="#4a2a7a"/><stop offset="1" stop-color="#120d24"/></radialGradient></defs>
+      <rect width="400" height="200" fill="url(#bgl)"/>
+      <g opacity=".55"><path d="M60 0l70 200H10z" fill="#ff4fa3" opacity=".35"/><path d="M340 0l50 200H250z" fill="#4fe3ff" opacity=".35"/></g>
+      <rect x="0" y="150" width="400" height="50" fill="#0a0714"/><path d="M0 150h400" stroke="#2a1f4a" stroke-width="3"/>
+      <g transform="translate(205 112) rotate(-28)"><rect x="-12" y="-70" width="24" height="52" rx="8" fill="#ffd166"/><path d="M-28 -18c-18 10-22 40-8 56 8 10 24 10 32 0 6-8 2-18 10-26 8-8 16-18 8-30-6-9-28-9-42 0z" fill="#ffd166"/><circle cx="2" cy="12" r="8" fill="#2b1a05"/><path d="M-2 -66v80" stroke="#2b1a05" stroke-width="1.5"/></g>
+      <g font-family="Kalam,cursive" font-weight="700" fill="#fff" text-anchor="middle"><text x="200" y="40" font-size="20" opacity=".9">ZENGŐ</text></g>
+      <path d="M40 180q80-30 160-10t160-20" stroke="#ff4fa3" stroke-width="3" fill="none" stroke-dasharray="8 6"/>
+      <text x="334" y="188" font-family="Kalam,cursive" font-size="22" fill="#ffd166">?</text>
+    </svg>`,
+    matchmaker:`<svg viewBox="0 0 400 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <rect width="400" height="200" fill="#120d24"/>
+      <g fill="#231a45" stroke="#3a2d63" stroke-width="2"><rect x="24" y="40" width="110" height="120" rx="10"/><rect x="145" y="40" width="110" height="120" rx="10"/><rect x="266" y="60" width="110" height="80" rx="10"/></g>
+      <g fill="#352a5e"><rect x="24" y="40" width="110" height="26" rx="10"/><rect x="145" y="40" width="110" height="26" rx="10"/><rect x="266" y="60" width="110" height="26" rx="10"/></g>
+      <g fill="rgba(255,255,255,.08)">${[0,1,2,3,4].map(i=>`<rect x="32" y="${74+i*16}" width="94" height="11" rx="3"/><rect x="153" y="${74+i*16}" width="94" height="11" rx="3"/>`).join("")}${[0,1].map(i=>`<rect x="274" y="${94+i*16}" width="94" height="11" rx="3"/>`).join("")}</g>
+      <g fill="none" stroke-width="2" stroke="#ff4fa3" opacity=".9">${[[79,92],[79,108],[79,124],[79,140],[79,156]].map(([a,b],i)=>`<path d="M126 ${b}C140 ${b} 140 ${[80,80,96,112,128][i]} 153 ${[80,80,96,112,128][i]}"/>`).join("")}</g>
+      <g fill="none" stroke-width="2" stroke="#4fe3ff" opacity=".9">${[80,96,112,128,144].map((y,i)=>`<path d="M247 ${y}C260 ${y} 260 ${i<3?100:116} 274 ${i<3?100:116}"/>`).join("")}</g>
+      <g stroke-width="4" fill="none" stroke-linecap="round"><path d="M60 66V24h120v42" stroke="#ff4fa3"/><path d="M200 66V24h120v42" stroke="#4fe3ff"/></g>
+      <g font-family="Kalam,cursive" font-weight="700" font-size="18" text-anchor="middle"><text x="120" y="20" fill="#ff4fa3">1 : N</text><text x="260" y="20" fill="#4fe3ff">N : 1</text></g>
+      <g font-family="Kalam,cursive" font-size="16" fill="#b8ff5c"><text x="200" y="186" text-anchor="middle">✓ WHERE a.x_id = b.id</text></g>
+    </svg>`,
     "first-steps":`<svg viewBox="0 0 400 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
       <rect width="400" height="200" fill="#edf0f6"/>
       <rect x="30" y="28" width="190" height="146" rx="6" fill="#f6c99b"/>
