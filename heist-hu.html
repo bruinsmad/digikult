@@ -1,0 +1,1351 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Az Éjféli Paprika-rablás</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Kalam:wght@400;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<script src="https://cdn.jsdelivr.net/npm/sql.js@1.10.3/dist/sql-asm.js"></script>
+<style>
+/* Layout: the museum after dark. A brass plaque header, a velvet-rope chapter path, a cork suspect board,
+   then the detective's notebook (story + task) beside a security-camera monitor (SQL). One committed night look. */
+:root{
+  --bg:#0a0f13; --panel:#121a20; --ink:#e9eef0; --muted:#9aaab2; --line:#26343c;
+  --accent:#5fe0b0; --accent-soft:#12302a; --brass:#e2b04a; --brass-soft:#3a2c0f; --on-brass:#1d1606;
+  --velvet:#b3213f; --velvet-dark:#6e1226;
+  --code-bg:#0a1310; --ok:#5fd39a; --ok-soft:#12301f; --bad:#ff8a80; --bad-soft:#3a1714;
+  --paper:#fbfcfe; --paper-ink:#1d2433; --paper-line:#d3dff2; --paper-margin:#e58b98; --paper-muted:#5b6475; --pen:#2546b8;
+  --sticky:#fff1a0; --cork:#6a4a2c; --cork-frame:#3a2815;
+  --f-display:"Young Serif", Georgia, "Times New Roman", serif;
+  --f-body:"Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono:"JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --f-hand:"Kalam", "Comic Sans MS", "Segoe Print", cursive;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+*,*::before,*::after{font-feature-settings:"calt" 0,"liga" 0}
+html,body{margin:0}
+body{color:var(--ink);font:16px/1.55 var(--f-body);
+  background:
+    radial-gradient(ellipse 34% 55% at 12% -8%, rgba(255,232,170,.13), transparent 70%),
+    radial-gradient(ellipse 34% 55% at 88% -8%, rgba(255,232,170,.10), transparent 70%),
+    repeating-linear-gradient(90deg, rgba(255,255,255,.018) 0 2px, transparent 2px 140px),
+    var(--bg);
+  background-attachment:fixed;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));padding-block:22px 48px}
+.wrap{max-width:1240px;margin:0 auto;display:grid;gap:22px}
+h1,h2,h3{font-family:var(--f-display);font-weight:400;text-wrap:balance;margin:0;line-height:1.15}
+code,kbd,pre,textarea{font-family:var(--f-mono)}
+code{font-size:.92em}
+:focus-visible{outline:3px solid var(--brass);outline-offset:2px}
+.eyebrow{font:600 12px/1.2 var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+
+/* buttons */
+.btn{font:700 14px var(--f-body);border:1px solid var(--line);background:var(--panel);color:var(--ink);padding:8px 14px;border-radius:6px;cursor:pointer;transition:transform .12s, box-shadow .12s}
+.btn:hover{border-color:var(--brass)}
+.btn:active{transform:translateY(1px)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#04170f;box-shadow:0 3px 0 #2b8a66}
+.btn.primary:active{box-shadow:0 1px 0 #2b8a66;transform:translateY(2px)}
+.btn.small{padding:5px 10px;font-size:13px}
+.btn.danger{color:var(--bad)}
+.btn:disabled{opacity:.5;cursor:default}
+
+/* header: brass museum plaque */
+header.top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px 24px}
+.plaque{position:relative;display:flex;align-items:center;gap:16px;padding:14px 26px 14px 18px;min-width:0;max-width:100%;
+  background:linear-gradient(160deg,#2a2114,#15110a 70%);border:3px solid var(--brass);border-radius:8px;
+  outline:1px solid rgba(226,176,74,.5);outline-offset:5px;box-shadow:0 18px 40px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,240,200,.25)}
+.plaque::before,.plaque::after{content:"";position:absolute;top:50%;width:9px;height:9px;margin-top:-4px;border-radius:50%;
+  background:radial-gradient(circle at 35% 30%,#fff3c4,var(--brass) 55%,#6b4a0d)}
+.plaque::before{left:-17px}.plaque::after{right:-17px}
+.plaque h1{font-size:clamp(28px,4.6vw,50px);color:#fff1cc;text-shadow:0 0 22px rgba(226,176,74,.45), 0 2px 0 #000}
+.plaque .eyebrow{color:#d9b665}
+.gem-badge{position:relative;flex:none;width:52px;height:52px;display:grid;place-items:center}
+.gem-badge svg{width:46px;height:auto;filter:drop-shadow(0 0 10px rgba(255,70,90,.75))}
+.sparkle{position:absolute;width:16px;height:16px;background:#fff;clip-path:polygon(50% 0,60% 40%,100% 50%,60% 60%,50% 100%,40% 60%,0 50%,40% 40%)}
+.sparkle.a{top:-2px;right:0}.sparkle.b{bottom:4px;left:-2px;width:10px;height:10px}
+.stamp{display:inline-block;font:700 13px/1 var(--f-mono);letter-spacing:.12em;text-transform:uppercase;white-space:nowrap;
+  color:var(--bad);border:3px double var(--bad);padding:6px 9px;border-radius:4px;transform:rotate(-8deg);margin-left:4px}
+.stamp.closed{color:var(--ok);border-color:var(--ok)}
+.meta{display:flex;gap:10px 18px;align-items:center;flex-wrap:wrap;font-variant-numeric:tabular-nums}
+.meta-item{display:grid;gap:1px}
+.meta-item .lbl{font:600 10.5px var(--f-mono);letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.meta-item b{font:400 20px var(--f-display);color:#fff1cc}
+
+/* velvet rope chapter path */
+.steps{display:grid;grid-template-columns:repeat(11,minmax(0,1fr));gap:0;padding-top:6px}
+.step{all:unset;position:relative;display:grid;justify-items:center;gap:6px;cursor:pointer;padding:4px 2px;min-width:0}
+.step .n{position:relative;z-index:2;width:42px;height:42px;border-radius:50%;display:grid;place-items:center;
+  font:400 18px var(--f-display);color:#2a1d05;
+  background:radial-gradient(circle at 35% 30%,#fff3c4,var(--brass) 48%,#7a5410 100%);
+  box-shadow:0 3px 0 #5a3d08, 0 8px 16px rgba(0,0,0,.55)}
+.step .t{max-width:100%;padding:0 3px;font:700 13px/1.2 var(--f-body);color:#b9c6cc;text-align:center;text-wrap:balance;overflow-wrap:break-word;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.step-caption{display:none;text-align:center;font:700 15px/1.3 var(--f-body);color:#fff1cc}
+.step-caption span{font:600 11px var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-right:6px}
+.step:not(:last-child)::after{content:"";position:absolute;z-index:1;top:22px;left:50%;width:100%;height:22px;
+  border-bottom:7px solid var(--velvet);border-radius:0 0 50% 50% / 0 0 100% 100%;
+  filter:drop-shadow(0 5px 3px rgba(0,0,0,.5))}
+.step.done .n{color:#04210f;background:radial-gradient(circle at 35% 30%,#d8ffec,var(--ok) 50%,#0d5a35 100%);box-shadow:0 3px 0 #0b4a2b, 0 0 18px rgba(95,211,154,.45)}
+.step.done .t{color:#cfe9dc}
+.step.current .n{outline:3px solid #fff3c4;outline-offset:3px}
+.step.current .t{color:#fff1cc}
+.step.current::before{content:"";position:absolute;z-index:0;top:-34px;left:50%;width:120px;height:130px;transform:translateX(-50%);
+  background:radial-gradient(ellipse 50% 70% at 50% 0,rgba(255,240,190,.38),transparent 75%);pointer-events:none}
+.step.locked{cursor:not-allowed}
+.step.locked .n{filter:grayscale(.9) brightness(.55)}
+.step.locked .t{color:#7f8d95}
+.step:focus-visible .n{outline:3px solid var(--accent);outline-offset:3px}
+@media (max-width:1150px){ .step .t{font-size:11.5px} }
+@media (max-width:900px){ .step-caption{display:block} .step .t{display:none} .step .n{width:30px;height:30px;font-size:14px} .step:not(:last-child)::after{top:16px;height:16px;border-bottom-width:5px} .step.current::before{width:70px} }
+
+/* cork suspect board */
+.board{border:10px solid var(--cork-frame);border-radius:6px;padding:14px 16px 18px;display:grid;gap:12px;
+  background:radial-gradient(rgba(0,0,0,.18) 1px, transparent 1.5px) 0 0/7px 7px, radial-gradient(rgba(255,220,170,.10) 1px, transparent 1.5px) 3px 4px/9px 9px, var(--cork);
+  box-shadow:inset 0 0 30px rgba(0,0,0,.5), 0 16px 30px rgba(0,0,0,.45)}
+.board-head{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px}
+.board-head h2{font-size:17px;color:#2a1d05;background:linear-gradient(#f4d27e,var(--brass));padding:4px 12px;border-radius:3px;box-shadow:0 2px 0 #7a5410}
+.board-head p{margin:0;font:700 19px/1.2 var(--f-hand);color:#fff4dc;text-shadow:0 1px 2px rgba(0,0,0,.6)}
+.board-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(62px,1fr));gap:12px 9px}
+.mug{position:relative;background:#f7f8f9;padding:5px 5px 2px;transform:rotate(var(--r,0deg));box-shadow:0 4px 8px rgba(0,0,0,.45);color:#1d2433;text-align:center;transition:opacity .4s, filter .4s}
+.mug::before{content:"";position:absolute;z-index:2;top:-5px;left:50%;width:11px;height:11px;margin-left:-5px;border-radius:50%;
+  background:radial-gradient(circle at 35% 30%,#ff9aa8,#c8203f 60%,#6e1226);box-shadow:0 2px 2px rgba(0,0,0,.5)}
+.mug svg{display:block;width:100%;height:auto}
+.mug .nm{display:block;font:700 13px/1.4 var(--f-hand);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mug.out{background:#c9ccd0}
+.mug.out svg,.mug.out .nm{opacity:.5;filter:grayscale(1)}
+.mug.out::after{content:"";position:absolute;inset:4px;pointer-events:none;
+  background:linear-gradient(45deg,transparent 46%,#e0233f 46%,#e0233f 54%,transparent 54%),linear-gradient(-45deg,transparent 46%,#e0233f 46%,#e0233f 54%,transparent 54%)}
+.mug.caught{outline:3px solid var(--brass);box-shadow:0 0 22px rgba(226,176,74,.8)}
+.mug.caught::after{content:"ELKAPVA";position:absolute;left:50%;top:40%;transform:translate(-50%,-50%) rotate(-14deg);
+  font:700 11px var(--f-mono);letter-spacing:.1em;color:#c8203f;border:2px solid #c8203f;padding:2px 4px;background:rgba(255,255,255,.85)}
+
+.mug.victim{background:#1c2026;outline:2px dashed #e9eef0;outline-offset:2px}
+.mug.victim svg,.mug.victim .nm{opacity:.45;filter:grayscale(1)}
+.mug.victim .nm{color:#e9eef0}
+.mug.victim::after{content:"ÁLDOZAT";position:absolute;left:50%;top:40%;transform:translate(-50%,-50%) rotate(-10deg);font:700 11px var(--f-mono);letter-spacing:.1em;color:#ffffff;background:#111;border:2px solid #ffffff;padding:2px 4px}
+/* main grid */
+main{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:26px;align-items:start}
+@media (max-width:960px){ main{grid-template-columns:minmax(0,1fr)} }
+.panel{min-width:0}
+
+/* the detective's notebook */
+.case{
+  --ink:var(--paper-ink); --muted:var(--paper-muted); --line:#cfd8e6; --panel:#ffffff; --code-bg:#eef2f9;
+  --accent:var(--pen); --accent-soft:#e6ecfb; --brass:#c48a12; --brass-soft:#fff0bf;
+  --ok:#16774a; --ok-soft:#dff1e6; --bad:#b0291f; --bad-soft:#fbe5e2;
+  color-scheme:light;color:var(--ink);position:relative;display:grid;gap:16px;
+  padding:26px 22px 26px 70px;border-radius:4px 10px 10px 4px;transform:rotate(-.35deg);
+  background:
+    radial-gradient(circle at 24px 50%, var(--bg) 7px, rgba(0,0,0,.25) 8px, transparent 9px) 0 0/48px 84px repeat-y,
+    linear-gradient(to right, transparent 52px, var(--paper-margin) 52px 54px, transparent 54px),
+    repeating-linear-gradient(to bottom, transparent 0 29px, var(--paper-line) 29px 30px),
+    var(--paper);
+  box-shadow:0 24px 50px rgba(0,0,0,.6), 0 2px 0 #e3e8ef, 0 4px 0 #cbd3de}
+.case::before{content:"";position:absolute;top:-16px;right:42px;width:20px;height:62px;border:3px solid #a7b3bf;border-radius:12px;transform:rotate(8deg);box-shadow:1px 2px 2px rgba(0,0,0,.3)}
+@media (max-width:560px){ .case{padding-left:46px;background:
+    radial-gradient(circle at 14px 50%, var(--bg) 5px, rgba(0,0,0,.25) 6px, transparent 7px) 0 0/28px 70px repeat-y,
+    linear-gradient(to right, transparent 32px, var(--paper-margin) 32px 34px, transparent 34px),
+    repeating-linear-gradient(to bottom, transparent 0 29px, var(--paper-line) 29px 30px), var(--paper)} }
+.case > .eyebrow{font:700 17px var(--f-hand);letter-spacing:0;text-transform:none;color:var(--pen)}
+.case h2{font-size:32px;color:#141a28}
+.story p{margin:0 0 .7em;max-width:62ch}
+.story p:last-child{margin-bottom:0}
+mark{background:linear-gradient(transparent 35%, #ffe45c 35%, #ffe45c 88%, transparent 88%);color:inherit;padding:0 .1em}
+.learn{position:relative;background:var(--sticky);border-radius:2px;padding:20px 16px 14px;display:grid;gap:8px;transform:rotate(.6deg);box-shadow:0 8px 16px rgba(30,30,10,.25)}
+.learn::before{content:"";position:absolute;top:-9px;left:50%;width:84px;height:20px;margin-left:-42px;background:rgba(220,230,240,.75);transform:rotate(-3deg);box-shadow:0 1px 2px rgba(0,0,0,.15)}
+.learn h3{font:700 20px var(--f-hand);color:#7a5a00}
+.learn p{margin:0}
+.learn pre{margin:0;background:#ffffff;border:1px solid #e5d98a;border-radius:4px;padding:10px 12px;overflow-x:auto;font-size:13.5px;line-height:1.5}
+.task{border-left:4px solid #d2333f;padding:4px 0 4px 14px;display:grid;gap:4px}
+.task h3{font:700 22px var(--f-hand);color:#d2333f}
+.task p{margin:0;font-weight:700;font-size:17px}
+.hint.locked{border:2px dashed #c9d2df;border-radius:8px;padding:8px 12px;font:600 12.5px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:#8a95a8;background:repeating-linear-gradient(135deg,rgba(201,210,223,.25) 0 8px,transparent 8px 16px)}
+details.hint{border:2px dashed #9db0cc;border-radius:8px;padding:8px 12px;background:rgba(230,236,251,.65)}
+details.hint summary{cursor:pointer;font:600 12.5px var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:#3b4f78}
+details.hint[open] summary{margin-bottom:6px}
+details.hint p{margin:0}
+details.hint pre{margin:6px 0 0;overflow-x:auto;background:#ffffff;padding:8px 10px;border-radius:5px;font-size:13px}
+form.answer{display:flex;gap:10px;flex-wrap:wrap;align-items:end}
+form.answer input{flex:1 1 180px;min-width:0;font:700 22px var(--f-hand);color:var(--pen);padding:4px 4px 2px;border:none;border-bottom:2px solid var(--pen);border-radius:0;background:transparent}
+form.answer input::placeholder{color:#8f9bb3;font-weight:400}
+form.answer input:focus-visible{outline:none;border-bottom-width:3px;background:rgba(37,70,184,.06)}
+.case .btn.primary{background:var(--pen);border-color:var(--pen);color:#fff;box-shadow:0 3px 0 #172f80}
+.case .btn{background:#fff;border-color:#c8d2e2;color:var(--ink)}
+.case .btn.primary{background:var(--pen);color:#fff}
+.verdict{border-radius:6px;padding:10px 14px;font-weight:700}
+.verdict.ok{background:var(--ok-soft);color:var(--ok);border:3px double var(--ok);transform:rotate(-1deg)}
+.verdict.bad{background:var(--bad-soft);color:var(--bad)}
+.verdict p{margin:0;font-weight:400;color:var(--ink)}
+.navrow{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.anatomy{display:grid;border:1px solid var(--line);border-radius:8px;overflow:hidden;margin:4px 0 12px;background:#ffffff}
+.anatomy > div{display:grid;grid-template-columns:minmax(0,15ch) minmax(0,1fr);gap:14px;padding:9px 12px;border-bottom:1px solid var(--line);align-items:baseline}
+.anatomy > div:last-child{border-bottom:none}
+.anatomy code{font-weight:600;color:var(--pen);white-space:nowrap}
+.anatomy span{font-size:15px}
+@media (max-width:480px){ .anatomy > div{grid-template-columns:minmax(0,1fr);gap:2px} }
+.rules{margin:0;padding-left:1.2em;display:grid;gap:4px;max-width:62ch}
+table.ops{background:#fff;border:1px solid #e5d98a;border-radius:4px;font-size:14px}
+.case table th{position:static;background:#fffbe0;color:#6b5a1a}
+.tries{display:flex;flex-direction:column;gap:6px;align-items:flex-start}
+.try{font:13px var(--f-mono);text-align:left;background:#fff;color:var(--ink);border:1px solid #e5d98a;border-radius:4px;padding:6px 10px;cursor:pointer;max-width:100%;white-space:normal}
+.try:hover{border-color:var(--pen);color:var(--pen)}
+.ending{display:grid;gap:12px}
+.ending ol{margin:0;padding-left:1.3em;display:grid;gap:6px}
+.export{display:grid;gap:8px;background:#ffffff;border:2px solid var(--pen);border-radius:6px;padding:14px 16px;transform:rotate(-.4deg)}
+.export h3{font:700 20px var(--f-hand);color:var(--pen)}
+.export label{font:600 12px var(--f-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.export input{font:700 22px var(--f-hand);color:var(--pen);padding:4px 4px 2px;border:none;border-bottom:2px solid var(--pen);background:transparent;min-width:0}
+.export input:focus-visible{outline:none;border-bottom-width:3px;background:rgba(37,70,184,.06)}
+.export-btns{display:flex;gap:8px;flex-wrap:wrap}
+.export-steps{margin:0;padding-left:1.3em;display:grid;gap:4px;font-size:15px;color:var(--ink)}
+.export-note{margin:0;font-weight:700;color:var(--ok);min-height:1.2em}
+
+/* security camera monitor */
+.monitor{background:linear-gradient(#20272c,#14191d);border-radius:24px;padding:12px 14px 16px;box-shadow:inset 0 0 0 2px #2f383f, inset 0 2px 0 #3a444c, 0 24px 50px rgba(0,0,0,.6)}
+.monitor-bar{display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px 14px;padding:2px 10px 10px;font:600 12px var(--f-mono);letter-spacing:.12em;color:#8fb8a8;font-variant-numeric:tabular-nums}
+.rec{color:#ff5a5a}
+.screen{
+  --ink:#d6fbe8; --muted:#7fb9a0; --line:#1d4436; --code-bg:#051009; --panel:#0b1d16;
+  position:relative;display:grid;gap:12px;padding:18px;border-radius:16px;overflow:hidden;color:var(--ink);
+  background:radial-gradient(ellipse at 50% 40%, #10302a 0%, #06130e 100%);
+  box-shadow:inset 0 0 50px rgba(0,0,0,.85), inset 0 0 0 1px #1d3b30}
+.screen::after{content:"";position:absolute;inset:0;pointer-events:none;border-radius:inherit;
+  background:repeating-linear-gradient(to bottom, rgba(255,255,255,.035) 0 1px, transparent 1px 3px)}
+.term-head{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.term-head h2{font:600 15px var(--f-mono);letter-spacing:.14em;text-transform:uppercase;color:var(--accent);text-shadow:0 0 10px rgba(95,224,176,.5)}
+.term-head .rule{font-size:13px;color:var(--muted)}
+textarea#sql{width:100%;min-height:150px;resize:vertical;font-size:15px;line-height:1.55;padding:12px 14px;border:1px solid var(--line);border-radius:8px;
+  background:var(--code-bg);color:#b8ffd9;caret-color:var(--accent);text-shadow:0 0 6px rgba(95,224,176,.35);tab-size:2}
+textarea#sql:focus-visible{outline:2px solid var(--accent);outline-offset:0}
+.run-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.run-row .kbd{font:12px var(--f-mono);color:var(--muted)}
+.screen .btn:not(.primary){background:transparent;color:var(--ink);border-color:var(--line)}
+#out{min-height:60px}
+.result-meta{font:600 13px var(--f-mono);color:var(--accent);margin-bottom:6px}
+.tablebox{overflow-x:auto;max-height:440px;overflow-y:auto;border:1px solid var(--line);border-radius:8px;background:rgba(0,0,0,.25)}
+table{border-collapse:collapse;width:100%;font-size:14px;font-variant-numeric:tabular-nums}
+th,td{text-align:left;padding:6px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+th{position:sticky;top:0;background:#0a221a;font:600 12.5px var(--f-mono);color:var(--accent)}
+tr:last-child td{border-bottom:none}
+.screen tbody tr:hover td{background:rgba(95,224,176,.08)}
+td.num{text-align:right}
+td.null{color:var(--muted);font-style:italic}
+.err{background:var(--bad-soft);color:var(--bad);border-radius:8px;padding:12px 14px;font-weight:700}
+.err p{margin:.3em 0 0;font-weight:400;color:var(--ink)}
+.note{color:var(--muted);font-style:italic;margin:0}
+.schema{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:10px}
+.tbl{border:1px solid var(--line);border-radius:8px;padding:10px 12px;background:rgba(0,0,0,.25);min-width:0}
+.tbl button{all:unset;cursor:pointer;font:600 14px var(--f-mono);color:var(--accent)}
+.tbl button:hover{text-decoration:underline}
+.tbl ul{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:7px}
+.tbl li{display:grid;grid-template-columns:auto 1fr;align-items:baseline;column-gap:8px;row-gap:1px}
+.tbl li .k{font:600 13px var(--f-mono);color:var(--ink)}
+.tbl li .ty{justify-self:start;font:600 10px var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);border:1px solid var(--line);border-radius:3px;padding:0 4px}
+.tbl li .d{grid-column:1/-1;font:13px/1.4 var(--f-body);color:var(--muted)}
+.tbl li .d code{color:var(--accent)}
+
+@media (prefers-reduced-motion: no-preference){
+  .verdict.ok{animation:pop .35s ease-out}
+  @keyframes pop{from{transform:scale(.9) rotate(-4deg);opacity:.3}to{transform:rotate(-1deg);opacity:1}}
+  .rec{animation:recblink 1.2s steps(1) infinite}
+  @keyframes recblink{50%{opacity:.2}}
+  .sparkle{animation:twinkle 2.4s ease-in-out infinite}
+  .sparkle.b{animation-delay:1.2s}
+  @keyframes twinkle{0%,100%{transform:scale(0) rotate(0);opacity:0}50%{transform:scale(1) rotate(90deg);opacity:1}}
+  .step.current .n{animation:knob 1.8s ease-in-out infinite}
+  @keyframes knob{50%{box-shadow:0 3px 0 #5a3d08, 0 0 26px rgba(255,236,170,.75)}}
+  .mug.fresh-out::after{animation:scribble .5s ease-out both}
+  @keyframes scribble{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}
+  .mug.fresh-out{animation:jolt .5s ease-out}
+  @keyframes jolt{30%{transform:rotate(calc(var(--r) + 6deg)) scale(1.1)}}
+  .mug.caught{animation:caughtpop .8s cubic-bezier(.2,1.8,.4,1) both}
+  @keyframes caughtpop{from{transform:scale(.3) rotate(-30deg)}to{transform:rotate(var(--r))}}
+}
+
+/* ---------- celebrations ---------- */
+:root{ --fx-night:#05080a; --fx-gold:#f5c542; --fx-ruby:#ff4d6d; --fx-sapphire:#4d8dff; --fx-emerald:#2fd39a; --fx-ice:#bdf6ff; --fx-white:#ffffff; }
+#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:60}
+.step.just{animation:plaque 1.1s ease-out}
+@keyframes plaque{0%{transform:scale(1)}20%{transform:scale(1.25) rotate(-3deg);box-shadow:0 0 0 4px var(--brass),0 0 30px var(--brass)}45%{transform:scale(.95) rotate(2deg)}70%{transform:scale(1.06)}100%{transform:none}}
+.plus{position:fixed;z-index:61;pointer-events:none;font:400 34px var(--f-display);color:var(--brass);text-shadow:0 2px 0 var(--on-brass);animation:plus 1.2s ease-out forwards}
+@keyframes plus{0%{transform:translate(-50%,0) scale(.4);opacity:0}20%{transform:translate(-50%,-20px) scale(1.4);opacity:1}100%{transform:translate(-50%,-110px) scale(1);opacity:0}}
+.shake{animation:shake .6s cubic-bezier(.36,.07,.19,.97)}
+@keyframes shake{10%,90%{transform:translate(-2px,1px)}20%,80%{transform:translate(4px,-2px)}30%,50%,70%{transform:translate(-8px,3px) rotate(-.4deg)}40%,60%{transform:translate(8px,-3px) rotate(.4deg)}}
+
+#finale{position:fixed;inset:0;z-index:55;display:grid;place-items:center;overflow:auto;
+  background:radial-gradient(ellipse at 50% 40%, #12302a 0%, var(--fx-night) 70%);color:var(--fx-white);
+  padding:max(20px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) max(20px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px))}
+#finale .flash{position:absolute;inset:0;background:var(--fx-white);opacity:0;pointer-events:none}
+#finale .siren{position:absolute;top:-25vmax;width:60vmax;height:60vmax;border-radius:50%;filter:blur(60px);opacity:0;pointer-events:none}
+#finale .siren.red{left:-25vmax;background:var(--fx-ruby)}
+#finale .siren.blue{right:-25vmax;background:var(--fx-sapphire)}
+.finale-inner{position:relative;display:grid;justify-items:center;gap:14px;text-align:center;max-width:780px;width:100%}
+.gem-wrap{position:relative;width:180px;height:180px;display:grid;place-items:center}
+.rays{position:absolute;inset:-90px;border-radius:50%;
+  background:repeating-conic-gradient(from 0deg, rgba(245,197,66,.28) 0deg 8deg, transparent 8deg 22deg);
+  -webkit-mask:radial-gradient(circle, #000 20%, transparent 68%);mask:radial-gradient(circle, #000 20%, transparent 68%)}
+.gem{width:130px;height:auto;filter:drop-shadow(0 0 18px rgba(255,90,110,.9)) drop-shadow(0 0 50px rgba(255,40,70,.55))}
+.big-stamp{font:400 clamp(34px,9vw,92px)/1 var(--f-display);letter-spacing:.02em;white-space:nowrap;color:var(--fx-gold);
+  border:6px solid var(--fx-gold);border-radius:10px;padding:10px 24px;transform:rotate(-6deg);
+  text-shadow:0 0 30px rgba(245,197,66,.6);box-shadow:0 0 40px rgba(245,197,66,.35), inset 0 0 30px rgba(245,197,66,.25)}
+.finale-sub{margin:6px 0 0;font:700 clamp(18px,3vw,24px) var(--f-body)}
+.finale-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;width:100%}
+.finale-stats > div{border:1px solid rgba(255,255,255,.18);border-radius:8px;padding:10px 8px;background:rgba(255,255,255,.05);display:grid;gap:2px}
+.finale-stats span{font:600 11px var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--fx-ice)}
+.finale-stats b{font:400 clamp(18px,3.4vw,26px) var(--f-display);color:var(--fx-white);font-variant-numeric:tabular-nums}
+.caught{font:600 14px var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--fx-ruby);background:rgba(255,77,109,.12);border:1px solid rgba(255,77,109,.5);padding:8px 14px;border-radius:4px}
+.finale-btns{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+#finale .btn{background:var(--fx-gold);border-color:var(--fx-gold);color:var(--fx-night);font-size:16px;padding:12px 20px}
+#finale .btn.ghost{background:transparent;color:var(--fx-white);border-color:rgba(255,255,255,.4)}
+@media (max-width:480px){ .finale-stats{grid-template-columns:minmax(0,1fr)} .gem-wrap{width:130px;height:130px} .gem{width:100px} }
+
+@media (prefers-reduced-motion: no-preference){
+  #finale{animation:fadein .4s ease-out}
+  #finale .flash{animation:flash .9s ease-out .85s}
+  #finale .siren.red{animation:sirenA .5s steps(1) infinite}
+  #finale .siren.blue{animation:sirenB .5s steps(1) infinite}
+  .rays{animation:spin 14s linear infinite}
+  .gem{animation:gemdrop 1s cubic-bezier(.2,1.6,.4,1) both, gemspin 3.2s ease-in-out 1s infinite}
+  .big-stamp{animation:slam .45s cubic-bezier(.6,-0.3,.7,1.2) .5s both}
+  .finale-inner.shake{animation:shake .6s cubic-bezier(.36,.07,.19,.97) .95s}
+  .finale-sub,.finale-stats > div,.caught,.finale-btns{animation:rise .6s ease-out both}
+  .finale-sub{animation-delay:1.3s}
+  .finale-stats > div:nth-child(1){animation-delay:1.55s}
+  .finale-stats > div:nth-child(2){animation-delay:1.7s}
+  .finale-stats > div:nth-child(3){animation-delay:1.85s}
+  .caught{animation:rise .6s ease-out 2.1s both, blink 1s steps(1) 2.7s 4}
+  .finale-btns{animation-delay:2.5s}
+  .steps.wave .step{animation:wave .7s ease-out both}
+}
+@keyframes fadein{from{opacity:0}to{opacity:1}}
+
+/* dancing cats: each cat gets its own dance, fur pattern, accessory and name */
+.finale-inner{z-index:2}
+.disco-wrap{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:1}
+.disco-lights{position:absolute;inset:-60%;opacity:.6;mix-blend-mode:screen;background:
+  radial-gradient(circle at 30% 35%, rgba(255,77,109,.55) 0 1.2%, transparent 1.6%),
+  radial-gradient(circle at 62% 28%, rgba(77,141,255,.55) 0 1.2%, transparent 1.6%),
+  radial-gradient(circle at 45% 62%, rgba(245,197,66,.55) 0 1.2%, transparent 1.6%),
+  radial-gradient(circle at 70% 58%, rgba(47,211,154,.55) 0 1.2%, transparent 1.6%),
+  radial-gradient(circle at 38% 48%, rgba(255,255,255,.45) 0 .8%, transparent 1.2%),
+  radial-gradient(circle at 56% 44%, rgba(255,255,255,.45) 0 .8%, transparent 1.2%),
+  radial-gradient(circle at 52% 70%, rgba(255,77,109,.5) 0 1%, transparent 1.4%),
+  radial-gradient(circle at 34% 72%, rgba(77,141,255,.5) 0 1%, transparent 1.4%)}
+.discoball{position:absolute;top:0;left:15%;width:76px;height:126px;margin-left:-38px}
+.discoball::before{content:"";position:absolute;left:37px;top:0;width:2px;height:52px;background:#cfd6dc}
+.discoball .ball{position:absolute;left:6px;top:50px;width:64px;height:64px;border-radius:50%;
+  background:radial-gradient(circle at 32% 30%, rgba(255,255,255,.95) 0 8%, transparent 22%),
+    repeating-linear-gradient(0deg, rgba(0,0,0,.35) 0 1px, transparent 1px 8px),
+    repeating-linear-gradient(90deg, #eef2f5 0 7px, #8d99a5 7px 8px, #c9d1d8 8px 15px, #6f7b87 15px 16px);
+  box-shadow:0 0 26px rgba(255,255,255,.55), inset -10px -12px 18px rgba(0,0,0,.45)}
+.catline{position:relative;display:flex;flex-wrap:wrap;justify-content:center;align-items:flex-end;gap:6px 12px;padding:0 10px;border-radius:12px}
+.catline.floor{padding:8px 14px 10px;background:
+  linear-gradient(to bottom, rgba(5,8,10,.55), transparent 45%),
+  repeating-conic-gradient(rgba(255,77,109,.30) 0 25%, rgba(77,141,255,.30) 0 50%) 0 0/34px 34px;
+  box-shadow:inset 0 0 26px rgba(245,197,66,.25)}
+.cat{position:relative;width:96px;flex:none;cursor:pointer;-webkit-tap-highlight-color:transparent;
+  filter:drop-shadow(0 0 1.5px rgba(255,255,255,.55)) drop-shadow(0 8px 10px rgba(0,0,0,.5))}
+.cat svg{display:block;width:100%;height:auto;overflow:visible}
+.cat-name{display:block;margin-top:1px;font:700 14px/1.1 var(--f-hand);color:#fff1cc;text-align:center;white-space:nowrap;text-shadow:0 1px 2px #000}
+.cat:focus-visible{outline:2px solid var(--fx-gold);outline-offset:3px;border-radius:8px}
+@media (prefers-reduced-motion: no-preference){
+  .discoball{animation:balldrop 1.1s cubic-bezier(.3,1.5,.5,1) both}
+  .discoball .ball{animation:ballshine 1s steps(4) infinite}
+  .disco-lights{animation:lightspin 7s linear infinite}
+  .catline.floor{animation:floorflash 1s steps(2) infinite}
+  .cat{animation:catin .7s cubic-bezier(.2,1.6,.4,1) both}
+  .cat svg{transform-origin:50% 100%}
+  .cat .head{transform-origin:50px 62px}
+  .cat .arm-l{transform-origin:40px 66px}
+  .cat .arm-r{transform-origin:60px 66px}
+  .cat .leg-l{transform-origin:43px 103px}
+  .cat .leg-r{transform-origin:57px 103px}
+  .cat .tail{transform-origin:68px 96px;animation:wag .25s ease-in-out infinite alternate}
+  .cat .eyes{transform-origin:50px 43px;animation:blink 3.4s infinite}
+  .cat .ear-l{transform-origin:38px 34px;animation:twitch 2.6s infinite}
+  /* disco: point to the sky, hand on hip */
+  .d-disco svg{animation:sway 1s ease-in-out infinite}
+  .d-disco .bod{animation:hop .5s ease-in-out infinite alternate}
+  .d-disco .arm-r{animation:point 1s steps(1) infinite}
+  .d-disco .arm-l{transform:rotate(-105deg)}
+  /* headbang */
+  .d-headbang .head{animation:bang .25s ease-in-out infinite alternate}
+  .d-headbang .bod{animation:hop .25s ease-in-out infinite alternate}
+  .d-headbang .arm-l{animation:clawL .5s ease-in-out infinite alternate}
+  .d-headbang .arm-r{animation:clawR .5s ease-in-out infinite alternate}
+  /* spin */
+  .d-spin svg{animation:spin360 2s cubic-bezier(.5,0,.5,1) infinite}
+  .d-spin .arm-l{animation:armL .5s ease-in-out infinite alternate}
+  .d-spin .arm-r{animation:armR .5s ease-in-out infinite alternate}
+  /* wave: both paws in the air */
+  .d-wave svg{animation:sway 2s ease-in-out infinite}
+  .d-wave .head{animation:tilt 1s ease-in-out infinite}
+  .d-wave .arm-l{animation:waveL .5s ease-in-out infinite alternate}
+  .d-wave .arm-r{animation:waveR .5s ease-in-out infinite alternate}
+  /* shuffle: side steps and kicks */
+  .d-shuffle svg{animation:slide 1s ease-in-out infinite}
+  .d-shuffle .leg-l{animation:kickL .5s ease-in-out infinite alternate}
+  .d-shuffle .leg-r{animation:kickR .5s ease-in-out infinite alternate}
+  .d-shuffle .arm-l{animation:armL .5s ease-in-out infinite alternate-reverse}
+  .d-shuffle .arm-r{animation:armR .5s ease-in-out infinite alternate}
+  .cat.boing svg{animation:boing .8s cubic-bezier(.3,1.5,.5,1)!important}
+}
+@keyframes catin{0%{transform:translateY(-60vh) rotate(-540deg) scale(.3)}100%{transform:none}}
+@keyframes balldrop{0%{transform:translateY(-140px)}100%{transform:none}}
+@keyframes ballshine{0%{filter:brightness(1)}25%{filter:brightness(1.25) hue-rotate(20deg)}50%{filter:brightness(.95)}75%{filter:brightness(1.3) hue-rotate(-20deg)}}
+@keyframes lightspin{to{transform:rotate(360deg)}}
+@keyframes floorflash{50%{background-position:0 0,17px 0}}
+@keyframes sway{0%,100%{transform:rotate(-7deg)}50%{transform:rotate(7deg)}}
+@keyframes hop{from{transform:translateY(0)}to{transform:translateY(-9px)}}
+@keyframes armL{from{transform:rotate(0)}to{transform:rotate(-70deg)}}
+@keyframes armR{from{transform:rotate(-20deg)}to{transform:rotate(70deg)}}
+@keyframes wag{from{transform:rotate(-14deg)}to{transform:rotate(16deg)}}
+@keyframes tilt{0%,100%{transform:rotate(-10deg)}50%{transform:rotate(10deg)}}
+@keyframes point{0%{transform:rotate(-38deg)}50%{transform:rotate(95deg)}}
+@keyframes bang{from{transform:rotate(-6deg)}to{transform:rotate(22deg) translateY(3px)}}
+@keyframes clawL{from{transform:rotate(-15deg)}to{transform:rotate(-45deg)}}
+@keyframes clawR{from{transform:rotate(15deg)}to{transform:rotate(45deg)}}
+@keyframes spin360{0%{transform:rotateY(0)}25%{transform:rotateY(0) translateY(-6px)}60%{transform:rotateY(360deg) translateY(-16px)}100%{transform:rotateY(360deg)}}
+@keyframes waveL{from{transform:rotate(-45deg)}to{transform:rotate(-5deg)}}
+@keyframes waveR{from{transform:rotate(5deg)}to{transform:rotate(45deg)}}
+@keyframes slide{0%,100%{transform:translateX(-10px) rotate(-3deg)}50%{transform:translateX(10px) rotate(3deg)}}
+@keyframes kickL{from{transform:rotate(0)}to{transform:rotate(38deg)}}
+@keyframes kickR{from{transform:rotate(0)}to{transform:rotate(-38deg)}}
+@keyframes blink{0%,90%,100%{transform:scaleY(1)}94%{transform:scaleY(.1)}}
+@keyframes twitch{0%,80%,100%{transform:rotate(0)}85%{transform:rotate(-14deg)}90%{transform:rotate(4deg)}}
+@keyframes boing{0%{transform:none}45%{transform:translateY(-42px) rotate(360deg) scale(1.15)}100%{transform:none}}
+@keyframes flash{0%{opacity:.85}100%{opacity:0}}
+@keyframes sirenA{0%{opacity:.55}50%{opacity:.08}}
+@keyframes sirenB{0%{opacity:.08}50%{opacity:.55}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes gemdrop{0%{transform:translateY(-120vh) scale(.6) rotate(-40deg)}100%{transform:none}}
+@keyframes gemspin{0%,100%{transform:rotateY(0) scale(1)}50%{transform:rotateY(180deg) scale(1.08)}}
+@keyframes slam{0%{transform:scale(5) rotate(-20deg);opacity:0}70%{transform:scale(.92) rotate(-5deg);opacity:1}100%{transform:scale(1) rotate(-6deg);opacity:1}}
+@keyframes rise{from{transform:translateY(24px);opacity:0}to{transform:none;opacity:1}}
+@keyframes blink{50%{opacity:.35}}
+@keyframes wave{0%{transform:none}40%{transform:translateY(-14px) scale(1.12);border-top-color:var(--brass)}100%{transform:none}}
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="plaque">
+      <div class="gem-badge" aria-hidden="true">
+        <svg viewBox="0 0 100 86">
+          <polygon points="22,2 78,2 98,28 50,84 2,28" fill="#d7263d"/>
+          <polygon points="22,2 36,28 2,28" fill="#ff6b7d"/>
+          <polygon points="78,2 64,28 98,28" fill="#a3122a"/>
+          <polygon points="22,2 78,2 64,28 36,28" fill="#f0485c"/>
+          <polygon points="36,28 64,28 50,84" fill="#b8152f"/>
+          <polygon points="2,28 36,28 50,84" fill="#e0334a"/>
+          <polygon points="98,28 64,28 50,84" fill="#7c0a1e"/>
+        </svg>
+        <span class="sparkle a"></span><span class="sparkle b"></span>
+      </div>
+      <div>
+        <div class="eyebrow">Városi Kincsmúzeum · Zárás után</div>
+        <h1>Az Éjféli Paprika-rablás</h1>
+      </div>
+      <span class="stamp" id="stamp">Nyitott ügy</span>
+    </div>
+    <div class="meta">
+      <span class="meta-item"><span class="lbl">Idő</span><b id="timer">00:00</b></span>
+      <span class="meta-item"><span class="lbl">Haladás</span><b id="solvedCount">0 / 10 fejezet kész</b></span>
+      <button class="btn small" id="soundToggle" type="button" aria-pressed="true">Hang: be</button>
+      <button class="btn small danger" id="resetProgress" type="button">Újrakezdés</button>
+    </div>
+  </header>
+
+  <nav class="steps" id="steps" aria-label="Fejezetek"></nav>
+  <div class="step-caption" id="stepCaption" aria-hidden="true"></div>
+
+  <section class="board" aria-label="Gyanúsítottak">
+    <div class="board-head"><h2>Gyanúsítottak</h2><p id="boardNote">Szombaton 30 látogató volt a múzeumban.</p></div>
+    <div class="board-grid" id="board"></div>
+  </section>
+
+  <main>
+    <section class="panel case" id="case" aria-live="polite"></section>
+
+    <section class="panel monitor">
+      <div class="monitor-bar"><span class="rec">● REC</span><span>KAM 04 · Drágakőterem</span><span id="camClock">SZO 17:58:00</span></div>
+      <div class="screen">
+        <div class="term-head">
+          <h2>Biztonsági terminál</h2>
+          <span class="rule">Lekérdezésenként egy tábla: SELECT … FROM … WHERE …</span>
+        </div>
+        <label for="sql" class="eyebrow">SQL-lekérdezésed</label>
+        <textarea id="sql" spellcheck="false" autocapitalize="off" autocomplete="off"></textarea>
+        <div class="run-row">
+          <button class="btn primary" id="run" type="button">Futtatás</button>
+          <button class="btn" id="resetDb" type="button">Adatok visszaállítása</button>
+          <span class="kbd">Ctrl + Enter: futtatás</span>
+        </div>
+        <div id="out"><p class="note">A múzeum adatbázisa töltődik…</p></div>
+        <div class="eyebrow">Táblák és oszlopok (kattints egy tábla nevére a teljes tartalmához)</div>
+        <div class="schema" id="schema"></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<canvas id="fx" aria-hidden="true"></canvas>
+<div id="finale" hidden role="dialog" aria-modal="true" aria-labelledby="finaleTitle">
+  <div class="siren red"></div><div class="siren blue"></div>
+  <div class="disco-wrap" id="disco" hidden aria-hidden="true"><div class="disco-lights"></div><div class="discoball"><div class="ball"></div></div></div>
+  <div class="finale-inner" id="finaleInner">
+    <div class="gem-wrap">
+      <div class="rays"></div>
+      <svg class="gem" viewBox="0 0 100 86" aria-hidden="true">
+        <polygon points="22,2 78,2 98,28 50,84 2,28" fill="#d7263d"/>
+        <polygon points="22,2 36,28 2,28" fill="#ff6b7d"/>
+        <polygon points="78,2 64,28 98,28" fill="#a3122a"/>
+        <polygon points="22,2 78,2 64,28 36,28" fill="#f0485c"/>
+        <polygon points="36,28 64,28 50,84" fill="#b8152f"/>
+        <polygon points="2,28 36,28 50,84" fill="#e0334a"/>
+        <polygon points="98,28 64,28 50,84" fill="#7c0a1e"/>
+        <polygon points="30,8 40,8 34,20" fill="#ffffff"/>
+      </svg>
+    </div>
+    <div class="big-stamp" id="finaleTitle">ÜGY LEZÁRVA</div>
+    <p class="finale-sub">Az Éjféli Paprika visszakerült a vitrinjébe.</p>
+    <div class="finale-stats">
+      <div><span>Idő</span><b id="fTime">–</b></div>
+      <div><span>Lekérdezések</span><b id="fQueries">–</b></div>
+      <div><span>Rang</span><b id="fRank">–</b></div>
+    </div>
+    <div class="caught">M. Anna Petra &amp; K. Nóra · letartóztatva</div>
+    <div class="finale-btns">
+      <button class="btn" id="finaleClose" type="button">Bónusz nyomozások</button>
+      <button class="btn ghost" id="finaleAgain" type="button">Még több tűzijáték</button>
+      <button class="btn ghost" id="catBtn" type="button">Táncoló cica</button>
+      <button class="btn ghost" id="finaleSave" type="button">Válaszok mentése</button>
+    </div>
+    <div class="catline" id="catline" aria-hidden="true"></div>
+  </div>
+  <div class="flash"></div>
+</div>
+
+<script>
+/*SEED*/
+const SEED = `
+CREATE TABLE targyak (id INTEGER PRIMARY KEY, nev TEXT, terem TEXT, ev INTEGER, anyag TEXT, ertek_eur INTEGER);
+INSERT INTO targyak VALUES
+(1,'Éjféli Paprika','Drágakőterem',1880,'gyémánt',4200000),
+(2,'Rubinkorona','Drágakőterem',1765,'arany és rubin',2900000),
+(3,'Smaragdbross','Drágakőterem',1910,'smaragd',850000),
+(4,'Zafírgyűrű','Drágakőterem',1932,'zafír',420000),
+(5,'Gyöngysor','Drágakőterem',1895,'gyöngy',610000),
+(6,'Opáltojás','Drágakőterem',1902,'opál és ezüst',1300000),
+(7,'Arany szkarabeusz','Egyiptomi terem',-1350,'arany',3100000),
+(8,'Macskamúmia','Egyiptomi terem',-600,'vászon',90000),
+(9,'Festett koporsó','Egyiptomi terem',-900,'fa',750000),
+(10,'Kék négyzet','Modern szárny',1968,'olaj, vászon',1800000),
+(11,'Olvadó óra (vázlat)','Modern szárny',1951,'ceruza',240000),
+(12,'Neonbicikli','Modern szárny',2004,'acél és neon',310000),
+(13,'Római aranyérme','Éremtár',117,'arany',56000),
+(14,'Ezüsttallér','Éremtár',1622,'ezüst',18000),
+(15,'T. rex fog','Dinoszauruszterem',-66000000,'kövület',120000),
+(16,'Raptorkarom','Dinoszauruszterem',-75000000,'kövület',45000);
+
+CREATE TABLE latogatok (id INTEGER PRIMARY KEY, nev TEXT, kor INTEGER, magassag_cm INTEGER, haj TEXT, kabat TEXT, jegy TEXT, erkezes TEXT, tavozas TEXT);
+INSERT INTO latogatok VALUES
+(1,'B. Dániel',16,168,'szőke','kék','diák','09:10','11:30'),
+(2,'B. Mihály',16,172,'fekete','fekete','diák','09:15','12:00'),
+(3,'B. Rozália',17,160,'ősz','bézs','diák','09:30','11:45'),
+(4,'C. Balázs',16,185,'fekete','sötétkék','diák','10:00','13:20'),
+(5,'É. Bence',16,158,'vörös','sárga','diák','10:05','12:40'),
+(6,'F. Lilianna',17,178,'barna','zöld','tag','10:20','14:10'),
+(7,'M. Márk',38,188,'barna','piros','felnőtt','10:30','15:20'),
+(8,'F. Réka',16,170,'fehér','szürke','diák','11:00','14:45'),
+(9,'H. Hunor József',17,164,'fekete','narancs','diák','11:15','15:05'),
+(10,'K. Kamilla',16,183,'szőke','fekete','diák','11:40','15:30'),
+(11,'K. Luca',16,166,'fekete','fehér','diák','12:10','15:50'),
+(12,'L. Mária Éva',17,175,'barna','kék','tag','13:00','15:58'),
+(13,'M. Anna Petra',17,184,'fekete','piros','diák','14:20','17:52'),
+(14,'L. Ágnes Abigél',16,182,'barna','narancs','diák','14:30','17:10'),
+(15,'L. Laura',17,187,'szőke','piros','tag','13:40','16:45'),
+(16,'H. Viktor',50,186,'ősz','piros','személyzet','08:30','18:15'),
+(17,'L. Zorka',16,190,'barna','fekete','diák','15:00','17:30'),
+(18,'L. Zsombor Attila',17,181,'barna','zöld','diák','15:10','16:20'),
+(19,'N. Boglárka',16,183,'fehér','szürke','diák','14:00','16:40'),
+(20,'O. Benjámin Ádám',16,192,'fekete','kék','diák','15:20','17:45'),
+(21,'K. Nóra',16,165,'szőke','zöld','diák','15:30','17:52'),
+(22,'P. Hanna',16,155,'fekete','narancs','diák','15:40','17:20'),
+(23,'P. Petra Patrícia',16,180,'vörös','piros','diák','14:50','17:00'),
+(24,'R. Benjámin Laurence',17,176,'ősz','fekete','tag','13:30','16:30'),
+(25,'S. Bálint Máté',16,162,'fekete','lila','diák','14:10','16:50'),
+(26,'S. Eliza',16,170,'barna','kék','diák','15:05','17:40'),
+(27,'S. Fruzsina',17,158,'szőke','sárga','diák','15:15','17:05'),
+(28,'W. Bianka Kinga',16,173,'szőke','piros','diák','14:40','17:35'),
+(29,'W. Jay',16,179,'fekete','szürke','diák','15:25','17:15'),
+(30,'Z. Zalán Benedek',17,169,'barna','piros','személyzet','12:00',NULL);
+`;
+/*END SEED*/
+
+const CHAPTERS = [
+{
+  refresher:true,
+  title:"Gyors ismétlés",
+  story:`<p>Mielőtt elkezdődik a nyomozás, egy háromperces emlékeztető arról, hogyan épül fel egy lekérdezés. Ebben az ügyben minden lekérdezés ugyanabból a három részből áll, mindig ebben a sorrendben.</p>
+  <div class="anatomy" role="table" aria-label="Egy lekérdezés részei">
+    <div role="row"><code role="cell">SELECT nev, kor</code><span role="cell">mely <b>oszlopokat</b> mutassa. A <code>*</code> az összeset jelenti. Az oszlopneveket vesszővel válaszd el.</span></div>
+    <div role="row"><code role="cell">FROM latogatok</code><span role="cell">melyik <b>táblából</b> olvasson</span></div>
+    <div role="row"><code role="cell">WHERE kor &gt; 16;</code><span role="cell">mely <b>sorokat</b> tartsa meg. Elhagyható: nélküle minden sort megkapsz.</span></div>
+  </div>
+  <ul class="rules">
+    <li>A szöveges értékek egyszeres idézőjelbe kerülnek: <code>'piros'</code>. A számok nem: <code>180</code>.</li>
+    <li>Az <code>=</code> pontos egyezést kér: az <code>'arany'</code> nem egyezik az <code>'arany és rubin'</code> értékkel.</li>
+    <li>A kis- és nagybetű számít: a <code>'Piros'</code> nem ugyanaz, mint a <code>'piros'</code>. Az ékezetek is számítanak.</li>
+    <li>Az oszlopneveket pontosan úgy írd, ahogy a szerkesztő alatti listában szerepelnek.</li>
+  </ul>`,
+  learn:`<table class="ops"><thead><tr><th>Jel</th><th>Jelentés</th><th>Példa</th></tr></thead><tbody>
+    <tr><td><code>=</code></td><td>egyenlő</td><td><code>kabat = 'kék'</code></td></tr>
+    <tr><td><code>&lt;&gt;</code></td><td>nem egyenlő</td><td><code>jegy &lt;&gt; 'felnőtt'</code></td></tr>
+    <tr><td><code>&gt;</code> / <code>&lt;</code></td><td>nagyobb / kisebb</td><td><code>kor &gt; 16</code></td></tr>
+    <tr><td><code>&gt;=</code> / <code>&lt;=</code></td><td>vagy egyenlő</td><td><code>ev &lt;= 1900</code></td></tr>
+  </tbody></table>
+  <p><b>Próbáld ki!</b> Kattints egyre, és már fut is:</p>
+  <div class="tries">
+    <button type="button" class="try" data-sql="SELECT * FROM targyak;">SELECT * FROM targyak;</button>
+    <button type="button" class="try" data-sql="SELECT nev, terem FROM targyak;">SELECT nev, terem FROM targyak;</button>
+    <button type="button" class="try" data-sql="SELECT nev, ev FROM targyak WHERE ev &lt; 0;">SELECT nev, ev FROM targyak WHERE ev &lt; 0;</button>
+  </div>`,
+  task:"Bemelegítés: hány tárgy anyaga pontosan 'arany'?",
+  hints:[
+    "Használd ezt: WHERE anyag = 'arany'. Számold meg az eredmény sorait. Az 'arany és rubin' nem számít bele, mert az = pontos egyezést kér.",
+    {sql:"SELECT nev, anyag FROM targyak\nWHERE anyag = 'arany';"}
+  ],
+  answers:["2","ketto","ket"],
+  placeholder:"egy szám",
+  success:"Kettő: az Arany szkarabeusz és a Római aranyérme. Készen állsz. A múzeum mindjárt bezár…",
+  starter:"SELECT * FROM targyak;"
+},
+{
+  title:"Riasztás záráskor",
+  story:`<p>Szombat, 18:00. A Városi Kincsmúzeum épp zárni készül, amikor az egyik teremben megszólal a riasztó. Az ország leghíresebb gyémántja, az <mark>Éjféli Paprika</mark>, egy diónyi, mélyvörös gyémánt, eltűnt az üvegvitrinből.</p>
+  <p>Aznap az egész osztályotok a múzeumban volt osztálykiránduláson. A múzeum igazgatója a segítségedet kéri. Leülhetsz a biztonsági terminálhoz, és hozzáférsz a múzeum adatbázisához. Először derítsd ki, hol volt kiállítva a gyémánt.</p>`,
+  learn:`<p>A <code>SELECT *</code> minden oszlopot megmutat. A <code>FROM</code> után áll, hogy melyik táblából olvasunk.</p>
+  <pre>SELECT * FROM latogatok;</pre>`,
+  task:"Nézd meg a targyak táblát! Melyik teremben volt kiállítva az Éjféli Paprika?",
+  hints:[
+    "Jelenítsd meg a teljes targyak táblát, és keresd meg azt a sort, ahol a nev oszlopban Éjféli Paprika áll.",
+    {sql:"SELECT * FROM targyak;"}
+  ],
+  answers:["dragakoterem","a dragakoterem","dragako terem","a dragako terem","dragakoteremben","a dragakoteremben"],
+  placeholder:"a terem neve",
+  success:"A Drágakőteremben. Ez a múzeum legértékesebb terme."
+},
+{
+  title:"Számold meg az ékszereket",
+  story:`<p>Egy őr átrohan a Drágakőterembe, és megszámolja a még kiállított kincseket. <mark>Ötöt</mark> számol. Csak a gyémánt hiányzik, vagy a tolvaj mást is elvitt?</p>
+  <p>Nézd meg, hány tárgyat tart nyilván az adatbázis ebben a teremben. Nem kell minden oszlop, elég a név és az érték.</p>`,
+  learn:`<p>A <code>SELECT</code> után csak a szükséges oszlopokat is felsorolhatod. A <code>WHERE</code> csak a feltételnek megfelelő sorokat tartja meg. A szöveg egyszeres idézőjelbe kerül.</p>
+  <pre>SELECT nev, ev FROM targyak
+WHERE terem = 'Egyiptomi terem';</pre>
+  <p>A terminál minden eredmény fölött kiírja a sorok számát.</p>`,
+  task:"Hány tárgyat tart nyilván az adatbázis a Drágakőteremben?",
+  hints:[
+    "SELECT nev, ertek_eur FROM targyak, majd adj hozzá egy WHERE feltételt a terem oszlopra. A kis- és nagybetű és az ékezetek is számítanak: 'Drágakőterem'.",
+    {sql:"SELECT nev, ertek_eur FROM targyak\nWHERE terem = 'Drágakőterem';"}
+  ],
+  answers:["6","hat"],
+  placeholder:"egy szám",
+  success:"Hat az adatbázisban, öt a teremben. Csak az Éjféli Paprika hiányzik, amely 4 200 000 eurót ér. Jöhetnek a látogatók."
+},
+{
+  title:"Ki volt még bent?",
+  story:`<p>Osztálytársatok, Z. Zalán Benedek hétvégente a Drágakőterem őreként dolgozik. <mark>16:00</mark>-kor fotót küldött a gyémántról a biztonsági pultnak, tehát azt csak ezután lopták el. Aki 16:00 előtt elhagyta a múzeumot, az nem lehet a tolvaj.</p>
+  <p>A <code>latogatok</code> tábla rögzíti, ki mikor érkezett (<code>erkezes</code>) és mikor távozott (<code>tavozas</code>). Az időpontok szövegként szerepelnek, például <code>'14:05'</code>, és a <code>&gt;</code> meg a <code>&lt;</code> helyesen működik rajtuk.</p>`,
+  learn:`<p>Összehasonlító jelek: <code>=</code> egyenlő, <code>&gt;</code> nagyobb, <code>&lt;</code> kisebb, <code>&gt;=</code> nagyobb vagy egyenlő, <code>&lt;=</code> kisebb vagy egyenlő.</p>
+  <pre>SELECT nev, erkezes FROM latogatok
+WHERE erkezes &lt; '10:00';</pre>`,
+  task:"Hány látogató távozott a múzeumból 16:00 után?",
+  hints:[
+    "Használd ezt: WHERE tavozas > '16:00'. A sorok számát az eredmény fölött látod.",
+    {sql:"SELECT nev, tavozas FROM latogatok\nWHERE tavozas > '16:00';"}
+  ],
+  answers:["17","tizenhet"],
+  placeholder:"egy szám",
+  success:"17 látogató távozott 16:00 után. Még mindig túl sok a gyanúsított, és valami nem stimmel a számokkal."
+},
+{
+  title:"Az őr, aki sosem távozott",
+  story:`<p>Valami nem stimmel. 12 látogató távozott 16:00 előtt, 17 pedig utána. Ez összesen 29, a beléptető számláló szerint viszont szombaton <mark>30 ember</mark> jött be.</p>
+  <p>Valaki bement, de soha nem jött ki. Az ő <code>tavozas</code> mezője üres.</p>`,
+  learn:`<p>Az adatbázisban az üres cella neve <code>NULL</code>, vagyis „nincs érték”. Az <code>= NULL</code> feltétellel nem találod meg, mert az soha semmire nem teljesül. Helyette az <code>IS NULL</code> kell, az ellenkezőjére pedig az <code>IS NOT NULL</code>.</p>
+  <pre>SELECT nev, haj FROM latogatok
+WHERE haj IS NULL;</pre>
+  <p>Ez a példa 0 sort ad, mert mindenkinek ki van töltve a hajszíne.</p>`,
+  task:"Ki nem hagyta el soha a múzeumot? Add meg a nevét!",
+  hints:[
+    "Keresd azt a sort, ahol tavozas IS NULL. Próbáld ki az = NULL-t is, és figyeld meg, hogy semmit sem talál.",
+    {sql:"SELECT nev, jegy, erkezes, tavozas FROM latogatok\nWHERE tavozas IS NULL;"}
+  ],
+  answers:["z zalan benedek","zalan benedek","zalan","z zalan","zalan benedek z"],
+  placeholder:"név",
+  success:"Z. Zalán Benedek, a Drágakőterem őre. A rendőrség a pincelépcső aljában találja meg. Halott. Biztosan látta a tolvajt, így ez már gyilkossági ügy."
+},
+{
+  title:"Magas árnyék",
+  story:`<p>Közvetlenül a riasztás előtt egy turistacsoport valakit látott a gyémánt vitrinjénél. Egy dologban mindannyian egyetértenek: az illető <mark>180 cm-nél magasabb</mark> volt.</p>
+  <p>Először csak ezt a szűrést gyakorold. A számokhoz nem kell idézőjel.</p>`,
+  learn:`<p>A számokat idézőjel nélkül írjuk. A „magasabb, mint” <code>&gt;</code>-t jelent, tehát aki pontosan 180 cm, az nem számít bele.</p>
+  <pre>SELECT nev, kor FROM latogatok
+WHERE kor &gt;= 17;</pre>`,
+  task:"Hány látogató magasabb 180 cm-nél az egész táblában?",
+  hints:[
+    "WHERE magassag_cm > 180. Itt ne a >= jelet használd: aki pontosan 180 cm, az nem magasabb 180-nál.",
+    {sql:"SELECT nev, magassag_cm FROM latogatok\nWHERE magassag_cm > 180;"}
+  ],
+  answers:["11","tizenegy"],
+  placeholder:"egy szám",
+  success:"11 magas látogató. Néhányan közülük viszont korán elmentek. Ideje összekapcsolni a két nyomot."
+},
+{
+  title:"Két nyom egyszerre",
+  story:`<p>Két tényt tudsz a tolvajról: <mark>16:00 után távozott</mark>, és <mark>180 cm-nél magasabb</mark>. Ugyanarra az emberre mindkettőnek igaznak kell lennie.</p>`,
+  learn:`<p>Az <code>AND</code> két feltételt kapcsol össze. Egy sor csak akkor marad meg, ha mindkét feltétel igaz.</p>
+  <pre>SELECT nev, kor, jegy FROM latogatok
+WHERE haj = 'fekete' AND kor &lt; 17;</pre>`,
+  task:"Hány látogató távozott 16:00 után ÉS magasabb 180 cm-nél?",
+  hints:[
+    "Kapcsold össze a 3. és az 5. fejezet feltételét AND-del.",
+    {sql:"SELECT nev, magassag_cm, tavozas FROM latogatok\nWHERE tavozas > '16:00' AND magassag_cm > 180;"}
+  ],
+  answers:["8","nyolc"],
+  placeholder:"egy szám",
+  success:"Már csak 8 gyanúsított van. Írd fel a nevüket a jegyzetfüzetedbe."
+},
+{
+  title:"Piros vagy narancs?",
+  story:`<p>A turisták vitatkoznak a kabát színén. A felük szerint <mark>piros</mark> volt, a másik felük szerint <mark>narancs</mark>. Úgy döntesz, hogy mindkét színt megtartod.</p>
+  <p>Vigyázz: a 6. fejezet két nyomára továbbra is szükséged van.</p>`,
+  learn:`<p>Az <code>OR</code> akkor tartja meg a sort, ha legalább az egyik feltétel igaz. Ha az <code>AND</code>-et és az <code>OR</code>-t együtt használod, az <code>OR</code>-os részt tedd zárójelbe. Zárójel nélkül az SQL előbb az <code>AND</code>-et értékeli ki, és rossz sorokat kapsz.</p>
+  <pre>SELECT nev, haj FROM latogatok
+WHERE kor &gt; 16 AND (haj = 'szőke' OR haj = 'vörös');</pre>`,
+  task:"A gyanúsítottjaid közül hányan viseltek piros vagy narancs kabátot?",
+  hints:[
+    "Maradjon a tavozas > '16:00' AND magassag_cm > 180, és add hozzá ezt: AND (kabat = 'piros' OR kabat = 'narancs'). Ha 6-ot kapsz, lemaradt a zárójel.",
+    {sql:"SELECT nev, kabat, magassag_cm, tavozas FROM latogatok\nWHERE tavozas > '16:00' AND magassag_cm > 180\n  AND (kabat = 'piros' OR kabat = 'narancs');"}
+  ],
+  answers:["4","negy"],
+  placeholder:"egy szám",
+  success:"4 gyanúsított maradt. Egyikük ismerős: H. Viktor piros dzsekit visel."
+},
+{
+  title:"Az őr dzsekije",
+  story:`<p>H. Viktor a múzeum őre, és minden őr <mark>piros dzsekit</mark> hord. A kamerák szerint 16:30-tól zárásig a főbejáratnál állt, tehát nem lehet a tolvaj.</p>
+  <p>A személyzet tagjainál a táblában <code>jegy = 'személyzet'</code> szerepel. Vedd ki őket a listádból.</p>`,
+  learn:`<p>A <code>&lt;&gt;</code> jelentése „nem egyenlő”. Minden sort megtart, kivéve az egyezőket.</p>
+  <pre>SELECT nev, jegy FROM latogatok
+WHERE jegy &lt;&gt; 'diák';</pre>`,
+  task:"Adj hozzá egy feltételt, amely kiszűri a személyzetet! Hány gyanúsított maradt?",
+  hints:[
+    "Add hozzá a 7. fejezet lekérdezéséhez ezt: AND jegy <> 'személyzet'.",
+    {sql:"SELECT nev, kabat, jegy FROM latogatok\nWHERE tavozas > '16:00' AND magassag_cm > 180\n  AND (kabat = 'piros' OR kabat = 'narancs')\n  AND jegy <> 'személyzet';"}
+  ],
+  answers:["3","harom"],
+  placeholder:"egy szám",
+  success:"Három gyanúsított maradt. Tartsd meg a lekérdezésedet: a következő nyom egyetlen emberre szűkíti a kört."
+},
+{
+  title:"A szakadt jegy",
+  story:`<p>A gyémánt vitrinje alatt egy takarító egy elszakadt múzeumi belépőjegy felét találja meg. Minden jegyre rányomtatják a látogató nevét, de ez pont a névnél szakadt el. Csak az első betű olvasható: <mark>M</mark>.</p>`,
+  learn:`<p>A <code>LIKE</code> szövegen belül keres. A <code>%</code> jelentése „bármennyi tetszőleges karakter”. Az <code>'A%'</code> azt jelenti, hogy „A-val kezdődik”, a <code>'%ka'</code> pedig azt, hogy „ka-ra végződik”.</p>
+  <pre>SELECT nev FROM latogatok
+WHERE nev LIKE '%a';</pre>`,
+  task:"A három gyanúsítottad közül kinek a neve kezdődik M-mel? Add meg a teljes nevét!",
+  hints:[
+    "Add hozzá a 8. fejezet lekérdezéséhez ezt: AND nev LIKE 'M%'. Ha a LIKE 'M%'-et önmagában használod, két embert kapsz, és közülük az egyik nem gyanúsított.",
+    {sql:"SELECT nev, magassag_cm, kabat, tavozas FROM latogatok\nWHERE tavozas > '16:00' AND magassag_cm > 180\n  AND (kabat = 'piros' OR kabat = 'narancs')\n  AND jegy <> 'személyzet'\n  AND nev LIKE 'M%';"}
+  ],
+  answers:["m anna petra","anna petra","anna petra m","m anna","anna"],
+  placeholder:"teljes név",
+  success:"M. Anna Petra. A rendőrség otthon is átkutatja, de a gyémánt nincs nála."
+},
+{
+  title:"A tettestárs",
+  story:`<p>Anna Petra <mark>17:52</mark>-kor hagyta el a múzeumot, és a kijáratnál álló őr megesküszik rá, hogy üres volt a zsebe. Biztosan átadta a gyémántot valakinek a ruhatárban, és együtt sétáltak ki az ajtón.</p>`,
+  learn:`<p>Az <code>=</code> az időpontokon is működik. Keresd meg mindenkit, aki pontosan ugyanabban a percben távozott.</p>
+  <pre>SELECT nev, erkezes FROM latogatok
+WHERE erkezes = '15:00';</pre>`,
+  task:"Ki hagyta el a múzeumot ugyanakkor, mint M. Anna Petra? Add meg a teljes nevét!",
+  hints:[
+    "WHERE tavozas = '17:52'. Az egyik sor maga Anna Petra.",
+    {sql:"SELECT nev, magassag_cm, kabat, tavozas FROM latogatok\nWHERE tavozas = '17:52';"}
+  ],
+  answers:["k nora","nora","nora k"],
+  placeholder:"teljes név",
+  success:"K. Nóra. A rendőrség az esernyője nyelében találja meg az Éjféli Paprikát."
+}
+];
+
+const BONUS = [
+  "Sorold fel az összes 1 000 000 eurónál értékesebb tárgyat, amely NEM a Drágakőteremben van!",
+  "Mely tárgyak készültek a 0. év előtt? (A negatív évszám időszámításunk előttit jelent.)",
+  "Keresd meg a múzeum összes tagját (jegy = 'tag'), aki 11:00 előtt érkezett!",
+  "Mely látogatók szőkék, és végződik a nevük 'a' betűre?",
+  "Ki töltötte a legtöbb időt a múzeumban? Keress korai érkezést és késői távozást!"
+];
+
+/* ---------- state ---------- */
+const KEY = "ejfeli-paprika-hu-v1";
+const num = i => CHAPTERS[0].refresher ? i : i+1;           /* refresher is step "R", chapters start at 1 */
+const NCH = CHAPTERS.filter(c=>!c.refresher).length;
+let state = { solved: [], current: 0, start: Date.now(), end: null, drafts: {} };
+try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && Array.isArray(s.solved)) state = Object.assign(state, s); } catch(e){}
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(state)); } catch(e){} }
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const norm = s => s.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9 ]/g," ").replace(/\s+/g," ").trim();
+const isUnlocked = i => i === 0 || state.solved.includes(i-1);
+const allDone = () => state.solved.length === CHAPTERS.length;
+const starterFor = i => CHAPTERS[i].starter || `-- ${num(i)}. fejezet: ${CHAPTERS[i].title}\n`;
+
+function renderSteps(){
+  $("steps").innerHTML = CHAPTERS.map((c,i)=>{
+    const cls = ["step"];
+    if (state.solved.includes(i)) cls.push("done");
+    if (i === state.current) cls.push("current");
+    if (!isUnlocked(i)) cls.push("locked");
+    return `<button type="button" class="${cls.join(" ")}" data-i="${i}" ${isUnlocked(i)?"":"aria-disabled=\"true\""} title="${esc(c.title)}">
+      <span class="n">${c.refresher ? "0" : num(i)}</span><span class="t">${esc(c.title)}</span></button>`;
+  }).join("");
+  { const cc = CHAPTERS[state.current]; $("stepCaption").innerHTML = `<span>${cc.refresher ? "Ismétlés" : `${num(state.current)}. fejezet / ${NCH}`}</span>${esc(cc.title)}`; }
+  $("solvedCount").textContent = `${state.solved.filter(i=>!CHAPTERS[i].refresher).length} / ${NCH} fejezet kész`;
+  const st = $("stamp"); st.textContent = allDone() ? "Lezárva" : "Nyitott ügy"; st.classList.toggle("closed", allDone());
+}
+$("case").addEventListener("click", e=>{
+  const b = e.target.closest("button.try"); if (!b) return;
+  $("sql").value = b.dataset.sql; run();
+});
+$("steps").addEventListener("click", e=>{
+  const b = e.target.closest(".step"); if (!b) return;
+  const i = +b.dataset.i; if (isUnlocked(i)) goTo(i);
+});
+
+function goTo(i){
+  state.drafts[state.current] = $("sql").value;
+  state.current = i; save();
+  renderSteps(); renderCase();
+  $("sql").value = state.drafts[i] ?? starterFor(i);
+}
+
+function renderCase(){
+  const i = state.current, c = CHAPTERS[i], solved = state.solved.includes(i);
+  const hints = c.hints.map((h,k)=>{
+    if (typeof h === "string") return `<details class="hint"><summary>1. bizonyítékzacskó · tipp</summary><p>${esc(h)}</p></details>`;
+    const tries = (state.wrong && state.wrong[i]) || 0;
+    if (!solved && tries < 2) return `<div class="hint locked">2. bizonyítékzacskó · lezárva. Még ${2 - tries} rossz válasz után nyílik ki.</div>`;
+    return `<details class="hint"><summary>2. bizonyítékzacskó · egy működő lekérdezés</summary><pre>${esc(h.sql)}</pre></details>`;
+  }).join("");
+  const last = i === CHAPTERS.length - 1;
+  $("case").innerHTML = `
+    <div class="eyebrow">${c.refresher ? "Nyomozás előtt · kb. 3 perc" : `${num(i)}. fejezet / ${NCH}`}</div>
+    <h2>${esc(c.title)}</h2>
+    <div class="story">${c.story}</div>
+    <div class="learn"><h3>${c.refresher ? "Összehasonlító jelek" : "Ehhez a lépéshez"}</h3>${c.learn}</div>
+    <div class="task"><h3>Feladat</h3><p>${esc(c.task)}</p></div>
+    ${hints}
+    <form class="answer" id="answerForm" autocomplete="off">
+      <input id="answer" type="text" placeholder="Válasz: ${esc(c.placeholder)}" aria-label="Válaszod" ${solved?"disabled":""}>
+      <button class="btn primary" type="submit" ${solved?"disabled":""}>Ellenőrzés</button>
+    </form>
+    <div id="verdict">${solved ? `<div class="verdict ok">Helyes!<p>${esc(c.success)}</p></div>` : ""}</div>
+    <div class="navrow">
+      <button class="btn" type="button" id="prev" ${i===0?"hidden":""}>Előző fejezet</button>
+      <button class="btn primary" type="button" id="next" ${solved && !last ? "" : "hidden"}>${c.refresher ? "Indul a nyomozás" : "Következő fejezet"}</button>
+    </div>
+    ${allDone() && last ? endingHtml() : ""}`;
+  $("answerForm").addEventListener("submit", e=>{ e.preventDefault(); check(); });
+  $("prev").onclick = ()=> goTo(i-1);
+  $("next").onclick = ()=> goTo(i+1);
+}
+
+function check(){
+  const i = state.current, c = CHAPTERS[i], v = norm($("answer").value);
+  if (!v) return;
+  if (devHash(v) === 2236979087){ devComplete(); return; }
+  if (c.answers.includes(v)){
+    if (!state.solved.includes(i)){
+      state.answers = state.answers || {}; state.answers[i] = $("answer").value.trim();
+      state.solvedSql = state.solvedSql || {}; state.solvedSql[i] = $("sql").value;
+    }
+    const r = document.querySelector("#answerForm button").getBoundingClientRect();
+    const first = !state.solved.includes(i);
+    if (first) state.solved.push(i);
+    const finished = first && allDone();
+    if (allDone() && !state.end) state.end = Date.now();
+    save(); renderSteps(); renderCase();
+    const n = $("next"); if (n && !n.hidden) n.focus();
+    renderBoard(true);
+    if (finished) finale();
+    else if (first) chapterWin(r.left + r.width/2, r.top + r.height/2, i);
+  } else {
+    state.wrong = state.wrong || {}; state.wrong[i] = (state.wrong[i] || 0) + 1; save();
+    if (state.wrong[i] <= 2){ renderCase(); $("answer").focus(); }
+    $("verdict").innerHTML = `<div class="verdict bad">Nem egészen.<p>Nézd meg újra az eredményt. Ellenőrizd az összes feltételt, és azt is, hogy a feladat számot vagy nevet kér.</p></div>`;
+  }
+}
+
+/* teacher shortcut: a secret answer that solves every chapter (only its hash is stored here) */
+function devHash(s){ let x = 5381; for (const ch of s) x = ((x*33) ^ ch.charCodeAt(0)) >>> 0; return x; }
+function devComplete(){
+  state.dev = true;
+  state.solved = CHAPTERS.map((_,k)=>k);
+  state.current = CHAPTERS.length - 1;
+  if (!state.end) state.end = Date.now();
+  save(); renderSteps(); renderCase(); renderBoard(true);
+  $("sql").value = starterFor(state.current);
+  finale();
+}
+function endingHtml(){
+  const mins = Math.max(1, Math.round(((state.end||Date.now()) - state.start)/60000));
+  return `<div class="ending learn">
+    <h3>Az ügy lezárva</h3>
+    <p>Az Éjféli Paprika visszakerült a vitrinjébe. M. Anna Petra és K. Nóra hónapokig tervezte a lopást. Amikor Zalán rajtakapta őket a vitrinnél, gondoskodtak róla, hogy soha senkinek ne mondhassa el. Körülbelül <b>${mins} perc</b> alatt találtad meg őket, csak SELECT, FROM és WHERE segítségével.</p>
+    <p><b>Bónusz nyomozások</b> a gyors detektíveknek:</p>
+    <ol>${BONUS.map(b=>`<li>${esc(b)}</li>`).join("")}</ol>
+    <div class="export">
+      <h3>Add be a válaszaidat</h3>
+      <ol class="export-steps">
+        <li>Írd be lent a nevedet.</li>
+        <li>Kattints a <b>Válaszok mentése (.txt)</b> gombra. A fájl a Letöltések mappába kerül.</li>
+        <li>Nyisd meg a feladatot a <b>Google Classroomban</b>, töltsd fel a fájlt a <b>Hozzáadás vagy létrehozás → Fájl</b> menüponttal, majd kattints a <b>Beadás</b> gombra.</li>
+      </ol>
+      <label for="studentName">Neved</label>
+      <input id="studentName" type="text" autocomplete="off" placeholder="Ide írd a neved" value="${esc(state.student || "")}">
+      <div class="export-btns">
+        <button class="btn primary" type="button" id="saveTxt">Válaszok mentése (.txt)</button>
+        <button class="btn" type="button" id="copyTxt">Másolás szövegként</button>
+      </div>
+      <p class="export-note" id="exportNote" aria-live="polite"></p>
+    </div>
+    <div><button class="btn" type="button" id="replayFinale">Ünneplés újra</button></div>
+  </div>`;
+}
+$("case").addEventListener("click", e=>{
+  if (e.target.id === "replayFinale") finale();
+  if (e.target.id === "saveTxt") exportAnswers("save");
+  if (e.target.id === "copyTxt") exportAnswers("copy");
+});
+$("case").addEventListener("input", e=>{ if (e.target.id === "studentName"){ state.student = e.target.value; save(); } });
+
+/* ---------- answer sheet export ---------- */
+function fmtTime(ms){ const m = Math.floor(ms/60000), s = Math.floor(ms/1000)%60; return `${m}:${String(s).padStart(2,"0")}`; }
+function buildReport(){
+  const pad = n => String(n).padStart(2,"0"), d = new Date(state.end || Date.now());
+  const L = [];
+  L.push("AZ ÉJFÉLI PAPRIKA-RABLÁS - VÁLASZLAP");
+  L.push("====================================");
+  L.push(`Név: ${(state.student || "").trim()}`);
+  L.push(`Befejezve: ${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`);
+  L.push(`Időtartam: ${fmtTime((state.end || Date.now()) - state.start)}`);
+  L.push(`Lekérdezések: ${state.queries || 0}`);
+  if (state.dev) L.push("MEGJEGYZÉS: a tanári kóddal lett befejezve, ezért egyes válaszok hiányozhatnak.");
+  L.push("");
+  CHAPTERS.forEach((c,i)=>{
+    L.push(`${c.refresher ? "Ismétlés" : num(i) + ". fejezet"}: ${c.title}`);
+    L.push("-".repeat(40));
+    L.push(`Feladat: ${c.task}`);
+    L.push(`Válasz: ${(state.answers && state.answers[i]) || (state.solved.includes(i) ? "(kihagyva)" : "(nincs megoldva)")}`);
+    L.push(`Rossz válaszok: ${(state.wrong && state.wrong[i]) || 0}`);
+    const q = ((state.solvedSql && state.solvedSql[i]) || "").trim();
+    L.push("Lekérdezés:");
+    L.push(q ? q.split("\n").map(x=>"    " + x).join("\n") : "    (nincs mentve)");
+    L.push("");
+  });
+  return L.join("\r\n");
+}
+function exportAnswers(mode){
+  const note = $("exportNote"), nameEl = $("studentName");
+  const name = (state.student || "").trim();
+  if (!name){ note.textContent = "Előbb írd be a nevedet!"; nameEl.focus(); return; }
+  const text = buildReport();
+  if (mode === "copy"){
+    const done = ()=> note.textContent = "Kimásolva. Illeszd be privát megjegyzésként a Google Classroom-feladatba, majd kattints a Beadás gombra.";
+    const fallback = ()=>{ const t = document.createElement("textarea"); t.value = text; document.body.appendChild(t); t.select();
+      try { document.execCommand("copy"); done(); } catch(e){ note.textContent = "A másolás itt le van tiltva. Használd a Válaszok mentése gombot."; } t.remove(); };
+    try { navigator.clipboard.writeText(text).then(done, fallback); } catch(e){ fallback(); }
+    return;
+  }
+  const slug = name.normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^A-Za-z0-9]+/g,"-").replace(/^-|-$/g,"") || "student";
+  const file = `ejfeli-paprika-${slug}.txt`;
+  try {
+    const url = URL.createObjectURL(new Blob(["\ufeff" + text], {type:"text/plain;charset=utf-8"}));
+    const a = document.createElement("a"); a.href = url; a.download = file; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=> URL.revokeObjectURL(url), 2000);
+    note.textContent = `Elmentve: ${file}. Most töltsd fel a Google Classroom-feladathoz, és kattints a Beadás gombra.`;
+  } catch(e){ note.textContent = "A mentés itt le van tiltva. Használd a Másolás szövegként gombot."; }
+}
+
+/* ---------- celebrations ---------- */
+const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const FXC = ["#f5c542","#ff4d6d","#4d8dff","#2fd39a","#bdf6ff","#ffffff"];
+const fx = { c: $("fx"), ctx: $("fx").getContext("2d"), parts: [], raf: 0, w: 0, h: 0 };
+function fxSize(){ const d = devicePixelRatio || 1; fx.w = innerWidth; fx.h = innerHeight;
+  fx.c.width = fx.w*d; fx.c.height = fx.h*d; fx.ctx.setTransform(d,0,0,d,0,0); }
+addEventListener("resize", fxSize); fxSize();
+const rnd = (a,b) => a + Math.random()*(b-a);
+function spawn(p){ fx.parts.push(p); if (!fx.raf) fx.raf = requestAnimationFrame(fxLoop); }
+function fxLoop(){
+  const g = fx.ctx; g.clearRect(0,0,fx.w,fx.h);
+  fx.parts = fx.parts.filter(p => p.life > 0 && p.y < fx.h + 60);
+  for (const p of fx.parts){
+    p.vx *= p.drag; p.vy = p.vy*p.drag + p.g; p.x += p.vx; p.y += p.vy; p.rot += p.vr; p.life--;
+    const a = Math.min(1, p.life / 30);
+    g.save(); g.globalAlpha = a; g.translate(p.x, p.y); g.rotate(p.rot); g.fillStyle = p.color;
+    if (p.type === "confetti"){ g.scale(1, Math.cos(p.life*0.2)); g.fillRect(-p.s/2, -p.s/4, p.s, p.s/2); }
+    else if (p.type === "gem"){ g.beginPath(); g.moveTo(0,-p.s); g.lineTo(p.s*.8,-p.s*.25); g.lineTo(0,p.s); g.lineTo(-p.s*.8,-p.s*.25); g.closePath(); g.fill(); }
+    else { g.globalCompositeOperation = "lighter"; g.beginPath(); g.arc(0,0,p.s,0,6.283); g.fill(); }
+    g.restore();
+  }
+  fx.raf = fx.parts.length ? requestAnimationFrame(fxLoop) : 0;
+}
+function burst(x, y, n, power=9){
+  for (let k=0; k<n; k++){
+    const ang = rnd(0, Math.PI*2), sp = rnd(power*.3, power);
+    spawn({ type: Math.random() < .35 ? "gem" : "confetti", x, y, vx: Math.cos(ang)*sp, vy: Math.sin(ang)*sp - power*.5,
+      g: .25, drag: .985, rot: rnd(0,6), vr: rnd(-.3,.3), s: rnd(7,13), color: FXC[k % FXC.length], life: rnd(70,120) });
+  }
+}
+function firework(x, y){
+  const col = FXC[Math.floor(rnd(0, FXC.length))], n = 90;
+  for (let k=0; k<n; k++){
+    const ang = k/n*Math.PI*2, sp = rnd(3,7.5);
+    spawn({ type:"spark", x, y, vx: Math.cos(ang)*sp, vy: Math.sin(ang)*sp, g:.06, drag:.975, rot:0, vr:0, s: rnd(1.6,3.2), color: col, life: rnd(60,95) });
+  }
+  tone(rnd(90,160), .35, "sawtooth", .05, 40);
+}
+function rain(ms){
+  const end = performance.now() + ms;
+  (function drop(){
+    for (let k=0; k<6; k++) spawn({ type: Math.random()<.3?"gem":"confetti", x: rnd(0, fx.w), y: -20, vx: rnd(-1.5,1.5), vy: rnd(2,5),
+      g:.05, drag:.995, rot: rnd(0,6), vr: rnd(-.2,.2), s: rnd(8,14), color: FXC[Math.floor(rnd(0,FXC.length))], life: 400 });
+    if (performance.now() < end) setTimeout(drop, 60);
+  })();
+}
+function fireworkShow(count){
+  for (let k=0; k<count; k++) setTimeout(()=> firework(rnd(fx.w*.12, fx.w*.88), rnd(fx.h*.1, fx.h*.5)), 400 + k*rnd(280,420));
+}
+
+/* sound: tiny synthesizer, only ever started by a click */
+let soundOn = true;
+try { soundOn = localStorage.getItem(KEY+"-sound") !== "off"; } catch(e){}
+function paintSound(){ const b = $("soundToggle"); b.textContent = `Hang: ${soundOn?"be":"ki"}`; b.setAttribute("aria-pressed", soundOn); }
+paintSound();
+$("soundToggle").onclick = ()=>{ soundOn = !soundOn; paintSound(); try { localStorage.setItem(KEY+"-sound", soundOn?"on":"off"); } catch(e){} };
+let actx = null;
+function tone(freq, dur, type="triangle", vol=.12, slideTo=null, delay=0){
+  if (!soundOn) return;
+  try {
+    actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+    const t = actx.currentTime + delay, o = actx.createOscillator(), g = actx.createGain();
+    o.type = type; o.frequency.setValueAtTime(freq, t);
+    if (slideTo) o.frequency.exponentialRampToValueAtTime(slideTo, t + dur);
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + .02); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(g).connect(actx.destination); o.start(t); o.stop(t + dur + .05);
+  } catch(e){}
+}
+function chime(){ tone(880,.18,"triangle",.12,null,0); tone(1320,.35,"triangle",.12,null,.1); }
+function fanfare(){
+  for (let k=0; k<3; k++){ tone(650,.25,"square",.05,1250,k*.5); tone(1250,.25,"square",.05,650,k*.5+.25); }
+  const notes = [523,659,784,1047,784,1047,1319];
+  const at    = [1.6,1.75,1.9,2.05,2.35,2.5,2.65];
+  notes.forEach((f,k)=>{ tone(f, k===notes.length-1?1.2:.22, "triangle", .14, null, at[k]); tone(f/2, k===notes.length-1?1.2:.22, "square", .04, null, at[k]); });
+}
+
+function chapterWin(x, y, i){
+  chime();
+  const el = document.createElement("div"); el.className = "plus"; el.textContent = CHAPTERS[i].refresher ? "Mehet!" : "Megoldva!";
+  el.style.left = x+"px"; el.style.top = (y-30)+"px"; document.body.appendChild(el); setTimeout(()=>el.remove(), 1300);
+  const s = document.querySelector(`.step[data-i="${i}"]`); if (s){ s.classList.add("just"); }
+  if (reduceMotion) return;
+  burst(x, y, 70);
+  const wrap = document.querySelector(".wrap"); wrap.classList.remove("shake"); void wrap.offsetWidth; wrap.classList.add("shake");
+}
+
+function rankFor(min){ return min <= 20 ? "Legenda" : min <= 28 ? "Főfelügyelő" : min <= 35 ? "Felügyelő" : "Nyomozó"; }
+function finale(){
+  const ms = (state.end || Date.now()) - state.start;
+  const mins = Math.floor(ms/60000), secs = Math.floor(ms/1000)%60;
+  $("fTime").textContent = `${mins}:${String(secs).padStart(2,"0")}`;
+  $("fQueries").textContent = state.queries || 0;
+  $("fRank").textContent = rankFor(ms/60000);
+  const f = $("finale"); f.hidden = true; void f.offsetWidth; f.hidden = false;
+  const inner = $("finaleInner"); inner.classList.remove("shake"); void inner.offsetWidth; inner.classList.add("shake");
+  fanfare();
+  $("finaleClose").focus();
+  if (reduceMotion) return;
+  setTimeout(()=>{ burst(fx.w/2, fx.h*.35, 160, 16); }, 950);
+  setTimeout(()=> rain(5000), 1200);
+  setTimeout(()=> fireworkShow(10), 1400);
+}
+function closeFinale(){
+  $("finale").hidden = true;
+  const st = $("steps"); st.classList.remove("wave");
+  [...st.children].forEach((b,k)=> b.style.animationDelay = (k*.08)+"s");
+  void st.offsetWidth; st.classList.add("wave");
+  const end = document.querySelector(".ending"); if (end) end.scrollIntoView({behavior: reduceMotion?"auto":"smooth", block:"center"});
+}
+$("finaleClose").onclick = closeFinale;
+$("finaleSave").onclick = ()=>{ closeFinale(); setTimeout(()=>{ const n = $("studentName"); if (n){ n.scrollIntoView({block:"center"}); n.focus(); } }, 400); };
+
+/* dancing cats: every click adds one to the dance line (max 7), each with its own look and dance */
+const CAT_LOOKS = [
+  {fur:"#f0a24a", dark:"#b0611a", pattern:"tabby",  gear:"shades", dance:"disco",    name:"DJ Cirmi"},
+  {fur:"#2a2a2e", dark:"#111114", pattern:"tux",    gear:"phones", dance:"headbang", name:"Meowtallica"},
+  {fur:"#9aa4ad", dark:"#5f6870", pattern:"tabby",  gear:"party",  dance:"spin",     name:"Sir Purrcival"},
+  {fur:"#f2f2f2", dark:"#c8c8c8", pattern:"calico", gear:"bow",    dance:"wave",     name:"Kitty Gaga"},
+  {fur:"#c9783a", dark:"#7d431a", pattern:"plain",  gear:"crown",  dance:"shuffle",  name:"Mirci Mercury"},
+  {fur:"#6b6f78", dark:"#3d4047", pattern:"tux",    gear:"shades", dance:"disco",    name:"Catrick Swayze"},
+  {fur:"#e8c99a", dark:"#b08a55", pattern:"tabby",  gear:"party",  dance:"wave",     name:"Bajusz Béla"}
+];
+let catCount = 0, beatUntil = 0;
+function catSvg(o){
+  const f = o.fur, d = o.dark;
+  const leg = (cls,x1,x2) => `<g class="${cls}"><path d="M${x1} 103L${x2} 116" stroke="${f}" stroke-width="8" stroke-linecap="round"/><ellipse cx="${x2}" cy="117.5" rx="6" ry="3.5" fill="${o.pattern==="tux" ? "#ffffff" : f}"/></g>`;
+  const arm = (cls,x1,y1,x2,y2) => `<g class="${cls}"><path d="M${x1} ${y1}L${x2} ${y2}" stroke="${f}" stroke-width="8" stroke-linecap="round"/><circle cx="${x2}" cy="${y2}" r="4.6" fill="${o.pattern==="tux" ? "#ffffff" : f}"/></g>`;
+  const bodyPattern = {
+    tabby:  `<path d="M33 78Q40 76 42 82M31 90Q39 88 41 94M67 78Q60 76 58 82M69 90Q61 88 59 94" stroke="${d}" stroke-width="3" fill="none" stroke-linecap="round"/>`,
+    tux:    `<ellipse cx="50" cy="88" rx="13" ry="18" fill="#ffffff"/>`,
+    calico: `<ellipse cx="38" cy="80" rx="8" ry="10" fill="#e08a3c"/><ellipse cx="62" cy="94" rx="7" ry="8" fill="#3a3030"/><ellipse cx="50" cy="90" rx="9" ry="12" fill="#ffffff" opacity=".5"/>`,
+    plain:  `<ellipse cx="50" cy="90" rx="11" ry="14" fill="#ffffff" opacity=".35"/>`
+  }[o.pattern];
+  const headPattern = {
+    tabby:  `<path d="M44 27L45.5 33M50 25.5V32M56 27L54.5 33" stroke="${d}" stroke-width="2.6" stroke-linecap="round"/>`,
+    tux:    `<ellipse cx="50" cy="53" rx="11" ry="8" fill="#ffffff"/>`,
+    calico: `<path d="M50 24A21 21 0 0 1 71 45L56 40Z" fill="#e08a3c"/><path d="M29 45A21 21 0 0 1 36 30L44 40Z" fill="#3a3030"/>`,
+    plain:  ``
+  }[o.pattern];
+  const eyes = o.gear === "shades"
+    ? `<rect x="34" y="37" width="14" height="9" rx="3" fill="#111318" stroke="#f5c542" stroke-width="1.6"/><rect x="52" y="37" width="14" height="9" rx="3" fill="#111318" stroke="#f5c542" stroke-width="1.6"/><path d="M48 41H52" stroke="#f5c542" stroke-width="1.6"/><path d="M37 39H41" stroke="#ffffff" stroke-width="1.4" stroke-linecap="round" opacity=".8"/>`
+    : `<g class="eyes"><ellipse cx="42" cy="43" rx="4.4" ry="5" fill="#c6f36b"/><ellipse cx="58" cy="43" rx="4.4" ry="5" fill="#c6f36b"/><ellipse cx="42" cy="43.5" rx="1.6" ry="3.8" fill="#111"/><ellipse cx="58" cy="43.5" rx="1.6" ry="3.8" fill="#111"/><circle cx="43.3" cy="41.3" r="1.1" fill="#fff"/><circle cx="59.3" cy="41.3" r="1.1" fill="#fff"/></g>`;
+  const gear = {
+    shades: ``,
+    party:  `<path d="M39 28L50 -4L61 28Z" fill="#ff4d6d"/><path d="M42.5 19L57.5 19M46 9L54 9" stroke="#f5c542" stroke-width="3"/><circle cx="50" cy="-5" r="4" fill="#f5c542"/>`,
+    bow:    `<path d="M50 67L38 61V73Z M50 67L62 61V73Z" fill="#4d8dff"/><circle cx="50" cy="67" r="3.4" fill="#2f5fc4"/>`,
+    phones: `<path d="M27 44A23 23 0 0 1 73 44" stroke="#222" stroke-width="4.5" fill="none"/><rect x="22" y="38" width="9" height="15" rx="4" fill="#ff4d6d"/><rect x="69" y="38" width="9" height="15" rx="4" fill="#ff4d6d"/>`,
+    crown:  `<path d="M37 27L37 15L43.5 21L50 11L56.5 21L63 15L63 27Z" fill="#f5c542" stroke="#b8860b" stroke-width="1.2"/><circle cx="50" cy="20" r="2" fill="#ff4d6d"/>`
+  }[o.gear];
+  return `<svg viewBox="0 0 100 122" aria-hidden="true">
+    <path class="tail" d="M68 96C90 92 94 70 84 56" stroke="${f}" stroke-width="8" fill="none" stroke-linecap="round"/>
+    <g class="bod">
+      ${leg("leg-l",43,40)}${leg("leg-r",57,60)}
+      ${arm("arm-l",40,66,25,52)}${arm("arm-r",60,66,75,52)}
+      <ellipse cx="50" cy="84" rx="20" ry="24" fill="${f}"/>${bodyPattern}
+      <g class="head">
+        <g class="ear-l"><path d="M30 40L32 16L46 30Z" fill="${f}"/><path d="M34 33L34 22L41 30Z" fill="#ff9fb2"/></g>
+        <path d="M70 40L68 16L54 30Z" fill="${f}"/><path d="M66 33L66 22L59 30Z" fill="#ff9fb2"/>
+        <circle cx="50" cy="45" r="21" fill="${f}"/>${headPattern}${eyes}
+        <path d="M47.5 50H52.5L50 53Z" fill="#ff8fa3"/>
+        <path d="M50 53Q46 58 43 55M50 53Q54 58 57 55" stroke="#1a1a1a" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+        <path d="M31 50L19 48M31 53L19 55M69 50L81 48M69 53L81 55" stroke="#d9dde2" stroke-width="1" stroke-linecap="round"/>
+        ${gear}
+      </g>
+    </g></svg>`;
+}
+function discoBeat(seconds){
+  if (!soundOn) return;
+  const step = 0.25, steps = Math.round(seconds/step);
+  const bass = [110,110,165,147,110,110,196,165];
+  for (let k=0; k<steps; k++){
+    const t = k*step;
+    if (k%2===0) tone(140, .18, "sine", .22, 45, t);
+    else tone(7000, .04, "square", .015, null, t);
+    if (k%2===0) tone(bass[(k/2)%bass.length], .2, "sawtooth", .045, null, t);
+    if (k%8===4) tone(880, .08, "triangle", .05, 1320, t);
+  }
+}
+function meow(){ tone(700, .25, "triangle", .12, 1400, 0); tone(1400, .3, "triangle", .1, 600, .22); }
+function addCat(){
+  const line = $("catline");
+  if (!line.classList.contains("floor")){ line.classList.add("floor"); $("disco").hidden = false; }
+  if (line.children.length >= 7) line.firstElementChild.remove();
+  const o = CAT_LOOKS[catCount++ % CAT_LOOKS.length];
+  const d = document.createElement("div");
+  d.className = `cat d-${o.dance}`; d.tabIndex = 0; d.setAttribute("role","button"); d.setAttribute("aria-label", `${o.name}, kattints rá, és ugrik egyet`);
+  d.innerHTML = catSvg(o) + `<span class="cat-name">${esc(o.name)}</span>`;
+  line.appendChild(d);
+  meow();
+  const now = performance.now();
+  if (now > beatUntil){ discoBeat(8); beatUntil = now + 8000; }
+  if (!reduceMotion){ const r = d.getBoundingClientRect(); setTimeout(()=> burst(r.left + r.width/2, r.top + 20, 40, 8), 650); }
+}
+function boing(cat){
+  meow();
+  cat.classList.remove("boing"); void cat.offsetWidth; cat.classList.add("boing");
+  setTimeout(()=> cat.classList.remove("boing"), 850);
+  if (!reduceMotion){ const r = cat.getBoundingClientRect(); burst(r.left + r.width/2, r.top + 10, 18, 6); }
+}
+$("catline").addEventListener("click", e=>{ const c = e.target.closest(".cat"); if (c) boing(c); });
+$("catline").addEventListener("keydown", e=>{ const c = e.target.closest(".cat"); if (c && (e.key === "Enter" || e.key === " ")){ e.preventDefault(); boing(c); } });
+$("catBtn").onclick = addCat;
+$("finaleAgain").onclick = ()=>{ if (reduceMotion) return; fireworkShow(8); rain(2500); tone(523,.15,"triangle",.12,null,0); tone(1047,.4,"triangle",.12,null,.12); };
+addEventListener("keydown", e=>{ if (e.key === "Escape" && !$("finale").hidden) closeFinale(); });
+
+function tick(){
+  const ms = (state.end || Date.now()) - state.start;
+  const m = Math.floor(ms/60000), s = Math.floor(ms/1000)%60;
+  $("timer").textContent = `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+}
+setInterval(tick, 1000); tick();
+
+let resetArmed = null;
+$("resetProgress").onclick = ()=>{
+  const b = $("resetProgress");
+  if (!resetArmed){
+    b.textContent = "Kattints újra a törléshez";
+    resetArmed = setTimeout(()=>{ b.textContent = "Újrakezdés"; resetArmed = null; }, 3000);
+    return;
+  }
+  clearTimeout(resetArmed); resetArmed = null; b.textContent = "Újrakezdés";
+  state = { solved: [], current: 0, start: Date.now(), end: null, drafts: {} };
+  save(); renderSteps(); renderCase(); $("sql").value = starterFor(0); resetDb(); renderBoard(false);
+};
+
+/* ---------- suspect board ---------- */
+const COATS = {blue:"#3f6fd8",black:"#22262b",beige:"#d8c3a0",navy:"#26365e",yellow:"#f2c230",green:"#3d9a5b",red:"#d33a3a",grey:"#8b949c",orange:"#ef8a2b",white:"#eef1f3",purple:"#7c4fc4"};
+const BASE = "tavozas > '16:00' AND magassag_cm > 180";
+const SUSPECT_SQL = {           /* chapter index -> who is still a suspect after solving it */
+  3: "tavozas > '16:00'",
+  6: BASE,
+  7: BASE + " AND (kabat = 'piros' OR kabat = 'narancs')",
+  8: BASE + " AND (kabat = 'piros' OR kabat = 'narancs') AND jegy <> 'személyzet'",
+  9: BASE + " AND (kabat = 'piros' OR kabat = 'narancs') AND jegy <> 'személyzet' AND nev LIKE 'M%'"
+};
+const CAUGHT = [13, 21], VICTIM = 30;
+let refDb = null, prevOut = new Set();
+const GIRLS = new Set([3,6,8,10,11,12,13,14,15,17,19,21,22,23,26,27,28]);
+function mugSvg(coat, girl){
+  return `<svg viewBox="0 0 60 64" aria-hidden="true"><rect width="60" height="64" fill="#b9c6cf"/>
+    <path d="M0 16H60M0 32H60M0 48H60" stroke="#9fb0bb" stroke-width="1"/>
+    ${girl ? `<path d="M17 27C15 9 45 9 43 27L46 45C38 41 22 41 14 45Z" fill="#2f3842"/><circle cx="41" cy="14" r="3.2" fill="#e2577a"/><circle cx="46" cy="12" r="3.2" fill="#e2577a"/><circle cx="43.5" cy="13" r="1.6" fill="#ffd0dc"/>` : ""}
+    <circle cx="30" cy="24" r="11" fill="#2f3842"/>
+    <path d="M7 64C9 45 19 38 30 38S51 45 53 64Z" fill="#5d6b78"/></svg>`;
+}
+function renderBoard(animate){
+  if (!refDb) return;
+  const people = refDb.exec("SELECT id, nev, kabat FROM latogatok ORDER BY id")[0].values;
+  const done = state.solved.includes(CHAPTERS.length - 1);
+  let level = -1;
+  Object.keys(SUSPECT_SQL).map(Number).forEach(k=>{ if (state.solved.includes(k)) level = Math.max(level, k); });
+  const keep = level < 0 ? null : new Set((refDb.exec(`SELECT id FROM latogatok WHERE ${SUSPECT_SQL[level]}`)[0]?.values || []).map(v=>v[0]));
+  const victimFound = state.solved.includes(4);
+  const status = id => (victimFound && id === VICTIM) ? "victim" : done ? (CAUGHT.includes(id) ? "caught" : "out") : (keep && !keep.has(id) ? "out" : "in");
+  const nowOut = new Set(people.filter(p=>status(p[0])==="out").map(p=>p[0]));
+  $("board").innerHTML = people.map(([id,name,coat])=>{
+    const st = status(id), fresh = animate && st==="out" && !prevOut.has(id);
+    const r = ((id*37) % 7 - 3) * 0.9;
+    return `<div class="mug ${st}${fresh?" fresh-out":""}" style="--r:${r}deg">${mugSvg(coat, GIRLS.has(id))}<span class="nm">${esc(name.split(" ")[1] || name)}</span></div>`;
+  }).join("");
+  [...$("board").querySelectorAll(".fresh-out")].forEach((m,k)=> m.style.animationDelay = (k*0.04)+"s");
+  prevOut = nowOut;
+  const left = people.filter(p=>status(p[0])==="in").length;
+  $("boardNote").textContent = done ? "M. Anna Petra és K. Nóra: elkapva!"
+    : level < 0 ? `Szombaton ${people.length} látogató volt a múzeumban. Fejtsd meg a nyomokat, és húzd ki a neveket!`
+    : left === 1 ? "Egy gyanúsított maradt." : `${left} gyanúsított maradt.`;
+}
+
+/* camera clock: starts at 17:58 on the night of the theft */
+const camStart = Date.now();
+setInterval(()=>{
+  const t = (17*3600 + 58*60 + Math.floor((Date.now()-camStart)/1000)) % 86400;
+  $("camClock").textContent = `SZO ${String(Math.floor(t/3600)).padStart(2,"0")}:${String(Math.floor(t/60)%60).padStart(2,"0")}:${String(t%60).padStart(2,"0")}`;
+}, 1000);
+
+/* ---------- database ---------- */
+let SQL = null, db = null;
+function resetDb(){
+  if (!SQL) return;
+  if (db) db.close();
+  db = new SQL.Database(); db.run(SEED);
+  $("out").innerHTML = `<p class="note">Az adatbázis kész. Írj egy lekérdezést, és kattints a Futtatás gombra.</p>`;
+  renderSchema();
+}
+const COLDOCS = {
+  targyak: {
+    id: "A tárgy sorszáma.",
+    nev: "A tárgy neve, pl. <code>'Éjféli Paprika'</code>.",
+    terem: "A terem, ahol kiállították, pl. <code>'Drágakőterem'</code>.",
+    ev: "Az elkészülés éve. A negatív szám időszámításunk előttit jelent.",
+    anyag: "Miből készült, pl. <code>'arany'</code>.",
+    ertek_eur: "Az érték euróban."
+  },
+  latogatok: {
+    id: "A látogató sorszáma.",
+    nev: "Vezetéknév kezdőbetűje és keresztnév, pl. <code>'K. Luca'</code>.",
+    kor: "Életkor években.",
+    magassag_cm: "Magasság centiméterben.",
+    haj: "Hajszín, pl. <code>'barna'</code>.",
+    kabat: "A kabát színe, pl. <code>'piros'</code>.",
+    jegy: "Jegytípus: <code>'diák'</code>, <code>'tag'</code>, <code>'felnőtt'</code> vagy <code>'személyzet'</code>.",
+    erkezes: "Az érkezés ideje szövegként: <code>'ÓÓ:PP'</code>.",
+    tavozas: "A távozás ideje szövegként: <code>'ÓÓ:PP'</code>."
+  }
+};
+function renderSchema(){
+  const t = db.exec("SELECT name FROM sqlite_master WHERE type='table' ORDER BY rowid");
+  if (!t.length){ $("schema").innerHTML = ""; return; }
+  $("schema").innerHTML = t[0].values.map(([name])=>{
+    const cols = db.exec(`PRAGMA table_info("${name.replace(/"/g,'""')}")`);
+    const docs = COLDOCS[name] || {};
+    const lis = cols.length ? cols[0].values.map(r=>`<li><span class="k">${esc(r[1])}</span><span class="ty">${/INT/i.test(r[2]) ? "szám" : "szöveg"}</span>${docs[r[1]] ? `<span class="d">${docs[r[1]]}</span>` : ""}</li>`).join("") : "";
+    return `<div class="tbl"><button type="button" data-t="${esc(name)}">${esc(name)}</button><ul>${lis}</ul></div>`;
+  }).join("");
+}
+$("schema").addEventListener("click", e=>{
+  const b = e.target.closest("button[data-t]"); if (!b) return;
+  $("sql").value = `SELECT * FROM ${b.dataset.t};`; run();
+});
+
+function run(){
+  if (!db) return;
+  const sql = $("sql").value;
+  state.drafts[state.current] = sql; state.queries = (state.queries||0) + 1; save();
+  const bare = sql.replace(/--[^\n]*/g," ").replace(/\/\*[\s\S]*?\*\//g," ").trim();
+  if (!bare){ $("out").innerHTML = `<p class="note">A szerkesztő üres. Előbb írj be egy lekérdezést.</p>`; return; }
+  try {
+    const res = db.exec(sql);
+    renderSchema();
+    if (!res.length){ $("out").innerHTML = `<p class="note">0 sor. Egyetlen látogató vagy tárgy sem felel meg minden feltételednek. Ellenőrizd a szöveges értékek helyesírását, az ékezeteket is.</p>`; return; }
+    $("out").innerHTML = res.map(r=>`<div class="result-meta">${r.values.length} sor</div>
+      <div class="tablebox"><table><thead><tr>${r.columns.map(c=>`<th>${esc(c)}</th>`).join("")}</tr></thead>
+      <tbody>${r.values.map(v=>`<tr>${v.map(x=> x===null ? `<td class="null">NULL</td>` : `<td${typeof x==="number"?' class="num"':""}>${esc(x)}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`).join("");
+  } catch(e){
+    let tip = "Ellenőrizd a helyesírást, a vesszőket és az idézőjeleket. A szöveges értékek egyszeres idézőjelbe kerülnek, például 'piros'.";
+    if (/no such column/i.test(e.message)) tip = "Nincs ilyen oszlop. Nézd meg az oszloplistát a szerkesztő alatt. Lehet, hogy egy szöveges értékről lemaradt az idézőjel?";
+    if (/no such table/i.test(e.message)) tip = "Nincs ilyen tábla. A táblák: targyak és latogatok.";
+    $("out").innerHTML = `<div class="err">Hiba van a lekérdezésben.<p>${esc(e.message)}</p><p>${tip}</p></div>`;
+  }
+}
+$("run").onclick = run;
+$("resetDb").onclick = resetDb;
+$("sql").addEventListener("keydown", e=>{
+  if ((e.ctrlKey || e.metaKey) && e.key === "Enter"){ e.preventDefault(); run(); }
+  if (e.key === "Tab" && !e.shiftKey){
+    e.preventDefault(); const t = e.target, s = t.selectionStart;
+    t.value = t.value.slice(0,s) + "  " + t.value.slice(t.selectionEnd); t.selectionStart = t.selectionEnd = s + 2;
+  }
+});
+
+if (state.current >= CHAPTERS.length || !isUnlocked(state.current)) state.current = 0;
+renderSteps(); renderCase();
+$("sql").value = state.drafts[state.current] ?? starterFor(state.current);
+
+if (typeof initSqlJs !== "function"){
+  $("out").innerHTML = `<div class="err">Az SQL-motor nem töltődött be.<p>Ellenőrizd az internetkapcsolatot, és töltsd újra az oldalt.</p></div>`;
+} else {
+  initSqlJs().then(s=>{ SQL = s; resetDb(); refDb = new SQL.Database(); refDb.run(SEED); renderBoard(false); })
+    .catch(e=>{ $("out").innerHTML = `<div class="err">Az SQL-motor nem indult el.<p>${esc(e.message)}</p></div>`; });
+}
+</script>
+</body>
+</html>
