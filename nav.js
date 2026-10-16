@@ -1,101 +1,248 @@
-/* digikult page navigator
-   Every page includes:  <script src="nav.js" defer></script>
-   To add a new page, add one line to PAGES below. */
-(function () {
-  const PAGES = [
-    { file: "index.html",    title: "CSS First Steps",          tag: "CSS",      lang: "en" },
-    { file: "heist.html",    title: "The Midnight Paprika Heist", tag: "SQL · WHERE", lang: "en" },
-    { file: "heist-hu.html", title: "Az Éjféli Paprika-rablás",  tag: "SQL · WHERE", lang: "hu" },
-    { file: "round-up.html", title: "Bodri's Round-Up",          tag: "SQL · GROUP BY", lang: "en" },
-    { file: "pasture.html",  title: "Bodri's Pasture",           tag: "GROUP BY demo", lang: "en" }
-  ];
+/* ============================================================
+   digikult — site map + page menu
+   ------------------------------------------------------------
+   Every page includes this file once, before </body>, with a
+   path relative to that page, e.g. for sql/where/heist.html:
+       <script src="../../nav.js" defer></script>
 
+   TO ADD A PAGE
+   1. Put the file in  <topic>/<lesson>/<page>.html
+   2. Add it to SITE below (a new lesson or topic is just a new
+      object in the right list).
+   3. Add the <script src="../../nav.js" defer></script> line.
+   The landing page and the menu update themselves.
+   ============================================================ */
+(function () {
+  const SITE = {
+    name: { hu: "Digitális kultúra", en: "Digital Culture" },
+    tagline: {
+      hu: "Interaktív feladatok és bemutatók az órákhoz",
+      en: "Interactive lessons and classroom demos"
+    },
+    topics: [
+      {
+        id: "sql",
+        accent: "#e7b84a",
+        title: { hu: "Adatbázisok – SQL", en: "Databases – SQL" },
+        blurb: {
+          hu: "Lekérdezések a böngészőben, igazi adatbázissal. Nyomozás, terelés, csoportosítás.",
+          en: "Real queries against a real database, right in the browser."
+        },
+        lessons: [
+          {
+            id: "where",
+            title: { hu: "Szűrés: SELECT … FROM … WHERE", en: "Filtering: SELECT … FROM … WHERE" },
+            pages: [
+              {
+                id: "heist",
+                kind: "story",
+                minutes: 35,
+                title: { hu: "Az Éjféli Paprika-rablás", en: "The Midnight Paprika Heist" },
+                desc: {
+                  hu: "Valaki ellopta az Éjféli Paprikát. 10 fejezet, egyetlen tábla – szűrd ki a tettest.",
+                  en: "The Midnight Paprika is gone. Ten chapters, one table at a time: filter your way to the thief."
+                },
+                files: { en: "sql/where/heist.html", hu: "sql/where/heist-hu.html" }
+              }
+            ]
+          },
+          {
+            id: "group-by",
+            title: { hu: "Csoportosítás: GROUP BY és összesítő függvények", en: "Grouping: GROUP BY and aggregates" },
+            pages: [
+              {
+                id: "round-up",
+                kind: "story",
+                minutes: 35,
+                title: { hu: "Bodri nagy terelése", en: "Bodri's Round-Up" },
+                desc: {
+                  hu: "Jön a vihar, Bodrinak be kell terelnie 48 birkát. COUNT, SUM, AVG, MAX és HAVING.",
+                  en: "A storm is coming and Bodri has 48 sheep to herd. COUNT, SUM, AVG, MAX and HAVING."
+                },
+                files: { en: "sql/group-by/round-up.html" }
+              },
+              {
+                id: "pasture",
+                kind: "demo",
+                title: { hu: "Bodri legelője", en: "Bodri's Pasture" },
+                desc: {
+                  hu: "Kivetítős bemutató: bármilyen GROUP BY lekérdezésnél Bodri karámokba tereli a birkákat.",
+                  en: "Projector demo: run any GROUP BY and watch Bodri herd the sheep into pens."
+                },
+                files: { en: "sql/group-by/pasture.html" }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        id: "css",
+        accent: "#7f9cff",
+        title: { hu: "Weboldalak – CSS", en: "Web pages – CSS" },
+        blurb: {
+          hu: "Szelektorok, tulajdonságok, értékek – élő előnézettel.",
+          en: "Selectors, properties and values, with a live preview."
+        },
+        lessons: [
+          {
+            id: "basics",
+            title: { hu: "Első lépések", en: "First steps" },
+            pages: [
+              {
+                id: "first-steps",
+                kind: "lesson",
+                title: { hu: "CSS első lépések", en: "CSS First Steps" },
+                desc: {
+                  hu: "Lépésről lépésre: színek, betűk, dobozok, és azonnal látod az eredményt.",
+                  en: "Step by step: colours, fonts and boxes, with the result shown instantly."
+                },
+                files: { en: "css/basics/first-steps.html" }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  };
+
+  const KIND = {
+    story:  { hu: "Feladat", en: "Mission" },
+    demo:   { hu: "Bemutató", en: "Demo" },
+    lesson: { hu: "Lecke", en: "Lesson" }
+  };
+  const UI = {
+    hu: { btn: "Oldalak", home: "Kezdőlap", close: "Bezárás", here: "itt vagy", min: "perc" },
+    en: { btn: "Pages", home: "Home", close: "Close", here: "you are here", min: "min" }
+  };
+
+  /* ---------- base URL + language ---------- */
+  const me = document.currentScript;
+  const BASE = new URL(".", me ? me.src : location.href);
+  const url = rel => new URL(rel, BASE).href;
+  const norm = p => p.replace(/index\.html$/, "").replace(/\/+$/, "/");
+  const herePath = norm(location.pathname);
+
+  const LKEY = "digikult-lang";
+  let lang;
+  try { lang = localStorage.getItem(LKEY); } catch (e) {}
+  if (lang !== "hu" && lang !== "en") lang = "hu";   /* students default to Hungarian */
+  const listeners = [];
+  const setLang = l => {
+    lang = l;
+    try { localStorage.setItem(LKEY, l); } catch (e) {}
+    listeners.forEach(f => f(l));
+  };
+  const t = o => (o && (o[lang] || o.en || o.hu)) || "";
+  const fileFor = p => p.files[lang] || p.files.en || p.files.hu;
+  const isHere = p => Object.values(p.files).some(f => norm(new URL(f, BASE).pathname) === herePath);
+
+  window.DIGIKULT = {
+    SITE, KIND, UI, url, t, fileFor, isHere,
+    get lang() { return lang; }, setLang, onLang: f => listeners.push(f)
+  };
+
+  /* The landing page draws its own full map; no floating menu there. */
+  if (document.documentElement.hasAttribute("data-digikult-home")) return;
   if (window.__digikultNav) return;
   window.__digikultNav = true;
 
-  const here = (location.pathname.split("/").pop() || "index.html").toLowerCase();
-  const hu = (document.documentElement.lang || "").toLowerCase().startsWith("hu");
-  const T = hu
-    ? { btn: "Oldalak", head: "Minden oldal", here: "itt vagy", close: "Bezárás" }
-    : { btn: "Pages", head: "All pages", here: "you are here", close: "Close" };
-
+  /* ---------- floating menu ---------- */
   const host = document.createElement("div");
   host.id = "digikult-nav";
   const root = host.attachShadow({ mode: "open" });
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 
-  root.innerHTML = `
-<style>
+  const style = `
   :host { all: initial; }
   * { box-sizing: border-box; font-feature-settings: "calt" 0, "liga" 0; }
-  .wrap {
-    position: fixed; left: max(12px, env(safe-area-inset-left)); bottom: max(12px, env(safe-area-inset-bottom));
-    z-index: 2147483000;
-    font: 500 14px/1.3 "Segoe UI", system-ui, -apple-system, sans-serif; color: #eef3f1;
-  }
-  button.toggle {
-    display: inline-flex; align-items: center; gap: 8px;
-    padding: 9px 14px 9px 12px; border-radius: 999px; cursor: pointer;
-    background: rgba(18, 26, 38, .88); color: inherit; font: inherit; font-weight: 600;
-    border: 1px solid rgba(255,255,255,.22);
-    box-shadow: 0 6px 18px rgba(0,0,0,.35);
-    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-    transition: transform .15s, background .15s;
-  }
-  button.toggle:hover { background: rgba(30, 42, 60, .95); transform: translateY(-1px); }
-  button.toggle:focus-visible, a:focus-visible, button.x:focus-visible { outline: 3px solid #e7b84a; outline-offset: 2px; }
+  .wrap { position: fixed; left: max(12px, env(safe-area-inset-left)); bottom: max(12px, env(safe-area-inset-bottom));
+    z-index: 2147483000; font: 500 14px/1.3 "Segoe UI", system-ui, -apple-system, sans-serif; color: #eef3f1; }
+  button { font: inherit; color: inherit; cursor: pointer; }
+  .toggle { display: inline-flex; align-items: center; gap: 8px; padding: 9px 14px 9px 12px; border-radius: 999px;
+    background: rgba(18,26,38,.9); border: 1px solid rgba(255,255,255,.22); font-weight: 600;
+    box-shadow: 0 6px 18px rgba(0,0,0,.35); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); transition: transform .15s, background .15s; }
+  .toggle:hover { background: rgba(30,42,60,.96); transform: translateY(-1px); }
+  :focus-visible { outline: 3px solid #e7b84a; outline-offset: 2px; }
   .bars { width: 16px; height: 12px; display: grid; align-content: space-between; }
   .bars i { display: block; height: 2px; border-radius: 2px; background: currentColor; }
-  .panel {
-    position: absolute; left: 0; bottom: calc(100% + 10px);
-    width: min(320px, calc(100vw - 24px));
-    background: rgba(16, 23, 34, .97); border: 1px solid rgba(255,255,255,.18); border-radius: 14px;
-    box-shadow: 0 18px 40px rgba(0,0,0,.45);
-    padding: 8px; transform-origin: bottom left;
-    animation: pop .16s ease-out;
-  }
+  .panel { position: absolute; left: 0; bottom: calc(100% + 10px); width: min(360px, calc(100vw - 24px));
+    max-height: min(72vh, 620px); overflow: auto; overscroll-behavior: contain;
+    background: rgba(16,23,34,.98); border: 1px solid rgba(255,255,255,.18); border-radius: 14px;
+    box-shadow: 0 18px 40px rgba(0,0,0,.45); padding: 8px; animation: pop .16s ease-out; }
   .panel[hidden] { display: none; }
   @keyframes pop { from { opacity: 0; transform: translateY(6px) scale(.97); } to { opacity: 1; transform: none; } }
-  .head { display: flex; align-items: center; justify-content: space-between; padding: 6px 8px 8px; }
-  .head span { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: #a8b8b4; }
-  button.x { background: none; border: 0; color: #a8b8b4; font-size: 18px; line-height: 1; cursor: pointer; padding: 2px 6px; border-radius: 6px; }
-  button.x:hover { color: #fff; }
-  ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
-  a {
-    display: grid; grid-template-columns: 1fr auto; gap: 2px 10px; align-items: baseline;
-    padding: 9px 10px; border-radius: 9px; color: #eef3f1; text-decoration: none;
-  }
-  a:hover { background: rgba(255,255,255,.08); }
-  a .t { font-weight: 600; }
-  a .g { font-size: 11px; color: #a8b8b4; white-space: nowrap; }
-  a .h { grid-column: 1 / -1; font-size: 11px; color: #e7b84a; }
-  a[aria-current="page"] { background: rgba(231,184,74,.14); box-shadow: inset 3px 0 0 #e7b84a; }
-  @media (prefers-reduced-motion: reduce) { .panel { animation: none; } button.toggle { transition: none; } }
-  @media print { .wrap { display: none; } }
-</style>
-<nav class="wrap" aria-label="${T.head}">
-  <div class="panel" id="p" hidden>
-    <div class="head"><span>${T.head}</span><button class="x" type="button" aria-label="${T.close}">×</button></div>
-    <ul>${PAGES.map(p => {
-      const cur = p.file.toLowerCase() === here;
-      return `<li><a href="${p.file}" lang="${p.lang}"${cur ? ' aria-current="page"' : ""}>
-        <span class="t">${p.title}</span><span class="g">${p.tag}</span>${cur ? `<span class="h">● ${T.here}</span>` : ""}</a></li>`;
-    }).join("")}</ul>
-  </div>
-  <button class="toggle" type="button" aria-expanded="false" aria-controls="p"><span class="bars" aria-hidden="true"><i></i><i></i><i></i></span>${T.btn}</button>
-</nav>`;
+  .head { display: flex; align-items: center; gap: 8px; padding: 4px 4px 8px 6px; position: sticky; top: -8px;
+    background: rgba(16,23,34,.98); margin: -8px -8px 0; padding: 12px 12px 10px 14px; border-bottom: 1px solid rgba(255,255,255,.1); }
+  .home { flex: 1; color: #eef3f1; text-decoration: none; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+  .home:hover { color: #fff; text-decoration: underline; }
+  .lang { display: inline-flex; border: 1px solid rgba(255,255,255,.22); border-radius: 999px; overflow: hidden; }
+  .lang button { background: none; border: 0; padding: 3px 9px; font-size: 12px; font-weight: 700; color: #a8b8b4; }
+  .lang button[aria-pressed="true"] { background: #eef3f1; color: #101722; }
+  .x { background: none; border: 0; color: #a8b8b4; font-size: 20px; line-height: 1; padding: 2px 6px; border-radius: 6px; }
+  .x:hover { color: #fff; }
+  .topic { margin-top: 10px; }
+  .topic h3 { margin: 0; padding: 6px 8px 4px; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--a); display: flex; gap: 8px; align-items: center; }
+  .topic h3::before { content: ""; width: 8px; height: 8px; border-radius: 2px; background: var(--a); }
+  .lesson { padding: 4px 8px 2px 24px; font-size: 12px; color: #a8b8b4; }
+  ul { list-style: none; margin: 0; padding: 0 0 0 16px; display: grid; gap: 1px; }
+  a.pg { display: grid; grid-template-columns: 1fr auto; gap: 2px 10px; align-items: baseline;
+    padding: 8px 10px; border-radius: 9px; color: #eef3f1; text-decoration: none; }
+  a.pg:hover { background: rgba(255,255,255,.08); }
+  .tt { font-weight: 600; }
+  .kd { font-size: 11px; color: #a8b8b4; white-space: nowrap; }
+  .hr { grid-column: 1 / -1; font-size: 11px; color: #e7b84a; }
+  a.pg[aria-current="page"] { background: rgba(231,184,74,.14); box-shadow: inset 3px 0 0 #e7b84a; }
+  @media (prefers-reduced-motion: reduce) { .panel { animation: none; } .toggle { transition: none; } }
+  @media print { .wrap { display: none; } }`;
 
-  const btn = root.querySelector(".toggle");
-  const panel = root.querySelector(".panel");
-  const set = open => {
+  function render() {
+    const u = UI[lang];
+    const topics = SITE.topics.map(tp => `
+      <section class="topic" style="--a:${tp.accent}">
+        <h3>${esc(t(tp.title))}</h3>
+        ${tp.lessons.map(ls => `
+          <div class="lesson">${esc(t(ls.title))}</div>
+          <ul>${ls.pages.map(p => {
+            const cur = isHere(p);
+            return `<li><a class="pg" href="${url(fileFor(p))}"${cur ? ' aria-current="page"' : ""}>
+              <span class="tt">${esc(t(p.title))}</span><span class="kd">${esc(t(KIND[p.kind]))}</span>
+              ${cur ? `<span class="hr">● ${u.here}</span>` : ""}</a></li>`;
+          }).join("")}</ul>`).join("")}
+      </section>`).join("");
+    const open = root.querySelector(".panel") && !root.querySelector(".panel").hidden;
+    root.innerHTML = `<style>${style}</style>
+    <nav class="wrap" aria-label="${u.btn}">
+      <div class="panel" id="p"${open ? "" : " hidden"}>
+        <div class="head">
+          <a class="home" href="${url("./")}">⌂ ${u.home}</a>
+          <span class="lang" role="group" aria-label="Language">
+            <button type="button" data-l="hu" aria-pressed="${lang === "hu"}">HU</button><button type="button" data-l="en" aria-pressed="${lang === "en"}">EN</button>
+          </span>
+          <button class="x" type="button" aria-label="${u.close}">×</button>
+        </div>
+        ${topics}
+      </div>
+      <button class="toggle" type="button" aria-expanded="${open}" aria-controls="p"><span class="bars" aria-hidden="true"><i></i><i></i><i></i></span>${u.btn}</button>
+    </nav>`;
+    wire();
+  }
+
+  function setOpen(open) {
+    const panel = root.querySelector(".panel"), btn = root.querySelector(".toggle");
     panel.hidden = !open;
     btn.setAttribute("aria-expanded", String(open));
-    if (open) (root.querySelector('a[aria-current="page"]') || root.querySelector("a")).focus();
-  };
-  btn.addEventListener("click", () => set(panel.hidden));
-  root.querySelector(".x").addEventListener("click", () => { set(false); btn.focus(); });
-  root.addEventListener("keydown", e => { if (e.key === "Escape") { set(false); btn.focus(); } });
-  document.addEventListener("click", e => { if (!e.composedPath().includes(host)) set(false); });
+    if (open) (root.querySelector('a[aria-current="page"]') || root.querySelector("a.pg")).focus();
+  }
+  function wire() {
+    root.querySelector(".toggle").addEventListener("click", () => setOpen(root.querySelector(".panel").hidden));
+    root.querySelector(".x").addEventListener("click", () => { setOpen(false); root.querySelector(".toggle").focus(); });
+    root.querySelectorAll(".lang button").forEach(b => b.addEventListener("click", () => setLang(b.dataset.l)));
+  }
+  root.addEventListener("keydown", e => { if (e.key === "Escape") { setOpen(false); root.querySelector(".toggle").focus(); } });
+  document.addEventListener("click", e => { if (!e.composedPath().includes(host)) setOpen(false); });
+  listeners.push(render);
 
+  render();
   const mount = () => document.body.appendChild(host);
   if (document.body) mount(); else document.addEventListener("DOMContentLoaded", mount);
 })();
