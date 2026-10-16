@@ -195,6 +195,13 @@ table.ops{background:#fff;border:1px solid #e5d98a;border-radius:4px;font-size:1
 .try:hover{border-color:var(--pen);color:var(--pen)}
 .ending{display:grid;gap:12px}
 .ending ol{margin:0;padding-left:1.3em;display:grid;gap:6px}
+.export{display:grid;gap:8px;background:#ffffff;border:2px solid var(--pen);border-radius:6px;padding:14px 16px;transform:rotate(-.4deg)}
+.export h3{font:700 20px var(--f-hand);color:var(--pen)}
+.export label{font:600 12px var(--f-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.export input{font:700 22px var(--f-hand);color:var(--pen);padding:4px 4px 2px;border:none;border-bottom:2px solid var(--pen);background:transparent;min-width:0}
+.export input:focus-visible{outline:none;border-bottom-width:3px;background:rgba(37,70,184,.06)}
+.export-btns{display:flex;gap:8px;flex-wrap:wrap}
+.export-note{margin:0;font-weight:700;color:var(--ok);min-height:1.2em}
 
 /* security camera monitor */
 .monitor{background:linear-gradient(#20272c,#14191d);border-radius:24px;padding:12px 14px 16px;box-shadow:inset 0 0 0 2px #2f383f, inset 0 2px 0 #3a444c, 0 24px 50px rgba(0,0,0,.6)}
@@ -442,6 +449,7 @@ td.null{color:var(--muted);font-style:italic}
       <button class="btn" id="finaleClose" type="button">See bonus investigations</button>
       <button class="btn ghost" id="finaleAgain" type="button">More fireworks</button>
       <button class="btn ghost" id="catBtn" type="button">Dancing cat</button>
+      <button class="btn ghost" id="finaleSave" type="button">Save answers</button>
     </div>
     <div class="catline" id="catline" aria-hidden="true"></div>
   </div>
@@ -791,6 +799,10 @@ function check(){
   if (!v) return;
   if (devHash(v) === 2236979087){ devComplete(); return; }
   if (c.answers.includes(v)){
+    if (!state.solved.includes(i)){
+      state.answers = state.answers || {}; state.answers[i] = $("answer").value.trim();
+      state.solvedSql = state.solvedSql || {}; state.solvedSql[i] = $("sql").value;
+    }
     const r = document.querySelector("#answerForm button").getBoundingClientRect();
     const first = !state.solved.includes(i);
     if (first) state.solved.push(i);
@@ -811,6 +823,7 @@ function check(){
 /* teacher shortcut: a secret answer that solves every chapter (only its hash is stored here) */
 function devHash(s){ let x = 5381; for (const ch of s) x = ((x*33) ^ ch.charCodeAt(0)) >>> 0; return x; }
 function devComplete(){
+  state.dev = true;
   state.solved = CHAPTERS.map((_,k)=>k);
   state.current = CHAPTERS.length - 1;
   if (!state.end) state.end = Date.now();
@@ -825,10 +838,73 @@ function endingHtml(){
     <p>The Danube Star is back in its case. M. Anna Petra and K. Nóra planned the theft for months. When Zalán caught them at the diamond case, they made sure he could never tell anyone. You found them in about <b>${mins} minutes</b>, using only SELECT, FROM and WHERE.</p>
     <p><b>Bonus investigations</b> for fast detectives:</p>
     <ol>${BONUS.map(b=>`<li>${esc(b)}</li>`).join("")}</ol>
+    <div class="export">
+      <h3>Hand in your answers</h3>
+      <label for="studentName">Your name</label>
+      <input id="studentName" type="text" autocomplete="off" placeholder="Write your name here" value="${esc(state.student || "")}">
+      <div class="export-btns">
+        <button class="btn primary" type="button" id="saveTxt">Save answers (.txt)</button>
+        <button class="btn" type="button" id="copyTxt">Copy as text</button>
+      </div>
+      <p class="export-note" id="exportNote" aria-live="polite"></p>
+    </div>
     <div><button class="btn" type="button" id="replayFinale">Replay the celebration</button></div>
   </div>`;
 }
-$("case").addEventListener("click", e=>{ if (e.target.id === "replayFinale") finale(); });
+$("case").addEventListener("click", e=>{
+  if (e.target.id === "replayFinale") finale();
+  if (e.target.id === "saveTxt") exportAnswers("save");
+  if (e.target.id === "copyTxt") exportAnswers("copy");
+});
+$("case").addEventListener("input", e=>{ if (e.target.id === "studentName"){ state.student = e.target.value; save(); } });
+
+/* ---------- answer sheet export ---------- */
+function fmtTime(ms){ const m = Math.floor(ms/60000), s = Math.floor(ms/1000)%60; return `${m}:${String(s).padStart(2,"0")}`; }
+function buildReport(){
+  const pad = n => String(n).padStart(2,"0"), d = new Date(state.end || Date.now());
+  const L = [];
+  L.push("THE DANUBE STAR HEIST - ANSWER SHEET");
+  L.push("====================================");
+  L.push(`Name: ${(state.student || "").trim()}`);
+  L.push(`Finished: ${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`);
+  L.push(`Time taken: ${fmtTime((state.end || Date.now()) - state.start)}`);
+  L.push(`Queries run: ${state.queries || 0}`);
+  if (state.dev) L.push("NOTE: completed with the teacher code, so some answers may be missing.");
+  L.push("");
+  CHAPTERS.forEach((c,i)=>{
+    L.push(`${c.refresher ? "Refresher" : "Chapter " + num(i)}: ${c.title}`);
+    L.push("-".repeat(40));
+    L.push(`Task: ${c.task}`);
+    L.push(`Answer: ${(state.answers && state.answers[i]) || (state.solved.includes(i) ? "(skipped)" : "(not solved)")}`);
+    L.push(`Wrong answers: ${(state.wrong && state.wrong[i]) || 0}`);
+    const q = ((state.solvedSql && state.solvedSql[i]) || "").trim();
+    L.push("Query:");
+    L.push(q ? q.split("\n").map(x=>"    " + x).join("\n") : "    (none saved)");
+    L.push("");
+  });
+  return L.join("\r\n");
+}
+function exportAnswers(mode){
+  const note = $("exportNote"), nameEl = $("studentName");
+  const name = (state.student || "").trim();
+  if (!name){ note.textContent = "Write your name first."; nameEl.focus(); return; }
+  const text = buildReport();
+  if (mode === "copy"){
+    const done = ()=> note.textContent = "Copied. Paste it wherever your teacher asks.";
+    const fallback = ()=>{ const t = document.createElement("textarea"); t.value = text; document.body.appendChild(t); t.select();
+      try { document.execCommand("copy"); done(); } catch(e){ note.textContent = "Copying is blocked here. Use Save answers instead."; } t.remove(); };
+    try { navigator.clipboard.writeText(text).then(done, fallback); } catch(e){ fallback(); }
+    return;
+  }
+  const slug = name.normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^A-Za-z0-9]+/g,"-").replace(/^-|-$/g,"") || "student";
+  const file = `danube-star-${slug}.txt`;
+  try {
+    const url = URL.createObjectURL(new Blob(["\ufeff" + text], {type:"text/plain;charset=utf-8"}));
+    const a = document.createElement("a"); a.href = url; a.download = file; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=> URL.revokeObjectURL(url), 2000);
+    note.textContent = `Saved as ${file}. Check your Downloads folder.`;
+  } catch(e){ note.textContent = "Saving is blocked here. Use Copy as text instead."; }
+}
 
 /* ---------- celebrations ---------- */
 const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -940,6 +1016,7 @@ function closeFinale(){
   const end = document.querySelector(".ending"); if (end) end.scrollIntoView({behavior: reduceMotion?"auto":"smooth", block:"center"});
 }
 $("finaleClose").onclick = closeFinale;
+$("finaleSave").onclick = ()=>{ closeFinale(); setTimeout(()=>{ const n = $("studentName"); if (n){ n.scrollIntoView({block:"center"}); n.focus(); } }, 400); };
 
 /* dancing cats: every click adds one to the dance line (max 7), with a disco beat */
 const FURS = ["#f0a24a","#9aa4ad","#2a2a2e","#f2f2f2","#c9783a","#e8c99a","#6b6f78"];
