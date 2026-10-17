@@ -309,7 +309,6 @@ body.subject .hero{display:none}
   .rail .wrap{flex-wrap:wrap;height:auto;padding-top:10px;gap:4px 18px}
   .lang{margin-left:auto}
   .topics{order:3;flex-basis:100%;margin:0 0 6px -12px;overflow-x:auto}
-  .topics a{white-space:nowrap}
   .topic{scroll-margin-top:118px}.step{scroll-margin-top:126px}
 }
 @media (min-width:700px) and (max-width:1043px){
@@ -639,6 +638,8 @@ function puliSvg(){
       <text x="200" y="128" text-anchor="middle" font-family="Kalam,cursive" font-weight="700" font-size="92" fill="${a}">${letter}</text></svg>`;
   }
   const cover = (p, tp) => p.cover ? `<img src="${D.url(p.cover)}" alt="">` : (COVERS[p.id] || genCover(p, tp));
+  /* a second copy of a cover (the start note) needs its own ids, or the poster's gradients point at the hidden copy */
+  const ownIds = (svg, sfx) => svg.replace(/\bid="([^"]+)"/g, `id="$1-${sfx}"`).replace(/url\(#([^)]+)\)/g, `url(#$1-${sfx})`).replace(/href="#([^"]+)"/g, `href="#$1-${sfx}"`);
 
   /* ---------- a chalk drawing for each subject ---------- */
   const EMBLEMS = {
@@ -754,7 +755,7 @@ function puliSvg(){
       const { p, tp, pr } = next;
       const href = D.url(pr && pr.started && pr.lang ? p.files[pr.lang] : D.fileFor(p));
       const doneN = pr ? pr.done : 0, total = pr ? pr.total : 0;
-      $("#note").innerHTML = `<span class="cover" aria-hidden="true">${cover(p, tp)}</span><p class="who">${inProg ? T.left : T.start}</p>
+      $("#note").innerHTML = `<span class="cover" aria-hidden="true">${ownIds(cover(p, tp), "note")}</span><p class="who">${inProg ? T.left : T.start}</p>
         <h2>${esc(D.t(p.title))}</h2>
         <span class="kind">${esc(D.t(tp.title).split(" – ").pop())}</span>
         ${inProg ? tally(doneN, total, "#b8860b") : ""}
