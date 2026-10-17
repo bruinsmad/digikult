@@ -184,8 +184,8 @@
         accent: "#f0a3b8",
         title: { hu: "Vektorgrafika – Inkscape", en: "Vector graphics – Inkscape" },
         blurb: {
-          hu: "Alakzatok, kitöltés és körvonal, csomópontok, Unió, Metszet, Különbség – plakátok lépésről lépésre, menükkel.",
-          en: "Shapes, fill and stroke, nodes, Union, Intersection, Difference – posters step by step, using the menus."
+          hu: "Alakzatok, kitöltés és körvonal, csomópontok, halmazműveletek és szövegek – plakátok lépésről lépésre, menükkel.",
+          en: "Shapes, fill and stroke, nodes, path operations and text – posters step by step, using the menus."
         },
         lessons: [
           {
@@ -215,6 +215,24 @@
                 },
                 files: { en: "inkscape/path-ops/haunted-house.html" },
                 progress: { chapters: 7, keys: { en: "haunted-house-v1" } }
+              }
+            ]
+          },
+          {
+            id: "text",
+            title: { hu: "Szövegek és szövegdobozok", en: "Text and text boxes" },
+            pages: [
+              {
+                id: "slice-shop",
+                kind: "story",
+                minutes: 35,
+                title: { hu: "A Szeletbolt", en: "The Slice Shop" },
+                desc: {
+                  hu: "Pizzéria-szórólap: cím körvonallal, szöveg körben a pizza körül, szövegdoboz, szöveg körbe öntve és kivágott betűk.",
+                  en: "A pizza-shop flyer: an outlined title, text round the pizza, a text box, text poured into a circle and cut-out letters."
+                },
+                files: { en: "inkscape/text/slice-shop.html" },
+                progress: { chapters: 6, keys: { en: "slice-shop-v1" } }
               }
             ]
           }
