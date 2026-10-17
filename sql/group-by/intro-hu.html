@@ -36,7 +36,9 @@ code,pre,textarea{font-family:var(--f-mono)}
 .rail .in{max-width:980px;margin:0 auto;padding:0 18px;height:54px;display:flex;align-items:center;gap:14px}
 .home{font:700 20px/1 var(--f-chalk);color:#fff6e8;text-decoration:none;white-space:nowrap}
 .crumb{color:#f3dcc4;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
-.langlink{margin-left:auto;flex:none;font:700 13px var(--f-body);color:#5d3820;background:#fff6e8;border-radius:999px;padding:5px 12px;text-decoration:none}
+.crumb a{color:inherit;text-decoration:none}.crumb a:hover{color:#fff6e8;text-decoration:underline;text-decoration-color:var(--yellow);text-underline-offset:3px}
+.langlink{margin-left:auto;flex:none;font:700 14px var(--f-body);color:#fff6e8;border:1.5px solid rgba(255,246,232,.45);border-radius:4px;padding:4px 10px;text-decoration:none}
+.langlink:hover{border-color:#fff6e8;background:rgba(0,0,0,.15)}
 
 /* hero on the board */
 .hero{max-width:980px;margin:0 auto;padding:44px 22px 30px}
@@ -241,7 +243,7 @@ footer.end{max-width:980px;margin:0 auto;padding:0 22px 60px;color:var(--chalk-d
 <body>
 <header class="rail"><div class="in">
   <a class="home" href="../../index.html">Digitális kultúra</a>
-  <span class="crumb">Adatbázisok – SQL › 2. lecke</span>
+  <span class="crumb"><a href="../../index.html#sql">Adatbázisok – SQL</a> › <a href="../../index.html#sql-group-by">2. lecke</a></span>
   <a class="langlink" href="intro.html" lang="en">English</a>
 </div></header>
 
