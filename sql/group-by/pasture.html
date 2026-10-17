@@ -252,12 +252,38 @@ function tone(freq, dur, type="triangle", vol=.12, slideTo=null, delay=0){
   } catch(e){}
 }
 function bark(){ tone(420, .09, "square", .08, 260, 0); tone(460, .1, "square", .08, 280, .14); }
-$("badgeDog").innerHTML = `<svg viewBox="0 0 64 56" width="100%" height="100%" aria-hidden="true">
-  <path d="M52 22C60 16 62 24 56 28" stroke="#1d1d1f" stroke-width="5" fill="none" stroke-linecap="round"/><ellipse cx="34" cy="32" rx="20" ry="13" fill="#1d1d1f"/>
-  <path d="M18 34V48M24 36V50M42 36V50M48 34V48" stroke="#1d1d1f" stroke-width="5" stroke-linecap="round"/>
-  <path d="M18 26Q20 40 22 44M26 24Q27 38 28 46M34 22Q34 38 34 46M42 24Q41 38 40 46M49 27Q47 38 46 44" stroke="#3a3a3e" stroke-width="2.2" fill="none" stroke-linecap="round"/>
-  <circle cx="14" cy="24" r="11" fill="#1d1d1f"/><path d="M6 18Q7 28 6 34M10 15Q11 27 10 35M15 14Q15 26 15 35M20 16Q19 27 20 33" stroke="#3a3a3e" stroke-width="2" fill="none" stroke-linecap="round"/>
-  <ellipse cx="6" cy="28" rx="3" ry="2.4" fill="#0b0b0c"/><path d="M9 31Q10 37 13 35Q12 32 9 31Z" fill="#ff8fa3"/></svg>`;
+/* Bodri, a puli seen from the side, facing left: a dome of black cords that hang to the ground,
+   a fringe over the eyes, a shiny nose, a pink tongue and a mop tail curled over the back. */
+function puliSvg(){
+  const top = x => {                                   /* upper outline: head dome, then the back */
+    if (x < 27){ const dx = (x - 17)/12.5; return 22 - Math.sqrt(Math.max(0, 1 - dx*dx))*12.5; }
+    const dx = (x - 38)/19; return 30 - Math.sqrt(Math.max(0, 1 - dx*dx))*15;
+  };
+  let cords = "", hi = "";
+  for (let i = 0, x = 5.5; x <= 56.5; i++, x += 2.55){
+    const y0 = top(x) + 1.2, sway = ((i*37) % 7 - 3)*.35, len = (x < 9 ? 41 : x < 26 ? 48 : 50) - y0 + ((i*5)%3)*.9;
+    const y1 = y0 + len, mx = x + sway, col = i % 2 ? "#232327" : "#1b1b1e";
+    cords += `<path d="M${x.toFixed(1)} ${y0.toFixed(1)}Q${(mx+.8).toFixed(1)} ${((y0+y1)/2).toFixed(1)} ${(mx-.3).toFixed(1)} ${y1.toFixed(1)}" stroke="${col}" stroke-width="3.4" stroke-linecap="round" fill="none"/>`;
+    hi += `<path d="M${(x-.7).toFixed(1)} ${(y0+1.5).toFixed(1)}Q${(mx).toFixed(1)} ${(y0+len*.35).toFixed(1)} ${(mx-.6).toFixed(1)} ${(y0+len*.6).toFixed(1)}" stroke="#5c5c68" stroke-width=".8" stroke-linecap="round" fill="none" opacity="${i%2 ? .55 : .35}"/>`;
+  }
+  let top2 = "";                                      /* a short second layer of cords for volume */
+  for (let i = 0, x = 8; x <= 54; i++, x += 4.9){
+    const y0 = top(x) + .4, len = 9 + (i%3)*2;
+    top2 += `<path d="M${x.toFixed(1)} ${y0.toFixed(1)}q${(.9 - (i%2)*1.6).toFixed(1)} ${(len/2).toFixed(1)} ${(-.4 + (i%3)*.4).toFixed(1)} ${len}" stroke="#2a2a30" stroke-width="3.1" stroke-linecap="round" fill="none"/><path d="M${(x-.6).toFixed(1)} ${(y0+1).toFixed(1)}q.6 3 .2 ${(len*.55).toFixed(1)}" stroke="#6a6a76" stroke-width=".8" stroke-linecap="round" fill="none" opacity=".5"/>`;
+  }
+  return `<svg viewBox="0 0 64 56" aria-hidden="true">
+    <ellipse cx="32" cy="52.5" rx="27" ry="2.6" fill="#000" opacity=".22"/>
+    <g fill="#0f0f11"><ellipse cx="13" cy="51" rx="3" ry="1.8"/><ellipse cx="22" cy="52" rx="3" ry="1.8"/><ellipse cx="42" cy="52" rx="3" ry="1.8"/><ellipse cx="51" cy="51" rx="3" ry="1.8"/></g>
+    <path d="M5 22a12.5 12.5 0 0 1 24-6c3-2 8-2 12-2 10 0 17 6 17 16v12H5z" fill="#141416"/>
+    ${cords}${hi}${top2}
+    <g stroke-linecap="round" fill="none"><path d="M52 18c4-8 11-6 10 0-1 4-5 5-7 3" stroke="#1b1b1e" stroke-width="4.2"/><path d="M53 17c3-6 8-5 8-1" stroke="#5c5c68" stroke-width=".9" opacity=".5"/></g>
+    <path d="M3 27.6c0-2.3 1.8-3.6 3.8-3.4s2.9 1.8 2.6 3.6-2.2 2.7-4 2.5S3 29.2 3 27.6z" fill="#070708"/>
+    <circle cx="5.2" cy="26.3" r=".9" fill="#fff" opacity=".7"/>
+    <path d="M7.5 31c.4 3 1.6 4.6 3.2 4.4s2-2.4 1.4-4.6z" fill="#ff8fa3" stroke="#d65c78" stroke-width=".6"/>
+    <circle cx="11.5" cy="20.5" r="1.1" fill="#e9eef2" opacity=".85"/>
+  </svg>`;
+}
+$("badgeDog").innerHTML = puliSvg().replace("<svg ", '<svg width="100%" height="100%" ');
 let SQL = null, db = null;
 
 /* ---------- the pasture engine: Bodri herds the sheep the way the query groups them ---------- */
@@ -696,36 +722,33 @@ function drawDog(g, t){
   g.save(); g.translate(d.x, d.y); g.scale(d.face*S, S);
   g.fillStyle = "rgba(0,0,0,.22)"; g.beginPath(); g.ellipse(1, 10.5, 13 - bob, 2.6, 0, 0, 6.283); g.fill();
   g.translate(0, -bob);
-  /* feet peeking out under the cords */
-  const leg = run ? Math.sin(t/40)*3.2 : 0;
-  g.fillStyle = "#121214";
-  [[-7, leg],[-3,-leg],[5,-leg],[9,leg]].forEach(([x,o])=>{ g.beginPath(); g.ellipse(x + o, 9.6, 1.9, 1.2, 0, 0, 6.283); g.fill(); });
-  /* body */
-  g.fillStyle = "#1b1b1d"; g.beginPath(); g.ellipse(0, 0, 12.5, 7.8, 0, 0, 6.283); g.fill();
-  /* corded coat: wavy strands that swing while he runs */
-  g.lineCap = "round"; g.lineWidth = 1.7;
-  for (let k=-11; k<=11; k+=2.2){
-    const top = -Math.sqrt(Math.max(0, 1 - (k/12.5)**2))*7.4, len = 9.5 + ((k*7)%3);
-    g.strokeStyle = (Math.round(k*10) % 3 === 0) ? "#2e2e33" : "#252528";
-    g.beginPath(); g.moveTo(k, top);
-    g.quadraticCurveTo(k + swing*1.4, top + len*.5, k - swing*1.8 + Math.sin(k)*.6, top + len + 3.2);
-    g.stroke();
+  /* the same puli as the badge, drawn in its 64×56 frame and flipped to face the way he runs */
+  g.scale(-.5, .5); g.translate(-32, -32);
+  const leg = run ? Math.sin(t/40)*3.4 : 0;
+  g.fillStyle = "#0f0f11";
+  [[13, leg],[22,-leg],[42,-leg],[51,leg]].forEach(([x,o])=>{ g.beginPath(); g.ellipse(x + o, 51.5, 3, 1.8, 0, 0, 6.283); g.fill(); });
+  const top = x => x < 27 ? 22 - Math.sqrt(Math.max(0, 1 - ((x-17)/12.5)**2))*12.5 : 30 - Math.sqrt(Math.max(0, 1 - ((x-38)/19)**2))*15;
+  g.fillStyle = "#141416"; g.beginPath(); g.moveTo(5, 22); g.arc(17.5, 22, 12.5, Math.PI, Math.PI*1.72); g.bezierCurveTo(32, 14, 37, 14, 41, 14);
+  g.bezierCurveTo(51, 14, 58, 20, 58, 30); g.lineTo(58, 42); g.lineTo(5, 42); g.closePath(); g.fill();
+  g.lineCap = "round";
+  const cord = (x, y0, y1, k, col, w, hiOp) => {               /* one cord; the tip swings behind the dog while he runs */
+    const tip = -swing*2.2*k, mx = x + ((k*37) % 7 - 3)*.35;
+    g.strokeStyle = col; g.lineWidth = w; g.beginPath(); g.moveTo(x, y0); g.quadraticCurveTo(mx + .8 + tip*.4, (y0 + y1)/2, mx - .3 + tip, y1); g.stroke();
+    g.strokeStyle = `rgba(92,92,104,${hiOp})`; g.lineWidth = .8; g.beginPath(); g.moveTo(x - .7, y0 + 1.5); g.quadraticCurveTo(mx + tip*.2, y0 + (y1-y0)*.35, mx - .6 + tip*.5, y0 + (y1-y0)*.6); g.stroke();
+  };
+  for (let i = 0, x = 5.5; x <= 56.5; i++, x += 2.55){
+    const y0 = top(x) + 1.2, y1 = (x < 9 ? 41 : x < 26 ? 48 : 50) + ((i*5)%3)*.9;
+    cord(x, y0, y1, 1 + (i%3)*.15, i % 2 ? "#232327" : "#1b1b1e", 3.4, i % 2 ? .55 : .35);
   }
-  /* curled tail over the back */
-  g.fillStyle = "#1b1b1d"; g.beginPath(); g.arc(-10.5, -7, 3.6, 0, 6.283); g.fill();
-  g.strokeStyle = "#2e2e33"; g.lineWidth = 1.4;
-  for (let a=0; a<6.28; a+=1.05){ g.beginPath(); g.moveTo(-10.5 + Math.cos(a)*1.2, -7 + Math.sin(a)*1.2); g.lineTo(-10.5 + Math.cos(a + swing*.3)*4.6, -7 + Math.sin(a + swing*.3)*4.6); g.stroke(); }
-  /* head with a mop fringe over the eyes */
-  g.fillStyle = "#1b1b1d"; g.beginPath(); g.arc(11.5, -4.5, 6.4, 0, 6.283); g.fill();
-  g.fillStyle = "#0c0c0d"; g.beginPath(); g.ellipse(17.4, -2.6, 2, 1.6, 0, 0, 6.283); g.fill();
-  g.fillStyle = "rgba(255,255,255,.55)"; g.beginPath(); g.arc(17.9, -3.2, .55, 0, 6.283); g.fill();
-  g.fillStyle = "#e9eef2"; g.beginPath(); g.arc(14, -5.4, .9, 0, 6.283); g.fill();
-  g.strokeStyle = "#2e2e33"; g.lineWidth = 1.6;
-  for (let k=6.5; k<=16; k+=1.9){
-    const top = -4.5 - Math.sqrt(Math.max(0, 1 - ((k-11.5)/6.4)**2))*6.2;
-    g.beginPath(); g.moveTo(k, top); g.quadraticCurveTo(k + swing, top + 4, k - swing*.8, top + 8.2 + ((k*3)%2)); g.stroke();
-  }
-  if (run){ g.fillStyle = "#ff8fa3"; g.beginPath(); g.ellipse(16.6, 1.4, 1.5, 2.6 + Math.abs(swing)*.6, .2, 0, 6.283); g.fill(); }
+  for (let i = 0, x = 8; x <= 54; i++, x += 4.9){ const y0 = top(x) + .4; cord(x, y0, y0 + 9 + (i%3)*2, .5, "#2a2a30", 3.1, .5); }
+  /* mop tail curled over the back, wagging */
+  g.save(); g.translate(55, 20); g.rotate(swing*.25); g.strokeStyle = "#1b1b1e"; g.lineWidth = 4.2;
+  g.beginPath(); g.moveTo(-3, -2); g.bezierCurveTo(1, -10, 8, -8, 7, -2); g.bezierCurveTo(6, 2, 2, 3, 0, 1); g.stroke(); g.restore();
+  /* nose, glint, tongue */
+  g.fillStyle = "#070708"; g.beginPath(); g.ellipse(6.2, 27.4, 3.2, 2.9, 0, 0, 6.283); g.fill();
+  g.fillStyle = "rgba(255,255,255,.7)"; g.beginPath(); g.arc(5.2, 26.3, .9, 0, 6.283); g.fill();
+  g.fillStyle = "rgba(233,238,242,.85)"; g.beginPath(); g.arc(11.5, 20.5, 1.1, 0, 6.283); g.fill();
+  if (run){ g.fillStyle = "#ff8fa3"; g.beginPath(); g.ellipse(9.4, 33 + Math.abs(swing), 2, 3 + Math.abs(swing)*.8, -.15, 0, 6.283); g.fill(); }
   g.restore();
   if (t - d.barkAt < 600){
     const a = 1 - (t - d.barkAt)/600, fs = Math.round(13*pv.S);
