@@ -46,7 +46,10 @@ code,pre,textarea{font-family:var(--f-mono)}
 .hero h1{margin:6px 0 8px;font:700 clamp(38px,6vw,64px)/1.05 var(--f-chalk);text-shadow:0 0 12px rgba(255,255,255,.08)}
 .hero h1 code{font:700 .62em var(--f-mono);color:var(--yellow);background:rgba(0,0,0,.2);padding:0 .25em;border-radius:6px}
 .lead{max-width:62ch;margin:0;font-size:clamp(18px,2.2vw,20px);color:var(--chalk-dim)}
-.meta{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:16px;color:var(--chalk-dim);font-size:15px}
+.meta{display:flex;flex-wrap:wrap;gap:8px 0;margin-top:16px;color:var(--chalk-dim);font-size:15px}
+.meta span{padding-right:14px;margin-right:14px;border-right:2px solid rgba(239,238,230,.18)}
+.meta span:last-child{border-right:0;margin-right:0;padding-right:0}
+@media (max-width:520px){ .meta{flex-direction:column;gap:3px} .meta span{border:0;margin:0;padding:0} }
 /* contents: numbered like the sections below, read down the columns */
 .toc{columns:3 210px;column-gap:28px;margin:24px 0 0;padding:14px 0 0;list-style:none;counter-reset:toc;border-top:2px dashed rgba(239,238,230,.16)}
 .toc li{counter-increment:toc;break-inside:avoid;padding:3px 0}
@@ -321,7 +324,7 @@ HAVING COUNT(*) &gt;= 3;</textarea><div class="ex-bar"><button type="button" cla
 <span class="k">FROM</span> sheep
 <span class="k">WHERE</span> pasture = <span class="s">&#x27;Stork Pond&#x27;</span>;</pre><div class="opts"><button type="button" class="opt">45</button><button type="button" class="opt">51</button><button type="button" class="opt">66</button><button type="button" class="opt">153</button></div><p class="fb"><b></b> (66 + 45 + 42) / 3 = 51. 153 would be the total (<code>SUM</code>).</p></fieldset><fieldset class="q" data-ok="2"><legend>Which order is right?</legend><div class="opts"><button type="button" class="opt"><code>SELECT … FROM … GROUP BY … WHERE … HAVING …</code></button><button type="button" class="opt"><code>SELECT … FROM … WHERE … HAVING … GROUP BY …</code></button><button type="button" class="opt"><code>SELECT … FROM … WHERE … GROUP BY … HAVING …</code></button><button type="button" class="opt"><code>SELECT … GROUP BY … FROM … WHERE … HAVING …</code></button></div><p class="fb"><b></b> WHERE comes before grouping, HAVING after it.</p></fieldset><p class="score" aria-live="polite"></p></div></section><section class="sec" id="practice"><h2><span class="n">9</span>Practise</h2><div class="practice"><a class="pcard" href="round-up.html"><span class="k">Mission</span><h4>Bodri's Round-Up</h4><p>A storm is coming and 48 sheep must be herded in: COUNT, SUM, AVG, MAX and HAVING.</p></a><a class="pcard" href="pasture.html"><span class="k demo">Demo</span><h4>Bodri's Pasture</h4><p>Projector demo: run any GROUP BY and watch Bodri herd the sheep into pens.</p></a></div></section>
 </main>
-<footer class="end">Digital Culture · The examples run in your browser; nothing is sent anywhere.</footer>
+<footer class="end">Digital Culture. The examples run in your browser; nothing is sent anywhere.</footer>
 
 <script>
 const SEED = `CREATE TABLE sheep (id INTEGER PRIMARY KEY, name TEXT, breed TEXT, colour TEXT, pasture TEXT, age INTEGER, weight_kg INTEGER);
