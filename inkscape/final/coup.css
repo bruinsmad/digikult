@@ -1,0 +1,87 @@
+/* Coup! – extras on top of ../mission.css: the command-tent questions, live banner, generated steps. */
+.disclaimer{margin:10px 0 0;font-size:14px;color:var(--chalk-dim);opacity:.8;font-style:italic}
+.flag-poster{width:min(360px,100%)}
+.flag-poster .banner{display:block;width:100%;height:auto;border-radius:2px}
+.banner{display:block;width:100%;height:auto}
+
+/* command tent */
+.tent{display:grid;grid-template-columns:1.2fr .9fr;gap:28px;margin-top:20px;align-items:start}
+.qs{counter-reset:q;display:grid;gap:14px}
+.q{display:grid;grid-template-columns:36px 1fr;gap:12px;align-items:start;padding:14px 16px;border:2px dashed var(--chalk-faint);border-radius:14px;background:rgba(0,0,0,.12)}
+.qn{counter-increment:q;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;border:2px solid var(--accent);color:var(--accent);font:700 18px/1 var(--f-chalk)}
+.qn::before{content:counter(q)}
+.ql{display:block;font:700 20px/1.25 var(--f-chalk);color:var(--chalk);margin:2px 0 8px}
+.qh{margin:6px 0 0;font-size:14px;color:var(--chalk-dim)}
+.qs select,.qs input[type=text]{width:100%;font:600 16px var(--f-body);color:var(--paper-ink);background:var(--paper);border:0;border-radius:9px;padding:10px 12px}
+.qs input:disabled,.qs select:disabled{opacity:.6;cursor:not-allowed}
+.idea{font:600 13px var(--f-body);background:transparent;color:var(--chalk);border:1px solid var(--chalk-faint);border-radius:999px;padding:2px 9px;margin:2px 2px 0 0;cursor:pointer}
+.idea:hover:not(:disabled){border-color:var(--chalk-dim)}
+.custom{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px;color:var(--chalk-dim);font-size:14px}
+.custom input[type=color]{width:46px;height:36px;border:2px solid var(--chalk-faint);border-radius:8px;background:none;padding:2px;cursor:pointer}
+.custom input[type=text]{flex:1;min-width:140px}
+.swatches{display:flex;flex-wrap:wrap;gap:10px}
+.swl input{position:absolute;opacity:0;pointer-events:none}
+.swl span{display:block;width:46px;height:46px;border-radius:10px;background:var(--c);border:3px solid rgba(255,255,255,.25);cursor:pointer;box-shadow:0 2px 0 rgba(0,0,0,.25)}
+.swl input:checked + span{border-color:var(--yellow);box-shadow:0 0 0 3px rgba(242,210,100,.35)}
+.swl input:focus-visible + span{outline:3px solid var(--yellow);outline-offset:2px}
+.cards2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.cards2 label,.prides label{position:relative;cursor:pointer}
+.cards2 input,.prides input{position:absolute;opacity:0;pointer-events:none}
+.cards2 span{display:block;padding:12px 14px;border-radius:12px;background:rgba(255,255,255,.06);border:2px solid var(--chalk-faint);height:100%}
+.cards2 b{display:block;font:700 18px var(--f-chalk);color:var(--chalk)}
+.cards2 small{color:var(--chalk-dim);font-size:13.5px}
+.cards2 input:checked + span,.prides input:checked + span{border-color:var(--yellow);background:rgba(242,210,100,.12)}
+.cards2 input:focus-visible + span,.prides input:focus-visible + span{outline:3px solid var(--yellow);outline-offset:2px}
+.prides{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.prides span{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:10px;background:rgba(255,255,255,.06);border:2px solid var(--chalk-faint);font-weight:600;font-size:15px}
+.prides i{font-style:normal;font-size:20px}
+.slide{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;font:700 15px var(--f-body);color:var(--chalk-dim)}
+.slide input{width:100%;accent-color:var(--yellow);height:28px}
+
+/* live preview */
+.preview{position:sticky;top:84px}
+.sheet.mini{margin:0;padding:14px}
+.sheet.mini .banner{border-radius:3px;box-shadow:0 1px 3px rgba(0,0,0,.15)}
+.live-cap{margin:8px 0 4px;font:700 18px var(--f-chalk);text-align:center;color:var(--paper-ink)}
+.why{margin:6px 0 0;padding-left:18px;font-size:14px;color:var(--paper-muted)}
+.why li{margin:2px 0}
+.lock{width:100%;justify-content:center;margin-top:14px;font-size:17px;padding:13px}
+.lock-msg{margin:8px 0 0;font-size:14px;color:var(--chalk-dim);text-align:center}
+
+/* badges */
+.badges{display:flex;flex-wrap:wrap;gap:8px;list-style:none;padding:0;margin:14px 0 0}
+.badges li{border:2px solid var(--accent);color:var(--chalk);border-radius:999px;padding:3px 12px;font-weight:700;font-size:14.5px}
+
+/* steps */
+.stepgrid{display:grid;grid-template-columns:minmax(220px,.95fr) 1.25fr;gap:18px;align-items:start}
+.stepflag{border:1px solid var(--paper-line);border-radius:8px;overflow:hidden;background:#e9e7dd}
+.do{margin:0;padding-left:22px;display:grid;gap:9px;font-size:16px}
+.do li{padding-left:2px}
+.ti{display:inline-block;width:26px;height:27px;vertical-align:middle;border-radius:6px;margin:0 2px}
+.sw{display:inline-block;width:18px;height:18px;border-radius:4px;background:var(--c);border:1.5px solid #8a8a95;vertical-align:-3px;margin-right:4px}
+.hex{font:700 14px ui-monospace,Menlo,Consolas,monospace;background:#f1efe5;border-radius:5px;padding:1px 5px;margin-right:4px}
+.nums{font:700 14px ui-monospace,Menlo,Consolas,monospace;background:#fff6c9;border-radius:5px;padding:1px 6px;white-space:nowrap}
+.starlist{display:inline-block;white-space:normal;line-height:1.8}
+.sheet code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:14px;background:#f1efe5;border-radius:5px;padding:1px 5px}
+.stuck{margin-top:14px;border:2px solid #f5d38a;background:#fff8e6;border-radius:10px;padding:8px 14px}
+.stuck summary{cursor:pointer;font-weight:700;color:#7a5a12}
+.stuck ul{margin:8px 0 2px;padding-left:20px}
+
+@media (max-width:860px){
+  .tent{grid-template-columns:1fr}
+  .preview{position:static;order:-1}
+  .stepgrid{grid-template-columns:1fr}
+}
+@media (max-width:520px){
+  .cards2{grid-template-columns:1fr}
+  .q{grid-template-columns:1fr;padding:12px}
+  .qn{display:none}
+}
+@media print{
+  .rail,.tray,.tent .qs,.lock,.lock-msg,.actions,.done-btn,.next-link,.stuck,#bonus,.disclaimer{display:none!important}
+  body{background:#fff;color:#000}
+  .tent{grid-template-columns:1fr}
+  .sheet{box-shadow:none;border:1px solid #ccc;break-inside:avoid;transform:none}
+  .sec-head h2{color:#000}
+  .badges li{color:#000}
+}
