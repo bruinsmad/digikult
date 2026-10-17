@@ -16,6 +16,7 @@
 .qs input:disabled,.qs select:disabled{opacity:.6;cursor:not-allowed}
 .idea{font:600 13px var(--f-body);background:transparent;color:var(--chalk);border:1px solid var(--chalk-faint);border-radius:999px;padding:2px 9px;margin:2px 2px 0 0;cursor:pointer}
 .idea:hover:not(:disabled){border-color:var(--chalk-dim)}
+.custom[hidden]{display:none}
 .custom{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px;color:var(--chalk-dim);font-size:14px}
 .custom input[type=color]{width:46px;height:36px;border:2px solid var(--chalk-faint);border-radius:8px;background:none;padding:2px;cursor:pointer}
 .custom input[type=text]{flex:1;min-width:140px}
