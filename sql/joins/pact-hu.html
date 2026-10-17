@@ -582,13 +582,16 @@ const crestSvg = () => document.querySelector(".guitar").outerHTML.replace('clas
 $("heroGuitar").innerHTML = crestSvg();
 
 /* ---------- line-up strip ---------- */
+/* chapter-strip markers: a guitar pick over the chapter you are on, nothing extra on solved ones (their post turns lime) */
+const WHO_CUR = "🕯️"; const _unusedPick = `<svg viewBox="0 0 20 20" width="18" height="18"><path d="M10 18C5 13 2 9 2.5 5.5 3 2.5 6 1.5 10 1.5s7 1 7.5 4C18 9 15 13 10 18z" fill="var(--pink)" stroke="#7a1248" stroke-width="1.2"/><path d="M6 5.5c1.5-1 3-1.2 4-1.2" stroke="#fff" stroke-opacity=".6" stroke-width="1.3" stroke-linecap="round" fill="none"/></svg>`;
+const WHO_DONE = "👑";
 function renderSteps(){
   $("steps").innerHTML = CHAPTERS.map((c,i)=>{
     const cls = ["step"];
     if (state.solved.includes(i)) cls.push("done");
     if (i === state.current) cls.push("current");
     if (!isUnlocked(i)) cls.push("locked");
-    const who = i === state.current ? "🕯️" : (state.solved.includes(i) ? "👑" : "");
+    const who = i === state.current ? WHO_CUR : (state.solved.includes(i) ? WHO_DONE : "");
     return `<button type="button" class="${cls.join(" ")}" data-i="${i}" ${isUnlocked(i)?"":"aria-disabled=\"true\""} title="${esc(c.title)}">
       <span class="who" aria-hidden="true">${who}</span><span class="post">${c.refresher ? "R" : num(i)}</span><span class="t">${esc(c.title)}</span></button>`;
   }).join("");

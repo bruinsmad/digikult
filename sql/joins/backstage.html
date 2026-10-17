@@ -220,12 +220,25 @@ tr:last-child td{border-bottom:none}
   <header class="top">
     <div class="sign">
       <span class="hole" aria-hidden="true"></span>
-      <svg class="guitar" viewBox="0 0 64 64" aria-hidden="true">
-        <path d="M44 8l12 12-20 20-12-12z" fill="#2b1a0e"/><path d="M50 6l8 8" stroke="#ffd166" stroke-width="3" stroke-linecap="round"/>
-        <path d="M30 26c-6-6-18-4-20 4-2 6 2 10 6 12-4 2-8 6-6 12 2 8 14 10 20 4 6-6 4-14 0-18 4-4 6-10 0-14z" fill="#d81b60"/>
-        <path d="M30 26c-6-6-18-4-20 4-2 6 2 10 6 12-4 2-8 6-6 12 2 8 14 10 20 4 6-6 4-14 0-18 4-4 6-10 0-14z" fill="none" stroke="#7a1248" stroke-width="2"/>
-        <circle cx="21" cy="40" r="5" fill="#2b1a0e"/><path d="M14 44h14" stroke="#ffd166" stroke-width="1.5"/>
-        <path d="M18 36L44 10" stroke="#f3eefb" stroke-width="1"/><path d="M20 38L46 12" stroke="#f3eefb" stroke-width="1"/>
+      <svg class="guitar" viewBox="0 0 100 100" aria-hidden="true">
+        <defs><linearGradient id="cherryG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff4d6d"/><stop offset=".55" stop-color="#d0103a"/><stop offset="1" stop-color="#7d0a24"/></linearGradient>
+          <linearGradient id="neckG" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#5a3519"/><stop offset=".5" stop-color="#7a4a24"/><stop offset="1" stop-color="#5a3519"/></linearGradient></defs>
+        <g transform="rotate(40 50 50)">
+          <path d="M45 2h10l2 3-1 13h-12l-1-13z" fill="#1c1210" stroke="#0b0706" stroke-width="1"/>
+          <g fill="#e8e2d2"><circle cx="42.5" cy="6" r="1.7"/><circle cx="42.5" cy="11" r="1.7"/><circle cx="42.5" cy="16" r="1.7"/><circle cx="57.5" cy="6" r="1.7"/><circle cx="57.5" cy="11" r="1.7"/><circle cx="57.5" cy="16" r="1.7"/></g>
+          <rect x="45.5" y="17" width="9" height="42" rx="1" fill="url(#neckG)"/>
+          <path d="M45.5 18h9" stroke="#f3eadb" stroke-width="1.4"/>
+          <path d="M45.5 23h9M45.5 28h9M45.5 32.6h9M45.5 37h9M45.5 41h9M45.5 44.8h9M45.5 48.4h9M45.5 51.8h9M45.5 55h9" stroke="#cfc7b6" stroke-width=".6"/>
+          <g fill="#f3eadb"><circle cx="50" cy="30.3" r=".9"/><circle cx="50" cy="39" r=".9"/><circle cx="50" cy="46.6" r=".9"/><circle cx="48.3" cy="53.4" r=".8"/><circle cx="51.7" cy="53.4" r=".8"/></g>
+          <path d="M45 57C41 53 37 49 33 46c-3-2-5 1-4 5l2 11c1 5 2 7 0 12l-4 11c-2 8 4 13 13 13h20c9 0 15-5 13-13l-4-11c-2-5-1-7 0-12l2-11c1-4-1-7-4-5-4 3-8 7-12 11z" fill="url(#cherryG)" stroke="#5c0619" stroke-width="1.4" stroke-linejoin="round"/>
+          <path d="M32 52l2 10c1 4 1 7-1 11" stroke="#fff" stroke-opacity=".35" stroke-width="2" stroke-linecap="round" fill="none"/>
+          <path d="M41 60h18l3 22-5 8h-14l-5-8z" fill="#14100f" opacity=".85"/>
+          <g><rect x="43.5" y="63" width="13" height="5" rx="1.2" fill="#18181b" stroke="#c9c9cf" stroke-width=".8"/><rect x="43.5" y="72" width="13" height="5" rx="1.2" fill="#18181b" stroke="#c9c9cf" stroke-width=".8"/>
+            <g fill="#c9c9cf"><circle cx="46" cy="65.5" r=".7"/><circle cx="48.5" cy="65.5" r=".7"/><circle cx="51" cy="65.5" r=".7"/><circle cx="53.5" cy="65.5" r=".7"/><circle cx="46" cy="74.5" r=".7"/><circle cx="48.5" cy="74.5" r=".7"/><circle cx="51" cy="74.5" r=".7"/><circle cx="53.5" cy="74.5" r=".7"/></g></g>
+          <rect x="44" y="82" width="12" height="3.4" rx="1" fill="#d8d8de" stroke="#8c8c94" stroke-width=".6"/>
+          <g fill="#ffd166" stroke="#8a6414" stroke-width=".6"><circle cx="64" cy="84" r="2.2"/><circle cx="67" cy="91" r="2.2"/><circle cx="36" cy="84" r="2.2"/><circle cx="33" cy="91" r="2.2"/></g>
+          <g stroke="#f4f1ea" stroke-width=".45" opacity=".9"><path d="M47.2 17v67M49.1 17v67M50.9 17v67M52.8 17v67"/></g>
+        </g>
       </svg>
       <div>
         <div class="eyebrow">Zengő Festival · Tisza bank · Saturday night</div>
@@ -576,13 +589,16 @@ const guitarSvg = () => document.querySelector(".guitar").outerHTML.replace('cla
 $("heroGuitar").innerHTML = guitarSvg();
 
 /* ---------- line-up strip ---------- */
+/* chapter-strip markers: a guitar pick over the chapter you are on, nothing extra on solved ones (their post turns lime) */
+const WHO_CUR = `<svg viewBox="0 0 20 20" width="18" height="18"><path d="M10 18C5 13 2 9 2.5 5.5 3 2.5 6 1.5 10 1.5s7 1 7.5 4C18 9 15 13 10 18z" fill="var(--pink)" stroke="#7a1248" stroke-width="1.2"/><path d="M6 5.5c1.5-1 3-1.2 4-1.2" stroke="#fff" stroke-opacity=".6" stroke-width="1.3" stroke-linecap="round" fill="none"/></svg>`;
+const WHO_DONE = "";
 function renderSteps(){
   $("steps").innerHTML = CHAPTERS.map((c,i)=>{
     const cls = ["step"];
     if (state.solved.includes(i)) cls.push("done");
     if (i === state.current) cls.push("current");
     if (!isUnlocked(i)) cls.push("locked");
-    const who = i === state.current ? "🔎" : (state.solved.includes(i) ? "🎸" : "");
+    const who = i === state.current ? WHO_CUR : (state.solved.includes(i) ? WHO_DONE : "");
     return `<button type="button" class="${cls.join(" ")}" data-i="${i}" ${isUnlocked(i)?"":"aria-disabled=\"true\""} title="${esc(c.title)}">
       <span class="who" aria-hidden="true">${who}</span><span class="post">${c.refresher ? "R" : num(i)}</span><span class="t">${esc(c.title)}</span></button>`;
   }).join("");
