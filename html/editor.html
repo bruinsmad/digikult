@@ -154,6 +154,21 @@ body.focus .rail{display:none}
 @media (max-width:1380px){ #fullBtn .lb,#fmtBtn .lb{display:none} }
 body{grid-template-columns:minmax(0,1fr)}
 @media (max-width:760px){ .sep{display:none} .grp.push{margin-left:0} .rail .crumb{display:none} .status{font-size:11.5px} }
+/* preview: element picking */
+.bw-view{position:relative;min-height:0}
+.bw[data-fixed] .bw-view{flex:1;display:flex;flex-direction:column}
+.bw-bar{display:flex;align-items:center;gap:8px}
+.bw-bar .addr{flex:1;min-width:0}
+.bw-pick{flex:none;display:inline-flex;align-items:center;gap:5px;font:700 12.5px/1 "Atkinson Hyperlegible",system-ui,sans-serif;color:#2b2520;background:#f3ede1;border:1.5px solid #d8ccb4;border-radius:999px;padding:4px 10px 4px 7px;cursor:pointer}
+.bw-pick svg{width:14px;height:14px}
+.bw-pick:hover{border-color:#2b2520}
+.bw-pick[aria-pressed="true"]{background:#e07b2c;border-color:#e07b2c;color:#fff}
+.bw.picking iframe{cursor:crosshair}
+.dk-box{position:absolute;pointer-events:none;border:2px solid #e07b2c;background:rgba(224,123,44,.12);border-radius:3px;z-index:3;transition:left .08s,top .08s,width .08s,height .08s}
+.dk-tag{position:absolute;left:-2px;top:-21px;background:#e07b2c;color:#fff;font:700 11.5px/1 "JetBrains Mono",ui-monospace,monospace;padding:4px 6px;border-radius:4px 4px 4px 0;white-space:nowrap}
+.dk-box.below .dk-tag{top:auto;bottom:-21px;border-radius:0 4px 4px 4px}
+@media (prefers-reduced-motion:reduce){ .dk-box{transition:none} }
+.cm-line.dk-flash,.cm-dk-flash{background:rgba(224,123,44,.28)!important;transition:background .6s}
 
 </style>
 </head>
@@ -203,14 +218,14 @@ body{grid-template-columns:minmax(0,1fr)}
 <footer class="status"><span id="stPos"></span><button type="button" id="stWarn"></button><span class="sp"></span><span>💾 saves automatically in this browser ·</span><span id="stSave"></span></footer>
 
 <div class="keys" id="keys" hidden><div class="keys-h"><b>Keyboard shortcuts, as in VS Code</b><button type="button" class="x" id="keysClose" aria-label="Close">×</button></div>
-  <dl><dt>ul&gt;li*3 + Tab</dt><dd>Emmet: short codes become full HTML. Try <code>p</code>, <code>img</code>, <code>table&gt;tr*3&gt;td*3</code>, <code>!</code></dd><dt>Tab or Enter</dt><dd>accept the suggested tag or attribute</dd><dt>Ctrl + Space</dt><dd>open suggestions</dd><dt>Ctrl + B / Ctrl + I</dt><dd>wrap the selection in &lt;strong&gt; / &lt;em&gt;</dd><dt>Ctrl + /</dt><dd>comment on/off (&lt;!-- --&gt;)</dd><dt>Alt + ↑ / ↓</dt><dd>move the line up / down</dd><dt>Shift + Alt + ↓</dt><dd>duplicate the line</dd><dt>Ctrl + D</dt><dd>select the next match too: type with several cursors at once</dd><dt>Ctrl + click</dt><dd>add another cursor</dd><dt>Ctrl + F</dt><dd>find and replace</dd><dt>Shift + Alt + F</dt><dd>fix the indentation</dd><dt>Ctrl + Shift + [ / ]</dt><dd>fold / unfold an element</dd><dt>Ctrl + Z / Ctrl + Y</dt><dd>undo / redo</dd><dt>mouse over a tag</dt><dd>shows what the tag is for</dd><dt>Ctrl + S</dt><dd>save (it saves by itself anyway)</dd><dt>drop files here</dt><dd>open an HTML file or image from your computer</dd></dl><p class="keys-n">On a Mac use ⌘ (Cmd) instead of Ctrl and ⌥ (Option) instead of Alt.</p></div>
+  <dl><dt>ul&gt;li*3 + Tab</dt><dd>Emmet: short codes become full HTML. Try <code>p</code>, <code>img</code>, <code>table&gt;tr*3&gt;td*3</code>, <code>!</code></dd><dt>Tab or Enter</dt><dd>accept the suggested tag or attribute</dd><dt>Ctrl + Space</dt><dd>open suggestions</dd><dt>Ctrl + B / Ctrl + I</dt><dd>wrap the selection in &lt;strong&gt; / &lt;em&gt;</dd><dt>Ctrl + /</dt><dd>comment on/off (&lt;!-- --&gt;)</dd><dt>Alt + ↑ / ↓</dt><dd>move the line up / down</dd><dt>Shift + Alt + ↓</dt><dd>duplicate the line</dd><dt>Ctrl + D</dt><dd>select the next match too: type with several cursors at once</dd><dt>Ctrl + click</dt><dd>add another cursor</dd><dt>Ctrl + F</dt><dd>find and replace</dd><dt>Shift + Alt + F</dt><dd>fix the indentation</dd><dt>Ctrl + Shift + [ / ]</dt><dd>fold / unfold an element</dd><dt>Ctrl + Z / Ctrl + Y</dt><dd>undo / redo</dd><dt>mouse over a tag</dt><dd>shows what the tag is for</dd><dt>Alt + click in the preview</dt><dd>jumps to the element in the code (or the 🎯 Pick button)</dd><dt>Ctrl + S</dt><dd>save (it saves by itself anyway)</dd><dt>drop files here</dt><dd>open an HTML file or image from your computer</dd></dl><p class="keys-n">On a Mac use ⌘ (Cmd) instead of Ctrl and ⌥ (Option) instead of Alt.</p></div>
 <dialog id="dlg"></dialog>
 <div class="toast" id="toast" role="status"></div>
 <div class="drop" id="drop" hidden>Drop to open the files</div>
 
 <script src="../vendor/codemirror-html.js?v=4d85dc2d"></script>
 <script>
-const CFG = {"ui": {"title": "HTML editor", "preview": "Preview", "localTpl": "This link would open {h}, but you have no page or image with that name. Create it with ＋ New!", "switched": "Switched to {n}", "saveFail": "Couldn't save: the browser's storage is full.", "pos": "Line {l}, column {c}", "warns": "⚠ {n} warnings", "noWarn": "✓ no mistakes", "saved": "saved ✓", "saving": "saving…", "savedToast": "Saved. (It saves by itself too.)", "ok": "OK", "cancel": "Cancel", "fileName": "File name", "nameEmpty": "Type a name.", "nameTaken": "You already have a page called {n}", "newTitle": "New page", "create": "Create", "tplSkel": "HTML skeleton", "tplSkelD": "DOCTYPE, head, title and body, as in the lesson", "tplBlank": "Empty", "tplBlankD": "A completely empty file. Tip: type ! and press Tab.", "created": "Created {n}", "renameTitle": "Rename", "rename": "Rename", "delTitle": "Delete the page?", "delText": "<b>{n}</b> will be deleted from this browser for good.", "del": "Delete", "opened": "Opened: {p} page(s), {i} other file(s)", "imgTitle": "Images", "imgText": "Uploaded images stay in this browser. Refer to them by name in your code, e.g. <code>src=\"dog.jpg\"</code>. They go into the downloaded .zip too.", "imgAdd": "＋ Upload an image", "imgMine": "Your images", "imgNone": "No images of your own yet. Upload one, or drop it into the window!", "imgSamples": "Sample images (always available)", "sample": "sample", "insert": "Insert", "close": "Close", "downloaded": "Downloaded {n}", "zipFail": "The .zip couldn't be made; only the page was downloaded.", "imported": "Opened in the editor: {n}"}, "samples": ["img/morzsa.svg", "img/cirmi.svg", "img/pamacs.svg", "img/bodri.svg", "img/logo.svg"], "sampleBase": "basics/img/", "templates": {"skeleton": "<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <title>New page</title>\n  </head>\n  <body>\n    <h1>Hello, world!</h1>\n\n  </body>\n</html>\n"}};
+const CFG = {"ui": {"pick": "Pick", "pickT": "Click an element in the preview to jump to its code. Alt+click always works.", "title": "HTML editor", "preview": "Preview", "localTpl": "This link would open {h}, but you have no page or image with that name. Create it with ＋ New!", "switched": "Switched to {n}", "saveFail": "Couldn't save: the browser's storage is full.", "pos": "Line {l}, column {c}", "warns": "⚠ {n} warnings", "noWarn": "✓ no mistakes", "saved": "saved ✓", "saving": "saving…", "savedToast": "Saved. (It saves by itself too.)", "ok": "OK", "cancel": "Cancel", "fileName": "File name", "nameEmpty": "Type a name.", "nameTaken": "You already have a page called {n}", "newTitle": "New page", "create": "Create", "tplSkel": "HTML skeleton", "tplSkelD": "DOCTYPE, head, title and body, as in the lesson", "tplBlank": "Empty", "tplBlankD": "A completely empty file. Tip: type ! and press Tab.", "created": "Created {n}", "renameTitle": "Rename", "rename": "Rename", "delTitle": "Delete the page?", "delText": "<b>{n}</b> will be deleted from this browser for good.", "del": "Delete", "opened": "Opened: {p} page(s), {i} other file(s)", "imgTitle": "Images", "imgText": "Uploaded images stay in this browser. Refer to them by name in your code, e.g. <code>src=\"dog.jpg\"</code>. They go into the downloaded .zip too.", "imgAdd": "＋ Upload an image", "imgMine": "Your images", "imgNone": "No images of your own yet. Upload one, or drop it into the window!", "imgSamples": "Sample images (always available)", "sample": "sample", "insert": "Insert", "close": "Close", "downloaded": "Downloaded {n}", "zipFail": "The .zip couldn't be made; only the page was downloaded.", "imported": "Opened in the editor: {n}"}, "samples": ["img/morzsa.svg", "img/cirmi.svg", "img/pamacs.svg", "img/bodri.svg", "img/logo.svg"], "sampleBase": "basics/img/", "templates": {"skeleton": "<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <title>New page</title>\n  </head>\n  <body>\n    <h1>Hello, world!</h1>\n\n  </body>\n</html>\n"}};
 const UI = { preview: CFG.ui.preview, localNote: h => CFG.ui.localTpl.replace("{h}", h) };
 /* ---------- shared by the HTML explainer and the HTML mission ---------- */
 const $ = (s, el=document) => el.querySelector(s), $$ = (s, el=document) => [...el.querySelectorAll(s)];
@@ -376,17 +391,51 @@ function makeEditor(ta, opts={}){
 }
 
 /* A small browser window: the tab shows the page's <title>, the address bar its file name. */
-function makeBrowser(host, file, T){
+/* Mark every element with where it sits in the code: data-dk="start,endOfOpeningTag,end".
+   The preview gets these attributes; downloads and "open in a new tab" use the clean code. */
+function instrument(src){
+  const out = [], stack = [], marks = [];
+  const re = /<!--[\s\S]*?(?:-->|$)|<!doctype[^>]*>|<(\/?)([a-zA-Z][\w-]*)((?:[^>"']|"[^"]*"|'[^']*')*)>/gi;
+  let m;
+  while ((m = re.exec(src))){
+    if (m[2] === undefined) continue;
+    const name = m[2].toLowerCase(), at = m.index, endOpen = re.lastIndex;
+    if (m[1]){                                              /* closing tag */
+      const k = stack.map(e => e.name).lastIndexOf(name);
+      if (k >= 0){ for (let j = stack.length - 1; j >= k; j--) stack[j].mark.end = j === k ? endOpen : at; stack.length = k; }
+      continue;
+    }
+    const mark = { pos: at + 1 + m[2].length, start: at, open: endOpen, end: endOpen };
+    marks.push(mark);
+    if (!VOID.has(name) && !/\/\s*$/.test(m[3])) stack.push({ name, mark });
+    if (name === "script" || name === "style"){              /* skip their contents */
+      const close = new RegExp("</" + name + "\\s*>", "i"); close.lastIndex = 0;
+      const rest = src.slice(endOpen), c = close.exec(rest);
+      if (c){ re.lastIndex = endOpen + c.index; }
+    }
+  }
+  stack.forEach(e => e.mark.end = src.length);
+  let last = 0;
+  for (const mk of marks){ out.push(src.slice(last, mk.pos), ` data-dk="${mk.start},${mk.open},${mk.end}"`); last = mk.pos; }
+  out.push(src.slice(last));
+  return out.join("");
+}
+
+/* A small browser window: the tab shows the page's <title>, the address bar its file name.
+   With opts.pick, a target button turns on "pick" mode: hover shows the element, click jumps to its code. */
+function makeBrowser(host, file, T, opts = {}){
   host.classList.add("bw");
+  const pickBtn = opts.pick ? `<button type="button" class="bw-pick" aria-pressed="false" title="${esc(opts.pick.title)}"><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="5.2" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="8" cy="8" r="1.8" fill="currentColor"/><path d="M8 0.8v3M8 12.2v3M0.8 8h3M12.2 8h3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><span>${esc(opts.pick.label)}</span></button>` : "";
   host.innerHTML = `<div class="bw-top"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
     <span class="bw-tab"><span class="fav" aria-hidden="true"></span><span class="ttl"></span></span></div>
-    <div class="bw-bar"><span class="addr"><span aria-hidden="true">📄</span> ${esc(file)}</span></div>
-    <iframe title="${esc(T.preview)}" sandbox="allow-same-origin allow-popups allow-popups-to-escape-sandbox"></iframe>`;
-  const fr = $("iframe", host), ttl = $(".ttl", host);
+    <div class="bw-bar"><span class="addr"><span aria-hidden="true">📄</span> ${esc(file)}</span>${pickBtn}</div>
+    <div class="bw-view"><iframe title="${esc(T.preview)}" sandbox="allow-same-origin allow-popups allow-popups-to-escape-sandbox"></iframe>
+    <div class="dk-box" hidden><span class="dk-tag"></span></div></div>`;
+  const fr = $("iframe", host), ttl = $(".ttl", host), box = $(".dk-box", host), boxTag = $(".dk-tag", host);
   const nt = document.createElement("div"); nt.className = "bw-note"; nt.setAttribute("role", "status"); host.append(nt);
   let ntTimer = 0;
   const note = msg => { nt.textContent = msg; nt.classList.add("on"); clearTimeout(ntTimer); ntTimer = setTimeout(() => nt.classList.remove("on"), 3200); };
-  let timer = 0, pendingScroll = 0;
+  let timer = 0, pendingScroll = 0, picking = false, boxTimer = 0;
   const size = () => {
     if (host.dataset.fixed) return;
     try {
@@ -395,18 +444,48 @@ function makeBrowser(host, file, T){
       fr.style.height = Math.min(host.dataset.max ? +host.dataset.max : 560, Math.max(+host.dataset.min || 110, h + 4)) + "px";
     } catch(e){}
   };
+  /* the highlight box lives outside the page, so the student's page is never changed */
+  const showBox = (el, stay) => {
+    if (!el || !el.getBoundingClientRect){ box.hidden = true; return; }
+    const r = el.getBoundingClientRect();
+    if (!r.width && !r.height){ box.hidden = true; return; }
+    box.hidden = false;
+    Object.assign(box.style, { left: r.left + "px", top: r.top + "px", width: r.width + "px", height: r.height + "px" });
+    boxTag.textContent = "<" + el.tagName.toLowerCase() + ">";
+    box.classList.toggle("below", r.top < 22);
+    clearTimeout(boxTimer);
+    if (stay) boxTimer = setTimeout(() => { if (!picking) box.hidden = true; }, stay);
+  };
+  const markOf = el => { const e = el && el.closest && el.closest("[data-dk]"); if (!e) return null; const [a, b, c] = e.dataset.dk.split(",").map(Number); return { el: e, start: a, open: b, end: c }; };
+  const setPick = on => {
+    picking = on; host.classList.toggle("picking", on);
+    const b = $(".bw-pick", host); if (b) b.setAttribute("aria-pressed", String(on));
+    if (!on) box.hidden = true;
+  };
+  if (opts.pick) $(".bw-pick", host).onclick = () => setPick(!picking);
   fr.addEventListener("load", () => {
     try {
       const d = fr.contentDocument;
       d.documentElement.scrollTop = pendingScroll;
-      d.addEventListener("click", e => {                         /* links open in a new tab; #anchors scroll inside */
-        const a = e.target.closest && e.target.closest("a[href]"); if (!a) return;
+      d.addEventListener("click", e => {
+        if (opts.pick && (picking || e.altKey)){                  /* jump to the code */
+          const mk = markOf(e.target);
+          if (mk){ e.preventDefault(); e.stopPropagation(); showBox(mk.el, 1600); opts.pick.onPick(mk.start, mk.open, mk.end); }
+          return;
+        }
+        const a = e.target.closest && e.target.closest("a[href]"); if (!a) return;   /* links open in a new tab; #anchors scroll inside */
         e.preventDefault();
         const h = a.getAttribute("href") || "";
         if (h.startsWith("#")){ const t = d.getElementById(h.slice(1)); if (t) t.scrollIntoView({ behavior:"smooth" }); return; }
         if (/^(https?:|mailto:|tel:)/i.test(h)) window.open(a.href, "_blank", "noopener");
         else if (!(T.localLink && T.localLink(h))) note(T.localNote(h));
-      });
+      }, true);
+      if (opts.pick){
+        d.addEventListener("mousemove", e => { if (picking || e.altKey) showBox(markOf(e.target) && markOf(e.target).el); else if (!boxTimer) box.hidden = true; });
+        d.addEventListener("mouseleave", () => { if (picking) box.hidden = true; });
+        d.addEventListener("scroll", () => { box.hidden = true; }, true);
+        d.addEventListener("keydown", e => { if (e.key === "Escape") setPick(false); });
+      }
       $$("img", d).forEach(im => im.addEventListener("load", size));
     } catch(e){}
     size();
@@ -415,11 +494,27 @@ function makeBrowser(host, file, T){
     const t = /<title[^>]*>([\s\S]*?)<\/title>/i.exec(src);
     ttl.textContent = t && t[1].trim() ? t[1].replace(/\s+/g, " ").trim() : file;
     try { pendingScroll = fr.contentDocument ? fr.contentDocument.documentElement.scrollTop : 0; } catch(e){ pendingScroll = 0; }
+    box.hidden = true;
     fr.srcdoc = src;
+  };
+  /* the other way round: the element that contains a position in the code */
+  const highlightAt = pos => {
+    if (!picking) return;
+    try {
+      let best = null, size = Infinity;
+      for (const el of fr.contentDocument.querySelectorAll("[data-dk]")){
+        const [a, , c] = el.dataset.dk.split(",").map(Number);
+        if (a <= pos && pos <= c && c - a < size){ best = el; size = c - a; }
+      }
+      if (best && best.tagName !== "HTML" && best.tagName !== "BODY" && best.tagName !== "HEAD"){
+        if (best.scrollIntoView) best.scrollIntoView({ block: "nearest" });
+        showBox(best);
+      } else box.hidden = true;
+    } catch(e){}
   };
   return {
     show: (src, now) => { clearTimeout(timer); if (now) show(src); else timer = setTimeout(() => show(src), 160); },
-    frame: fr, resize: size, note
+    frame: fr, resize: size, note, highlightAt, setPick, get picking(){ return picking; }
   };
 }
 
@@ -510,7 +605,7 @@ function resolve(code){
 /* ---------- editor + preview ---------- */
 const ta = $("#code");
 ta.value = doc().code;
-const editor = makeEditor(ta, { lines: true, fixed: true, fold: true, files: FILES, onCursor: (l, c) => { cur = [l, c]; drawStatus(); } });
+const editor = makeEditor(ta, { lines: true, fixed: true, fold: true, files: FILES, onCursor: (l, c) => { try { cur = [l, c]; drawStatus(); if (browser.picking) browser.highlightAt(editor.cm.view.state.selection.main.head); } catch(e){} } });
 let cur = [1, 1], warnN = 0, savedOk = true;
 UI.localLink = h => {                                          /* a link to one of your pages opens it */
   const n = h.split(/[?#]/)[0].replace(/^\.\//, "");
@@ -518,11 +613,16 @@ UI.localLink = h => {                                          /* a link to one 
   if (assets.has(n)) { window.open(assets.get(n).url, "_blank"); return true; }
   return false;
 };
-const browser = makeBrowser($("#browser"), doc().name, UI);
+const browser = makeBrowser($("#browser"), doc().name, UI, { pick: { label: T.pick, title: T.pickT, onPick: (start, open) => jumpTo(start, open) } });
+function jumpTo(start, open){
+  if (mode === "view") setMode(innerWidth < 760 ? "code" : "both");
+  if (editor.cm){ const v = editor.cm.view; v.dispatch({ selection: { anchor: open, head: start }, scrollIntoView: true }); v.focus(); }
+  else { ta.focus(); ta.setSelectionRange(start, open); }
+}
 function render(now){
   const d = doc();
   $(".bw-bar .addr", $("#browser")).lastChild.textContent = " " + d.name;
-  browser.show(resolve(ta.value), now);
+  browser.show(resolve(instrument(ta.value)), now);
   const w = lint(ta.value); warnN = w.length;
   $("#lint").hidden = !w.length; $("#lint").innerHTML = w.map(x => `<p>${x.html}</p>`).join("");
   drawStatus();
