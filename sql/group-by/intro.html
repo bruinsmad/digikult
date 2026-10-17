@@ -265,16 +265,16 @@ footer.end{max-width:980px;margin:0 auto;padding:0 22px 60px;color:var(--chalk-d
 <p>An aggregate function turns <mark>many rows into a single value</mark>:</p>
 <table class="ops"><thead><tr><th>function</th><th>returns</th><th>example</th></tr></thead><tbody><tr><td>COUNT(*)</td><td>the number of rows</td><td>how many sheep</td></tr><tr><td>SUM(weight_kg)</td><td>the total of the values</td><td>the total weight</td></tr><tr><td>AVG(weight_kg)</td><td>the average</td><td>the average weight</td></tr><tr><td>MIN(age)</td><td>the smallest value</td><td>the youngest age</td></tr><tr><td>MAX(age)</td><td>the largest value</td><td>the oldest age</td></tr></tbody></table>
 <div class="ex"><div class="ex-tag"><span class="t">Try it – you can edit it</span><span class="kb">Ctrl + Enter</span></div><textarea spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="SQL">SELECT COUNT(*), SUM(weight_kg), AVG(weight_kg), MAX(age)
-FROM sheep;</textarea><div class="ex-bar"><button type="button" class="btn run">Run ▸</button><button type="button" class="btn ghost reset">Reset</button></div><div class="ex-out" aria-live="polite"></div></div>
+FROM sheep;</textarea><div class="ex-bar"><button type="button" class="btn run">Run</button><button type="button" class="btn ghost reset">Reset</button></div><div class="ex-out" aria-live="polite"></div></div>
 <div class="idea"><span class="i" aria-hidden="true">💡</span><p>The result is <b>a single row</b>: the query treats the whole table as one big heap.</p></div>
 <h3>A nicer result: ROUND and AS</h3>
 <p><code>ROUND(…, 1)</code> rounds to one decimal place, and <code>AS</code> gives the result column a name:</p>
 <div class="ex"><div class="ex-tag"><span class="t">Try it – you can edit it</span><span class="kb">Ctrl + Enter</span></div><textarea spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="SQL">SELECT ROUND(AVG(weight_kg), 1) AS average_kg
-FROM sheep;</textarea><div class="ex-bar"><button type="button" class="btn run">Run ▸</button><button type="button" class="btn ghost reset">Reset</button></div><div class="ex-out" aria-live="polite"></div></div></section><section class="sec" id="filter-first"><h2><span class="n">3</span>Filter first, then count</h2>
+FROM sheep;</textarea><div class="ex-bar"><button type="button" class="btn run">Run</button><button type="button" class="btn ghost reset">Reset</button></div><div class="ex-out" aria-live="polite"></div></div></section><section class="sec" id="filter-first"><h2><span class="n">3</span>Filter first, then count</h2>
 <p><code>WHERE</code> runs <b>before</b> the aggregate: it picks the rows first, and only those get counted.</p>
 <div class="ex"><div class="ex-tag"><span class="t">Try it – you can edit it</span><span class="kb">Ctrl + Enter</span></div><textarea spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="SQL">SELECT COUNT(*) AS black_sheep
 FROM sheep
-WHERE colour = &#x27;black&#x27;;</textarea><div class="ex-bar"><button type="button" class="btn run">Run ▸</button><button type="button" class="btn ghost reset">Reset</button></div><div class="ex-out" aria-live="polite"></div></div></section><section class="sec" id="groupby"><h2><span class="n">4</span>GROUP BY: one result per group</h2>
+WHERE colour = &#x27;black&#x27;;</textarea><div class="ex-bar"><button type="button" class="btn run">Run</button><button type="button" class="btn ghost reset">Reset</button></div><div class="ex-out" aria-live="polite"></div></div></section><section class="sec" id="groupby"><h2><span class="n">4</span>GROUP BY: one result per group</h2>
 <p>When you need a number <b>for each pasture</b> instead of the whole flock, <code>GROUP BY</code> works in three steps:</p>
 <ol><li>It puts rows with the same value into one group (one pen).</li>
 <li>It runs the aggregate function for each group separately.</li>
@@ -283,26 +283,26 @@ WHERE colour = &#x27;black&#x27;;</textarea><div class="ex-bar"><button type="bu
 <div class="ex"><div class="ex-tag"><span class="t">Try it – you can edit it</span><span class="kb">Ctrl + Enter</span></div><textarea spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="SQL">SELECT pasture, COUNT(*) AS how_many
 FROM sheep
 GROUP BY pasture
-ORDER BY COUNT(*) DESC;</textarea><div class="ex-bar"><button type="button" class="btn run">Run ▸</button><button type="button" class="btn ghost reset">Reset</button></div><div class="ex-out" aria-live="polite"></div></div>
+ORDER BY COUNT(*) DESC;</textarea><div class="ex-bar"><button type="button" class="btn run">Run</button><button type="button" class="btn ghost reset">Reset</button></div><div class="ex-out" aria-live="polite"></div></div>
 <div class="rule-box"><b>Rule:</b> after <code>SELECT</code> you may only list the grouping column(s) and aggregate functions. Not a sheep's <code>name</code>: a pen holds many sheep.</div>
 <h3>A group within a group</h3>
 <p>You can group by several columns: then every <i>pasture + colour</i> pair becomes a group.</p>
 <div class="ex"><div class="ex-tag"><span class="t">Try it – you can edit it</span><span class="kb">Ctrl + Enter</span></div><textarea spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="SQL">SELECT pasture, colour, COUNT(*) AS how_many
 FROM sheep
 GROUP BY pasture, colour
-ORDER BY pasture;</textarea><div class="ex-bar"><button type="button" class="btn run">Run ▸</button><button type="button" class="btn ghost reset">Reset</button></div><div class="ex-out" aria-live="polite"></div></div></section><section class="sec" id="having"><h2><span class="n">5</span>HAVING: filtering groups</h2>
+ORDER BY pasture;</textarea><div class="ex-bar"><button type="button" class="btn run">Run</button><button type="button" class="btn ghost reset">Reset</button></div><div class="ex-out" aria-live="polite"></div></div></section><section class="sec" id="having"><h2><span class="n">5</span>HAVING: filtering groups</h2>
 <p><code>WHERE</code> filters <b>rows</b> before grouping. To filter the finished <b>groups</b> (say, only the big pens), use <code>HAVING</code>:</p>
 <table class="ops"><thead><tr><th></th><th>runs</th><th>filters</th><th>may contain COUNT, SUM…?</th></tr></thead><tbody><tr><td>WHERE</td><td>before grouping</td><td>rows</td><td>no</td></tr><tr><td>HAVING</td><td>after grouping</td><td>groups</td><td>yes</td></tr></tbody></table>
 <div class="ex"><div class="ex-tag"><span class="t">Try it – you can edit it</span><span class="kb">Ctrl + Enter</span></div><textarea spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="SQL">SELECT pasture, COUNT(*) AS how_many
 FROM sheep
 GROUP BY pasture
-HAVING COUNT(*) &gt; 3;</textarea><div class="ex-bar"><button type="button" class="btn run">Run ▸</button><button type="button" class="btn ghost reset">Reset</button></div><div class="ex-out" aria-live="polite"></div></div>
+HAVING COUNT(*) &gt; 3;</textarea><div class="ex-bar"><button type="button" class="btn run">Run</button><button type="button" class="btn ghost reset">Reset</button></div><div class="ex-out" aria-live="polite"></div></div>
 <p>The two work together: first keep the white sheep, then keep only the pastures with at least three of them.</p>
 <div class="ex"><div class="ex-tag"><span class="t">Try it – you can edit it</span><span class="kb">Ctrl + Enter</span></div><textarea spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="SQL">SELECT pasture, COUNT(*) AS white
 FROM sheep
 WHERE colour = &#x27;white&#x27;
 GROUP BY pasture
-HAVING COUNT(*) &gt;= 3;</textarea><div class="ex-bar"><button type="button" class="btn run">Run ▸</button><button type="button" class="btn ghost reset">Reset</button></div><div class="ex-out" aria-live="polite"></div></div></section><section class="sec" id="order"><h2><span class="n">6</span>The order of the parts</h2>
+HAVING COUNT(*) &gt;= 3;</textarea><div class="ex-bar"><button type="button" class="btn run">Run</button><button type="button" class="btn ghost reset">Reset</button></div><div class="ex-out" aria-live="polite"></div></div></section><section class="sec" id="order"><h2><span class="n">6</span>The order of the parts</h2>
 <p>You always write them in this order:</p>
 <div class="anat"><div><code>SELECT <span class="rest">pasture, COUNT(*)</span></code><span>what to show</span></div><div><code>FROM <span class="rest">sheep</span></code><span>which table</span></div><div><code>WHERE <span class="rest">colour = &#x27;white&#x27;</span></code><span>filter rows</span></div><div><code>GROUP BY <span class="rest">pasture</span></code><span>make groups</span></div><div><code>HAVING <span class="rest">COUNT(*) &gt;= 2</span></code><span>filter groups</span></div><div><code>ORDER BY <span class="rest">COUNT(*) DESC;</span></code><span>sort</span></div></div>
 <div class="idea"><span class="i" aria-hidden="true">🔁</span><p>SQL <b>carries them out</b> in a different order, though: FROM → WHERE → GROUP BY → HAVING → SELECT → ORDER BY. That's why COUNT can't go in WHERE: there are no groups yet.</p></div></section><section class="sec" id="mistakes"><h2><span class="n">7</span>Common mistakes</h2><div class="mist"><div class="side bad"><span class="lbl">✗ Wrong</span><pre class="code"><span class="k">SELECT</span> pasture, <span class="f">COUNT</span>(*)

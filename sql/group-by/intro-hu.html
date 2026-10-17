@@ -265,16 +265,16 @@ footer.end{max-width:980px;margin:0 auto;padding:0 22px 60px;color:var(--chalk-d
 <p>Az összesítő függvény <mark>sok sorból egyetlen értéket</mark> számol:</p>
 <table class="ops"><thead><tr><th>függvény</th><th>mit ad vissza</th><th>példa</th></tr></thead><tbody><tr><td>COUNT(*)</td><td>a sorok számát</td><td>hány birka van</td></tr><tr><td>SUM(suly)</td><td>az értékek összegét</td><td>mennyi az összsúly</td></tr><tr><td>AVG(suly)</td><td>az értékek átlagát</td><td>mennyi az átlagsúly</td></tr><tr><td>MIN(kor)</td><td>a legkisebb értéket</td><td>a legfiatalabb kora</td></tr><tr><td>MAX(kor)</td><td>a legnagyobb értéket</td><td>a legidősebb kora</td></tr></tbody></table>
 <div class="ex"><div class="ex-tag"><span class="t">Próbáld ki – át is írhatod</span><span class="kb">Ctrl + Enter</span></div><textarea spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="SQL">SELECT COUNT(*), SUM(suly), AVG(suly), MAX(kor)
-FROM birkak;</textarea><div class="ex-bar"><button type="button" class="btn run">Futtatás ▸</button><button type="button" class="btn ghost reset">Visszaállítás</button></div><div class="ex-out" aria-live="polite"></div></div>
+FROM birkak;</textarea><div class="ex-bar"><button type="button" class="btn run">Futtatás</button><button type="button" class="btn ghost reset">Visszaállítás</button></div><div class="ex-out" aria-live="polite"></div></div>
 <div class="idea"><span class="i" aria-hidden="true">💡</span><p>Az eredmény <b>egyetlen sor</b>: a lekérdezés az egész táblát egy nagy kupacnak tekinti.</p></div>
 <h3>Szebb eredmény: ROUND és AS</h3>
 <p>A <code>ROUND(…, 1)</code> egy tizedesjegyre kerekít, az <code>AS</code> pedig nevet ad az eredményoszlopnak:</p>
 <div class="ex"><div class="ex-tag"><span class="t">Próbáld ki – át is írhatod</span><span class="kb">Ctrl + Enter</span></div><textarea spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="SQL">SELECT ROUND(AVG(suly), 1) AS atlagsuly
-FROM birkak;</textarea><div class="ex-bar"><button type="button" class="btn run">Futtatás ▸</button><button type="button" class="btn ghost reset">Visszaállítás</button></div><div class="ex-out" aria-live="polite"></div></div></section><section class="sec" id="szures"><h2><span class="n">3</span>Előbb szűrés, aztán számolás</h2>
+FROM birkak;</textarea><div class="ex-bar"><button type="button" class="btn run">Futtatás</button><button type="button" class="btn ghost reset">Visszaállítás</button></div><div class="ex-out" aria-live="polite"></div></div></section><section class="sec" id="szures"><h2><span class="n">3</span>Előbb szűrés, aztán számolás</h2>
 <p>A <code>WHERE</code> az összesítés <b>előtt</b> fut le: először kiválogatja a sorokat, és csak a megmaradtakat számolja meg.</p>
 <div class="ex"><div class="ex-tag"><span class="t">Próbáld ki – át is írhatod</span><span class="kb">Ctrl + Enter</span></div><textarea spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="SQL">SELECT COUNT(*) AS fekete_birkak
 FROM birkak
-WHERE szin = &#x27;fekete&#x27;;</textarea><div class="ex-bar"><button type="button" class="btn run">Futtatás ▸</button><button type="button" class="btn ghost reset">Visszaállítás</button></div><div class="ex-out" aria-live="polite"></div></div></section><section class="sec" id="groupby"><h2><span class="n">4</span>GROUP BY: csoportonként</h2>
+WHERE szin = &#x27;fekete&#x27;;</textarea><div class="ex-bar"><button type="button" class="btn run">Futtatás</button><button type="button" class="btn ghost reset">Visszaállítás</button></div><div class="ex-out" aria-live="polite"></div></div></section><section class="sec" id="groupby"><h2><span class="n">4</span>GROUP BY: csoportonként</h2>
 <p>Ha nem az egész nyájra, hanem <b>minden legelőre külön</b> kell egy szám, a <code>GROUP BY</code> három lépésben dolgozik:</p>
 <ol><li>Az azonos értékű sorokat egy csoportba (karámba) teszi.</li>
 <li>Minden csoportra külön lefuttatja az összesítő függvényt.</li>
@@ -283,26 +283,26 @@ WHERE szin = &#x27;fekete&#x27;;</textarea><div class="ex-bar"><button type="but
 <div class="ex"><div class="ex-tag"><span class="t">Próbáld ki – át is írhatod</span><span class="kb">Ctrl + Enter</span></div><textarea spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="SQL">SELECT legelo, COUNT(*) AS darab
 FROM birkak
 GROUP BY legelo
-ORDER BY COUNT(*) DESC;</textarea><div class="ex-bar"><button type="button" class="btn run">Futtatás ▸</button><button type="button" class="btn ghost reset">Visszaállítás</button></div><div class="ex-out" aria-live="polite"></div></div>
+ORDER BY COUNT(*) DESC;</textarea><div class="ex-bar"><button type="button" class="btn run">Futtatás</button><button type="button" class="btn ghost reset">Visszaállítás</button></div><div class="ex-out" aria-live="polite"></div></div>
 <div class="rule-box"><b>Szabály:</b> a <code>SELECT</code> után csak a csoportosító oszlop(ok) és összesítő függvények állhatnak. Egy birka <code>nev</code>-e nem, mert egy karámban sok birka van.</div>
 <h3>Csoport a csoportban</h3>
 <p>Több oszlop szerint is csoportosíthatsz: ekkor minden <i>legelő + szín</i> párosból lesz egy csoport.</p>
 <div class="ex"><div class="ex-tag"><span class="t">Próbáld ki – át is írhatod</span><span class="kb">Ctrl + Enter</span></div><textarea spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="SQL">SELECT legelo, szin, COUNT(*) AS darab
 FROM birkak
 GROUP BY legelo, szin
-ORDER BY legelo;</textarea><div class="ex-bar"><button type="button" class="btn run">Futtatás ▸</button><button type="button" class="btn ghost reset">Visszaállítás</button></div><div class="ex-out" aria-live="polite"></div></div></section><section class="sec" id="having"><h2><span class="n">5</span>HAVING: csoportok szűrése</h2>
+ORDER BY legelo;</textarea><div class="ex-bar"><button type="button" class="btn run">Futtatás</button><button type="button" class="btn ghost reset">Visszaállítás</button></div><div class="ex-out" aria-live="polite"></div></div></section><section class="sec" id="having"><h2><span class="n">5</span>HAVING: csoportok szűrése</h2>
 <p>A <code>WHERE</code> <b>sorokat</b> szűr a csoportosítás előtt. Ha a kész <b>csoportokat</b> akarod szűrni (például csak a nagy karámokat), arra a <code>HAVING</code> való:</p>
 <table class="ops"><thead><tr><th></th><th>mikor fut</th><th>mit szűr</th><th>lehet benne COUNT, SUM…?</th></tr></thead><tbody><tr><td>WHERE</td><td>a csoportosítás előtt</td><td>sorokat</td><td>nem</td></tr><tr><td>HAVING</td><td>a csoportosítás után</td><td>csoportokat</td><td>igen</td></tr></tbody></table>
 <div class="ex"><div class="ex-tag"><span class="t">Próbáld ki – át is írhatod</span><span class="kb">Ctrl + Enter</span></div><textarea spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="SQL">SELECT legelo, COUNT(*) AS darab
 FROM birkak
 GROUP BY legelo
-HAVING COUNT(*) &gt; 3;</textarea><div class="ex-bar"><button type="button" class="btn run">Futtatás ▸</button><button type="button" class="btn ghost reset">Visszaállítás</button></div><div class="ex-out" aria-live="polite"></div></div>
+HAVING COUNT(*) &gt; 3;</textarea><div class="ex-bar"><button type="button" class="btn run">Futtatás</button><button type="button" class="btn ghost reset">Visszaállítás</button></div><div class="ex-out" aria-live="polite"></div></div>
 <p>A kettő együtt is használható: előbb kiszűröd a fehér birkákat, aztán csak azokat a legelőket tartod meg, ahol legalább három van belőlük.</p>
 <div class="ex"><div class="ex-tag"><span class="t">Próbáld ki – át is írhatod</span><span class="kb">Ctrl + Enter</span></div><textarea spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="SQL">SELECT legelo, COUNT(*) AS feher
 FROM birkak
 WHERE szin = &#x27;fehér&#x27;
 GROUP BY legelo
-HAVING COUNT(*) &gt;= 3;</textarea><div class="ex-bar"><button type="button" class="btn run">Futtatás ▸</button><button type="button" class="btn ghost reset">Visszaállítás</button></div><div class="ex-out" aria-live="polite"></div></div></section><section class="sec" id="sorrend"><h2><span class="n">6</span>A részek sorrendje</h2>
+HAVING COUNT(*) &gt;= 3;</textarea><div class="ex-bar"><button type="button" class="btn run">Futtatás</button><button type="button" class="btn ghost reset">Visszaállítás</button></div><div class="ex-out" aria-live="polite"></div></div></section><section class="sec" id="sorrend"><h2><span class="n">6</span>A részek sorrendje</h2>
 <p>Leírni mindig ebben a sorrendben kell:</p>
 <div class="anat"><div><code>SELECT <span class="rest">legelo, COUNT(*)</span></code><span>mit mutasson</span></div><div><code>FROM <span class="rest">birkak</span></code><span>melyik táblából</span></div><div><code>WHERE <span class="rest">szin = &#x27;fehér&#x27;</span></code><span>sorok szűrése</span></div><div><code>GROUP BY <span class="rest">legelo</span></code><span>csoportok képzése</span></div><div><code>HAVING <span class="rest">COUNT(*) &gt;= 2</span></code><span>csoportok szűrése</span></div><div><code>ORDER BY <span class="rest">COUNT(*) DESC;</span></code><span>rendezés</span></div></div>
 <div class="idea"><span class="i" aria-hidden="true">🔁</span><p>Az SQL viszont más sorrendben <b>végzi el</b>: FROM → WHERE → GROUP BY → HAVING → SELECT → ORDER BY. Ezért nem lehet a WHERE-ben COUNT: ott még nincsenek csoportok.</p></div></section><section class="sec" id="hibak"><h2><span class="n">7</span>Gyakori hibák</h2><div class="mist"><div class="side bad"><span class="lbl">✗ Hibás</span><pre class="code"><span class="k">SELECT</span> legelo, <span class="f">COUNT</span>(*)

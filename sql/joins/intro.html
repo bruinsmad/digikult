@@ -270,11 +270,11 @@ footer.end{max-width:980px;margin:0 auto;padding:0 22px 60px;color:var(--chalk-d
 <div class="ex"><div class="ex-tag"><span class="t">Try it – you can edit it</span><span class="kb">Ctrl + Enter</span></div><textarea spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="SQL">SELECT band_id FROM concerts
 WHERE day = &#x27;Saturday&#x27; AND start_time = &#x27;22:00&#x27;;
 
-SELECT name FROM bands WHERE id = 3;</textarea><div class="ex-bar"><button type="button" class="btn run">Run ▸</button><button type="button" class="btn ghost reset">Reset</button></div><div class="ex-out" aria-live="polite"></div></div>
+SELECT name FROM bands WHERE id = 3;</textarea><div class="ex-bar"><button type="button" class="btn run">Run</button><button type="button" class="btn ghost reset">Reset</button></div><div class="ex-out" aria-live="polite"></div></div>
 <div class="idea"><span class="i" aria-hidden="true">💡</span><p>Two queries for one name is slow. In the next steps a single query does the lookup for you.</p></div></section><section class="sec" id="cross"><h2><span class="n">3</span>Two tables after FROM: every row with every row</h2>
 <p>When you write two tables after <code>FROM</code>, SQL pairs <b>every</b> row of the first with <b>every</b> row of the second. 6 concerts × 4 bands = 24 pairs, and most of them are nonsense (like a Velvet Locomotive concert with the Paprika Punks' name).</p>
 <div class="ex"><div class="ex-tag"><span class="t">Try it – you can edit it</span><span class="kb">Ctrl + Enter</span></div><textarea spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="SQL">SELECT COUNT(*)
-FROM concerts, bands;</textarea><div class="ex-bar"><button type="button" class="btn run">Run ▸</button><button type="button" class="btn ghost reset">Reset</button></div><div class="ex-out" aria-live="polite"></div></div>
+FROM concerts, bands;</textarea><div class="ex-bar"><button type="button" class="btn run">Run</button><button type="button" class="btn ghost reset">Reset</button></div><div class="ex-out" aria-live="polite"></div></div>
 <div class="idea"><span class="i" aria-hidden="true">💡</span><p>That's not a bug: it's the raw material. Next comes the rule that throws the wrong pairs away.</p></div></section><section class="sec" id="rule"><h2><span class="n">4</span>The matching rule</h2>
 <p>A concert belongs to a band when the concert's <code>band_id</code> equals the band's <code>id</code>. That's what you write in <code>WHERE</code>:</p>
 <pre class="code"><span class="k">WHERE</span> concerts.band_id = bands.id</pre>
@@ -283,19 +283,19 @@ FROM concerts, bands;</textarea><div class="ex-bar"><button type="button" class=
 <p>Both tables have an <code>id</code> column, so you must write the table name in front of it, or SQL won't know which one you mean. The easiest habit: <b>always</b> write it, like <code>concerts.day</code>, <code>bands.name</code>.</p>
 <div class="ex"><div class="ex-tag"><span class="t">Try it – you can edit it</span><span class="kb">Ctrl + Enter</span></div><textarea spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="SQL">SELECT bands.name, concerts.day, concerts.start_time
 FROM concerts, bands
-WHERE concerts.band_id = bands.id;</textarea><div class="ex-bar"><button type="button" class="btn run">Run ▸</button><button type="button" class="btn ghost reset">Reset</button></div><div class="ex-out" aria-live="polite"></div></div>
+WHERE concerts.band_id = bands.id;</textarea><div class="ex-bar"><button type="button" class="btn run">Run</button><button type="button" class="btn ghost reset">Reset</button></div><div class="ex-out" aria-live="polite"></div></div>
 <p>Now you get 6 rows: one per concert, each with the right band.</p></section><section class="sec" id="filters"><h2><span class="n">5</span>Rule + filters</h2>
 <p>After the matching rule come the usual conditions, joined with <code>AND</code>. A good habit: <mark>the rule first, then the filters</mark>.</p>
 <div class="ex"><div class="ex-tag"><span class="t">Try it – you can edit it</span><span class="kb">Ctrl + Enter</span></div><textarea spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="SQL">SELECT bands.name, concerts.start_time
 FROM concerts, bands
 WHERE concerts.band_id = bands.id
-  AND concerts.day = &#x27;Saturday&#x27;;</textarea><div class="ex-bar"><button type="button" class="btn run">Run ▸</button><button type="button" class="btn ghost reset">Reset</button></div><div class="ex-out" aria-live="polite"></div></div></section><section class="sec" id="three"><h2><span class="n">6</span>Three tables</h2>
+  AND concerts.day = &#x27;Saturday&#x27;;</textarea><div class="ex-bar"><button type="button" class="btn run">Run</button><button type="button" class="btn ghost reset">Reset</button></div><div class="ex-out" aria-live="polite"></div></div></section><section class="sec" id="three"><h2><span class="n">6</span>Three tables</h2>
 <p>For the stage name you also need <code>stages</code>. List all three tables and write one rule for each link:</p>
 <div class="rule-box"><b>Three tables need two rules.</b> In general: <i>n</i> tables need <i>n</i> − 1 matching rules.</div>
 <div class="ex"><div class="ex-tag"><span class="t">Try it – you can edit it</span><span class="kb">Ctrl + Enter</span></div><textarea spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="SQL">SELECT bands.name, stages.name, concerts.day
 FROM concerts, bands, stages
 WHERE concerts.band_id = bands.id
-  AND concerts.stage_id = stages.id;</textarea><div class="ex-bar"><button type="button" class="btn run">Run ▸</button><button type="button" class="btn ghost reset">Reset</button></div><div class="ex-out" aria-live="polite"></div></div>
+  AND concerts.stage_id = stages.id;</textarea><div class="ex-bar"><button type="button" class="btn run">Run</button><button type="button" class="btn ghost reset">Reset</button></div><div class="ex-out" aria-live="polite"></div></div>
 <p>Both of these tables have a <code>name</code> column too: <code>bands.name</code> and <code>stages.name</code> are two different things.</p></section><section class="sec" id="types"><h2><span class="n">7</span>Kinds of links</h2>
 <table class="ops"><thead><tr><th>kind</th><th>meaning</th><th>example</th></tr></thead><tbody><tr><td>N : 1</td><td>many rows can point to the same row</td><td>many concerts → one band (<code>band_id</code> can repeat)</td></tr><tr><td>1 : 1</td><td>every row has exactly one partner</td><td>every band has exactly one manager</td></tr><tr><td>N : N</td><td>many on both sides</td><td>a band plays on several stages, a stage hosts several bands: the <code>concerts</code> table links them</td></tr></tbody></table>
 <div class="idea"><span class="i" aria-hidden="true">💡</span><p>An N : N link is always stored in a third, “linking” table. Here that's <code>concerts</code>: each row is one band–stage pair.</p></div></section><section class="sec" id="mistakes"><h2><span class="n">8</span>Common mistakes</h2><div class="mist"><div class="side bad"><span class="lbl">✗ Wrong</span><pre class="code"><span class="k">SELECT</span> bands.name, concerts.day
