@@ -274,6 +274,14 @@ a{color:inherit}
 .switch a[aria-current="page"]{color:var(--board-deep);background:var(--c);border-color:var(--c)}
 .topics a[aria-current="page"]{background:rgba(0,0,0,.25);box-shadow:inset 0 -3px 0 var(--c)}
 body.subject .hero{display:none}
+.onward{display:flex;flex-wrap:wrap;align-items:center;gap:16px 28px;margin:6px 0 0 74px;padding-top:26px;border-top:2px dashed var(--chalk-faint)}
+.onward a:first-child{display:flex;align-items:center;gap:18px;text-decoration:none;color:var(--chalk)}
+.onward .emb svg{display:block;height:54px;width:auto;overflow:visible}
+.onward small{display:block;font:400 17px/1.2 var(--f-chalk);color:var(--chalk-dim)}
+.onward b{font:700 clamp(26px,3vw,32px)/1.1 var(--f-chalk);color:var(--c);text-decoration:underline;text-decoration-color:transparent;text-decoration-thickness:3px;text-underline-offset:6px}
+.onward a:first-child:hover b{text-decoration-color:currentColor}
+.onward a.back{margin-left:auto;font:700 18px var(--f-chalk);color:var(--chalk-dim);text-decoration:none;border-bottom:2px solid var(--chalk-faint)}
+.onward a.back:hover{color:var(--chalk);border-bottom-color:var(--yellow)}
 
 /* ---------- chalk tray (footer) ---------- */
 .tray{margin-top:40px;background:linear-gradient(var(--wood-hi),var(--wood) 40%,var(--wood-lo));box-shadow:0 -3px 0 rgba(0,0,0,.2) inset}
@@ -303,6 +311,8 @@ body.subject .hero{display:none}
   .subjects>.slate:last-child:nth-child(odd){grid-column:1/-1;justify-self:center;width:calc(50% - 17px)}
 }
 @media (max-width:520px){
+  .onward{margin-left:0}
+  .onward a.back{margin-left:0}
   .topic-head{grid-template-columns:1fr}
   .topic-head .emb svg{height:60px}
   .step{grid-template-columns:40px 1fr;gap:0 12px}
@@ -367,7 +377,7 @@ body.subject .hero{display:none}
       enOnly:"angol nyelvű", other:{en:"English version", hu:"Magyar változat"},
       demoNote:"Tanári bemutató, kivetítőre", readFirst:"olvasd el először",
       foot:"Minden oldal bal alsó sarkában ott a ☰ menü: onnan bármikor visszajutsz ide.",
-      back:"← Minden tantárgy", open:n=>`${n} megnyitása`,
+      back:"← Minden tantárgy", open:n=>`${n} megnyitása`, nextLabel:"Következő tantárgy",
       count:{story:n=>`${n} küldetés`, theory:n=>`${n} elmélet`, lesson:n=>`${n} lecke`, demo:n=>`${n} bemutató`, tool:n=>`${n} eszköz`},
       missionsDone:(d,n)=>`${d} / ${n} küldetés kész`,
       againAll:"Bármelyiket újrajátszhatod lent.",
@@ -381,7 +391,7 @@ body.subject .hero{display:none}
       enOnly:"English only", huOnly:"Hungarian only", other:{en:"English version", hu:"Magyar változat"},
       demoNote:"Teacher demo for the projector", readFirst:"read this first",
       foot:"Every page has a ☰ menu in the bottom-left corner that brings you back here.",
-      back:"← All subjects", open:n=>`Open ${n}`,
+      back:"← All subjects", open:n=>`Open ${n}`, nextLabel:"Next subject",
       count:{story:n=>`${n} mission${n>1?"s":""}`, theory:n=>`${n} explainer${n>1?"s":""}`, lesson:n=>`${n} lesson${n>1?"s":""}`, demo:n=>`${n} demo${n>1?"s":""}`, tool:n=>`${n} tool${n>1?"s":""}`},
       missionsDone:(d,n)=>`${d} of ${n} missions done`,
       againAll:"Replay any of them below.",
@@ -775,7 +785,18 @@ function puliSvg(){
             </div>
           </li>`).join("")}
         </ol>
+        ${nextSubject(tp, T)}
       </section>`).join("");
+  }
+
+  /* the end of one subject points on to the next, so nobody has to scroll back up for the rail */
+  function nextSubject(tp, T){
+    const all = D.SITE.topics, nx = all[(all.indexOf(tp) + 1) % all.length];
+    if (nx === tp) return "";
+    return `<nav class="onward" aria-label="${esc(T.nextLabel)}"><a href="#${nx.id}" style="--c:${nx.accent}">
+      <span class="emb">${EMBLEMS[nx.id] || embGen}</span>
+      <span><small>${esc(T.nextLabel)}</small><b>${esc(D.t(nx.title).split(" – ").pop())}</b></span></a>
+      <a class="back" href="#">${esc(T.back)}</a></nav>`;
   }
 
   function langLine(p, T, L){
