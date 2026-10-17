@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pizza Pont – Inkscape</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap">
+<link rel="stylesheet" href="../mission.css">
+<style>:root{--accent:#ff8a65}</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+window.MISSION = {
+  lang: "hu",
+  key: "slice-shop-v1",
+  title: "Pizza Pont",
+  story: "Új pizzéria nyílik az iskola mellett, és a tulajdonosnak péntekig kell egy szórólap. Te vagy a tervező – és most a szöveg a főszereplő.",
+  file: "vezeteknev_pizzapont",
+  poster: "../img/slice-shop/hu/poster.png",
+  pdf: "../pdf/slice-shop-feladatlap.pdf",
+  teacherPdf: "../pdf/slice-shop-tanari.pdf",
+  saveImg: "../img/slice-shop/hu/save.png",
+  bonusImg: "../img/slice-shop/hu/bonus.png",
+  buildIntro: "A szórólapon minden szöveg másképp készül. A színek, betűtípusok és méretek a te döntésed.",
+  rules: [
+    "<b>Szöveg eszköz (a nagy A):</b> egy <i>kattintás</i> az oldalon = egy sor szöveg; egy <i>húzás</i> = szövegkeret, amelyben maguktól tördelődnek a sorok.",
+    "<b>Betűtípus, stílus, méret:</b> jelöld ki a szöveget, és állítsd át fent, az eszközvezérlő-sávon.",
+    "<b>Szín:</b> Kijelölő, kattints a szövegre, aztán egy színmintára a palettán. Körvonal: <span class='menu'>Objektum ▸ Kitöltés és körvonal…</span>, <i>Körvonalrajzolat</i> fül.",
+    "<b>Több objektum:</b> kattints az elsőre, tartsd lenyomva a <span class='key'>Shift</span>-et, és kattints a többire. Az állapotsor megszámolja őket."
+  ],
+  elements: [
+    ["Háttér és pizza", "Téglalap és Ellipszis eszköz", "bemelegítés"],
+    ["PIZZA PONT cím", "kattintás a Szöveg eszközzel, vastag betű, kitöltés + körvonal", "egyszerű szöveg"],
+    ["FORRÓ * FRISS * GYORS gyűrű", "kör + szöveg, a kör színe: nincs", "Szöveg ▸ Útvonalra való illesztés"],
+    ["Nyitvatartás", "keret húzása a Szöveg eszközzel", "szövegkeret"],
+    ["INGYEN SZELET jelvény", "piros kör + szöveg, középre igazítva", "Szöveg ▸ Szöveg tördelése keretbe"],
+    ["-10% kupon", "alakzattá alakított szöveg, téglalapból kivágva", "Útvonallá alakítás + Különbség"]
+  ],
+  steps: [
+    { title: "Háttér és pizza", img: "../img/slice-shop/hu/step1.png",
+      alt: "1. lépés: krémszínű téglalap az oldalon, narancs tésztakör, rajta sárga kör, kis sötétpiros szalámikörök",
+      lead: "Gyors bemelegítés ismert alakzatokkal – ma a szöveg az igazi feladat.",
+      note: "Az oldal tetejét hagyd szabadon a címnek, az alját a szövegkeretnek és a kuponnak.",
+      stuck: ["A téglalapnak körvonala van: <span class='menu'>Objektum ▸ Kitöltés és körvonal…</span> → <i>Körvonalrajzolat</i> fül → kattints az <b>X</b>-re."] },
+    { title: "A cím", img: "../img/slice-shop/hu/step2.png",
+      alt: "2. lépés: kattintás a Szöveg eszközzel, PIZZA PONT beírása, vastag betűtípus és 72-es méret az eszközvezérlő-sávon, piros szín, sötét körvonal",
+      lead: "Kattintás a Szöveg eszközzel = egy sor szöveg. Aztán legyen nagy, vastag és piros, sötét körvonallal.",
+      note: "Nincs Impact vagy Arial Black? Válassz bármilyen betűtípust, és mellette a stílusmezőben a <b>Bold</b> vagy <b>Black</b> változatot.",
+      stuck: ["Nem változik a betűtípus: nincs kijelölve semmi. Előbb kattints a szövegre a Kijelölővel, aztán váltsd át.",
+              "Elírást javítanál: válaszd a Szöveg eszközt, és kattints a betűk közé."] },
+    { title: "Szöveg a pizza körül", img: "../img/slice-shop/hu/step3.png",
+      alt: "3. lépés: a pizzánál nagyobb kör, egy sor szöveg FORRÓ * FRISS * GYORS, mindkettő kijelölve, Szöveg ▸ Útvonalra való illesztés, a kör színe: nincs",
+      lead: "A <span class='menu'>Szöveg ▸ Útvonalra való illesztés</span> egy alakzat mentén futtatja a szöveget – itt egy körön.",
+      stuck: ["Nem történik semmi: pontosan 2 objektum legyen kijelölve – a kör és a szöveg. Nézd meg az állapotsort.",
+              "A szöveg félúton megáll: hosszabb a körnél. Csökkentsd a betűméretet.",
+              "Rés maradt: kattints a szövegbe a Szöveg eszközzel, és írj még szavakat.",
+              "Az X után is van körvonal: <span class='menu'>Objektum ▸ Kitöltés és körvonal…</span> → <i>Körvonalrajzolat</i> → <b>X</b>."] },
+    { title: "Szövegkeret", img: "../img/slice-shop/hu/step4.png",
+      alt: "4. lépés: keret húzása a Szöveg eszközzel, a nyitvatartás beírása, a sorok tördelődnek; a piros keret azt jelenti, hogy nem fér el a szöveg, húzd a sarokfogantyút",
+      lead: "Kattintás helyett húzz: keretet kapsz, és a sorok a szélén maguktól tördelődnek.",
+      note: "Entert csak új bekezdéshez nyomj – sor végén soha.",
+      stuck: ["Egyetlen hosszú sort kaptál: kattintottál húzás helyett. <span class='menu'>Szerkesztés ▸ Visszavonás</span>, és húzz egy keretet.",
+              "Piros a keret: nem fér el a szöveg. Húzd a jobb alsó ◇ fogantyút, vagy csökkentsd a méretet."] },
+    { title: "Szöveg a körben", img: "../img/slice-shop/hu/step5.png",
+      alt: "5. lépés: piros kör, INGYEN SZELET az első 50 vendégnek szöveg, mindkettő kijelölve, Szöveg ▸ Szöveg tördelése keretbe, középre igazítás és fehér szín",
+      lead: "A <span class='menu'>Szöveg ▸ Szöveg tördelése keretbe</span> beönti a szöveget egy alakzatba. A kör a helyén marad.",
+      stuck: ["Nem került be a szöveg a körbe: jelöld ki MINDKETTŐT, a kört és a szöveget (2 objektum), és próbáld újra.",
+              "A szöveg balra tapad: válaszd a Szöveg eszközt, kattints a szövegbe, és nyomd meg az eszközvezérlő-sávon a <i>középre</i> gombot."] },
+    { title: "Kivágott kupon", img: "../img/slice-shop/hu/step6.png",
+      alt: "6. lépés: piros téglalap, rajta -10% szöveg, Útvonal ▸ Objektum átalakítása útvonallá, Shift + kattintás a téglalapra, Útvonal ▸ Különbség kivágja a betűket",
+      lead: "Alakítsd a szöveget alakzattá: <span class='menu'>Útvonal ▸ Objektum átalakítása útvonallá</span>, aztán vágd ki: <span class='menu'>Útvonal ▸ Különbség</span> – mint a krátereket a Sajtholdon.",
+      note: "Előbb ellenőrizd a helyesírást: útvonallá alakítás után a betűket már nem lehet szövegként szerkeszteni.",
+      stuck: ["Inkább a téglalap tűnt el: a szöveg volt alul. <span class='menu'>Szerkesztés ▸ Visszavonás</span>, kattints a szövegre, <span class='menu'>Objektum ▸ Felülre helyezés</span>, és próbáld újra.",
+              "A Különbség szürke: pontosan 2 objektum legyen kijelölve – a szöveg és a téglalap."] }
+  ],
+  checklist: [
+    "A háttér befedi az oldalt; pizza tésztával, sajttal és szalámival",
+    "A cím vastag betűs, piros kitöltésű, sötét körvonalú",
+    "A FORRÓ * FRISS * GYORS körbefut a pizzán, kör nem látszik (Útvonalra illesztés)",
+    "A nyitvatartás szövegkeretben, minden szöveg látszik – nincs piros keret",
+    "Az INGYEN SZELET szöveg a piros körben, középre igazítva, fehéren (Tördelés keretbe)",
+    "A -10% betűi kivágva a kuponból (Útvonallá alakítás + Különbség)",
+    "Az SVG és a PNG is elmentve, a fájlnévben a vezetékneveddel"
+  ],
+  bonus: [
+    ["Árnyékos cím", "Jelöld ki a címet, <span class='menu'>Szerkesztés ▸ Kettőzés</span>, kattints egy sötét színre, <span class='menu'>Objektum ▸ Lejjebb helyezés</span>, és tolj rajta kicsit jobbra le."],
+    ["ÚJ! robbanás", "Csillag eszköz, 14 csúcs, sárga. Írd be: ÚJ!, jelöld ki mindkettőt → <span class='menu'>Szöveg ▸ Szöveg tördelése keretbe</span>."],
+    ["Cím sor", "Szöveg eszköz, kis méret, a stílusmezőben <i>Italic</i> (dőlt): Pizza utca 12., Budapest."],
+    ["Ferde kupon", "Kattints a kuponra, majd még egyszer, és forgasd el egy saroknyíllal."],
+    ["Étlap árakkal", "Egy második szövegkeret: Margherita 1990 Ft, Szalámis 2390 Ft, Zöldséges 2190 Ft – soronként egy."]
+  ]
+};
+</script>
+<script src="../mission.js?v=2"></script>
+<script src="../../nav.js" defer></script>
+</body>
+</html>
