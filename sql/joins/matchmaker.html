@@ -79,7 +79,7 @@ tbody tr:last-child td{border-bottom:0}
 th.link{color:var(--lc);box-shadow:inset 0 -3px 0 var(--lc)}
 td.link{color:#fff;font-weight:700;background:color-mix(in srgb, var(--lc) 16%, transparent)}
 td.num{text-align:right}
-tbody tr{cursor:pointer;transition:opacity .25s, background .25s}
+tbody tr{cursor:pointer;transition:opacity .2s, background .2s}
 tbody tr:hover td{background-color:rgba(255,255,255,.06)}
 td.cnt{padding-left:4px;width:1%}
 td.cnt span{display:inline-block;min-width:2.1em;text-align:center;padding:1px 7px;border-radius:999px;background:var(--gold);color:#2a1f05;font:800 calc(var(--fs) * .8) var(--f-body);animation:pop .4s ease-out both}
@@ -91,7 +91,7 @@ td.cnt span{display:inline-block;min-width:2.1em;text-align:center;padding:1px 7
 .stage.focused tbody tr.on.root td{background-color:rgba(255,209,102,.32)}
 
 /* wires */
-#wires path{fill:none;stroke-width:3;stroke-linecap:round;transition:opacity .35s, stroke-width .25s}
+#wires path{fill:none;stroke-width:3;stroke-linecap:round;transition:opacity .2s, stroke-width .2s}
 #wires path.row{stroke-width:2.4}
 #wires path.cross{stroke:var(--grey);stroke-width:1.6;stroke-dasharray:5 6}
 #wires path.cross.match{stroke:var(--pink);stroke-width:2.6;stroke-dasharray:none}
@@ -239,6 +239,7 @@ function render(animate = true){
   $("cards").innerHTML = sc.tables.map(t => cardHtml(t, ph, P)).join("");
   if (!animate) document.querySelectorAll(".card").forEach(c => c.style.animation = "none");
   focus = ph.focus ? { t: ph.focus[0], id: ph.focus[1] } : null;
+  $("wires").innerHTML = ""; $("stage").classList.remove("focused");   /* old wires must not linger over the new cards */
   /* wires are measured from the cards, so wait until the cards have finished sliding in */
   const token = ++renderToken;
   requestAnimationFrame(() => { fit();
@@ -285,7 +286,8 @@ function draw(animate){
   const grow = (p, delay) => { if (!animate) return; const len = p.getTotalLength(); p.style.strokeDasharray = len; p.style.strokeDashoffset = len;
     p.getBoundingClientRect(); p.style.transition = `stroke-dashoffset .55s ease-in-out ${delay}ms, opacity .35s`; p.style.strokeDashoffset = 0;
     timers.push(setTimeout(() => { p.style.strokeDasharray = ""; p.style.transition = ""; }, delay + 650)); };
-  const fade = (n, delay) => { if (!animate) return; n.style.opacity = 0; n.style.transition = `opacity .3s ${delay}ms`; n.getBoundingClientRect(); n.style.opacity = ""; };
+  const fade = (n, delay) => { if (!animate) return; n.style.opacity = 0; n.style.transition = `opacity .3s ${delay}ms`; n.getBoundingClientRect(); n.style.opacity = "";
+    timers.push(setTimeout(() => { n.style.transition = ""; }, delay + 400)); };   /* drop the delay so later dimming is instant */
 
   if (ph.mode === "cols"){
     sc.links.forEach((k, i) => { const L = linkOf(k), a = card(L.from), b = card(L.to); if (!a || !b) return;
@@ -318,13 +320,14 @@ function draw(animate){
 
 function applyFocus(P, delay = 0){
   const go = () => {
-    const stage = $("stage"); stage.classList.toggle("focused", !!focus);
+    const f = focus;
+    const stage = $("stage"); stage.classList.toggle("focused", !!f);
     document.querySelectorAll("tbody tr").forEach(tr => tr.classList.remove("on", "root"));
     document.querySelectorAll("#wires .w").forEach(w => w.classList.remove("on"));
-    if (!focus) return;
-    const on = reach(focus.t, focus.id, P);
+    if (!f) return;
+    const on = reach(f.t, f.id, P);
     document.querySelectorAll(".card").forEach(c => c.querySelectorAll("tbody tr").forEach(tr => {
-      const key = c.dataset.t + ":" + tr.dataset.id; if (on.has(key)) tr.classList.add("on"); if (key === focus.t + ":" + focus.id) tr.classList.add("root"); }));
+      const key = c.dataset.t + ":" + tr.dataset.id; if (on.has(key)) tr.classList.add("on"); if (key === f.t + ":" + f.id) tr.classList.add("root"); }));
     document.querySelectorAll("#wires .w").forEach(w => { if (on.has(w.dataset.a) && on.has(w.dataset.b)) w.classList.add("on"); });
   };
   if (delay) timers.push(setTimeout(go, delay)); else go();
