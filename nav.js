@@ -247,6 +247,24 @@
                 progress: { chapters: 6, keys: { en: "band-night-v1" } }
               }
             ]
+          },
+          {
+            id: "final",
+            title: { hu: "Összefoglaló projekt", en: "Final project" },
+            pages: [
+              {
+                id: "coup",
+                kind: "story",
+                minutes: 45,
+                title: { hu: "Puccs! – a te zászlód", en: "Coup! Design your banner" },
+                desc: {
+                  hu: "Átveszed a hatalmat egy kitalált puccsban: az ország zászlószínei, a döntéseid és egy csúszka alapján mindenki egyedi zászlót kap – lépésről lépésre, minden eddigi eszközzel.",
+                  en: "Take power in a fictional coup: your country's flag colours and your choices give every student a unique banner – guided step by step, with every tool from the year."
+                },
+                files: { en: "inkscape/final/coup.html" },
+                progress: { chapters: 7, keys: { en: "coup-v1" } }
+              }
+            ]
           }
         ]
       }
