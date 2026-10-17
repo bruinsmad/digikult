@@ -357,7 +357,7 @@ function makeEditor(ta, opts={}){
   if (window.CMHTML){                                     /* CodeMirror: completion, auto-closing tags, smart indent */
     const w = document.createElement("div"); w.className = "cmw" + (opts.fixed ? " fixed" : ""); ta.before(w); ta.hidden = true;
     let quiet = false;
-    const cm = CMHTML.create({ parent: w, doc: ta.value, lines: !!opts.lines, fit: !opts.fixed, label: ta.getAttribute("aria-label") || "",
+    const cm = CMHTML.create({ parent: w, doc: ta.value, lines: !!opts.lines, fit: true, label: ta.getAttribute("aria-label") || "",
       onChange: v => { if (quiet) return; ta.value = v; ta.dispatchEvent(new Event("input")); } });
     w.addEventListener("mousedown", e => { if (e.target === w){ e.preventDefault(); cm.focus(); } });
     return { refit: () => { quiet = true; cm.set(ta.value); quiet = false; cm.view.requestMeasure(); }, cm, el: w };
