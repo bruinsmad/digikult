@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Irány a Sajthold! – Inkscape</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap">
+<link rel="stylesheet" href="../mission.css">
+<style>:root{--accent:#f2d264}</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+window.MISSION = {
+  lang: "hu",
+  key: "cheese-moon-v1",
+  title: "Irány a Sajthold!",
+  story: "A legenda szerint a Hold sajtból van. A következő űrmisszió kideríti – és te tervezed meg az indulás plakátját.",
+  file: "vezeteknev_sajthold",
+  poster: "../img/cheese-moon/hu/poster.png",
+  pdf: "../pdf/cheese-moon-feladatlap.pdf",
+  teacherPdf: "../pdf/cheese-moon-tanari.pdf",
+  saveImg: "../img/cheese-moon/hu/save.png",
+  bonusImg: "../img/cheese-moon/hu/bonus.png",
+  elements: [
+    ["Éjszakai ég és csillagok", "Téglalap + Csillag eszköz", "kitöltés, körvonal"],
+    ["Sajthold kráterekkel", "nagy kör, kis körök", "Unió → Különbség"],
+    ["Rakétatest", "ellipszis + téglalap", "Metszet"],
+    ["Szárnyak", "téglalap → útvonal → csomópontok; kettőzés, tükrözés", "Csomópont eszköz"],
+    ["Ablak", "két kör", "Különbség (gyűrű)"],
+    ["Láng", "háromszög + kisebb sárga másolat", "rétegsorrend"]
+  ],
+  steps: [
+    { title: "Éjszakai ég és csillagok", img: "../img/cheese-moon/hu/step1.png",
+      alt: "1. lépés: sötétkék téglalap az oldalon, körvonal nélkül, majd csillagok a Csillag eszközzel",
+      lead: "Az ég egyetlen nagy téglalap, a csillagokat a Csillag eszköz rajzolja.",
+      note: "A jobb felső sarkot (Hold) és a bal alsó részt (rakéta) hagyd üresen.",
+      stuck: ["A téglalapnak vékony körvonala van: <span class='menu'>Objektum ▸ Kitöltés és körvonal…</span> → <i>Körvonalrajzolat</i> fül → kattints az <b>X</b>-re.",
+              "A csillagodnak 3 csúcsa van: az eszközvezérlő-sávon kattints a <b>Csillag</b> mód gombjára, és a Csúcsok legyen 5."] },
+    { title: "A Sajthold", img: "../img/cheese-moon/hu/step2.png",
+      alt: "2. lépés: nagy kör, kis körök, Shift + kattintás, Útvonal ▸ Unió, a Hold és a kráterek kijelölése, Útvonal ▸ Különbség",
+      lead: "<b>Először Unió</b> (a kráterek egy objektummá válnak), <b>aztán Különbség</b> (a krátereket kivágod a Holdból).",
+      stuck: ["A Hold tűnt el a kráterek helyett? A Hold volt felül. <span class='menu'>Szerkesztés ▸ Visszavonás</span>, jelöld ki a krátereket, <span class='menu'>Objektum ▸ Felülre helyezés</span>, és próbáld újra.",
+              "A Különbség szürke: pontosan két objektum legyen kijelölve – a Hold és az egyesített kráterek. Nézd meg az állapotsort."] },
+    { title: "Rakétatest", img: "../img/cheese-moon/hu/step3.png",
+      alt: "3. lépés: magas ellipszis sötét körvonallal, téglalap a felső részén, Útvonal ▸ Metszet",
+      lead: "A Metszet csak azt a részt tartja meg, amelyen a két alakzat osztozik.",
+      stuck: ["A Metszet után semmi sem maradt: a téglalap nem fedte az ellipszist. Vonj vissza, és rajzold a felső részére."] },
+    { title: "Szárnyak a Csomópont eszközzel", img: "../img/cheese-moon/hu/step4.png",
+      alt: "4. lépés: piros téglalap, Útvonal ▸ Objektum átalakítása útvonallá, a bal felső csomópont lehúzása, Szerkesztés ▸ Kettőzés és Objektum ▸ Vízszintes tükrözés, a test: Objektum ▸ Felülre helyezés",
+      lead: "Egy sarok elhúzásával a téglalapból szárny lesz; a másik szárny egy tükrözött másolat.",
+      stuck: ["Az egész alakzat mozog, amikor egy csomópontot húzol: még a Kijelölő eszköz aktív – válaszd a Csomópont eszközt.",
+              "A Csomópont eszköz kerek fogantyúkat mutat, nem sarkokat: előbb <span class='menu'>Útvonal ▸ Objektum átalakítása útvonallá</span>."] },
+    { title: "Ablak", img: "../img/cheese-moon/hu/step5.png",
+      alt: "5. lépés: piros kör, benne kisebb kör, Útvonal ▸ Különbség: gyűrű, világoskék üveg a lyukban",
+      lead: "Gyűrű = két kör különbsége.",
+      stuck: ["Nem vágódik ki a lyuk: a kis kör alul van. Jelöld ki, <span class='menu'>Objektum ▸ Felülre helyezés</span>, aztán Különbség."] },
+    { title: "Láng és rétegsorrend", img: "../img/cheese-moon/hu/step6.png",
+      alt: "6. lépés: háromszög a Csillag eszközzel, Sokszög módban, a rakéta alá húzva, Objektum ▸ Lejjebb helyezés, sárga belső láng",
+      lead: "A lángnak a test mögé kell kerülnie: az <span class='menu'>Objektum ▸ Lejjebb helyezés</span> minden kattintásra egy szinttel hátrébb viszi. Aztán egy sárga belső láng felülre.",
+      note: "Végül <span class='menu'>Nézet ▸ Nagyítás ▸ Nagyítás az oldalra</span>, hogy lásd az egész plakátot.",
+      stuck: ["Eltűnt a láng: az <span class='menu'>Alulra helyezés</span> az ég mögé rejtette. <span class='menu'>Szerkesztés ▸ Visszavonás</span> vagy <span class='menu'>Objektum ▸ Feljebb helyezés</span>."] }
+  ],
+  checklist: [
+    "Az ég az egész oldalt befedi",
+    "Legalább 8 csillag",
+    "Legalább 5 kráter a Holdon, kettő beleharap a szélébe (Különbség)",
+    "A rakétatest alja egyenes (Metszet)",
+    "Két tükrözött szárny, a test előttük van (Csomópont eszköz + tükrözés)",
+    "Gyűrű alakú ablak üveggel (Különbség)",
+    "A láng a test mögött van, és van sárga belső lángja (rétegsorrend)",
+    "A rakétatestnek sötét körvonala van, az égnek nincs",
+    "Az SVG és a PNG is elmentve, a fájlnévben a vezetékneveddel"
+  ],
+  bonus: [
+    ["Piros orrkúp", "A testtel azonos méretű ellipszis + téglalap a FELSŐ részén → <span class='menu'>Útvonal ▸ Metszet</span> → piros kitöltés."],
+    ["Hullócsillag", "Egy csillag + mögötte legyezőszerűen három hosszú, vékony háromszög, mind a csillagban kezdődik → mindent kijelölsz → <span class='menu'>Útvonal ▸ Unió</span>."],
+    ["Gyűrűs bolygó", "Kör + egy lapos ellipszis, rajta egy kisebb lapos ellipszis → <span class='menu'>Útvonal ▸ Különbség</span> → a gyűrű a bolygó elé."],
+    ["Kráterárnyék", "Kettőzd a Holdat, sötétebb narancs, <span class='menu'>Objektum ▸ Lejjebb helyezés</span>, tolj rajta egy kicsit."],
+    ["Plakátcím", "Szöveg eszköz: IRÁNY A SAJTHOLD! – nagy, vastag, sárga."],
+    ["Ferde rakéta", "Jelöld ki az egész rakétát, <span class='menu'>Objektum ▸ Csoportosítás</span>, kattints rá újra, és forgasd a saroknyilakkal."]
+  ]
+};
+</script>
+<script src="../mission.js?v=2"></script>
+<script src="../../nav.js" defer></script>
+</body>
+</html>
