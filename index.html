@@ -42,6 +42,8 @@ body{
 a{color:inherit}
 :focus-visible{outline:3px solid var(--yellow);outline-offset:3px;border-radius:6px}
 .wrap{max-width:1100px;margin:0 auto;padding:0 22px}
+.skip{position:absolute;left:12px;top:-60px;z-index:30;background:var(--paper);color:var(--paper-ink);font-weight:700;padding:10px 16px;border-radius:4px;text-decoration:none}
+.skip:focus{top:10px}
 
 /* ---------- wooden frame rail (top) ---------- */
 .rail{position:sticky;top:0;z-index:20;
@@ -117,6 +119,7 @@ a{color:inherit}
 .step h3 .what code{font-weight:700}
 /* headings that only receive focus from a link landing on them */
 [tabindex="-1"]:focus{outline:none}
+main:focus{outline:none}
 .items{container:items/inline-size;display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:26px 26px;align-items:start}
 
 /* poster = a student mission, taped to the board */
@@ -334,6 +337,7 @@ body.subject .hero{display:none}
 </style>
 </head>
 <body>
+<a class="skip" href="#main" id="skip">Ugrás a tartalomra</a>
 <header class="rail">
   <div class="wrap">
     <a class="logo" href="./">
@@ -347,7 +351,7 @@ body.subject .hero{display:none}
   </div>
 </header>
 
-<main class="wrap">
+<main class="wrap" id="main" tabindex="-1">
   <section class="hero">
     <div>
       <h1 id="name"></h1>
@@ -386,7 +390,7 @@ body.subject .hero{display:none}
       back:"← Minden tantárgy", open:n=>`${n} megnyitása`, nextLabel:"Következő tantárgy",
       count:{story:n=>`${n} küldetés`, theory:n=>`${n} elmélet`, lesson:n=>`${n} lecke`, demo:n=>`${n} bemutató`, tool:n=>`${n} eszköz`},
       missionsDone:(d,n)=>`${d} / ${n} küldetés kész`,
-      againAll:"Bármelyiket újrajátszhatod lent.",
+      againAll:"Bármelyiket újrajátszhatod lent.", skip:"Ugrás a tartalomra",
       sticky:"Ctrl+S, ne felejtsd!"
     },
     en:{
@@ -400,7 +404,7 @@ body.subject .hero{display:none}
       back:"← All subjects", open:n=>`Open ${n}`, nextLabel:"Next subject",
       count:{story:n=>`${n} mission${n>1?"s":""}`, theory:n=>`${n} explainer${n>1?"s":""}`, lesson:n=>`${n} lesson${n>1?"s":""}`, demo:n=>`${n} demo${n>1?"s":""}`, tool:n=>`${n} tool${n>1?"s":""}`},
       missionsDone:(d,n)=>`${d} of ${n} missions done`,
-      againAll:"Replay any of them below.",
+      againAll:"Replay any of them below.", skip:"Skip to content",
       sticky:"Ctrl+S, don't forget!"
     }
   };
@@ -743,6 +747,7 @@ function puliSvg(){
     $("#name").textContent = D.t(D.SITE.name);
     $("#tagline").textContent = T.tagline.replace(/([\p{L}\d])-(?=\p{L})/gu, "$1\u2011");
     $("#foot").textContent = T.foot;
+    $("#skip").textContent = T.skip;
     document.querySelectorAll(".lang button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.l === L)));
     $("#topics").innerHTML = D.SITE.topics.map(tp => `<a href="#${tp.id}">${esc(D.t(tp.title).split(" – ").pop())}</a>`).join("");
 
@@ -856,6 +861,8 @@ function puliSvg(){
   }
 
   document.querySelectorAll(".lang button").forEach(b => b.addEventListener("click", () => D.setLang(b.dataset.l)));
+  /* the hash is the router here, so the skip link moves focus itself instead of changing it */
+  $("#skip").addEventListener("click", e => { e.preventDefault(); const m = $("#main"); m.focus(); m.scrollIntoView({ block: "start" }); });
   D.onLang(draw);
   window.addEventListener("pageshow", draw);   // refresh progress when coming back with the Back button
   function place(){
