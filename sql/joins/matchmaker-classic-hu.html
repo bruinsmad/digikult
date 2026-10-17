@@ -1,0 +1,760 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>A párosító</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600..800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<script src="https://cdn.jsdelivr.net/npm/sql.js@1.10.3/dist/sql-asm.js"></script>
+<style>
+/* Layout: a teacher's demo for the projector. The board (tables as cards, connections as cables) fills the top;
+   the table picker, cable builder, SQL and feedback sit underneath. */
+:root{
+  --night:#120d24; --night-2:#1d1438; --ink:#f3eefb; --muted:#b3a8cc; --line:#3a2d63; --panel:#0d0a1a;
+  --pink:#ff4fa3; --cyan:#4fe3ff; --lime:#b8ff5c; --gold:#ffd166; --bad:#ff7a7a; --warn:#ffb15c; --ok:#7dffb0;
+  --f-display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body:"Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono:"JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+*,*::before,*::after{font-feature-settings:"calt" 0,"liga" 0}
+html,body{margin:0}
+body{color:var(--ink);font:16px/1.5 var(--f-body);min-height:100vh;
+  background:radial-gradient(900px 420px at 15% -5%, rgba(255,79,163,.2), transparent 65%),radial-gradient(800px 420px at 85% 0%, rgba(79,227,255,.16), transparent 65%),linear-gradient(var(--night), var(--night-2));
+  background-attachment:fixed;padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));padding-block:16px 40px}
+.wrap{max-width:1500px;margin:0 auto;display:grid;gap:14px}
+h1,h2,h3{font-family:var(--f-display);font-weight:800;margin:0;line-height:1.12;letter-spacing:-.01em}
+code,pre,textarea,select{font-family:var(--f-mono)}
+:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.eyebrow{font:600 12px/1.2 var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+header.top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px 20px}
+.sign{display:flex;align-items:center;gap:14px;padding:12px 20px 12px 14px;background:linear-gradient(135deg,#ffffff,#f1ecff);color:#1a1230;border-radius:14px;box-shadow:0 12px 30px rgba(0,0,0,.45), inset 0 0 0 3px #fff, inset 0 0 0 5px #d8cff5}
+.sign h1{font-size:clamp(24px,3.4vw,36px)}
+.sign .eyebrow{color:#7a6aa6}
+.controls{display:flex;gap:8px;flex-wrap:wrap}
+.btn{font:700 15px var(--f-body);border:1px solid var(--line);background:#2a2050;color:var(--ink);padding:9px 15px;border-radius:8px;cursor:pointer}
+.btn:hover{border-color:var(--pink)}
+.btn.primary{background:var(--pink);border-color:var(--pink);color:#2b0a1b;box-shadow:0 3px 0 #a3235f}
+.btn[aria-pressed="true"]{background:#3b5a2a;border-color:#7fb35a}
+
+/* board */
+#board{display:block;width:100%;height:clamp(420px, 60vh, 760px);border-radius:16px;border:4px solid #3a2d63;background:#0b0817;box-shadow:0 16px 36px rgba(0,0,0,.5)}
+.caption{margin:0;font:700 clamp(16px,1.5vw,21px)/1.35 var(--f-body);color:#f2ecff;min-height:1.4em;display:flex;flex-wrap:wrap;gap:6px 8px;align-items:baseline}
+.caption .st{padding:2px 9px;border-radius:6px;background:rgba(255,255,255,.08)}
+.caption .st.new{background:var(--gold);color:#2a1f05}
+.caption .st.todo{opacity:.35}
+.caption .st.ok{background:rgba(125,255,176,.18);color:var(--ok)}
+.caption .st.warn{background:rgba(255,177,92,.18);color:var(--warn)}
+.caption .st.bad{background:rgba(255,122,122,.18);color:var(--bad)}
+.caption .arrow{color:var(--muted)}
+@media (prefers-reduced-motion: no-preference){ .caption .st.new{animation:stpop .4s ease-out} @keyframes stpop{from{transform:scale(1.2)}to{transform:none}} }
+
+/* below */
+.below{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:16px;align-items:start}
+@media (max-width:1000px){ .below{grid-template-columns:minmax(0,1fr)} }
+.panel{border-radius:12px;background:linear-gradient(#2a2250,#1a1333);padding:8px;border:1px solid var(--line)}
+.inner{display:grid;gap:10px;padding:14px;border-radius:8px;background:var(--panel);box-shadow:inset 0 0 0 1px #2a2050;min-width:0}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font:700 13px var(--f-mono);background:transparent;color:#e7deff;border:1px solid var(--line);border-radius:999px;padding:5px 11px;cursor:pointer}
+.chip:hover{border-color:var(--pink)}
+.chip[aria-pressed="true"]{background:var(--pink);border-color:var(--pink);color:#2b0a1b}
+.chip .n{opacity:.7;font-weight:400}
+.preset{font:700 13px var(--f-body);background:transparent;color:#e7deff;border:1px solid var(--line);border-radius:999px;padding:5px 11px;cursor:pointer}
+.preset:hover,.preset.on{border-color:var(--gold);color:var(--gold)}
+.preset.bad{border-style:dashed}
+.builder{display:grid;grid-template-columns:auto 1fr auto 1fr auto;gap:6px;align-items:center}
+.builder select{font:600 14px var(--f-mono);background:#07050f;color:#e9f5ff;border:1px solid var(--line);border-radius:6px;padding:7px 8px;min-width:0}
+.builder .eq{font:800 18px var(--f-mono);color:var(--gold);text-align:center}
+@media (max-width:640px){ .builder{grid-template-columns:1fr 1fr} .builder .eq{grid-column:1/-1} }
+textarea#sql{width:100%;min-height:130px;resize:vertical;font-size:16px;line-height:1.5;padding:12px 14px;border:1px solid var(--line);border-radius:8px;background:#07050f;color:#e9f5ff;caret-color:var(--pink)}
+.run-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.kbd{font:12px var(--f-mono);color:var(--muted)}
+.result-meta{font:600 13px var(--f-mono);color:var(--cyan);margin-bottom:6px}
+.tablebox{overflow-x:auto;max-height:300px;overflow-y:auto;border:1px solid var(--line);border-radius:8px;background:rgba(255,255,255,.03)}
+table{border-collapse:collapse;width:100%;font-size:14.5px;font-variant-numeric:tabular-nums}
+th,td{text-align:left;padding:6px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+th{position:sticky;top:0;background:#16102c;font:600 12.5px var(--f-mono);color:var(--cyan)}
+td.num{text-align:right}
+tr:last-child td{border-bottom:none}
+.err{background:#3b1522;color:var(--bad);border-radius:8px;padding:12px 14px;font-weight:700}
+.err p{margin:.3em 0 0;font-weight:400;color:var(--ink)}
+.note{color:var(--muted);font-style:italic;margin:0}
+.verdicts{display:grid;gap:8px}
+.v{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;padding:10px 12px;border-radius:8px;border:1px solid var(--line);background:rgba(255,255,255,.03);align-items:start}
+.v .mark{font:800 22px/1 var(--f-display);width:28px;text-align:center}
+.v.ok .mark{color:var(--ok)} .v.warn .mark{color:var(--warn)} .v.bad .mark{color:var(--bad)} .v.info .mark{color:var(--cyan)}
+.v b{font-family:var(--f-mono);font-size:14px}
+.v .rel{display:inline-block;margin-left:8px;padding:1px 8px;border-radius:999px;font:800 13px var(--f-mono);background:var(--gold);color:#2a1f05}
+.v p{margin:2px 0 0;color:var(--muted);font-size:14px}
+.v .sw{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.legend{font-size:13px;color:var(--muted);display:flex;flex-wrap:wrap;gap:4px 16px}
+.legend b{color:var(--ink)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="sign">
+      <svg width="52" height="52" viewBox="0 0 52 52" aria-hidden="true"><rect x="3" y="8" width="18" height="14" rx="3" fill="#1a1230"/><rect x="31" y="30" width="18" height="14" rx="3" fill="#1a1230"/><rect x="31" y="8" width="18" height="14" rx="3" fill="#1a1230"/><path d="M21 15C28 15 25 37 31 37" stroke="#ff4fa3" stroke-width="3" fill="none"/><path d="M21 15h10" stroke="#4fe3ff" stroke-width="3"/><circle cx="21" cy="15" r="3" fill="#ffd166"/><circle cx="31" cy="37" r="3" fill="#ffd166"/><circle cx="31" cy="15" r="3" fill="#ffd166"/></svg>
+      <div><div class="eyebrow">Zengő Fesztivál · így kapcsolódnak a táblák</div><h1>A párosító</h1></div>
+    </div>
+    <div class="controls">
+      <button class="btn" id="slow" type="button" aria-pressed="false">Lassítás: off</button>
+      <button class="btn" id="soundToggle" type="button" aria-pressed="true">Hang: on</button>
+    </div>
+  </header>
+
+  <canvas id="board" aria-hidden="true"></canvas>
+  <p class="caption" id="caption" aria-live="polite">Válassz egy példát, vagy építs kapcsolatot lent.</p>
+
+  <div class="below">
+    <section class="panel" aria-label="Query">
+      <div class="inner">
+        <div class="eyebrow">Példák</div>
+        <div class="chips" id="presets"></div>
+        <div class="eyebrow">Táblák a táblán</div>
+        <div class="chips" id="tables"></div>
+        <div class="eyebrow">Köss be egy kábelt: tábla.oszlop = tábla.oszlop</div>
+        <div class="builder">
+          <select id="ta" aria-label="table A"></select><select id="ca" aria-label="column A"></select>
+          <span class="eq">=</span>
+          <select id="tb" aria-label="table B"></select><select id="cb" aria-label="column B"></select>
+        </div>
+        <div class="run-row"><button class="btn" id="connect" type="button">Bedugom →</button><span class="kbd">beírja a feltételt a WHERE-be és lefuttatja</span></div>
+        <label class="eyebrow" for="sql">Lekérdezés (az utolsó utasítás kerül a táblára)</label>
+        <textarea id="sql" spellcheck="false" autocapitalize="off" autocomplete="off"></textarea>
+        <div class="run-row"><button class="btn primary" id="run" type="button">▶ Futtat</button><span class="kbd">Ctrl/⌘ + Enter</span></div>
+        <div class="legend"><span>✓ színes kábel = az oszlopok tényleg egymásra mutatnak</span><span>⚠ narancs = lefut, de az oszlopoknak semmi közük egymáshoz · ✗ piros = nincs találat</span></div>
+      </div>
+    </section>
+    <section class="panel" aria-label="Result">
+      <div class="inner">
+        <div class="eyebrow">Visszajelzés</div>
+        <div class="verdicts" id="verdicts"><p class="note">Töltöm a fesztivál adatbázisát…</p></div>
+        <div class="eyebrow">Eredmény</div>
+        <div id="out"><p class="note">–</p></div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<script>
+const SEED = `
+CREATE TABLE zenekarok (id INTEGER PRIMARY KEY, nev TEXT, mufaj TEXT, orszag TEXT, tagok INTEGER);
+CREATE TABLE szinpadok (id INTEGER PRIMARY KEY, nev TEXT, ferohely INTEGER, terulet TEXT);
+CREATE TABLE koncertek (id INTEGER PRIMARY KEY, zenekar_id INTEGER, szinpad_id INTEGER, nap TEXT, kezdes TEXT, vege TEXT);
+CREATE TABLE stab (id INTEGER PRIMARY KEY, nev TEXT, munka TEXT, szinpad_id INTEGER, radio INTEGER);
+CREATE TABLE belepesek (id INTEGER PRIMARY KEY, stab_id INTEGER, zona TEXT, ido TEXT);
+CREATE TABLE menedzserek (id INTEGER PRIMARY KEY, zenekar_id INTEGER, nev TEXT, telefon TEXT);
+INSERT INTO zenekarok VALUES (1,'Paprika Punks','punk','Magyarország',4);
+INSERT INTO zenekarok VALUES (2,'Danube Drift','indie','Magyarország',5);
+INSERT INTO zenekarok VALUES (3,'Velvet Locomotive','rock','Egyesült Királyság',4);
+INSERT INTO zenekarok VALUES (4,'Csárdás Collective','népzene','Magyarország',6);
+INSERT INTO zenekarok VALUES (5,'Neon Gulyás','elektro','Magyarország',2);
+INSERT INTO zenekarok VALUES (6,'The Baltic Owls','indie','Észtország',3);
+INSERT INTO zenekarok VALUES (7,'Karol & the Krakow Brass','jazz','Lengyelország',7);
+INSERT INTO zenekarok VALUES (8,'Lady Lavender','pop','Ausztria',1);
+INSERT INTO zenekarok VALUES (9,'Tokaj Thunder','metal','Magyarország',5);
+INSERT INTO zenekarok VALUES (10,'Bratislava Beat Club','elektro','Szlovákia',3);
+INSERT INTO zenekarok VALUES (11,'Hollóház Choir','népzene','Magyarország',9);
+INSERT INTO zenekarok VALUES (12,'Mango Tango','pop','Spanyolország',4);
+INSERT INTO zenekarok VALUES (13,'Zebra Crossing','rock','Németország',4);
+INSERT INTO zenekarok VALUES (14,'Pusztawave','elektro','Magyarország',1);
+INSERT INTO zenekarok VALUES (15,'Fruzsi Fülöp','pop','Magyarország',1);
+INSERT INTO zenekarok VALUES (16,'The Rusty Trams','punk','Csehország',4);
+INSERT INTO szinpadok VALUES (1,'Nagyszínpad',12000,'észak');
+INSERT INTO szinpadok VALUES (2,'Dűne sátor',3000,'észak');
+INSERT INTO szinpadok VALUES (3,'Tiszapart',5000,'folyópart');
+INSERT INTO szinpadok VALUES (4,'Táncpajta',1500,'dél');
+INSERT INTO szinpadok VALUES (5,'Néma diszkó',800,'dél');
+INSERT INTO koncertek VALUES (1,1,3,'péntek','17:00','18:00');
+INSERT INTO koncertek VALUES (2,6,2,'péntek','18:00','19:00');
+INSERT INTO koncertek VALUES (3,12,1,'péntek','18:30','19:30');
+INSERT INTO koncertek VALUES (4,4,4,'péntek','19:00','20:00');
+INSERT INTO koncertek VALUES (5,7,3,'péntek','19:00','20:00');
+INSERT INTO koncertek VALUES (6,5,2,'péntek','20:00','21:00');
+INSERT INTO koncertek VALUES (7,2,1,'péntek','20:00','21:15');
+INSERT INTO koncertek VALUES (8,16,3,'péntek','20:30','21:30');
+INSERT INTO koncertek VALUES (9,10,5,'péntek','22:00','23:30');
+INSERT INTO koncertek VALUES (10,8,1,'péntek','22:00','23:30');
+INSERT INTO koncertek VALUES (11,14,5,'péntek','23:30','23:59');
+INSERT INTO koncertek VALUES (12,11,4,'szombat','16:00','17:00');
+INSERT INTO koncertek VALUES (13,15,3,'szombat','17:00','18:00');
+INSERT INTO koncertek VALUES (14,13,1,'szombat','17:30','18:30');
+INSERT INTO koncertek VALUES (15,7,2,'szombat','18:00','19:00');
+INSERT INTO koncertek VALUES (16,1,3,'szombat','18:30','19:30');
+INSERT INTO koncertek VALUES (17,6,1,'szombat','19:00','20:00');
+INSERT INTO koncertek VALUES (18,4,4,'szombat','19:30','20:30');
+INSERT INTO koncertek VALUES (19,9,1,'szombat','20:30','21:30');
+INSERT INTO koncertek VALUES (20,5,5,'szombat','21:00','22:00');
+INSERT INTO koncertek VALUES (21,16,3,'szombat','21:00','22:00');
+INSERT INTO koncertek VALUES (22,3,1,'szombat','22:00','23:30');
+INSERT INTO koncertek VALUES (23,10,2,'szombat','22:30','23:30');
+INSERT INTO koncertek VALUES (24,14,5,'szombat','22:30','23:59');
+INSERT INTO koncertek VALUES (25,11,3,'vasárnap','15:00','16:00');
+INSERT INTO koncertek VALUES (26,15,1,'vasárnap','16:00','17:00');
+INSERT INTO koncertek VALUES (27,4,4,'vasárnap','17:00','18:00');
+INSERT INTO koncertek VALUES (28,12,3,'vasárnap','18:00','19:00');
+INSERT INTO koncertek VALUES (29,13,2,'vasárnap','19:00','20:00');
+INSERT INTO koncertek VALUES (30,2,3,'vasárnap','20:00','21:00');
+INSERT INTO koncertek VALUES (31,8,1,'vasárnap','21:00','22:30');
+INSERT INTO koncertek VALUES (32,9,3,'vasárnap','21:30','22:30');
+INSERT INTO stab VALUES (1,'Gergő Hámori','roadie',1,3);
+INSERT INTO stab VALUES (2,'Bea Szalai','hangmérnök',1,3);
+INSERT INTO stab VALUES (3,'Máté Orbán','fénytechnikus',1,3);
+INSERT INTO stab VALUES (4,'Nóra Kiss','biztonsági őr',1,1);
+INSERT INTO stab VALUES (5,'Dávid Bakos','hangmérnök',2,4);
+INSERT INTO stab VALUES (6,'Lilla Fehér','roadie',2,4);
+INSERT INTO stab VALUES (7,'Ákos Tar','biztonsági őr',3,1);
+INSERT INTO stab VALUES (8,'Petra Nagy','hangmérnök',3,5);
+INSERT INTO stab VALUES (9,'Zoli Berki','fénytechnikus',3,5);
+INSERT INTO stab VALUES (10,'Hanna Rózsa','roadie',4,6);
+INSERT INTO stab VALUES (11,'Bence Varga','hangmérnök',4,6);
+INSERT INTO stab VALUES (12,'Rozi Rab','futár',5,7);
+INSERT INTO stab VALUES (13,'Emma Lukács','hangmérnök',5,7);
+INSERT INTO stab VALUES (14,'Tomi Sós','biztonsági őr',5,1);
+INSERT INTO belepesek VALUES (1,4,'Nagyszínpad backstage','18:40');
+INSERT INTO belepesek VALUES (2,1,'Nagyszínpad backstage','18:55');
+INSERT INTO belepesek VALUES (3,2,'Nagyszínpad backstage','19:02');
+INSERT INTO belepesek VALUES (4,6,'Dűne backstage','19:10');
+INSERT INTO belepesek VALUES (5,5,'Dűne backstage','19:12');
+INSERT INTO belepesek VALUES (6,8,'Tiszapart backstage','19:30');
+INSERT INTO belepesek VALUES (7,12,'Étkező','19:45');
+INSERT INTO belepesek VALUES (8,10,'Étkező','19:50');
+INSERT INTO belepesek VALUES (9,3,'Nagyszínpad backstage','20:05');
+INSERT INTO belepesek VALUES (10,7,'Tiszapart backstage','20:10');
+INSERT INTO belepesek VALUES (11,13,'Étkező','20:20');
+INSERT INTO belepesek VALUES (12,9,'Tiszapart backstage','20:25');
+INSERT INTO belepesek VALUES (13,1,'Étkező','20:40');
+INSERT INTO belepesek VALUES (14,3,'Nagyszínpad backstage','20:55');
+INSERT INTO belepesek VALUES (15,11,'Stáb parkoló','21:00');
+INSERT INTO belepesek VALUES (16,14,'Étkező','21:05');
+INSERT INTO belepesek VALUES (17,1,'Nagyszínpad backstage','21:12');
+INSERT INTO belepesek VALUES (18,6,'Dűne backstage','21:20');
+INSERT INTO belepesek VALUES (19,12,'Nagyszínpad backstage','21:23');
+INSERT INTO belepesek VALUES (20,2,'Nagyszínpad backstage','21:30');
+INSERT INTO belepesek VALUES (21,8,'Tiszapart backstage','21:33');
+INSERT INTO belepesek VALUES (22,5,'Stáb parkoló','21:38');
+INSERT INTO belepesek VALUES (23,4,'Nagyszínpad backstage','21:45');
+INSERT INTO belepesek VALUES (24,12,'Étkező','21:52');
+INSERT INTO belepesek VALUES (25,3,'Nagyszínpad backstage','21:58');
+INSERT INTO belepesek VALUES (26,13,'Stáb parkoló','22:05');
+INSERT INTO belepesek VALUES (27,9,'Tiszapart backstage','22:10');
+INSERT INTO belepesek VALUES (28,1,'Nagyszínpad backstage','22:15');
+INSERT INTO belepesek VALUES (29,10,'Étkező','22:20');
+INSERT INTO belepesek VALUES (30,7,'Tiszapart backstage','22:30');
+INSERT INTO belepesek VALUES (31,6,'Étkező','22:40');
+INSERT INTO belepesek VALUES (32,2,'Nagyszínpad backstage','22:48');
+INSERT INTO belepesek VALUES (33,14,'Stáb parkoló','23:00');
+INSERT INTO belepesek VALUES (34,11,'Étkező','23:10');
+INSERT INTO belepesek VALUES (35,12,'Stáb parkoló','23:20');
+INSERT INTO belepesek VALUES (36,4,'Nagyszínpad backstage','23:40');
+INSERT INTO menedzserek VALUES (1,1,'Ilona Pék','+36 30 111 2233');
+INSERT INTO menedzserek VALUES (2,2,'Marci Dobó','+36 20 222 3344');
+INSERT INTO menedzserek VALUES (3,3,'Harriet Cole','+44 7700 900123');
+INSERT INTO menedzserek VALUES (4,4,'Teri Juhász','+36 70 333 4455');
+INSERT INTO menedzserek VALUES (5,5,'Olivér Kun','+36 30 444 5566');
+INSERT INTO menedzserek VALUES (6,6,'Kai Tamm','+372 5555 1234');
+INSERT INTO menedzserek VALUES (7,7,'Agnieszka Lis','+48 600 123 456');
+INSERT INTO menedzserek VALUES (8,8,'Felix Baumann','+43 660 123 4567');
+INSERT INTO menedzserek VALUES (9,9,'Zsolt Erdős','+36 20 555 6677');
+INSERT INTO menedzserek VALUES (10,10,'Jana Horváthová','+421 900 123 456');
+INSERT INTO menedzserek VALUES (11,11,'Bori Szép','+36 70 666 7788');
+INSERT INTO menedzserek VALUES (12,12,'Lucía Marín','+34 600 123 456');
+INSERT INTO menedzserek VALUES (13,13,'Anke Vogel','+49 170 1234567');
+INSERT INTO menedzserek VALUES (14,14,'Dénes Varga','+36 30 777 8899');
+INSERT INTO menedzserek VALUES (15,15,'Panni Tóth','+36 20 888 9900');
+INSERT INTO menedzserek VALUES (16,16,'Petr Dvořák','+420 601 123 456');
+`;
+const ALIAS = {};                 /* default short names per table */
+const FK = [["koncertek", "zenekar_id", "zenekarok", "id"], ["koncertek", "szinpad_id", "szinpadok", "id"], ["stab", "szinpad_id", "szinpadok", "id"], ["belepesek", "stab_id", "stab", "id"], ["menedzserek", "zenekar_id", "zenekarok", "id"]];                       /* real references: [child, column, parent, column] */
+const LABELCOLS = {"zenekarok": ["id", "nev"], "szinpadok": ["id", "nev"], "koncertek": ["id", "zenekar_id", "szinpad_id", "nap"], "stab": ["id", "nev", "szinpad_id"], "belepesek": ["id", "stab_id", "zona"], "menedzserek": ["id", "zenekar_id", "nev"]};         /* which columns to print on a row chip */
+const PRESETS = [{"label": "⚠ Kapcsolat nélkül: zenekarok × szinpadok", "bad": true, "sql": "SELECT zenekarok.nev, szinpadok.nev\nFROM zenekarok, szinpadok;"}, {"label": "1 : 1 — minden zenekarnak egy menedzsere van", "sql": "SELECT zenekarok.nev, menedzserek.nev, menedzserek.telefon\nFROM zenekarok, menedzserek\nWHERE zenekarok.id = menedzserek.zenekar_id;"}, {"label": "1 : N — egy zenekar sok koncertet ad", "sql": "SELECT zenekarok.nev, koncertek.nap, koncertek.kezdes\nFROM zenekarok, koncertek\nWHERE zenekarok.id = koncertek.zenekar_id;"}, {"label": "N : 1 — sok stábtag, egy színpad", "sql": "SELECT stab.nev, stab.munka, szinpadok.nev\nFROM stab, szinpadok\nWHERE stab.szinpad_id = szinpadok.id;"}, {"label": "N : N — zenekarok ↔ szinpadok a koncerteken át", "sql": "SELECT zenekarok.nev, szinpadok.nev, koncertek.nap\nFROM zenekarok, koncertek, szinpadok\nWHERE zenekarok.id = koncertek.zenekar_id\n  AND koncertek.szinpad_id = szinpadok.id;"}, {"label": "Három tábla + szűrés", "sql": "SELECT zenekarok.nev, szinpadok.nev, koncertek.kezdes\nFROM zenekarok, koncertek, szinpadok\nWHERE zenekarok.id = koncertek.zenekar_id\n  AND koncertek.szinpad_id = szinpadok.id\n  AND koncertek.nap = 'szombat'\n  AND szinpadok.nev = 'Nagyszínpad';"}, {"label": "⚠ Rossz oszlop: szinpad_id = zenekarok.id", "bad": true, "sql": "SELECT zenekarok.nev, koncertek.nap\nFROM zenekarok, koncertek\nWHERE koncertek.szinpad_id = zenekarok.id;"}, {"label": "✗ Szöveg = szám: nev = id", "bad": true, "sql": "SELECT *\nFROM zenekarok, koncertek\nWHERE zenekarok.nev = koncertek.zenekar_id;"}, {"label": "Ki járt a backstage-ben? (3 tábla)", "sql": "SELECT stab.nev, stab.munka, belepesek.zona, belepesek.ido, szinpadok.nev\nFROM belepesek, stab, szinpadok\nWHERE belepesek.stab_id = stab.id\n  AND stab.szinpad_id = szinpadok.id\n  AND belepesek.zona = 'Nagyszínpad backstage';"}];
+const T = {
+  "sound": "Hang",
+  "slow": "Lassítás",
+  "idle": "Válassz egy példát, vagy építs kapcsolatot lent.",
+  "ready": "Az adatbázis kész. Futtass egy lekérdezést, és jönnek a kábelek.",
+  "boardIdle": "Futtass egy lekérdezést – itt jelennek meg a táblák",
+  "engFail": "Az SQL-motor nem töltődött be. Ellenőrizd az internetet, és töltsd újra az oldalt.",
+  "sqlErr": "SQL-hiba",
+  "zero": "(nincs sor)",
+  "alias": "mint",
+  "tablesWord": "tábla",
+  "accident": "véletlenül",
+  "noMatch": "nincs találat",
+  "allPairs": "minden sor minden sorral",
+  "capError": "A lekérdezés hibás – nézd az eredménydobozt.",
+  "capNoTables": "Nem találok táblát a FROM-ban.",
+  "rows": n => `${n} sor`,
+  "rowsN": n => `${n} sor`,
+  "pairsN": n => `${n} pár`,
+  "resultN": n => `Eredmény: ${n} sor`,
+  "capCross": n => `nincs WHERE-szabály → ${n} pár`,
+  "capLoose": t => `${t}: nincs bekötve`,
+  "fromLine": (k, n) => k < 2 ? 'Egy tábla – nincs mit összekötni.' : `${k} tábla a FROM-ban. Szabály nélkül az SQL minden sort minden sorral párosítana: ${n} pár.`,
+  "noRule": "Nincs összekötő szabály",
+  "noRuleWhy": n => `Minden zenekar minden színpaddal szerepel – ${n} értelmetlen pár. Írj egy szabályt, pl. WHERE koncertek.zenekar_id = zenekarok.id.`,
+  "whyTable": "Ilyen tábla nincs.",
+  "whyColumn": c => `Nincs ${c} oszlop.`,
+  "whyTypes": (a,b) => `Egy ${a==='text'?'szöveges':'szám'} oszlopot hasonlítasz egy ${b==='text'?'szöveges':'szám'} oszlophoz – sosem lehetnek egyenlők.`,
+  "whyNoMatch": "Ezekben az oszlopokban egyik tábla egyetlen sora sem egyezik a másik egyetlen sorával sem.",
+  "whyAccident": j => `Az SQL talált egyenlő számokat, de ${j.a.alias}.${j.ca} nem a ${j.b.alias}.${j.cb}-re mutat. A párok véletlenek (egy azonosító épp egyenlő egy másikkal).`,
+  "whyReal": (j, rel, ma, mb, na, nb) => rel === '1 : 1' ? `Valódi hivatkozás. Minden ${j.a.name}-sorhoz legfeljebb egy ${j.b.name}-sor tartozik, és fordítva.` : rel === 'N : 1' ? `Valódi hivatkozás. Sok ${j.a.name}-sor osztozik egy ${j.b.name}-soron (legfeljebb ${mb} soronként), minden ${j.a.name}-sornak egy párja van.` : rel === '1 : N' ? `Valódi hivatkozás. Egy ${j.a.name}-sorhoz sok ${j.b.name}-sor tartozik (legfeljebb ${ma}), minden ${j.b.name}-sor pontosan egyre mutat.` : `Valódi hivatkozás, több a többhöz ezeken a sorokon.`,
+  "looseWhy": t => `${t} a FROM-ban van, de semmi nem köti be – minden sora minden eredménysorral párosul.`,
+  "viaWhy": (x, y, v) => `Egy zenekar több színpadon játszik, egy színpadon több zenekar lép fel. Ezt egy oszlop nem tudja tárolni – ezért a középső ${v} tábla minden párosításhoz egy sort tart.`,
+  "filterWhy": n => `Közönséges feltételek – az összekötött sorok közül megtartják az odaillőket: ${n} az eredményben.`
+};
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const fmt = x => typeof x === "number" && !Number.isInteger(x) ? String(Math.round(x*1000)/1000) : String(x);
+const clamp = (v,a,b) => Math.max(a, Math.min(b, v));
+const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const COLS = ["#ff4fa3","#4fe3ff","#b8ff5c","#ffd166","#c9a2ff","#ff9e7a"];
+
+/* ---------- sound ---------- */
+let soundOn = true, actx = null;
+try { soundOn = localStorage.getItem("matchmaker-sound") !== "off"; } catch(e){}
+const ONOFF = document.documentElement.lang === "hu" ? ["be", "ki"] : ["on", "off"];
+function paintSound(){ const b = $("soundToggle"); b.textContent = `${T.sound}: ${soundOn?ONOFF[0]:ONOFF[1]}`; b.setAttribute("aria-pressed", soundOn); }
+paintSound();
+$("soundToggle").onclick = ()=>{ soundOn = !soundOn; paintSound(); try { localStorage.setItem("matchmaker-sound", soundOn?"on":"off"); } catch(e){} };
+function tone(freq, dur, type="triangle", vol=.1, slideTo=null, delay=0){
+  if (!soundOn) return;
+  try { actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+    const t = actx.currentTime + delay, o = actx.createOscillator(), g = actx.createGain();
+    o.type = type; o.frequency.setValueAtTime(freq, t); if (slideTo) o.frequency.exponentialRampToValueAtTime(slideTo, t + dur);
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + .02); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(g).connect(actx.destination); o.start(t); o.stop(t + dur + .05); } catch(e){}
+}
+const sfx = {
+  tick(){ tone(880 + Math.random()*300, .04, "square", .03); },
+  good(){ tone(523, .12, "triangle", .1); tone(784, .18, "triangle", .1, null, .1); },
+  warn(){ tone(330, .18, "sawtooth", .06, 300); },
+  bad(){ tone(180, .3, "sawtooth", .08, 90); tone(120, .3, "square", .05, 70, .05); },
+  plug(){ tone(200, .08, "square", .06, 400); }
+};
+
+/* ---------- database + schema ---------- */
+let SQL = null, db = null, SCHEMA = {};      /* SCHEMA[table] = { cols:[{name,type}], rows:[[...]], rowids:[] } */
+function loadSchema(){
+  SCHEMA = {};
+  const t = db.exec("SELECT name FROM sqlite_master WHERE type='table' ORDER BY rowid");
+  (t.length ? t[0].values : []).forEach(([name])=>{
+    const info = db.exec(`PRAGMA table_info("${name}")`)[0].values.map(r=>({ name: r[1], type: /INT|REAL/i.test(r[2]) ? "number" : "text" }));
+    const r = db.exec(`SELECT rowid, * FROM "${name}"`);
+    SCHEMA[name] = { cols: info, rowids: r.length ? r[0].values.map(v=>v[0]) : [], rows: r.length ? r[0].values.map(v=>v.slice(1)) : [] };
+  });
+}
+
+/* ---------- SQL parsing (just enough for the board) ---------- */
+function lastStatement(sql){
+  const s = sql.replace(/--[^\n]*/g," ").replace(/\/\*[\s\S]*?\*\//g," ");
+  const parts = []; let q = null, cur = "";
+  for (const ch of s){ if (q){ cur += ch; if (ch === q) q = null; continue; } if (ch === "'" || ch === '"'){ q = ch; cur += ch; continue; } if (ch === ";"){ parts.push(cur); cur = ""; continue; } cur += ch; }
+  parts.push(cur); return parts.map(p=>p.trim()).filter(Boolean).pop() || "";
+}
+function splitClauses(sql){
+  const kw = [["select",/^select\b/i],["from",/^from\b/i],["where",/^where\b/i],["group",/^group\s+by\b/i],["having",/^having\b/i],["order",/^order\s+by\b/i],["limit",/^limit\b/i]];
+  let depth = 0, q = null; const marks = [];
+  for (let i=0; i<sql.length; i++){ const ch = sql[i];
+    if (q){ if (ch === q) q = null; continue; } if (ch === "'" || ch === '"'){ q = ch; continue; }
+    if (ch === "(") depth++; else if (ch === ")") depth--;
+    else if (depth === 0 && /[a-z]/i.test(ch) && (i === 0 || /[\s(),;]/.test(sql[i-1]))){ const rest = sql.slice(i);
+      for (const [name, re] of kw){ const m = rest.match(re); if (m){ marks.push({ name, i, len: m[0].length }); i += m[0].length - 1; break; } } } }
+  const out = {}; marks.forEach((m,k)=>{ if (out[m.name] === undefined) out[m.name] = sql.slice(m.i + m.len, k+1 < marks.length ? marks[k+1].i : sql.length).trim(); });
+  return out;
+}
+function splitTop(s, sep){   /* sep: "," or /\bAND\b/i at depth 0, outside quotes */
+  const parts = []; let depth = 0, q = null, cur = "", i = 0;
+  while (i < s.length){ const ch = s[i];
+    if (q){ cur += ch; if (ch === q) q = null; i++; continue; }
+    if (ch === "'" || ch === '"'){ q = ch; cur += ch; i++; continue; }
+    if (ch === "(") depth++; if (ch === ")") depth--;
+    if (depth === 0){
+      if (sep === "," && ch === ","){ parts.push(cur.trim()); cur = ""; i++; continue; }
+      if (sep !== "," && /\s/.test(s[i-1] || " ") && /^and\b/i.test(s.slice(i)) ){ parts.push(cur.trim()); cur = ""; i += 3; continue; } }
+    cur += ch; i++; }
+  if (cur.trim()) parts.push(cur.trim()); return parts;
+}
+function parseQuery(sql){
+  const st = lastStatement(sql), cl = splitClauses(st);
+  if (!cl.from) return null;
+  /* JOIN … ON … → comma list + extra conditions */
+  let from = cl.from, extra = [];
+  from = from.replace(/\b(inner|left|right|cross|outer)\s+/gi, "");
+  if (/\bjoin\b/i.test(from)){
+    const pieces = from.split(/\bjoin\b/i); const list = [pieces[0]];
+    pieces.slice(1).forEach(p=>{ const m = p.match(/^(.*?)\bon\b(.*)$/is); if (m){ list.push(m[1]); extra.push(m[2].trim()); } else list.push(p); });
+    from = list.join(",");
+  }
+  const tables = [];
+  splitTop(from, ",").forEach(x=>{ const m = x.replace(/\s+as\s+/i, " ").trim().match(/^([A-Za-z_]\w*)(?:\s+([A-Za-z_]\w*))?$/);
+    if (m) tables.push({ name: m[1], alias: m[2] || m[1] }); });
+  const resolve = ref => tables.find(t=>t.alias.toLowerCase() === ref.toLowerCase() || t.name.toLowerCase() === ref.toLowerCase());
+  const conds = cl.where ? splitTop(cl.where, "and").concat(extra) : extra, joins = [], filters = [];
+  conds.forEach(c=>{
+    const m = c.match(/^\(?\s*([A-Za-z_]\w*)\.([A-Za-z_]\w*)\s*=\s*([A-Za-z_]\w*)\.([A-Za-z_]\w*)\s*\)?$/);
+    if (m){ const A = resolve(m[1]), B = resolve(m[3]);
+      if (A && B && A !== B){ joins.push({ a: A, ca: m[2], b: B, cb: m[4], text: c.trim() }); return; } }
+    filters.push(c.trim());
+  });
+  return { tables, joins, filters, cl, st };
+}
+
+/* ---------- judging a connection ---------- */
+function judge(j){
+  const SA = SCHEMA[j.a.name], SB = SCHEMA[j.b.name];
+  const colA = SA && SA.cols.find(c=>c.name.toLowerCase() === j.ca.toLowerCase()), colB = SB && SB.cols.find(c=>c.name.toLowerCase() === j.cb.toLowerCase());
+  if (!SA || !SB) return { kind: "bad", why: T.whyTable, pairs: [] };
+  if (!colA || !colB) return { kind: "bad", why: T.whyColumn(!colA ? `${j.a.alias}.${j.ca}` : `${j.b.alias}.${j.cb}`), pairs: [] };
+  let pairs = [];
+  try { const r = db.exec(`SELECT "${j.a.alias}".rowid, "${j.b.alias}".rowid FROM "${j.a.name}" "${j.a.alias}", "${j.b.name}" "${j.b.alias}" WHERE "${j.a.alias}"."${j.ca}" = "${j.b.alias}"."${j.cb}"`); pairs = r.length ? r[0].values : []; } catch(e){}
+  const real = FK.some(([ct,cc,pt,pc])=> (ct === j.a.name && cc.toLowerCase() === j.ca.toLowerCase() && pt === j.b.name && pc.toLowerCase() === j.cb.toLowerCase()) || (ct === j.b.name && cc.toLowerCase() === j.cb.toLowerCase() && pt === j.a.name && pc.toLowerCase() === j.ca.toLowerCase()));
+  const perA = new Map(), perB = new Map();
+  pairs.forEach(([ra, rb])=>{ perA.set(ra, (perA.get(ra)||0)+1); perB.set(rb, (perB.get(rb)||0)+1); });
+  const maxA = Math.max(0, ...perA.values()), maxB = Math.max(0, ...perB.values());
+  /* maxA = most B rows one A row matches; maxB = most A rows one B row matches. Read left→right: "1 : N" = one A row, many B rows */
+  const rel = !pairs.length ? "" : (maxA <= 1 && maxB <= 1) ? "1 : 1" : (maxA > 1 && maxB <= 1) ? "1 : N" : (maxA <= 1 && maxB > 1) ? "N : 1" : "N : N";
+  if (!pairs.length) return { kind: "bad", why: colA.type !== colB.type ? T.whyTypes(colA.type, colB.type) : T.whyNoMatch, pairs, rel, maxA, maxB, colA, colB };
+  if (!real) return { kind: "warn", why: T.whyAccident(j), pairs, rel, maxA, maxB, colA, colB };
+  return { kind: "ok", why: T.whyReal(j, rel, maxA, maxB, SA.rows.length, SB.rows.length), pairs, rel, maxA, maxB, colA, colB };
+}
+
+/* ---------- the board ---------- */
+const bd = { c: $("board"), ctx: $("board").getContext("2d"), W: 0, H: 0, cards: [], joins: [], plan: null, t0: 0, slow: false, hover: null, mouse: null };
+function size(){
+  const d = devicePixelRatio || 1, r = bd.c.getBoundingClientRect(); if (!r.width) return;
+  bd.W = r.width; bd.H = r.height; bd.c.width = Math.round(r.width*d); bd.c.height = Math.round(r.height*d); bd.ctx.setTransform(d,0,0,d,0,0);
+  if (bd.plan) layout();
+}
+const SL = () => bd.slow ? 2.4 : 1;
+$("slow").onclick = ()=>{ bd.slow = !bd.slow; $("slow").setAttribute("aria-pressed", bd.slow); $("slow").textContent = `${T.slow}: ${bd.slow ? ONOFF[0] : ONOFF[1]}`; };
+$("slow").textContent = `${T.slow}: ${ONOFF[1]}`;
+
+/* order tables so that connected ones sit next to each other */
+function orderTables(tables, joins){
+  if (tables.length <= 2) return tables.slice();
+  const adj = new Map(tables.map(t=>[t, new Set()]));
+  joins.forEach(j=>{ adj.get(j.a).add(j.b); adj.get(j.b).add(j.a); });
+  const left = new Set(tables), out = [];
+  /* start from a table with degree 1 if any (an end of a chain) */
+  while (left.size){
+    let start = [...left].find(t=>adj.get(t).size === 1) || [...left].find(t=>adj.get(t).size === 0) || [...left][0];
+    let cur = start;
+    while (cur){ out.push(cur); left.delete(cur); cur = [...adj.get(cur)].find(n=>left.has(n)); }
+  }
+  return out;
+}
+function layout(){
+  const plan = bd.plan, W = bd.W, H = bd.H, n = plan.order.length;
+  const gap = Math.min(70, W*.06), pad = 14, top = 54, bottom = 54;   /* room for badges above and below */
+  const cw = (W - 2*pad - (n-1)*gap)/n;
+  bd.cards = plan.order.map((t,i)=>{
+    const S = SCHEMA[t.name], rows = S ? S.rows.length : 0;
+    const head = 46, colh = 18, avail = H - top - bottom - head - colh - 10;
+    const rh = clamp(avail/Math.max(1,rows), 8, 22), ch = head + colh + 8 + rows*rh + 8;
+    const x = pad + i*(cw + gap), y = top;
+    const card = { t, S, x, y, w: cw, h: ch, head, colh, rh, rowY: k => y + head + colh + 8 + k*rh + rh/2, colX: {} };
+    /* column anchor positions along the column header */
+    if (S){ const names = S.cols.map(c=>c.name); const per = (cw - 16)/names.length; names.forEach((nm,k)=>{ card.colX[nm.toLowerCase()] = x + 8 + per*k + per/2; }); }
+    return card;
+  });
+  bd.cardOf = new Map(bd.cards.map(c=>[c.t, c]));
+}
+function buildPlan(p){
+  const order = orderTables(p.tables, p.joins);
+  const joins = p.joins.map((j,k)=> Object.assign({ col: COLS[k % COLS.length], verdict: judge(j) }, j));
+  /* tables with no connection at all */
+  const connected = new Set(); joins.forEach(j=>{ connected.add(j.a); connected.add(j.b); });
+  const loose = p.tables.filter(t=>!connected.has(t));
+  /* final rows: which base rows survive the whole WHERE */
+  let final = null, error = null, resultRows = 0;
+  try {
+    const res = db.exec(p.st); resultRows = res.length ? res[0].values.length : 0;
+    if (!p.cl.group){
+      const sel = p.tables.map(t=>`"${t.alias}".rowid AS r_${t.alias}`).join(", ");
+      const fromS = p.tables.map(t=>`"${t.name}" "${t.alias}"`).join(", ");
+      const whereS = p.cl.where ? ` WHERE ${p.cl.where}` : "";
+      const r = db.exec(`SELECT DISTINCT ${sel} FROM ${fromS}${whereS}`);
+      final = p.tables.map(()=>new Set());
+      (r.length ? r[0].values : []).forEach(v=> v.forEach((rid,k)=> final[k].add(rid)));
+    }
+  } catch(e){ error = e.message; }
+  /* N:N through a junction: a table joined to two others that are not joined to each other */
+  let via = null;
+  for (const t of p.tables){
+    const js = joins.filter(j=>(j.a === t || j.b === t) && j.verdict.kind === "ok");
+    if (js.length >= 2){ const others = js.map(j=> j.a === t ? j.b : j.a);
+      for (let i=0;i<others.length;i++) for (let k=i+1;k<others.length;k++){ const X = others[i], Y = others[k];
+        if (!joins.some(j=>(j.a===X&&j.b===Y)||(j.a===Y&&j.b===X))){
+          const jx = js.find(j=>j.a===X||j.b===X), jy = js.find(j=>j.a===Y||j.b===Y);
+          const manyX = (jx.a === t ? jx.verdict.maxB : jx.verdict.maxA) > 1, manyY = (jy.a === t ? jy.verdict.maxB : jy.verdict.maxA) > 1;
+          if (manyX && manyY) via = { X, Y, via: t }; } } }
+  }
+  return { order, joins, loose, via, final, error, resultRows, tables: p.tables, filters: p.filters, crossPairs: p.tables.reduce((a,t)=>a*(SCHEMA[t.name] ? SCHEMA[t.name].rows.length : 1), 1) };
+}
+
+/* timeline: 0 cards in → per join: cable, row lines, badge → filters dim → result */
+function schedule(plan){
+  const now = performance.now(), s = SL(); let t = now + 400*s;
+  plan.tIn = now;
+  if (plan.loose.length && plan.tables.length >= 2 && !plan.joins.length){ plan.tCross = t; t += 1800*s; }
+  plan.joins.forEach(j=>{ j.tCable = t; t += 420*s; j.tRows = t; const n = Math.min(j.verdict.pairs.length, 60); t += 400*s + n*18*s; j.tBadge = t; t += 650*s; });
+  if (plan.loose.length && plan.joins.length){ plan.tLoose = t; t += 900*s; }
+  if (plan.filters.length && plan.final){ plan.tFilter = t; t += 700*s; }
+  plan.tDone = t; plan.sounded = new Set();
+}
+function run(){
+  if (!db) return;
+  const sql = $("sql").value;
+  const p = parseQuery(sql);
+  let res = null, err = null;
+  try { res = db.exec(sql); } catch(e){ err = e.message; }
+  /* result table */
+  if (err) $("out").innerHTML = `<div class="err">${T.sqlErr}<p>${esc(err)}</p></div>`;
+  else if (!res || !res.length) $("out").innerHTML = `<p class="note">${T.zero}</p>`;
+  else $("out").innerHTML = res.map(r=>`<div class="result-meta">${T.rows(r.values.length)}</div><div class="tablebox"><table><thead><tr>${r.columns.map(c=>`<th>${esc(c)}</th>`).join("")}</tr></thead><tbody>${r.values.map(v=>`<tr>${v.map(x=> x===null ? `<td>NULL</td>` : `<td${typeof x==="number"?' class="num"':""}>${esc(fmt(x))}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`).join("");
+  if (!p || !p.tables.length || !p.tables.every(t=>SCHEMA[t.name])){ bd.plan = null; $("caption").textContent = err ? T.capError : T.capNoTables; $("verdicts").innerHTML = `<p class="note">${err ? esc(err) : T.capNoTables}</p>`; return; }
+  const plan = buildPlan(p); if (err) plan.error = err;
+  bd.plan = plan; layout(); schedule(plan); syncChips(p);
+  renderVerdicts(plan); sfx.plug();
+}
+
+/* ---------- feedback panel ---------- */
+function renderVerdicts(plan){
+  const L = [];
+  L.push(`<div class="v info"><span class="mark">${plan.tables.length}</span><div><b>FROM ${plan.tables.map(t=>t.alias === t.name ? t.name : `${t.name} ${t.alias}`).join(", ")}</b><p>${T.fromLine(plan.tables.length, plan.crossPairs)}</p></div></div>`);
+  if (!plan.joins.length && plan.tables.length >= 2) L.push(`<div class="v warn"><span class="mark">⚠</span><div><b>${T.noRule}</b><p>${T.noRuleWhy(plan.crossPairs)}</p></div></div>`);
+  plan.joins.forEach(j=>{ const v = j.verdict, mark = v.kind === "ok" ? "✓" : v.kind === "warn" ? "⚠" : "✗";
+    L.push(`<div class="v ${v.kind}"><span class="mark">${mark}</span><div><b><span class="sw" style="background:${j.col}"></span>${esc(j.text)}${v.rel ? `<span class="rel">${v.rel}</span>` : ""}</b><p>${v.why}</p></div></div>`); });
+  if (plan.loose.length && plan.joins.length) L.push(`<div class="v warn"><span class="mark">⚠</span><div><b>${plan.loose.map(t=>t.name).join(", ")}</b><p>${T.looseWhy(plan.loose.map(t=>t.name).join(", "))}</p></div></div>`);
+  if (plan.via) L.push(`<div class="v ok"><span class="mark">∞</span><div><b>${plan.via.X.name} ↔ ${plan.via.Y.name}<span class="rel">N : N</span></b><p>${T.viaWhy(plan.via.X.name, plan.via.Y.name, plan.via.via.name)}</p></div></div>`);
+  if (plan.filters.length) L.push(`<div class="v info"><span class="mark">⌕</span><div><b>${esc(plan.filters.join(" AND "))}</b><p>${T.filterWhy(plan.resultRows)}</p></div></div>`);
+  if (plan.error) L.push(`<div class="v bad"><span class="mark">✗</span><div><b>${T.sqlErr}</b><p>${esc(plan.error)}</p></div></div>`);
+  $("verdicts").innerHTML = L.join("");
+}
+
+/* ---------- drawing ---------- */
+function rowText(card, k){
+  const S = card.S, cols = LABELCOLS[card.t.name] || S.cols.map(c=>c.name).slice(0,3);
+  return cols.map(n=>{ const i = S.cols.findIndex(c=>c.name === n); return i >= 0 ? fmt(S.rows[k][i]) : ""; }).join(" · ");
+}
+function roundRect(g, x, y, w, h, r){ g.beginPath(); g.roundRect ? g.roundRect(x,y,w,h,r) : g.rect(x,y,w,h); }
+function cable(g, x1, y1, x2, y2, prog, col, width, dash){
+  const cx = (x1 + x2)/2;
+  g.save(); g.strokeStyle = col; g.lineWidth = width; g.lineCap = "round"; if (dash) g.setLineDash(dash);
+  if (prog < 1){ /* approximate partial bezier by sampling */
+    g.beginPath(); for (let i=0;i<=40;i++){ const u = i/40*prog, x = bez(x1,cx,cx,x2,u), y = bez(y1,y1,y2,y2,u); i ? g.lineTo(x,y) : g.moveTo(x,y); } g.stroke(); }
+  else { g.beginPath(); g.moveTo(x1,y1); g.bezierCurveTo(cx,y1,cx,y2,x2,y2); g.stroke(); }
+  g.restore();
+}
+const bez = (a,b,c,d,u)=> (1-u)**3*a + 3*(1-u)**2*u*b + 3*(1-u)*u*u*c + u**3*d;
+function rowState(plan, card, k, t){
+  /* 0 idle, 1 matched by some finished join, 2 in final result, -1 dimmed */
+  const rid = card.S.rowids[k]; let matched = false, any = false;
+  for (const j of plan.joins){ if (t < j.tRows) continue; if (j.a === card.t || j.b === card.t){ any = true; const side = j.a === card.t ? 0 : 1; if (j.verdict.pairs.some(p=>p[side] === rid)) matched = true; } }
+  if (plan.tFilter && t >= plan.tFilter && plan.final){ const idx = plan.tables.indexOf(card.t); return plan.final[idx].has(rid) ? 2 : -1; }
+  if (any) return matched ? 1 : -1;
+  return 0;
+}
+function frame(t){
+  requestAnimationFrame(frame);
+  if (document.hidden || !bd.W) return;
+  const g = bd.ctx, W = bd.W, H = bd.H;
+  g.clearRect(0,0,W,H);
+  /* stage-floor grid */
+  g.save(); g.strokeStyle = "rgba(255,255,255,.04)"; g.lineWidth = 1; for (let x=0;x<W;x+=32){ g.beginPath(); g.moveTo(x,0); g.lineTo(x,H); g.stroke(); } for (let y=0;y<H;y+=32){ g.beginPath(); g.moveTo(0,y); g.lineTo(W,y); g.stroke(); } g.restore();
+  const plan = bd.plan;
+  if (!plan){ g.fillStyle = "rgba(243,238,251,.55)"; g.font = `600 ${Math.round(clamp(W/40,14,24))}px 'Atkinson Hyperlegible', sans-serif`; g.textAlign = "center"; g.textBaseline = "middle"; g.fillText(T.boardIdle, W/2, H/2); return; }
+  const s = SL(), ein = clamp((t - plan.tIn)/(400*s), 0, 1);
+  const hover = bd.hover;
+  /* cross-product phase: faint lines from every row to every row of the neighbour */
+  if (plan.tCross && t >= plan.tCross && t < plan.tCross + 1800*s){
+    const k = clamp((t - plan.tCross)/(1800*s), 0, 1), a = Math.sin(k*Math.PI)*.12;
+    for (let i=0;i<bd.cards.length-1;i++){ const A = bd.cards[i], B = bd.cards[i+1]; g.save(); g.globalAlpha = a; g.strokeStyle = "#ffffff"; g.lineWidth = 1;
+      const step = Math.max(1, Math.round(A.S.rows.length*B.S.rows.length/400));
+      let n = 0; for (let ra=0; ra<A.S.rows.length; ra++) for (let rb=0; rb<B.S.rows.length; rb++){ if ((n++ % step) !== 0) continue; g.beginPath(); g.moveTo(A.x+A.w, A.rowY(ra)); g.lineTo(B.x, B.rowY(rb)); g.stroke(); }
+      g.restore(); }
+  }
+  /* cards */
+  bd.topLabels = [];
+  bd.cards.forEach((card, ci)=>{
+    const S = card.S, x = card.x, y = card.y + (1-ein)*24, w = card.w, h = card.h;
+    g.save(); g.globalAlpha = ein;
+    roundRect(g, x, y, w, h, 12); g.fillStyle = "#17112f"; g.fill(); g.strokeStyle = "#3a2d63"; g.lineWidth = 1.5; g.stroke();
+    /* header */
+    roundRect(g, x, y, w, card.head, 12); g.fillStyle = "#231a45"; g.fill();
+    g.fillStyle = "#fff"; g.font = `800 ${Math.round(clamp(w/9,14,22))}px 'Bricolage Grotesque', sans-serif`; g.textAlign = "left"; g.textBaseline = "middle";
+    g.fillText(card.t.name, x + 12, y + card.head/2 - 2);
+    const narrow = w < 250;
+    if (card.t.alias !== card.t.name && !narrow){ g.font = `600 12px 'JetBrains Mono', monospace`; g.fillStyle = "#ffd166"; g.fillText(`${T.alias} ${card.t.alias}`, x + 12 + g.measureText(card.t.name).width*1.8 + 10, y + card.head/2 - 1); }
+    g.font = `600 11px 'JetBrains Mono', monospace`; g.fillStyle = "#b3a8cc"; g.textAlign = "right"; if (!narrow) g.fillText(T.rowsN(S.rows.length), x + w - 10, y + card.head/2 - 1);
+    /* column header */
+    const per = (w - 16)/S.cols.length; g.textAlign = "center"; g.textBaseline = "middle";
+    /* joined columns are placed first and drawn later, on top of their cables; the others only where they fit */
+    const labs = S.cols.map((c,k)=>{ const cx = x + 8 + per*k + per/2, cy = y + card.head + card.colh/2;
+      const j = plan.joins.find(j=> (j.a === card.t && j.ca.toLowerCase() === c.name.toLowerCase()) || (j.b === card.t && j.cb.toLowerCase() === c.name.toLowerCase()));
+      const fs = Math.round(j ? clamp(per/(c.name.length*.62), 9, 12) : clamp(per/(c.name.length*.62), 8, 12)), font = `${j ? "700" : "500"} ${fs}px 'JetBrains Mono', monospace`;
+      g.font = font; const tw = g.measureText(c.name).width; return { c, j, cx, cy, font, tw, fs }; });
+    const taken = [];
+    labs.filter(L=>L.j).forEach(L=>{ L.lx = clamp(L.cx, x + 6 + L.tw/2, x + w - 6 - L.tw/2); taken.push([L.lx - L.tw/2 - 6, L.lx + L.tw/2 + 6]);
+      bd.topLabels.push({ text: L.c.name, x: L.lx, y: L.cy, font: L.font, col: L.j.col, w: L.tw, h: L.fs + 6, alpha: ein }); });
+    labs.filter(L=>!L.j).forEach(L=>{ if (per < L.c.name.length*5) return; const a = L.cx - L.tw/2, b = L.cx + L.tw/2;
+      if (taken.some(([p,q])=> a < q && b > p)) return; taken.push([a - 4, b + 4]);
+      g.font = L.font; g.fillStyle = "#8f84ad"; g.fillText(L.c.name, L.cx, L.cy); });
+    labs.filter(L=>L.j).forEach(L=>{ g.beginPath(); g.arc(L.cx, y + card.head + card.colh + 2, 3.5, 0, 6.283); g.fillStyle = L.j.col; g.fill(); });
+    /* rows */
+    const fs = clamp(card.rh*.72, 7, 13); g.font = `500 ${Math.round(fs)}px 'JetBrains Mono', monospace`; g.textAlign = "left";
+    S.rows.forEach((r,k)=>{
+      const ry = card.rowY(k) + (1-ein)*24, st = rowState(plan, card, k, t);
+      const isHover = hover && hover.card === card && hover.k === k, linked = hover && hover.linked.has(card.t.name + ":" + S.rowids[k]);
+      let bg = "rgba(255,255,255,.03)", fg = "#d9d0ee", al = 1;
+      if (st === -1){ al = .28; } if (st === 1){ bg = "rgba(255,255,255,.08)"; fg = "#fff"; } if (st === 2){ bg = "rgba(184,255,92,.18)"; fg = "#eaffd0"; }
+      if (isHover || linked){ bg = "rgba(255,209,102,.35)"; fg = "#fff"; al = 1; }
+      g.save(); g.globalAlpha = al; g.fillStyle = bg; roundRect(g, x + 6, ry - card.rh/2 + 1, w - 12, card.rh - 2, 3); g.fill();
+      if (card.rh >= 10){ g.fillStyle = fg; let txt = rowText(card, k); while (g.measureText(txt).width > w - 20 && txt.length > 3) txt = txt.slice(0,-2); if (txt !== rowText(card, k)) txt = txt.trimEnd() + "…"; g.fillText(txt, x + 10, ry + 0.5); }
+      g.restore(); });
+    g.restore();
+  });
+  /* loose tables: dashed 'all pairs' cable to the neighbour */
+  if (plan.tLoose && t >= plan.tLoose){ plan.loose.forEach(lt=>{ const c = bd.cardOf.get(lt), i = bd.cards.indexOf(c), nb = bd.cards[i-1] || bd.cards[i+1]; if (!nb) return;
+      const k = clamp((t - plan.tLoose)/(500*s), 0, 1); cable(g, nb.x + (nb.x < c.x ? nb.w : 0), nb.y + nb.head/2, c.x + (nb.x < c.x ? 0 : c.w), c.y + c.head/2, k, "#ffb15c", 3, [8,8]);
+      if (k >= 1) badge(g, (nb.x + nb.w/2 + c.x + c.w/2)/2, Math.min(nb.y, c.y) - 2, `⚠ ${T.allPairs}`, "#ffb15c"); }); }
+  /* joins: cable between column anchors, row lines, badge */
+  plan.joins.forEach((j, ji)=>{
+    if (t < j.tCable) return;
+    const A = bd.cardOf.get(j.a), B = bd.cardOf.get(j.b); if (!A || !B) return;
+    const left = A.x < B.x ? A : B, right = left === A ? B : A, leftCol = left === A ? j.ca : j.cb, rightCol = left === A ? j.cb : j.ca;
+    const ax = left.colX[leftCol.toLowerCase()] ?? left.x + left.w/2, bx = right.colX[rightCol.toLowerCase()] ?? right.x + right.w/2;
+    const ay = left.y + left.head + left.colh + 2, by = right.y + right.head + right.colh + 2;
+    const kc = clamp((t - j.tCable)/(420*s), 0, 1), v = j.verdict, col = v.kind === "bad" ? "#ff7a7a" : j.col;
+    /* cable rises above the cards and drops to the other column */
+    const topY = Math.min(left.y, right.y) - 6;
+    g.save(); g.strokeStyle = col; g.lineWidth = 4; g.lineCap = "round"; g.globalAlpha = v.kind === "bad" ? .8 : 1;
+    const pts = [[ax, ay],[ax, topY],[bx, topY],[bx, by]]; let total = 0; for (let i=1;i<4;i++) total += Math.hypot(pts[i][0]-pts[i-1][0], pts[i][1]-pts[i-1][1]);
+    let left_ = total*kc; g.beginPath(); g.moveTo(...pts[0]);
+    for (let i=1;i<4 && left_>0;i++){ const [x0,y0] = pts[i-1], [x1,y1] = pts[i], seg = Math.hypot(x1-x0,y1-y0), f = Math.min(1, left_/seg); g.lineTo(x0+(x1-x0)*f, y0+(y1-y0)*f); left_ -= seg; }
+    g.stroke(); g.restore();
+    if (kc >= 1 && !plan.sounded.has("c"+ji)){ plan.sounded.add("c"+ji); sfx.plug(); }
+    /* row lines */
+    if (t >= j.tRows){
+      const pairs = v.pairs, n = pairs.length, per = n ? Math.max(6*s, (Math.min(n,60)*18*s + 400*s)/n) : 0;
+      g.save(); g.lineWidth = 1.4; g.strokeStyle = j.col;
+      pairs.forEach((p, pi)=>{
+        const kr = clamp((t - j.tRows - pi*per)/(300*s), 0, 1); if (kr <= 0) return;
+        const ka = A.S.rowids.indexOf(p[0]), kb = B.S.rowids.indexOf(p[1]); if (ka < 0 || kb < 0) return;
+        const x1 = A.x < B.x ? A.x + A.w - 4 : A.x + 4, x2 = A.x < B.x ? B.x + 4 : B.x + B.w - 4;
+        const hl = hover && (hover.linked.has(A.t.name+":"+p[0]) && hover.linked.has(B.t.name+":"+p[1]));
+        g.globalAlpha = hover ? (hl ? 1 : .12) : .75; g.lineWidth = hl ? 2.6 : 1.4; g.strokeStyle = hl ? "#ffd166" : j.col;
+        cable(g, x1, A.rowY(ka), x2, B.rowY(kb), kr, g.strokeStyle, g.lineWidth);
+        if (kr >= 1 && kr < 1.05 && pi % 3 === 0 && !plan.sounded.has(`r${ji}_${pi}`)){ plan.sounded.add(`r${ji}_${pi}`); sfx.tick(); }
+      });
+      g.restore();
+    }
+    /* badge */
+    if (t >= j.tBadge){
+      const kb = clamp((t - j.tBadge)/(280*s), 0, 1), sc = 1 + Math.sin(kb*Math.PI)*.3;
+      const label = v.kind === "ok" ? `✓ ${v.rel} · ${T.pairsN(v.pairs.length)}` : v.kind === "warn" ? `⚠ ${v.rel} · ${T.accident}` : `✗ ${T.noMatch}`;
+      badge(g, (ax + bx)/2, topY - 10, label, col, sc, kb);
+      if (!plan.sounded.has("b"+ji)){ plan.sounded.add("b"+ji); (v.kind === "ok" ? sfx.good : v.kind === "warn" ? sfx.warn : sfx.bad)(); }
+    }
+  });
+  /* joined column names sit on top of their cables, on a small plate */
+  bd.topLabels.forEach(L=>{ g.save(); g.globalAlpha = L.alpha; roundRect(g, L.x - L.w/2 - 5, L.y - L.h/2, L.w + 10, L.h, 5); g.fillStyle = "#17112f"; g.fill(); g.strokeStyle = L.col; g.lineWidth = 1.5; g.stroke();
+    g.font = L.font; g.fillStyle = L.col; g.textAlign = "center"; g.textBaseline = "middle"; g.fillText(L.text, L.x, L.y + .5); g.restore(); });
+  /* N:N summary */
+  if (plan.via && t >= plan.tDone){ const X = bd.cardOf.get(plan.via.X), Y = bd.cardOf.get(plan.via.Y); if (X && Y){ const k = clamp((t - plan.tDone)/(400*s), 0, 1);
+      badge(g, (X.x + X.w/2 + Y.x + Y.w/2)/2, H - 42, `∞ ${plan.via.X.name} ↔ ${plan.via.Y.name}: N : N`, "#b8ff5c", 1, k); } }
+  /* result badge */
+  if (t >= plan.tDone && plan.final && !plan.error){ const k = clamp((t - plan.tDone)/(300*s), 0, 1); badge(g, W/2, H - 14, `${T.resultN(plan.resultRows)}`, "#b8ff5c", 1, k); }
+  /* hover tooltip */
+  if (hover){ const txt = hover.full; g.save(); g.font = `600 12px 'JetBrains Mono', monospace`; const tw = g.measureText(txt).width + 16; let tx = clamp(bd.mouse.x + 14, 4, W - tw - 4), ty = clamp(bd.mouse.y - 30, 4, H - 26);
+    roundRect(g, tx, ty, tw, 22, 6); g.fillStyle = "rgba(0,0,0,.85)"; g.fill(); g.fillStyle = "#ffd166"; g.textAlign = "left"; g.textBaseline = "middle"; g.fillText(txt, tx + 8, ty + 11); g.restore(); }
+  updateCaption(t);
+}
+function badge(g, cx, cy, text, col, sc=1, alpha=1){
+  g.save(); g.globalAlpha = alpha; g.translate(cx, cy); g.scale(sc, sc);
+  g.font = `800 ${Math.round(clamp(bd.W/70, 11, 16))}px 'Atkinson Hyperlegible', sans-serif`; g.textAlign = "center"; g.textBaseline = "middle";
+  const tw = g.measureText(text).width + 18; roundRect(g, -tw/2, -12, tw, 24, 12); g.fillStyle = "rgba(0,0,0,.72)"; g.fill(); g.strokeStyle = col; g.lineWidth = 2; g.stroke();
+  g.fillStyle = col; g.fillText(text, 0, 1); g.restore();
+}
+function updateCaption(t){
+  const plan = bd.plan; if (!plan) return;
+  const parts = [`<span class="st">FROM: ${plan.tables.length} ${T.tablesWord}</span>`];
+  if (plan.tCross) parts.push(`<span class="st ${t >= plan.tCross ? "warn" : "todo"}">${T.capCross(plan.crossPairs)}</span>`);
+  plan.joins.forEach(j=>{ const v = j.verdict, done = t >= j.tBadge, cls = !done ? "todo" : v.kind; const txt = done ? `${v.kind === "ok" ? "✓" : v.kind === "warn" ? "⚠" : "✗"} ${j.text}${v.rel ? "\u00a0→ " + v.rel.replace(/ /g, "\u00a0") : ""}` : j.text; parts.push(`<span class="st ${cls}">${esc(txt)}</span>`); });
+  if (plan.tLoose) parts.push(`<span class="st ${t >= plan.tLoose ? "warn" : "todo"}">${T.capLoose(plan.loose.map(x=>x.name).join(", "))}</span>`);
+  if (plan.tFilter) parts.push(`<span class="st ${t >= plan.tFilter ? "ok" : "todo"}">WHERE: ${esc(plan.filters.join(" AND "))}</span>`);
+  if (plan.final && !plan.error) parts.push(`<span class="st ${t >= plan.tDone ? "new" : "todo"}">${T.resultN(plan.resultRows)}</span>`);
+  const html = parts.join('<span class="arrow">→</span>'); if (html !== bd.capHtml){ bd.capHtml = html; $("caption").innerHTML = html; }
+}
+/* hover: which row is under the mouse, and which rows are linked to it */
+bd.c.addEventListener("mousemove", e=>{
+  const r = bd.c.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top; bd.mouse = { x, y }; bd.hover = null;
+  if (!bd.plan) return;
+  for (const card of bd.cards){ if (x < card.x || x > card.x + card.w) continue; const k = Math.floor((y - (card.y + card.head + card.colh + 8))/card.rh); if (k < 0 || k >= card.S.rows.length) continue;
+    const rid = card.S.rowids[k], linked = new Set([card.t.name + ":" + rid]);
+    /* follow every finished join from this row */
+    let grew = true; while (grew){ grew = false; for (const j of bd.plan.joins){ if (performance.now() < j.tRows) continue; j.verdict.pairs.forEach(p=>{ const ka = j.a.name + ":" + p[0], kb = j.b.name + ":" + p[1]; if (linked.has(ka) && !linked.has(kb)){ linked.add(kb); grew = true; } if (linked.has(kb) && !linked.has(ka)){ linked.add(ka); grew = true; } }); } }
+    bd.hover = { card, k, linked, full: card.S.cols.map((c,i)=>`${c.name}=${fmt(card.S.rows[k][i])}`).join("  ") }; bd.c.style.cursor = "crosshair"; return; }
+  bd.c.style.cursor = "";
+});
+bd.c.addEventListener("mouseleave", ()=>{ bd.hover = null; });
+
+/* ---------- pickers ---------- */
+function tablesInSql(){ const p = parseQuery($("sql").value); return p ? p.tables : []; }
+function renderTableChips(){
+  const on = new Set(tablesInSql().map(t=>t.name));
+  $("tables").innerHTML = Object.keys(SCHEMA).map(n=>`<button type="button" class="chip" data-t="${n}" aria-pressed="${on.has(n)}">${n} <span class="n">${SCHEMA[n].rows.length}</span></button>`).join("");
+  const opts = Object.keys(SCHEMA).map(n=>`<option value="${n}">${n}</option>`).join("");
+  ["ta","tb"].forEach(id=>{ const cur = $(id).value; $(id).innerHTML = opts; if (cur) $(id).value = cur; });
+  if (!$("ta").value || $("ta").value === $("tb").value){ const ks = Object.keys(SCHEMA); $("ta").value = ks[2] || ks[0]; $("tb").value = ks[0]; }
+  fillCols();
+}
+function fillCols(){ [["ta","ca"],["tb","cb"]].forEach(([t,c])=>{ const S = SCHEMA[$(t).value]; const cur = $(c).value; $(c).innerHTML = S ? S.cols.map(x=>`<option value="${x.name}">${x.name}</option>`).join("") : ""; if (cur && S && S.cols.some(x=>x.name === cur)) $(c).value = cur; else if (S){ const fk = S.cols.find(x=>/_id$/.test(x.name)); $(c).value = (t === "ta" && fk) ? fk.name : "id"; } }); }
+$("ta").onchange = $("tb").onchange = fillCols;
+function syncChips(p){ const on = new Set(p.tables.map(t=>t.name)); document.querySelectorAll("#tables .chip").forEach(b=> b.setAttribute("aria-pressed", on.has(b.dataset.t))); }
+$("tables").addEventListener("click", e=>{
+  const b = e.target.closest(".chip"); if (!b) return;
+  const p = parseQuery($("sql").value) || { tables: [], joins: [], filters: [], cl: {} };
+  let tables = p.tables.slice();
+  if (tables.some(t=>t.name === b.dataset.t)) tables = tables.filter(t=>t.name !== b.dataset.t); else tables.push({ name: b.dataset.t, alias: ALIAS[b.dataset.t] || b.dataset.t });
+  const names = new Set(tables.map(t=>t.alias.toLowerCase()).concat(tables.map(t=>t.name.toLowerCase())));
+  const keep = (p.joins || []).filter(j=>names.has(j.a.alias.toLowerCase()) && names.has(j.b.alias.toLowerCase())).map(j=>j.text).concat((p.filters || []).filter(f=>{ const refs = f.match(/\b([A-Za-z_]\w*)\./g) || []; return refs.every(r=>names.has(r.slice(0,-1).toLowerCase())); }));
+  writeSql(tables, keep); run();
+});
+function writeSql(tables, conds){
+  if (!tables.length){ $("sql").value = ""; return; }
+  $("sql").value = `SELECT *\nFROM ${tables.map(t=>t.alias === t.name ? t.name : `${t.name} ${t.alias}`).join(", ")}` + (conds.length ? `\nWHERE ${conds.join("\n  AND ")}` : "") + ";";
+}
+$("connect").onclick = ()=>{
+  const p = parseQuery($("sql").value) || { tables: [], joins: [], filters: [], cl: {} };
+  let tables = p.tables.slice();
+  [$("ta").value, $("tb").value].forEach(n=>{ if (!tables.some(t=>t.name === n)) tables.push({ name: n, alias: ALIAS[n] || n }); });
+  const A = tables.find(t=>t.name === $("ta").value), B = tables.find(t=>t.name === $("tb").value);
+  const cond = `${A.alias}.${$("ca").value} = ${B.alias}.${$("cb").value}`;
+  const conds = p.joins.map(j=>j.text).concat(p.filters); if (!conds.includes(cond)) conds.push(cond);
+  writeSql(tables, conds); run();
+};
+$("presets").innerHTML = PRESETS.map((p,k)=>`<button type="button" class="preset${p.bad ? " bad" : ""}" data-k="${k}">${esc(p.label)}</button>`).join("");
+$("presets").addEventListener("click", e=>{ const b = e.target.closest(".preset"); if (!b) return; document.querySelectorAll(".preset").forEach(x=>x.classList.toggle("on", x === b)); $("sql").value = PRESETS[+b.dataset.k].sql; run(); });
+$("run").onclick = run;
+$("sql").addEventListener("keydown", e=>{ if ((e.ctrlKey || e.metaKey) && e.key === "Enter"){ e.preventDefault(); run(); } });
+
+/* ---------- boot ---------- */
+if (window.ResizeObserver) new ResizeObserver(size).observe(bd.c); else addEventListener("resize", size);
+size(); requestAnimationFrame(frame);
+$("sql").value = PRESETS[1].sql;
+if (typeof initSqlJs !== "function"){ $("verdicts").innerHTML = `<div class="err">${T.engFail}</div>`; }
+else initSqlJs().then(s=>{ SQL = s; db = new SQL.Database(); db.run(SEED); loadSchema(); renderTableChips(); $("verdicts").innerHTML = `<p class="note">${T.ready}</p>`; $("caption").textContent = T.idle; })
+  .catch(e=>{ $("verdicts").innerHTML = `<div class="err">${T.engFail}<p>${esc(e.message)}</p></div>`; });
+</script>
+<script src="../../nav.js" defer></script>
+</body>
+</html>
