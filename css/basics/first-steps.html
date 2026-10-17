@@ -8,7 +8,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;500&display=swap">
 <style>
 /* Layout: lesson steps on top; left column = explanation, live controls, code editor; right column = rendered result (sticky on wide screens). */
 :root {
@@ -178,13 +178,32 @@ textarea.layer::selection { background: rgba(124, 146, 255, .38); color: transpa
 .bm .bm-p { background: var(--bm-p); color: var(--bm-p-fg); }
 .bm .bm-c { background: var(--bm-c); color: var(--bm-c-fg); padding: 14px 10px; text-align: center; font: 500 12px var(--mono); }
 .diagram p { margin: 10px 0 0; font-size: 13px; color: var(--muted); }
+
+/* ---- site skin: the same chalkboard, chalk and two typefaces as the rest of digikult ---- */
+:root:root:root {
+  --bg: #22362f; --surface: #1a2a24; --surface-2: #2b4339; --fg: #efeee6; --muted: #b4c4b8; --line: rgba(239,238,230,.16);
+  --accent: #f2d264; --accent-fg: #1a2a24; --accent-soft: rgba(242,210,100,.16);
+  --t-sel: #f0a3b8; --t-prop: #9cc8e8; --t-val: #f2d264;
+  --code-bg: #1f2a26; --code-fg: #e9efe9; --code-line: #2f3f39;
+  --syn-sel: #f0a3b8; --syn-prop: #9cc8e8; --syn-val: #f2d264; --syn-pun: #6f857c;
+  --bm-m: #FFE2C2; --bm-m-fg: #6B3600; --bm-b: #efeee6; --bm-b-fg: #1a2a24; --bm-p: #CDEFD9; --bm-p-fg: #0B5B3A; --bm-c: #CFE0FF; --bm-c-fg: #1B3FA8;
+  --display: "Kalam", "Segoe Print", "Comic Sans MS", cursive;
+  --body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  color-scheme: dark;
+}
+.eyebrow, .step { font: 700 19px/1.2 var(--display); letter-spacing: 0; text-transform: none; color: var(--accent); }
+.ctl-title, .r-bar .lbl, .diagram h3 { font-family: var(--body); font-weight: 700; font-size: 14px; letter-spacing: 0; text-transform: none; }
+.title, .ltitle { letter-spacing: 0; }
+.anatomy, .sel-list, .controls, .editor, .result-card, .html-view, .diagram { border-radius: 4px; }
+.seg button, .mini, .tab .n { border-radius: 3px; }
+.tab { border-radius: 4px; }
 </style>
 
 </head>
 <body>
 <div class="wrap">
   <header>
-    <p class="eyebrow">Introductory CSS &middot; live lessons</p>
+    <p class="eyebrow">Web pages, CSS: live lessons</p>
     <h1 class="title">CSS First Steps</h1>
     <p class="lede">Edit the CSS and watch the page change as you type. Five short lessons cover color, text, spacing, borders and size.</p>
   </header>
