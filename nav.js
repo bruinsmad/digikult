@@ -233,6 +233,18 @@
                 },
                 files: { en: "inkscape/text/slice-shop.html" },
                 progress: { chapters: 6, keys: { en: "slice-shop-v1" } }
+              },
+              {
+                id: "band-night",
+                kind: "story",
+                minutes: 35,
+                title: { hu: "Zenekari est", en: "Band Night" },
+                desc: {
+                  hu: "Koncertplakát: betűnként színezett cím, szöveg egy hanghullámon, fellépőlista, szövegbuborék és tüskés betűk a csomópont-szerkesztővel.",
+                  en: "A concert poster: a title coloured letter by letter, text on a sound wave, a line-up, a speech bubble and spiky letters with the Node tool."
+                },
+                files: { en: "inkscape/text/band-night.html" },
+                progress: { chapters: 6, keys: { en: "band-night-v1" } }
               }
             ]
           }
