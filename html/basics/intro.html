@@ -46,7 +46,10 @@ code,pre,textarea{font-family:var(--f-mono)}
 .hero h1{margin:6px 0 8px;font:700 clamp(38px,6vw,64px)/1.05 var(--f-chalk);text-shadow:0 0 12px rgba(255,255,255,.08)}
 .hero h1 code{font:700 .62em var(--f-mono);color:var(--yellow);background:rgba(0,0,0,.2);padding:0 .25em;border-radius:6px}
 .lead{max-width:62ch;margin:0;font-size:clamp(18px,2.2vw,20px);color:var(--chalk-dim)}
-.meta{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:16px;color:var(--chalk-dim);font-size:15px}
+.meta{display:flex;flex-wrap:wrap;gap:8px 0;margin-top:16px;color:var(--chalk-dim);font-size:15px}
+.meta span{padding-right:14px;margin-right:14px;border-right:2px solid rgba(239,238,230,.18)}
+.meta span:last-child{border-right:0;margin-right:0;padding-right:0}
+@media (max-width:520px){ .meta{flex-direction:column;gap:3px} .meta span{border:0;margin:0;padding:0} }
 /* contents: numbered like the sections below, read down the columns */
 .toc{columns:3 210px;column-gap:28px;margin:24px 0 0;padding:14px 0 0;list-style:none;counter-reset:toc;border-top:2px dashed rgba(239,238,230,.16)}
 .toc li{counter-increment:toc;break-inside:avoid;padding:3px 0}
@@ -499,7 +502,7 @@ line breaks.&lt;/p&gt;
 <a class="pcard" href="../../css/basics/first-steps.html"><span class="k demo">Next lesson</span><h4>CSS First Steps</h4><p>Once the HTML is in place, on to the looks: colours, fonts, borders and spacing.</p></a>
 </div></section>
 </main>
-<footer class="end">Digital Culture · The examples run in your browser; nothing is sent anywhere.</footer>
+<footer class="end">Digital Culture. The examples run in your browser; nothing is sent anywhere.</footer>
 <script src="../../vendor/codemirror-html.js?v=4d85dc2d"></script>
 <script>
 const CFG = {"editorUrl": "../editor.html", "ui": {"preview": "Preview", "qRight": "Right!", "qWrong": "Not this one.", "xrOn": "X-ray: on", "xrOff": "X-ray: off"}, "localTpl": "This link would open the file {h}, but there's no such file here. On a real website it would be in the folder.", "scoreTpl": ["Score: {r} / {n} right. Go back over the parts marked in red.", "Score: {r} / {n} right. Nice work!"], "xray": {"src": "<h1>Paw Shelter</h1>\n<p>Saturday is <strong>adoption day</strong>!</p>\n<h2>Our animals</h2>\n<ul>\n  <li>Morzsa the dog</li>\n  <li>Cirmi the cat</li>\n</ul>\n<p><img src=\"img/pamacs.svg\" alt=\"Pamacs the rabbit\" width=\"64\"> <a href=\"#\">Write to us!</a></p>", "desc": {"h1": "the main heading, the most important one on the page.", "h2": "a subheading, one level down.", "p": "a paragraph.", "strong": "important, emphasised text (bold).", "ul": "a bulleted list.", "li": "one item of the list.", "img": "an image. It's empty: no closing tag.", "a": "a link: click it to go somewhere else."}}};
