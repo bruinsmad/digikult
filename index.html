@@ -71,10 +71,13 @@ a{color:inherit}
 .hero p{margin:22px 0 0;max-width:34ch;font-size:clamp(18px,2.1vw,21px);color:var(--chalk-dim)}
 
 /* the "where you left off" note pinned to the board */
-.note{position:relative;background:var(--paper);color:var(--paper-ink);border-radius:2px;padding:22px 22px 20px;
+.note{position:relative;background:var(--paper);color:var(--paper-ink);border-radius:2px;padding:20px 22px 20px;
   transform:rotate(1.2deg);box-shadow:0 2px 0 rgba(0,0,0,.08),0 18px 30px rgba(0,0,0,.35)}
 .note::before{content:"";position:absolute;top:-12px;left:50%;width:96px;height:24px;transform:translateX(-50%) rotate(-3deg);
   background:var(--tape);box-shadow:0 1px 2px rgba(0,0,0,.2)}
+/* the mission's own cover, the same picture as its poster on the subject page */
+.note .cover{display:block;aspect-ratio:auto;height:132px;margin:-10px -10px 16px;border-radius:2px;background:#22362f;overflow:hidden}
+.note .cover svg,.note .cover img{width:100%;height:100%;object-fit:cover}
 .note .who{font:700 22px/1.2 var(--f-chalk);color:#8a6a10;margin:0}
 .note h2{margin:6px 0 4px;font:700 26px/1.15 var(--f-body)}
 .note .sub{margin:0;color:var(--paper-muted);font-size:15px}
@@ -314,6 +317,7 @@ body.subject .hero{display:none}
   .subjects>.slate:last-child:nth-child(odd){grid-column:1/-1;justify-self:center;width:calc(50% - 17px)}
 }
 @media (max-width:520px){
+  .note .cover{height:104px}
   .onward{margin-left:0}
   .onward a.back{margin-left:0}
   .topic-head{grid-template-columns:1fr}
@@ -750,7 +754,7 @@ function puliSvg(){
       const { p, tp, pr } = next;
       const href = D.url(pr && pr.started && pr.lang ? p.files[pr.lang] : D.fileFor(p));
       const doneN = pr ? pr.done : 0, total = pr ? pr.total : 0;
-      $("#note").innerHTML = `<p class="who">${inProg ? T.left : T.start}</p>
+      $("#note").innerHTML = `<span class="cover" aria-hidden="true">${cover(p, tp)}</span><p class="who">${inProg ? T.left : T.start}</p>
         <h2>${esc(D.t(p.title))}</h2>
         <span class="kind">${esc(D.t(tp.title).split(" – ").pop())}</span>
         ${inProg ? tally(doneN, total, "#b8860b") : ""}
