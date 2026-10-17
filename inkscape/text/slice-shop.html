@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Slice Shop – Inkscape</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap">
+<link rel="stylesheet" href="../mission.css">
+<style>:root{--accent:#ff8a65}</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+window.MISSION = {
+  key: "slice-shop-v1",
+  title: "The Slice Shop",
+  story: "A new pizza place is opening next to the school, and the owner needs a flyer by Friday. You are the designer – and this time the star is text.",
+  file: "surname_sliceshop",
+  poster: "../img/slice-shop/poster.png",
+  pdf: "../pdf/slice-shop-worksheet.pdf",
+  teacherPdf: "../pdf/slice-shop-teacher.pdf",
+  saveImg: "../img/slice-shop/save.png",
+  bonusImg: "../img/slice-shop/bonus.png",
+  buildIntro: "Every text on the flyer is made a different way. Colours, fonts and sizes are up to you.",
+  rules: [
+    "<b>Text tool (the big A):</b> a <i>click</i> on the page = one line of text; a <i>drag</i> = a text box whose lines wrap.",
+    "<b>Font, style, size:</b> select the text, then change them in the tool controls bar at the top.",
+    "<b>Colour:</b> Selector, click the text, click a swatch in the palette. Outline: <span class='menu'>Object ▸ Fill and Stroke…</span>, <i>Stroke paint</i> tab.",
+    "<b>Several objects:</b> click the first, hold <span class='key'>Shift</span> and click the others. The status bar counts them."
+  ],
+  elements: [
+    ["Background and pizza", "Rectangle and Ellipse tools", "warm-up"],
+    ["Title SLICE SHOP", "click with the Text tool, bold font, fill + stroke", "regular text"],
+    ["HOT * FRESH * FAST ring", "circle + text, circle set to no paint", "Text ▸ Put on Path"],
+    ["Opening hours", "drag a box with the Text tool", "text box"],
+    ["FREE SLICE badge", "red circle + text, centred", "Text ▸ Flow into Frame"],
+    ["-10% coupon", "text turned into a shape, cut out of a rectangle", "Object to Path + Difference"]
+  ],
+  steps: [
+    { title: "Background and pizza", img: "../img/slice-shop/step1.png",
+      alt: "Step 1: cream rectangle over the page, orange crust circle with a yellow circle on top, small dark red pepperoni circles",
+      lead: "A quick warm-up with shapes you know – the text is the real job today.",
+      note: "Leave the top of the page free for the title and the bottom for the text box and the coupon.",
+      stuck: ["The rectangle has an outline: <span class='menu'>Object ▸ Fill and Stroke…</span> → <i>Stroke paint</i> tab → click the <b>X</b>."] },
+    { title: "The title", img: "../img/slice-shop/step2.png",
+      alt: "Step 2: click with the Text tool and type SLICE SHOP, choose a bold font and size 72 in the tool controls bar, click red, add a dark stroke",
+      lead: "Click with the Text tool = one line of text. Then make it big, bold and red with a dark outline.",
+      note: "No Impact or Arial Black? Pick any font and choose <b>Bold</b> or <b>Black</b> in the style box next to it.",
+      stuck: ["The font doesn't change: nothing is selected. Click the text with the Selector first, then change the font.",
+              "You want to fix a typo: pick the Text tool and click into the letters."] },
+    { title: "Text round the pizza", img: "../img/slice-shop/step3.png",
+      alt: "Step 3: a circle bigger than the pizza, a line of text HOT * FRESH * FAST, both selected, Text ▸ Put on Path, the circle set to no paint",
+      lead: "<span class='menu'>Text ▸ Put on Path</span> makes the text follow a shape – here a circle.",
+      stuck: ["Nothing happens: exactly 2 objects must be selected – the circle and the text. Check the status bar.",
+              "The text stops halfway: it is longer than the circle. Make the font size smaller.",
+              "A gap is left: click into the text with the Text tool and type more words.",
+              "Still an outline after clicking X: <span class='menu'>Object ▸ Fill and Stroke…</span> → <i>Stroke paint</i> → <b>X</b>."] },
+    { title: "A text box", img: "../img/slice-shop/step4.png",
+      alt: "Step 4: drag a box with the Text tool, type the opening hours, the lines wrap; a red frame means the text does not fit, drag the corner handle",
+      lead: "Drag instead of clicking: you get a box, and the lines wrap at its edge by themselves.",
+      note: "Press Enter only to start a new paragraph – never at the end of a line.",
+      stuck: ["You get one long line: you clicked instead of dragging. <span class='menu'>Edit ▸ Undo</span> and drag a box.",
+              "The frame is red: the text does not fit. Drag the ◇ handle at the bottom right, or make the size smaller."] },
+    { title: "Text in a circle", img: "../img/slice-shop/step5.png",
+      alt: "Step 5: red circle, text FREE SLICE for the first 50 guests, both selected, Text ▸ Flow into Frame, centre alignment and white colour",
+      lead: "<span class='menu'>Text ▸ Flow into Frame</span> pours the text into a shape. The circle stays where it is.",
+      stuck: ["The text didn't move into the circle: select BOTH, the circle and the text (2 objects), then try again.",
+              "The text sticks to the left: pick the Text tool, click into the text and press the <i>centre</i> button in the tool controls bar."] },
+    { title: "Cut-out coupon", img: "../img/slice-shop/step6.png",
+      alt: "Step 6: red rectangle, text -10% on it, Path ▸ Object to Path, Shift-click the rectangle, Path ▸ Difference cuts the letters out",
+      lead: "Turn the text into a shape with <span class='menu'>Path ▸ Object to Path</span>, then cut it out with <span class='menu'>Path ▸ Difference</span> – like the craters on the Cheese Moon.",
+      note: "Check the spelling first: after Object to Path the letters can't be edited as text any more.",
+      stuck: ["The rectangle vanished instead: the text was underneath. <span class='menu'>Edit ▸ Undo</span>, click the text, <span class='menu'>Object ▸ Raise to Top</span>, try again.",
+              "Difference is greyed out: exactly 2 objects must be selected – the text and the rectangle."] }
+  ],
+  checklist: [
+    "Background covers the page; a pizza with crust, cheese and pepperoni",
+    "Title in a bold font, red fill and a dark stroke",
+    "HOT * FRESH * FAST runs round the pizza, no circle visible (Put on Path)",
+    "Opening hours in a text box, all text visible – no red frame",
+    "FREE SLICE text inside the red circle, centred, white (Flow into Frame)",
+    "-10% letters cut out of the coupon (Object to Path + Difference)",
+    "Both SVG and PNG saved, with your surname in the file name"
+  ],
+  bonus: [
+    ["Title shadow", "Select the title, <span class='menu'>Edit ▸ Duplicate</span>, click a dark colour, <span class='menu'>Object ▸ Lower</span>, move it a little down and right."],
+    ["NEW! burst", "Star tool, 14 corners, yellow. Type NEW!, select both → <span class='menu'>Text ▸ Flow into Frame</span>."],
+    ["Address line", "Text tool, small size, <i>Italic</i> in the style box: 12 Pizza Street, Budapest."],
+    ["Tilted coupon", "Click the coupon, click it again, drag a corner arrow to rotate it."],
+    ["Menu with prices", "A second text box: Margherita 1990 Ft, Pepperoni 2390 Ft, Veggie 2190 Ft – one per line."]
+  ]
+};
+</script>
+<script src="../mission.js"></script>
+<script src="../../nav.js" defer></script>
+</body>
+</html>
