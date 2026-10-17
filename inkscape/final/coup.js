@@ -1,17 +1,18 @@
-/* Coup! – the Inkscape final project.
-   Students answer the questions of the "command tent"; the answers deterministically produce a banner
-   (layout, colours, frame, symbol, stars, name, motto) and the guided Inkscape steps for exactly that banner.
-   Saved in this browser under KEY as {answers, locked, solved:[1..7], checks:[…], end}. The landing page reads
-   "solved" (nav.js → progress chapters 7). Everything is drawn as inline SVG – no images to download. */
+/* Coup! – the Inkscape final project (v2).
+   One question at a time; the banner stays hidden until every question is answered. The answers deterministically produce
+   a banner – layout, colours, frame, background emblem, symbol, stars, name, generated motto – and the guided Inkscape steps
+   for exactly that banner. Only the background gets exact numbers; afterwards the page is resized to the banner, and every
+   other shape is centred with Align and Distribute (relative to Page), shifted with Transform ▸ Move, or dragged by eye.
+   Saved under KEY as {answers, q, revealed, solved:[1..7], checks:[…], end}. The landing page reads "solved" (7 chapters). */
 (function () {
   "use strict";
   const KEY = "coup-v1";
-  const W = 300, H = 180;
+  const W = 300, H = 180, CX = 150, CY = 90;
   const $ = s => document.querySelector(s);
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 
-  /* ------------------------------------------------------------------ countries: flag colours */
-  const COUNTRIES = [
+  /* ------------------------------------------------------------------ data */
+    const COUNTRIES = [
     ["Albania", "#E41E20 #000000"], ["Argentina", "#74ACDF #FFFFFF #F6B40E"], ["Armenia", "#D90012 #0033A0 #F2A800"],
     ["Australia", "#012169 #FFFFFF #E4002B"], ["Austria", "#C8102E #FFFFFF"], ["Bangladesh", "#006A4E #F42A41"],
     ["Belgium", "#000000 #FDDA24 #EF3340"], ["Bhutan", "#FFD520 #FF4E12 #FFFFFF"], ["Bolivia", "#D52B1E #F9E300 #007934"],
@@ -43,19 +44,34 @@
   ].map(([n, c]) => ({ n, c: c.split(" ") }));
 
   const PRIDE = {
-    industry: { label: "Industry", sym: "gear", icon: "⚙️" },
-    farming: { label: "Farming", sym: "sun", icon: "🌾" },
-    sea: { label: "The sea", sym: "waves", icon: "🌊" },
-    mountains: { label: "Mountains", sym: "mountains", icon: "⛰️" },
-    forests: { label: "Forests", sym: "tree", icon: "🌲" },
-    science: { label: "Science", sym: "atom", icon: "⚛️" },
-    kings: { label: "Old kings & history", sym: "crown", icon: "👑" },
-    night: { label: "The night sky", sym: "crescent", icon: "🌙" },
-    freedom: { label: "Freedom", sym: "star", icon: "⭐" }
+    industry: { label: "Industry", icon: "⚙️", sym: "gear", word: "Steel" },
+    farming: { label: "Farming", icon: "🌾", sym: "sun", word: "Bread" },
+    sea: { label: "The sea", icon: "🌊", sym: "waves", word: "Salt" },
+    mountains: { label: "Mountains", icon: "⛰️", sym: "mountains", word: "Stone" },
+    forests: { label: "Forests", icon: "🌲", sym: "tree", word: "Timber" },
+    science: { label: "Science", icon: "⚛️", sym: "atom", word: "Science" },
+    kings: { label: "Old kings & history", icon: "👑", sym: "crown", word: "Glory" },
+    night: { label: "The night sky", icon: "🌙", sym: "crescent", word: "Starlight" },
+    freedom: { label: "Freedom", icon: "⭐", sym: "star", word: "Hope" }
   };
-  const MOTTOS = ["Order and Bread", "Forward, Always", "Strength in Unity", "No Going Back", "Bread, Peace, WiFi",
-    "From the Ashes", "One Land, One Voice", "Iron and Honey", "We Never Sleep", "Peace Through Paperwork"];
-  const NAMES = ["Republic of Nova", "Iron Federation", "United Provinces", "People's Union", "Grand Duchy", "Free State"];
+  const SYM_NAME = { gear: "a gear", sun: "a rising sun", waves: "a wave disc", mountains: "mountains in a round window", tree: "a pine tree",
+    atom: "an atom", crown: "a jewelled crown", crescent: "a crescent and star", star: "a star outline" };
+  const TAKEOVER = {
+    palace: { label: "A quiet palace coup at night", icon: "🌙" },
+    uprising: { label: "A people's uprising", icon: "✊" },
+    parade: { label: "Tanks at the morning parade", icon: "🎖️" },
+    lottery: { label: "You won a rigged lottery", icon: "🎟️" }
+  };
+  const SLIDERS = {
+    rule: { q: "How will you rule?", ends: ["Iron fist", "Free elections"], opts: ["Iron fist", "Strict", "Balanced", "Open", "Free elections"],
+      hints: ["One leader, one voice, daily parades.", "Rules are rules. Mostly yours.", "A council – that you chair.", "A parliament that sometimes says no.", "Real elections. You might even lose."] },
+    econ: { q: "Where does your economy lean?", ends: ["Left", "Right"], opts: ["Far left", "Left", "Centre", "Right", "Far right"],
+      hints: ["The state owns every factory.", "Workers first, big public services.", "A bit of everything.", "Business first, low taxes.", "The market decides everything."] },
+    army: { q: "How much does your power rest on the army?", ends: ["Peace", "Army"], opts: ["Pacifist", "Peaceful", "Watchful", "Strong", "Military state"],
+      hints: ["Soldiers now plant trees.", "A small army for parades.", "Ready, but quiet.", "Tanks at every celebration.", "The army IS the state."] },
+    trad: { q: "Tradition or progress?", ends: ["Tradition", "Progress"], opts: ["Old ways", "Traditional", "Balanced", "Modern", "Future first"],
+      hints: ["Like grandfather did it.", "Change slowly, if at all.", "Keep the good, change the rest.", "New ideas welcome.", "Robots, rockets, tomorrow."] }
+  };
 
   /* ------------------------------------------------------------------ colour helpers */
   const rgb = h => { h = h.replace("#", ""); return [0, 2, 4].map(i => parseInt(h.substr(i, 2), 16)); };
@@ -63,7 +79,8 @@
   const contrast = (a, b) => { const x = lum(a), y = lum(b); return (Math.max(x, y) + .05) / (Math.min(x, y) + .05); };
   const close = (a, b) => rgb(a).reduce((s, v, i) => s + Math.abs(v - rgb(b)[i]), 0) < 60;
   const WHITE = "#FFFFFF", BLACK = "#111111";
-  /* best colour on a background: a palette colour if one stands out enough (keeps the country's look), else a neutral */
+  const uniq = a => a.filter((c, i) => a.findIndex(d => close(c, d)) === i);
+  const worstC = (c, bgs) => Math.min(...bgs.map(b => contrast(b, c)));
   function best(bg, cands, palette, avoid) {
     const ok = c => !(avoid && avoid.some(a => close(a, c))) && !close(c, bg);
     const pick = list => list.filter(ok).sort((a, b) => contrast(bg, b) - contrast(bg, a))[0];
@@ -71,529 +88,543 @@
     if (fromPal && contrast(bg, fromPal) >= 2.6) return fromPal;
     const any = pick(cands);
     if (any && contrast(bg, any) >= 2.2) return any;
-    const ext = [...cands, WHITE, BLACK].filter(c => !close(c, bg)).sort((a, b) => contrast(bg, b) - contrast(bg, a))[0];
-    return ext || (lum(bg) > .4 ? BLACK : WHITE);
+    return [...cands, WHITE, BLACK].filter(c => !close(c, bg)).sort((a, b) => contrast(bg, b) - contrast(bg, a))[0] || (lum(bg) > .4 ? BLACK : WHITE);
   }
-  /* one colour that must stand out on several backgrounds: maximise the worst contrast */
   function bestMulti(bgs, cands, palette, avoid) {
     const ok = c => !(avoid && avoid.some(a => close(a, c))) && !bgs.some(b => close(c, b));
-    const worst = c => Math.min(...bgs.map(b => contrast(b, c)));
-    const pick = list => list.filter(ok).sort((a, b) => worst(b) - worst(a))[0];
+    const pick = list => list.filter(ok).sort((a, b) => worstC(b, bgs) - worstC(a, bgs))[0];
     const fromPal = pick(cands.filter(c => palette.some(p => close(p, c))));
-    if (fromPal && worst(fromPal) >= 2.6) return fromPal;
+    if (fromPal && worstC(fromPal, bgs) >= 2.6) return fromPal;
     return pick(cands) || pick([WHITE, BLACK]) || WHITE;
   }
-  const worstC = (c, bgs) => Math.min(...bgs.map(b => contrast(b, c)));
-  const uniq = a => a.filter((c, i) => a.findIndex(d => close(c, d)) === i);
   const hex6 = h => h.replace("#", "").toLowerCase();
-  /* real text width (em units) from the browser's font engine; falls back to an estimate */
   const FONT_B = "Arial Black,Impact,sans-serif", FONT_R = "Atkinson Hyperlegible,Arial,sans-serif";
   let ctx2d = null;
-  function emWidth(text, family, weight, spacingEm = 0) {
-    try {
-      ctx2d = ctx2d || document.createElement("canvas").getContext("2d");
-      ctx2d.font = `${weight} 100px ${family}`;
-      return ctx2d.measureText(text).width / 100 + spacingEm * text.length;
-    } catch (e) { return text.length * (weight >= 800 ? .95 : .62) + spacingEm * text.length; }
+  function emWidth(text, family, weight) {
+    try { ctx2d = ctx2d || document.createElement("canvas").getContext("2d"); ctx2d.font = `${weight} 100px ${family}`; return ctx2d.measureText(text).width / 100; }
+    catch (e) { return text.length * (weight >= 800 ? .95 : .62); }
   }
 
   /* ------------------------------------------------------------------ geometry helpers */
   const r1 = v => Math.round(v * 10) / 10;
+  const mm = v => String(Math.round(v));
   function starPts(cx, cy, R, ratio, n, rot = -90) {
     const p = [];
-    for (let i = 0; i < 2 * n; i++) {
-      const a = (rot + i * 180 / n) * Math.PI / 180, rr = i % 2 ? R * ratio : R;
-      p.push([cx + rr * Math.cos(a), cy + rr * Math.sin(a)]);
-    }
+    for (let i = 0; i < 2 * n; i++) { const a = (rot + i * 180 / n) * Math.PI / 180, rr = i % 2 ? R * ratio : R; p.push([cx + rr * Math.cos(a), cy + rr * Math.sin(a)]); }
     return p;
   }
-  function polyPts(cx, cy, R, n, rot = -90) {
-    const p = [];
-    for (let i = 0; i < n; i++) { const a = (rot + i * 360 / n) * Math.PI / 180; p.push([cx + R * Math.cos(a), cy + R * Math.sin(a)]); }
-    return p;
-  }
-  const ptsAttr = p => p.map(q => q.map(r1).join(",")).join(" ");
-  const bboxPts = p => { const xs = p.map(q => q[0]), ys = p.map(q => q[1]); return [Math.min(...xs), Math.min(...ys), Math.max(...xs), Math.max(...ys)]; };
-  const xywh = b => `X ${r1(b[0])}, Y ${r1(b[1])}, W ${r1(b[2] - b[0])}, H ${r1(b[3] - b[1])}`;
-  const circB = (cx, cy, r) => [cx - r, cy - r, cx + r, cy + r];
+  const P = p => p.map(q => q.map(r1).join(",")).join(" ");
+  const bb = p => { const xs = p.map(q => q[0]), ys = p.map(q => q[1]); return [Math.min(...xs), Math.min(...ys), Math.max(...xs), Math.max(...ys)]; };
+  const cb = (x, y, r) => [x - r, y - r, x + r, y + r];
+  const tri = (cx, cy, w, h) => [[cx - w / 2, cy + h / 2], [cx, cy - h / 2], [cx + w / 2, cy + h / 2]];        /* apex up */
+  const triR = (x0, cy, w, h) => [[x0, cy - h / 2], [x0 + w, cy], [x0, cy + h / 2]];                           /* apex right */
   function inPoly(x, y, p) {
     let ins = false;
-    for (let i = 0, j = p.length - 1; i < p.length; j = i++) {
-      const [xi, yi] = p[i], [xj, yj] = p[j];
-      if ((yi > y) !== (yj > y) && x < (xj - xi) * (y - yi) / (yj - yi) + xi) ins = !ins;
-    }
+    for (let i = 0, j = p.length - 1; i < p.length; j = i++) { const [xi, yi] = p[i], [xj, yj] = p[j]; if ((yi > y) !== (yj > y) && x < (xj - xi) * (y - yi) / (yj - yi) + xi) ins = !ins; }
     return ins;
   }
+  const rotPt = ([x, y], a, ox, oy) => { const t = a * Math.PI / 180, c = Math.cos(t), s = Math.sin(t); return [ox + (x - ox) * c - (y - oy) * s, oy + (x - ox) * s + (y - oy) * c]; };
+  const ellPath = (cx, cy, rx, ry) => `M${r1(cx - rx)} ${r1(cy)}a${r1(rx)} ${r1(ry)} 0 1 0 ${r1(2 * rx)} 0a${r1(rx)} ${r1(ry)} 0 1 0 ${r1(-2 * rx)} 0Z`;
 
   /* ------------------------------------------------------------------ instruction helpers */
   const T = t => `<img class="ti" src="../img/common/tools/${t}.png" alt="${t} tool" title="${t} tool">`;
   const M = t => `<span class="menu">${t}</span>`;
   const K = t => `<span class="key">${t}</span>`;
   const C = h => `<span class="sw" style="--c:${h}"></span><code class="hex">${hex6(h)}ff</code>`;
-  const SIZE = b => `<span class="nums">${xywh(b)}</span>`;
-  const fillRow = h => `${M("Object ▸ Fill and Stroke…")} <i>Fill</i> tab → RGBA ${C(h)}, <i>Stroke paint</i> → <b>X</b>`;
-  const pt = mm => Math.round(mm / 0.3528);   /* SVG font-size (mm, em) → Inkscape pt */
+  const SZ = (w, h) => `<span class="nums">W ${mm(w)}, H ${mm(h)}</span>`;
+  const ALN = { left: "Align left edges", cv: "Center on vertical axis", right: "Align right edges", top: "Align top edges", ch: "Center on horizontal axis", bottom: "Align bottom edges", dh: "Distribute centers horizontally" };
+  const ALI = { left: "al-left", cv: "al-cv", right: "al-right", top: "al-top", ch: "al-ch", bottom: "al-bottom", dh: "di-ch" };
+  const AL = (...k) => `<span class="align">${k.map(x => `<img class="ai" src="../img/common/tools/${ALI[x]}.png" alt="${ALN[x]}" title="${ALN[x]}">`).join("")}<i>${k.map(x => ALN[x]).join(" + ")}</i></span>`;
+  const CENTRE = AL("cv", "ch");
+  const MOVE = (dx, dy) => {
+    const parts = [];
+    if (Math.round(dx)) parts.push(`Horizontal <b>${Math.round(dx) > 0 ? "+" : "−"}${Math.abs(Math.round(dx))}</b> (${dx > 0 ? "right" : "left"})`);
+    if (Math.round(dy)) parts.push(`Vertical <b>${Math.round(dy) > 0 ? "+" : "−"}${Math.abs(Math.round(dy))}</b> (${dy > 0 ? "down" : "up"})`);
+    return parts.length ? `${M("Object ▸ Transform…")} → <i>Move</i>, <i>Relative move</i> on: ${parts.join(", ")} → Apply` : "";
+  };
+  const fillRow = h => `fill RGBA ${C(h)}`;
+  const pt = v => Math.round(v / 0.3528);
 
   /* ------------------------------------------------------------------ the generator */
-  const TABLE = {
-    demo: { L: { P: "tri-v", M: "tri-v", A: "diagonal" }, C: { P: "tri-h", M: "bi-h", A: "cross" }, R: { P: "canton", M: "canton", A: "cross" } },
-    auth: { L: { P: "diagonal", M: "triangle", A: "triangle" }, C: { P: "border", M: "tri-h", A: "border" }, R: { P: "cross", M: "bi-h", A: "border" } }
-  };
-  const LAYOUT_NAME = { "tri-h": "horizontal tricolour", "tri-v": "vertical tricolour", "bi-h": "two stripes", cross: "Nordic cross",
-    triangle: "hoist triangle", diagonal: "diagonal band", canton: "canton with stars", border: "bordered field" };
-  const bucket = v => v < 34 ? "L" : v < 67 ? "C" : "R";
+  const LAYOUTS = [                         /* [rule][trad] */
+    ["border", "chevron", "triangle", "cross", "diagonal"],
+    ["border", "triangle", "chevron", "diagonal", "bi-h"],
+    ["cross", "tri-h", "wave", "tri-v", "diagonal"],
+    ["canton", "tri-h", "wave", "tri-v", "bi-h"],
+    ["canton", "tri-v", "wave", "tri-h", "diagonal"]
+  ];
+  const LAYOUT_NAME = { "tri-h": "horizontal tricolour", "tri-v": "vertical tricolour", "bi-h": "two stripes", cross: "centre cross",
+    triangle: "hoist triangle", diagonal: "diagonal band", canton: "canton", border: "bordered field", chevron: "chevron", wave: "wave" };
+  const FRAME_NAME = ["a cog ring", "a ring", "a disc with an outline", "a round shield", "a pointed shield"];
+  const BEHIND_NAME = ["a sunburst", "a compass star", "a halo", "crossed bars", "crossed blades"];
+
+  function motto(a) {
+    const A = ["Obedience", "Order", "Unity", "Liberty", "Freedom"][a.rule];
+    const Cw = ["Tradition", "Honour", "Balance", "Progress", "Tomorrow"][a.trad];
+    const D = ["Peace", "Calm", "Vigilance", "Strength", "Victory"][a.army];
+    const E = ["the Workers", "the People", "Everyone", "Enterprise", "the Market"][a.econ];
+    const B = (PRIDE[a.pride] || PRIDE.freedom).word;
+    return { palace: `${A}, ${B}, ${D}`, uprising: `${B} for ${E}`, parade: `${D} Through ${A}`, lottery: `${Cw} and ${B}` }[a.takeover] || `${A} and ${B}`;
+  }
 
   function build(A) {
     let uid = 0; const id = p => `${p}${++uid}`;
-    /* palette: chosen main colour first */
-    let pal = (A.palette || []).filter(Boolean).map(c => c.toUpperCase());
-    pal = pal.filter((c, i) => pal.findIndex(d => close(c, d)) === i);
-    if (!pal.length) pal = ["#CE2939", WHITE];
+    let pal = (A.palette || []).map(c => c.toUpperCase());
+    pal = uniq(pal);
+    if (!pal.length) pal = ["#6A4C93", "#F2D264", "#1982C4"];
     const main = pal.find(c => close(c, A.main || "")) || pal[0];
     pal = [main, ...pal.filter(c => !close(c, main))];
     if (pal.length === 1) pal.push(lum(main) > .4 ? BLACK : WHITE);
-    const f0 = pal[0], f1 = pal[1], f2 = pal[2] || pal[0];
+    const f0 = pal[0], f1 = pal[1], f2 = pal[2] || (pal.length > 3 ? pal[3] : pal[0]);
     const cands = [...pal, WHITE, BLACK];
-    const regime = A.regime === "auth" ? "auth" : "demo";
-    const lr = bucket(+A.lr), arm = bucket(+A.army);
-    const armK = { L: "P", C: "M", R: "A" }[arm];
-    const layout = TABLE[regime][lr][armK];
-    const N = Math.max(1, Math.min(9, +A.provinces || 3));
-    const pride = PRIDE[A.pride] ? A.pride : "freedom";
-    const name = (A.name || "Republic of Nova").trim().slice(0, 26) || "Republic of Nova";
-    const motto = (A.motto || "Forward, Always").trim().slice(0, 32) || "Forward, Always";
-    const NAME = name.toUpperCase(), MOTTO = motto.toUpperCase();
+    const rule = A.rule, econ = A.econ, army = A.army, trad = A.trad;
+    const layout = LAYOUTS[rule][trad];
+    const N = A.provinces;
+    const sym = PRIDE[A.pride].sym;
+    const NAME = A.name.trim().toUpperCase().slice(0, 26) || "REPUBLIC";
+    const MOTTO = motto(A), MOTTO_U = MOTTO.toUpperCase();
+    const arcName = rule <= 1 || (rule === 2 && army >= 3);
+    const bandMotto = rule <= 2;
+    const r = layout === "border" ? 36 : 34;
 
-    /* emblem placement */
-    let cx = 150, cy = regime === "auth" ? 82 : 88, r = regime === "auth" ? 40 : 36;
-    if (layout === "triangle") { cx = 196; }
-    if (layout === "cross") { cx = 102; cy = 90; r = regime === "auth" ? 32 : 30; }
-    if (layout === "canton") { cx = 212; }
-    if (layout === "border") { r = regime === "auth" ? 42 : 38; }
-
-    const items = [];          /* {step, svg, b: bbox} */
-    const dx = {};             /* debug: colours chosen for text (used by the test sweep) */
+    const items = [], steps = {}, why = [], skills = new Set(["Exact colours (RGBA)", "Align and Distribute", "Text tool"]);
     const add = (step, svg, b) => items.push({ step, svg, b });
-    const steps = {};          /* step → {title, lead, list:[html], note, stuck:[]} */
-    const skills = new Set(["Rectangle & Ellipse tools", "Exact colours (RGBA)", "Exact sizes (X, Y, W, H)", "Text tool"]);
-    const why = [];
+    const rect = (x, y, w, h, c, extra = "") => `<rect x="${r1(x)}" y="${r1(y)}" width="${r1(w)}" height="${r1(h)}" fill="${c}"${extra}/>`;
+    const BG = c => `${T("rect")} Draw a rectangle, ${T("selector")} type ${SZ(W, H)} (lock open), ${fillRow(c)}, <i>Stroke paint</i> → <b>X</b>. Then ${M("Edit ▸ Resize Page to Selection")} – the page is now exactly your banner.`;
 
     /* ---------- STEP 1: field ---------- */
-    let colorAt = () => f0;
-    const rect = (x, y, w, h, c) => `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${c}"/>`;
-    const L1 = [];
-    const stripeSteps = (dir, cols) => {
-      const n = cols.length, sz = (dir === "h" ? H : W) / n;
-      cols.forEach((c, i) => {
-        const b = dir === "h" ? [0, i * sz, W, (i + 1) * sz] : [i * sz, 0, (i + 1) * sz, H];
-        add(1, rect(b[0], b[1], b[2] - b[0], b[3] - b[1], c), b);
-        L1.push(i === 0
-          ? `${T("rect")} Draw a rectangle, then ${T("selector")} type ${SIZE(b)} in the tool controls bar. ${fillRow(c)}.`
-          : `${M("Edit ▸ Duplicate")}, type <b>${dir === "h" ? "Y " + r1(b[1]) : "X " + r1(b[0])}</b>, fill RGBA ${C(c)}.`);
-      });
-      colorAt = (x, y) => cols[Math.min(n - 1, Math.floor((dir === "h" ? y : x) / sz))];
-    };
-    if (layout === "tri-h") stripeSteps("h", [f0, f1, f2]);
-    if (layout === "tri-v") stripeSteps("v", [f0, f1, f2]);
-    if (layout === "bi-h") stripeSteps("h", [f0, f1]);
-    if (layout === "canton") {
-      stripeSteps("h", [f1, f2 === f0 ? (pal[3] || WHITE) : f2, f1]);
-      const cb = [0, 0, 130, 90]; const prev = colorAt;
-      add(1, rect(0, 0, 130, 90, f0), cb);
-      L1.push(`${T("rect")} The canton: a rectangle, ${SIZE(cb)}, fill RGBA ${C(f0)}. Your provinces' stars go here in step 5.`);
-      colorAt = (x, y) => (x < 130 && y < 90) ? f0 : prev(x, y);
+    let colorAt = () => f0; const L1 = [];
+    if (layout === "tri-h" || layout === "canton") {
+      const top = layout === "canton" ? f1 : f0, mid = layout === "canton" ? f2 : f1, bot = layout === "canton" ? f1 : f2;
+      add(1, rect(0, 0, W, H, mid), [0, 0, W, H]); add(1, rect(0, 0, W, 60, top) + rect(0, 120, W, 60, bot), [0, 0, W, H]);
+      L1.push(BG(mid), `${T("rect")} Top stripe ${SZ(W, 60)}, ${fillRow(top)}, then ${M("Object ▸ Align and Distribute…")} ${AL("cv", "top")}.`,
+        `${M("Edit ▸ Duplicate")}, ${fillRow(bot)}, then ${AL("cv", "bottom")}.`);
+      colorAt = (x, y) => y < 60 ? top : y < 120 ? mid : bot;
+      if (layout === "canton") {
+        add(1, rect(0, 0, 96, 72, f0), [0, 0, 96, 72]); const prev = colorAt;
+        L1.push(`${T("rect")} The canton ${SZ(96, 72)}, ${fillRow(f0)}, ${AL("left", "top")}. Your provinces' stars go here later.`);
+        colorAt = (x, y) => x < 96 && y < 72 ? f0 : prev(x, y);
+      }
+    }
+    if (layout === "tri-v") {
+      add(1, rect(0, 0, W, H, f1), [0, 0, W, H]); add(1, rect(0, 0, 100, H, f0) + rect(200, 0, 100, H, f2), [0, 0, W, H]);
+      L1.push(BG(f1), `${T("rect")} Left stripe ${SZ(100, H)}, ${fillRow(f0)}, ${M("Object ▸ Align and Distribute…")} ${AL("left", "ch")}.`,
+        `${M("Edit ▸ Duplicate")}, ${fillRow(f2)}, ${AL("right", "ch")}.`);
+      colorAt = x => x < 100 ? f0 : x < 200 ? f1 : f2;
+    }
+    if (layout === "bi-h") {
+      add(1, rect(0, 0, W, H, f1), [0, 0, W, H]); add(1, rect(0, 0, W, 90, f0), [0, 0, W, 90]);
+      L1.push(BG(f1), `${T("rect")} Upper half ${SZ(W, 90)}, ${fillRow(f0)}, ${M("Object ▸ Align and Distribute…")} ${AL("cv", "top")}.`);
+      colorAt = (x, y) => y < 90 ? f0 : f1;
     }
     if (layout === "cross") {
       add(1, rect(0, 0, W, H, f1), [0, 0, W, H]);
-      const hb = [0, cy - 18, W, cy + 18], vb = [cx - 18, 0, cx + 18, H];
-      add(1, `<path d="M${hb[0]} ${hb[1]}H${hb[2]}V${hb[3]}H${hb[0]}Z M${vb[0]} ${vb[1]}H${vb[2]}V${vb[3]}H${vb[0]}Z" fill="${f0}" fill-rule="nonzero"/>`, [0, 0, W, H]);
-      L1.push(`${T("rect")} Background: rectangle ${SIZE([0, 0, W, H])}. ${fillRow(f1)}.`,
-        `${T("rect")} Horizontal bar ${SIZE(hb)}, then vertical bar ${SIZE(vb)}. Both RGBA ${C(f0)}.`,
+      add(1, `<path d="M0 72H300V108H0Z M132 0H168V180H132Z" fill="${f0}"/>`, [0, 0, W, H]);
+      L1.push(BG(f1), `${T("rect")} Two bars: ${SZ(W, 36)} and ${SZ(36, H)}, both ${fillRow(f0)}. Select each and ${M("Object ▸ Align and Distribute…")} ${CENTRE}.`,
         `${T("selector")} Click one bar, ${K("Shift")} + click the other → ${M("Path ▸ Union")}: one cross.`);
-      colorAt = (x, y) => (Math.abs(y - cy) < 18 || Math.abs(x - cx) < 18) ? f0 : f1;
+      colorAt = (x, y) => (y > 72 && y < 108) || (x > 132 && x < 168) ? f0 : f1;
       skills.add("Union");
     }
     if (layout === "triangle") {
-      stripeSteps("h", [f1, f2 === f0 ? (pal[3] || (lum(f1) > .4 ? BLACK : WHITE)) : f2]);
-      const tri = [[0, 0], [120, 90], [0, 180]]; const prev = colorAt;
-      add(1, `<polygon points="${ptsAttr(tri)}" fill="${f0}"/>`, [0, 0, 120, 180]);
-      L1.push(`${T("rect")} A rectangle ${SIZE([0, 0, 120, 180])}, RGBA ${C(f0)}.`,
-        `${M("Path ▸ Object to Path")}, then ${T("node")} Node tool: drag the <b>top-right</b> node down to the middle of the right side, then the <b>bottom-right</b> node up to the same spot. A triangle!`);
-      colorAt = (x, y) => inPoly(x, y, tri) ? f0 : prev(x, y);
-      skills.add("Node tool"); skills.add("Object to Path");
+      const t = triR(0, CY, 100, H);
+      add(1, rect(0, 0, W, H, f2), [0, 0, W, H]); add(1, rect(0, 0, W, 90, f1), [0, 0, W, 90]); add(1, `<polygon points="${P(t)}" fill="${f0}"/>`, [0, 0, 100, H]);
+      L1.push(BG(f2), `${T("rect")} Upper half ${SZ(W, 90)}, ${fillRow(f1)}, ${M("Object ▸ Align and Distribute…")} ${AL("cv", "top")}.`,
+        `${T("star")} Star tool, <b>polygon</b> mode, Corners <b>3</b>: draw a triangle. ${M("Object ▸ Rotate 90° CW")} – it points right.`,
+        `${T("selector")} Type ${SZ(100, H)}, ${fillRow(f0)}, ${AL("left", "ch")}.`);
+      colorAt = (x, y) => inPoly(x, y, t) ? f0 : y < 90 ? f1 : f2;
+      skills.add("Rotate 90°");
     }
     if (layout === "diagonal") {
+      const band = [[-40, -21], [340, -21], [340, 21], [-40, 21]].map(q => rotPt([q[0] + CX - 150, q[1] + CY], -31, CX, CY));
+      const cid = id("c");
       add(1, rect(0, 0, W, H, f1), [0, 0, W, H]);
-      const band = [[0, 148], [300, -12], [300, 32], [0, 192]];
-      const cid = id("clip");
-      add(1, `<clipPath id="${cid}"><rect width="${W}" height="${H}"/></clipPath><polygon clip-path="url(#${cid})" points="${ptsAttr(band)}" fill="${f0}"/>`, [0, 0, W, H]);
-      L1.push(`${T("rect")} Background: rectangle ${SIZE([0, 0, W, H])}. ${fillRow(f1)}.`,
-        `${T("rect")} A band ${SIZE([0, 68, 300, 112])}, RGBA ${C(f0)}. ${M("Path ▸ Object to Path")}.`,
-        `${T("node")} Node tool: click the two <b>left</b> nodes (${K("Shift")} + click), drag them <b>down</b> about 80 mm. Then the two <b>right</b> nodes <b>up</b> about 80 mm.`,
-        `${T("selector")} Click the background, ${M("Edit ▸ Duplicate")}, ${M("Object ▸ Raise to Top")}. ${K("Shift")} + click the band → ${M("Path ▸ Intersection")}: the band is trimmed to the banner.`);
+      add(1, `<clipPath id="${cid}"><rect width="${W}" height="${H}"/></clipPath><polygon clip-path="url(#${cid})" points="${P(band)}" fill="${f0}"/>`, [0, 0, W, H]);
+      L1.push(BG(f1), `${T("rect")} A long band ${SZ(380, 42)}, ${fillRow(f0)}.`,
+        `${M("Object ▸ Transform…")} → <i>Rotate</i>: <b>31°</b> counter-clockwise → Apply. Then ${M("Object ▸ Align and Distribute…")} ${CENTRE}.`,
+        `The band sticks out of the banner. Click the background, ${M("Edit ▸ Duplicate")}, ${M("Object ▸ Raise to Top")}; ${K("Shift")} + click the band → ${M("Path ▸ Intersection")}: only the part inside the banner stays.`);
       colorAt = (x, y) => inPoly(x, y, band) ? f0 : f1;
-      skills.add("Node tool"); skills.add("Intersection"); skills.add("Object to Path");
+      skills.add("Transform (rotate)"); skills.add("Intersection");
     }
     if (layout === "border") {
+      add(1, rect(0, 0, W, H, f0), [0, 0, W, H]); add(1, rect(14, 14, 272, 152, f1), [14, 14, 286, 166]);
+      L1.push(BG(f0), `${T("rect")} Inner field ${SZ(272, 152)}, ${fillRow(f1)}, ${M("Object ▸ Align and Distribute…")} ${CENTRE} – a border appears all round.`);
+      colorAt = (x, y) => x < 14 || y < 14 || x > 286 || y > 166 ? f0 : f1;
+    }
+    if (layout === "chevron") {
+      const outer = triR(0, CY, 150, H), inner = triR(0, CY, 100, 120), cid = id("m");
+      add(1, rect(0, 0, W, H, f1), [0, 0, W, H]);
+      add(1, `<mask id="${cid}"><rect width="${W}" height="${H}" fill="#fff"/><polygon points="${P(inner)}" fill="#000"/></mask><polygon mask="url(#${cid})" points="${P(outer)}" fill="${f0}"/>`, [0, 0, 150, H]);
+      L1.push(BG(f1), `${T("star")} Star tool, <b>polygon</b> mode, Corners <b>3</b>: a triangle, ${M("Object ▸ Rotate 90° CW")}, type ${SZ(150, H)}, ${fillRow(f0)}, ${M("Object ▸ Align and Distribute…")} ${AL("left", "ch")}.`,
+        `${M("Edit ▸ Duplicate")}, type ${SZ(100, 120)}, ${AL("left", "ch")} again – a smaller triangle on top.`,
+        `${T("selector")} Select both → ${M("Path ▸ Difference")}: a chevron (a V lying on its side).`);
+      colorAt = (x, y) => inPoly(x, y, outer) && !inPoly(x, y, inner) ? f0 : f1;
+      skills.add("Difference"); skills.add("Rotate 90°");
+    }
+    if (layout === "wave") {
+      const xs = [32, 91, 150, 209, 268];
       add(1, rect(0, 0, W, H, f0), [0, 0, W, H]);
-      add(1, rect(14, 14, 272, 152, f1), [14, 14, 286, 166]);
-      L1.push(`${T("rect")} Background: rectangle ${SIZE([0, 0, W, H])}. ${fillRow(f0)}.`,
-        `${T("rect")} Inner field: rectangle ${SIZE([14, 14, 286, 166])}, RGBA ${C(f1)} – a border appears all round.`);
-      colorAt = (x, y) => (x < 14 || y < 14 || x > 286 || y > 166) ? f0 : f1;
+      add(1, `<g fill="${f1}">${rect(0, 90, W, 90, f1)}${xs.map(x => `<ellipse cx="${x}" cy="90" rx="32" ry="13"/>`).join("")}</g>`, [0, 77, W, H]);
+      L1.push(BG(f0), `${T("rect")} Lower half ${SZ(W, 90)}, ${fillRow(f1)}, ${M("Object ▸ Align and Distribute…")} ${AL("cv", "bottom")}.`,
+        `${T("ellipse")} An ellipse ${SZ(64, 26)}, same colour. ${M("Edit ▸ Duplicate")} it 4 times and drag the 5 ellipses along the top edge of the lower half.`,
+        `Select the 5 ellipses → ${AL("dh")}. Then add the lower half to the selection → ${M("Path ▸ Union")}: a wavy edge.`);
+      colorAt = (x, y) => (y > 90 || xs.some(cx => ((x - cx) / 32) ** 2 + ((y - 90) / 13) ** 2 < 1)) ? f1 : f0;
+      skills.add("Union");
     }
-    steps[1] = { title: "The field", lead: `Your banner is a <b>${LAYOUT_NAME[layout]}</b>, 300 × 180 mm. Type the numbers exactly – then everything else fits.`, list: L1,
-      stuck: ["The size fields are greyed out: click the shape with the Selector first.",
-        "The numbers jump back: press Enter after typing each one. Leave the lock between W and H open.",
-        "Colour looks wrong: check that you typed the code in the <i>Fill</i> tab, not <i>Stroke paint</i>."] };
-    why.push(`<b>${regime === "auth" ? "Authoritarian" : "Democratic"}</b>, <b>${{ L: "left", C: "centre", R: "right" }[lr]}</b>-leaning and <b>${{ L: "peaceful", C: "balanced", R: "army-backed" }[arm]}</b> → ${LAYOUT_NAME[layout]}`);
+    steps[1] = { title: "The field", lead: `Your banner is a <b>${LAYOUT_NAME[layout]}</b>. Only the background gets exact numbers – then the page becomes the banner and everything else is aligned to it.`, list: L1,
+      stuck: ["The Align buttons do nothing: check <i>Relative to: Page</i> at the top of the Align and Distribute panel, and that the page was resized to the banner.",
+        "Size fields greyed out: select the shape with the Selector first. Press Enter after each number."] };
+    why.push(`<b>${SLIDERS.rule.opts[rule]}</b> + <b>${SLIDERS.trad.opts[trad]}</b> → ${LAYOUT_NAME[layout]}`);
 
-    /* colours that depend on the field */
-    const around = (x, y, R, n = 12) => uniq(Array.from({ length: n }, (_, i) => { const a = i / n * 2 * Math.PI; return colorAt(x + R * Math.cos(a), y + R * Math.sin(a)); }).concat([colorAt(x, y)]));
-    const bgE = colorAt(cx, cy);
-    const bgRing = around(cx, cy, r * .95);
-    const frameKind = { L: "ring", C: "disc", R: "shield" }[lr];
+    /* ---------- colours that depend on the field ---------- */
+    const around = (R, n = 16) => uniq(Array.from({ length: n }, (_, i) => { const a = i / n * 2 * Math.PI; return colorAt(CX + R * Math.cos(a), CY + R * Math.sin(a)); }).concat([colorAt(CX, CY)]));
+    const bgRing = around(r * .95);
     const frameCol = bestMulti(bgRing, cands, pal);
-    const extraCol = bestMulti(around(cx, cy, r * 1.25), cands, pal, [frameCol]);
-    const innerCol = frameKind === "ring" ? best(frameCol, cands, pal, [frameCol]) : null;
-    const symBg = frameKind === "ring" ? innerCol : frameCol;
-    const symCol = best(symBg, cands, pal, frameKind === "ring" ? [] : [frameCol]);
-    const frameOutl = frameKind !== "disc" && worstC(frameCol, bgRing) < 1.6 ? best(frameCol, [WHITE, BLACK, ...pal], pal) : null;
+    const extraCol = bestMulti(around(r * 1.25), cands, pal, [frameCol]);
+    const inner = econ <= 1;                               /* ring frames get a filled centre */
+    const innerCol = inner ? best(frameCol, cands, pal, [frameCol]) : null;
+    const symBg = inner ? innerCol : frameCol;
+    const symCol = best(symBg, cands, pal, inner ? [] : [frameCol]);
+    const frameOutl = econ !== 2 && worstC(frameCol, bgRing) < 1.6 ? best(frameCol, [WHITE, BLACK, ...pal], pal) : null;
 
-    /* ---------- STEP 2: behind the emblem ---------- */
-    const L2 = [];
-    const extra = { L: "rays", C: "halo", R: "bars" }[arm];
-    if (extra === "rays") {
-      const R = r * 1.32, p = starPts(cx, cy, R, .42, 24);
-      add(2, `<polygon points="${ptsAttr(p)}" fill="${extraCol}"/>`, bboxPts(p));
-      L2.push(`${T("star")} Star tool, <b>star</b> mode, Corners <b>24</b>, Spoke ratio <b>0.42</b>. Drag out a star over the emblem spot.`,
-        `${T("selector")} Type ${SIZE(bboxPts(p))}. ${fillRow(extraCol)}.`);
-      why.push(`<b>Peaceful</b> → sun rays behind the emblem`);
+    /* ---------- STEP 2: behind the emblem (army) ---------- */
+    const L2 = []; const ec = extraCol;
+    if (army === 0) {
+      const p = starPts(CX, CY, r * 1.3, .45, 24); add(2, `<polygon points="${P(p)}" fill="${ec}"/>`, bb(p));
+      L2.push(`${T("star")} Star tool, <b>star</b> mode, Corners <b>24</b>, Spoke ratio <b>0.45</b>: drag out a star. Type ${SZ(bb(p)[2] - bb(p)[0], bb(p)[3] - bb(p)[1])}, ${fillRow(ec)}.`,
+        `${M("Object ▸ Align and Distribute…")} ${CENTRE}.`);
     }
-    if (extra === "halo") {
-      const R = r + 7;
-      add(2, `<circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="${extraCol}" stroke-width="2.5"/>`, circB(cx, cy, R));
-      L2.push(`${T("ellipse")} A circle, ${T("selector")} ${SIZE(circB(cx, cy, R))}.`,
-        `${M("Object ▸ Fill and Stroke…")} <i>Fill</i> → <b>X</b> (no fill). <i>Stroke paint</i> → flat colour, RGBA ${C(extraCol)}. <i>Stroke style</i> → width <b>2.5 mm</b>.`);
-      why.push(`<b>Balanced</b> → a thin halo ring`);
-      skills.add("Fill and stroke");
+    if (army === 1) {
+      const p = starPts(CX, CY, r * 1.32, .32, 8), c = r * .62, cid = id("g");
+      add(2, `<g fill="${ec}"><polygon points="${P(p)}"/><circle cx="${CX}" cy="${CY}" r="${r1(c)}"/></g>`, bb(p));
+      L2.push(`${T("star")} Star tool, <b>star</b> mode, Corners <b>8</b>, Spoke ratio <b>0.32</b>. Type ${SZ(bb(p)[2] - bb(p)[0], bb(p)[3] - bb(p)[1])}, ${fillRow(ec)}.`,
+        `${T("ellipse")} A circle ${SZ(2 * c, 2 * c)}, same colour. Centre both: ${CENTRE}.`, `Select both → ${M("Path ▸ Union")}: a compass star.`);
+      skills.add("Union");
     }
-    if (extra === "bars") {
-      const len = r * 2.9, th = r * .24;
-      const bar = a => `<rect x="${r1(cx - len / 2)}" y="${r1(cy - th / 2)}" width="${r1(len)}" height="${r1(th)}" fill="${extraCol}" transform="rotate(${a} ${cx} ${cy})"/>`;
-      const e = len / 2 * Math.SQRT1_2 + th;
-      add(2, bar(45) + bar(-45), [cx - e, cy - e, cx + e, cy + e]);
-      L2.push(`${T("rect")} A long bar: ${SIZE([cx - len / 2, cy - th / 2, cx + len / 2, cy + th / 2])}, RGBA ${C(extraCol)}.`,
-        `${M("Object ▸ Transform…")} → <i>Rotate</i> tab → <b>45°</b> → Apply.`,
-        `${M("Edit ▸ Duplicate")}, then ${M("Object ▸ Flip Horizontal")}: an X.`,
-        `${K("Shift")} + click the first bar → ${M("Path ▸ Union")}. Drag the X so it crosses the emblem spot.`);
-      why.push(`<b>Army-backed</b> → crossed bars behind the emblem`);
+    if (army === 2) {
+      const R1 = r + 9, R2 = r + 5, cid = id("m");
+      add(2, `<mask id="${cid}"><rect width="${W}" height="${H}" fill="#fff"/><circle cx="${CX}" cy="${CY}" r="${R2}" fill="#000"/></mask><circle mask="url(#${cid})" cx="${CX}" cy="${CY}" r="${R1}" fill="${ec}"/>`, cb(CX, CY, R1));
+      L2.push(`${T("ellipse")} A circle ${SZ(2 * R1, 2 * R1)}, ${fillRow(ec)}. A second circle ${SZ(2 * R2, 2 * R2)}.`,
+        `Centre both: ${M("Object ▸ Align and Distribute…")} ${CENTRE}. Select both → ${M("Path ▸ Difference")}: a thin halo.`);
+      skills.add("Difference");
+    }
+    if (army >= 3) {
+      const len = army === 3 ? r * 2.9 : r * 2.5, th = army === 3 ? r * .24 : r * .2;
+      let shape;
+      if (army === 3) shape = [[CX - len / 2, CY - th / 2], [CX + len / 2, CY - th / 2], [CX + len / 2, CY + th / 2], [CX - len / 2, CY + th / 2]];
+      else { const tl = r * .42; shape = [[CX - len / 2, CY - th / 2], [CX + len / 2 - tl, CY - th / 2], [CX + len / 2 - tl, CY - th * .95], [CX + len / 2, CY], [CX + len / 2 - tl, CY + th * .95], [CX + len / 2 - tl, CY + th / 2], [CX - len / 2, CY + th / 2]]; }
+      const a = shape.map(q => rotPt(q, 45, CX, CY)), b2 = a.map(([x, y]) => [2 * CX - x, y]);
+      add(2, `<g fill="${ec}"><polygon points="${P(a)}"/><polygon points="${P(b2)}"/></g>`, bb([...a, ...b2]));
+      if (army === 3) L2.push(`${T("rect")} A bar ${SZ(len, th)}, ${fillRow(ec)}.`);
+      else L2.push(`${T("rect")} A blade: a bar ${SZ(len - r * .42, th)}, ${fillRow(ec)}.`,
+        `${T("star")} Polygon mode, Corners 3: a small triangle, ${M("Object ▸ Rotate 90° CW")}, type ${SZ(r * .42, th * 1.9)}. Drag it so it touches the right end of the bar → select both → ${M("Path ▸ Union")}: a blade.`);
+      L2.push(`${M("Object ▸ Transform…")} → <i>Rotate</i> <b>45°</b> → Apply. ${M("Edit ▸ Duplicate")}, ${M("Object ▸ Flip Horizontal")}: an X.`,
+        `${K("Shift")} + click the first one → ${M("Path ▸ Union")}. ${M("Object ▸ Align and Distribute…")} ${CENTRE}.`);
       skills.add("Union"); skills.add("Transform (rotate)");
     }
-    steps[2] = { title: "Behind the emblem", lead: { rays: "Rays of a rising era.", halo: "A thin ring – calm and balanced.", bars: "Crossed bars: the army stands behind you." }[extra], list: L2,
-      stuck: extra === "bars" ? ["The X is crooked: you rotated the duplicate again. Use Flip Horizontal for the second bar."]
-        : extra === "rays" ? ["The rays are too thick: Spoke ratio smaller (0.3–0.45)."]
-          : ["The circle is filled: Fill tab → X. Only the stroke should be coloured."] };
+    steps[2] = { title: "Behind the emblem", lead: `Your army level puts <b>${BEHIND_NAME[army]}</b> behind the emblem.`, list: L2,
+      stuck: ["Union or Difference greyed out: exactly the shapes you need must be selected – the status bar counts them.",
+        "The X is crooked: use Flip Horizontal for the copy, don't rotate it again."] };
+    why.push(`<b>${SLIDERS.army.opts[army]}</b> → ${BEHIND_NAME[army]} behind the emblem`);
 
-    /* ---------- STEP 3: frame ---------- */
-    const L3 = [];
-    if (frameKind === "ring") {
-      const cid = id("m");
-      add(3, `<mask id="${cid}"><rect width="${W}" height="${H}" fill="#fff"/><circle cx="${cx}" cy="${cy}" r="${r - 7}" fill="#000"/></mask><circle cx="${cx}" cy="${cy}" r="${r}" fill="${frameCol}" mask="url(#${cid})"/><circle cx="${cx}" cy="${cy}" r="${r - 7}" fill="${innerCol}"/>${frameOutl ? `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${frameOutl}" stroke-width="1.5"/>` : ""}`, circB(cx, cy, r));
-      L3.push(`${T("ellipse")} Circle ${SIZE(circB(cx, cy, r))}. ${fillRow(frameCol)}.`,
-        `${T("ellipse")} A smaller circle on top: ${SIZE(circB(cx, cy, r - 7))}.`,
-        `${T("selector")} Select both → ${M("Path ▸ Difference")}: a ring.`,
-        `${T("ellipse")} Fill the hole: one more circle with the small numbers again, RGBA ${C(innerCol)}.`);
-      if (frameOutl) L3.push(`The ring blends into the stripes, so outline it: click the ring, <i>Stroke paint</i> RGBA ${C(frameOutl)}, width <b>1.5 mm</b>.`);
+    /* ---------- STEP 3: frame (economy) ---------- */
+    const L3 = []; const fc = frameCol;
+    const outl = frameOutl ? ` stroke="${frameOutl}" stroke-width="1.5"` : "";
+    let rs = r * .66, sy = CY;
+    if (econ <= 1) {
+      const ri = r - 8, cid = id("m");
+      const outer = econ === 0 ? `<polygon points="${P(starPts(CX, CY, r, .86, 20))}" fill="${fc}" mask="url(#${cid})"${outl}/>` : `<circle cx="${CX}" cy="${CY}" r="${r}" fill="${fc}" mask="url(#${cid})"${outl}/>`;
+      add(3, `<mask id="${cid}"><rect width="${W}" height="${H}" fill="#fff"/><circle cx="${CX}" cy="${CY}" r="${ri}" fill="#000"/></mask>${outer}<circle cx="${CX}" cy="${CY}" r="${ri}" fill="${innerCol}"/>`, cb(CX, CY, r));
+      if (econ === 0) { const p = starPts(CX, CY, r, .86, 20); L3.push(`${T("star")} Star tool, <b>star</b> mode, Corners <b>20</b>, Spoke ratio <b>0.86</b>. Type ${SZ(bb(p)[2] - bb(p)[0], bb(p)[3] - bb(p)[1])}, ${fillRow(fc)}.`); }
+      else L3.push(`${T("ellipse")} A circle ${SZ(2 * r, 2 * r)}, ${fillRow(fc)}.`);
+      L3.push(`${T("ellipse")} A smaller circle ${SZ(2 * ri, 2 * ri)}. Centre both: ${M("Object ▸ Align and Distribute…")} ${CENTRE}.`,
+        `Select both → ${M("Path ▸ Difference")}: ${econ === 0 ? "a cog ring" : "a ring"}.`,
+        `Fill the hole: one more circle ${SZ(2 * ri, 2 * ri)}, ${fillRow(innerCol)}, ${CENTRE}.`);
+      rs = ri * .86;
       skills.add("Difference");
-      why.push(`<b>Left</b> → the emblem sits in a ring`);
     }
-    if (frameKind === "disc") {
-      add(3, `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${frameCol}" stroke="${extraCol}" stroke-width="2"/>`, circB(cx, cy, r));
-      L3.push(`${T("ellipse")} Circle ${SIZE(circB(cx, cy, r))}.`,
-        `${M("Object ▸ Fill and Stroke…")} <i>Fill</i> RGBA ${C(frameCol)}; <i>Stroke paint</i> RGBA ${C(extraCol)}; <i>Stroke style</i> width <b>2 mm</b>.`);
-      skills.add("Fill and stroke");
-      why.push(`<b>Centre</b> → the emblem sits on a disc`);
+    if (econ === 2) {
+      add(3, `<circle cx="${CX}" cy="${CY}" r="${r}" fill="${fc}" stroke="${extraCol}" stroke-width="2"/>`, cb(CX, CY, r));
+      L3.push(`${T("ellipse")} A circle ${SZ(2 * r, 2 * r)}, ${M("Object ▸ Align and Distribute…")} ${CENTRE}.`,
+        `${M("Object ▸ Fill and Stroke…")} <i>Fill</i> RGBA ${C(fc)}; <i>Stroke paint</i> RGBA ${C(extraCol)}; <i>Stroke style</i> width <b>2 mm</b>.`);
+      rs = (r - 4) * .86; skills.add("Fill and stroke");
     }
-    if (frameKind === "shield") {
-      const rb = [cx - .8 * r, cy - .9 * r, cx + .8 * r, cy + .1 * r], cc = [cx, cy + .1 * r, .8 * r];
-      add(3, `<path d="M${r1(rb[0])} ${r1(rb[1])}H${r1(rb[2])}V${r1(cc[1])}A${r1(cc[2])} ${r1(cc[2])} 0 0 1 ${r1(rb[0])} ${r1(cc[1])}Z" fill="${frameCol}"${frameOutl ? ` stroke="${frameOutl}" stroke-width="1.5"` : ""}/>`, [rb[0], rb[1], rb[2], cc[1] + cc[2]]);
-      L3.push(`${T("rect")} Rectangle ${SIZE(rb)}, RGBA ${C(frameCol)}.`,
-        `${T("ellipse")} Circle ${SIZE(circB(cc[0], cc[1], cc[2]))}, same colour.`,
-        `${T("selector")} Select both → ${M("Path ▸ Union")}: a shield with a round bottom.`);
-      if (frameOutl) L3.push(`The shield blends into the stripes, so outline it: <i>Stroke paint</i> RGBA ${C(frameOutl)}, width <b>1.5 mm</b>.`);
-      skills.add("Union");
-      why.push(`<b>Right</b> → the emblem sits on a shield`);
+    if (econ === 3) {
+      const rc = .8 * r;
+      add(3, `<path d="M${r1(CX - rc)} ${r1(CY - r)}H${r1(CX + rc)}V${CY}A${r1(rc)} ${r1(rc)} 0 0 1 ${r1(CX - rc)} ${CY}Z" fill="${fc}"${outl}/>`, [CX - rc, CY - r, CX + rc, CY + rc]);
+      L3.push(`${T("rect")} A rectangle ${SZ(2 * rc, r)} and ${T("ellipse")} a circle ${SZ(2 * rc, 2 * rc)}, both ${fillRow(fc)}.`,
+        `Centre both: ${M("Object ▸ Align and Distribute…")} ${CENTRE}. Then the rectangle only: ${MOVE(0, -r / 2)}.`,
+        `Select both → ${M("Path ▸ Union")}: a round-bottomed shield.`);
+      rs = rc * .8; sy = CY - r * .1; skills.add("Union"); skills.add("Transform (move)");
     }
-    steps[3] = { title: "The emblem frame", lead: { ring: "A ring around your symbol.", disc: "A disc with an outline – your symbol goes on it.", shield: "A shield, like an old coat of arms." }[frameKind], list: L3,
-      stuck: frameKind === "ring" ? ["The big circle vanished: the small one was underneath. Undo, click the small circle, Object ▸ Raise to Top, try again."]
-        : frameKind === "shield" ? ["A gap between the rectangle and the circle: they must overlap before Union."]
-          : ["No outline: Stroke paint must be a flat colour, and the width bigger than 0."] };
+    if (econ === 4) {
+      const R = 1.6 * r, d = .8 * r, oy = -.45 * r, cA = id("c"), cB = id("c");
+      add(3, `<clipPath id="${cA}"><circle cx="${r1(CX + d)}" cy="${r1(CY + oy)}" r="${r1(R)}"/></clipPath><clipPath id="${cB}"><circle cx="${r1(CX - d)}" cy="${r1(CY + oy)}" r="${r1(R)}"/></clipPath><g clip-path="url(#${cA})"><rect clip-path="url(#${cB})" x="${r1(CX - d)}" y="${r1(CY - .95 * r)}" width="${r1(2 * d)}" height="${r1(1.9 * r)}" fill="${fc}"/></g>${frameOutl ? `<path d="M${r1(CX - d)} ${r1(CY - .95 * r)}H${r1(CX + d)}V${r1(CY + .1 * r)}Q${r1(CX + d * .7)} ${r1(CY + .7 * r)} ${CX} ${r1(CY + .94 * r)}Q${r1(CX - d * .7)} ${r1(CY + .7 * r)} ${r1(CX - d)} ${r1(CY + .1 * r)}Z" fill="none" stroke="${frameOutl}" stroke-width="1.5"/>` : ""}`, [CX - d, CY - .95 * r, CX + d, CY + .94 * r]);
+      L3.push(`${T("ellipse")} A big circle ${SZ(2 * R, 2 * R)}, ${fillRow(fc)}. ${M("Object ▸ Align and Distribute…")} ${CENTRE}, then ${MOVE(d, oy)}.`,
+        `${M("Edit ▸ Duplicate")}, then ${MOVE(-2 * d, 0)}. Select both circles → ${M("Path ▸ Intersection")}: a pointed lens.`,
+        `${T("rect")} A rectangle ${SZ(2 * d, 1.9 * r)}, ${CENTRE}. Select lens + rectangle → ${M("Path ▸ Intersection")} again: a pointed shield with a flat top.`);
+      rs = d * .78; sy = CY - r * .12; skills.add("Intersection"); skills.add("Transform (move)");
+    }
+    if (frameOutl) L3.push(`It blends into the field, so outline it: <i>Stroke paint</i> RGBA ${C(frameOutl)}, width <b>1.5 mm</b>.`);
+    steps[3] = { title: "The emblem frame", lead: `Your economy gives the emblem <b>${FRAME_NAME[econ]}</b>.`, list: L3,
+      stuck: ["Difference removed the wrong shape: the shape to cut out must be on TOP. Undo, click it, Object ▸ Raise to Top.",
+        "Transform ▸ Move went the wrong way: check <i>Relative move</i> is ticked; + is right/down, − is left/up."] };
+    why.push(`<b>${SLIDERS.econ.opts[econ]}</b> → ${FRAME_NAME[econ]}`);
 
-    /* ---------- STEP 4: symbol ---------- */
-    const rs = (frameKind === "ring" ? r - 9 : r - 6) * .9, sy = frameKind === "shield" ? cy - .12 * r : cy;
-    const sc = symCol, L4 = []; let symSvg = "", symB = circB(cx, sy, rs);
-    const sym = PRIDE[pride].sym;
+    /* ---------- STEP 4: symbol (pride) ---------- */
+    const L4 = []; const sc = symCol; let symSvg = "", symB = cb(CX, sy, rs);
+    const dy0 = sy - CY;
+    const ctr = (dx, dy) => (Math.round(dx) || Math.round(dy + dy0)) ? `${CENTRE}, then ${MOVE(dx, dy + dy0)}` : CENTRE;
     if (sym === "gear") {
-      const p = starPts(cx, sy, rs, .8, 12), cid = id("m");
-      symSvg = `<mask id="${cid}"><rect width="${W}" height="${H}" fill="#fff"/><circle cx="${cx}" cy="${sy}" r="${r1(rs * .38)}" fill="#000"/></mask><polygon mask="url(#${cid})" points="${ptsAttr(p)}" fill="${sc}"/>`;
-      symB = bboxPts(p);
-      L4.push(`${T("star")} Star tool, <b>star</b> mode, Corners <b>12</b>, Spoke ratio <b>0.8</b>. Drag one out, then ${T("selector")} ${SIZE(bboxPts(p))}. RGBA ${C(sc)}.`,
-        `${T("ellipse")} A small circle in the middle: ${SIZE(circB(cx, sy, rs * .38))}.`,
-        `Select both → ${M("Path ▸ Difference")}: a gear with a hole.`);
+      const p = starPts(CX, sy, rs, .8, 12), cid = id("m");
+      symSvg = `<mask id="${cid}"><rect width="${W}" height="${H}" fill="#fff"/><circle cx="${CX}" cy="${r1(sy)}" r="${r1(rs * .38)}" fill="#000"/></mask><polygon mask="url(#${cid})" points="${P(p)}" fill="${sc}"/>`; symB = bb(p);
+      L4.push(`${T("star")} Star tool, <b>star</b> mode, Corners <b>12</b>, Spoke ratio <b>0.8</b>: ${SZ(bb(p)[2] - bb(p)[0], bb(p)[3] - bb(p)[1])}, ${fillRow(sc)}. ${ctr(0, 0)}.`,
+        `${T("ellipse")} A small circle ${SZ(rs * .76, rs * .76)}, ${ctr(0, 0)}. Select both → ${M("Path ▸ Difference")}: a gear.`);
       skills.add("Difference");
     }
     if (sym === "sun") {
-      const sunY = sy + rs * .25, p = starPts(cx, sunY, rs * .95, .55, 16), cid = id("c");
-      symSvg = `<clipPath id="${cid}"><rect x="0" y="0" width="${W}" height="${r1(sunY)}"/></clipPath><g clip-path="url(#${cid})" fill="${sc}"><polygon points="${ptsAttr(p)}"/><circle cx="${cx}" cy="${r1(sunY)}" r="${r1(rs * .5)}"/></g><rect x="${r1(cx - rs)}" y="${r1(sunY + rs * .08)}" width="${r1(2 * rs)}" height="${r1(rs * .14)}" fill="${sc}"/>`;
-      L4.push(`${T("ellipse")} Circle ${SIZE(circB(cx, sunY, rs * .5))}, RGBA ${C(sc)}.`,
-        `${T("star")} Star tool, star mode, Corners <b>16</b>, Spoke ratio <b>0.55</b>: ${SIZE(bboxPts(p))}. Same colour. Select both → ${M("Path ▸ Union")}.`,
-        `${T("rect")} A rectangle over the lower half: ${SIZE([cx - rs * 1.1, sunY, cx + rs * 1.1, sunY + rs * 1.1])}. Select sun + rectangle → ${M("Path ▸ Difference")}: the sun rises.`,
-        `${T("rect")} A thin horizon line under it: ${SIZE([cx - rs, sunY + rs * .08, cx + rs, sunY + rs * .22])}.`);
+      const p = starPts(CX, sy, rs * .95, .55, 16), cid = id("c");
+      symSvg = `<clipPath id="${cid}"><rect width="${W}" height="${r1(sy)}"/></clipPath><g clip-path="url(#${cid})" fill="${sc}"><polygon points="${P(p)}"/><circle cx="${CX}" cy="${r1(sy)}" r="${r1(rs * .5)}"/></g>${rect(CX - rs, sy + rs * .1, 2 * rs, rs * .14, sc)}`;
+      L4.push(`${T("ellipse")} A circle ${SZ(rs, rs)} and ${T("star")} a star (star mode, Corners <b>16</b>, Spoke ratio <b>0.55</b>) ${SZ(bb(p)[2] - bb(p)[0], bb(p)[3] - bb(p)[1])}, both ${fillRow(sc)}. ${ctr(0, 0)} for both → ${M("Path ▸ Union")}.`,
+        `${T("rect")} A rectangle ${SZ(2.2 * rs, 1.1 * rs)}, ${ctr(0, .55 * rs)} – it covers the lower half. Sun + rectangle → ${M("Path ▸ Difference")}: the sun rises.`,
+        `${T("rect")} A thin horizon ${SZ(2 * rs, .14 * rs)}, ${ctr(0, .17 * rs)}.`);
       skills.add("Union"); skills.add("Difference");
     }
     if (sym === "waves") {
-      const cid = id("m"), ys = [-.42, .02, .46];
-      symSvg = `<mask id="${cid}"><rect width="${W}" height="${H}" fill="#fff"/>${ys.map(k => `<ellipse cx="${cx + rs * .15}" cy="${r1(sy + k * rs)}" rx="${r1(rs * 1.2)}" ry="${r1(rs * .11)}" fill="#000"/>`).join("")}</mask><circle mask="url(#${cid})" cx="${cx}" cy="${sy}" r="${r1(rs)}" fill="${sc}"/>`;
-      L4.push(`${T("ellipse")} Circle ${SIZE(circB(cx, sy, rs))}, RGBA ${C(sc)}.`,
-        `${T("ellipse")} Three wide, flat ellipses across it, each about <span class="nums">W ${r1(rs * 2.4)}, H ${r1(rs * .22)}</span>, at <span class="nums">Y ${ys.map(k => r1(sy + k * rs - rs * .11)).join(" / ")}</span>.`,
-        `Select the three ellipses → ${M("Path ▸ Union")}. Then circle + ellipses → ${M("Path ▸ Difference")}: waves!`);
+      const cid = id("m"), ys = [-.44, 0, .44];
+      symSvg = `<mask id="${cid}"><rect width="${W}" height="${H}" fill="#fff"/>${ys.map(k => `<ellipse cx="${CX}" cy="${r1(sy + k * rs)}" rx="${r1(rs * 1.2)}" ry="${r1(rs * .11)}" fill="#000"/>`).join("")}</mask><circle mask="url(#${cid})" cx="${CX}" cy="${r1(sy)}" r="${r1(rs)}" fill="${sc}"/>`;
+      L4.push(`${T("ellipse")} A circle ${SZ(2 * rs, 2 * rs)}, ${fillRow(sc)}, ${ctr(0, 0)}.`,
+        `${T("ellipse")} A flat ellipse ${SZ(2.4 * rs, .22 * rs)}, ${ctr(0, 0)}. ${M("Edit ▸ Duplicate")} → ${MOVE(0, -.44 * rs)}. Duplicate again → ${MOVE(0, .88 * rs)}.`,
+        `Select the 3 ellipses → ${M("Path ▸ Union")}. Circle + ellipses → ${M("Path ▸ Difference")}: waves.`);
       skills.add("Union"); skills.add("Difference");
     }
     if (sym === "mountains") {
-      const big = [[cx - rs * .95, sy + rs * .55], [cx - rs * .15, sy - rs * .75], [cx + rs * .65, sy + rs * .55]];
-      const small = [[cx - rs * .05, sy + rs * .55], [cx + rs * .5, sy - rs * .2], [cx + rs * 1.0, sy + rs * .55]];
-      symSvg = `<g fill="${sc}"><polygon points="${ptsAttr(big)}"/><polygon points="${ptsAttr(small)}"/></g>`;
-      symB = [cx - rs, sy - rs * .75, cx + rs, sy + rs * .55];
-      L4.push(`${T("star")} Star tool, <b>polygon</b> mode, Corners <b>3</b>. A big triangle ${SIZE(bboxPts(big))}, RGBA ${C(sc)}.`,
-        `${T("star")} A smaller triangle overlapping on the right: ${SIZE(bboxPts(small))}.`,
-        `Select both → ${M("Path ▸ Union")}: a mountain range.`);
-      skills.add("Union");
+      const big = tri(CX - .25 * rs, sy, 1.6 * rs, 1.3 * rs), small = tri(CX + .45 * rs, sy + .225 * rs, 1.1 * rs, .85 * rs), cid = id("c");
+      symSvg = `<clipPath id="${cid}"><circle cx="${CX}" cy="${r1(sy)}" r="${r1(rs)}"/></clipPath><g clip-path="url(#${cid})" fill="${sc}"><polygon points="${P(big)}"/><polygon points="${P(small)}"/></g>`;
+      L4.push(`${T("star")} Polygon mode, Corners <b>3</b>: a big triangle ${SZ(1.6 * rs, 1.3 * rs)}, ${fillRow(sc)}, ${ctr(-.25 * rs, 0)}.`,
+        `A smaller triangle ${SZ(1.1 * rs, .85 * rs)}, ${ctr(.45 * rs, .225 * rs)}. Select both → ${M("Path ▸ Union")}.`,
+        `${T("ellipse")} A circle ${SZ(2 * rs, 2 * rs)}, ${ctr(0, 0)}. Mountains + circle → ${M("Path ▸ Intersection")}: mountains in a round window.`);
+      skills.add("Union"); skills.add("Intersection");
     }
     if (sym === "tree") {
-      const tris = [[.95, -.95, -.25], [1.15, -.55, .15], [1.35, -.15, .55]].map(([w, top, bot]) =>
-        [[cx - rs * w * .5, sy + rs * bot], [cx, sy + rs * top], [cx + rs * w * .5, sy + rs * bot]]);
-      const trunk = [cx - rs * .14, sy + rs * .55, cx + rs * .14, sy + rs * .95];
-      symSvg = `<g fill="${sc}">${tris.map(t => `<polygon points="${ptsAttr(t)}"/>`).join("")}<rect x="${r1(trunk[0])}" y="${r1(trunk[1])}" width="${r1(trunk[2] - trunk[0])}" height="${r1(trunk[3] - trunk[1])}"/></g>`;
-      L4.push(`${T("star")} Star tool, <b>polygon</b> mode, Corners <b>3</b>. Three triangles, top to bottom: ${tris.map(t => SIZE(bboxPts(t))).join(" · ")}. RGBA ${C(sc)}.`,
-        `${T("rect")} The trunk: ${SIZE(trunk)}.`,
-        `Select all four → ${M("Path ▸ Union")}: one tree.`);
+      const parts = [[1.0, .8, -.5], [1.3, .9, -.12], [1.6, 1.0, .3]].map(([w, h, o]) => tri(CX, sy + o * rs, w * rs, h * rs));
+      const tr = [CX - .14 * rs, sy + .7 * rs, CX + .14 * rs, sy + 1.0 * rs];
+      symSvg = `<g fill="${sc}">${parts.map(t => `<polygon points="${P(t)}"/>`).join("")}${rect(tr[0], tr[1], tr[2] - tr[0], tr[3] - tr[1], sc)}</g>`; symB = [CX - .8 * rs, sy - .9 * rs, CX + .8 * rs, sy + rs];
+      L4.push(`${T("star")} Polygon mode, Corners <b>3</b>, ${fillRow(sc)}: three triangles – ${SZ(rs, .8 * rs)} ${ctr(0, -.5 * rs)}; ${SZ(1.3 * rs, .9 * rs)} ${ctr(0, -.12 * rs)}; ${SZ(1.6 * rs, rs)} ${ctr(0, .3 * rs)}.`,
+        `${T("rect")} The trunk ${SZ(.28 * rs, .3 * rs)}, ${ctr(0, .85 * rs)}.`, `Select all four → ${M("Path ▸ Union")}: one tree.`);
       skills.add("Union");
     }
     if (sym === "atom") {
-      const rx = rs, ry = rs * .36;
-      symSvg = `<g fill="none" stroke="${sc}" stroke-width="2.4">${[0, 60, 120].map(a => `<ellipse cx="${cx}" cy="${sy}" rx="${r1(rx)}" ry="${r1(ry)}" transform="rotate(${a} ${cx} ${sy})"/>`).join("")}</g><circle cx="${cx}" cy="${sy}" r="${r1(rs * .17)}" fill="${sc}"/>`;
-      L4.push(`${T("ellipse")} Ellipse ${SIZE([cx - rx, sy - ry, cx + rx, sy + ry])}. ${M("Object ▸ Fill and Stroke…")} <i>Fill</i> → X; <i>Stroke paint</i> RGBA ${C(sc)}; width <b>2.4 mm</b>.`,
-        `${M("Edit ▸ Duplicate")}, ${M("Object ▸ Transform…")} → Rotate <b>60°</b> → Apply. Duplicate again → Apply again.`,
-        `${T("ellipse")} A small filled circle in the middle: ${SIZE(circB(cx, sy, rs * .17))}.`);
-      skills.add("Fill and stroke"); skills.add("Transform (rotate)");
+      const rings = [0, 60, 120].map(a => `<path d="${ellPath(CX, sy, rs, rs * .38)} ${ellPath(CX, sy, rs * .86, rs * .25)}" fill-rule="evenodd" transform="rotate(${a} ${CX} ${r1(sy)})"/>`);
+      symSvg = `<g fill="${sc}">${rings.join("")}<circle cx="${CX}" cy="${r1(sy)}" r="${r1(rs * .18)}"/></g>`;
+      L4.push(`${T("ellipse")} An ellipse ${SZ(2 * rs, .76 * rs)}, ${fillRow(sc)}, and a smaller one ${SZ(1.72 * rs, .5 * rs)}. ${ctr(0, 0)} for both → ${M("Path ▸ Difference")}: an orbit ring.`,
+        `${M("Edit ▸ Duplicate")}, ${M("Object ▸ Transform…")} → <i>Rotate</i> <b>60°</b> → Apply. Duplicate again → Apply again.`,
+        `${T("ellipse")} A nucleus ${SZ(.36 * rs, .36 * rs)}, ${ctr(0, 0)}. Select all → ${M("Path ▸ Union")}: one atom.`);
+      skills.add("Difference"); skills.add("Union"); skills.add("Transform (rotate)");
     }
     if (sym === "crown") {
-      const base = [cx - rs * .8, sy + rs * .1, cx + rs * .8, sy + rs * .6];
-      const tips = [-.55, 0, .55].map(k => [[cx + rs * (k - .3), sy + rs * .15], [cx + rs * k, sy - rs * (k ? .55 : .8)], [cx + rs * (k + .3), sy + rs * .15]]);
-      const balls = tips.map(t => [t[1][0], t[1][1] - rs * .08]);
-      symSvg = `<g fill="${sc}"><rect x="${r1(base[0])}" y="${r1(base[1])}" width="${r1(base[2] - base[0])}" height="${r1(base[3] - base[1])}"/>${tips.map(t => `<polygon points="${ptsAttr(t)}"/>`).join("")}${balls.map(b => `<circle cx="${r1(b[0])}" cy="${r1(b[1])}" r="${r1(rs * .12)}"/>`).join("")}</g>`;
-      symB = [base[0], sy - rs, base[2], base[3]];
-      L4.push(`${T("rect")} Crown base ${SIZE(base)}, RGBA ${C(sc)}.`,
-        `${T("star")} Polygon mode, Corners 3: three triangles standing on the base – ${tips.map(t => SIZE(bboxPts(t))).join(" · ")}.`,
-        `${T("ellipse")} A small circle on each tip (about <span class="nums">W ${r1(rs * .24)}</span>).`,
-        `Select everything of the crown → ${M("Path ▸ Union")}.`);
-      skills.add("Union");
+      const base = [CX - .8 * rs, sy + .1 * rs, CX + .8 * rs, sy + .6 * rs];
+      const tips = [-.55, 0, .55].map(k => tri(CX + k * rs, sy - .2 * rs, .6 * rs, .85 * rs));
+      const holes = [-.5, 0, .5].map(k => [CX + k * rs, sy + .35 * rs]), cid = id("m");
+      symSvg = `<mask id="${cid}"><rect width="${W}" height="${H}" fill="#fff"/>${holes.map(([x, y]) => `<circle cx="${r1(x)}" cy="${r1(y)}" r="${r1(rs * .11)}" fill="#000"/>`).join("")}</mask><g mask="url(#${cid})" fill="${sc}">${rect(base[0], base[1], base[2] - base[0], base[3] - base[1], sc)}${tips.map(t => `<polygon points="${P(t)}"/>`).join("")}</g>`;
+      symB = [base[0], sy - .63 * rs, base[2], base[3]];
+      L4.push(`${T("rect")} Crown base ${SZ(1.6 * rs, .5 * rs)}, ${fillRow(sc)}, ${ctr(0, .35 * rs)}.`,
+        `${T("star")} Polygon mode, Corners 3: a triangle ${SZ(.6 * rs, .85 * rs)}, ${ctr(-.55 * rs, -.2 * rs)}. Duplicate → ${MOVE(.55 * rs, 0)}; duplicate → ${MOVE(.55 * rs, 0)}. Select base + 3 triangles → ${M("Path ▸ Union")}.`,
+        `${T("ellipse")} Three small circles ${SZ(.22 * rs, .22 * rs)} in a row on the band (same trick: centre, then Move). Union them → crown + circles → ${M("Path ▸ Difference")}: jewel holes.`);
+      skills.add("Union"); skills.add("Difference");
     }
     if (sym === "crescent") {
-      const c1 = [cx - rs * .18, sy, rs * .78], c2 = [cx + rs * .08, sy - rs * .08, rs * .64];
-      const st = starPts(cx + rs * .5, sy, rs * .3, .4, 5), cid = id("m");
-      symSvg = `<mask id="${cid}"><rect width="${W}" height="${H}" fill="#fff"/><circle cx="${r1(c2[0])}" cy="${r1(c2[1])}" r="${r1(c2[2])}" fill="#000"/></mask><circle mask="url(#${cid})" cx="${r1(c1[0])}" cy="${c1[1]}" r="${r1(c1[2])}" fill="${sc}"/><polygon points="${ptsAttr(st)}" fill="${sc}"/>`;
-      L4.push(`${T("ellipse")} Circle ${SIZE(circB(...c1))}, RGBA ${C(sc)}.`,
-        `${T("ellipse")} A second circle a bit to the right: ${SIZE(circB(...c2))}. Select both → ${M("Path ▸ Difference")}: a crescent.`,
-        `${T("star")} Star tool, star mode, Corners 5, Spoke ratio 0.4: a small star ${SIZE(bboxPts(st))}.`);
-      skills.add("Difference");
+      const c1 = [CX - .15 * rs, sy, .78 * rs], c2 = [CX + .12 * rs, sy - .08 * rs, .65 * rs], st = starPts(CX + .5 * rs, sy, .3 * rs, .4, 5), cid = id("m");
+      symSvg = `<mask id="${cid}"><rect width="${W}" height="${H}" fill="#fff"/><circle cx="${r1(c2[0])}" cy="${r1(c2[1])}" r="${r1(c2[2])}" fill="#000"/></mask><circle mask="url(#${cid})" cx="${r1(c1[0])}" cy="${r1(c1[1])}" r="${r1(c1[2])}" fill="${sc}"/><polygon points="${P(st)}" fill="${sc}"/>`;
+      L4.push(`${T("ellipse")} A circle ${SZ(1.56 * rs, 1.56 * rs)}, ${fillRow(sc)}, ${ctr(-.15 * rs, 0)}.`,
+        `A second circle ${SZ(1.3 * rs, 1.3 * rs)}, ${ctr(.12 * rs, -.08 * rs)}. Select both → ${M("Path ▸ Difference")}: a crescent.`,
+        `${T("star")} A small star (5 corners, Spoke ratio 0.4) ${SZ(bb(st)[2] - bb(st)[0], bb(st)[3] - bb(st)[1])}, ${ctr(.5 * rs, 0)}. Crescent + star → ${M("Path ▸ Union")}.`);
+      skills.add("Difference"); skills.add("Union");
     }
     if (sym === "star") {
-      const p = starPts(cx, sy + rs * .06, rs, .4, 5), q = starPts(cx, sy + rs * .06, rs * .55, .4, 5), cid = id("m");
-      symSvg = `<mask id="${cid}"><rect width="${W}" height="${H}" fill="#fff"/><polygon points="${ptsAttr(q)}" fill="#000"/></mask><polygon mask="url(#${cid})" points="${ptsAttr(p)}" fill="${sc}"/>`;
-      symB = bboxPts(p);
-      L4.push(`${T("star")} Star tool, star mode, Corners <b>5</b>, Spoke ratio <b>0.4</b>. Then ${T("selector")} ${SIZE(bboxPts(p))}. RGBA ${C(sc)}.`,
-        `${M("Edit ▸ Duplicate")} and type ${SIZE(bboxPts(q))}: a smaller star in the middle.`,
-        `Select both → ${M("Path ▸ Difference")}: a star outline.`);
+      const p = starPts(CX, sy + rs * .05, rs, .4, 5), q = starPts(CX, sy + rs * .05, rs * .55, .4, 5), cid = id("m");
+      symSvg = `<mask id="${cid}"><rect width="${W}" height="${H}" fill="#fff"/><polygon points="${P(q)}" fill="#000"/></mask><polygon mask="url(#${cid})" points="${P(p)}" fill="${sc}"/>`; symB = bb(p);
+      L4.push(`${T("star")} Star mode, Corners <b>5</b>, Spoke ratio <b>0.4</b>: ${SZ(bb(p)[2] - bb(p)[0], bb(p)[3] - bb(p)[1])}, ${fillRow(sc)}, ${ctr(0, 0)}.`,
+        `${M("Edit ▸ Duplicate")}, type ${SZ(bb(q)[2] - bb(q)[0], bb(q)[3] - bb(q)[1])}, ${ctr(0, 0)} again. Select both → ${M("Path ▸ Difference")}: a star outline.`);
       skills.add("Difference");
     }
     add(4, symSvg, symB);
-    steps[4] = { title: "Your national symbol", lead: `Your nation is proud of <b>${PRIDE[pride].label.toLowerCase()}</b>, so the symbol is a <b>${{ gear: "gear", sun: "rising sun", waves: "wave disc", mountains: "mountain range", tree: "tree", atom: "atom", crown: "crown", crescent: "crescent and star", star: "star outline" }[sym]}</b>.`, list: L4,
-      stuck: ["Difference removed the wrong part: the shape to cut out must be on TOP. Undo, click it, Object ▸ Raise to Top.",
-        "Union/Difference is greyed out: select exactly the shapes you need – the status bar counts them."] };
-    why.push(`<b>${PRIDE[pride].label}</b> → ${{ gear: "a gear", sun: "a rising sun", waves: "waves", mountains: "mountains", tree: "a tree", atom: "an atom", crown: "a crown", crescent: "a crescent and star", star: "a star" }[sym]}`);
+    steps[4] = { title: "Your national symbol", lead: `Your nation is proud of <b>${PRIDE[A.pride].label.toLowerCase()}</b>: the symbol is <b>${SYM_NAME[sym]}</b>.`, list: L4,
+      stuck: ["Typing W and H moved the shape: that's normal – centre it again afterwards.", "The cut went wrong: the shape to cut out must be on top (Object ▸ Raise to Top)."] };
+    why.push(`<b>${PRIDE[A.pride].label}</b> → ${SYM_NAME[sym]}`);
 
     /* ---------- STEP 5: provinces ---------- */
     const L5 = [], starPos = [];
-    const sR = layout === "canton" ? 6.5 : 5;
+    const sR = layout === "canton" ? (N > 6 ? 4 : 5) : 5;
     if (layout === "canton") {
-      const cols = N <= 3 ? N : N === 4 ? 2 : 3, rows = Math.ceil(N / cols);
-      for (let i = 0; i < N; i++) {
-        const rr = Math.floor(i / cols), cc = i % cols, inRow = Math.min(cols, N - rr * cols);
-        starPos.push([65 + (cc - (inRow - 1) / 2) * 34, 45 + (rr - (rows - 1) / 2) * 26]);
-      }
+      const rows = N > 5 ? 2 : 1, perRow = Math.ceil(N / rows);
+      for (let i = 0; i < N; i++) { const rr = Math.floor(i / perRow), cc = i % perRow, inRow = Math.min(perRow, N - rr * perRow); starPos.push([48 + (cc - (inRow - 1) / 2) * 16, 36 + (rr - (rows - 1) / 2) * 20]); }
     } else {
-      const R = Math.max(r + sR + 2, Math.min(r + (extra === "rays" ? r * .32 : 9) + 6, 140 - sR - cy)), step = N > 1 ? Math.min(24, 120 / (N - 1)) : 0;
-      for (let i = 0; i < N; i++) { const a = (90 + (i - (N - 1) / 2) * step) * Math.PI / 180; starPos.push([cx + R * Math.cos(a), cy + R * Math.sin(a)]); }
+      const gap = Math.min(16, 200 / Math.max(1, N));
+      for (let i = 0; i < N; i++) starPos.push([CX + (i - (N - 1) / 2) * gap, 141]);
     }
-    const starCol = bestMulti(layout === "canton" ? [f0] : uniq(starPos.map(([x, y]) => colorAt(x, y))), cands, pal);
     const starBgs = layout === "canton" ? [f0] : uniq(starPos.map(([x, y]) => colorAt(x, y)));
+    const starCol = bestMulti(starBgs, cands, pal);
     const starOutl = worstC(starCol, starBgs) < 1.8 ? best(starCol, [WHITE, BLACK, ...pal], pal) : null;
-    starPos.forEach(([x, y]) => add(5, `<polygon points="${ptsAttr(starPts(x, y, sR, .4, 5))}" fill="${starCol}"${starOutl ? ` stroke="${starOutl}" stroke-width=".7" stroke-linejoin="round"` : ""}/>`, bboxPts(starPts(x, y, sR, .4, 5))));
-    L5.push(`${T("star")} Star tool, star mode, Corners 5, Spoke ratio 0.4. One small star, RGBA ${C(starCol)}.`,
-      N > 1 ? `${M("Edit ▸ Duplicate")} it ${N - 1}× and type the positions (keep W and H):` : `Type its size and place:`,
-      `<span class="nums starlist">${starPos.map(([x, y], i) => { const b = bboxPts(starPts(x, y, sR, .4, 5)); return `★${i + 1}: ${xywh(b)}`; }).join("<br>")}</span>`);
-    if (starOutl) L5.splice(1, 0, `The stars cross different colours, so outline the first one before duplicating: <i>Stroke paint</i> RGBA ${C(starOutl)}, width <b>0.7 mm</b>.`);
-    steps[5] = { title: N === 1 ? "One province, one star" : `${N} provinces, ${N} stars`, lead: layout === "canton" ? "Your provinces shine in the canton." : "Your provinces form an arc under the emblem.", list: L5,
-      stuck: ["All copies are in one place: Duplicate puts the copy exactly on the original – just type the next X and Y."] };
-    why.push(`<b>${N} province${N > 1 ? "s" : ""}</b> → ${N} star${N > 1 ? "s" : ""}${layout === "canton" ? " in the canton" : " under the emblem"}`);
+    starPos.forEach(([x, y]) => add(5, `<polygon points="${P(starPts(x, y, sR, .4, 5))}" fill="${starCol}"${starOutl ? ` stroke="${starOutl}" stroke-width=".7" stroke-linejoin="round"` : ""}/>`, bb(starPts(x, y, sR, .4, 5))));
+    const s1 = bb(starPts(0, 0, sR, .4, 5));
+    L5.push(`${T("star")} Star mode, Corners 5, Spoke ratio 0.4: one star ${SZ(s1[2] - s1[0], s1[3] - s1[1])}, ${fillRow(starCol)}.` + (starOutl ? ` Outline: <i>Stroke paint</i> RGBA ${C(starOutl)}, width <b>0.7 mm</b>.` : ""));
+    if (N > 1) L5.push(`${M("Edit ▸ Duplicate")} it ${N - 1}× and drag the copies into ${layout === "canton" ? (N > 5 ? "two rows inside the canton" : "a row inside the canton") : "a row under the emblem"}, like in the picture.`,
+      `Select all ${N} stars → ${M("Object ▸ Align and Distribute…")} ${AL("dh")}: equal gaps.` + (layout === "canton" ? "" : ` Then ${M("Object ▸ Group")} and ${AL("cv")}.`));
+    else L5.push(layout === "canton" ? `Drag it into the middle of the canton.` : `${AL("cv")}, then drag it straight down under the emblem.`);
+    steps[5] = { title: N === 1 ? "One province, one star" : `${N} provinces, ${N} stars`, lead: layout === "canton" ? "Your provinces shine in the canton." : "Your provinces line up under the emblem.", list: L5,
+      stuck: ["All copies sit on top of each other: Duplicate puts the copy exactly on the original – just drag it away.",
+        "Distribute did nothing: it needs at least 3 objects selected (for 2 stars, drag them by eye)."] };
+    why.push(`<b>${N} province${N > 1 ? "s" : ""}</b> → ${N} star${N > 1 ? "s" : ""}`);
 
     /* ---------- STEP 6: name ---------- */
-    const L6 = [];
-    if (regime === "auth") {
-      const Rn0 = r + (extra === "rays" ? r * .32 : 9) + 8;
-      const em = emWidth(NAME, FONT_B, 900) + .05 * NAME.length;   /* letter-spacing .5 at size 10 ≈ .05 em */
-      let Rn = Math.min(Math.max(Rn0, 7 * em / (Math.PI * .9)), Math.min(cx, W - cx) - 9, cy - 10);
-      let fs = Math.min(13, (Math.PI * Rn * .9) / em);
-      if (cy - Rn - fs * .85 < 3) { Rn = Math.max(r + 6, cy - 3 - fs * .85); fs = Math.min(fs, (Math.PI * Rn * .9) / em); }
-      const nBgs = uniq(Array.from({ length: 13 }, (_, i) => { const a = Math.PI * (1 + i / 12); return colorAt(cx + (Rn + fs * .35) * Math.cos(a), cy + (Rn + fs * .35) * Math.sin(a)); }));
-      const nameCol = bestMulti(nBgs, cands, pal);
-      const outl = worstC(nameCol, nBgs) < 2.2 ? best(nameCol, [WHITE, BLACK, ...pal], pal) : null;
-      Object.assign(dx, { nameCol, nBgs, outl, fs });
+    const L6 = []; const dx = {};
+    if (arcName) {
+      const R0 = (army >= 3 ? r * 1.45 : army === 2 ? r + 9 : army === 0 ? r * 1.3 : r * 1.32) + 6;
+      const em = emWidth(NAME, FONT_B, 900) + .05 * NAME.length;
+      let Rn = Math.min(Math.max(R0, 7 * em / (Math.PI * .9)), CX - 9, CY - 12);
+      let fs = Math.min(13, Math.PI * Rn * .9 / em);
+      if (CY - Rn - fs * .85 < 3) { Rn = CY - 3 - fs * .85; fs = Math.min(fs, Math.PI * Rn * .9 / em); }
+      const nBgs = uniq(Array.from({ length: 13 }, (_, i) => { const a = Math.PI * (1 + i / 12); return colorAt(CX + (Rn + fs * .35) * Math.cos(a), CY + (Rn + fs * .35) * Math.sin(a)); }));
+      const nameCol = bestMulti(nBgs, cands, pal), nOut = worstC(nameCol, nBgs) < 2.5 ? best(nameCol, [WHITE, BLACK, ...pal], pal) : null;
       const pid = id("arc");
-      add(6, `<path id="${pid}" d="M${r1(cx - Rn)} ${cy} A${r1(Rn)} ${r1(Rn)} 0 0 1 ${r1(cx + Rn)} ${cy}" fill="none"/><text font-family="Arial Black,Impact,sans-serif" font-weight="900" font-size="${r1(fs)}" fill="${nameCol}" letter-spacing="${r1(fs * .05)}"${outl ? ` stroke="${outl}" stroke-width="1.1" paint-order="stroke" stroke-linejoin="round"` : ""}><textPath href="#${pid}" startOffset="50%" text-anchor="middle">${esc(NAME)}</textPath></text>`, [cx - Rn - fs, cy - Rn - fs, cx + Rn + fs, cy]);
-      L6.push(`${T("ellipse")} A helper circle around the emblem: ${SIZE(circB(cx, cy, Rn))}.`,
+      add(6, `<path id="${pid}" d="M${r1(CX - Rn)} ${CY} A${r1(Rn)} ${r1(Rn)} 0 0 1 ${r1(CX + Rn)} ${CY}" fill="none"/><text font-family="${FONT_B}" font-weight="900" font-size="${r1(fs)}" fill="${nameCol}" letter-spacing="${r1(fs * .05)}"${nOut ? ` stroke="${nOut}" stroke-width="1.1" paint-order="stroke" stroke-linejoin="round"` : ""}><textPath href="#${pid}" startOffset="50%" text-anchor="middle">${esc(NAME)}</textPath></text>`, [CX - Rn - fs, CY - Rn - fs, CX + Rn + fs, CY]);
+      L6.push(`${T("ellipse")} A helper circle ${SZ(2 * Rn, 2 * Rn)} around the emblem, ${M("Object ▸ Align and Distribute…")} ${CENTRE}.`,
         `${M("Path ▸ Object to Path")}, then ${M("Object ▸ Rotate 90° CW")} <b>twice</b> – now the path starts on the left.`,
-        `${T("text")} Click outside the banner and type <b>${esc(NAME)}</b>. Bold font, size about <b>${pt(fs)}</b>, RGBA ${C(nameCol)}.`,
-        `${T("selector")} Select the circle AND the text → ${M("Text ▸ Put on Path")}. Then click the circle and give it no fill and no stroke (<b>X</b> in both tabs).`);
-      if (outl) { L6.push(`The name crosses different colours, so give it an outline: click the text, <i>Stroke paint</i> RGBA ${C(outl)}, <i>Stroke style</i> width <b>1 mm</b>.`); skills.add("Fill and stroke"); }
+        `${T("text")} Click outside the banner, type <b>${esc(NAME)}</b>. Bold font, size about <b>${pt(fs)}</b>, ${fillRow(nameCol)}.` + (nOut ? ` Outline: <i>Stroke paint</i> RGBA ${C(nOut)}, width <b>1 mm</b>.` : ""),
+        `${T("selector")} Select the circle AND the text → ${M("Text ▸ Put on Path")}. Click the circle, give it no fill and no stroke (<b>X</b> in both tabs).`);
       skills.add("Put on Path"); skills.add("Object to Path");
-      steps[6] = { title: "The name, in an arc", lead: "Authoritarian states like their name curved over the emblem, like on a medal.", list: L6,
-        note: "The text starts at the left (9 o'clock). Make the size bigger or smaller until it ends on the right side; to centre it, type spaces in front of the name.",
-        stuck: ["The text runs along the bottom, upside down: the circle wasn't rotated. Undo the Put on Path, rotate the circle twice, try again.",
-          "The text stops halfway: it is longer than half the circle. Make the size smaller."] };
-      why.push(`<b>Authoritarian</b> → the name in an arc, the motto cut out of a band`);
+      steps[6] = { title: "The name, in an arc", lead: "Your state's name curves over the emblem, like on a medal.", list: L6,
+        note: "The text starts at 9 o'clock. Change the size until it ends on the right side; type spaces in front of the name to centre it.",
+        stuck: ["The text runs upside down along the bottom: the circle wasn't rotated. Undo, rotate twice, try again.", "The text stops halfway: make the size smaller."] };
+      Object.assign(dx, { nameCol, nBgs, nOut, fs });
     } else {
-      const nx = layout === "canton" ? 215 : 150, avail = layout === "canton" ? 160 : 270;
-      const em = emWidth(NAME, FONT_B, 900);
-      const fs = Math.min(15, avail / em), ny = cy - r - (extra === "rays" ? r * .32 : 9) - 8;
-      const tw = em * fs;
+      const avail = layout === "canton" ? 160 : 270, nx = layout === "canton" ? 213 : CX;
+      const em = emWidth(NAME, FONT_B, 900), fs = Math.min(15, avail / em), top = army <= 1 ? CY - r * 1.32 : army >= 3 ? CY - r * 1.45 : CY - r - 9;
+      const ny = Math.max(fs * .8 + 6, top - 7), tw = em * fs;
       const nBgs = uniq(Array.from({ length: 9 }, (_, i) => colorAt(nx - tw / 2 + tw * i / 8, ny - fs * .35)));
-      const nameCol = bestMulti(nBgs, cands, pal);
-      const outl = worstC(nameCol, nBgs) < 2.2 ? best(nameCol, [WHITE, BLACK, ...pal], pal) : null;
-      Object.assign(dx, { nameCol, nBgs, outl, fs });
-      add(6, `<text x="${nx}" y="${r1(ny)}" text-anchor="middle" font-family="Arial Black,Impact,sans-serif" font-weight="900" font-size="${r1(fs)}" fill="${nameCol}"${outl ? ` stroke="${outl}" stroke-width="1.1" paint-order="stroke" stroke-linejoin="round"` : ""}>${esc(NAME)}</text>`, [nx - tw / 2, ny - fs * .8, nx + tw / 2, ny]);
-      L6.push(`${T("text")} Click above the emblem and type <b>${esc(NAME)}</b>. Bold font, size about <b>${pt(fs)}</b>, RGBA ${C(nameCol)}.`,
-        `${T("selector")} Look at the text's <b>W</b> in the tool controls bar and type <b>X = (${nx * 2} − W) ÷ 2</b> – it is centred${layout === "canton" ? " in the right part" : ""}. Bottom of the letters at about <b>Y ${r1(ny)}</b>.`);
-      if (outl) { L6.push(`The name crosses different colours, so give it an outline: <i>Stroke paint</i> RGBA ${C(outl)}, <i>Stroke style</i> width <b>1 mm</b>.`); skills.add("Fill and stroke"); }
-      steps[6] = { title: "The name", lead: "Democracies write their name plainly, straight across the top.", list: L6,
-        stuck: ["The text is too wide: smaller size, or use a narrower bold font."] };
-      why.push(`<b>Democratic</b> → a plain name across the top, the motto in a ribbon`);
+      const nameCol = bestMulti(nBgs, cands, pal), nOut = worstC(nameCol, nBgs) < 2.5 ? best(nameCol, [WHITE, BLACK, ...pal], pal) : null;
+      add(6, `<text x="${nx}" y="${r1(ny)}" text-anchor="middle" font-family="${FONT_B}" font-weight="900" font-size="${r1(fs)}" fill="${nameCol}"${nOut ? ` stroke="${nOut}" stroke-width="1.1" paint-order="stroke" stroke-linejoin="round"` : ""}>${esc(NAME)}</text>`, [nx - tw / 2, ny - fs * .8, nx + tw / 2, ny]);
+      L6.push(`${T("text")} Click above the emblem, type <b>${esc(NAME)}</b>. Bold font, size about <b>${pt(fs)}</b>, ${fillRow(nameCol)}.` + (nOut ? ` Outline: <i>Stroke paint</i> RGBA ${C(nOut)}, width <b>1 mm</b>.` : ""),
+        layout === "canton" ? `${T("selector")} Drag it into the space right of the canton, above the emblem.` : `${T("selector")} ${M("Object ▸ Align and Distribute…")} ${AL("cv")}, then drag it straight up above the emblem.`);
+      steps[6] = { title: "The name", lead: "Your state's name, plain and clear across the top.", list: L6, stuck: ["Too wide: make the size smaller or pick a narrower bold font."] };
+      Object.assign(dx, { nameCol, nBgs, nOut, fs });
     }
+    why.push(arcName ? `<b>${SLIDERS.rule.opts[rule]}</b> → the name in an arc` : `<b>${SLIDERS.rule.opts[rule]}</b> → the name straight across the top`);
 
     /* ---------- STEP 7: motto + frame ---------- */
     const L7 = [];
-    if (regime === "auth") {
-      const bb = [40, 148, 260, 172];
-      const underBand = uniq([40, 95, 150, 205, 258].map(x => colorAt(x, 160)));
+    if (bandMotto) {
+      const underBand = uniq(Array.from({ length: 28 }, (_, i) => 42 + i * 8).flatMap(x => [152, 160, 168].map(y => colorAt(x, y))));
       const bandCol = bestMulti(underBand, [...pal, BLACK, WHITE], pal);
-      const backing = worstC(bandCol, underBand) < 1.8 ? best(bandCol, [WHITE, ...pal, BLACK], pal, [bandCol]) : null;
+      const backing = worstC(bandCol, underBand) < 2 ? best(bandCol, [WHITE, ...pal, BLACK], pal, [bandCol]) : null;
+      const fs = Math.min(13, 205 / emWidth(MOTTO_U, FONT_B, 900)), cid = id("m");
+      add(7, `<mask id="${cid}"><rect width="${W}" height="${H}" fill="#fff"/><text x="${CX}" y="${r1(160 + fs * .36)}" text-anchor="middle" font-family="${FONT_B}" font-weight="900" font-size="${r1(fs)}" fill="#000">${esc(MOTTO_U)}</text></mask>${backing ? rect(40, 148, 220, 24, backing) : ""}<rect mask="url(#${cid})" x="40" y="148" width="220" height="24" fill="${bandCol}"/>`, [40, 148, 260, 172]);
+      if (backing) L7.push(`${T("rect")} A backing strip ${SZ(220, 24)}, ${fillRow(backing)} – it will shine through the letters.`);
+      L7.push(`${T("rect")} The motto band ${SZ(220, 24)}, ${fillRow(bandCol)}. ${M("Object ▸ Align and Distribute…")} ${AL("cv", "bottom")}, then ${MOVE(0, -8)}.` + (backing ? " Do the same with the backing strip first." : ""),
+        `${T("text")} Type your motto <b>${esc(MOTTO_U)}</b>, bold, size about <b>${pt(fs)}</b>. ${AL("cv")}, then drag it onto the band.`,
+        `Check the spelling! ${M("Path ▸ Object to Path")} on the text. Select band + text → ${M("Path ▸ Difference")}: the letters are cut out.`);
+      skills.add("Object to Path"); skills.add("Difference");
       Object.assign(dx, { bandCol, underBand, backing });
-      const fs = Math.min(13, 205 / emWidth(MOTTO, FONT_B, 900)), cid = id("m");
-      add(7, `<mask id="${cid}"><rect width="${W}" height="${H}" fill="#fff"/><text x="150" y="${r1(160 + fs * .36)}" text-anchor="middle" font-family="Arial Black,Impact,sans-serif" font-weight="900" font-size="${r1(fs)}" fill="#000">${esc(MOTTO)}</text></mask>${backing ? `<rect x="40" y="148" width="220" height="24" fill="${backing}"/>` : ""}<rect mask="url(#${cid})" x="40" y="148" width="220" height="24" fill="${bandCol}"/>`, bb);
-      if (backing) L7.push(`${T("rect")} First a backing strip ${SIZE(bb)}, RGBA ${C(backing)} – it will shine through the letters.`);
-      L7.push(`${T("rect")} The motto band${backing ? " on top of it, same numbers" : ""}: ${SIZE(bb)}, RGBA ${C(bandCol)}.`,
-        `${T("text")} Click on the band, type <b>${esc(MOTTO)}</b>. Bold, size about <b>${pt(fs)}</b>. Centre it on the band (X = (300 − W) ÷ 2).`,
-        `Check the spelling! Then ${M("Path ▸ Object to Path")} on the text.`,
-        `Select band + text → ${M("Path ▸ Difference")}: the letters are cut out and ${backing ? "the backing" : "the field"} shows through.`);
-      skills.add("Difference"); skills.add("Object to Path");
     } else {
       const ribCol = bestMulti(uniq([52, 100, 150, 200, 248].map(x => colorAt(x, 157))), [WHITE, ...pal, BLACK], pal);
       const txtCol = best(ribCol, cands, pal, [ribCol]);
-      Object.assign(dx, { ribCol, txtCol });
-      const fs = Math.min(10, 186 / emWidth(motto, FONT_R, 700));
-      add(7, `<g fill="${ribCol}"><rect x="60" y="146" width="180" height="22"/><circle cx="60" cy="157" r="11"/><circle cx="240" cy="157" r="11"/></g><text x="150" y="${r1(157 + fs * .36)}" text-anchor="middle" font-family="Atkinson Hyperlegible,Arial,sans-serif" font-weight="700" font-size="${r1(fs)}" fill="${txtCol}">${esc(motto)}</text>`, [49, 146, 251, 168]);
-      L7.push(`${T("rect")} Ribbon: rectangle ${SIZE([60, 146, 240, 168])}; ${T("ellipse")} two circles ${SIZE(circB(60, 157, 11))} and ${SIZE(circB(240, 157, 11))}. All RGBA ${C(ribCol)}.`,
-        `Select the three → ${M("Path ▸ Union")}: one ribbon.`,
-        `${T("text")} Type <b>${esc(motto)}</b> beside the banner, size about <b>${pt(fs)}</b>, RGBA ${C(txtCol)}.`,
-        `Select ribbon + text → ${M("Text ▸ Flow into Frame")}. Then ${T("text")} click into the text and press the <i>centre</i> button.`);
+      const fs = Math.min(10, 186 / emWidth(MOTTO, FONT_R, 700));
+      add(7, `<g fill="${ribCol}">${rect(60, 146, 180, 22, ribCol)}<circle cx="60" cy="157" r="11"/><circle cx="240" cy="157" r="11"/></g><text x="${CX}" y="${r1(157 + fs * .36)}" text-anchor="middle" font-family="${FONT_R}" font-weight="700" font-size="${r1(fs)}" fill="${txtCol}">${esc(MOTTO)}</text>`, [49, 146, 251, 168]);
+      L7.push(`${T("rect")} A rectangle ${SZ(180, 22)} and ${T("ellipse")} two circles ${SZ(22, 22)}, all ${fillRow(ribCol)}. Drag a circle onto each end of the rectangle.`,
+        `Select the three → ${M("Path ▸ Union")}: a ribbon. ${M("Object ▸ Align and Distribute…")} ${AL("cv", "bottom")}, then ${MOVE(0, -12)}.`,
+        `${T("text")} Type your motto <b>${esc(MOTTO)}</b> beside the banner, size about <b>${pt(fs)}</b>, ${fillRow(txtCol)}.`,
+        `Select ribbon + text → ${M("Text ▸ Flow into Frame")}. ${T("text")} Click into the text and press the <i>centre</i> button.`);
       skills.add("Union"); skills.add("Flow into Frame");
+      Object.assign(dx, { ribCol, txtCol });
     }
-    const edgeCol = regime === "auth" ? best(colorAt(2, 2), [...pal, BLACK], pal) : best(colorAt(2, 2), [WHITE, ...pal], pal);
-    const ew = regime === "auth" ? 6 : 3;
+    const ew = [6, 5, 4, 3, 2][rule];
+    const edgeCol = bestMulti(uniq([colorAt(2, 2), colorAt(298, 90), colorAt(150, 178)]), rule <= 2 ? [...pal, BLACK] : [WHITE, ...pal], pal);
     add(7, `<rect x="${ew / 2}" y="${ew / 2}" width="${W - ew}" height="${H - ew}" fill="none" stroke="${edgeCol}" stroke-width="${ew}"/>`, [0, 0, W, H]);
-    L7.push(`${T("rect")} Last: a frame. Draw a rectangle; <i>Fill</i> → X, <i>Stroke paint</i> RGBA ${C(edgeCol)}, width <b>${ew} mm</b>. Then type ${SIZE([0, 0, W, H])} – the size includes the stroke, so the frame sits exactly on the edge.`);
+    L7.push(`${T("rect")} Last, the frame: a rectangle, <i>Fill</i> → X, <i>Stroke paint</i> RGBA ${C(edgeCol)}, width <b>${ew} mm</b>. Type ${SZ(W, H)} (the size includes the stroke), then ${CENTRE}.`);
     skills.add("Fill and stroke");
-    steps[7] = { title: regime === "auth" ? "Motto band and frame" : "Motto ribbon and frame", lead: regime === "auth" ? "The motto is cut out of a dark band – nobody can erase it." : "The motto flows into a ribbon.", list: L7,
-      stuck: regime === "auth" ? ["The band disappeared instead: the text was underneath. Undo, click the text, Object ▸ Raise to Top.", "Difference is greyed out: the text must be converted first (Path ▸ Object to Path)."]
-        : ["The text sticks out of the ribbon: make the size smaller, or the ribbon wider.", "Flow into Frame does nothing: exactly 2 objects – the ribbon and the text."] };
+    steps[7] = { title: bandMotto ? "Motto band and frame" : "Motto ribbon and frame", lead: `Your answers wrote your motto: <b>“${esc(MOTTO)}”</b>.`, list: L7,
+      stuck: bandMotto ? ["The band vanished instead of the letters: the text must be on top (Object ▸ Raise to Top).", "Difference greyed out: convert the text first – Path ▸ Object to Path."]
+        : ["The text sticks out: smaller size.", "Flow into Frame does nothing: exactly 2 objects – the ribbon and the text."] };
+    why.push(`<b>${TAKEOVER[A.takeover].label}</b> → the motto “${esc(MOTTO)}”`);
 
-    const dbg = { bgE, bgRing, frameCol, innerCol, symBg, symCol, extraCol, starCol, starBgs, starOutl, frameOutl, starPos, sR, cx, cy, r, ...dx };
-    return { items, steps, skills: [...skills], why, layout, pal, name, motto, N, pride, regime, frameKind, extra, sym, dbg };
+    const dbg = Object.assign({ bgRing, frameCol, innerCol, symBg, symCol, extraCol, starCol, starBgs, starOutl, frameOutl, starPos, sR }, dx);
+    return { items, steps, why, skills: [...skills], layout, pal, name: NAME, motto: MOTTO, N, sym, arcName, bandMotto, dbg, econ, army, rule };
   }
 
   let G = 0;
   function svg(model, upto = 7, highlight = 0, cls = "") {
     const pfx = "g" + (++G) + "_";
-    const parts = model.items.filter(i => i.step <= upto).map(i => i.svg).join("")
-      .replace(/(id="|url\(#|href="#)([a-z]+\d+)/g, (m0, a, b) => a + pfx + b);
+    const parts = model.items.filter(i => i.step <= upto).map(i => i.svg).join("").replace(/(id="|url\(#|href="#)([a-z]+\d+)/g, (m0, a, b) => a + pfx + b);
     let hl = "";
     if (highlight) {
       const bs = model.items.filter(i => i.step === highlight).map(i => i.b);
       if (bs.length) {
         const b = [Math.min(...bs.map(q => q[0])), Math.min(...bs.map(q => q[1])), Math.max(...bs.map(q => q[2])), Math.max(...bs.map(q => q[3]))];
-        hl = `<rect x="${r1(b[0] - 2)}" y="${r1(b[1] - 2)}" width="${r1(b[2] - b[0] + 4)}" height="${r1(b[3] - b[1] + 4)}" fill="none" stroke="#1d2622" stroke-width="1.2" stroke-dasharray="4 3"/><rect x="${r1(b[0] - 2)}" y="${r1(b[1] - 2)}" width="${r1(b[2] - b[0] + 4)}" height="${r1(b[3] - b[1] + 4)}" fill="none" stroke="#fff" stroke-width="1.2" stroke-dasharray="4 3" stroke-dashoffset="3.5"/>`;
+        const rr = `x="${r1(b[0] - 2)}" y="${r1(b[1] - 2)}" width="${r1(b[2] - b[0] + 4)}" height="${r1(b[3] - b[1] + 4)}" fill="none" stroke-width="1.2" stroke-dasharray="4 3"`;
+        hl = `<rect ${rr} stroke="#1d2622"/><rect ${rr} stroke="#fff" stroke-dashoffset="3.5"/>`;
       }
     }
     return `<svg class="banner ${cls}" viewBox="-6 -6 312 192" role="img" aria-label="Banner of ${esc(model.name)}${upto < 7 ? ", after step " + upto : ""}"><rect x="-6" y="-6" width="312" height="192" fill="#e9e7dd"/>${parts}${hl}</svg>`;
   }
-  window.COUP_BUILD = build; window.COUP_SVG = svg; window.COUP_COUNTRIES = COUNTRIES; window.COUP_CONTRAST = contrast;   /* used by the teacher-notes gallery script */
+  const MYSTERY = `<svg class="banner" viewBox="-6 -6 312 192" role="img" aria-label="Hidden banner"><rect x="-6" y="-6" width="312" height="192" fill="#e9e7dd"/><rect width="300" height="180" fill="#3a3f3c"/><path d="M0 0L300 180M300 0L0 180" stroke="#4a504c" stroke-width="2"/><text x="150" y="118" text-anchor="middle" font-family="${FONT_B}" font-weight="900" font-size="96" fill="#efeee6" opacity=".85">?</text></svg>`;
+  window.COUP_BUILD = build; window.COUP_SVG = svg; window.COUP_COUNTRIES = COUNTRIES; window.COUP_CONTRAST = contrast; window.COUP_MOTTO = motto;
 
   /* ------------------------------------------------------------------ state */
-  const DEF = { country: "", palette: [], main: "", name: "", motto: "", regime: "", lr: 50, army: 50, pride: "", provinces: 3, custom: ["#CE2939", "#FFFFFF", "#477050"] };
+  const DEF = { country: "", palette: [], main: "", name: "", rule: 2, econ: 2, army: 2, trad: 2, pride: "", provinces: 3, takeover: "", custom: ["#6A4C93", "#F2D264", "#1982C4"], touched: {} };
   const fresh = () => JSON.parse(JSON.stringify(DEF));
-  let S = { answers: fresh(), locked: false, solved: [], checks: [], end: false };
-  /* repair whatever is in storage: wrong types would break the page */
   function clean(raw) {
     const d = fresh(), a = raw && typeof raw === "object" ? raw : {};
     const str = (v, def) => typeof v === "string" ? v : def;
     const num = (v, lo, hi, def) => { v = +v; return Number.isFinite(v) ? Math.min(hi, Math.max(lo, Math.round(v))) : def; };
     const hexes = v => Array.isArray(v) ? v.filter(c => typeof c === "string" && /^#[0-9a-f]{6}$/i.test(c)).map(c => c.toUpperCase()).slice(0, 6) : [];
     const custom = hexes(a.custom);
-    return {
-      country: str(a.country, ""), palette: hexes(a.palette), main: str(a.main, ""), name: str(a.name, "").slice(0, 26), motto: str(a.motto, "").slice(0, 32),
-      regime: a.regime === "auth" || a.regime === "demo" ? a.regime : "", lr: num(a.lr, 0, 100, 50), army: num(a.army, 0, 100, 50),
-      pride: PRIDE[a.pride] ? a.pride : "", provinces: num(a.provinces, 1, 9, 3), custom: custom.length === 3 ? custom : d.custom
-    };
+    return { country: str(a.country, ""), palette: hexes(a.palette), main: str(a.main, ""), name: str(a.name, "").slice(0, 26),
+      rule: num(a.rule, 0, 4, 2), econ: num(a.econ, 0, 4, 2), army: num(a.army, 0, 4, 2), trad: num(a.trad, 0, 4, 2),
+      pride: PRIDE[a.pride] ? a.pride : "", provinces: num(a.provinces, 1, 9, 3), takeover: TAKEOVER[a.takeover] ? a.takeover : "",
+      custom: custom.length === 3 ? custom : d.custom, touched: a.touched && typeof a.touched === "object" ? a.touched : {} };
   }
+  let S = { answers: fresh(), q: 0, revealed: false, solved: [], checks: [], end: false };
   try {
     const s = JSON.parse(localStorage.getItem(KEY));
     if (s && typeof s === "object") {
-      const nums = v => Array.isArray(v) ? v.map(Number).filter(n => Number.isInteger(n) && n >= 0 && n <= 7) : [];
-      S = { answers: clean(s.answers), locked: !!s.locked, solved: nums(s.solved).filter(n => n >= 1), checks: nums(s.checks), end: !!s.end };
-      if (S.locked && missing0(S.answers).length) S.locked = false;
+      const nums = v => Array.isArray(v) ? v.map(Number).filter(n => Number.isInteger(n) && n >= 0 && n <= 8) : [];
+      S = { answers: clean(s.answers), q: Math.max(0, Math.min(9, +s.q || 0)), revealed: !!s.revealed, solved: nums(s.solved).filter(n => n >= 1 && n <= 7), checks: nums(s.checks), end: !!s.end };
     }
   } catch (e) {}
-  function missing0(a) {
-    const m = [];
-    if (!a.palette.length) m.push("a country");
-    if (!a.name.trim()) m.push("a state name");
-    if (!a.motto.trim()) m.push("a motto");
-    if (!a.regime) m.push("authoritarian or democratic");
-    if (!a.pride) m.push("what your nation is proud of");
-    return m;
-  }
   const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} };
   const A = () => S.answers;
-  const missing = () => missing0(A());
+
+  /* ------------------------------------------------------------------ questions */
+  const swatchOpts = a => a.palette.map(c => `<label class="swl"><input type="radio" name="main" value="${c}" ${close(c, a.main || a.palette[0]) ? "checked" : ""}><span style="--c:${c}" title="${c}"></span></label>`).join("");
+  const sliderQ = k => ({
+    id: k, title: SLIDERS[k].q, valid: a => !!a.touched[k],
+    html: a => `<div class="slide5"><div class="ends"><span>${SLIDERS[k].ends[0]}</span><span>${SLIDERS[k].ends[1]}</span></div>
+      <input type="range" min="0" max="4" step="1" value="${a[k]}" data-k="${k}" aria-label="${SLIDERS[k].q}">
+      <div class="ticks">${SLIDERS[k].opts.map((o, i) => `<button type="button" class="tick${a[k] === i && a.touched[k] ? " on" : ""}" data-k="${k}" data-v="${i}">${o}</button>`).join("")}</div>
+      <p class="pick" aria-live="polite">${a.touched[k] ? `<b>${SLIDERS[k].opts[a[k]]}</b> – ${SLIDERS[k].hints[a[k]]}` : "Move the slider or click an option."}</p></div>`
+  });
+  const QUESTIONS = [
+    { id: "country", title: "Which country did you take over?", sub: "Its flag colours become your palette.", valid: a => a.palette.length > 0 && !!a.country,
+      html: a => { const known = COUNTRIES.find(c => c.n === a.country); return `<select id="q-country"><option value="">– choose a country –</option>${COUNTRIES.map(c => `<option${c.n === a.country ? " selected" : ""}>${esc(c.n)}</option>`).join("")}<option value="__other"${a.country && !known ? " selected" : ""}>Other country – I'll enter the flag colours</option></select>
+        <div class="custom" id="custom"${a.country && !known ? "" : " hidden"}><span>Flag colours:</span>${[0, 1, 2].map(i => `<input type="color" data-ci="${i}" value="${a.custom[i].toLowerCase()}" aria-label="Flag colour ${i + 1}">`).join("")}<input type="text" id="q-cname" maxlength="30" placeholder="country name" value="${known ? "" : esc(a.country === "__other" ? "" : a.country)}"></div>
+        ${a.palette.length ? `<div class="palette-show">${a.palette.map(c => `<span style="--c:${c}"></span>`).join("")}</div>` : ""}`; } },
+    { id: "main", title: "Which colour is your movement's colour?", sub: "It will lead your banner.", valid: a => !!a.main, html: a => `<div class="swatches big">${swatchOpts(a)}</div>` },
+    { id: "name", title: "What is your new state called?", sub: "Keep it short and loud.", valid: a => a.name.trim().length > 0,
+      html: a => `<input type="text" id="q-name" maxlength="26" placeholder="e.g. Iron Federation" value="${esc(a.name)}"><p class="qh">Ideas: ${["Republic of Nova", "Iron Federation", "United Provinces", "People's Union", "Grand Duchy", "Free State"].map(n => `<button type="button" class="idea" data-v="${esc(n)}">${esc(n)}</button>`).join(" ")}</p>` },
+    sliderQ("rule"), sliderQ("econ"), sliderQ("army"), sliderQ("trad"),
+    { id: "pride", title: "What is your nation proud of?", valid: a => !!a.pride,
+      html: a => `<div class="prides">${Object.entries(PRIDE).map(([k, p]) => `<label><input type="radio" name="pride" value="${k}" ${a.pride === k ? "checked" : ""}><span><i aria-hidden="true">${p.icon}</i>${p.label}</span></label>`).join("")}</div>` },
+    { id: "provinces", title: "How many provinces does your country have?", valid: a => !!a.touched.provinces,
+      html: a => `<div class="slide5"><div class="ends"><span>1</span><span>9</span></div><input type="range" min="1" max="9" step="1" value="${a.provinces}" data-k="provinces" aria-label="Provinces"><p class="pick big" aria-live="polite">${a.touched.provinces ? `<b>${a.provinces}</b> province${a.provinces > 1 ? "s" : ""}` : "Move the slider."}</p></div>` },
+    { id: "takeover", title: "How did you take power?", sub: "History will remember.", valid: a => !!a.takeover,
+      html: a => `<div class="cards2 four">${Object.entries(TAKEOVER).map(([k, t]) => `<label><input type="radio" name="takeover" value="${k}" ${a.takeover === k ? "checked" : ""}><span><i aria-hidden="true">${t.icon}</i><b>${t.label}</b></span></label>`).join("")}</div>` }
+  ];
+  const allValid = () => QUESTIONS.every(q => q.valid(A()));
 
   /* ------------------------------------------------------------------ page */
   const tape = `<span class="tape l" aria-hidden="true"></span><span class="tape r" aria-hidden="true"></span>`;
   const STEP_TITLES = ["The field", "Behind the emblem", "The emblem frame", "Your national symbol", "Provinces", "The name", "Motto and frame"];
   const head = (h, p, c) => `<div class="sec-head"${c ? ` style="--c:${c}"` : ""}><h2>${h}</h2><p>${p}</p><svg viewBox="0 0 200 12" aria-hidden="true"><path d="M3 8 C 50 2, 100 12, 150 5 S 190 5, 197 7"/></svg></div>`;
-  const slider = (key, left, right, l2, r2) => `<div class="q"><span class="qn"></span><div class="qb"><label class="ql" for="q-${key}">${l2}</label>
-      <div class="slide"><span>${left}</span><input type="range" id="q-${key}" data-k="${key}" min="0" max="100" step="1"><span>${right}</span></div><p class="qh" id="h-${key}"></p></div></div>`;
-
   $("#app").innerHTML = `
   <header class="rail"><div class="wrap">
     <a class="logo" href="../../"><svg width="28" height="28" viewBox="0 0 30 30" aria-hidden="true"><rect x="1.5" y="3" width="27" height="20" rx="2" fill="#22362f" stroke="#fff6e8" stroke-width="2"/><path d="M7 10h9M7 15h13" stroke="#f2d264" stroke-width="2.4" stroke-linecap="round"/><path d="M9 23l-3 5M21 23l3 5" stroke="#fff6e8" stroke-width="2" stroke-linecap="round"/></svg><span>digikult</span></a>
@@ -605,152 +636,131 @@
         <p class="kicker">Inkscape final project</p>
         <h1>Coup!</h1>
         <svg class="scribble" viewBox="0 0 420 22" aria-hidden="true"><path d="M4 14 C 80 4, 160 20, 240 10 S 360 6, 414 12"/></svg>
-        <p class="story">03:00. The palace is quiet, the old government has left by helicopter, and the TV station is yours. You are a morally grey general with a brand-new country – and no banner. Answer the questions of your command tent: every answer changes the banner you will draw in Inkscape.</p>
+        <p class="story">03:00. The palace is quiet, the old government has left by helicopter, and the TV station is yours. You are a morally grey general with a brand-new country – and no banner. Answer the questions of your command tent one by one: when the last one is answered, your banner is revealed.</p>
         <p class="disclaimer">A design game: the coup is pure fiction, no real government is harmed by your SVG file.</p>
         <div class="meter" aria-live="polite"><div class="row"><span>Your progress</span><b id="count"></b></div><span class="bar" id="bar">${STEP_TITLES.map(() => "<i></i>").join("")}</span></div>
         <div class="actions"><a class="btn chalk" href="#tent">To the command tent ▸</a><button class="btn ghost" type="button" id="print">🖨 Print my plan</button></div>
       </div>
-      <figure class="poster flag-poster"><div id="hero-flag"></div><figcaption id="hero-cap">Your banner appears here</figcaption></figure>
+      <figure class="poster flag-poster"><div id="hero-flag"></div><figcaption id="hero-cap"></figcaption></figure>
     </section>
-
-    <section class="sec" id="tent">
-      ${head("The command tent", "Answer every question. The banner on the right changes as you go – then lock it in.")}
-      <div class="tent">
-        <form class="qs" id="qs" autocomplete="off">
-          <div class="q"><span class="qn"></span><div class="qb"><label class="ql" for="q-country">Which country did you take over?</label>
-            <select id="q-country"><option value="">– choose a country –</option>${COUNTRIES.map(c => `<option>${esc(c.n)}</option>`).join("")}<option value="__other">Other country – I'll enter the flag colours</option></select>
-            <div class="custom" id="custom" hidden><span>Flag colours:</span>${[0, 1, 2].map(i => `<input type="color" data-ci="${i}" aria-label="Flag colour ${i + 1}">`).join("")}<input type="text" id="q-cname" maxlength="30" placeholder="country name"></div>
-            <p class="qh">Its flag colours become your palette.</p></div></div>
-          <div class="q"><span class="qn"></span><div class="qb"><span class="ql">Which colour is your movement's colour?</span><div class="swatches" id="swatches"></div><p class="qh">It becomes the main colour of the banner.</p></div></div>
-          <div class="q"><span class="qn"></span><div class="qb"><label class="ql" for="q-name">What is your new state called?</label>
-            <input type="text" id="q-name" data-k="name" maxlength="26" placeholder="e.g. Iron Federation"><p class="qh">Ideas: ${NAMES.map(n => `<button type="button" class="idea" data-k="name" data-v="${esc(n)}">${esc(n)}</button>`).join(" ")}</p></div></div>
-          <div class="q"><span class="qn"></span><div class="qb"><label class="ql" for="q-motto">Your national motto?</label>
-            <input type="text" id="q-motto" data-k="motto" maxlength="32" placeholder="e.g. Bread, Peace, WiFi"><p class="qh">Ideas: ${MOTTOS.slice(0, 6).map(n => `<button type="button" class="idea" data-k="motto" data-v="${esc(n)}">${esc(n)}</button>`).join(" ")}</p></div></div>
-          <div class="q"><span class="qn"></span><div class="qb"><span class="ql">How will you rule?</span>
-            <div class="cards2"><label><input type="radio" name="regime" value="auth"><span><b>Authoritarian</b><small>One leader, one voice, big parades.</small></span></label>
-            <label><input type="radio" name="regime" value="demo"><span><b>Democratic</b><small>Elections – you promise, at least.</small></span></label></div></div></div>
-          ${slider("lr", "Left", "Right", "Where does your government lean?")}
-          ${slider("army", "Peace", "Army", "How much does your power rest on the army?")}
-          <div class="q"><span class="qn"></span><div class="qb"><span class="ql">What is your nation proud of?</span>
-            <div class="prides">${Object.entries(PRIDE).map(([k, p]) => `<label><input type="radio" name="pride" value="${k}"><span><i aria-hidden="true">${p.icon}</i>${p.label}</span></label>`).join("")}</div></div></div>
-          <div class="q"><span class="qn"></span><div class="qb"><label class="ql" for="q-provinces">How many provinces does your country have?</label>
-            <div class="slide"><span>1</span><input type="range" id="q-provinces" data-k="provinces" min="1" max="9" step="1"><span>9</span></div><p class="qh" id="h-provinces"></p></div></div>
-        </form>
-        <aside class="preview">
-          <div class="sheet mini">${tape}<div id="live"></div><p class="live-cap" id="live-cap"></p><ul class="why" id="why"></ul></div>
-          <button class="btn chalk lock" type="button" id="lock">Lock in my banner ▸</button>
-          <p class="lock-msg" id="lock-msg" role="status"></p>
-        </aside>
-      </div>
-    </section>
-
+    <section class="sec" id="tent">${head("The command tent", "One question at a time. No peeking – the banner appears at the end.")}<div id="wizard"></div></section>
     <div id="work"></div>
   </main>
   <footer class="tray"><div class="wrap"><span class="sticks" aria-hidden="true"><i></i><i></i><i></i></span>
     <span>Teachers: <a href="../pdf/coup-teacher.pdf" download>teacher notes (PDF)</a></span>
     <button class="reset" type="button" id="reset">Start over</button></div></footer>`;
 
-  /* ------------------------------------------------------------------ form wiring */
-  const form = $("#qs");
-  function syncForm() {
-    const a = A();
-    const known = COUNTRIES.find(c => c.n === a.country);
-    $("#q-country").value = known ? a.country : (a.country ? "__other" : "");
-    $("#custom").hidden = !(a.country && !known);
-    form.querySelectorAll("[data-ci]").forEach(i => { i.value = (a.custom[+i.dataset.ci] || "#ffffff").toLowerCase(); });
-    $("#q-cname").value = (!known && a.country !== "__other") ? a.country : "";
-    $("#q-name").value = a.name; $("#q-motto").value = a.motto;
-    $("#q-lr").value = a.lr; $("#q-army").value = a.army; $("#q-provinces").value = a.provinces;
-    form.querySelectorAll("input[name=regime]").forEach(r => { r.checked = r.value === a.regime; });
-    form.querySelectorAll("input[name=pride]").forEach(r => { r.checked = r.value === a.pride; });
-    $("#swatches").innerHTML = a.palette.length ? a.palette.map(c => `<label class="swl"><input type="radio" name="main" value="${c}" ${close(c, a.main || a.palette[0]) ? "checked" : ""}><span style="--c:${c}" title="${c}"></span></label>`).join("") : `<span class="qh">Choose a country first.</span>`;
-    form.querySelectorAll("input, select, button.idea").forEach(el => { el.disabled = S.locked; });
+  /* ------------------------------------------------------------------ wizard */
+  function renderWizard(focus) {
+    const box = $("#wizard");
+    if (S.revealed) { renderReveal(); return; }
+    const q = QUESTIONS[S.q], a = A(), last = S.q === QUESTIONS.length - 1, ok = q.valid(a);
+    box.innerHTML = `<article class="sheet qcard" style="--tilt:-.2deg">${tape}
+      <div class="qtop"><span class="qcount">Question ${S.q + 1} of ${QUESTIONS.length}</span>
+        <span class="qdots" aria-hidden="true">${QUESTIONS.map((x, i) => `<i class="${i < S.q ? "done" : i === S.q ? "cur" : ""}"></i>`).join("")}</span></div>
+      <h3 class="qtitle" tabindex="-1">${q.title}</h3>${q.sub ? `<p class="lead">${q.sub}</p>` : ""}
+      <div class="qbody">${q.html(a)}</div>
+      <div class="qnav"><button type="button" class="btn back" id="back" ${S.q === 0 ? "disabled" : ""}>◂ Back</button>
+        <button type="button" class="btn next" id="next" ${ok ? "" : "disabled"}>${last ? "Reveal my banner ▸" : "Next ▸"}</button></div>
+    </article>`;
+    wire();
+    if (focus) { const t = box.querySelector(".qtitle"); if (t) t.focus({ preventScroll: true }); }
   }
-  function hints() {
-    const a = A();
-    const lr = bucket(+a.lr), ar = bucket(+a.army);
-    $("#h-lr").textContent = { L: "Left: workers first, big state.", C: "Centre: a bit of everything.", R: "Right: tradition, business, order." }[lr];
-    $("#h-army").textContent = { L: "Peace: your soldiers plant trees now.", C: "Balanced: the army is there, quietly.", R: "Army: tanks at every parade." }[ar];
-    $("#h-provinces").textContent = `${a.provinces} province${a.provinces > 1 ? "s" : ""}`;
+  function refreshNav() {
+    const q = QUESTIONS[S.q]; const n = $("#next"); if (n) n.disabled = !q.valid(A());
   }
-  function setPaletteFromCountry() {
+  function setPalette() {
     const a = A(), c = COUNTRIES.find(x => x.n === a.country);
-    a.palette = c ? c.c.slice() : a.custom.map(x => x.toUpperCase());
-    if (!a.palette.some(p => close(p, a.main || ""))) a.main = a.palette[0];
+    a.palette = c ? c.c.slice() : (a.country ? a.custom.map(x => x.toUpperCase()) : []);
+    if (!a.palette.some(p => close(p, a.main || ""))) a.main = a.palette[0] || "";
   }
-  form.addEventListener("input", e => {
-    const t = e.target, a = A();
-    if (t.id === "q-country") {
-      if (t.value === "__other") { a.country = $("#q-cname").value || "__other"; }
-      else a.country = t.value;
-      setPaletteFromCountry();
-    } else if (t.dataset.ci != null) { a.custom[+t.dataset.ci] = t.value.toUpperCase(); setPaletteFromCountry(); }
-    else if (t.id === "q-cname") { a.country = t.value || "__other"; }
-    else if (t.name === "regime") a.regime = t.value;
-    else if (t.name === "pride") a.pride = t.value;
-    else if (t.name === "main") a.main = t.value;
-    else if (t.dataset.k) a[t.dataset.k] = t.type === "range" ? +t.value : t.value;
-    save();
-    if (t.id === "q-country" || t.dataset.ci != null) syncForm();
-    hints(); live();
-  });
-  form.addEventListener("change", e => { if (e.target.id === "q-country") { syncForm(); live(); } });
-  form.querySelectorAll("button.idea").forEach(b => b.addEventListener("click", () => {
-    A()[b.dataset.k] = b.dataset.v; save(); syncForm(); live();
-  }));
-
-  /* ------------------------------------------------------------------ live preview + lock */
-  function live() {
-    const m = build(A());
-    $("#live").innerHTML = svg(m);
-    $("#live-cap").textContent = A().palette.length ? `Banner of ${m.name}` : "A sample banner – answer the questions to make it yours.";
-    $("#why").innerHTML = m.why.map(w => `<li>${w}</li>`).join("");
-    $("#hero-flag").innerHTML = svg(m);
-    $("#hero-cap").textContent = S.locked ? `The banner of ${m.name}` : "Your banner appears here";
-    const miss = missing();
-    $("#lock").textContent = S.locked ? "Change my answers" : "Lock in my banner ▸";
-    $("#lock-msg").textContent = S.locked ? "Locked. Your steps are below." : miss.length ? `Still missing: ${miss.join(", ")}.` : "Happy with it? Lock it in.";
-  }
-  $("#lock").addEventListener("click", () => {
-    if (S.locked) {
-      if (S.solved.length && !confirm("Change your answers? Your banner and steps will change, and your ticks will be cleared.")) return;
-      S.locked = false; S.solved = []; S.checks = []; S.end = false;
-    } else {
-      const miss = missing();
-      if (miss.length) { $("#lock-msg").textContent = `Still missing: ${miss.join(", ")}.`; return; }
-      S.locked = true;
+  function wire() {
+    const box = $("#wizard"), a = A();
+    box.querySelector("#back").addEventListener("click", () => { if (S.q > 0) { S.q--; save(); renderWizard(true); } });
+    box.querySelector("#next").addEventListener("click", next);
+    const sel = box.querySelector("#q-country");
+    if (sel) {
+      sel.addEventListener("change", () => {
+        if (sel.value === "__other") a.country = (box.querySelector("#q-cname").value || "").trim() || "__other";
+        else a.country = sel.value;
+        setPalette(); save(); renderWizard();
+      });
+      box.querySelectorAll("[data-ci]").forEach(i => i.addEventListener("input", () => { a.custom[+i.dataset.ci] = i.value.toUpperCase(); setPalette(); save(); const ps = box.querySelector(".palette-show"); if (ps) ps.innerHTML = a.palette.map(c => `<span style="--c:${c}"></span>`).join(""); refreshNav(); }));
+      const cn = box.querySelector("#q-cname");
+      if (cn) cn.addEventListener("input", () => { a.country = cn.value.trim() || "__other"; save(); refreshNav(); });
     }
-    save(); syncForm(); live(); renderWork();
-    if (S.locked) setTimeout(() => $("#work").scrollIntoView({ block: "start" }), 120);
-  });
+    box.querySelectorAll("input[name=main]").forEach(i => i.addEventListener("change", () => { a.main = i.value; save(); refreshNav(); }));
+    const nm = box.querySelector("#q-name");
+    if (nm) {
+      nm.addEventListener("input", () => { a.name = nm.value; save(); refreshNav(); });
+      nm.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); next(); } });
+      box.querySelectorAll(".idea").forEach(b => b.addEventListener("click", () => { a.name = b.dataset.v; nm.value = b.dataset.v; save(); refreshNav(); }));
+    }
+    const sliderText = k => {          /* update ticks + caption in place, so dragging is never interrupted */
+      box.querySelectorAll(`.tick[data-k="${k}"]`).forEach(t => t.classList.toggle("on", +t.dataset.v === a[k]));
+      const pk = box.querySelector(".pick");
+      if (pk) pk.innerHTML = SLIDERS[k] ? `<b>${SLIDERS[k].opts[a[k]]}</b> – ${SLIDERS[k].hints[a[k]]}` : `<b>${a[k]}</b> province${a[k] > 1 ? "s" : ""}`;
+    };
+    box.querySelectorAll("input[type=range]").forEach(rg => rg.addEventListener("input", () => {
+      const k = rg.dataset.k; a[k] = +rg.value; a.touched[k] = true; save(); sliderText(k); refreshNav();
+    }));
+    box.querySelectorAll(".tick").forEach(b => b.addEventListener("click", () => {
+      const k = b.dataset.k; a[k] = +b.dataset.v; a.touched[k] = true; save();
+      const rg = box.querySelector(`input[type=range][data-k="${k}"]`); if (rg) rg.value = a[k];
+      sliderText(k); refreshNav();
+    }));
+    box.querySelectorAll("input[name=pride], input[name=takeover]").forEach(i => i.addEventListener("change", () => { a[i.name] = i.value; save(); refreshNav(); }));
+  }
+  function next() {
+    if (!QUESTIONS[S.q].valid(A())) return;
+    if (S.q < QUESTIONS.length - 1) { S.q++; save(); renderWizard(true); return; }
+    if (!allValid()) { S.q = QUESTIONS.findIndex(q => !q.valid(A())); save(); renderWizard(true); return; }
+    S.revealed = true; S.solved = []; S.checks = []; S.end = false; save();
+    renderReveal(true); renderWork(); hero();
+  }
 
-  /* ------------------------------------------------------------------ the guided steps */
+  /* ------------------------------------------------------------------ reveal */
+  function renderReveal(animate) {
+    const m = build(A());
+    $("#wizard").innerHTML = `<article class="sheet reveal${animate ? " anim" : ""}" style="--tilt:.2deg">${tape}
+      <p class="drum">${animate ? "The people gather in the square…" : "Your banner"}</p>
+      <div class="reveal-flag">${svg(m)}</div>
+      <h3 class="rname">${esc(m.name)}</h3>
+      <p class="rmotto">“${esc(m.motto)}”</p>
+      <ul class="why">${m.why.map(w => `<li>${w}</li>`).join("")}</ul>
+      <div class="qnav"><button type="button" class="btn back" id="again">↺ Answer again</button><a class="btn next" href="#start">Build it in Inkscape ↓</a></div>
+    </article>`;
+    $("#again").addEventListener("click", () => {
+      if (S.solved.length && !confirm("Answer again? Your banner and steps will change, and your ticks will be cleared.")) return;
+      S.revealed = false; S.q = 0; S.solved = []; S.checks = []; S.end = false; save();
+      renderWizard(true); renderWork(); hero(); $("#tent").scrollIntoView({ block: "start" });
+    });
+  }
+  function hero() {
+    if (S.revealed) { const m = build(A()); $("#hero-flag").innerHTML = svg(m); $("#hero-cap").textContent = `The banner of ${m.name}`; }
+    else { $("#hero-flag").innerHTML = MYSTERY; $("#hero-cap").textContent = "Answer every question to reveal it"; }
+  }
+
+  /* ------------------------------------------------------------------ guided steps */
   function renderWork() {
     const box = $("#work");
-    if (!S.locked) { box.innerHTML = ""; paint(); return; }
+    if (!S.revealed) { box.innerHTML = ""; paint(); return; }
     const m = build(A());
     const tilt = i => ["-.3deg", ".25deg", "-.15deg", ".35deg"][i % 4];
     const fileName = "surname_" + m.name.toLowerCase().replace(/[^a-z0-9]+/g, "").slice(0, 16);
     box.innerHTML = `
-    <section class="sec">
-      ${head("Skills on your banner", "Everything from this year – your banner uses these:")}
-      <ul class="badges">${m.skills.map(s => `<li>${s}</li>`).join("")}</ul>
-    </section>
-    <section class="sec" id="start">
-      ${head("Before you start", "No keyboard shortcuts: every command is in a menu or on a toolbar.")}
-      <article class="sheet" style="--tilt:-.2deg">${tape}
-        <h3>Set up</h3>
+    <section class="sec">${head("Skills on your banner", "Everything from this year – your banner uses these:")}<ul class="badges">${m.skills.map(s => `<li>${s}</li>`).join("")}</ul></section>
+    <section class="sec" id="start">${head("Before you start", "No keyboard shortcuts: every command is in a menu or on a toolbar.")}
+      <article class="sheet" style="--tilt:-.2deg">${tape}<h3>Four tricks you will use all the time</h3>
         <ol class="do">
-          <li>${M("File ▸ New")}, then ${M("File ▸ Save As…")} <code>${fileName}.svg</code>. ${M("View ▸ Zoom ▸ Zoom Page")}.</li>
-          <li><b>Exact sizes:</b> with the ${T("selector")} Selector, the tool controls bar shows <b>X, Y, W, H</b> (in mm). Click a shape, type the numbers, press Enter after each. Leave the lock open.</li>
-          <li><b>Exact colours:</b> ${M("Object ▸ Fill and Stroke…")} → <i>Fill</i> tab → flat colour → type the code in the <b>RGBA</b> box, e.g. ${C(m.pal[0])}, press Enter.</li>
-          <li><b>Several objects:</b> click the first, ${K("Shift")} + click the others. The status bar counts them. Difference: the object on <i>top</i> is cut out.</li>
+          <li>${M("File ▸ New")}, ${M("File ▸ Save As…")} <code>${fileName}.svg</code>.</li>
+          <li><b>Sizes:</b> with the ${T("selector")} Selector, type <b>W</b> and <b>H</b> in the tool controls bar (mm, lock open, Enter after each).</li>
+          <li><b>Colours:</b> ${M("Object ▸ Fill and Stroke…")} → <i>Fill</i> → flat colour → type the code in <b>RGBA</b>, e.g. ${C(m.pal[0])}.</li>
+          <li><b>Placing:</b> ${M("Object ▸ Align and Distribute…")} with <i>Relative to: <b>Page</b></i>. ${CENTRE} puts the selected shape in the middle of the banner. To shift it exactly: ${M("Object ▸ Transform…")} → <i>Move</i>, tick <i>Relative move</i> (+ = right/down, − = left/up).</li>
         </ol>
-        <p class="note">Your palette: ${m.pal.map(c => C(c)).join(" ")} ${C(WHITE)} ${C(BLACK)}</p>
-      </article>
-    </section>
-    <section class="sec">
-      ${head("The steps", "Each picture shows your banner after the step; the dashed box marks what is new.", "var(--accent)")}
+        <p class="note">Your palette: ${m.pal.map(c => C(c)).join(" ")} ${C(WHITE)} ${C(BLACK)}. Several objects: click, ${K("Shift")} + click. Difference: the top object is cut out.</p>
+      </article></section>
+    <section class="sec">${head("The steps", "Each picture shows your banner after the step; the dashed box marks what is new.", "var(--accent)")}
       ${[1, 2, 3, 4, 5, 6, 7].map((n, i) => { const s = m.steps[n]; return `
       <article class="sheet step" id="step-${n}" data-n="${n}" style="--tilt:${tilt(i)}">${tape}
         <h3><span class="num">${n}</span>${s.title} <span class="stamp">done!</span></h3>
@@ -762,100 +772,66 @@
         ${n < 7 ? `<a class="next-link" href="#step-${n + 1}">Next: ${m.steps[n + 1].title} ↓</a>` : `<a class="next-link" href="#save">Last thing: save and hand in ↓</a>`}</div>
       </article>`; }).join("")}
     </section>
-    <section class="sec" id="save">
-      ${head("Save and hand in", "The SVG shows how you built it; the PNG is the picture.")}
+    <section class="sec" id="save">${head("Save and hand in", "The SVG shows how you built it; the PNG is the picture.")}
       <article class="sheet" style="--tilt:.2deg">${tape}
-        <ol class="do"><li>${M("File ▸ Save")} – <code>${fileName}.svg</code></li>
-        <li>${M("File ▸ Export…")} → choose <b>Drawing</b> → name it <code>${fileName}.png</code> → Export.</li></ol>
+        <ol class="do"><li>${M("File ▸ Save")} – <code>${fileName}.svg</code></li><li>${M("File ▸ Export…")} → <b>Page</b> → <code>${fileName}.png</code> → Export.</li></ol>
         <h3 style="margin-top:14px">Checklist</h3>
         <ul class="check">${checklist(m).map((c, i) => `<li><label><input type="checkbox" data-c="${i}"><span>${c}</span></label></li>`).join("")}</ul>
       </article>
       <div class="finish" id="finish" role="status"><h2>Long live ${esc(m.name)}!</h2><p>Hand in your two files, then try a bonus below.</p></div>
     </section>
-    <section class="sec" id="bonus">
-      ${head("Bonus – rule harder", "Same tools, more propaganda. Pick any.")}
-      <article class="sheet" style="--tilt:-.2deg">${tape}
-        <ul class="bonus">
-          <li><b>Flag on a pole</b><span>Duplicate your whole banner (${M("Edit ▸ Select All")}, ${M("Object ▸ Group")}), add a thin rectangle pole and a circle on top → ${M("Path ▸ Union")}.</span></li>
-          <li><b>A coin</b><span>Two circles → ${M("Path ▸ Difference")} for the rim, your symbol in the middle, the name with ${M("Text ▸ Put on Path")}.</span></li>
-          <li><b>A banknote</b><span>Rectangle, your symbol, the value in big bold text, the motto in a text box.</span></li>
-          <li><b>The general's medal</b><span>A star (Star tool, 8 corners) + a ribbon (rectangle → ${M("Path ▸ Object to Path")} → ${T("node")} pull the bottom corners into a V).</span></li>
-        </ul>
-      </article>
-    </section>`;
+    <section class="sec" id="bonus">${head("Bonus – rule harder", "Same tools, more propaganda. Pick any.")}
+      <article class="sheet" style="--tilt:-.2deg">${tape}<ul class="bonus">
+        <li><b>A coin</b><span>Two circles → ${M("Path ▸ Difference")} for the rim, your symbol in the middle, the name with ${M("Text ▸ Put on Path")}.</span></li>
+        <li><b>A banknote</b><span>Rectangle with a cog-ring border (Star tool, many corners, minus a rectangle), your symbol, the value in big bold text.</span></li>
+        <li><b>Flag on a pole</b><span>${M("Edit ▸ Select All")}, ${M("Object ▸ Group")}; a thin rectangle pole + a circle on top → ${M("Path ▸ Union")}.</span></li>
+        <li><b>The general's medal</b><span>An 8-corner star minus a circle (${M("Path ▸ Difference")}) + a ribbon: rectangle → ${M("Path ▸ Object to Path")} → ${T("node")} pull the bottom corners into a V.</span></li>
+      </ul></article></section>`;
     box.querySelectorAll(".done-btn").forEach(b => b.addEventListener("click", () => {
       const n = +b.dataset.n;
       S.solved = S.solved.includes(n) ? S.solved.filter(x => x !== n) : [...S.solved, n].sort((x, y) => x - y);
       update();
-      if (S.solved.includes(n)) {
-        const next = [1, 2, 3, 4, 5, 6, 7].find(k => !S.solved.includes(k));
-        const target = next ? document.getElementById("step-" + next) : $("#save");
-        if (target && next !== n) setTimeout(() => target.scrollIntoView({ block: "start" }), 250);
-      }
+      if (S.solved.includes(n)) { const nx = [1, 2, 3, 4, 5, 6, 7].find(k => !S.solved.includes(k)); const t = nx ? document.getElementById("step-" + nx) : $("#save"); if (t && nx !== n) setTimeout(() => t.scrollIntoView({ block: "start" }), 250); }
     }));
-    box.querySelectorAll(".check input").forEach(c => c.addEventListener("change", () => {
-      const k = +c.dataset.c;
-      S.checks = c.checked ? [...new Set([...S.checks, k])] : S.checks.filter(x => x !== k);
-      update();
-    }));
-    const io = new IntersectionObserver(es => es.forEach(e => {
-      if (e.isIntersecting) document.querySelectorAll(".dots a").forEach(a => a.classList.toggle("cur", a.dataset.n === e.target.dataset.n));
-    }), { rootMargin: "-40% 0px -55% 0px" });
+    box.querySelectorAll(".check input").forEach(c => c.addEventListener("change", () => { const k = +c.dataset.c; S.checks = c.checked ? [...new Set([...S.checks, k])] : S.checks.filter(x => x !== k); update(); }));
+    const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) document.querySelectorAll(".dots a").forEach(a => a.classList.toggle("cur", a.dataset.n === e.target.dataset.n)); }), { rootMargin: "-40% 0px -55% 0px" });
     box.querySelectorAll(".step").forEach(el => io.observe(el));
     paint();
   }
   function checklist(m) {
-    return [
-      `The field: ${LAYOUT_NAME[m.layout]}, 300 × 180 mm, exact colours`,
-      `Behind the emblem: ${{ rays: "sun rays", halo: "a thin halo ring", bars: "crossed bars (one shape)" }[m.extra]}`,
-      `The emblem frame: ${{ ring: "a ring (Difference)", disc: "a disc with an outline", shield: "a shield (Union)" }[m.frameKind]}`,
-      `The symbol: ${{ gear: "gear", sun: "rising sun", waves: "waves", mountains: "mountains", tree: "tree", atom: "atom", crown: "crown", crescent: "crescent and star", star: "star outline" }[m.sym]}`,
-      `${m.N} star${m.N > 1 ? "s" : ""} for the provinces`,
-      `The name ${esc(m.name.toUpperCase())}${m.regime === "auth" ? " in an arc (Put on Path)" : " centred at the top"}`,
-      `The motto ${m.regime === "auth" ? "cut out of the band (Object to Path + Difference)" : "flowed into the ribbon (Flow into Frame)"}, and the frame`,
-      "Both SVG and PNG saved, with your surname in the file name"
-    ];
+    return [`The field: ${LAYOUT_NAME[m.layout]}, exact colours, page resized to the banner`, `Behind the emblem: ${BEHIND_NAME[m.army]}`, `The emblem frame: ${FRAME_NAME[m.econ]}`,
+      `The symbol: ${SYM_NAME[m.sym]}`, `${m.N} star${m.N > 1 ? "s" : ""} with equal gaps`, `The name ${esc(m.name)}${m.arcName ? " in an arc (Put on Path)" : " centred at the top"}`,
+      `The motto “${esc(m.motto)}” ${m.bandMotto ? "cut out of the band" : "flowed into the ribbon"}, and the frame`, "Both SVG and PNG saved, with your surname in the file name"];
   }
 
   /* ------------------------------------------------------------------ progress */
   function paint() {
     document.querySelectorAll(".step").forEach(el => {
-      const n = +el.dataset.n, d = S.solved.includes(n);
-      el.classList.toggle("is-done", d);
-      const b = el.querySelector(".done-btn");
-      b.setAttribute("aria-pressed", String(d));
-      b.querySelector(".box").textContent = d ? "✓" : "";
-      b.querySelector(".t").textContent = d ? "Done" : "I did this step";
+      const n = +el.dataset.n, d = S.solved.includes(n); el.classList.toggle("is-done", d);
+      const b = el.querySelector(".done-btn"); b.setAttribute("aria-pressed", String(d)); b.querySelector(".box").textContent = d ? "✓" : ""; b.querySelector(".t").textContent = d ? "Done" : "I did this step";
     });
     document.querySelectorAll(".dots a").forEach(a => a.classList.toggle("done", S.solved.includes(+a.dataset.n)));
     document.querySelectorAll("#bar i").forEach((i, k) => i.classList.toggle("on", S.solved.includes(k + 1)));
     $("#count").textContent = `${S.solved.length} / 7 steps`;
     document.querySelectorAll(".check input").forEach(c => { c.checked = S.checks.includes(+c.dataset.c); });
-    const wasEnd = S.end;
-    S.end = S.locked && S.solved.length >= 7 && S.checks.length >= 8;
+    const was = S.end; S.end = S.revealed && S.solved.length >= 7 && S.checks.length >= 8;
     const f = $("#finish"); if (f) f.classList.toggle("show", S.end);
-    return !wasEnd && S.end;
+    return !was && S.end;
   }
   function confetti() {
     if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const box = document.createElement("div"); box.className = "confetti";
-    const cols = build(A()).pal.concat(["#efeee6"]);
-    for (let i = 0; i < 90; i++) {
-      const p = document.createElement("i");
-      p.style.left = Math.random() * 100 + "vw"; p.style.background = cols[i % cols.length];
-      p.style.animationDuration = 1.8 + Math.random() * 1.8 + "s"; p.style.animationDelay = Math.random() * .5 + "s";
-      box.appendChild(p);
-    }
+    const box = document.createElement("div"); box.className = "confetti"; const cols = build(A()).pal.concat(["#efeee6"]);
+    for (let i = 0; i < 90; i++) { const p = document.createElement("i"); p.style.left = Math.random() * 100 + "vw"; p.style.background = cols[i % cols.length]; p.style.animationDuration = 1.8 + Math.random() * 1.8 + "s"; p.style.animationDelay = Math.random() * .5 + "s"; box.appendChild(p); }
     document.body.appendChild(box); setTimeout(() => box.remove(), 4200);
   }
   function update() { const j = paint(); save(); if (j) confetti(); }
-
   $("#reset").addEventListener("click", () => {
     if (!confirm("Start over? Your answers and ticks will be cleared.")) return;
-    S = { answers: fresh(), locked: false, solved: [], checks: [], end: false };
-    save(); syncForm(); hints(); live(); renderWork(); window.scrollTo({ top: 0 });
+    S = { answers: fresh(), q: 0, revealed: false, solved: [], checks: [], end: false }; save();
+    renderWizard(); renderWork(); hero(); window.scrollTo({ top: 0 });
   });
   $("#print").addEventListener("click", () => window.print());
 
-  syncForm(); hints(); live(); renderWork();
+  if (S.revealed && !allValid()) S.revealed = false;
+  renderWizard(); renderWork(); hero();
 })();
