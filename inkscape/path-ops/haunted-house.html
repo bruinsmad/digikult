@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Haunted House – Inkscape</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap">
+<link rel="stylesheet" href="../mission.css">
+<style>:root{--accent:#c9a7f5}</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+window.MISSION = {
+  key: "haunted-house-v1",
+  title: "The Haunted House",
+  story: "At the end of the lane stands a house nobody enters. Tonight you design the poster for the Haunted House night.",
+  file: "surname_hauntedhouse",
+  poster: "../img/haunted-house/poster.png",
+  pdf: "../pdf/haunted-house-worksheet.pdf",
+  teacherPdf: "../pdf/haunted-house-teacher.pdf",
+  saveImg: "../img/haunted-house/save.png",
+  bonusImg: "../img/haunted-house/bonus.png",
+  elements: [
+    ["Night sky, stars, moon", "Rectangle, Star and Ellipse tools", "fill, stroke"],
+    ["Hill", "wide ellipse + rectangle", "Intersection"],
+    ["House silhouette", "rectangle + triangle", "Union"],
+    ["Glowing windows and door", "openings → Union → cut out; yellow behind", "Difference + stacking order"],
+    ["Ghost", "circle + rectangle; three small circles", "Union → Difference"],
+    ["Leaning tree", "rectangle → path → nodes", "Node tool"],
+    ["Fence", "one plank, copied four times", "Edit ▸ Duplicate"]
+  ],
+  steps: [
+    { title: "Night sky, stars and moon", img: "../img/haunted-house/step1.png",
+      alt: "Step 1: purple rectangle over the page, stars with the Star tool, a full moon with an orange stroke",
+      lead: "One big rectangle for the sky, stars from the Star tool, a moon with a stroke.",
+      note: "Leave the bottom third of the page empty – the hill, the house and the tree go there.",
+      stuck: ["The moon's outline: <span class='menu'>Object ▸ Fill and Stroke…</span> → <i>Stroke paint</i> tab → flat colour, pick orange."] },
+    { title: "Hill", img: "../img/haunted-house/step2.png",
+      alt: "Step 2: wide dark green ellipse half below the page, rectangle over it, Path ▸ Intersection",
+      lead: "Intersection keeps only the part the two shapes share – here it trims the ellipse to the page.",
+      stuck: ["The hill vanished: the rectangle didn't overlap the ellipse. Undo and draw it over the ellipse's top half."] },
+    { title: "House silhouette", img: "../img/haunted-house/step3.png",
+      alt: "Step 3: dark rectangle on the hill, triangle roof with the Star tool in Polygon mode, Path ▸ Union",
+      lead: "Walls + roof become one shape with Union.",
+      stuck: ["There's a gap between roof and walls: the roof must overlap the top of the walls a little before Union."] },
+    { title: "Glowing windows", img: "../img/haunted-house/step4.png",
+      alt: "Step 4: window rectangles and a door, Union of the openings, Difference from the house, yellow rectangle lowered behind",
+      lead: "The windows and the door become holes; a yellow rectangle behind the house shines through.",
+      stuck: ["The house disappeared instead of the openings: the house was on top. <span class='menu'>Edit ▸ Undo</span>, select the openings, <span class='menu'>Object ▸ Raise to Top</span>, try again.",
+              "Difference is greyed out: the openings must be ONE object first (<span class='menu'>Path ▸ Union</span>).",
+              "The yellow covers everything: use <span class='menu'>Object ▸ Lower</span> – not Lower to Bottom, that hides it behind the sky."] },
+    { title: "Ghost", img: "../img/haunted-house/step5.png",
+      alt: "Step 5: white circle and rectangle, Union, three small circles on the bottom edge, Union them, Difference, dark eyes",
+      lead: "Union builds the body, Difference bites the wavy hem.",
+      stuck: ["The hem doesn't change: the small circles must sit ON the bottom edge – half inside, half outside – and be united first."] },
+    { title: "Leaning tree", img: "../img/haunted-house/step6.png",
+      alt: "Step 6: thin rectangle, Object to Path and drag the top-left node, a branch made the same way",
+      lead: "A rectangle turns into a crooked trunk by moving one corner node.",
+      note: "Second branch: click the branch, <span class='menu'>Edit ▸ Duplicate</span>, <span class='menu'>Object ▸ Flip Horizontal</span>, drag it to the other side.",
+      stuck: ["The whole shape moves when you drag a node: pick the Node tool, not the Selector.",
+              "Round handles instead of corners: <span class='menu'>Path ▸ Object to Path</span> first."] },
+    { title: "Fence", img: "../img/haunted-house/step7.png",
+      alt: "Step 7: one thin plank, Edit ▸ Duplicate and drag the copies into a row of five, a long flat rail across",
+      lead: "Draw one plank, then <span class='menu'>Edit ▸ Duplicate</span> – the copy lands exactly on the original, ready to drag.",
+      stuck: ["The copy seems to do nothing: it's sitting on the original. Just drag it to the right."] }
+  ],
+  checklist: [
+    "The sky covers the whole page",
+    "At least 8 stars and a moon with an orange stroke",
+    "The hill has a curved top and a flat bottom (Intersection)",
+    "The house is ONE object: walls and roof joined (Union)",
+    "Windows and door are holes, with yellow light behind them (Difference + Object ▸ Lower)",
+    "The ghost has a wavy hem and two eyes (Union + Difference)",
+    "The tree leans and has at least one branch (Node tool)",
+    "A fence of at least 5 planks and a rail (Edit ▸ Duplicate)",
+    "Both SVG and PNG saved, with your surname in the file name"
+  ],
+  bonus: [
+    ["Bat in front of the moon", "Small ellipse + a triangle on each side → <span class='menu'>Path ▸ Union</span> → almost black."],
+    ["Pumpkin on the hill", "Orange ellipse; triangle eyes and mouth → Union → <span class='menu'>Path ▸ Difference</span>; darker ellipse behind."],
+    ["Crescent moon", "A sky-coloured circle over the moon, slightly to one side → <span class='menu'>Path ▸ Difference</span>."],
+    ["Chimney", "Small rectangle on the roof → select it with the house → <span class='menu'>Path ▸ Union</span>."],
+    ["Poster title", "Text tool: HAUNTED HOUSE NIGHT – big letters, pale yellow."]
+  ]
+};
+</script>
+<script src="../mission.js"></script>
+<script src="../../nav.js" defer></script>
+</body>
+</html>
