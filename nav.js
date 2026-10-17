@@ -143,8 +143,8 @@
                 kind: "demo",
                 title: { hu: "A párosító", en: "The Matchmaker" },
                 desc: {
-                  hu: "Kivetítős bemutató, kód nélkül: előbb a táblák szerkezete, aztán vonalak kötik össze a sorokat – N:1, 1:1 és N:N.",
-                  en: "Projector demo, no code: first the structure of the tables, then wires join the rows – N:1, 1:1 and N:N."
+                  hu: "Kivetítős bemutató, kód nélkül: előbb a táblák szerkezete, aztán vonalak kötik össze a sorokat – 1:1, 1:N és N:N.",
+                  en: "Projector demo, no code: first the structure of the tables, then wires join the rows – 1:1, 1:N and N:N."
                 },
                 files: { en: "sql/joins/matchmaker.html", hu: "sql/joins/matchmaker-hu.html" }
               }
