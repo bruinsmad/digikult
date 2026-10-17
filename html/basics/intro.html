@@ -374,7 +374,7 @@ footer.end{max-width:980px;margin:0 auto;padding:0 22px 60px;color:var(--chalk-d
 &lt;/html&gt;</textarea>
 <div class="pv"><div class="browser" data-file="shelter.html" data-min="110" data-max="520"></div></div></div>
 <div class="ex-bar"><span class="try">Change the <code>title</code> and watch the tab at the top of the preview. Then write a new paragraph under the <code>&lt;h1&gt;</code>.</span><button type="button" class="btn ghost reset">Reset</button></div></div>
-<div class="idea"><span class="i" aria-hidden="true">⌨️</span><p>The editor helps like VS Code does: type an opening tag and it adds the closing tag for you, and while you type it suggests tags and attributes. Press Enter or Tab to pick one.</p></div>
+<div class="idea"><span class="i" aria-hidden="true">⌨️</span><p>The editor helps like VS Code does: it adds closing tags for you, suggests tags and attributes as you type (Enter or Tab), and tells you what a tag is for when you hover over it. Try Emmet too: type <code>ul&gt;li*3</code> and press Tab!</p></div>
 <div class="idea"><span class="i" aria-hidden="true">💡</span><p>The <code>head</code> is like an envelope: the details are written on it, but the letter itself is in the <code>body</code>.</p></div>
 <div class="rule-box"><b>Tip:</b> the spaces at the start of the lines (indentation) are optional, but they show what is inside what. The preview stays the same; the code becomes much easier to read.</div></section><section class="sec" id="szoveg"><h2><span class="n">4</span>Headings and paragraphs</h2>
 <p>There are six levels of <b>heading</b>: <code>&lt;h1&gt;</code> is the most important, <code>&lt;h6&gt;</code> the least. A page usually has just one <code>&lt;h1&gt;</code>, its main title. Choose a heading by how important it is, not by its size: we set sizes later with CSS.</p>
@@ -487,6 +487,53 @@ const $ = (s, el=document) => el.querySelector(s), $$ = (s, el=document) => [...
 const esc = s => String(s).replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const VOID = new Set(["area","base","br","col","embed","hr","img","input","link","meta","source","track","wbr"]);
 
+/* ---------- editor texts: suggestions, hover help, search panel, mistake messages ---------- */
+const PAGE_LANG = document.documentElement.lang === "en" ? "en" : "hu";
+const ED_TEXT = {
+  hu: {
+    docs: { html: "az egész oldal", head: "fejrész: adatok az oldalról", body: "törzs: ami az oldalon látszik", title: "a böngésző fülén látszó cím",
+      meta: "adat az oldalról (pl. kódolás)", h1: "főcím, a legfontosabb címsor", h2: "alcím", h3: "harmadszintű címsor", h4: "kisebb címsor", h5: "kisebb címsor", h6: "a legkisebb címsor",
+      p: "bekezdés", br: "sortörés (üres elem)", hr: "vízszintes vonal (üres elem)", strong: "fontos szöveg, félkövér", em: "hangsúlyos szöveg, dőlt",
+      b: "félkövér betű", i: "dőlt betű", u: "aláhúzott szöveg", sub: "alsó index, pl. H₂O", sup: "felső index, pl. m²", ul: "felsorolás pontokkal",
+      ol: "számozott lista", li: "a lista egy eleme", a: "hivatkozás (link)", img: "kép (üres elem)", table: "táblázat", tr: "a táblázat egy sora",
+      th: "fejléccella", td: "cella", div: "doboz, részeket csoportosít", span: "szövegrész, csoportosít", "@href": "hová visz a link", "@src": "a képfájl helye",
+      "@alt": "a kép leírása", "@width": "szélesség képpontban", "@height": "magasság képpontban", "@target": "_blank: új lapon nyílik", "@lang": "az oldal nyelve, pl. hu",
+      "@colspan": "hány oszlopon át ér a cella", "@rowspan": "hány soron át ér a cella", "@border": "keret a cellák körül", "@charset": "karakterkódolás",
+      "@title": "súgó, ha fölé viszed az egeret", "#file": "kép a mappában", "#emmet": "Emmet · Tab" },
+    phrases: { "Find": "Keresés", "Replace": "Csere", "next": "következő", "previous": "előző", "all": "mind", "match case": "kis- és nagybetű",
+      "regexp": "regex", "by word": "egész szó", "replace": "csere", "replace all": "mindet cseréli", "close": "bezárás", "current match": "aktuális találat",
+      "replaced $ matches": "$ találat cserélve", "replaced match on line $": "csere a(z) $. sorban", "on line": "sor", "Go to line": "Ugrás sorra", "go": "ugrás",
+      "Folded lines": "Összecsukott sorok", "Unfolded lines": "Kibontott sorok", "to": "–", "folded code": "összecsukott kód", "unfold": "kibontás",
+      "Fold line": "Összecsukás", "Unfold line": "Kibontás", "Diagnostics": "Figyelmeztetések", "No diagnostics": "Nincs figyelmeztetés" },
+    lint: { lintOpen: "{1}. sor: a címke nincs befejezve, hiányzik a > jel: {0}", lintQuote: "{1}. sor: hiányzik egy idézőjel ebben a címkében: {0}",
+      lintVoidClose: "{1}. sor: {0} üres elem, nincs záró címkéje. Töröld a {c0} címkét.", lintStray: "{1}. sor: {c0} lezár valamit, amit nem nyitottál meg.",
+      lintCross: "{3}. sor: keresztbe zárt címkék. Előbb {c0}, utána {c1} jön.", lintUnclosed: "{1}. sor: {0} nincs lezárva. Valahová kell egy {c0}." }
+  },
+  en: {
+    docs: { html: "the whole page", head: "information about the page", body: "everything visible on the page", title: "the title on the browser tab",
+      meta: "page information (e.g. encoding)", h1: "main heading, the most important", h2: "subheading", h3: "third-level heading", h4: "smaller heading", h5: "smaller heading", h6: "the smallest heading",
+      p: "paragraph", br: "line break (empty element)", hr: "horizontal line (empty element)", strong: "important text, bold", em: "stressed text, italic",
+      b: "bold text", i: "italic text", u: "underlined text", sub: "subscript, e.g. H₂O", sup: "superscript, e.g. m²", ul: "bulleted list",
+      ol: "numbered list", li: "one item of a list", a: "link", img: "image (empty element)", table: "table", tr: "one row of a table",
+      th: "header cell", td: "cell", div: "box that groups parts", span: "piece of text, groups", "@href": "where the link goes", "@src": "where the image file is",
+      "@alt": "description of the image", "@width": "width in pixels", "@height": "height in pixels", "@target": "_blank: opens in a new tab", "@lang": "the page's language, e.g. en",
+      "@colspan": "how many columns the cell spans", "@rowspan": "how many rows the cell spans", "@border": "border round the cells", "@charset": "character encoding",
+      "@title": "tooltip on mouse hover", "#file": "image in the folder", "#emmet": "Emmet · Tab" },
+    phrases: {},
+    lint: { lintOpen: "Line {1}: this tag isn't finished, the > is missing: {0}", lintQuote: "Line {1}: a quote mark is missing in this tag: {0}",
+      lintVoidClose: "Line {1}: {0} is an empty element with no closing tag. Delete the {c0}.", lintStray: "Line {1}: {c0} closes something that was never opened.",
+      lintCross: "Line {3}: tags closed crosswise. First {c0}, then {c1}.", lintUnclosed: "Line {1}: {0} is never closed. Add a {c0} somewhere." }
+  }
+};
+const LINT_T = {};
+Object.entries(ED_TEXT[PAGE_LANG].lint).forEach(([k, tpl]) => {
+  LINT_T[k] = (...a) => tpl.replace(/\{(c?)(\d)\}/g, (_, c, i) => {
+    const v = a[+i];
+    return typeof v === "number" ? String(v) : `<code>&lt;${c ? "/" : ""}${esc(v)}&gt;</code>`;
+  });
+});
+const IMG_FILES = ["img/morzsa.svg", "img/cirmi.svg", "img/pamacs.svg", "img/bodri.svg", "img/logo.svg"];
+
 /* HTML syntax colouring: tags, attribute names, values, comments, entities */
 function hlTag(t){
   const m = /^(<\/?)([a-zA-Z][\w-]*)?([\s\S]*?)(\/?>)?$/.exec(t);
@@ -519,7 +566,7 @@ function hl(src){
 }
 
 /* A tolerant check for beginners' mistakes: unclosed, stray and crossed tags, with line numbers. */
-function lint(src, T){
+function lint(src, T = LINT_T){
   const out = [], stack = [];
   const lineOf = i => src.slice(0, i).split("\n").length;
   const clean = src.replace(/<!--[\s\S]*?-->/g, c => c.replace(/[^\n]/g, " "));
@@ -528,35 +575,39 @@ function lint(src, T){
   const lateClose = {};                                        /* closing tags we already explained (crossed pairs) */
   let m;
   while ((m = re.exec(clean))){
-    if (m[6] !== undefined && m[2] === undefined){ out.push(T.lintOpen(m[6].toLowerCase(), lineOf(m.index))); continue; }
+    if (m[6] !== undefined && m[2] === undefined){ out.push({ line: lineOf(m.index), html: T.lintOpen(m[6].toLowerCase(), lineOf(m.index)) }); continue; }
     const close = !!m[1], name = m[2].toLowerCase(), line = lineOf(m.index), attrs = m[3] || "";
-    if ((attrs.split('"').length - 1) % 2) out.push(T.lintQuote(name, line));
-    if (VOID.has(name)){ if (close) out.push(T.lintVoidClose(name, line)); continue; }
+    if ((attrs.split('"').length - 1) % 2) out.push({ line, html: T.lintQuote(name, line) });
+    if (VOID.has(name)){ if (close) out.push({ line, html: T.lintVoidClose(name, line) }); continue; }
     if (!close){ stack.push({ name, line }); continue; }
     const at = stack.map(s => s.name).lastIndexOf(name);
     if (at < 0){
-      if (lateClose[name]) lateClose[name]--; else out.push(T.lintStray(name, line));
+      if (lateClose[name]) lateClose[name]--; else out.push({ line, html: T.lintStray(name, line) });
       continue;
     }
     const rest = clean.slice(re.lastIndex).toLowerCase();
     stack.slice(at + 1).reverse().forEach(inner => {
       if (skip.has(inner.name)) return;
       const crossed = new RegExp("^\\s*</" + inner.name + "\\s*>").test(rest);
-      if (crossed){ out.push(T.lintCross(inner.name, name, inner.line, line)); lateClose[inner.name] = (lateClose[inner.name] || 0) + 1; }
-      else out.push(T.lintUnclosed(inner.name, inner.line));
+      if (crossed){ out.push({ line, html: T.lintCross(inner.name, name, inner.line, line) }); lateClose[inner.name] = (lateClose[inner.name] || 0) + 1; }
+      else out.push({ line: inner.line, html: T.lintUnclosed(inner.name, inner.line) });
     });
     stack.length = at;
   }
-  stack.forEach(s => { if (!skip.has(s.name)) out.push(T.lintUnclosed(s.name, s.line)); });
-  return [...new Set(out)].slice(0, 4);
+  stack.forEach(s => { if (!skip.has(s.name)) out.push({ line: s.line, html: T.lintUnclosed(s.name, s.line) }); });
+  const seen = new Set();
+  return out.filter(w => !seen.has(w.html) && seen.add(w.html)).slice(0, 6);
 }
 
 /* Highlighted editor: a coloured copy underneath, a see-through textarea on top, line numbers on the left. */
 function makeEditor(ta, opts={}){
-  if (window.CMHTML){                                     /* CodeMirror: completion, auto-closing tags, smart indent */
+  if (window.CMHTML){                                     /* CodeMirror: VS Code-style comforts */
     const w = document.createElement("div"); w.className = "cmw" + (opts.fixed ? " fixed" : ""); ta.before(w); ta.hidden = true;
     let quiet = false;
+    const T = ED_TEXT[PAGE_LANG];
     const cm = CMHTML.create({ parent: w, doc: ta.value, lines: !!opts.lines, fit: true, label: ta.getAttribute("aria-label") || "",
+      lang: PAGE_LANG, docs: T.docs, phrases: T.phrases, files: opts.files || IMG_FILES, fold: !!opts.fold,
+      lint: opts.lint === false ? null : (src => lint(src)),
       onChange: v => { if (quiet) return; ta.value = v; ta.dispatchEvent(new Event("input")); } });
     w.addEventListener("mousedown", e => { if (e.target === w){ e.preventDefault(); cm.focus(); } });
     return { refit: () => { quiet = true; cm.set(ta.value); quiet = false; cm.view.requestMeasure(); }, cm, el: w };
