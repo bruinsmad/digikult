@@ -197,10 +197,22 @@ textarea.layer::selection { background: rgba(124, 146, 255, .38); color: transpa
 .anatomy, .sel-list, .controls, .editor, .result-card, .html-view, .diagram { border-radius: 4px; }
 .seg button, .mini, .tab .n { border-radius: 3px; }
 .tab { border-radius: 4px; }
+/* the same wooden rail as the other lessons: home and where you are */
+.rail { position: sticky; top: 0; z-index: 20; margin: -24px calc(-1 * max(16px, env(safe-area-inset-left, 0px))) 24px calc(-1 * max(16px, env(safe-area-inset-left, 0px))); background: linear-gradient(#b07448, #8a5532 45%, #5d3820); box-shadow: 0 3px 0 rgba(0,0,0,.25); }
+.rail .in { max-width: 1180px; margin: 0 auto; padding: 0 18px; height: 54px; display: flex; align-items: center; gap: 14px; }
+.home { font: 700 20px/1 var(--display); color: #fff6e8; text-decoration: none; white-space: nowrap; }
+.crumb { color: #f3dcc4; font: 14px var(--body); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.crumb a { color: inherit; text-decoration: none; }
+.crumb a:hover { color: #fff6e8; text-decoration: underline; text-decoration-color: var(--accent); text-underline-offset: 3px; }
+@media (min-width: 861px) { .col-result { top: 70px; } }
 </style>
 
 </head>
 <body>
+<header class="rail"><div class="in">
+  <a class="home" href="../../index.html">Digital Culture</a>
+  <span class="crumb"><a href="../../index.html#web">Web pages</a> › <a href="../../index.html#web-basics">Lesson 2</a></span>
+</div></header>
 <div class="wrap">
   <header>
     <p class="eyebrow">Web pages, CSS: live lessons</p>
