@@ -94,7 +94,7 @@ main{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:18px;ali
 .case p{margin:.5em 0}
 .case mark{background:#ffe9a8;color:#3a2b00;padding:0 4px;border-radius:3px}
 .case code{background:#ede7ff;color:#3b2a7a;padding:1px 5px;border-radius:4px;font-size:.92em}
-.case pre{background:var(--laptop);color:#e9f5ff;padding:12px 14px;border-radius:8px;overflow:auto;font-size:14px;line-height:1.5;margin:8px 0}
+.case pre{background:var(--laptop);color:#e9f5ff;padding:12px 14px;border-radius:8px;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;font-size:14px;line-height:1.5;margin:8px 0}
 .learn{margin-top:14px;padding:12px 14px;border-left:4px solid var(--cyan);background:rgba(79,227,255,.08);border-radius:0 8px 8px 0}
 .learn h3,.task h3{font-size:14px;letter-spacing:.08em;text-transform:uppercase;color:#1e7f99;margin-bottom:4px}
 .links{margin-top:14px;padding:12px 14px 10px;border-radius:10px;border:1px solid var(--lk-border);background:var(--lk-bg)}
@@ -173,7 +173,7 @@ tr:last-child td{border-bottom:none}
 .err{background:var(--bad-soft);color:var(--bad);border-radius:8px;padding:12px 14px;font-weight:700}
 .err p{margin:.3em 0 0;font-weight:400;color:var(--ink)}
 .note{color:var(--muted);font-style:italic;margin:0}
-.schema{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
+.schema{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(250px,100%),1fr));gap:10px}
 .tbl{border:1px solid var(--line);border-radius:8px;padding:10px 12px;background:rgba(255,255,255,.03)}
 .tbl button{font:700 15px var(--f-mono);background:none;border:0;color:var(--gold);cursor:pointer;padding:0}
 .tbl button:hover{text-decoration:underline}
@@ -892,7 +892,8 @@ function fireworkShow(count){ for (let k=0; k<count; k++) setTimeout(()=> firewo
 
 let soundOn = true;
 try { soundOn = localStorage.getItem(KEY+"-sound") !== "off"; } catch(e){}
-function paintSound(){ const b = $("soundToggle"); b.textContent = `${T.sound}: ${soundOn?"on":"off"}`; b.setAttribute("aria-pressed", soundOn); }
+const ONOFF = document.documentElement.lang === "hu" ? ["be", "ki"] : ["on", "off"];
+function paintSound(){ const b = $("soundToggle"); b.textContent = `${T.sound}: ${soundOn?ONOFF[0]:ONOFF[1]}`; b.setAttribute("aria-pressed", soundOn); }
 paintSound();
 $("soundToggle").onclick = ()=>{ soundOn = !soundOn; paintSound(); try { localStorage.setItem(KEY+"-sound", soundOn?"on":"off"); } catch(e){} };
 let actx = null;

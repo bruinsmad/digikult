@@ -319,7 +319,8 @@ const COLS = ["#ff4fa3","#4fe3ff","#b8ff5c","#ffd166","#c9a2ff","#ff9e7a"];
 /* ---------- sound ---------- */
 let soundOn = true, actx = null;
 try { soundOn = localStorage.getItem("matchmaker-sound") !== "off"; } catch(e){}
-function paintSound(){ const b = $("soundToggle"); b.textContent = `${T.sound}: ${soundOn?"on":"off"}`; b.setAttribute("aria-pressed", soundOn); }
+const ONOFF = document.documentElement.lang === "hu" ? ["be", "ki"] : ["on", "off"];
+function paintSound(){ const b = $("soundToggle"); b.textContent = `${T.sound}: ${soundOn?ONOFF[0]:ONOFF[1]}`; b.setAttribute("aria-pressed", soundOn); }
 paintSound();
 $("soundToggle").onclick = ()=>{ soundOn = !soundOn; paintSound(); try { localStorage.setItem("matchmaker-sound", soundOn?"on":"off"); } catch(e){} };
 function tone(freq, dur, type="triangle", vol=.1, slideTo=null, delay=0){
@@ -432,7 +433,8 @@ function size(){
   if (bd.plan) layout();
 }
 const SL = () => bd.slow ? 2.4 : 1;
-$("slow").onclick = ()=>{ bd.slow = !bd.slow; $("slow").setAttribute("aria-pressed", bd.slow); $("slow").textContent = `${T.slow}: ${bd.slow ? "on" : "off"}`; };
+$("slow").onclick = ()=>{ bd.slow = !bd.slow; $("slow").setAttribute("aria-pressed", bd.slow); $("slow").textContent = `${T.slow}: ${bd.slow ? ONOFF[0] : ONOFF[1]}`; };
+$("slow").textContent = `${T.slow}: ${ONOFF[1]}`;
 
 /* order tables so that connected ones sit next to each other */
 function orderTables(tables, joins){
@@ -580,6 +582,7 @@ function frame(t){
       g.restore(); }
   }
   /* cards */
+  bd.topLabels = [];
   bd.cards.forEach((card, ci)=>{
     const S = card.S, x = card.x, y = card.y + (1-ein)*24, w = card.w, h = card.h;
     g.save(); g.globalAlpha = ein;
@@ -593,11 +596,18 @@ function frame(t){
     g.font = `600 11px 'JetBrains Mono', monospace`; g.fillStyle = "#b3a8cc"; g.textAlign = "right"; if (!narrow) g.fillText(T.rowsN(S.rows.length), x + w - 10, y + card.head/2 - 1);
     /* column header */
     const per = (w - 16)/S.cols.length; g.textAlign = "center"; g.textBaseline = "middle";
-    S.cols.forEach((c,k)=>{ const cx = x + 8 + per*k + per/2, cy = y + card.head + card.colh/2;
+    /* joined columns are placed first and drawn later, on top of their cables; the others only where they fit */
+    const labs = S.cols.map((c,k)=>{ const cx = x + 8 + per*k + per/2, cy = y + card.head + card.colh/2;
       const j = plan.joins.find(j=> (j.a === card.t && j.ca.toLowerCase() === c.name.toLowerCase()) || (j.b === card.t && j.cb.toLowerCase() === c.name.toLowerCase()));
-      let fs = clamp(per/ (c.name.length*.62), 8, 12); g.font = `${j ? "700" : "500"} ${Math.round(fs)}px 'JetBrains Mono', monospace`;
-      g.fillStyle = j ? j.col : "#8f84ad"; if (per >= c.name.length*5 || j) g.fillText(c.name, cx, cy);
-      if (j){ g.beginPath(); g.arc(cx, y + card.head + card.colh + 2, 3.5, 0, 6.283); g.fillStyle = j.col; g.fill(); } });
+      const fs = Math.round(j ? clamp(per/(c.name.length*.62), 9, 12) : clamp(per/(c.name.length*.62), 8, 12)), font = `${j ? "700" : "500"} ${fs}px 'JetBrains Mono', monospace`;
+      g.font = font; const tw = g.measureText(c.name).width; return { c, j, cx, cy, font, tw, fs }; });
+    const taken = [];
+    labs.filter(L=>L.j).forEach(L=>{ L.lx = clamp(L.cx, x + 6 + L.tw/2, x + w - 6 - L.tw/2); taken.push([L.lx - L.tw/2 - 6, L.lx + L.tw/2 + 6]);
+      bd.topLabels.push({ text: L.c.name, x: L.lx, y: L.cy, font: L.font, col: L.j.col, w: L.tw, h: L.fs + 6, alpha: ein }); });
+    labs.filter(L=>!L.j).forEach(L=>{ if (per < L.c.name.length*5) return; const a = L.cx - L.tw/2, b = L.cx + L.tw/2;
+      if (taken.some(([p,q])=> a < q && b > p)) return; taken.push([a - 4, b + 4]);
+      g.font = L.font; g.fillStyle = "#8f84ad"; g.fillText(L.c.name, L.cx, L.cy); });
+    labs.filter(L=>L.j).forEach(L=>{ g.beginPath(); g.arc(L.cx, y + card.head + card.colh + 2, 3.5, 0, 6.283); g.fillStyle = L.j.col; g.fill(); });
     /* rows */
     const fs = clamp(card.rh*.72, 7, 13); g.font = `500 ${Math.round(fs)}px 'JetBrains Mono', monospace`; g.textAlign = "left";
     S.rows.forEach((r,k)=>{
@@ -654,6 +664,9 @@ function frame(t){
       if (!plan.sounded.has("b"+ji)){ plan.sounded.add("b"+ji); (v.kind === "ok" ? sfx.good : v.kind === "warn" ? sfx.warn : sfx.bad)(); }
     }
   });
+  /* joined column names sit on top of their cables, on a small plate */
+  bd.topLabels.forEach(L=>{ g.save(); g.globalAlpha = L.alpha; roundRect(g, L.x - L.w/2 - 5, L.y - L.h/2, L.w + 10, L.h, 5); g.fillStyle = "#17112f"; g.fill(); g.strokeStyle = L.col; g.lineWidth = 1.5; g.stroke();
+    g.font = L.font; g.fillStyle = L.col; g.textAlign = "center"; g.textBaseline = "middle"; g.fillText(L.text, L.x, L.y + .5); g.restore(); });
   /* N:N summary */
   if (plan.via && t >= plan.tDone){ const X = bd.cardOf.get(plan.via.X), Y = bd.cardOf.get(plan.via.Y); if (X && Y){ const k = clamp((t - plan.tDone)/(400*s), 0, 1);
       badge(g, (X.x + X.w/2 + Y.x + Y.w/2)/2, H - 42, `∞ ${plan.via.X.name} ↔ ${plan.via.Y.name}: N : N`, "#b8ff5c", 1, k); } }
@@ -674,7 +687,7 @@ function updateCaption(t){
   const plan = bd.plan; if (!plan) return;
   const parts = [`<span class="st">FROM: ${plan.tables.length} ${T.tablesWord}</span>`];
   if (plan.tCross) parts.push(`<span class="st ${t >= plan.tCross ? "warn" : "todo"}">${T.capCross(plan.crossPairs)}</span>`);
-  plan.joins.forEach(j=>{ const v = j.verdict, done = t >= j.tBadge, cls = !done ? "todo" : v.kind; const txt = done ? `${v.kind === "ok" ? "✓" : v.kind === "warn" ? "⚠" : "✗"} ${j.text}${v.rel ? " → " + v.rel : ""}` : j.text; parts.push(`<span class="st ${cls}">${esc(txt)}</span>`); });
+  plan.joins.forEach(j=>{ const v = j.verdict, done = t >= j.tBadge, cls = !done ? "todo" : v.kind; const txt = done ? `${v.kind === "ok" ? "✓" : v.kind === "warn" ? "⚠" : "✗"} ${j.text}${v.rel ? "\u00a0→ " + v.rel.replace(/ /g, "\u00a0") : ""}` : j.text; parts.push(`<span class="st ${cls}">${esc(txt)}</span>`); });
   if (plan.tLoose) parts.push(`<span class="st ${t >= plan.tLoose ? "warn" : "todo"}">${T.capLoose(plan.loose.map(x=>x.name).join(", "))}</span>`);
   if (plan.tFilter) parts.push(`<span class="st ${t >= plan.tFilter ? "ok" : "todo"}">WHERE: ${esc(plan.filters.join(" AND "))}</span>`);
   if (plan.final && !plan.error) parts.push(`<span class="st ${t >= plan.tDone ? "new" : "todo"}">${T.resultN(plan.resultRows)}</span>`);
