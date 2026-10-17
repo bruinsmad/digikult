@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Band Night – Inkscape</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap">
+<link rel="stylesheet" href="../mission.css">
+<style>:root{--accent:#4cc9f0}</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+window.MISSION = {
+  key: "band-night-v1",
+  title: "Band Night",
+  story: "The school bands play on Friday night in the gym, and nobody has made a poster yet. You have one lesson – and a few new text tricks.",
+  file: "surname_bandnight",
+  poster: "../img/band-night/poster.png",
+  pdf: "../pdf/band-night-worksheet.pdf",
+  teacherPdf: "../pdf/band-night-teacher.pdf",
+  saveImg: "../img/band-night/save.png",
+  bonusImg: "../img/band-night/bonus.png",
+  buildIntro: "Text is the star again – with new tricks. Colours, fonts and sizes are up to you.",
+  rules: [
+    "<b>Text tool:</b> a <i>click</i> = one line, a <i>drag</i> = a text box. Click <i>into</i> a text to edit it.",
+    "<b>Part of a text:</b> drag over some letters with the Text tool – colour and size then change only those letters.",
+    "<b>Pen tool</b> (pen nib with a curve, under the spiral): click, click, click – a straight line between clicks – and <i>double-click</i> to finish.",
+    "<b>Put on Path, Flow into Frame, Union:</b> exactly 2 objects selected (click, <span class='key'>Shift</span> + click). The status bar counts them."
+  ],
+  elements: [
+    ["Background and record", "Rectangle and Ellipse tools", "warm-up"],
+    ["Neon title BAND NIGHT", "drag over one letter, click a colour – letter by letter", "styling part of a text"],
+    ["Sound wave", "Pen-tool zigzag + text", "Text ▸ Put on Path"],
+    ["Line-up", "text box, Enter after each line, centred, first line bigger", "text box, alignment"],
+    ["Speech bubble", "ellipse + triangle → Union, then the text", "Text ▸ Flow into Frame"],
+    ["Spiky ROCK!", "letters turned into a shape, one corner pulled", "Object to Path + Node tool"]
+  ],
+  steps: [
+    { title: "Background and record", img: "../img/band-night/step1.png",
+      alt: "Step 1: dark purple rectangle over the page, a big black circle, a red label circle and a tiny purple hole",
+      lead: "A quick warm-up with shapes you know.",
+      note: "Leave the top free for the title, the middle-left for the speech bubble and the bottom for the line-up and ROCK!",
+      stuck: ["The rectangle has an outline: <span class='menu'>Object ▸ Fill and Stroke…</span> → <i>Stroke paint</i> tab → <b>X</b>."] },
+    { title: "Neon title", img: "../img/band-night/step2.png",
+      alt: "Step 2: type BAND NIGHT in white, drag over the B with the Text tool, click pink, repeat with a new colour for every letter",
+      lead: "One text, many colours: with the Text tool you can select single letters and change only those.",
+      note: "Selected letters get a blue highlight.",
+      stuck: ["The whole title changes colour: the Selector was active. Pick the Text tool and drag over just one letter.",
+              "Don't type each letter as a separate text – it must stay ONE text object."] },
+    { title: "Text on a sound wave", img: "../img/band-night/step3.png",
+      alt: "Step 3: Pen tool zigzag line from left to right, light blue stroke, text LIVE MUSIC * FOOD * DANCING, both selected, Text ▸ Put on Path",
+      lead: "Draw your own path with the Pen tool, then put the text on it with <span class='menu'>Text ▸ Put on Path</span>.",
+      note: "Keep the zigzag gentle – at sharp corners the letters squeeze together.",
+      stuck: ["The line keeps growing: you didn't finish it. Double-click on the last point.",
+              "The zigzag fills with colour: a palette click sets the <i>fill</i>. Click X, then set the colour in <i>Stroke paint</i>.",
+              "The text starts at the right end: the line was drawn from right to left. <span class='menu'>Path ▸ Reverse</span> on the line, or draw it again."] },
+    { title: "The line-up", img: "../img/band-night/step4.png",
+      alt: "Step 4: drag a text box, type the bands with Enter after each line, centre button, select LINE-UP only and make it bigger and yellow",
+      lead: "A text box with several lines – and different sizes in one box.",
+      stuck: ["Red frame: the text doesn't fit. Drag the ◇ handle at the bottom right.",
+              "Every line got bigger: select only the first line with the Text tool before changing the size."] },
+    { title: "Speech bubble", img: "../img/band-night/step5.png",
+      alt: "Step 5: white ellipse and triangle tail, Path ▸ Union, text typed below, bubble and text selected, Text ▸ Flow into Frame, centred and dark",
+      lead: "Union builds the bubble, <span class='menu'>Text ▸ Flow into Frame</span> fills it with text.",
+      stuck: ["Union leaves two pieces: the tail didn't overlap the ellipse. Undo, move the tail in, try again.",
+              "Text missing at the end: the bubble is too small for it. Make the bubble bigger or the text smaller."] },
+    { title: "Spiky ROCK!", img: "../img/band-night/step6.png",
+      alt: "Step 6: yellow text ROCK!, Path ▸ Object to Path, Node tool shows the nodes, drag the top-right corner of the K up into a spike",
+      lead: "After <span class='menu'>Path ▸ Object to Path</span> the letters are an ordinary shape – edit their nodes like the tree in the Haunted House.",
+      note: "Check the spelling first: after Object to Path the letters can't be edited as text any more.",
+      stuck: ["No nodes appear: it's still text. <span class='menu'>Path ▸ Object to Path</span> first.",
+              "The whole word moves: you're on the Selector. Pick the Node tool and drag one node."] }
+  ],
+  checklist: [
+    "Background covers the page; a record with a label",
+    "BAND NIGHT in a bold font, every letter a different colour – one text object",
+    "A zigzag line with LIVE MUSIC * FOOD * DANCING riding on it (Pen tool + Put on Path)",
+    "Line-up in a text box: centred, LINE-UP bigger and yellow",
+    "Speech bubble as ONE shape with the text inside (Union + Flow into Frame)",
+    "ROCK! with at least one pulled-out spike (Object to Path + Node tool)",
+    "Both SVG and PNG saved, with your surname in the file name"
+  ],
+  bonus: [
+    ["Glowing title", "Select the title, <span class='menu'>Edit ▸ Duplicate</span>, <span class='menu'>Object ▸ Lower</span>, then <i>Blur (%)</i> about 10 in the Fill and Stroke panel."],
+    ["Record label text", "A small circle on the label + SIDE A * SIDE A * → <span class='menu'>Text ▸ Put on Path</span>."],
+    ["Ticket line", "TICKETS: 500 Ft at the door – then a smaller, italic second line in the same text."],
+    ["Music notes", "Ellipse + thin rectangle + small triangle → <span class='menu'>Path ▸ Union</span>, then <span class='menu'>Edit ▸ Duplicate</span>."],
+    ["Tilted title", "Click the title twice, drag a corner arrow."]
+  ]
+};
+</script>
+<script src="../mission.js"></script>
+<script src="../../nav.js" defer></script>
+</body>
+</html>
