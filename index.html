@@ -345,14 +345,24 @@ body.subject .hero{display:none}
       <g transform="translate(262 128)"><ellipse rx="13" ry="7" fill="#1b1b1b"/><circle cx="-12" cy="-4" r="6" fill="#1b1b1b"/></g>
     </svg>`,
     backstage:`<svg viewBox="0 0 400 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-      <defs><radialGradient id="bgl" cx=".5" cy=".1" r=".9"><stop offset="0" stop-color="#4a2a7a"/><stop offset="1" stop-color="#120d24"/></radialGradient></defs>
-      <rect width="400" height="200" fill="url(#bgl)"/>
-      <g opacity=".55"><path d="M60 0l70 200H10z" fill="#ff4fa3" opacity=".35"/><path d="M340 0l50 200H250z" fill="#4fe3ff" opacity=".35"/></g>
-      <rect x="0" y="150" width="400" height="50" fill="#0a0714"/><path d="M0 150h400" stroke="#2a1f4a" stroke-width="3"/>
-      <g transform="translate(205 112) rotate(-28)"><rect x="-12" y="-70" width="24" height="52" rx="8" fill="#ffd166"/><path d="M-28 -18c-18 10-22 40-8 56 8 10 24 10 32 0 6-8 2-18 10-26 8-8 16-18 8-30-6-9-28-9-42 0z" fill="#ffd166"/><circle cx="2" cy="12" r="8" fill="#2b1a05"/><path d="M-2 -66v80" stroke="#2b1a05" stroke-width="1.5"/></g>
-      <g font-family="Kalam,cursive" font-weight="700" fill="#fff" text-anchor="middle"><text x="200" y="40" font-size="20" opacity=".9">ZENGŐ</text></g>
-      <path d="M40 180q80-30 160-10t160-20" stroke="#ff4fa3" stroke-width="3" fill="none" stroke-dasharray="8 6"/>
-      <text x="334" y="188" font-family="Kalam,cursive" font-size="22" fill="#ffd166">?</text>
+      <defs><linearGradient id="bsSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0c0820"/><stop offset="1" stop-color="#2a1550"/></linearGradient>
+        <linearGradient id="bsBeamP" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff4fa3" stop-opacity=".55"/><stop offset="1" stop-color="#ff4fa3" stop-opacity="0"/></linearGradient>
+        <linearGradient id="bsBeamC" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4fe3ff" stop-opacity=".5"/><stop offset="1" stop-color="#4fe3ff" stop-opacity="0"/></linearGradient>
+        <linearGradient id="bsBeamW" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff6d8" stop-opacity=".75"/><stop offset="1" stop-color="#fff6d8" stop-opacity=".05"/></linearGradient></defs>
+      <rect width="400" height="200" fill="url(#bsSky)"/>
+      <g fill="#fff" opacity=".55"><circle cx="30" cy="22" r="1"/><circle cx="96" cy="12" r=".8"/><circle cx="352" cy="18" r="1"/><circle cx="380" cy="44" r=".8"/></g>
+      <path d="M74 28L28 150h70z" fill="url(#bsBeamP)"/><path d="M326 28L304 150h72z" fill="url(#bsBeamC)"/>
+      <path d="M200 28L160 136h80z" fill="url(#bsBeamW)"/>
+      <g stroke="#6d6a80" stroke-width="2.5" fill="none"><path d="M40 24h320M40 32h320"/><path d="M48 24l8 8 8-8l8 8 8-8l8 8 8-8l8 8 8-8l8 8 8-8l8 8 8-8l8 8 8-8l8 8 8-8l8 8 8-8l8 8 8-8l8 8 8-8l8 8 8-8l8 8 8-8l8 8 8-8l8 8 8-8l8 8 8-8l8 8 8-8l8 8 8-8l8 8 8-8" stroke-width="1.4"/><path d="M40 24v130M360 24v130"/></g>
+      <g><rect x="66" y="30" width="16" height="12" rx="3" fill="#2a2740"/><rect x="192" y="30" width="16" height="12" rx="3" fill="#2a2740"/><rect x="318" y="30" width="16" height="12" rx="3" fill="#2a2740"/>
+        <circle cx="74" cy="42" r="4" fill="#ff8fc6"/><circle cx="200" cy="42" r="4" fill="#fff6d8"/><circle cx="326" cy="42" r="4" fill="#a8f3ff"/></g>
+      <rect x="0" y="132" width="400" height="20" fill="#1b1430"/><path d="M0 132h400" stroke="#4a3b78" stroke-width="2"/>
+      <ellipse cx="200" cy="134" rx="46" ry="6" fill="#fff6d8" opacity=".25"/>
+      <g stroke="#c9c9cf" stroke-width="3" stroke-linecap="round" fill="none"><path d="M200 112v10M184 133l16-14 16 14M186 121h28"/></g>
+      <g transform="translate(157.5 50) scale(.85)" fill="none" stroke="#ffd166" stroke-width="3" stroke-dasharray="6 5" stroke-linejoin="round"><path d="M45 2h10l2 3-1 13h-12l-1-13z"/><path d="M45.5 18v38M54.5 18v38"/><path d="M45 57C41 53 37 49 33 46c-3-2-5 1-4 5l2 11c1 5 2 7 0 12l-4 11c-2 8 4 13 13 13h20c9 0 15-5 13-13l-4-11c-2-5-1-7 0-12l2-11c1-4-1-7-4-5-4 3-8 7-12 11z"/></g>
+      <text x="262" y="104" text-anchor="middle" font-family="Kalam,cursive" font-weight="700" font-size="44" fill="#ffd166" transform="rotate(12 262 104)">?</text>
+      <g fill="#07050f"><path d="M0 200v-40c10-6 20-6 28 0 6-10 22-10 28 0 8-8 22-8 30 0 6-12 24-12 30 0 8-6 20-6 26 2 8-10 24-10 30 0 6-8 20-8 26 0 8-12 24-12 32 0 6-6 18-6 24 0 8-10 24-10 32 0 6-8 20-8 26 0 8-10 22-10 30 0 6-6 18-6 22 0 10-10 24-10 34 0 6-6 16-6 22-2V200z"/>
+        <path d="M58 168l-6-22M60 146l-8-6M318 166l8-24M326 142l6-8" stroke="#07050f" stroke-width="5" stroke-linecap="round"/></g>
     </svg>`,
     matchmaker:`<svg viewBox="0 0 400 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
       <rect width="400" height="200" fill="#120d24"/>
