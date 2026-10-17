@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mission to the Cheese Moon – Inkscape</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap">
+<link rel="stylesheet" href="../mission.css">
+<style>:root{--accent:#f2d264}</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+window.MISSION = {
+  key: "cheese-moon-v1",
+  title: "Mission to the Cheese Moon",
+  story: "Legend says the Moon is made of cheese. The next space mission will find out – and you are designing the launch poster.",
+  file: "surname_cheesemoon",
+  poster: "../img/cheese-moon/poster.png",
+  pdf: "../pdf/cheese-moon-worksheet.pdf",
+  teacherPdf: "../pdf/cheese-moon-teacher.pdf",
+  saveImg: "../img/cheese-moon/save.png",
+  bonusImg: "../img/cheese-moon/bonus.png",
+  elements: [
+    ["Night sky and stars", "Rectangle tool + Star tool", "fill, stroke"],
+    ["Cheese Moon with craters", "big circle, small circles", "Union → Difference"],
+    ["Rocket body", "ellipse + rectangle", "Intersection"],
+    ["Fins", "rectangle → path → nodes; duplicate, flip", "Node tool"],
+    ["Porthole", "two circles", "Difference (ring)"],
+    ["Flame", "triangle + smaller yellow copy", "stacking order"]
+  ],
+  steps: [
+    { title: "Night sky and stars", img: "../img/cheese-moon/step1.png",
+      alt: "Step 1: rectangle over the page in dark blue, no stroke, then stars with the Star tool",
+      lead: "The sky is one big rectangle; the stars come from the Star tool.",
+      note: "Leave the top-right corner empty (Moon) and the bottom-left area empty (rocket).",
+      stuck: ["The rectangle has a thin outline: <span class='menu'>Object ▸ Fill and Stroke…</span> → <i>Stroke paint</i> tab → click the <b>X</b>.",
+              "Your stars have 3 corners: in the tool controls bar click the <b>Star</b> mode button and set Corners to 5."] },
+    { title: "The Cheese Moon", img: "../img/cheese-moon/step2.png",
+      alt: "Step 2: big circle, small circles, Shift-click them, Path ▸ Union, select Moon and craters, Path ▸ Difference",
+      lead: "<b>Union first</b> (the craters become one object), <b>then Difference</b> (the craters are cut out of the Moon).",
+      stuck: ["The Moon disappeared instead of the craters? The Moon was on top. <span class='menu'>Edit ▸ Undo</span>, select the craters, <span class='menu'>Object ▸ Raise to Top</span>, try again.",
+              "Difference is greyed out: exactly two objects must be selected – the Moon and the united craters. Check the status bar."] },
+    { title: "Rocket body", img: "../img/cheese-moon/step3.png",
+      alt: "Step 3: tall ellipse with a dark stroke, rectangle over the top part, Path ▸ Intersection",
+      lead: "Intersection keeps only the part the two shapes share.",
+      stuck: ["Nothing left after Intersection: the rectangle didn't overlap the ellipse. Undo and draw it over the top part."] },
+    { title: "Fins with the Node tool", img: "../img/cheese-moon/step4.png",
+      alt: "Step 4: red rectangle, Path ▸ Object to Path, drag the top-left node, Edit ▸ Duplicate and Object ▸ Flip Horizontal, body Object ▸ Raise to Top",
+      lead: "A rectangle becomes a fin by pulling one corner; the other fin is a flipped copy.",
+      stuck: ["The whole shape moves when you drag a node: you're still on the Selector – pick the Node tool.",
+              "The Node tool shows round handles, not corners: do <span class='menu'>Path ▸ Object to Path</span> first."] },
+    { title: "Porthole", img: "../img/cheese-moon/step5.png",
+      alt: "Step 5: red circle, smaller circle inside, Path ▸ Difference makes a ring, light-blue glass in the hole",
+      lead: "A ring = Difference of two circles.",
+      stuck: ["The hole isn't cut: the small circle is underneath. Select it, <span class='menu'>Object ▸ Raise to Top</span>, then Difference."] },
+    { title: "Flame and stacking order", img: "../img/cheese-moon/step6.png",
+      alt: "Step 6: triangle with the Star tool in Polygon mode, moved under the rocket, Object ▸ Lower, yellow inner flame",
+      lead: "The flame must go behind the body: <span class='menu'>Object ▸ Lower</span> moves it one step back each time. Then a yellow inner flame on top.",
+      note: "Finally <span class='menu'>View ▸ Zoom ▸ Zoom Page</span> to see the whole poster.",
+      stuck: ["The flame vanished: <span class='menu'>Lower to Bottom</span> hid it behind the sky. Use <span class='menu'>Edit ▸ Undo</span> or <span class='menu'>Object ▸ Raise</span>."] }
+  ],
+  checklist: [
+    "The sky covers the whole page",
+    "At least 8 stars",
+    "At least 5 craters on the Moon, two of them biting into the edge (Difference)",
+    "The rocket body has a straight bottom edge (Intersection)",
+    "Two mirrored fins, with the body in front of them (Node tool + flip)",
+    "A ring-shaped porthole with glass (Difference)",
+    "The flame is behind the body and has a yellow inner flame (stacking order)",
+    "The rocket body has a dark stroke, the sky has none",
+    "Both SVG and PNG saved, with your surname in the file name"
+  ],
+  bonus: [
+    ["Red nose cone", "Ellipse the size of the body + rectangle over the TOP part → <span class='menu'>Path ▸ Intersection</span> → red fill."],
+    ["Shooting star", "A star + three long thin triangles fanning out behind it, each starting inside the star → select all → <span class='menu'>Path ▸ Union</span>."],
+    ["Ringed planet", "Circle + a flat ellipse with a smaller flat ellipse on top → <span class='menu'>Path ▸ Difference</span> → ring in front of the planet."],
+    ["Crater shadows", "Duplicate the Moon, darker orange, <span class='menu'>Object ▸ Lower</span>, move it a little."],
+    ["Poster title", "Text tool: MISSION TO THE CHEESE MOON! – big, bold, yellow."],
+    ["Tilted rocket", "Select the whole rocket, <span class='menu'>Object ▸ Group</span>, click again and rotate with the corner arrows."]
+  ]
+};
+</script>
+<script src="../mission.js"></script>
+<script src="../../nav.js" defer></script>
+</body>
+</html>
