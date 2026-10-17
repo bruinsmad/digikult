@@ -348,6 +348,13 @@
     get lang() { return lang; }, setLang, onLang: f => listeners.push(f)
   };
 
+  /* every page wears the site's chalkboard icon in its tab */
+  if (!document.querySelector('link[rel~="icon"]')) {
+    const ic = document.createElement("link");
+    ic.rel = "icon"; ic.type = "image/svg+xml"; ic.href = url("favicon.svg");
+    document.head.appendChild(ic);
+  }
+
   /* The landing page draws its own full map; no floating menu there. */
   if (document.documentElement.hasAttribute("data-digikult-home")) return;
   if (window.__digikultNav) return;
