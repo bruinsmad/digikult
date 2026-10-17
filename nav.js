@@ -178,6 +178,47 @@
             ]
           }
         ]
+      },
+      {
+        id: "inkscape",
+        accent: "#f0a3b8",
+        title: { hu: "Vektorgrafika – Inkscape", en: "Vector graphics – Inkscape" },
+        blurb: {
+          hu: "Alakzatok, kitöltés és körvonal, csomópontok, Unió, Metszet, Különbség – plakátok lépésről lépésre, menükkel.",
+          en: "Shapes, fill and stroke, nodes, Union, Intersection, Difference – posters step by step, using the menus."
+        },
+        lessons: [
+          {
+            id: "path-ops",
+            title: { hu: "Halmazműveletek és a csomópont-szerkesztő", en: "Path operations and the Node tool" },
+            pages: [
+              {
+                id: "cheese-moon",
+                kind: "story",
+                minutes: 35,
+                title: { hu: "Irány a Sajthold!", en: "Mission to the Cheese Moon" },
+                desc: {
+                  hu: "Űrplakát rakétával és kráteres sajtholddal: Unió, Különbség, Metszet és a csomópont-szerkesztő, képregényszerű lépésekben.",
+                  en: "A space poster with a rocket and a cratered cheese Moon: Union, Difference, Intersection and the Node tool, in comic-strip steps."
+                },
+                files: { en: "inkscape/path-ops/cheese-moon.html" },
+                progress: { chapters: 6, keys: { en: "cheese-moon-v1" } }
+              },
+              {
+                id: "haunted-house",
+                kind: "story",
+                minutes: 35,
+                title: { hu: "A kísértetház", en: "The Haunted House" },
+                desc: {
+                  hu: "Éjszakai plakát világító ablakokkal, szellemmel, ferde fával és kerítéssel: lyukak Különbséggel, fény mögöttük.",
+                  en: "A night poster with glowing windows, a ghost, a leaning tree and a fence: holes cut with Difference, light behind them."
+                },
+                files: { en: "inkscape/path-ops/haunted-house.html" },
+                progress: { chapters: 7, keys: { en: "haunted-house-v1" } }
+              }
+            ]
+          }
+        ]
       }
     ]
   };
