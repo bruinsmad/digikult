@@ -419,6 +419,10 @@
   .kd { font-size: 12px; color: #b4c4b8; white-space: nowrap; }
   .hr { grid-column: 1 / -1; font: 700 15px/1.1 "Kalam", "Atkinson Hyperlegible", system-ui, sans-serif; color: #f2d264; }
   a.pg[aria-current="page"] { background: rgba(242,210,100,.14); box-shadow: inset 3px 0 0 #f2d264; }
+  /* while someone types in an editor, the button steps back so it doesn't sit on their code */
+  .wrap.typing .toggle { opacity: .28; }
+  .wrap.typing .toggle:hover, .wrap.typing .toggle:focus-visible { opacity: 1; }
+  .toggle { transition: transform .15s, background .15s, opacity .2s; }
   @media (prefers-reduced-motion: reduce) { .panel { animation: none; } .toggle, .lbl { transition: none; } }
   @media print { .wrap { display: none; } }`;
 
@@ -468,6 +472,11 @@
   root.addEventListener("keydown", e => { if (e.key === "Escape") { setOpen(false); root.querySelector(".toggle").focus(); } });
   document.addEventListener("click", e => { if (!e.composedPath().includes(host)) setOpen(false); });
   listeners.push(render);
+  const typingIn = el => !!el && (el.tagName === "TEXTAREA" || el.isContentEditable || (el.tagName === "INPUT" && /^(text|search|)$/.test(el.type)));
+  const markTyping = () => { const w = root.querySelector(".wrap"); if (w) w.classList.toggle("typing", typingIn(document.activeElement)); };
+  document.addEventListener("focusin", markTyping);
+  document.addEventListener("focusout", () => setTimeout(markTyping, 0));
+  document.addEventListener("pointerdown", () => setTimeout(markTyping, 0), true);
 
   /* the menu writes in the site's two faces even on a mission page that brings its own fonts */
   if (![...document.querySelectorAll('link[href*="fonts.googleapis.com"]')].some(l => /Kalam/.test(l.href) && /Atkinson/.test(l.href))) {
