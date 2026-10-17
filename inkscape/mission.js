@@ -10,7 +10,7 @@ const DEFAULT_RULES = [
 const MISSION_UI = {
   en: {
     steps: "Steps", step: "Step", kicker: "Inkscape mission", progress: "Your progress", nSteps: (a, b) => `${a} / ${b} steps`,
-    start: "Start the mission ▸", pdf: "⬇ Worksheet (PDF)", posterCap: "This is what you'll make", posterAria: "Enlarge the finished poster", posterAlt: "The finished poster",
+    start: "Start the mission", pdf: "Worksheet (PDF)", posterCap: "This is what you'll make", posterAria: "Enlarge the finished poster", posterAlt: "The finished poster",
     build: "What you'll build", buildIntro: "Every part is made with one operation you already know. Colours and sizes are up to you.",
     before: "Before you start", beforeSub: "No keyboard shortcuts today: every command is in a menu or on a toolbar.",
     find: "Find your way around Inkscape", findLead: "The numbered parts are the ones you'll use. Click the picture to make it bigger.",
@@ -29,7 +29,7 @@ const MISSION_UI = {
   },
   hu: {
     steps: "Lépések", step: "Lépés", kicker: "Inkscape-küldetés", progress: "Haladásod", nSteps: (a, b) => `${a} / ${b} lépés`,
-    start: "Indulhat a küldetés ▸", pdf: "⬇ Feladatlap (PDF)", posterCap: "Ezt fogod elkészíteni", posterAria: "A kész plakát nagyítása", posterAlt: "A kész plakát",
+    start: "Indulhat a küldetés", pdf: "Feladatlap (PDF)", posterCap: "Ezt fogod elkészíteni", posterAria: "A kész plakát nagyítása", posterAlt: "A kész plakát",
     build: "Mit készítesz?", buildIntro: "Minden rész egy olyan művelettel készül, amit már ismersz. A színek és a méretek a te döntésed.",
     before: "Mielőtt elkezded", beforeSub: "Ma nincs billentyűparancs: minden parancs egy menüben vagy egy eszköztáron van.",
     find: "Igazodj el az Inkscape-ben", findLead: "A számozott részeket fogod használni. Kattints a képre a nagyításhoz.",
