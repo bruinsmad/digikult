@@ -6,17 +6,17 @@
 <title>The Matchmaker</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600..800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
-<script src="https://cdn.jsdelivr.net/npm/sql.js@1.10.3/dist/sql-asm.js"></script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600..800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600;700&display=swap">
 <style>
-/* Layout: a teacher's demo for the projector. The board (tables as cards, connections as cables) fills the top;
-   the table picker, cable builder, SQL and feedback sit underneath. */
+/* A teacher's projector demo, no code: tables as cards, links as wires.
+   Each scene goes structure -> rows -> wires between rows; the arrow keys (or a presenter clicker) step through. */
 :root{
-  --night:#120d24; --night-2:#1d1438; --ink:#f3eefb; --muted:#b3a8cc; --line:#3a2d63; --panel:#0d0a1a;
-  --pink:#ff4fa3; --cyan:#4fe3ff; --lime:#b8ff5c; --gold:#ffd166; --bad:#ff7a7a; --warn:#ffb15c; --ok:#7dffb0;
+  --night:#120d24; --night-2:#1d1438; --ink:#f3eefb; --muted:#b3a8cc; --line:#3a2d63; --card:#17112f; --card-h:#231a45;
+  --pink:#ff4fa3; --cyan:#4fe3ff; --lime:#b8ff5c; --gold:#ffd166; --grey:#8f84ad;
   --f-display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
   --f-body:"Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
   --f-mono:"JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --fs:clamp(13px, 1.05vw, 19px);
   color-scheme:dark;
 }
 *{box-sizing:border-box}
@@ -24,75 +24,112 @@
 *,*::before,*::after{font-feature-settings:"calt" 0,"liga" 0}
 html,body{margin:0}
 body{color:var(--ink);font:16px/1.5 var(--f-body);min-height:100vh;
-  background:radial-gradient(900px 420px at 15% -5%, rgba(255,79,163,.2), transparent 65%),radial-gradient(800px 420px at 85% 0%, rgba(79,227,255,.16), transparent 65%),linear-gradient(var(--night), var(--night-2));
-  background-attachment:fixed;padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));padding-block:16px 40px}
-.wrap{max-width:1500px;margin:0 auto;display:grid;gap:14px}
-h1,h2,h3{font-family:var(--f-display);font-weight:800;margin:0;line-height:1.12;letter-spacing:-.01em}
-code,pre,textarea,select{font-family:var(--f-mono)}
+  background:radial-gradient(900px 420px at 15% -5%, rgba(255,79,163,.18), transparent 65%),radial-gradient(800px 420px at 85% 0%, rgba(79,227,255,.14), transparent 65%),linear-gradient(var(--night), var(--night-2));
+  background-attachment:fixed;padding:16px max(16px, env(safe-area-inset-right, 0px)) 40px max(16px, env(safe-area-inset-left, 0px))}
+.wrap{max-width:1840px;margin:0 auto;display:grid;gap:16px}
+h1,h2{font-family:var(--f-display);font-weight:800;margin:0;line-height:1.12;letter-spacing:-.01em}
 :focus-visible{outline:3px solid var(--gold);outline-offset:2px}
 .eyebrow{font:600 12px/1.2 var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+
 header.top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px 20px}
 .sign{display:flex;align-items:center;gap:14px;padding:12px 20px 12px 14px;background:linear-gradient(135deg,#ffffff,#f1ecff);color:#1a1230;border-radius:14px;box-shadow:0 12px 30px rgba(0,0,0,.45), inset 0 0 0 3px #fff, inset 0 0 0 5px #d8cff5}
 .sign h1{font-size:clamp(24px,3.4vw,36px)}
 .sign .eyebrow{color:#7a6aa6}
-.controls{display:flex;gap:8px;flex-wrap:wrap}
+.tools{display:flex;gap:8px;flex-wrap:wrap}
 .btn{font:700 15px var(--f-body);border:1px solid var(--line);background:#2a2050;color:var(--ink);padding:9px 15px;border-radius:8px;cursor:pointer}
-.btn:hover{border-color:var(--pink)}
+.btn:hover:not(:disabled){border-color:var(--pink)}
+.btn:disabled{opacity:.35;cursor:default}
 .btn.primary{background:var(--pink);border-color:var(--pink);color:#2b0a1b;box-shadow:0 3px 0 #a3235f}
-.btn[aria-pressed="true"]{background:#3b5a2a;border-color:#7fb35a}
 
-/* board */
-#board{display:block;width:100%;height:clamp(420px, 60vh, 760px);border-radius:16px;border:4px solid #3a2d63;background:#0b0817;box-shadow:0 16px 36px rgba(0,0,0,.5)}
-.caption{margin:0;font:700 clamp(16px,1.5vw,21px)/1.35 var(--f-body);color:#f2ecff;min-height:1.4em;display:flex;flex-wrap:wrap;gap:6px 8px;align-items:baseline}
-.caption .st{padding:2px 9px;border-radius:6px;background:rgba(255,255,255,.08)}
-.caption .st.new{background:var(--gold);color:#2a1f05}
-.caption .st.todo{opacity:.35}
-.caption .st.ok{background:rgba(125,255,176,.18);color:var(--ok)}
-.caption .st.warn{background:rgba(255,177,92,.18);color:var(--warn)}
-.caption .st.bad{background:rgba(255,122,122,.18);color:var(--bad)}
-.caption .arrow{color:var(--muted)}
-@media (prefers-reduced-motion: no-preference){ .caption .st.new{animation:stpop .4s ease-out} @keyframes stpop{from{transform:scale(1.2)}to{transform:none}} }
+/* scene tabs */
+.scenes{display:flex;gap:8px;flex-wrap:wrap;margin:0;padding:0;list-style:none}
+.scenes button{display:flex;align-items:center;gap:8px;font:700 15px var(--f-body);color:var(--muted);background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:999px;padding:6px 14px 6px 6px;cursor:pointer}
+.scenes button b{display:grid;place-items:center;width:26px;height:26px;border-radius:50%;background:#2a2050;color:var(--ink);font:800 14px var(--f-display)}
+.scenes button[aria-current="step"]{color:#fff;border-color:var(--pink);background:rgba(255,79,163,.14)}
+.scenes button[aria-current="step"] b{background:var(--pink);color:#2b0a1b}
+.scenes button:hover{color:#fff}
 
-/* below */
-.below{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:16px;align-items:start}
-@media (max-width:1000px){ .below{grid-template-columns:minmax(0,1fr)} }
-.panel{border-radius:12px;background:linear-gradient(#2a2250,#1a1333);padding:8px;border:1px solid var(--line)}
-.inner{display:grid;gap:10px;padding:14px;border-radius:8px;background:var(--panel);box-shadow:inset 0 0 0 1px #2a2050;min-width:0}
-.chips{display:flex;flex-wrap:wrap;gap:6px}
-.chip{font:700 13px var(--f-mono);background:transparent;color:#e7deff;border:1px solid var(--line);border-radius:999px;padding:5px 11px;cursor:pointer}
-.chip:hover{border-color:var(--pink)}
-.chip[aria-pressed="true"]{background:var(--pink);border-color:var(--pink);color:#2b0a1b}
-.chip .n{opacity:.7;font-weight:400}
-.preset{font:700 13px var(--f-body);background:transparent;color:#e7deff;border:1px solid var(--line);border-radius:999px;padding:5px 11px;cursor:pointer}
-.preset:hover,.preset.on{border-color:var(--gold);color:var(--gold)}
-.preset.bad{border-style:dashed}
-.builder{display:grid;grid-template-columns:auto 1fr auto 1fr auto;gap:6px;align-items:center}
-.builder select{font:600 14px var(--f-mono);background:#07050f;color:#e9f5ff;border:1px solid var(--line);border-radius:6px;padding:7px 8px;min-width:0}
-.builder .eq{font:800 18px var(--f-mono);color:var(--gold);text-align:center}
-@media (max-width:640px){ .builder{grid-template-columns:1fr 1fr} .builder .eq{grid-column:1/-1} }
-textarea#sql{width:100%;min-height:130px;resize:vertical;font-size:16px;line-height:1.5;padding:12px 14px;border:1px solid var(--line);border-radius:8px;background:#07050f;color:#e9f5ff;caret-color:var(--pink)}
-.run-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
-.kbd{font:12px var(--f-mono);color:var(--muted)}
-.result-meta{font:600 13px var(--f-mono);color:var(--cyan);margin-bottom:6px}
-.tablebox{overflow-x:auto;max-height:300px;overflow-y:auto;border:1px solid var(--line);border-radius:8px;background:rgba(255,255,255,.03)}
-table{border-collapse:collapse;width:100%;font-size:14.5px;font-variant-numeric:tabular-nums}
-th,td{text-align:left;padding:6px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
-th{position:sticky;top:0;background:#16102c;font:600 12.5px var(--f-mono);color:var(--cyan)}
+/* the stage: cards in a row, wires drawn on an svg laid over them */
+.stage{position:relative;border-radius:18px;border:4px solid var(--line);background:#0b0817;
+  background-image:linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);background-size:32px 32px;
+  min-height:clamp(380px, 54vh, 820px);padding:clamp(24px,3vw,48px) clamp(16px,3vw,48px);display:grid;align-items:center;overflow:hidden;box-shadow:0 16px 36px rgba(0,0,0,.5)}
+.cards.n2{--fs:clamp(14px, 1.3vw, 24px)}
+.cards{min-width:0;position:relative;z-index:1;display:flex;justify-content:center;align-items:flex-start;gap:clamp(70px, 9vw, 190px)}
+#wires{position:absolute;inset:0;width:100%;height:100%;z-index:2;pointer-events:none;overflow:visible}
+.card{background:var(--card);border:1.5px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:0 10px 26px rgba(0,0,0,.45);min-width:0;flex:0 0 auto;
+  animation:cardIn .45s ease-out both}
+.card:nth-child(2){animation-delay:.08s}.card:nth-child(3){animation-delay:.16s}
+@keyframes cardIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.ch{display:flex;align-items:baseline;justify-content:space-between;gap:16px;padding:10px 14px;background:var(--card-h);border-bottom:1.5px solid var(--line)}
+.ch h2{font-size:clamp(18px,1.7vw,28px)}
+.ch .rc{font:600 12px var(--f-mono);color:var(--muted);white-space:nowrap}
+
+/* structure view: one line per column */
+.cols{list-style:none;margin:0;padding:6px 0}
+.cols li{display:flex;align-items:center;gap:10px;padding:6px 16px 6px 12px;font:600 calc(var(--fs) * 1.08) var(--f-mono);color:var(--muted);border-left:5px solid transparent}
+.cols li .ic{width:1.4em;text-align:center;font-size:.9em}
+.cols li.link{color:#fff;border-left-color:var(--lc);background:color-mix(in srgb, var(--lc) 14%, transparent)}
+.cols li.link .ic{color:var(--lc)}
+
+/* rows view */
+table{border-collapse:collapse;font:500 var(--fs)/1.3 var(--f-mono)}
+th{font:700 calc(var(--fs) * .82) var(--f-mono);color:var(--muted);text-align:left;padding:8px 12px;border-bottom:1.5px solid var(--line);white-space:nowrap}
+td{padding:7px 12px;white-space:nowrap;color:#e9e3f7;border-bottom:1px solid rgba(255,255,255,.05)}
+tbody tr:last-child td{border-bottom:0}
+th.link{color:var(--lc);box-shadow:inset 0 -3px 0 var(--lc)}
+td.link{color:#fff;font-weight:700;background:color-mix(in srgb, var(--lc) 16%, transparent)}
 td.num{text-align:right}
-tr:last-child td{border-bottom:none}
-.err{background:#3b1522;color:var(--bad);border-radius:8px;padding:12px 14px;font-weight:700}
-.err p{margin:.3em 0 0;font-weight:400;color:var(--ink)}
-.note{color:var(--muted);font-style:italic;margin:0}
-.verdicts{display:grid;gap:8px}
-.v{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;padding:10px 12px;border-radius:8px;border:1px solid var(--line);background:rgba(255,255,255,.03);align-items:start}
-.v .mark{font:800 22px/1 var(--f-display);width:28px;text-align:center}
-.v.ok .mark{color:var(--ok)} .v.warn .mark{color:var(--warn)} .v.bad .mark{color:var(--bad)} .v.info .mark{color:var(--cyan)}
-.v b{font-family:var(--f-mono);font-size:14px}
-.v .rel{display:inline-block;margin-left:8px;padding:1px 8px;border-radius:999px;font:800 13px var(--f-mono);background:var(--gold);color:#2a1f05}
-.v p{margin:2px 0 0;color:var(--muted);font-size:14px}
-.v .sw{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
-.legend{font-size:13px;color:var(--muted);display:flex;flex-wrap:wrap;gap:4px 16px}
-.legend b{color:var(--ink)}
+tbody tr{cursor:pointer;transition:opacity .25s, background .25s}
+tbody tr:hover td{background-color:rgba(255,255,255,.06)}
+td.cnt{padding-left:4px;width:1%}
+td.cnt span{display:inline-block;min-width:2.1em;text-align:center;padding:1px 7px;border-radius:999px;background:var(--gold);color:#2a1f05;font:800 calc(var(--fs) * .8) var(--f-body);animation:pop .4s ease-out both}
+@keyframes pop{from{transform:scale(.3);opacity:0}to{transform:none;opacity:1}}
+
+/* focus: one row and everything it is wired to */
+.stage.focused tbody tr:not(.on){opacity:.22}
+.stage.focused tbody tr.on td{background-color:rgba(255,209,102,.16)}
+.stage.focused tbody tr.on.root td{background-color:rgba(255,209,102,.32)}
+
+/* wires */
+#wires path{fill:none;stroke-width:3;stroke-linecap:round;transition:opacity .35s, stroke-width .25s}
+#wires path.row{stroke-width:2.4}
+#wires path.cross{stroke:var(--grey);stroke-width:1.6;stroke-dasharray:5 6}
+#wires path.cross.match{stroke:var(--pink);stroke-width:2.6;stroke-dasharray:none}
+#wires.ruled path.cross:not(.match){opacity:.07}
+#wires circle{transition:opacity .35s}
+#wires text{font:800 clamp(16px,1.4vw,24px) var(--f-display);paint-order:stroke;stroke:#0b0817;stroke-width:5px}
+.stage.focused #wires .w:not(.on){opacity:.06}
+.stage.focused #wires path.on{stroke-width:4}
+
+/* caption under the stage */
+.cap{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:16px 24px;align-items:center}
+.cap .txt{min-height:4.2em}
+.cap h2{font-size:clamp(20px,2vw,32px);margin-bottom:6px}
+.cap p{margin:0;font:400 clamp(17px,1.55vw,25px)/1.45 var(--f-body);color:#ece6fa;max-width:72ch}
+.cap p b{color:#fff}
+.tn{font:700 .92em var(--f-mono);color:var(--gold)}
+.cn{font:700 .92em var(--f-mono);color:var(--lc, var(--gold))}
+.hint{margin-top:6px!important;font-size:clamp(14px,1.1vw,17px)!important;color:var(--muted)!important}
+.nav{display:flex;align-items:center;gap:10px}
+.dots{display:flex;gap:6px}
+.dots i{width:10px;height:10px;border-radius:50%;background:#3a2d63}
+.dots i.on{background:var(--pink)}
+.dots i.done{background:#7a4a6a}
+.nav .btn{font-size:17px;padding:11px 18px}
+
+
+/* narrow screens: cards stack, wires loop round the side */
+@media (max-width:820px){
+  .stage{padding:22px 34px;min-height:0}
+  .cards, .cards.n2{flex-direction:column;align-items:stretch;gap:40px;--fs:13px}
+  .card{width:100%}
+  .card .scroll{overflow-x:auto}
+  .cols li{padding:5px 12px 5px 8px}
+  #wires text{font-size:16px}
+  .cap{grid-template-columns:minmax(0,1fr)}
+  .nav{justify-content:space-between}
+}
+@media (prefers-reduced-motion: reduce){ .card, td.cnt span{animation:none} #wires path, tbody tr{transition:none} }
 </style>
 </head>
 <body>
@@ -100,659 +137,222 @@ tr:last-child td{border-bottom:none}
   <header class="top">
     <div class="sign">
       <svg width="52" height="52" viewBox="0 0 52 52" aria-hidden="true"><rect x="3" y="8" width="18" height="14" rx="3" fill="#1a1230"/><rect x="31" y="30" width="18" height="14" rx="3" fill="#1a1230"/><rect x="31" y="8" width="18" height="14" rx="3" fill="#1a1230"/><path d="M21 15C28 15 25 37 31 37" stroke="#ff4fa3" stroke-width="3" fill="none"/><path d="M21 15h10" stroke="#4fe3ff" stroke-width="3"/><circle cx="21" cy="15" r="3" fill="#ffd166"/><circle cx="31" cy="37" r="3" fill="#ffd166"/><circle cx="31" cy="15" r="3" fill="#ffd166"/></svg>
-      <div><div class="eyebrow">Zengő Festival · how tables plug together</div><h1>The Matchmaker</h1></div>
+      <div><div class="eyebrow">Zengő Festival · how tables connect</div><h1>The Matchmaker</h1></div>
     </div>
-    <div class="controls">
-      <button class="btn" id="slow" type="button" aria-pressed="false">Slow motion: off</button>
-      <button class="btn" id="soundToggle" type="button" aria-pressed="true">Sound: on</button>
+    <div class="tools">
+      <button class="btn" id="replay" type="button" title="R">↻ Replay</button>
+      <button class="btn" id="full" type="button" title="F">⛶ Full screen</button>
     </div>
   </header>
 
-  <canvas id="board" aria-hidden="true"></canvas>
-  <p class="caption" id="caption" aria-live="polite">Pick an example or build a connection below.</p>
+  <ol class="scenes" id="scenes" aria-label="Scenes"></ol>
 
-  <div class="below">
-    <section class="panel" aria-label="Query">
-      <div class="inner">
-        <div class="eyebrow">Examples</div>
-        <div class="chips" id="presets"></div>
-        <div class="eyebrow">Tables on the board</div>
-        <div class="chips" id="tables"></div>
-        <div class="eyebrow">Plug a cable: table.column = table.column</div>
-        <div class="builder">
-          <select id="ta" aria-label="table A"></select><select id="ca" aria-label="column A"></select>
-          <span class="eq">=</span>
-          <select id="tb" aria-label="table B"></select><select id="cb" aria-label="column B"></select>
-        </div>
-        <div class="run-row"><button class="btn" id="connect" type="button">Plug in →</button><span class="kbd">adds the condition to WHERE and runs</span></div>
-        <label class="eyebrow" for="sql">Query (last statement is shown on the board)</label>
-        <textarea id="sql" spellcheck="false" autocapitalize="off" autocomplete="off"></textarea>
-        <div class="run-row"><button class="btn primary" id="run" type="button">▶ Run</button><span class="kbd">Ctrl/⌘ + Enter</span></div>
-        <div class="legend"><span>✓ green/colour cable = the columns really refer to each other</span><span>⚠ orange = runs, but the columns have nothing to do with each other · ✗ red = no match</span></div>
-      </div>
-    </section>
-    <section class="panel" aria-label="Result">
-      <div class="inner">
-        <div class="eyebrow">Feedback</div>
-        <div class="verdicts" id="verdicts"><p class="note">Loading the festival database…</p></div>
-        <div class="eyebrow">Result</div>
-        <div id="out"><p class="note">–</p></div>
-      </div>
-    </section>
+  <section class="stage" id="stage" aria-label="The tables and their links">
+    <div class="cards" id="cards"></div>
+    <svg id="wires" aria-hidden="true"></svg>
+  </section>
+
+  <div class="cap">
+    <div class="txt" aria-live="polite"><h2 id="capTitle"></h2><p id="capText"></p><p class="hint" id="capHint" hidden>Click any row to see what it is wired to. · ← → or space: next / back</p></div>
+    <div class="nav">
+      <button class="btn" id="prev" type="button">◂ Back</button>
+      <span class="dots" id="dots" aria-hidden="true"></span>
+      <button class="btn primary" id="next" type="button">Next ▸</button>
+    </div>
   </div>
 </div>
 
 <script>
-const SEED = `
-CREATE TABLE bands (id INTEGER PRIMARY KEY, name TEXT, genre TEXT, country TEXT, members INTEGER);
-CREATE TABLE stages (id INTEGER PRIMARY KEY, name TEXT, capacity INTEGER, area TEXT);
-CREATE TABLE concerts (id INTEGER PRIMARY KEY, band_id INTEGER, stage_id INTEGER, day TEXT, start_time TEXT, end_time TEXT);
-CREATE TABLE crew (id INTEGER PRIMARY KEY, name TEXT, job TEXT, stage_id INTEGER, radio_channel INTEGER);
-CREATE TABLE passes (id INTEGER PRIMARY KEY, crew_id INTEGER, zone TEXT, time TEXT);
-CREATE TABLE managers (id INTEGER PRIMARY KEY, band_id INTEGER, name TEXT, phone TEXT);
-INSERT INTO bands VALUES (1,'Paprika Punks','punk','Hungary',4);
-INSERT INTO bands VALUES (2,'Danube Drift','indie','Hungary',5);
-INSERT INTO bands VALUES (3,'Velvet Locomotive','rock','UK',4);
-INSERT INTO bands VALUES (4,'Csárdás Collective','folk','Hungary',6);
-INSERT INTO bands VALUES (5,'Neon Gulyás','electro','Hungary',2);
-INSERT INTO bands VALUES (6,'The Baltic Owls','indie','Estonia',3);
-INSERT INTO bands VALUES (7,'Karol & the Krakow Brass','jazz','Poland',7);
-INSERT INTO bands VALUES (8,'Lady Lavender','pop','Austria',1);
-INSERT INTO bands VALUES (9,'Tokaj Thunder','metal','Hungary',5);
-INSERT INTO bands VALUES (10,'Bratislava Beat Club','electro','Slovakia',3);
-INSERT INTO bands VALUES (11,'Hollóház Choir','folk','Hungary',9);
-INSERT INTO bands VALUES (12,'Mango Tango','pop','Spain',4);
-INSERT INTO bands VALUES (13,'Zebra Crossing','rock','Germany',4);
-INSERT INTO bands VALUES (14,'Pusztawave','electro','Hungary',1);
-INSERT INTO bands VALUES (15,'Fruzsi Fülöp','pop','Hungary',1);
-INSERT INTO bands VALUES (16,'The Rusty Trams','punk','Czechia',4);
-INSERT INTO stages VALUES (1,'Main Stage',12000,'north');
-INSERT INTO stages VALUES (2,'Dune Tent',3000,'north');
-INSERT INTO stages VALUES (3,'Riverbank',5000,'river');
-INSERT INTO stages VALUES (4,'Folk Barn',1500,'south');
-INSERT INTO stages VALUES (5,'Silent Disco',800,'south');
-INSERT INTO concerts VALUES (1,1,3,'Friday','17:00','18:00');
-INSERT INTO concerts VALUES (2,6,2,'Friday','18:00','19:00');
-INSERT INTO concerts VALUES (3,12,1,'Friday','18:30','19:30');
-INSERT INTO concerts VALUES (4,4,4,'Friday','19:00','20:00');
-INSERT INTO concerts VALUES (5,7,3,'Friday','19:00','20:00');
-INSERT INTO concerts VALUES (6,5,2,'Friday','20:00','21:00');
-INSERT INTO concerts VALUES (7,2,1,'Friday','20:00','21:15');
-INSERT INTO concerts VALUES (8,16,3,'Friday','20:30','21:30');
-INSERT INTO concerts VALUES (9,10,5,'Friday','22:00','23:30');
-INSERT INTO concerts VALUES (10,8,1,'Friday','22:00','23:30');
-INSERT INTO concerts VALUES (11,14,5,'Friday','23:30','23:59');
-INSERT INTO concerts VALUES (12,11,4,'Saturday','16:00','17:00');
-INSERT INTO concerts VALUES (13,15,3,'Saturday','17:00','18:00');
-INSERT INTO concerts VALUES (14,13,1,'Saturday','17:30','18:30');
-INSERT INTO concerts VALUES (15,7,2,'Saturday','18:00','19:00');
-INSERT INTO concerts VALUES (16,1,3,'Saturday','18:30','19:30');
-INSERT INTO concerts VALUES (17,6,1,'Saturday','19:00','20:00');
-INSERT INTO concerts VALUES (18,4,4,'Saturday','19:30','20:30');
-INSERT INTO concerts VALUES (19,9,1,'Saturday','20:30','21:30');
-INSERT INTO concerts VALUES (20,5,5,'Saturday','21:00','22:00');
-INSERT INTO concerts VALUES (21,16,3,'Saturday','21:00','22:00');
-INSERT INTO concerts VALUES (22,3,1,'Saturday','22:00','23:30');
-INSERT INTO concerts VALUES (23,10,2,'Saturday','22:30','23:30');
-INSERT INTO concerts VALUES (24,14,5,'Saturday','22:30','23:59');
-INSERT INTO concerts VALUES (25,11,3,'Sunday','15:00','16:00');
-INSERT INTO concerts VALUES (26,15,1,'Sunday','16:00','17:00');
-INSERT INTO concerts VALUES (27,4,4,'Sunday','17:00','18:00');
-INSERT INTO concerts VALUES (28,12,3,'Sunday','18:00','19:00');
-INSERT INTO concerts VALUES (29,13,2,'Sunday','19:00','20:00');
-INSERT INTO concerts VALUES (30,2,3,'Sunday','20:00','21:00');
-INSERT INTO concerts VALUES (31,8,1,'Sunday','21:00','22:30');
-INSERT INTO concerts VALUES (32,9,3,'Sunday','21:30','22:30');
-INSERT INTO crew VALUES (1,'Gergő Hámori','roadie',1,3);
-INSERT INTO crew VALUES (2,'Bea Szalai','sound',1,3);
-INSERT INTO crew VALUES (3,'Máté Orbán','lights',1,3);
-INSERT INTO crew VALUES (4,'Nóra Kiss','security',1,1);
-INSERT INTO crew VALUES (5,'Dávid Bakos','sound',2,4);
-INSERT INTO crew VALUES (6,'Lilla Fehér','roadie',2,4);
-INSERT INTO crew VALUES (7,'Ákos Tar','security',3,1);
-INSERT INTO crew VALUES (8,'Petra Nagy','sound',3,5);
-INSERT INTO crew VALUES (9,'Zoli Berki','lights',3,5);
-INSERT INTO crew VALUES (10,'Hanna Rózsa','roadie',4,6);
-INSERT INTO crew VALUES (11,'Bence Varga','sound',4,6);
-INSERT INTO crew VALUES (12,'Rozi Rab','runner',5,7);
-INSERT INTO crew VALUES (13,'Emma Lukács','sound',5,7);
-INSERT INTO crew VALUES (14,'Tomi Sós','security',5,1);
-INSERT INTO passes VALUES (1,4,'Main backstage','18:40');
-INSERT INTO passes VALUES (2,1,'Main backstage','18:55');
-INSERT INTO passes VALUES (3,2,'Main backstage','19:02');
-INSERT INTO passes VALUES (4,6,'Dune backstage','19:10');
-INSERT INTO passes VALUES (5,5,'Dune backstage','19:12');
-INSERT INTO passes VALUES (6,8,'Riverbank backstage','19:30');
-INSERT INTO passes VALUES (7,12,'Catering','19:45');
-INSERT INTO passes VALUES (8,10,'Catering','19:50');
-INSERT INTO passes VALUES (9,3,'Main backstage','20:05');
-INSERT INTO passes VALUES (10,7,'Riverbank backstage','20:10');
-INSERT INTO passes VALUES (11,13,'Catering','20:20');
-INSERT INTO passes VALUES (12,9,'Riverbank backstage','20:25');
-INSERT INTO passes VALUES (13,1,'Catering','20:40');
-INSERT INTO passes VALUES (14,3,'Main backstage','20:55');
-INSERT INTO passes VALUES (15,11,'Crew parking','21:00');
-INSERT INTO passes VALUES (16,14,'Catering','21:05');
-INSERT INTO passes VALUES (17,1,'Main backstage','21:12');
-INSERT INTO passes VALUES (18,6,'Dune backstage','21:20');
-INSERT INTO passes VALUES (19,12,'Main backstage','21:23');
-INSERT INTO passes VALUES (20,2,'Main backstage','21:30');
-INSERT INTO passes VALUES (21,8,'Riverbank backstage','21:33');
-INSERT INTO passes VALUES (22,5,'Crew parking','21:38');
-INSERT INTO passes VALUES (23,4,'Main backstage','21:45');
-INSERT INTO passes VALUES (24,12,'Catering','21:52');
-INSERT INTO passes VALUES (25,3,'Main backstage','21:58');
-INSERT INTO passes VALUES (26,13,'Crew parking','22:05');
-INSERT INTO passes VALUES (27,9,'Riverbank backstage','22:10');
-INSERT INTO passes VALUES (28,1,'Main backstage','22:15');
-INSERT INTO passes VALUES (29,10,'Catering','22:20');
-INSERT INTO passes VALUES (30,7,'Riverbank backstage','22:30');
-INSERT INTO passes VALUES (31,6,'Catering','22:40');
-INSERT INTO passes VALUES (32,2,'Main backstage','22:48');
-INSERT INTO passes VALUES (33,14,'Crew parking','23:00');
-INSERT INTO passes VALUES (34,11,'Catering','23:10');
-INSERT INTO passes VALUES (35,12,'Crew parking','23:20');
-INSERT INTO passes VALUES (36,4,'Main backstage','23:40');
-INSERT INTO managers VALUES (1,1,'Ilona Pék','+36 30 111 2233');
-INSERT INTO managers VALUES (2,2,'Marci Dobó','+36 20 222 3344');
-INSERT INTO managers VALUES (3,3,'Harriet Cole','+44 7700 900123');
-INSERT INTO managers VALUES (4,4,'Teri Juhász','+36 70 333 4455');
-INSERT INTO managers VALUES (5,5,'Olivér Kun','+36 30 444 5566');
-INSERT INTO managers VALUES (6,6,'Kai Tamm','+372 5555 1234');
-INSERT INTO managers VALUES (7,7,'Agnieszka Lis','+48 600 123 456');
-INSERT INTO managers VALUES (8,8,'Felix Baumann','+43 660 123 4567');
-INSERT INTO managers VALUES (9,9,'Zsolt Erdős','+36 20 555 6677');
-INSERT INTO managers VALUES (10,10,'Jana Horváthová','+421 900 123 456');
-INSERT INTO managers VALUES (11,11,'Bori Szép','+36 70 666 7788');
-INSERT INTO managers VALUES (12,12,'Lucía Marín','+34 600 123 456');
-INSERT INTO managers VALUES (13,13,'Anke Vogel','+49 170 1234567');
-INSERT INTO managers VALUES (14,14,'Dénes Varga','+36 30 777 8899');
-INSERT INTO managers VALUES (15,15,'Panni Tóth','+36 20 888 9900');
-INSERT INTO managers VALUES (16,16,'Petr Dvořák','+420 601 123 456');
-`;
-const ALIAS = {};                 /* default short names per table */
-const FK = [["concerts", "band_id", "bands", "id"], ["concerts", "stage_id", "stages", "id"], ["crew", "stage_id", "stages", "id"], ["passes", "crew_id", "crew", "id"], ["managers", "band_id", "bands", "id"]];                       /* real references: [child, column, parent, column] */
-const LABELCOLS = {"bands": ["id", "name"], "stages": ["id", "name"], "concerts": ["id", "band_id", "stage_id", "day"], "crew": ["id", "name", "stage_id"], "passes": ["id", "crew_id", "zone"], "managers": ["id", "band_id", "name"]};         /* which columns to print on a row chip */
-const PRESETS = [{"label": "⚠ No connection: bands × stages", "bad": true, "sql": "SELECT bands.name, stages.name\nFROM bands, stages;"}, {"label": "1 : 1 — every band has one manager", "sql": "SELECT bands.name, managers.name, managers.phone\nFROM bands, managers\nWHERE bands.id = managers.band_id;"}, {"label": "1 : N — a band plays many concerts", "sql": "SELECT bands.name, concerts.day, concerts.start_time\nFROM bands, concerts\nWHERE bands.id = concerts.band_id;"}, {"label": "N : 1 — many crew, one stage", "sql": "SELECT crew.name, crew.job, stages.name\nFROM crew, stages\nWHERE crew.stage_id = stages.id;"}, {"label": "N : N — bands ↔ stages through concerts", "sql": "SELECT bands.name, stages.name, concerts.day\nFROM bands, concerts, stages\nWHERE bands.id = concerts.band_id\n  AND concerts.stage_id = stages.id;"}, {"label": "Three tables + a filter", "sql": "SELECT bands.name, stages.name, concerts.start_time\nFROM bands, concerts, stages\nWHERE bands.id = concerts.band_id\n  AND concerts.stage_id = stages.id\n  AND concerts.day = 'Saturday'\n  AND stages.name = 'Main Stage';"}, {"label": "⚠ Wrong column: stage_id = bands.id", "bad": true, "sql": "SELECT bands.name, concerts.day\nFROM bands, concerts\nWHERE concerts.stage_id = bands.id;"}, {"label": "✗ Text = number: name = id", "bad": true, "sql": "SELECT *\nFROM bands, concerts\nWHERE bands.name = concerts.band_id;"}, {"label": "Who was backstage? (4 tables)", "sql": "SELECT crew.name, crew.job, passes.zone, passes.time, stages.name\nFROM passes, crew, stages\nWHERE passes.crew_id = crew.id\n  AND crew.stage_id = stages.id\n  AND passes.zone = 'Main backstage';"}];
-const T = {
-  "sound": "Sound",
-  "slow": "Slow motion",
-  "idle": "Pick an example or build a connection below.",
-  "ready": "Database ready. Run a query to see the cables.",
-  "boardIdle": "Run a query – the tables will appear here",
-  "engFail": "The SQL engine could not be loaded. Check your internet connection and reload.",
-  "sqlErr": "SQL error",
-  "zero": "(no rows)",
-  "alias": "as",
-  "tablesWord": "table(s)",
-  "accident": "by accident",
-  "noMatch": "no match",
-  "allPairs": "every row with every row",
-  "capError": "The query has an error – see the result box.",
-  "capNoTables": "No tables found in FROM.",
-  "rows": n => `${n} row${n===1?'':'s'}`,
-  "rowsN": n => `${n} rows`,
-  "pairsN": n => `${n} pairs`,
-  "resultN": n => `Result: ${n} row${n===1?'':'s'}`,
-  "capCross": n => `no WHERE rule → ${n} pairs`,
-  "capLoose": t => `${t}: not connected`,
-  "fromLine": (k, n) => k < 2 ? 'One table – nothing to connect.' : `${k} tables in FROM. Without any rule SQL would pair every row with every row: ${n} pairs.`,
-  "noRule": "No connecting rule",
-  "noRuleWhy": n => `Each band is listed with each stage – ${n} meaningless pairs. Add a rule like WHERE concerts.band_id = bands.id.`,
-  "whyTable": "This table does not exist.",
-  "whyColumn": c => `Column ${c} does not exist.`,
-  "whyTypes": (a,b) => `A ${a} column is compared with a ${b} column – they can never be equal.`,
-  "whyNoMatch": "No row of one table equals any row of the other on these columns.",
-  "whyAccident": j => `SQL found equal numbers, but ${j.a.alias}.${j.ca} does not refer to ${j.b.alias}.${j.cb}. The pairs are coincidences (an id that happens to equal another id).`,
-  "whyReal": (j, rel, ma, mb, na, nb) => rel === '1 : 1' ? `Real reference. Every ${j.a.name} row links to at most one ${j.b.name} row and vice versa.` : rel === 'N : 1' ? `Real reference. Many ${j.a.name} rows share one ${j.b.name} row (up to ${mb} per row), each ${j.a.name} row has one match.` : rel === '1 : N' ? `Real reference. One ${j.a.name} row has many ${j.b.name} rows (up to ${ma}), each ${j.b.name} row points at exactly one.` : `Real reference, many to many on these rows.`,
-  "looseWhy": t => `${t} is in FROM but no rule connects it – each of its rows is paired with every result row.`,
-  "viaWhy": (x, y, v) => `A band plays on many stages and a stage hosts many bands. No column can hold that – so the middle table ${v} stores one row per pairing.`,
-  "filterWhy": n => `Ordinary conditions – they keep the connected rows that fit: ${n} in the result.`
-};
+const D = {"ui": {"rows": "{n} rows"}, "tables": {"bands": {"name": "bands", "cols": ["id", "name", "country"], "rows": [[1, "Paprika Punks", "Hungary"], [2, "Danube Drift", "Hungary"], [3, "Velvet Locomotive", "UK"], [4, "Lady Lavender", "Austria"]]}, "stages": {"name": "stages", "cols": ["id", "name", "area"], "rows": [[1, "Main Stage", "north"], [2, "Folk Barn", "south"]]}, "concerts": {"name": "concerts", "cols": ["id", "band_id", "stage_id", "day", "start_time"], "rows": [[1, 2, 1, "Friday", "20:00"], [2, 1, 2, "Friday", "21:00"], [3, 3, 1, "Saturday", "22:00"], [4, 1, 1, "Saturday", "18:00"], [5, 4, 2, "Sunday", "19:00"], [6, 2, 2, "Sunday", "17:00"]]}, "managers": {"name": "managers", "cols": ["id", "name", "band_id"], "rows": [[1, "Kiss Réka", 3], [2, "Tóth Bence", 1], [3, "Nagy Eszter", 4], [4, "Szabó Máté", 2]]}}, "links": {"cb": {"from": "concerts", "col": "band_id", "to": "bands", "color": "#ff4fa3", "gutter": "r"}, "cs": {"from": "concerts", "col": "stage_id", "to": "stages", "color": "#4fe3ff", "gutter": "l"}, "mb": {"from": "managers", "col": "band_id", "to": "bands", "color": "#b8ff5c", "gutter": "r"}}, "scenes": [{"tab": "A reference", "title": "A number that points to another table", "tables": ["concerts", "bands"], "links": ["cb"], "phases": [{"mode": "cols", "text": "The <span class=\"tn\">concerts<\/span> table has no band names. Its <span class=\"cn\" style='--lc:#ff4fa3'>band_id<\/span> column says <b>which band<\/b> plays instead: it points to the <span class=\"cn\" style='--lc:#ff4fa3'>id<\/span> column of <span class=\"tn\">bands<\/span>."}, {"mode": "rows", "text": "Here are the rows. The <span class=\"cn\" style='--lc:#ff4fa3'>band_id<\/span> column holds nothing but numbers – each one is the <span class=\"cn\" style='--lc:#ff4fa3'>id<\/span> of a band."}, {"mode": "rows", "lines": ["cb"], "animate": true, "text": "Each concert is wired to the band whose <span class=\"cn\" style='--lc:#ff4fa3'>id<\/span> equals the concert's <span class=\"cn\" style='--lc:#ff4fa3'>band_id<\/span>."}, {"mode": "rows", "lines": ["cb"], "badges": ["bands"], "text": "<b>N : 1<\/b> – a band can have several concerts (Paprika Punks and Danube Drift play twice), but every concert has exactly <b>one<\/b> band."}]}, {"tab": "No rule", "title": "What if we don't say what belongs together?", "tables": ["concerts", "bands"], "links": ["cb"], "phases": [{"mode": "rows", "text": "The same two tables. This time we don't say which concert belongs to which band."}, {"mode": "rows", "lines": "cross", "animate": true, "text": "Then <b>every concert is paired with every band<\/b>: 6 × 4 = <b>24 pairs<\/b>. Most are nonsense – a Velvet Locomotive concert with the Paprika Punks' name, for example."}, {"mode": "rows", "lines": "cross", "rule": true, "animate": false, "text": "The <b>matching rule<\/b> throws the wrong pairs away: only pairs where the concert's <span class=\"cn\" style='--lc:#ff4fa3'>band_id<\/span> equals the band's <span class=\"cn\" style='--lc:#ff4fa3'>id<\/span> stay. <b>6 of the 24 pairs remain<\/b> – exactly one per concert."}]}, {"tab": "Three tables", "title": "Concerts point two ways", "tables": ["bands", "concerts", "stages"], "links": ["cb", "cs"], "phases": [{"mode": "cols", "text": "<span class=\"tn\">concerts<\/span> has two references: <span class=\"cn\" style='--lc:#ff4fa3'>band_id<\/span> points to <span class=\"tn\">bands<\/span>, <span class=\"cn\" style='--lc:#4fe3ff'>stage_id<\/span> points to <span class=\"tn\">stages<\/span>. The concerts table ties the other two together."}, {"mode": "rows", "lines": ["cb", "cs"], "animate": true, "text": "Two wires leave every concert: one to its band, one to its stage. Three tables need <b>two<\/b> links."}, {"mode": "rows", "lines": ["cb", "cs"], "focus": ["concerts", 3], "text": "Follow one row: concert 3 is played by <b>Velvet Locomotive<\/b> on the <b>Main Stage<\/b>."}]}, {"tab": "One to one", "title": "Every band has exactly one manager", "tables": ["managers", "bands"], "links": ["mb"], "rel": {"mb": "1:1"}, "phases": [{"mode": "cols", "text": "The <span class=\"cn\" style='--lc:#b8ff5c'>band_id<\/span> column of <span class=\"tn\">managers<\/span> points to the <span class=\"cn\" style='--lc:#b8ff5c'>id<\/span> column of <span class=\"tn\">bands<\/span>."}, {"mode": "rows", "lines": ["mb"], "animate": true, "text": "Let's wire up the rows!"}, {"mode": "rows", "lines": ["mb"], "badges": ["managers", "bands"], "text": "<b>1 : 1<\/b> – exactly one wire reaches every band, and exactly one leaves every manager. Nobody is left out and nobody has two."}]}, {"tab": "Many to many", "title": "Bands and stages – through the concerts", "tables": ["bands", "concerts", "stages"], "links": ["cb", "cs"], "phases": [{"mode": "rows", "lines": ["cb", "cs"], "animate": true, "text": "There is no direct wire between <span class=\"tn\">bands<\/span> and <span class=\"tn\">stages<\/span>. They are linked through the <span class=\"tn\">concerts<\/span> table."}, {"mode": "rows", "lines": ["cb", "cs"], "focus": ["bands", 1], "text": "<b>Paprika Punks<\/b> play two concerts, on two <b>different<\/b> stages: one band → several stages."}, {"mode": "rows", "lines": ["cb", "cs"], "focus": ["stages", 1], "text": "The <b>Main Stage<\/b> has three concerts by three different bands: one stage → several bands."}, {"mode": "rows", "lines": ["cb", "cs"], "text": "<b>N : N<\/b> – many bands, many stages. A link like this always lives in a table in between – here, <span class=\"tn\">concerts<\/span>."}]}]};
 const $ = id => document.getElementById(id);
-const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-const fmt = x => typeof x === "number" && !Number.isInteger(x) ? String(Math.round(x*1000)/1000) : String(x);
-const clamp = (v,a,b) => Math.max(a, Math.min(b, v));
-const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
-const COLS = ["#ff4fa3","#4fe3ff","#b8ff5c","#ffd166","#c9a2ff","#ff9e7a"];
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const NS = "http://www.w3.org/2000/svg";
+let si = 0, pi = 0, focus = null, timers = [];
 
-/* ---------- sound ---------- */
-let soundOn = true, actx = null;
-try { soundOn = localStorage.getItem("matchmaker-sound") !== "off"; } catch(e){}
-const ONOFF = document.documentElement.lang === "hu" ? ["be", "ki"] : ["on", "off"];
-function paintSound(){ const b = $("soundToggle"); b.textContent = `${T.sound}: ${soundOn?ONOFF[0]:ONOFF[1]}`; b.setAttribute("aria-pressed", soundOn); }
-paintSound();
-$("soundToggle").onclick = ()=>{ soundOn = !soundOn; paintSound(); try { localStorage.setItem("matchmaker-sound", soundOn?"on":"off"); } catch(e){} };
-function tone(freq, dur, type="triangle", vol=.1, slideTo=null, delay=0){
-  if (!soundOn) return;
-  try { actx = actx || new (window.AudioContext || window.webkitAudioContext)();
-    const t = actx.currentTime + delay, o = actx.createOscillator(), g = actx.createGain();
-    o.type = type; o.frequency.setValueAtTime(freq, t); if (slideTo) o.frequency.exponentialRampToValueAtTime(slideTo, t + dur);
-    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + .02); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-    o.connect(g).connect(actx.destination); o.start(t); o.stop(t + dur + .05); } catch(e){}
-}
-const sfx = {
-  tick(){ tone(880 + Math.random()*300, .04, "square", .03); },
-  good(){ tone(523, .12, "triangle", .1); tone(784, .18, "triangle", .1, null, .1); },
-  warn(){ tone(330, .18, "sawtooth", .06, 300); },
-  bad(){ tone(180, .3, "sawtooth", .08, 90); tone(120, .3, "square", .05, 70, .05); },
-  plug(){ tone(200, .08, "square", .06, 400); }
-};
+/* position lives in the address (#3-2) so a reload keeps the place */
+(function(){ const m = location.hash.match(/^#(\d+)-(\d+)$/); if (m){ si = Math.min(D.scenes.length - 1, Math.max(0, m[1] - 1)); pi = Math.min(D.scenes[si].phases.length - 1, Math.max(0, m[2] - 1)); } })();
 
-/* ---------- database + schema ---------- */
-let SQL = null, db = null, SCHEMA = {};      /* SCHEMA[table] = { cols:[{name,type}], rows:[[...]], rowids:[] } */
-function loadSchema(){
-  SCHEMA = {};
-  const t = db.exec("SELECT name FROM sqlite_master WHERE type='table' ORDER BY rowid");
-  (t.length ? t[0].values : []).forEach(([name])=>{
-    const info = db.exec(`PRAGMA table_info("${name}")`)[0].values.map(r=>({ name: r[1], type: /INT|REAL/i.test(r[2]) ? "number" : "text" }));
-    const r = db.exec(`SELECT rowid, * FROM "${name}"`);
-    SCHEMA[name] = { cols: info, rowids: r.length ? r[0].values.map(v=>v[0]) : [], rows: r.length ? r[0].values.map(v=>v.slice(1)) : [] };
-  });
+const scene = () => D.scenes[si], phase = () => scene().phases[pi];
+const linkOf = k => D.links[k];
+const colIdx = (t, c) => D.tables[t].cols.indexOf(c);
+
+/* which link colours a column of a table in this scene */
+function colLink(t, c){
+  for (const k of scene().links){ const L = linkOf(k); if ((L.from === t && L.col === c) || (L.to === t && c === "id")) return L; }
+  return null;
 }
 
-/* ---------- SQL parsing (just enough for the board) ---------- */
-function lastStatement(sql){
-  const s = sql.replace(/--[^\n]*/g," ").replace(/\/\*[\s\S]*?\*\//g," ");
-  const parts = []; let q = null, cur = "";
-  for (const ch of s){ if (q){ cur += ch; if (ch === q) q = null; continue; } if (ch === "'" || ch === '"'){ q = ch; cur += ch; continue; } if (ch === ";"){ parts.push(cur); cur = ""; continue; } cur += ch; }
-  parts.push(cur); return parts.map(p=>p.trim()).filter(Boolean).pop() || "";
-}
-function splitClauses(sql){
-  const kw = [["select",/^select\b/i],["from",/^from\b/i],["where",/^where\b/i],["group",/^group\s+by\b/i],["having",/^having\b/i],["order",/^order\s+by\b/i],["limit",/^limit\b/i]];
-  let depth = 0, q = null; const marks = [];
-  for (let i=0; i<sql.length; i++){ const ch = sql[i];
-    if (q){ if (ch === q) q = null; continue; } if (ch === "'" || ch === '"'){ q = ch; continue; }
-    if (ch === "(") depth++; else if (ch === ")") depth--;
-    else if (depth === 0 && /[a-z]/i.test(ch) && (i === 0 || /[\s(),;]/.test(sql[i-1]))){ const rest = sql.slice(i);
-      for (const [name, re] of kw){ const m = rest.match(re); if (m){ marks.push({ name, i, len: m[0].length }); i += m[0].length - 1; break; } } } }
-  const out = {}; marks.forEach((m,k)=>{ if (out[m.name] === undefined) out[m.name] = sql.slice(m.i + m.len, k+1 < marks.length ? marks[k+1].i : sql.length).trim(); });
+/* the row pairs a phase draws: [link key | "cross", fromTable, fromId, toTable, toId, match] */
+function pairs(ph){
+  const out = [];
+  if (ph.lines === "cross"){
+    const [a, b] = scene().tables, L = linkOf(scene().links[0]);
+    const A = D.tables[L.from], ci = A.cols.indexOf(L.col);
+    for (const r of A.rows) for (const s of D.tables[L.to].rows) out.push(["cross", L.from, r[0], L.to, s[0], r[ci] === s[0]]);
+    return out;
+  }
+  for (const k of ph.lines || []){ const L = linkOf(k), ci = colIdx(L.from, L.col);
+    for (const r of D.tables[L.from].rows) out.push([k, L.from, r[0], L.to, r[ci], true]); }
   return out;
 }
-function splitTop(s, sep){   /* sep: "," or /\bAND\b/i at depth 0, outside quotes */
-  const parts = []; let depth = 0, q = null, cur = "", i = 0;
-  while (i < s.length){ const ch = s[i];
-    if (q){ cur += ch; if (ch === q) q = null; i++; continue; }
-    if (ch === "'" || ch === '"'){ q = ch; cur += ch; i++; continue; }
-    if (ch === "(") depth++; if (ch === ")") depth--;
-    if (depth === 0){
-      if (sep === "," && ch === ","){ parts.push(cur.trim()); cur = ""; i++; continue; }
-      if (sep !== "," && /\s/.test(s[i-1] || " ") && /^and\b/i.test(s.slice(i)) ){ parts.push(cur.trim()); cur = ""; i += 3; continue; } }
-    cur += ch; i++; }
-  if (cur.trim()) parts.push(cur.trim()); return parts;
+
+/* rows reachable from one row, never stepping back into a table already reached */
+function reach(t, id, P){
+  const on = new Set([t + ":" + id]), seen = new Set([t]); let front = [[t, id]];
+  while (front.length){ const next = [], hit = new Set();
+    for (const [ft, fid] of front) for (const p of P){ if (!p[5]) continue;
+      if (p[1] === ft && p[2] === fid && !seen.has(p[3])){ next.push([p[3], p[4]]); hit.add(p[3]); }
+      if (p[3] === ft && p[4] === fid && !seen.has(p[1])){ next.push([p[1], p[2]]); hit.add(p[1]); } }
+    hit.forEach(x => seen.add(x)); next.forEach(([a, b]) => on.add(a + ":" + b)); front = next; }
+  return on;
 }
-function parseQuery(sql){
-  const st = lastStatement(sql), cl = splitClauses(st);
-  if (!cl.from) return null;
-  /* JOIN … ON … → comma list + extra conditions */
-  let from = cl.from, extra = [];
-  from = from.replace(/\b(inner|left|right|cross|outer)\s+/gi, "");
-  if (/\bjoin\b/i.test(from)){
-    const pieces = from.split(/\bjoin\b/i); const list = [pieces[0]];
-    pieces.slice(1).forEach(p=>{ const m = p.match(/^(.*?)\bon\b(.*)$/is); if (m){ list.push(m[1]); extra.push(m[2].trim()); } else list.push(p); });
-    from = list.join(",");
+
+function cardHtml(t, ph, P){
+  const T = D.tables[t];
+  const head = `<div class="ch"><h2>${esc(T.name)}</h2><span class="rc">${esc(D.ui.rows.replace("{n}", T.rows.length))}</span></div>`;
+  if (ph.mode === "cols"){
+    return `<div class="card" data-t="${t}">${head}<ul class="cols">${T.cols.map(c => { const L = colLink(t, c);
+      const ic = c === "id" ? "🔑" : L ? "→" : "";
+      return `<li data-c="${c}"${L ? ` class="link" style="--lc:${L.color}"` : ""}><span class="ic">${ic}</span>${esc(c)}</li>`; }).join("")}</ul></div>`;
   }
-  const tables = [];
-  splitTop(from, ",").forEach(x=>{ const m = x.replace(/\s+as\s+/i, " ").trim().match(/^([A-Za-z_]\w*)(?:\s+([A-Za-z_]\w*))?$/);
-    if (m) tables.push({ name: m[1], alias: m[2] || m[1] }); });
-  const resolve = ref => tables.find(t=>t.alias.toLowerCase() === ref.toLowerCase() || t.name.toLowerCase() === ref.toLowerCase());
-  const conds = cl.where ? splitTop(cl.where, "and").concat(extra) : extra, joins = [], filters = [];
-  conds.forEach(c=>{
-    const m = c.match(/^\(?\s*([A-Za-z_]\w*)\.([A-Za-z_]\w*)\s*=\s*([A-Za-z_]\w*)\.([A-Za-z_]\w*)\s*\)?$/);
-    if (m){ const A = resolve(m[1]), B = resolve(m[3]);
-      if (A && B && A !== B){ joins.push({ a: A, ca: m[2], b: B, cb: m[4], text: c.trim() }); return; } }
-    filters.push(c.trim());
-  });
-  return { tables, joins, filters, cl, st };
+  const badge = (ph.badges || []).includes(t), count = id => P.filter(p => p[5] && ((p[3] === t && p[4] === id) || (p[1] === t && p[2] === id))).length;
+  const th = T.cols.map(c => { const L = colLink(t, c); return `<th${L ? ` class="link" style="--lc:${L.color}"` : ""}>${esc(c)}</th>`; }).join("") + (badge ? "<th></th>" : "");
+  const rows = T.rows.map(r => `<tr data-id="${r[0]}">${r.map((v, i) => { const L = colLink(t, T.cols[i]);
+      return `<td class="${typeof v === "number" ? "num" : ""}${L ? " link" : ""}"${L ? ` style="--lc:${L.color}"` : ""}>${esc(v)}</td>`; }).join("")}${badge ? `<td class="cnt"><span style="animation-delay:${reduce ? 0 : (P.length * stagger(ph) + 150 + 0)}ms">${count(r[0])}×</span></td>` : ""}</tr>`).join("");
+  return `<div class="card" data-t="${t}">${head}<div class="scroll"><table><thead><tr>${th}</tr></thead><tbody>${rows}</tbody></table></div></div>`;
+}
+const stagger = ph => ph.animate ? (ph.lines === "cross" ? 45 : 260) : 0;
+
+function render(animate = true){
+  timers.forEach(clearTimeout); timers = [];
+  const sc = scene(), ph = phase(), P = pairs(ph);
+  history.replaceState(null, "", `#${si + 1}-${pi + 1}`);
+  $("scenes").innerHTML = D.scenes.map((s, i) => `<li><button type="button" data-i="${i}"${i === si ? ' aria-current="step"' : ""}><b>${i + 1}</b>${esc(s.tab)}</button></li>`).join("");
+  $("dots").innerHTML = sc.phases.map((_, i) => `<i class="${i === pi ? "on" : i < pi ? "done" : ""}"></i>`).join("");
+  $("capTitle").textContent = sc.title;
+  $("capText").innerHTML = ph.text;
+  $("capHint").hidden = !(ph.mode === "rows" && ph.lines && ph.lines !== "cross");
+  $("prev").disabled = si === 0 && pi === 0;
+  $("next").disabled = si === D.scenes.length - 1 && pi === sc.phases.length - 1;
+  $("cards").className = "cards n" + sc.tables.length;
+  $("cards").innerHTML = sc.tables.map(t => cardHtml(t, ph, P)).join("");
+  if (!animate) document.querySelectorAll(".card").forEach(c => c.style.animation = "none");
+  focus = ph.focus ? { t: ph.focus[0], id: ph.focus[1] } : null;
+  requestAnimationFrame(() => { fit(); draw(animate && !reduce); });
 }
 
-/* ---------- judging a connection ---------- */
-function judge(j){
-  const SA = SCHEMA[j.a.name], SB = SCHEMA[j.b.name];
-  const colA = SA && SA.cols.find(c=>c.name.toLowerCase() === j.ca.toLowerCase()), colB = SB && SB.cols.find(c=>c.name.toLowerCase() === j.cb.toLowerCase());
-  if (!SA || !SB) return { kind: "bad", why: T.whyTable, pairs: [] };
-  if (!colA || !colB) return { kind: "bad", why: T.whyColumn(!colA ? `${j.a.alias}.${j.ca}` : `${j.b.alias}.${j.cb}`), pairs: [] };
-  let pairs = [];
-  try { const r = db.exec(`SELECT "${j.a.alias}".rowid, "${j.b.alias}".rowid FROM "${j.a.name}" "${j.a.alias}", "${j.b.name}" "${j.b.alias}" WHERE "${j.a.alias}"."${j.ca}" = "${j.b.alias}"."${j.cb}"`); pairs = r.length ? r[0].values : []; } catch(e){}
-  const real = FK.some(([ct,cc,pt,pc])=> (ct === j.a.name && cc.toLowerCase() === j.ca.toLowerCase() && pt === j.b.name && pc.toLowerCase() === j.cb.toLowerCase()) || (ct === j.b.name && cc.toLowerCase() === j.cb.toLowerCase() && pt === j.a.name && pc.toLowerCase() === j.ca.toLowerCase()));
-  const perA = new Map(), perB = new Map();
-  pairs.forEach(([ra, rb])=>{ perA.set(ra, (perA.get(ra)||0)+1); perB.set(rb, (perB.get(rb)||0)+1); });
-  const maxA = Math.max(0, ...perA.values()), maxB = Math.max(0, ...perB.values());
-  /* maxA = most B rows one A row matches; maxB = most A rows one B row matches. Read left→right: "1 : N" = one A row, many B rows */
-  const rel = !pairs.length ? "" : (maxA <= 1 && maxB <= 1) ? "1 : 1" : (maxA > 1 && maxB <= 1) ? "1 : N" : (maxA <= 1 && maxB > 1) ? "N : 1" : "N : N";
-  if (!pairs.length) return { kind: "bad", why: colA.type !== colB.type ? T.whyTypes(colA.type, colB.type) : T.whyNoMatch, pairs, rel, maxA, maxB, colA, colB };
-  if (!real) return { kind: "warn", why: T.whyAccident(j), pairs, rel, maxA, maxB, colA, colB };
-  return { kind: "ok", why: T.whyReal(j, rel, maxA, maxB, SA.rows.length, SB.rows.length), pairs, rel, maxA, maxB, colA, colB };
+/* keep every card whole: close the gaps first, then shrink the type until the row fits */
+function fit(){
+  const c = $("cards"); c.style.removeProperty("--fs"); c.style.removeProperty("gap");
+  if (matchMedia("(max-width:820px)").matches) return;
+  const over = () => c.scrollWidth > c.clientWidth + 1;
+  if (!over()) return;
+  c.style.gap = "56px";
+  const probe = c.querySelector("td, li"); let fs = probe ? parseFloat(getComputedStyle(probe).fontSize) : 16;
+  if (probe && probe.tagName === "LI") fs /= 1.08;
+  while (over() && fs > 10){ fs -= .5; c.style.setProperty("--fs", fs + "px"); }
 }
-
-/* ---------- the board ---------- */
-const bd = { c: $("board"), ctx: $("board").getContext("2d"), W: 0, H: 0, cards: [], joins: [], plan: null, t0: 0, slow: false, hover: null, mouse: null };
-function size(){
-  const d = devicePixelRatio || 1, r = bd.c.getBoundingClientRect(); if (!r.width) return;
-  bd.W = r.width; bd.H = r.height; bd.c.width = Math.round(r.width*d); bd.c.height = Math.round(r.height*d); bd.ctx.setTransform(d,0,0,d,0,0);
-  if (bd.plan) layout();
+/* geometry: where a wire leaves a card and where it enters the other one */
+function sides(a, b){
+  if (b.left >= a.right - 2) return ["r", "l"];
+  if (b.right <= a.left + 2) return ["l", "r"];
+  return [null, null];          /* stacked: loop round the side */
 }
-const SL = () => bd.slow ? 2.4 : 1;
-$("slow").onclick = ()=>{ bd.slow = !bd.slow; $("slow").setAttribute("aria-pressed", bd.slow); $("slow").textContent = `${T.slow}: ${bd.slow ? ONOFF[0] : ONOFF[1]}`; };
-$("slow").textContent = `${T.slow}: ${ONOFF[1]}`;
+function path(x1, y1, s1, x2, y2, s2, gutter){
+  if (s1){ const c = Math.max(30, Math.abs(x2 - x1) / 2), d1 = s1 === "r" ? c : -c, d2 = s2 === "r" ? c : -c;
+    return `M${x1} ${y1} C${x1 + d1} ${y1} ${x2 + d2} ${y2} ${x2} ${y2}`; }
+  const g = gutter === "l" ? -30 : 30;
+  return `M${x1} ${y1} C${x1 + g} ${y1} ${x2 + g} ${y2} ${x2} ${y2}`;
+}
+function el(name, attrs, parent){ const e = document.createElementNS(NS, name); for (const k in attrs) e.setAttribute(k, attrs[k]); parent.appendChild(e); return e; }
 
-/* order tables so that connected ones sit next to each other */
-function orderTables(tables, joins){
-  if (tables.length <= 2) return tables.slice();
-  const adj = new Map(tables.map(t=>[t, new Set()]));
-  joins.forEach(j=>{ adj.get(j.a).add(j.b); adj.get(j.b).add(j.a); });
-  const left = new Set(tables), out = [];
-  /* start from a table with degree 1 if any (an end of a chain) */
-  while (left.size){
-    let start = [...left].find(t=>adj.get(t).size === 1) || [...left].find(t=>adj.get(t).size === 0) || [...left][0];
-    let cur = start;
-    while (cur){ out.push(cur); left.delete(cur); cur = [...adj.get(cur)].find(n=>left.has(n)); }
+function draw(animate){
+  const svg = $("wires"); svg.innerHTML = "";
+  const ph = phase(), sc = scene(), base = $("stage").getBoundingClientRect();
+  const card = t => document.querySelector(`.card[data-t="${t}"]`);
+  const R = e => { const r = e.getBoundingClientRect(); return { left: r.left - base.left, right: r.right - base.left, top: r.top - base.top, bottom: r.bottom - base.top, mid: (r.top + r.bottom) / 2 - base.top }; };
+  const ends = (ta, ea, tb, eb, gutter) => {
+    const A = R(card(ta)), B = R(card(tb)), [s1, s2] = sides(A, B), ra = R(ea), rb = R(eb);
+    const x1 = s1 ? (s1 === "r" ? A.right : A.left) : (gutter === "l" ? A.left : A.right), x2 = s2 ? (s2 === "r" ? B.right : B.left) : (gutter === "l" ? B.left : B.right);
+    return { x1, y1: ra.mid, x2, y2: rb.mid, d: path(x1, ra.mid, s1, x2, rb.mid, s2, gutter), s1, s2 };
+  };
+  const grow = (p, delay) => { if (!animate) return; const len = p.getTotalLength(); p.style.strokeDasharray = len; p.style.strokeDashoffset = len;
+    p.getBoundingClientRect(); p.style.transition = `stroke-dashoffset .55s ease-in-out ${delay}ms, opacity .35s`; p.style.strokeDashoffset = 0;
+    timers.push(setTimeout(() => { p.style.strokeDasharray = ""; p.style.transition = ""; }, delay + 650)); };
+  const fade = (n, delay) => { if (!animate) return; n.style.opacity = 0; n.style.transition = `opacity .3s ${delay}ms`; n.getBoundingClientRect(); n.style.opacity = ""; };
+
+  if (ph.mode === "cols"){
+    sc.links.forEach((k, i) => { const L = linkOf(k), a = card(L.from), b = card(L.to); if (!a || !b) return;
+      const e = ends(L.from, a.querySelector(`li[data-c="${L.col}"]`), L.to, b.querySelector('li[data-c="id"]'), L.gutter);
+      const p = el("path", { d: e.d, stroke: L.color, class: "w" }, svg); grow(p, 250 + i * 500);
+      [[e.x1, e.y1], [e.x2, e.y2]].forEach(([x, y]) => fade(el("circle", { cx: x, cy: y, r: 6, fill: L.color }, svg), 250 + i * 500));
+      const [n1, n2] = (sc.rel && sc.rel[k] || "N:1").split(":");
+      const lab = (x, y, s, t) => { const dx = s === "l" ? -16 : 16; const tx = el("text", { x: x + dx, y: y - 12, fill: L.color, "text-anchor": s === "l" ? "end" : "start" }, svg); tx.textContent = t; fade(tx, 700 + i * 500); };
+      lab(e.x1, e.y1, e.s1 || L.gutter || "r", n1); lab(e.x2, e.y2, e.s2 || L.gutter || "r", n2);
+    });
+    return;
   }
-  return out;
-}
-function layout(){
-  const plan = bd.plan, W = bd.W, H = bd.H, n = plan.order.length;
-  const gap = Math.min(70, W*.06), pad = 14, top = 54, bottom = 54;   /* room for badges above and below */
-  const cw = (W - 2*pad - (n-1)*gap)/n;
-  bd.cards = plan.order.map((t,i)=>{
-    const S = SCHEMA[t.name], rows = S ? S.rows.length : 0;
-    const head = 46, colh = 18, avail = H - top - bottom - head - colh - 10;
-    const rh = clamp(avail/Math.max(1,rows), 8, 22), ch = head + colh + 8 + rows*rh + 8;
-    const x = pad + i*(cw + gap), y = top;
-    const card = { t, S, x, y, w: cw, h: ch, head, colh, rh, rowY: k => y + head + colh + 8 + k*rh + rh/2, colX: {} };
-    /* column anchor positions along the column header */
-    if (S){ const names = S.cols.map(c=>c.name); const per = (cw - 16)/names.length; names.forEach((nm,k)=>{ card.colX[nm.toLowerCase()] = x + 8 + per*k + per/2; }); }
-    return card;
+  if (!ph.lines) return;
+  const P = pairs(ph), st = stagger(ph);
+  P.forEach((p, i) => {
+    const L = p[0] === "cross" ? null : linkOf(p[0]);
+    const a = card(p[1]), b = card(p[3]); if (!a || !b) return;
+    const ra = a.querySelector(`tbody tr[data-id="${p[2]}"]`), rb = b.querySelector(`tbody tr[data-id="${p[4]}"]`); if (!ra || !rb) return;
+    const e = ends(p[1], ra, p[3], rb, L ? L.gutter : "r");
+    const cls = p[0] === "cross" ? "w cross" + (p[5] && ph.rule ? " match" : "") : "w row";
+    const node = el("path", { d: e.d, class: cls, "data-a": p[1] + ":" + p[2], "data-b": p[3] + ":" + p[4] }, svg);
+    if (L) node.setAttribute("stroke", L.color);
+    if (p[0] === "cross") fade(node, i * st); else grow(node, 150 + i * st);
+    if (L) [[e.x1, e.y1], [e.x2, e.y2]].forEach(([x, y]) => { const c = el("circle", { cx: x, cy: y, r: 4.5, fill: L.color, class: "w", "data-a": p[1] + ":" + p[2], "data-b": p[3] + ":" + p[4] }, svg); fade(c, 150 + i * st); });
   });
-  bd.cardOf = new Map(bd.cards.map(c=>[c.t, c]));
-}
-function buildPlan(p){
-  const order = orderTables(p.tables, p.joins);
-  const joins = p.joins.map((j,k)=> Object.assign({ col: COLS[k % COLS.length], verdict: judge(j) }, j));
-  /* tables with no connection at all */
-  const connected = new Set(); joins.forEach(j=>{ connected.add(j.a); connected.add(j.b); });
-  const loose = p.tables.filter(t=>!connected.has(t));
-  /* final rows: which base rows survive the whole WHERE */
-  let final = null, error = null, resultRows = 0;
-  try {
-    const res = db.exec(p.st); resultRows = res.length ? res[0].values.length : 0;
-    if (!p.cl.group){
-      const sel = p.tables.map(t=>`"${t.alias}".rowid AS r_${t.alias}`).join(", ");
-      const fromS = p.tables.map(t=>`"${t.name}" "${t.alias}"`).join(", ");
-      const whereS = p.cl.where ? ` WHERE ${p.cl.where}` : "";
-      const r = db.exec(`SELECT DISTINCT ${sel} FROM ${fromS}${whereS}`);
-      final = p.tables.map(()=>new Set());
-      (r.length ? r[0].values : []).forEach(v=> v.forEach((rid,k)=> final[k].add(rid)));
-    }
-  } catch(e){ error = e.message; }
-  /* N:N through a junction: a table joined to two others that are not joined to each other */
-  let via = null;
-  for (const t of p.tables){
-    const js = joins.filter(j=>(j.a === t || j.b === t) && j.verdict.kind === "ok");
-    if (js.length >= 2){ const others = js.map(j=> j.a === t ? j.b : j.a);
-      for (let i=0;i<others.length;i++) for (let k=i+1;k<others.length;k++){ const X = others[i], Y = others[k];
-        if (!joins.some(j=>(j.a===X&&j.b===Y)||(j.a===Y&&j.b===X))){
-          const jx = js.find(j=>j.a===X||j.b===X), jy = js.find(j=>j.a===Y||j.b===Y);
-          const manyX = (jx.a === t ? jx.verdict.maxB : jx.verdict.maxA) > 1, manyY = (jy.a === t ? jy.verdict.maxB : jy.verdict.maxA) > 1;
-          if (manyX && manyY) via = { X, Y, via: t }; } } }
-  }
-  return { order, joins, loose, via, final, error, resultRows, tables: p.tables, filters: p.filters, crossPairs: p.tables.reduce((a,t)=>a*(SCHEMA[t.name] ? SCHEMA[t.name].rows.length : 1), 1) };
+  if (ph.lines === "cross" && ph.rule){ svg.classList.add("ruled"); } else svg.classList.remove("ruled");
+  if (ph.lines === "cross" && ph.rule && animate){ svg.classList.remove("ruled"); timers.push(setTimeout(() => svg.classList.add("ruled"), 500)); }
+  applyFocus(P, animate ? 150 + P.length * st : 0);
 }
 
-/* timeline: 0 cards in → per join: cable, row lines, badge → filters dim → result */
-function schedule(plan){
-  const now = performance.now(), s = SL(); let t = now + 400*s;
-  plan.tIn = now;
-  if (plan.loose.length && plan.tables.length >= 2 && !plan.joins.length){ plan.tCross = t; t += 1800*s; }
-  plan.joins.forEach(j=>{ j.tCable = t; t += 420*s; j.tRows = t; const n = Math.min(j.verdict.pairs.length, 60); t += 400*s + n*18*s; j.tBadge = t; t += 650*s; });
-  if (plan.loose.length && plan.joins.length){ plan.tLoose = t; t += 900*s; }
-  if (plan.filters.length && plan.final){ plan.tFilter = t; t += 700*s; }
-  plan.tDone = t; plan.sounded = new Set();
-}
-function run(){
-  if (!db) return;
-  const sql = $("sql").value;
-  const p = parseQuery(sql);
-  let res = null, err = null;
-  try { res = db.exec(sql); } catch(e){ err = e.message; }
-  /* result table */
-  if (err) $("out").innerHTML = `<div class="err">${T.sqlErr}<p>${esc(err)}</p></div>`;
-  else if (!res || !res.length) $("out").innerHTML = `<p class="note">${T.zero}</p>`;
-  else $("out").innerHTML = res.map(r=>`<div class="result-meta">${T.rows(r.values.length)}</div><div class="tablebox"><table><thead><tr>${r.columns.map(c=>`<th>${esc(c)}</th>`).join("")}</tr></thead><tbody>${r.values.map(v=>`<tr>${v.map(x=> x===null ? `<td>NULL</td>` : `<td${typeof x==="number"?' class="num"':""}>${esc(fmt(x))}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`).join("");
-  if (!p || !p.tables.length || !p.tables.every(t=>SCHEMA[t.name])){ bd.plan = null; $("caption").textContent = err ? T.capError : T.capNoTables; $("verdicts").innerHTML = `<p class="note">${err ? esc(err) : T.capNoTables}</p>`; return; }
-  const plan = buildPlan(p); if (err) plan.error = err;
-  bd.plan = plan; layout(); schedule(plan); syncChips(p);
-  renderVerdicts(plan); sfx.plug();
+function applyFocus(P, delay = 0){
+  const go = () => {
+    const stage = $("stage"); stage.classList.toggle("focused", !!focus);
+    document.querySelectorAll("tbody tr").forEach(tr => tr.classList.remove("on", "root"));
+    document.querySelectorAll("#wires .w").forEach(w => w.classList.remove("on"));
+    if (!focus) return;
+    const on = reach(focus.t, focus.id, P);
+    document.querySelectorAll(".card").forEach(c => c.querySelectorAll("tbody tr").forEach(tr => {
+      const key = c.dataset.t + ":" + tr.dataset.id; if (on.has(key)) tr.classList.add("on"); if (key === focus.t + ":" + focus.id) tr.classList.add("root"); }));
+    document.querySelectorAll("#wires .w").forEach(w => { if (on.has(w.dataset.a) && on.has(w.dataset.b)) w.classList.add("on"); });
+  };
+  if (delay) timers.push(setTimeout(go, delay)); else go();
 }
 
-/* ---------- feedback panel ---------- */
-function renderVerdicts(plan){
-  const L = [];
-  L.push(`<div class="v info"><span class="mark">${plan.tables.length}</span><div><b>FROM ${plan.tables.map(t=>t.alias === t.name ? t.name : `${t.name} ${t.alias}`).join(", ")}</b><p>${T.fromLine(plan.tables.length, plan.crossPairs)}</p></div></div>`);
-  if (!plan.joins.length && plan.tables.length >= 2) L.push(`<div class="v warn"><span class="mark">⚠</span><div><b>${T.noRule}</b><p>${T.noRuleWhy(plan.crossPairs)}</p></div></div>`);
-  plan.joins.forEach(j=>{ const v = j.verdict, mark = v.kind === "ok" ? "✓" : v.kind === "warn" ? "⚠" : "✗";
-    L.push(`<div class="v ${v.kind}"><span class="mark">${mark}</span><div><b><span class="sw" style="background:${j.col}"></span>${esc(j.text)}${v.rel ? `<span class="rel">${v.rel}</span>` : ""}</b><p>${v.why}</p></div></div>`); });
-  if (plan.loose.length && plan.joins.length) L.push(`<div class="v warn"><span class="mark">⚠</span><div><b>${plan.loose.map(t=>t.name).join(", ")}</b><p>${T.looseWhy(plan.loose.map(t=>t.name).join(", "))}</p></div></div>`);
-  if (plan.via) L.push(`<div class="v ok"><span class="mark">∞</span><div><b>${plan.via.X.name} ↔ ${plan.via.Y.name}<span class="rel">N : N</span></b><p>${T.viaWhy(plan.via.X.name, plan.via.Y.name, plan.via.via.name)}</p></div></div>`);
-  if (plan.filters.length) L.push(`<div class="v info"><span class="mark">⌕</span><div><b>${esc(plan.filters.join(" AND "))}</b><p>${T.filterWhy(plan.resultRows)}</p></div></div>`);
-  if (plan.error) L.push(`<div class="v bad"><span class="mark">✗</span><div><b>${T.sqlErr}</b><p>${esc(plan.error)}</p></div></div>`);
-  $("verdicts").innerHTML = L.join("");
+function go(dir){
+  const sc = scene();
+  if (dir > 0){ if (pi < sc.phases.length - 1) pi++; else if (si < D.scenes.length - 1){ si++; pi = 0; } else return; }
+  else { if (pi > 0) pi--; else if (si > 0){ si--; pi = D.scenes[si].phases.length - 1; } else return; }
+  render(true);
 }
-
-/* ---------- drawing ---------- */
-function rowText(card, k){
-  const S = card.S, cols = LABELCOLS[card.t.name] || S.cols.map(c=>c.name).slice(0,3);
-  return cols.map(n=>{ const i = S.cols.findIndex(c=>c.name === n); return i >= 0 ? fmt(S.rows[k][i]) : ""; }).join(" · ");
-}
-function roundRect(g, x, y, w, h, r){ g.beginPath(); g.roundRect ? g.roundRect(x,y,w,h,r) : g.rect(x,y,w,h); }
-function cable(g, x1, y1, x2, y2, prog, col, width, dash){
-  const cx = (x1 + x2)/2;
-  g.save(); g.strokeStyle = col; g.lineWidth = width; g.lineCap = "round"; if (dash) g.setLineDash(dash);
-  if (prog < 1){ /* approximate partial bezier by sampling */
-    g.beginPath(); for (let i=0;i<=40;i++){ const u = i/40*prog, x = bez(x1,cx,cx,x2,u), y = bez(y1,y1,y2,y2,u); i ? g.lineTo(x,y) : g.moveTo(x,y); } g.stroke(); }
-  else { g.beginPath(); g.moveTo(x1,y1); g.bezierCurveTo(cx,y1,cx,y2,x2,y2); g.stroke(); }
-  g.restore();
-}
-const bez = (a,b,c,d,u)=> (1-u)**3*a + 3*(1-u)**2*u*b + 3*(1-u)*u*u*c + u**3*d;
-function rowState(plan, card, k, t){
-  /* 0 idle, 1 matched by some finished join, 2 in final result, -1 dimmed */
-  const rid = card.S.rowids[k]; let matched = false, any = false;
-  for (const j of plan.joins){ if (t < j.tRows) continue; if (j.a === card.t || j.b === card.t){ any = true; const side = j.a === card.t ? 0 : 1; if (j.verdict.pairs.some(p=>p[side] === rid)) matched = true; } }
-  if (plan.tFilter && t >= plan.tFilter && plan.final){ const idx = plan.tables.indexOf(card.t); return plan.final[idx].has(rid) ? 2 : -1; }
-  if (any) return matched ? 1 : -1;
-  return 0;
-}
-function frame(t){
-  requestAnimationFrame(frame);
-  if (document.hidden || !bd.W) return;
-  const g = bd.ctx, W = bd.W, H = bd.H;
-  g.clearRect(0,0,W,H);
-  /* stage-floor grid */
-  g.save(); g.strokeStyle = "rgba(255,255,255,.04)"; g.lineWidth = 1; for (let x=0;x<W;x+=32){ g.beginPath(); g.moveTo(x,0); g.lineTo(x,H); g.stroke(); } for (let y=0;y<H;y+=32){ g.beginPath(); g.moveTo(0,y); g.lineTo(W,y); g.stroke(); } g.restore();
-  const plan = bd.plan;
-  if (!plan){ g.fillStyle = "rgba(243,238,251,.55)"; g.font = `600 ${Math.round(clamp(W/40,14,24))}px 'Atkinson Hyperlegible', sans-serif`; g.textAlign = "center"; g.textBaseline = "middle"; g.fillText(T.boardIdle, W/2, H/2); return; }
-  const s = SL(), ein = clamp((t - plan.tIn)/(400*s), 0, 1);
-  const hover = bd.hover;
-  /* cross-product phase: faint lines from every row to every row of the neighbour */
-  if (plan.tCross && t >= plan.tCross && t < plan.tCross + 1800*s){
-    const k = clamp((t - plan.tCross)/(1800*s), 0, 1), a = Math.sin(k*Math.PI)*.12;
-    for (let i=0;i<bd.cards.length-1;i++){ const A = bd.cards[i], B = bd.cards[i+1]; g.save(); g.globalAlpha = a; g.strokeStyle = "#ffffff"; g.lineWidth = 1;
-      const step = Math.max(1, Math.round(A.S.rows.length*B.S.rows.length/400));
-      let n = 0; for (let ra=0; ra<A.S.rows.length; ra++) for (let rb=0; rb<B.S.rows.length; rb++){ if ((n++ % step) !== 0) continue; g.beginPath(); g.moveTo(A.x+A.w, A.rowY(ra)); g.lineTo(B.x, B.rowY(rb)); g.stroke(); }
-      g.restore(); }
-  }
-  /* cards */
-  bd.topLabels = [];
-  bd.cards.forEach((card, ci)=>{
-    const S = card.S, x = card.x, y = card.y + (1-ein)*24, w = card.w, h = card.h;
-    g.save(); g.globalAlpha = ein;
-    roundRect(g, x, y, w, h, 12); g.fillStyle = "#17112f"; g.fill(); g.strokeStyle = "#3a2d63"; g.lineWidth = 1.5; g.stroke();
-    /* header */
-    roundRect(g, x, y, w, card.head, 12); g.fillStyle = "#231a45"; g.fill();
-    g.fillStyle = "#fff"; g.font = `800 ${Math.round(clamp(w/9,14,22))}px 'Bricolage Grotesque', sans-serif`; g.textAlign = "left"; g.textBaseline = "middle";
-    g.fillText(card.t.name, x + 12, y + card.head/2 - 2);
-    const narrow = w < 250;
-    if (card.t.alias !== card.t.name && !narrow){ g.font = `600 12px 'JetBrains Mono', monospace`; g.fillStyle = "#ffd166"; g.fillText(`${T.alias} ${card.t.alias}`, x + 12 + g.measureText(card.t.name).width*1.8 + 10, y + card.head/2 - 1); }
-    g.font = `600 11px 'JetBrains Mono', monospace`; g.fillStyle = "#b3a8cc"; g.textAlign = "right"; if (!narrow) g.fillText(T.rowsN(S.rows.length), x + w - 10, y + card.head/2 - 1);
-    /* column header */
-    const per = (w - 16)/S.cols.length; g.textAlign = "center"; g.textBaseline = "middle";
-    /* joined columns are placed first and drawn later, on top of their cables; the others only where they fit */
-    const labs = S.cols.map((c,k)=>{ const cx = x + 8 + per*k + per/2, cy = y + card.head + card.colh/2;
-      const j = plan.joins.find(j=> (j.a === card.t && j.ca.toLowerCase() === c.name.toLowerCase()) || (j.b === card.t && j.cb.toLowerCase() === c.name.toLowerCase()));
-      const fs = Math.round(j ? clamp(per/(c.name.length*.62), 9, 12) : clamp(per/(c.name.length*.62), 8, 12)), font = `${j ? "700" : "500"} ${fs}px 'JetBrains Mono', monospace`;
-      g.font = font; const tw = g.measureText(c.name).width; return { c, j, cx, cy, font, tw, fs }; });
-    const taken = [];
-    labs.filter(L=>L.j).forEach(L=>{ L.lx = clamp(L.cx, x + 6 + L.tw/2, x + w - 6 - L.tw/2); taken.push([L.lx - L.tw/2 - 6, L.lx + L.tw/2 + 6]);
-      bd.topLabels.push({ text: L.c.name, x: L.lx, y: L.cy, font: L.font, col: L.j.col, w: L.tw, h: L.fs + 6, alpha: ein }); });
-    labs.filter(L=>!L.j).forEach(L=>{ if (per < L.c.name.length*5) return; const a = L.cx - L.tw/2, b = L.cx + L.tw/2;
-      if (taken.some(([p,q])=> a < q && b > p)) return; taken.push([a - 4, b + 4]);
-      g.font = L.font; g.fillStyle = "#8f84ad"; g.fillText(L.c.name, L.cx, L.cy); });
-    labs.filter(L=>L.j).forEach(L=>{ g.beginPath(); g.arc(L.cx, y + card.head + card.colh + 2, 3.5, 0, 6.283); g.fillStyle = L.j.col; g.fill(); });
-    /* rows */
-    const fs = clamp(card.rh*.72, 7, 13); g.font = `500 ${Math.round(fs)}px 'JetBrains Mono', monospace`; g.textAlign = "left";
-    S.rows.forEach((r,k)=>{
-      const ry = card.rowY(k) + (1-ein)*24, st = rowState(plan, card, k, t);
-      const isHover = hover && hover.card === card && hover.k === k, linked = hover && hover.linked.has(card.t.name + ":" + S.rowids[k]);
-      let bg = "rgba(255,255,255,.03)", fg = "#d9d0ee", al = 1;
-      if (st === -1){ al = .28; } if (st === 1){ bg = "rgba(255,255,255,.08)"; fg = "#fff"; } if (st === 2){ bg = "rgba(184,255,92,.18)"; fg = "#eaffd0"; }
-      if (isHover || linked){ bg = "rgba(255,209,102,.35)"; fg = "#fff"; al = 1; }
-      g.save(); g.globalAlpha = al; g.fillStyle = bg; roundRect(g, x + 6, ry - card.rh/2 + 1, w - 12, card.rh - 2, 3); g.fill();
-      if (card.rh >= 10){ g.fillStyle = fg; let txt = rowText(card, k); while (g.measureText(txt).width > w - 20 && txt.length > 3) txt = txt.slice(0,-2); if (txt !== rowText(card, k)) txt = txt.trimEnd() + "…"; g.fillText(txt, x + 10, ry + 0.5); }
-      g.restore(); });
-    g.restore();
-  });
-  /* loose tables: dashed 'all pairs' cable to the neighbour */
-  if (plan.tLoose && t >= plan.tLoose){ plan.loose.forEach(lt=>{ const c = bd.cardOf.get(lt), i = bd.cards.indexOf(c), nb = bd.cards[i-1] || bd.cards[i+1]; if (!nb) return;
-      const k = clamp((t - plan.tLoose)/(500*s), 0, 1); cable(g, nb.x + (nb.x < c.x ? nb.w : 0), nb.y + nb.head/2, c.x + (nb.x < c.x ? 0 : c.w), c.y + c.head/2, k, "#ffb15c", 3, [8,8]);
-      if (k >= 1) badge(g, (nb.x + nb.w/2 + c.x + c.w/2)/2, Math.min(nb.y, c.y) - 2, `⚠ ${T.allPairs}`, "#ffb15c"); }); }
-  /* joins: cable between column anchors, row lines, badge */
-  plan.joins.forEach((j, ji)=>{
-    if (t < j.tCable) return;
-    const A = bd.cardOf.get(j.a), B = bd.cardOf.get(j.b); if (!A || !B) return;
-    const left = A.x < B.x ? A : B, right = left === A ? B : A, leftCol = left === A ? j.ca : j.cb, rightCol = left === A ? j.cb : j.ca;
-    const ax = left.colX[leftCol.toLowerCase()] ?? left.x + left.w/2, bx = right.colX[rightCol.toLowerCase()] ?? right.x + right.w/2;
-    const ay = left.y + left.head + left.colh + 2, by = right.y + right.head + right.colh + 2;
-    const kc = clamp((t - j.tCable)/(420*s), 0, 1), v = j.verdict, col = v.kind === "bad" ? "#ff7a7a" : j.col;
-    /* cable rises above the cards and drops to the other column */
-    const topY = Math.min(left.y, right.y) - 6;
-    g.save(); g.strokeStyle = col; g.lineWidth = 4; g.lineCap = "round"; g.globalAlpha = v.kind === "bad" ? .8 : 1;
-    const pts = [[ax, ay],[ax, topY],[bx, topY],[bx, by]]; let total = 0; for (let i=1;i<4;i++) total += Math.hypot(pts[i][0]-pts[i-1][0], pts[i][1]-pts[i-1][1]);
-    let left_ = total*kc; g.beginPath(); g.moveTo(...pts[0]);
-    for (let i=1;i<4 && left_>0;i++){ const [x0,y0] = pts[i-1], [x1,y1] = pts[i], seg = Math.hypot(x1-x0,y1-y0), f = Math.min(1, left_/seg); g.lineTo(x0+(x1-x0)*f, y0+(y1-y0)*f); left_ -= seg; }
-    g.stroke(); g.restore();
-    if (kc >= 1 && !plan.sounded.has("c"+ji)){ plan.sounded.add("c"+ji); sfx.plug(); }
-    /* row lines */
-    if (t >= j.tRows){
-      const pairs = v.pairs, n = pairs.length, per = n ? Math.max(6*s, (Math.min(n,60)*18*s + 400*s)/n) : 0;
-      g.save(); g.lineWidth = 1.4; g.strokeStyle = j.col;
-      pairs.forEach((p, pi)=>{
-        const kr = clamp((t - j.tRows - pi*per)/(300*s), 0, 1); if (kr <= 0) return;
-        const ka = A.S.rowids.indexOf(p[0]), kb = B.S.rowids.indexOf(p[1]); if (ka < 0 || kb < 0) return;
-        const x1 = A.x < B.x ? A.x + A.w - 4 : A.x + 4, x2 = A.x < B.x ? B.x + 4 : B.x + B.w - 4;
-        const hl = hover && (hover.linked.has(A.t.name+":"+p[0]) && hover.linked.has(B.t.name+":"+p[1]));
-        g.globalAlpha = hover ? (hl ? 1 : .12) : .75; g.lineWidth = hl ? 2.6 : 1.4; g.strokeStyle = hl ? "#ffd166" : j.col;
-        cable(g, x1, A.rowY(ka), x2, B.rowY(kb), kr, g.strokeStyle, g.lineWidth);
-        if (kr >= 1 && kr < 1.05 && pi % 3 === 0 && !plan.sounded.has(`r${ji}_${pi}`)){ plan.sounded.add(`r${ji}_${pi}`); sfx.tick(); }
-      });
-      g.restore();
-    }
-    /* badge */
-    if (t >= j.tBadge){
-      const kb = clamp((t - j.tBadge)/(280*s), 0, 1), sc = 1 + Math.sin(kb*Math.PI)*.3;
-      const label = v.kind === "ok" ? `✓ ${v.rel} · ${T.pairsN(v.pairs.length)}` : v.kind === "warn" ? `⚠ ${v.rel} · ${T.accident}` : `✗ ${T.noMatch}`;
-      badge(g, (ax + bx)/2, topY - 10, label, col, sc, kb);
-      if (!plan.sounded.has("b"+ji)){ plan.sounded.add("b"+ji); (v.kind === "ok" ? sfx.good : v.kind === "warn" ? sfx.warn : sfx.bad)(); }
-    }
-  });
-  /* joined column names sit on top of their cables, on a small plate */
-  bd.topLabels.forEach(L=>{ g.save(); g.globalAlpha = L.alpha; roundRect(g, L.x - L.w/2 - 5, L.y - L.h/2, L.w + 10, L.h, 5); g.fillStyle = "#17112f"; g.fill(); g.strokeStyle = L.col; g.lineWidth = 1.5; g.stroke();
-    g.font = L.font; g.fillStyle = L.col; g.textAlign = "center"; g.textBaseline = "middle"; g.fillText(L.text, L.x, L.y + .5); g.restore(); });
-  /* N:N summary */
-  if (plan.via && t >= plan.tDone){ const X = bd.cardOf.get(plan.via.X), Y = bd.cardOf.get(plan.via.Y); if (X && Y){ const k = clamp((t - plan.tDone)/(400*s), 0, 1);
-      badge(g, (X.x + X.w/2 + Y.x + Y.w/2)/2, H - 42, `∞ ${plan.via.X.name} ↔ ${plan.via.Y.name}: N : N`, "#b8ff5c", 1, k); } }
-  /* result badge */
-  if (t >= plan.tDone && plan.final && !plan.error){ const k = clamp((t - plan.tDone)/(300*s), 0, 1); badge(g, W/2, H - 14, `${T.resultN(plan.resultRows)}`, "#b8ff5c", 1, k); }
-  /* hover tooltip */
-  if (hover){ const txt = hover.full; g.save(); g.font = `600 12px 'JetBrains Mono', monospace`; const tw = g.measureText(txt).width + 16; let tx = clamp(bd.mouse.x + 14, 4, W - tw - 4), ty = clamp(bd.mouse.y - 30, 4, H - 26);
-    roundRect(g, tx, ty, tw, 22, 6); g.fillStyle = "rgba(0,0,0,.85)"; g.fill(); g.fillStyle = "#ffd166"; g.textAlign = "left"; g.textBaseline = "middle"; g.fillText(txt, tx + 8, ty + 11); g.restore(); }
-  updateCaption(t);
-}
-function badge(g, cx, cy, text, col, sc=1, alpha=1){
-  g.save(); g.globalAlpha = alpha; g.translate(cx, cy); g.scale(sc, sc);
-  g.font = `800 ${Math.round(clamp(bd.W/70, 11, 16))}px 'Atkinson Hyperlegible', sans-serif`; g.textAlign = "center"; g.textBaseline = "middle";
-  const tw = g.measureText(text).width + 18; roundRect(g, -tw/2, -12, tw, 24, 12); g.fillStyle = "rgba(0,0,0,.72)"; g.fill(); g.strokeStyle = col; g.lineWidth = 2; g.stroke();
-  g.fillStyle = col; g.fillText(text, 0, 1); g.restore();
-}
-function updateCaption(t){
-  const plan = bd.plan; if (!plan) return;
-  const parts = [`<span class="st">FROM: ${plan.tables.length} ${T.tablesWord}</span>`];
-  if (plan.tCross) parts.push(`<span class="st ${t >= plan.tCross ? "warn" : "todo"}">${T.capCross(plan.crossPairs)}</span>`);
-  plan.joins.forEach(j=>{ const v = j.verdict, done = t >= j.tBadge, cls = !done ? "todo" : v.kind; const txt = done ? `${v.kind === "ok" ? "✓" : v.kind === "warn" ? "⚠" : "✗"} ${j.text}${v.rel ? "\u00a0→ " + v.rel.replace(/ /g, "\u00a0") : ""}` : j.text; parts.push(`<span class="st ${cls}">${esc(txt)}</span>`); });
-  if (plan.tLoose) parts.push(`<span class="st ${t >= plan.tLoose ? "warn" : "todo"}">${T.capLoose(plan.loose.map(x=>x.name).join(", "))}</span>`);
-  if (plan.tFilter) parts.push(`<span class="st ${t >= plan.tFilter ? "ok" : "todo"}">WHERE: ${esc(plan.filters.join(" AND "))}</span>`);
-  if (plan.final && !plan.error) parts.push(`<span class="st ${t >= plan.tDone ? "new" : "todo"}">${T.resultN(plan.resultRows)}</span>`);
-  const html = parts.join('<span class="arrow">→</span>'); if (html !== bd.capHtml){ bd.capHtml = html; $("caption").innerHTML = html; }
-}
-/* hover: which row is under the mouse, and which rows are linked to it */
-bd.c.addEventListener("mousemove", e=>{
-  const r = bd.c.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top; bd.mouse = { x, y }; bd.hover = null;
-  if (!bd.plan) return;
-  for (const card of bd.cards){ if (x < card.x || x > card.x + card.w) continue; const k = Math.floor((y - (card.y + card.head + card.colh + 8))/card.rh); if (k < 0 || k >= card.S.rows.length) continue;
-    const rid = card.S.rowids[k], linked = new Set([card.t.name + ":" + rid]);
-    /* follow every finished join from this row */
-    let grew = true; while (grew){ grew = false; for (const j of bd.plan.joins){ if (performance.now() < j.tRows) continue; j.verdict.pairs.forEach(p=>{ const ka = j.a.name + ":" + p[0], kb = j.b.name + ":" + p[1]; if (linked.has(ka) && !linked.has(kb)){ linked.add(kb); grew = true; } if (linked.has(kb) && !linked.has(ka)){ linked.add(ka); grew = true; } }); } }
-    bd.hover = { card, k, linked, full: card.S.cols.map((c,i)=>`${c.name}=${fmt(card.S.rows[k][i])}`).join("  ") }; bd.c.style.cursor = "crosshair"; return; }
-  bd.c.style.cursor = "";
+$("next").onclick = () => go(1);
+$("prev").onclick = () => go(-1);
+$("replay").onclick = () => render(true);
+$("full").onclick = () => { const d = document; if (d.fullscreenElement) d.exitFullscreen(); else d.documentElement.requestFullscreen && d.documentElement.requestFullscreen(); };
+$("scenes").addEventListener("click", e => { const b = e.target.closest("button[data-i]"); if (!b) return; si = +b.dataset.i; pi = 0; render(true); });
+$("cards").addEventListener("click", e => {
+  const tr = e.target.closest("tbody tr"), ph = phase(); if (!ph.lines || ph.lines === "cross" && !ph.rule) return;
+  if (!tr){ focus = null; applyFocus(pairs(ph)); return; }
+  const t = tr.closest(".card").dataset.t, id = +tr.dataset.id;
+  focus = focus && focus.t === t && focus.id === id ? null : { t, id }; applyFocus(pairs(ph));
 });
-bd.c.addEventListener("mouseleave", ()=>{ bd.hover = null; });
-
-/* ---------- pickers ---------- */
-function tablesInSql(){ const p = parseQuery($("sql").value); return p ? p.tables : []; }
-function renderTableChips(){
-  const on = new Set(tablesInSql().map(t=>t.name));
-  $("tables").innerHTML = Object.keys(SCHEMA).map(n=>`<button type="button" class="chip" data-t="${n}" aria-pressed="${on.has(n)}">${n} <span class="n">${SCHEMA[n].rows.length}</span></button>`).join("");
-  const opts = Object.keys(SCHEMA).map(n=>`<option value="${n}">${n}</option>`).join("");
-  ["ta","tb"].forEach(id=>{ const cur = $(id).value; $(id).innerHTML = opts; if (cur) $(id).value = cur; });
-  if (!$("ta").value || $("ta").value === $("tb").value){ const ks = Object.keys(SCHEMA); $("ta").value = ks[2] || ks[0]; $("tb").value = ks[0]; }
-  fillCols();
-}
-function fillCols(){ [["ta","ca"],["tb","cb"]].forEach(([t,c])=>{ const S = SCHEMA[$(t).value]; const cur = $(c).value; $(c).innerHTML = S ? S.cols.map(x=>`<option value="${x.name}">${x.name}</option>`).join("") : ""; if (cur && S && S.cols.some(x=>x.name === cur)) $(c).value = cur; else if (S){ const fk = S.cols.find(x=>/_id$/.test(x.name)); $(c).value = (t === "ta" && fk) ? fk.name : "id"; } }); }
-$("ta").onchange = $("tb").onchange = fillCols;
-function syncChips(p){ const on = new Set(p.tables.map(t=>t.name)); document.querySelectorAll("#tables .chip").forEach(b=> b.setAttribute("aria-pressed", on.has(b.dataset.t))); }
-$("tables").addEventListener("click", e=>{
-  const b = e.target.closest(".chip"); if (!b) return;
-  const p = parseQuery($("sql").value) || { tables: [], joins: [], filters: [], cl: {} };
-  let tables = p.tables.slice();
-  if (tables.some(t=>t.name === b.dataset.t)) tables = tables.filter(t=>t.name !== b.dataset.t); else tables.push({ name: b.dataset.t, alias: ALIAS[b.dataset.t] || b.dataset.t });
-  const names = new Set(tables.map(t=>t.alias.toLowerCase()).concat(tables.map(t=>t.name.toLowerCase())));
-  const keep = (p.joins || []).filter(j=>names.has(j.a.alias.toLowerCase()) && names.has(j.b.alias.toLowerCase())).map(j=>j.text).concat((p.filters || []).filter(f=>{ const refs = f.match(/\b([A-Za-z_]\w*)\./g) || []; return refs.every(r=>names.has(r.slice(0,-1).toLowerCase())); }));
-  writeSql(tables, keep); run();
+addEventListener("keydown", e => {
+  if (e.altKey || e.ctrlKey || e.metaKey || /input|textarea|select/i.test(e.target.tagName)) return;
+  if (["ArrowRight", "PageDown", " ", "Enter"].includes(e.key) && !(e.key === "Enter" && e.target.tagName === "BUTTON")){ e.preventDefault(); go(1); }
+  else if (["ArrowLeft", "PageUp", "Backspace"].includes(e.key)){ e.preventDefault(); go(-1); }
+  else if (e.key === "r" || e.key === "R") render(true);
+  else if (e.key === "f" || e.key === "F") $("full").click();
+  else if (e.key === "Escape" && focus){ focus = null; applyFocus(pairs(phase())); }
 });
-function writeSql(tables, conds){
-  if (!tables.length){ $("sql").value = ""; return; }
-  $("sql").value = `SELECT *\nFROM ${tables.map(t=>t.alias === t.name ? t.name : `${t.name} ${t.alias}`).join(", ")}` + (conds.length ? `\nWHERE ${conds.join("\n  AND ")}` : "") + ";";
-}
-$("connect").onclick = ()=>{
-  const p = parseQuery($("sql").value) || { tables: [], joins: [], filters: [], cl: {} };
-  let tables = p.tables.slice();
-  [$("ta").value, $("tb").value].forEach(n=>{ if (!tables.some(t=>t.name === n)) tables.push({ name: n, alias: ALIAS[n] || n }); });
-  const A = tables.find(t=>t.name === $("ta").value), B = tables.find(t=>t.name === $("tb").value);
-  const cond = `${A.alias}.${$("ca").value} = ${B.alias}.${$("cb").value}`;
-  const conds = p.joins.map(j=>j.text).concat(p.filters); if (!conds.includes(cond)) conds.push(cond);
-  writeSql(tables, conds); run();
-};
-$("presets").innerHTML = PRESETS.map((p,k)=>`<button type="button" class="preset${p.bad ? " bad" : ""}" data-k="${k}">${esc(p.label)}</button>`).join("");
-$("presets").addEventListener("click", e=>{ const b = e.target.closest(".preset"); if (!b) return; document.querySelectorAll(".preset").forEach(x=>x.classList.toggle("on", x === b)); $("sql").value = PRESETS[+b.dataset.k].sql; run(); });
-$("run").onclick = run;
-$("sql").addEventListener("keydown", e=>{ if ((e.ctrlKey || e.metaKey) && e.key === "Enter"){ e.preventDefault(); run(); } });
-
-/* ---------- boot ---------- */
-if (window.ResizeObserver) new ResizeObserver(size).observe(bd.c); else addEventListener("resize", size);
-size(); requestAnimationFrame(frame);
-$("sql").value = PRESETS[1].sql;
-if (typeof initSqlJs !== "function"){ $("verdicts").innerHTML = `<div class="err">${T.engFail}</div>`; }
-else initSqlJs().then(s=>{ SQL = s; db = new SQL.Database(); db.run(SEED); loadSchema(); renderTableChips(); $("verdicts").innerHTML = `<p class="note">${T.ready}</p>`; $("caption").textContent = T.idle; })
-  .catch(e=>{ $("verdicts").innerHTML = `<div class="err">${T.engFail}<p>${esc(e.message)}</p></div>`; });
+let rz; addEventListener("resize", () => { clearTimeout(rz); rz = setTimeout(() => { fit(); draw(false); }, 120); });
+if (document.fonts && document.fonts.status !== "loaded") document.fonts.ready.then(() => { fit(); draw(false); });
+render(true);
 </script>
 <script src="../../nav.js" defer></script>
 </body>
