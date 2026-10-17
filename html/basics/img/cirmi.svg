@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300" width="300" height="300">
+  <title>Cirmi, a cat</title>
+  <circle cx="150" cy="150" r="146" fill="#d8f0e4"/>
+  <path d="M40 300a110 66 0 0 1 220 0z" fill="#f0a24e"/>
+  <path d="M60 128L70 40l70 46zM240 128L230 40l-70 46z" fill="#f0a24e"/>
+  <path d="M74 110l6-50 42 30zM226 110l-6-50-42 30z" fill="#f7b8c4"/>
+  <ellipse cx="150" cy="160" rx="100" ry="90" fill="#f0a24e"/>
+  <g fill="#c96f22"><path d="M150 72c-6 0-8 4-8 10l4 28h8l4-28c0-6-2-10-8-10z"/><path d="M118 78c-6 2-6 8-4 12l12 22 6-4-6-24c-2-6-4-7-8-6z"/><path d="M182 78c6 2 6 8 4 12l-12 22-6-4 6-24c2-6 4-7 8-6z"/>
+    <path d="M52 168q20-4 36 4l-2 8q-18-6-34-4zM248 168q-20-4-36 4l2 8q18-6 34-4zM58 196q18 0 30 8l-4 7q-12-6-28-6zM242 196q-18 0-30 8l4 7q12-6 28-6z"/></g>
+  <ellipse cx="150" cy="200" rx="54" ry="40" fill="#fff4e4"/>
+  <ellipse cx="112" cy="150" rx="20" ry="22" fill="#9bd36a"/><ellipse cx="188" cy="150" rx="20" ry="22" fill="#9bd36a"/>
+  <ellipse cx="112" cy="150" rx="6" ry="17" fill="#1d2b12"/><ellipse cx="188" cy="150" rx="6" ry="17" fill="#1d2b12"/>
+  <circle cx="117" cy="142" r="4.5" fill="#fff"/><circle cx="193" cy="142" r="4.5" fill="#fff"/>
+  <path d="M140 182h20l-10 12z" fill="#e8738c" stroke="#b5485f" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M150 194v8M150 202c-6 8-16 8-22 2M150 202c6 8 16 8 22 2" stroke="#6b3a1a" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+  <g stroke="#6b3a1a" stroke-width="2.5" stroke-linecap="round"><path d="M106 194l-56-8M106 202l-54 6M194 194l56-8M194 202l54 6"/></g>
+</svg>

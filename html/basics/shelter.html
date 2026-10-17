@@ -1,0 +1,781 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Paw Shelter Website</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Kalam:wght@700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* The shelter office: warm paper, a green awning header, Teri's note beside the to-do list,
+   then the code editor beside a browser window. Committed daytime look. */
+:root{
+  --bg:#f4ecdd; --panel:#fffaf2; --ink:#2b2520; --muted:#6c6157; --line:#e2d4bd; --line-2:#d3c2a5;
+  --green:#2f7a5a; --green-d:#225c43; --green-soft:#dcefe3; --orange:#e07b2c; --orange-d:#b85f17; --orange-soft:#fde5cc;
+  --yellow:#f2d264; --bad:#b3362f; --bad-soft:#fbe3df;
+  --code-bg:#1f2a26; --code-ink:#e9efe9; --gut:#6f857c;
+  --tg:#f2d264; --an:#9cc8e8; --av:#a8dba0; --cm:#8fa39a; --en:#f0a3b8; --pu:#c9d3cc;
+  --f-display:"Fredoka","Atkinson Hyperlegible","Segoe UI",system-ui,sans-serif;
+  --f-body:"Atkinson Hyperlegible","Segoe UI",system-ui,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  --f-hand:"Kalam","Segoe Print","Comic Sans MS",cursive;
+  --code-size:15px;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+*,*::before,*::after{font-feature-settings:"calt" 0,"liga" 0}
+[hidden]{display:none!important}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.5 var(--f-body);
+  background-image:radial-gradient(circle at 12px 12px,rgba(120,90,50,.07) 2px,transparent 2.5px);background-size:28px 28px}
+a{color:var(--green-d)}
+:focus-visible{outline:3px solid var(--orange);outline-offset:2px;border-radius:6px}
+code{font-family:var(--f-mono);font-size:.9em;background:#f1e7d6;border:1px solid var(--line);border-radius:5px;padding:0 4px}
+button{font:inherit;color:inherit}
+
+/* top rail, same as the other pages */
+.rail{background:linear-gradient(#b07448,#8a5532 45%,#5d3820);box-shadow:0 3px 0 rgba(0,0,0,.2)}
+.rail .in{max-width:1500px;margin:0 auto;padding:0 18px;height:50px;display:flex;align-items:center;gap:14px}
+.rail .home{font:700 19px/1 var(--f-hand);color:#fff6e8;text-decoration:none;white-space:nowrap}
+.rail .crumb{color:#f3dcc4;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.rail .langlink{margin-left:auto;flex:none;font:700 13px var(--f-body);color:#5d3820;background:#fff6e8;border-radius:999px;padding:5px 12px;text-decoration:none}
+
+/* awning header */
+.sign{position:relative;background:var(--green);color:#fff8ea;padding:18px 0 18px}
+.sign::after{content:"";position:absolute;left:0;right:0;bottom:-18px;height:18px;
+  background:radial-gradient(circle at 18px 0,var(--green) 17px,transparent 18px) 0 0/36px 18px repeat-x;}
+.sign .in{max-width:1500px;margin:0 auto;padding:0 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.sign img{width:58px;height:58px;flex:none;border-radius:50%;box-shadow:0 0 0 4px rgba(255,248,234,.25)}
+.sign .tt{min-width:0;flex:1}
+.sign .kick{font:700 13px var(--f-body);letter-spacing:.08em;text-transform:uppercase;color:#bfe6cf}
+.sign h1{margin:2px 0 0;font:600 clamp(26px,3.6vw,40px)/1.1 var(--f-display);letter-spacing:.01em}
+.sign .meta{display:flex;gap:10px 18px;flex-wrap:wrap;font-size:14.5px;color:#d8efe1}
+.sign .meta b{color:#fff}
+
+/* chapter path: paw prints */
+.path{max-width:1500px;margin:30px auto 0;padding:0 20px;display:flex;gap:6px;flex-wrap:wrap;list-style:none}
+.path li{display:flex;align-items:center;gap:6px}
+.path li+li::before{content:"";width:14px;height:3px;border-radius:2px;background:var(--line-2)}
+.paw{display:inline-flex;align-items:center;gap:7px;border:2px solid var(--line-2);background:var(--panel);border-radius:999px;padding:4px 12px 4px 5px;cursor:pointer;font:700 14px var(--f-body);color:var(--ink)}
+.paw .ic{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:#efe4d0;color:var(--muted);font:700 13px var(--f-body)}
+.paw .ic svg{width:16px;height:16px}
+.paw .nm{white-space:nowrap}
+.paw.done{border-color:var(--green)}
+.paw.done .ic{background:var(--green);color:#fff}
+.paw[aria-current="step"]{border-color:var(--orange);box-shadow:0 0 0 3px var(--orange-soft);background:#fff}
+.paw[aria-current="step"] .ic{background:var(--orange);color:#fff}
+.paw:disabled{cursor:not-allowed;opacity:.55}
+@media (max-width:900px){ .paw .nm{display:none} .paw{padding:4px} .path li+li::before{width:8px} }
+
+/* layout */
+.wrap{max-width:1500px;margin:0 auto;padding:16px 20px 60px}
+.band{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:16px;align-items:start}
+.work{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;margin-top:16px;align-items:stretch}
+.work>*{height:min(74vh,720px);min-height:380px}
+@media (max-width:980px){ .work>*{height:62vh} }
+.extra{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;margin-top:16px;align-items:start}
+@media (max-width:980px){ .band,.work,.extra{grid-template-columns:minmax(0,1fr)} }
+.card{background:var(--panel);border:2px solid var(--line-2);border-radius:14px;box-shadow:0 2px 0 rgba(90,60,30,.08)}
+.card-h{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px;border-bottom:2px solid var(--line);font:700 13px var(--f-body);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+
+/* Teri's note */
+.note{display:flex;gap:14px;padding:16px}
+.note .av{flex:none;width:72px;height:72px}
+.note .who{font:700 14px var(--f-body);color:var(--muted)}
+.note .who b{color:var(--ink)}
+.note .ch{font:600 clamp(22px,2.6vw,28px)/1.15 var(--f-display);margin:2px 0 8px}
+.note .msg{position:relative;background:#fff;border:2px solid var(--line);border-radius:4px 14px 14px 14px;padding:12px 14px;font-size:16.5px;line-height:1.55}
+.note .msg p{margin:0 0 8px}.note .msg p:last-child{margin:0}
+.note .msg q{quotes:"„" "”" "‘" "’";font-style:italic}
+.note .msg .quote{display:block;margin:8px 0;padding:8px 12px;background:#fbf4e6;border-left:4px solid var(--orange);border-radius:6px;font-style:italic}
+
+/* to-do list */
+.todo ul{list-style:none;margin:0;padding:10px 12px 12px;display:grid;gap:6px}
+.goal{display:grid;grid-template-columns:28px minmax(0,1fr);gap:4px 10px;align-items:start;padding:8px 10px;border-radius:10px;background:#fff;border:2px solid var(--line)}
+.goal .bx{width:24px;height:24px;border-radius:50%;border:2.5px solid var(--line-2);display:grid;place-items:center;font:700 14px/1 var(--f-body);color:#fff;transition:background .2s,border-color .2s,transform .2s}
+.goal.ok{border-color:#a9d3b6;background:#f3faf5}
+.goal.ok .bx{background:var(--green);border-color:var(--green);transform:scale(1.06)}
+.goal .gt{font-size:15.5px;line-height:1.4;padding-top:1px}
+.goal .gt code{font-size:.88em}
+.goal .tip{grid-column:2;font-size:14px;color:var(--orange-d)}
+.goal.ok .tip{display:none}
+.goal .bonus{display:inline-block;font:700 11px var(--f-body);letter-spacing:.06em;text-transform:uppercase;background:var(--orange-soft);color:var(--orange-d);border-radius:999px;padding:1px 8px;margin-right:6px;vertical-align:1px}
+.todo .count{font:700 13px var(--f-body);color:var(--muted);text-transform:none;letter-spacing:0}
+.win{margin:0 12px 12px;padding:12px 14px;border-radius:12px;background:var(--green);color:#fff;display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;animation:pop .3s ease-out}
+.win .wt{flex:1;min-width:200px}
+.win .wt b{display:block;font:600 20px var(--f-display)}
+.win .wt span{font-size:15px;color:#e1f3e8}
+@keyframes pop{from{transform:scale(.96);opacity:0}to{transform:none;opacity:1}}
+
+.btn{font:700 15px var(--f-body);border:0;border-radius:10px;padding:9px 16px;cursor:pointer;background:var(--ink);color:#fff;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+.btn:hover{background:#000}
+.btn.go{background:var(--orange);color:#fff}
+.btn.go:hover{background:var(--orange-d)}
+.btn.light{background:#fff;color:var(--green-d)}
+.btn.light:hover{background:#eefaf2}
+.btn.ghost{background:transparent;color:var(--ink);border:2px solid var(--line-2);padding:7px 12px}
+.btn.ghost:hover{border-color:var(--ink)}
+.btn:disabled{opacity:.5;cursor:default}
+.mini{font:600 12.5px/1 var(--f-mono);color:var(--code-ink);background:transparent;border:1px solid #3a4a44;border-radius:6px;padding:6px 9px;cursor:pointer}
+.mini:hover{background:rgba(255,255,255,.08)}
+
+/* editor */
+.editor{background:var(--code-bg);border-radius:14px;overflow:hidden;border:2px solid #14201b;display:flex;flex-direction:column}
+.ed-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:7px 8px 7px 0;border-bottom:1px solid #33433c}
+.ed-bar .file{font:600 13px var(--f-mono);color:var(--code-ink);background:#2a3833;border-radius:8px 8px 0 0;padding:7px 12px;margin:-7px 0 -8px;align-self:stretch;display:flex;align-items:center;gap:7px}
+.ed-bar .file::before{content:"";width:10px;height:10px;border-radius:3px;background:var(--orange)}
+.ed-bar .sp{flex:1}
+.edw{position:relative;display:flex;background:var(--code-bg);flex:1;min-height:0;cursor:text}
+.edw .gut{margin:0;flex:none;padding:12px 8px 12px 10px;min-width:44px;text-align:right;font:400 var(--code-size)/1.6 var(--f-mono);color:var(--gut);background:#1a2420;overflow:hidden;user-select:none;border-right:1px solid #2c3a34}
+.edbox{position:relative;flex:1;min-width:0}
+.edw .ov,.edw textarea{position:absolute;inset:0;margin:0;border:0;padding:12px 14px;font:400 var(--code-size)/1.6 var(--f-mono);white-space:pre;tab-size:2;letter-spacing:0;font-variant-ligatures:none}
+.edw .ov{color:var(--code-ink);overflow:hidden;pointer-events:none}
+.edw textarea{width:100%;height:100%;background:transparent;color:transparent;-webkit-text-fill-color:transparent;caret-color:var(--yellow);resize:none;outline:none;overflow:auto}
+.edw textarea:focus{box-shadow:inset 0 0 0 2px rgba(242,210,100,.5)}
+.edw textarea::selection{background:rgba(242,210,100,.35)}
+.ov .tg{color:var(--tg);font-weight:700}.ov .an{color:var(--an)}.ov .av{color:var(--av)}.ov .pu{color:var(--pu)}.ov .cm{color:var(--cm);font-style:italic}.ov .dt{color:var(--en)}.ov .en{color:var(--en)}
+.lint{flex:none;max-height:40%;overflow:auto;border-top:1px solid #33433c;background:#2b2a1d;padding:8px 12px;display:grid;gap:4px}
+.lint p{margin:0;font:14px/1.4 var(--f-body);color:#f6e7a6}
+.lint p::before{content:"⚠ ";}
+.lint code{background:rgba(255,255,255,.1);border-color:transparent;color:#fff}
+
+/* browser */
+.bw{position:relative;border:2px solid var(--ink);border-radius:14px;overflow:hidden;background:#fff;display:flex;flex-direction:column}
+.bw-top{display:flex;align-items:flex-end;gap:10px;background:#dcd3c0;padding:7px 9px 0}
+.bw-top .dots{display:flex;gap:5px;padding-bottom:10px}
+.bw-top .dots i{width:10px;height:10px;border-radius:50%;background:#b3ad99}
+.bw-top .dots i:first-child{background:#e0796b}.bw-top .dots i:nth-child(2){background:#e6c25a}.bw-top .dots i:nth-child(3){background:#7fbf6e}
+.bw-tab{display:flex;align-items:center;gap:7px;background:#fff;border-radius:9px 9px 0 0;padding:7px 14px;font:600 13px var(--f-body);color:var(--ink);max-width:75%;min-width:0}
+.bw-tab .ttl{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bw-tab .fav{flex:none;width:13px;height:13px;border-radius:3px;background:var(--green)}
+.bw-bar{background:#fff;padding:6px 9px;border-bottom:1px solid var(--line)}
+.bw-bar .addr{display:block;background:#f3ede1;border-radius:999px;padding:4px 12px;font:12.5px var(--f-mono);color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bw iframe{display:block;width:100%;border:0;background:#fff;flex:1;min-height:0}
+.bw.flash .bw-tab{animation:flash .9s ease-out}
+@keyframes flash{0%{background:#f8e08e}100%{background:#fff}}
+.bw-note{position:absolute;left:10px;right:10px;bottom:10px;background:var(--ink);color:#fff;font:14px/1.4 var(--f-body);padding:9px 12px;border-radius:9px;opacity:0;transform:translateY(6px);transition:opacity .2s,transform .2s;pointer-events:none}
+.bw-note.on{opacity:1;transform:none}
+
+/* cheat sheet + solution */
+.cheat{padding:12px 14px 14px}
+.cheat p{margin:0 0 8px;font-size:15px;color:var(--muted)}
+pre.code{margin:0;background:var(--code-bg);color:var(--code-ink);border-radius:10px;padding:10px 14px;font:14.5px/1.55 var(--f-mono);white-space:pre-wrap;overflow-wrap:anywhere}
+pre.code .tg{color:var(--tg);font-weight:700}pre.code .an{color:var(--an)}pre.code .av{color:var(--av)}pre.code .pu{color:var(--pu)}pre.code .cm{color:var(--cm);font-style:italic}pre.code .dt{color:var(--en)}
+.sol{padding:12px 14px 14px;display:grid;gap:10px}
+.sol p{margin:0;font-size:15px;color:var(--muted)}
+.sol pre.code{max-height:340px;overflow:auto;white-space:pre}
+
+/* ending */
+.ending{margin:16px 0;padding:20px;background:var(--green);color:#fff;border-radius:16px;display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:20px;align-items:start;border:0}
+@media (max-width:980px){ .ending{grid-template-columns:minmax(0,1fr)} }
+.ending h2{margin:0 0 6px;font:600 clamp(26px,3.2vw,36px)/1.1 var(--f-display)}
+.ending p{margin:0 0 10px;color:#e1f3e8;font-size:16.5px}
+.ending .stats{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0}
+.ending .stat{background:rgba(255,255,255,.12);border-radius:12px;padding:8px 14px}
+.ending .stat b{display:block;font:600 24px var(--f-display);color:#fff}
+.ending .stat span{font-size:13px;color:#cfe9da}
+.ending .box{background:#fff;color:var(--ink);border-radius:14px;padding:14px;display:grid;gap:10px}
+.ending label{font:700 14px var(--f-body)}
+.ending input{width:100%;font:16px var(--f-body);padding:9px 12px;border:2px solid var(--line-2);border-radius:10px}
+.ending .row{display:flex;flex-wrap:wrap;gap:8px}
+.ending .small{font-size:13.5px;color:var(--muted);margin:0}
+
+/* confetti */
+.confetti{position:fixed;inset:0;pointer-events:none;z-index:50;overflow:hidden}
+.confetti i{position:absolute;top:-20px;width:10px;height:14px;border-radius:2px;animation:fall 1.6s ease-in forwards}
+@keyframes fall{to{transform:translate(var(--dx),110vh) rotate(var(--r));opacity:.9}}
+@media (prefers-reduced-motion:reduce){ .confetti{display:none} .win{animation:none} .goal .bx{transition:none} }
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+footer.end{max-width:1500px;margin:0 auto;padding:0 20px 40px;color:var(--muted);font-size:14px}
+.note .nb{min-width:0;flex:1}
+.kick2{margin:0;font:700 12.5px var(--f-body);letter-spacing:.08em;text-transform:uppercase;color:var(--orange-d)}
+.note .sig{margin:8px 0 0;font:700 17px var(--f-hand);color:var(--green-d)}
+.saved{font:600 12.5px var(--f-body);color:#a8dba0}
+@media (max-width:560px){ .note{flex-direction:column;gap:8px} .note .av{width:56px;height:56px} }
+.cmw{flex:1;min-height:0;position:relative;background:var(--code-bg)}
+.cmw .cm-editor{height:100%}
+.cmw .cm-scroller{overflow:auto}
+
+</style>
+</head>
+<body>
+<header class="rail"><div class="in">
+  <a class="home" href="../../index.html">Digital Culture</a>
+  <span class="crumb">Web pages › Lesson 1 › Mission</span>
+  <a class="langlink" href="shelter-hu.html" lang="hu">Magyar</a>
+</div></header>
+<section class="sign"><div class="in">
+  <img src="img/logo.svg" alt="">
+  <div class="tt"><div class="kick">Mission · HTML basics</div><h1>The Paw Shelter Website</h1></div>
+  <div class="meta"><span id="progress"></span><span>⏱ about 35 min</span><span>💾 saves automatically</span></div>
+</div></section>
+<nav aria-label="Chapters"><ol class="path" id="path"></ol></nav>
+
+<div class="wrap">
+  <section class="ending" id="ending" hidden aria-labelledby="endH">
+    <div>
+      <h2 id="endH">The website is done! 🎉</h2>
+      <p>Teri is already sending the link to everyone. Download your work, or open it full size.</p>
+      <div class="stats" id="endStats"></div>
+    </div>
+    <div class="box">
+      <label for="who">Your name (surname first)</label>
+      <input id="who" type="text" autocomplete="name" spellcheck="false">
+      <div class="row">
+        <button type="button" class="btn go" id="dl">Download (.zip)</button>
+        <button type="button" class="btn ghost" id="openFull">Open in a new tab</button>
+        <button type="button" class="btn ghost" id="copyRep">Copy report</button>
+      </div>
+      <p class="small">File name: <b id="zipName"></b>. It holds the HTML file and the <code>img</code> folder with the pictures. Unzip it and open the .html file.</p>
+      <p class="small"><button type="button" class="btn ghost" id="restart">Start again from the beginning</button></p>
+    </div>
+  </section>
+
+  <div class="band">
+    <section class="card" aria-labelledby="chTitle">
+      <div class="note">
+        <div class="av" id="teri"><svg viewBox="0 0 72 72" aria-hidden="true"><circle cx="36" cy="36" r="36" fill="#fde5cc"/>
+<path d="M8 72c2-13 13-20 28-20s26 7 28 20z" fill="#2f7a5a"/><path d="M28 52l8 9 8-9" fill="none" stroke="#225c43" stroke-width="2.5" stroke-linejoin="round"/>
+<path d="M31 47h10v6a5 5 0 0 1-10 0z" fill="#efc29c"/>
+<circle cx="36" cy="12" r="7.5" fill="#a9a29a"/>
+<ellipse cx="36" cy="32" rx="14.5" ry="16.5" fill="#f2c9a6"/>
+<path d="M21 31c-1-12 6-19 15-19s16 7 15 19c-3-7-8-10-15-10s-12 3-15 10z" fill="#bdb6ad"/>
+<circle cx="26" cy="39" r="2.6" fill="#f4a3a3" opacity=".65"/><circle cx="46" cy="39" r="2.6" fill="#f4a3a3" opacity=".65"/>
+<g fill="none" stroke="#5a3b22" stroke-width="1.8"><circle cx="30.5" cy="33" r="4.6"/><circle cx="41.5" cy="33" r="4.6"/><path d="M35 33h2"/></g>
+<circle cx="30.5" cy="33" r="1.5" fill="#2b2520"/><circle cx="41.5" cy="33" r="1.5" fill="#2b2520"/>
+<path d="M31.5 41q4.5 3.6 9 0" stroke="#a0522d" stroke-width="1.9" fill="none" stroke-linecap="round"/>
+<g fill="#fff6e0" transform="translate(48 62) scale(.5)"><ellipse cx="0" cy="3" rx="5" ry="4"/><circle cx="-5" cy="-3" r="2"/><circle cx="-1.8" cy="-6" r="2"/><circle cx="1.8" cy="-6" r="2"/><circle cx="5" cy="-3" r="2"/></g></svg></div>
+        <div class="nb">
+          <p class="kick2" id="chk"></p>
+          <h2 class="ch" id="chTitle"></h2>
+          <div class="msg" id="msg"></div>
+          <p class="sig">– Teri, shelter manager</p>
+        </div>
+      </div>
+    </section>
+    <section class="card todo" aria-labelledby="todoH">
+      <div class="card-h"><span id="todoH">To do</span><span class="count" id="count"></span></div>
+      <ul id="goals"></ul>
+      <div class="win" id="win" hidden><div class="wt" id="winText"></div><button type="button" class="btn light" id="nextBtn"></button></div>
+    </section>
+  </div>
+
+  <div class="work">
+    <section class="editor" aria-label="Code editor">
+      <div class="ed-bar"><span class="file">shelter.html</span><span class="sp"></span><span class="saved" id="savedTag" hidden>Saved ✓</span>
+        <button type="button" class="mini" id="smaller" aria-label="Smaller code">A−</button><button type="button" class="mini" id="bigger" aria-label="Larger code">A+</button>
+        <button type="button" class="mini" id="resetCh">↺ Chapter start</button></div>
+      <textarea id="code" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" aria-label="The website's HTML code"></textarea>
+      <div class="lint" id="lint" hidden aria-live="polite"></div>
+    </section>
+    <div id="browser" data-fixed="1"></div>
+  </div>
+
+  <div class="extra">
+    <section class="card"><div class="card-h"><span>Cheat sheet</span></div><div class="cheat"><p id="cheatNote"></p><pre class="code" id="cheat"></pre></div></section>
+    <section class="card"><div class="card-h"><span>Stuck?</span></div><div class="sol" id="sol"></div></section>
+  </div>
+</div>
+<footer class="end">Digital Culture · Everything stays in your browser; nothing is sent anywhere.</footer>
+<span class="sr" role="status" id="status"></span>
+<script src="../../vendor/codemirror-html.js"></script>
+<script>
+const CFG = {"key": "shelter-en-v1", "words": {"h1": "Paw Shelter", "h2s": ["About us", "Opening hours", "Our animals", "Contact"], "strongWord": "Saturday", "animals": ["Morzsa", "Cirmi", "Pamacs"], "imgs": ["img/morzsa.svg", "img/cirmi.svg", "img/pamacs.svg"], "allImgs": ["img/morzsa.svg", "img/cirmi.svg", "img/pamacs.svg", "img/bodri.svg", "img/logo.svg"], "lang": "en", "oldTitle": "New page", "file": "shelter.html", "fileBase": "shelter"}, "start": "<!DOCTYPE html>\n<html>\n  <head>\n    <meta charset=\"utf-8\">\n    <title>New page</title>\n  </head>\n  <body>\n    <h1>Hello, world!</h1>\n  </body>\n</html>\n", "models": ["<!DOCTYPE html>\n<html>\n  <head>\n    <meta charset=\"utf-8\">\n    <title>New page</title>\n  </head>\n  <body>\n    <h1>Paw Shelter</h1>\n  </body>\n</html>\n", "<!DOCTYPE html>\n<html>\n  <head>\n    <meta charset=\"utf-8\">\n    <title>New page</title>\n  </head>\n  <body>\n    <h1>Paw Shelter</h1>\n    <h2>About us</h2>\n    <h2>Opening hours</h2>\n    <h2>Our animals</h2>\n    <h2>Contact</h2>\n  </body>\n</html>\n", "<!DOCTYPE html>\n<html>\n  <head>\n    <meta charset=\"utf-8\">\n    <title>New page</title>\n  </head>\n  <body>\n    <h1>Paw Shelter</h1>\n    <p>Dogs, cats and bunnies are looking for a loving home.</p>\n    <h2>About us</h2>\n    <p>The Paw Shelter has looked after abandoned dogs, cats and rabbits since 2009. Right now 34 animals are waiting for a loving owner to take them home.</p>\n    <h2>Opening hours</h2>\n    <h2>Our animals</h2>\n    <h2>Contact</h2>\n  </body>\n</html>\n", "<!DOCTYPE html>\n<html>\n  <head>\n    <meta charset=\"utf-8\">\n    <title>New page</title>\n  </head>\n  <body>\n    <h1>Paw Shelter</h1>\n    <p>Dogs, cats and bunnies are looking for a loving home. Adoption day: <strong>Saturday from 10 am</strong>!</p>\n    <h2>About us</h2>\n    <p>The Paw Shelter has looked after abandoned dogs, cats and rabbits since 2009. Right now 34 animals are waiting for a <em>loving owner</em> to take them home.</p>\n    <h2>Opening hours</h2>\n    <h2>Our animals</h2>\n    <h2>Contact</h2>\n  </body>\n</html>\n", "<!DOCTYPE html>\n<html>\n  <head>\n    <meta charset=\"utf-8\">\n    <title>New page</title>\n  </head>\n  <body>\n    <h1>Paw Shelter</h1>\n    <p>Dogs, cats and bunnies are looking for a loving home. Adoption day: <strong>Saturday from 10 am</strong>!</p>\n    <h2>About us</h2>\n    <p>The Paw Shelter has looked after abandoned dogs, cats and rabbits since 2009. Right now 34 animals are waiting for a <em>loving owner</em> to take them home.</p>\n    <ol>\n      <li>Meet the animals.</li>\n      <li>Talk to the keepers.</li>\n      <li>Sign the agreement.</li>\n    </ol>\n    <h2>Opening hours</h2>\n    <ul>\n      <li>Monday–Friday: 10–17</li>\n      <li>Saturday: 9–13</li>\n      <li>Sunday: closed</li>\n    </ul>\n    <h2>Our animals</h2>\n    <h2>Contact</h2>\n  </body>\n</html>\n", "<!DOCTYPE html>\n<html>\n  <head>\n    <meta charset=\"utf-8\">\n    <title>New page</title>\n  </head>\n  <body>\n    <h1>Paw Shelter</h1>\n    <p>Dogs, cats and bunnies are looking for a loving home. Adoption day: <strong>Saturday from 10 am</strong>!</p>\n    <h2>About us</h2>\n    <p>The Paw Shelter has looked after abandoned dogs, cats and rabbits since 2009. Right now 34 animals are waiting for a <em>loving owner</em> to take them home.</p>\n    <ol>\n      <li>Meet the animals.</li>\n      <li>Talk to the keepers.</li>\n      <li>Sign the agreement.</li>\n    </ol>\n    <h2>Opening hours</h2>\n    <ul>\n      <li>Monday–Friday: 10–17</li>\n      <li>Saturday: 9–13</li>\n      <li>Sunday: closed</li>\n    </ul>\n    <h2>Our animals</h2>\n    <img src=\"img/morzsa.svg\" alt=\"Morzsa, a brown dog\" width=\"150\">\n    <img src=\"img/cirmi.svg\" alt=\"Cirmi, a ginger cat\" width=\"150\">\n    <img src=\"img/pamacs.svg\" alt=\"Pamacs, a grey bunny\" width=\"150\">\n    <h2>Contact</h2>\n  </body>\n</html>\n", "<!DOCTYPE html>\n<html>\n  <head>\n    <meta charset=\"utf-8\">\n    <title>New page</title>\n  </head>\n  <body>\n    <h1>Paw Shelter</h1>\n    <p>Dogs, cats and bunnies are looking for a loving home. Adoption day: <strong>Saturday from 10 am</strong>!</p>\n    <h2>About us</h2>\n    <p>The Paw Shelter has looked after abandoned dogs, cats and rabbits since 2009. Right now 34 animals are waiting for a <em>loving owner</em> to take them home.</p>\n    <ol>\n      <li>Meet the animals.</li>\n      <li>Talk to the keepers.</li>\n      <li>Sign the agreement.</li>\n    </ol>\n    <h2>Opening hours</h2>\n    <ul>\n      <li>Monday–Friday: 10–17</li>\n      <li>Saturday: 9–13</li>\n      <li>Sunday: closed</li>\n    </ul>\n    <h2>Our animals</h2>\n    <img src=\"img/morzsa.svg\" alt=\"Morzsa, a brown dog\" width=\"150\">\n    <img src=\"img/cirmi.svg\" alt=\"Cirmi, a ginger cat\" width=\"150\">\n    <img src=\"img/pamacs.svg\" alt=\"Pamacs, a grey bunny\" width=\"150\">\n    <h2>Contact</h2>\n    <p>Write to us: <a href=\"mailto:info@pawshelter.org\">info@pawshelter.org</a></p>\n    <p>How to find us: <a href=\"https://www.openstreetmap.org\" target=\"_blank\">map</a></p>\n  </body>\n</html>\n", "<!DOCTYPE html>\n<html>\n  <head>\n    <meta charset=\"utf-8\">\n    <title>New page</title>\n  </head>\n  <body>\n    <h1>Paw Shelter</h1>\n    <p>Dogs, cats and bunnies are looking for a loving home. Adoption day: <strong>Saturday from 10 am</strong>!</p>\n    <h2>About us</h2>\n    <p>The Paw Shelter has looked after abandoned dogs, cats and rabbits since 2009. Right now 34 animals are waiting for a <em>loving owner</em> to take them home.</p>\n    <ol>\n      <li>Meet the animals.</li>\n      <li>Talk to the keepers.</li>\n      <li>Sign the agreement.</li>\n    </ol>\n    <h2>Opening hours</h2>\n    <ul>\n      <li>Monday–Friday: 10–17</li>\n      <li>Saturday: 9–13</li>\n      <li>Sunday: closed</li>\n    </ul>\n    <h2>Our animals</h2>\n    <img src=\"img/morzsa.svg\" alt=\"Morzsa, a brown dog\" width=\"150\">\n    <img src=\"img/cirmi.svg\" alt=\"Cirmi, a ginger cat\" width=\"150\">\n    <img src=\"img/pamacs.svg\" alt=\"Pamacs, a grey bunny\" width=\"150\">\n    <table border=\"1\">\n      <tr><th>Name</th><th>Species</th><th>Age</th></tr>\n      <tr><td>Morzsa</td><td>dog</td><td>3 years</td></tr>\n      <tr><td>Cirmi</td><td>cat</td><td>2 years</td></tr>\n      <tr><td>Pamacs</td><td>rabbit</td><td>1 year</td></tr>\n    </table>\n    <h2>Contact</h2>\n    <p>Write to us: <a href=\"mailto:info@pawshelter.org\">info@pawshelter.org</a></p>\n    <p>How to find us: <a href=\"https://www.openstreetmap.org\" target=\"_blank\">map</a></p>\n  </body>\n</html>\n", "<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <title>Paw Shelter – Adoption</title>\n  </head>\n  <body>\n    <!-- Made by: Sample Student -->\n    <h1>Paw Shelter</h1>\n    <p>Dogs, cats and bunnies are looking for a loving home. Adoption day: <strong>Saturday from 10 am</strong>!</p>\n    <h2>About us</h2>\n    <p>The Paw Shelter has looked after abandoned dogs, cats and rabbits since 2009. Right now 34 animals are waiting for a <em>loving owner</em> to take them home.</p>\n    <ol>\n      <li>Meet the animals.</li>\n      <li>Talk to the keepers.</li>\n      <li>Sign the agreement.</li>\n    </ol>\n    <h2>Opening hours</h2>\n    <ul>\n      <li>Monday–Friday: 10–17</li>\n      <li>Saturday: 9–13</li>\n      <li>Sunday: closed</li>\n    </ul>\n    <h2>Our animals</h2>\n    <img src=\"img/morzsa.svg\" alt=\"Morzsa, a brown dog\" width=\"150\">\n    <img src=\"img/cirmi.svg\" alt=\"Cirmi, a ginger cat\" width=\"150\">\n    <img src=\"img/pamacs.svg\" alt=\"Pamacs, a grey bunny\" width=\"150\">\n    <table border=\"1\">\n      <tr><th>Name</th><th>Species</th><th>Age</th></tr>\n      <tr><td>Morzsa</td><td>dog</td><td>3 years</td></tr>\n      <tr><td>Cirmi</td><td>cat</td><td>2 years</td></tr>\n      <tr><td>Pamacs</td><td>rabbit</td><td>1 year</td></tr>\n    </table>\n    <h2>Contact</h2>\n    <p>Write to us: <a href=\"mailto:info@pawshelter.org\">info@pawshelter.org</a></p>\n    <p>How to find us: <a href=\"https://www.openstreetmap.org\" target=\"_blank\">map</a></p>\n  </body>\n</html>\n"], "chapters": [{"short": "Start", "label": "Warm-up", "title": "Getting started", "msg": "<p>Hi! I'm Teri, I run the Paw Shelter. On Saturday we're holding an adoption day, but we don't have a website yet. A colleague made a start, but… well, this is as far as it got.</p><p>Below on the left is the code; on the right is what visitors see. Let's start small: change the main heading to the shelter's name, <b>Paw Shelter</b>.</p>", "goals": [{"t": "The <code>&lt;h1&gt;</code> says: <b>Paw Shelter</b>", "tip": "Only change the text between <code>&lt;h1&gt;</code> and <code>&lt;/h1&gt;</code>; keep the tags."}], "cheat": "<h1>Paw Shelter</h1>", "cheatNote": "The tags stay; only the text between them changes. Tip: the editor closes tags for you and makes suggestions as you type. Press Enter to pick one.", "success": "See? As you type, the page changes too. That's the job: you write the code, the browser shows it."}, {"short": "Headings", "label": "Chapter 1", "title": "Headings", "msg": "<p>The page will have four parts: <b>About us</b>, <b>Opening hours</b>, <b>Our animals</b> and <b>Contact</b>. Each needs a subheading under the main heading, in exactly that order.</p><p>The main heading stays on its own: a page has just one <code>&lt;h1&gt;</code>; subheadings are <code>&lt;h2&gt;</code>.</p>", "goals": [{"t": "Exactly one <code>&lt;h1&gt;</code> on the page", "tip": ""}, {"t": "Four <code>&lt;h2&gt;</code> subheadings: About us, Opening hours, Our animals, Contact", "tip": "Check the spelling."}, {"t": "In this order: main heading, About us, Opening hours, Our animals, Contact", "tip": ""}], "cheat": "<h1>Paw Shelter</h1>\n<h2>About us</h2>\n<h2>…</h2>", "cheatNote": "Each subheading on its own line, inside the <code>body</code>, under the main heading.", "success": "The page's skeleton is showing! Now let's fill it in."}, {"short": "Paragraphs", "label": "Chapter 2", "title": "Paragraphs", "msg": "<p>Now for the text. Under the main heading, a short, friendly sentence to introduce us. And under <b>About us</b>, this:</p><span class=\"quote\">The Paw Shelter has looked after abandoned dogs, cats and rabbits since 2009. Right now 34 animals are waiting for a loving owner to take them home.</span><p>It's fine to put it in your own words.</p>", "goals": [{"t": "A paragraph (<code>&lt;p&gt;</code>) between the main heading and the first subheading", "tip": "At least one short sentence."}, {"t": "A paragraph of at least two sentences under <b>About us</b>", "tip": "End each sentence with a full stop (or ! or ?) followed by a space."}], "cheat": "<h1>Paw Shelter</h1>\n<p>A short introduction.</p>\n<h2>About us</h2>\n<p>First sentence. Second sentence.</p>", "cheatNote": "A paragraph starts with <code>&lt;p&gt;</code> and ends with <code>&lt;/p&gt;</code>. A new line in the code is not a new line on the page.", "success": "Lovely! Now people know who we are."}, {"short": "Emphasis", "label": "Chapter 3", "title": "Emphasis", "msg": "<p>The most important thing is that everyone knows when to come! Add this to the end of the introduction paragraph:</p><span class=\"quote\">Adoption day: Saturday from 10 am!</span><p>Make <b>Saturday from 10 am</b> strong. And in the About us paragraph, give <b>loving owner</b> emphasis, in italics.</p>", "goals": [{"t": "A <code>&lt;strong&gt;</code> element containing the word <b>Saturday</b>", "tip": ""}, {"t": "The <code>&lt;strong&gt;</code> is inside a paragraph", "tip": "Put the <code>&lt;strong&gt;</code> between <code>&lt;p&gt;</code> and <code>&lt;/p&gt;</code>."}, {"t": "An <code>&lt;em&gt;</code> element in the <b>About us</b> paragraph", "tip": ""}], "cheat": "<p>Adoption day: <strong>Saturday from 10 am</strong>!</p>\n<p>… waiting for a <em>loving owner</em> …</p>", "cheatNote": "The emphasis sits inside the paragraph: close the inner tag first, then the paragraph.", "success": "Nobody will miss that now! The yard will be packed on Saturday."}, {"short": "Lists", "label": "Chapter 4", "title": "Lists", "msg": "<p>Under <b>Opening hours</b> we need a bulleted list:</p><span class=\"quote\">Monday–Friday: 10–17 · Saturday: 9–13 · Sunday: closed</span><p>And in the <b>About us</b> part, under the paragraph, a numbered list of how adoption works: 1. Meet the animals. 2. Talk to the keepers. 3. Sign the agreement.</p>", "goals": [{"t": "Under <b>Opening hours</b>: a <code>&lt;ul&gt;</code> with at least 3 <code>&lt;li&gt;</code>", "tip": ""}, {"t": "In the <b>About us</b> part: an <code>&lt;ol&gt;</code> with at least 3 <code>&lt;li&gt;</code>", "tip": "Under the About us subheading, before the next subheading."}, {"t": "Every <code>&lt;li&gt;</code> is inside a <code>&lt;ul&gt;</code> or an <code>&lt;ol&gt;</code>", "tip": ""}], "cheat": "<ul>\n  <li>Monday–Friday: 10–17</li>\n  <li>…</li>\n</ul>\n\n<ol>\n  <li>Meet the animals.</li>\n  <li>…</li>\n</ol>", "cheatNote": "<code>ul</code>: bullets, <code>ol</code>: numbers. Each line is an <code>li</code>.", "success": "Clear, short, to the point. Just how I like it."}, {"short": "Images", "label": "Chapter 5", "title": "Images", "msg": "<p><b>Our animals</b> is the most important part: let's show them! We took photos of three, and they're in the <b>img</b> folder:</p><span class=\"quote\">img/morzsa.svg · img/cirmi.svg · img/pamacs.svg</span><p>Give each one a description (<code>alt</code>), and don't make them huge: set the width to 150.</p>", "goals": [{"t": "Three <code>&lt;img&gt;</code> under <b>Our animals</b>", "tip": ""}, {"t": "All three images show up (correct <code>src</code>)", "tip": "The file names: img/morzsa.svg, img/cirmi.svg, img/pamacs.svg – exactly like this, in lower case."}, {"t": "Every image has <code>alt</code> text", "tip": "Describe the picture, e.g. alt=\"Morzsa, a brown dog\"."}, {"t": "Every image has a <code>width</code> attribute (e.g. 150)", "tip": ""}, {"t": "Add Bodri, the shelter's guard dog, too: img/bodri.svg", "tip": "", "bonus": true}], "cheat": "<img src=\"img/morzsa.svg\" alt=\"Morzsa, a brown dog\" width=\"150\">", "cheatNote": "<code>img</code> is an empty element: no closing tag. Attributes are separated by spaces.", "success": "Oh, they're so sweet! Morzsa is already my favourite."}, {"short": "Links", "label": "Chapter 6", "title": "Links", "msg": "<p>If anyone has questions, they can write to us: <b>info@pawshelter.org</b>. Put this under <b>Contact</b> as a clickable email link.</p><p>Let's add a link to a map as well, so people can find us: <b>https://www.openstreetmap.org</b>. It should open in a new tab, so our page doesn't disappear.</p>", "goals": [{"t": "An email link under <b>Contact</b> (<code>mailto:</code>)", "tip": "The <code>href</code> starts with mailto:"}, {"t": "A link to a website (<code>https://</code>…)", "tip": ""}, {"t": "The website link opens in a new tab (<code>target</code>)", "tip": "<code>target=&quot;_blank&quot;</code> in the opening tag."}, {"t": "Every link has text to click on", "tip": "The text goes between <code>&lt;a …&gt;</code> and <code>&lt;/a&gt;</code>."}], "cheat": "<p>Write to us: <a href=\"mailto:info@pawshelter.org\">info@pawshelter.org</a></p>\n<p><a href=\"https://www.openstreetmap.org\" target=\"_blank\">map</a></p>", "cheatNote": "<code>href</code> says where the link goes; the text between the tags is what people click.", "success": "I tried it, it works! The email link even opened my mail app."}, {"short": "Table", "label": "Chapter 7", "title": "Table", "msg": "<p>Under the pictures I'd like a table of the animals, so they're easy to compare. Columns: <b>Name</b>, <b>Species</b>, <b>Age</b>.</p><span class=\"quote\">Morzsa – dog – 3 years · Cirmi – cat – 2 years · Pamacs – rabbit – 1 year</span><p>Give it a border too (<code>border=\"1\"</code>), so the cells are easy to see.</p>", "goals": [{"t": "A <code>&lt;table&gt;</code> in the <b>Our animals</b> part", "tip": "Under the pictures, before the Contact subheading."}, {"t": "The first row is the header: at least 3 <code>&lt;th&gt;</code> cells", "tip": ""}, {"t": "At least 3 data rows, each with 3 <code>&lt;td&gt;</code>", "tip": "Each row is a <code>&lt;tr&gt;</code> with its cells inside."}, {"t": "All three animals' names are in the table", "tip": ""}], "cheat": "<table border=\"1\">\n  <tr><th>Name</th><th>Species</th><th>Age</th></tr>\n  <tr><td>Morzsa</td><td>dog</td><td>3 years</td></tr>\n</table>", "cheatNote": "Row by row: each <code>tr</code> is a row, with its cells left to right. Header: <code>th</code>, data: <code>td</code>.", "success": "Now you can see everyone's age at a glance. Very professional!"}, {"short": "Head", "label": "Chapter 8", "title": "The finishing touches", "msg": "<p>Nearly done! But the browser tab still says <b>New page</b>. Change the <code>title</code> to:</p><span class=\"quote\">Paw Shelter – Adoption</span><p>Set the page's language to English (<code>lang</code>), and write your name in a comment at the start of the <code>body</code>, so we know who made it.</p>", "goals": [{"t": "The <code>&lt;title&gt;</code> contains: Paw Shelter", "tip": "The title is in the head. Watch the tab at the top of the preview!"}, {"t": "The <code>&lt;html&gt;</code> opening tag has <code>lang=&quot;en&quot;</code>", "tip": ""}, {"t": "A comment (<code>&lt;!-- … --&gt;</code>) with your name", "tip": "Comments don't show on the page, only in the code."}, {"t": "The skeleton is intact: DOCTYPE on the first line, head and body in place", "tip": "If you deleted something by accident, ↺ Chapter start brings it back."}], "cheat": "<html lang=\"en\">\n  <head>\n    <title>Paw Shelter – Adoption</title>\n  …\n  <body>\n    <!-- Made by: Anna Kovács -->", "cheatNote": "Whatever is in the <code>head</code> doesn't show on the page, but on the tab or behind the scenes.", "success": "Thank you! This is what everyone will see on Saturday. Morzsa, Cirmi and Pamacs say thanks too!"}], "ui": {"preview": "Page preview", "localTpl": "This link would open the file {h}, but there's no such file here.", "progress": "{n} / {t} chapters done", "doneWord": "done", "todoWord": "not done yet", "bonus": "bonus", "missing": "Missing: ", "badSrc": "No such image: ", "winTitle": "Done!", "nextCh": "Next chapter ▸", "startWork": "Let's get to work ▸", "toEnd": "Finish ▸", "solvedSay": "Chapter done!", "saved": "Saved.", "solNote": "If you're really stuck, you can look at a model solution. Have a go on your own first, though!", "solWait": "Model solution (in {t})", "solShow": "Show the model solution", "solLoadNote": "This is how the code could look at the end of this chapter. Compare it with yours! If you load it, it replaces the code in the editor.", "solLoad": "Load into the editor", "resetConfirm": "Put the code back the way it was at the start of this chapter?", "restartConfirm": "Start again from the beginning? All your work so far will be deleted from this browser.", "stChapters": "chapters", "stMinutes": "minutes", "stHelped": "model solutions", "noName": "noname", "zipping": "Packing…", "zipped": "Downloaded ✓", "zipFail": "Only the HTML file was downloaded", "copied": "Copied ✓", "repTitle": "The Paw Shelter Website – report", "repName": "Name", "repStart": "Started", "repEnd": "Finished", "repDone": "Chapters done", "repHelped": "With model solution", "repMin": "min", "repCode": "--- The website's code ---", "lintOpen": "Line {1}: this tag isn't finished, the > is missing: {0}", "lintQuote": "Line {1}: a quote mark is missing in this tag: {0}", "lintVoidClose": "Line {1}: {0} is an empty element with no closing tag. Delete the {c0}.", "lintStray": "Line {1}: {c0} closes something that was never opened.", "lintCross": "Line {3}: tags closed crosswise. First {c0}, then {c1}.", "lintUnclosed": "Line {1}: {0} is never closed. Add a {c0} somewhere."}, "pawSvg": "<svg viewBox=\"0 0 20 20\" aria-hidden=\"true\"><g fill=\"currentColor\"><ellipse cx=\"10\" cy=\"13\" rx=\"4.6\" ry=\"3.8\"/><ellipse cx=\"4.6\" cy=\"8.6\" rx=\"1.8\" ry=\"2.3\"/><ellipse cx=\"8\" cy=\"5.2\" rx=\"1.8\" ry=\"2.4\"/><ellipse cx=\"12\" cy=\"5.2\" rx=\"1.8\" ry=\"2.4\"/><ellipse cx=\"15.4\" cy=\"8.6\" rx=\"1.8\" ry=\"2.3\"/></g></svg>", "solutionDelay": 240};
+const UI = { preview: CFG.ui.preview };
+/* ---------- shared by the HTML explainer and the HTML mission ---------- */
+const $ = (s, el=document) => el.querySelector(s), $$ = (s, el=document) => [...el.querySelectorAll(s)];
+const esc = s => String(s).replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const VOID = new Set(["area","base","br","col","embed","hr","img","input","link","meta","source","track","wbr"]);
+
+/* HTML syntax colouring: tags, attribute names, values, comments, entities */
+function hlTag(t){
+  const m = /^(<\/?)([a-zA-Z][\w-]*)?([\s\S]*?)(\/?>)?$/.exec(t);
+  if (!m) return esc(t);
+  let attrs = "", rest = m[3] || "", last = 0, a;
+  const re = /([^\s=\/>"']+)(\s*=\s*)?("[^"]*"?|'[^']*'?|[^\s>"']+)?/g;
+  while ((a = re.exec(rest))){
+    attrs += esc(rest.slice(last, a.index)) + `<span class="an">${esc(a[1])}</span>`;
+    if (a[2]) attrs += `<span class="pu">${esc(a[2])}</span>`;
+    if (a[3]) attrs += `<span class="av">${esc(a[3])}</span>`;
+    last = re.lastIndex;
+  }
+  attrs += esc(rest.slice(last));
+  return `<span class="pu">${esc(m[1])}</span><span class="tg">${esc(m[2]||"")}</span>${attrs}<span class="pu">${esc(m[4]||"")}</span>`;
+}
+const TOKEN = /<!--[\s\S]*?(?:-->|$)|<!doctype[^>]*>?|<\/?[a-zA-Z][^<>]*>?|&#?[a-zA-Z0-9]+;/gi;
+function hl(src){
+  let o = "", last = 0, m;
+  TOKEN.lastIndex = 0;
+  while ((m = TOKEN.exec(src))){
+    o += esc(src.slice(last, m.index));
+    const t = m[0];
+    if (t.startsWith("<!--")) o += `<span class="cm">${esc(t)}</span>`;
+    else if (/^<!doctype/i.test(t)) o += `<span class="dt">${esc(t)}</span>`;
+    else if (t[0] === "&") o += `<span class="en">${esc(t)}</span>`;
+    else o += hlTag(t);
+    last = TOKEN.lastIndex;
+  }
+  return o + esc(src.slice(last));
+}
+
+/* A tolerant check for beginners' mistakes: unclosed, stray and crossed tags, with line numbers. */
+function lint(src, T){
+  const out = [], stack = [];
+  const lineOf = i => src.slice(0, i).split("\n").length;
+  const clean = src.replace(/<!--[\s\S]*?-->/g, c => c.replace(/[^\n]/g, " "));
+  const re = /<(\/?)([a-zA-Z][\w-]*)([^<>]*?)(\/?)>|<(\/?)([a-zA-Z][\w-]*)[^<>]*$/g;
+  const skip = new Set(["html","head","body"]);              /* optional end tags: a forgotten </body> is no drama */
+  const lateClose = {};                                        /* closing tags we already explained (crossed pairs) */
+  let m;
+  while ((m = re.exec(clean))){
+    if (m[6] !== undefined && m[2] === undefined){ out.push(T.lintOpen(m[6].toLowerCase(), lineOf(m.index))); continue; }
+    const close = !!m[1], name = m[2].toLowerCase(), line = lineOf(m.index), attrs = m[3] || "";
+    if ((attrs.split('"').length - 1) % 2) out.push(T.lintQuote(name, line));
+    if (VOID.has(name)){ if (close) out.push(T.lintVoidClose(name, line)); continue; }
+    if (!close){ stack.push({ name, line }); continue; }
+    const at = stack.map(s => s.name).lastIndexOf(name);
+    if (at < 0){
+      if (lateClose[name]) lateClose[name]--; else out.push(T.lintStray(name, line));
+      continue;
+    }
+    const rest = clean.slice(re.lastIndex).toLowerCase();
+    stack.slice(at + 1).reverse().forEach(inner => {
+      if (skip.has(inner.name)) return;
+      const crossed = new RegExp("^\\s*</" + inner.name + "\\s*>").test(rest);
+      if (crossed){ out.push(T.lintCross(inner.name, name, inner.line, line)); lateClose[inner.name] = (lateClose[inner.name] || 0) + 1; }
+      else out.push(T.lintUnclosed(inner.name, inner.line));
+    });
+    stack.length = at;
+  }
+  stack.forEach(s => { if (!skip.has(s.name)) out.push(T.lintUnclosed(s.name, s.line)); });
+  return [...new Set(out)].slice(0, 4);
+}
+
+/* Highlighted editor: a coloured copy underneath, a see-through textarea on top, line numbers on the left. */
+function makeEditor(ta, opts={}){
+  if (window.CMHTML){                                     /* CodeMirror: completion, auto-closing tags, smart indent */
+    const w = document.createElement("div"); w.className = "cmw" + (opts.fixed ? " fixed" : ""); ta.before(w); ta.hidden = true;
+    let quiet = false;
+    const cm = CMHTML.create({ parent: w, doc: ta.value, lines: !!opts.lines, fit: !opts.fixed, label: ta.getAttribute("aria-label") || "",
+      onChange: v => { if (quiet) return; ta.value = v; ta.dispatchEvent(new Event("input")); } });
+    w.addEventListener("mousedown", e => { if (e.target === w){ e.preventDefault(); cm.focus(); } });
+    return { refit: () => { quiet = true; cm.set(ta.value); quiet = false; cm.view.requestMeasure(); }, cm, el: w };
+  }
+  const w = document.createElement("div"); w.className = "edw" + (opts.lines ? " numbered" : ""); ta.before(w);
+  const gut = document.createElement("pre"); gut.className = "gut"; gut.setAttribute("aria-hidden", "true");
+  const ov = document.createElement("pre"); ov.className = "ov"; ov.setAttribute("aria-hidden", "true");
+  if (opts.lines) w.append(gut);
+  const box = document.createElement("div"); box.className = "edbox"; box.append(ov, ta); w.append(box);
+  const paint = () => {
+    ov.innerHTML = hl(ta.value) + "\n";
+    if (opts.lines){ const n = ta.value.split("\n").length; gut.textContent = Array.from({length:n}, (_, i) => i + 1).join("\n") + "\n"; }
+  };
+  const fit = () => {
+    if (opts.fixed){ paint(); ov.scrollTop = ta.scrollTop; gut.scrollTop = ta.scrollTop; return; }
+    ta.style.height = "auto"; ta.style.height = (ta.scrollHeight + 2) + "px"; paint();
+  };
+  ta.addEventListener("scroll", () => { ov.scrollTop = ta.scrollTop; ov.scrollLeft = ta.scrollLeft; gut.scrollTop = ta.scrollTop; });
+  ta.addEventListener("input", fit);
+  w.addEventListener("mousedown", e => { if (e.target === w || e.target === box || e.target === gut){ e.preventDefault(); ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length); } });
+  ta.addEventListener("keydown", e => {
+    if (e.key === "Tab" && !e.shiftKey && !e.ctrlKey && !e.metaKey && !e.altKey){
+      e.preventDefault();
+      const s = ta.selectionStart;
+      ta.setRangeText("  ", s, ta.selectionEnd, "end");
+      ta.dispatchEvent(new Event("input"));
+    }
+    if (e.key === "Enter" && !e.shiftKey && !e.ctrlKey && !e.metaKey){       /* keep the indentation of the line above */
+      const s = ta.selectionStart, ls = ta.value.lastIndexOf("\n", s - 1) + 1, ind = /^[ \t]*/.exec(ta.value.slice(ls, s))[0];
+      if (ind){ e.preventDefault(); ta.setRangeText("\n" + ind, s, ta.selectionEnd, "end"); ta.dispatchEvent(new Event("input")); }
+    }
+  });
+  fit();
+  return { refit: fit };
+}
+
+/* A small browser window: the tab shows the page's <title>, the address bar its file name. */
+function makeBrowser(host, file, T){
+  host.classList.add("bw");
+  host.innerHTML = `<div class="bw-top"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
+    <span class="bw-tab"><span class="fav" aria-hidden="true"></span><span class="ttl"></span></span></div>
+    <div class="bw-bar"><span class="addr"><span aria-hidden="true">📄</span> ${esc(file)}</span></div>
+    <iframe title="${esc(T.preview)}" sandbox="allow-same-origin allow-popups allow-popups-to-escape-sandbox"></iframe>`;
+  const fr = $("iframe", host), ttl = $(".ttl", host);
+  const nt = document.createElement("div"); nt.className = "bw-note"; nt.setAttribute("role", "status"); host.append(nt);
+  let ntTimer = 0;
+  const note = msg => { nt.textContent = msg; nt.classList.add("on"); clearTimeout(ntTimer); ntTimer = setTimeout(() => nt.classList.remove("on"), 3200); };
+  let timer = 0, pendingScroll = 0;
+  const size = () => {
+    if (host.dataset.fixed) return;
+    try {
+      const d = fr.contentDocument; if (!d || !d.documentElement) return;
+      const h = Math.max(d.documentElement.scrollHeight, d.body ? d.body.scrollHeight : 0);
+      fr.style.height = Math.min(host.dataset.max ? +host.dataset.max : 560, Math.max(+host.dataset.min || 110, h + 4)) + "px";
+    } catch(e){}
+  };
+  fr.addEventListener("load", () => {
+    try {
+      const d = fr.contentDocument;
+      d.documentElement.scrollTop = pendingScroll;
+      d.addEventListener("click", e => {                         /* links open in a new tab; #anchors scroll inside */
+        const a = e.target.closest && e.target.closest("a[href]"); if (!a) return;
+        e.preventDefault();
+        const h = a.getAttribute("href") || "";
+        if (h.startsWith("#")){ const t = d.getElementById(h.slice(1)); if (t) t.scrollIntoView({ behavior:"smooth" }); return; }
+        if (/^(https?:|mailto:|tel:)/i.test(h)) window.open(a.href, "_blank", "noopener");
+        else note(T.localNote(h));
+      });
+      $$("img", d).forEach(im => im.addEventListener("load", size));
+    } catch(e){}
+    size();
+  });
+  const show = src => {
+    const t = /<title[^>]*>([\s\S]*?)<\/title>/i.exec(src);
+    ttl.textContent = t && t[1].trim() ? t[1].replace(/\s+/g, " ").trim() : file;
+    try { pendingScroll = fr.contentDocument ? fr.contentDocument.documentElement.scrollTop : 0; } catch(e){ pendingScroll = 0; }
+    fr.srcdoc = src;
+  };
+  return {
+    show: (src, now) => { clearTimeout(timer); if (now) show(src); else timer = setTimeout(() => show(src), 160); },
+    frame: fr, resize: size
+  };
+}
+
+/* ---------- the mission ---------- */
+const W = CFG.words, CH = CFG.chapters, NCH = CH.length - 1;      /* chapter 0 is the warm-up */
+const KEY = CFG.key;
+UI.localNote = h => CFG.ui.localTpl.replace("{h}", h);
+["lintOpen","lintQuote","lintVoidClose","lintStray","lintCross","lintUnclosed"].forEach(k => {
+  UI[k] = (...a) => CFG.ui[k].replace(/\{(c?)(\d)\}/g, (_, c, i) => {
+    const v = a[+i];
+    return typeof v === "number" ? String(v) : `<code>&lt;${c ? "/" : ""}${esc(v)}&gt;</code>`;
+  });
+});
+
+let state = { solved: [], current: 0, start: Date.now(), end: null, code: CFG.start, chStart: {}, chOpen: {}, helped: [], doneAt: {}, name: "" };
+try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && Array.isArray(s.solved) && typeof s.code === "string") state = Object.assign(state, s); } catch(e){}
+if (!(state.current >= 0 && state.current < CH.length)) state.current = 0;
+let saveTimer = 0;
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(state)); } catch(e){} }
+const saveSoon = () => { clearTimeout(saveTimer); saveTimer = setTimeout(save, 400); };
+
+/* ---------- reading the student's page ---------- */
+const norm = s => String(s || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[–—]/g, "-").replace(/\s+/g, " ").trim().replace(/[.!?:]+$/, "");
+const parse = src => new DOMParser().parseFromString(src, "text/html");
+const h2named = (d, name) => [...d.querySelectorAll("h2")].find(h => norm(h.textContent) === norm(name));
+function section(d, name){
+  const h = h2named(d, name); if (!h) return null;
+  const out = []; let n = h.nextElementSibling;
+  while (n && !/^H[12]$/.test(n.tagName)){ out.push(n); n = n.nextElementSibling; }
+  return out;
+}
+function afterH1(d){
+  const h = d.querySelector("h1"); if (!h) return [];
+  const out = []; let n = h.nextElementSibling;
+  while (n && !/^H[12]$/.test(n.tagName)){ out.push(n); n = n.nextElementSibling; }
+  return out;
+}
+const within = (sec, sel) => sec ? sec.flatMap(e => [...(e.matches(sel) ? [e] : []), ...e.querySelectorAll(sel)]) : [];
+const sentences = t => (String(t).match(/[.!?…](\s|$)/g) || []).length;
+const before = (a, b) => !!(a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING);
+function comments(d){
+  const out = [], tw = d.createTreeWalker(d, NodeFilter.SHOW_COMMENT); let n;
+  while ((n = tw.nextNode())) out.push(n.nodeValue.trim());
+  return out;
+}
+const nameComment = d => comments(d).find(c => /\p{L}{3,}/u.test(c)) || "";
+const cellCount = r => [...r.children].filter(c => /^T[DH]$/.test(c.tagName)).reduce((s, c) => s + (parseInt(c.getAttribute("colspan"), 10) || 1), 0);
+
+/* Each check returns one entry per goal: true/false, or [ok, extra tip text]. */
+const CHECKS = [
+  d => { const h = d.querySelector("h1"); return [!!h && norm(h.textContent) === norm(W.h1)]; },
+  d => {
+    const h1s = d.querySelectorAll("h1"), found = W.h2s.map(n => h2named(d, n)), missing = W.h2s.filter((n, k) => !found[k]);
+    const ordered = !missing.length && h1s.length >= 1 && before(h1s[0], found[0]) && found.every((h, k) => k === 0 || before(found[k - 1], h));
+    return [h1s.length === 1, [!missing.length, missing.length && missing.length < 4 ? CFG.ui.missing + missing.join(", ") : ""], ordered];
+  },
+  d => {
+    const intro = within(afterH1(d), "p").some(p => p.textContent.trim().length >= 15);
+    const about = within(section(d, W.h2s[0]), "p").some(p => sentences(p.textContent) >= 2);
+    return [intro, about];
+  },
+  d => {
+    const st = [...d.querySelectorAll("strong")].find(s => norm(s.textContent).includes(norm(W.strongWord)));
+    const em = within(section(d, W.h2s[0]), "em").some(e => e.closest("p") && e.textContent.trim());
+    return [!!st, !!st && !!st.closest("p"), em];
+  },
+  d => {
+    const ul = within(section(d, W.h2s[1]), "ul").some(u => u.querySelectorAll(":scope > li").length >= 3);
+    const ol = within(section(d, W.h2s[0]), "ol").some(o => o.querySelectorAll(":scope > li").length >= 3);
+    const lis = [...d.querySelectorAll("li")];
+    return [ul, ol, lis.length > 0 && lis.every(li => /^(UL|OL)$/.test(li.parentElement.tagName))];
+  },
+  d => {
+    const imgs = within(section(d, W.h2s[2]), "img");
+    const srcs = imgs.map(i => (i.getAttribute("src") || "").trim().replace(/^\.\//, ""));
+    const bad = srcs.filter(s => !W.allImgs.includes(s)), missing = W.imgs.filter(f => !srcs.includes(f));
+    return [
+      imgs.length >= 3,
+      [imgs.length > 0 && !bad.length && !missing.length, bad.length ? CFG.ui.badSrc + bad.map(b => b || "?").join(", ") : ""],
+      imgs.length > 0 && imgs.every(i => (i.getAttribute("alt") || "").trim().length >= 3),
+      imgs.length > 0 && imgs.every(i => { const w = parseInt(i.getAttribute("width"), 10); return w >= 50 && w <= 400; }),
+      srcs.includes("img/bodri.svg")
+    ];
+  },
+  d => {
+    const as = within(section(d, W.h2s[3]), "a");
+    const href = a => (a.getAttribute("href") || "").trim();
+    const mail = as.find(a => /^mailto:[^\s@]+@[^\s@]+\.[a-z]{2,}$/i.test(href(a)));
+    const web = as.find(a => /^https?:\/\/[^\s.]+\.[^\s]+$/i.test(href(a)));
+    return [!!mail, !!web, !!web && web.getAttribute("target") === "_blank", as.length > 0 && as.every(a => a.textContent.trim().length > 0)];
+  },
+  d => {
+    const t = within(section(d, W.h2s[2]), "table")[0];
+    const rows = t ? [...t.querySelectorAll("tr")] : [];
+    const data = rows.filter(r => r.querySelector("td"));
+    const txt = t ? norm(t.textContent) : "";
+    return [!!t, rows.length > 0 && rows[0].querySelectorAll("th").length >= 3,
+            data.length >= 3 && data.every(r => cellCount(r) === 3), !!t && W.animals.every(a => txt.includes(norm(a)))];
+  },
+  (d, src) => {
+    const title = d.querySelector("title"), tt = title ? norm(title.textContent) : "";
+    const skel = /^\s*<!doctype html>/i.test(src) && /<head[\s>]/i.test(src) && /<\/head\s*>/i.test(src) && /<body[\s>]/i.test(src) && /<\/body\s*>/i.test(src) && !!d.querySelector("head meta[charset]");
+    return [tt.includes(norm(W.h1)) && tt !== norm(W.oldTitle), (d.documentElement.getAttribute("lang") || "").toLowerCase() === W.lang, !!nameComment(d), skel];
+  }
+];
+
+/* ---------- page parts ---------- */
+const ed = $("#code"), editor = makeEditor(ed, { lines: true, fixed: true });
+const browser = makeBrowser($("#browser"), W.file, UI);
+const TERI = $("#teri").innerHTML;
+
+const unlocked = i => i === 0 || state.solved.includes(i - 1);
+const solvedN = () => state.solved.filter(i => i > 0).length;
+
+function drawPath(){
+  $("#path").innerHTML = CH.map((c, i) => {
+    const done = state.solved.includes(i), cur = i === state.current, ok = unlocked(i);
+    const ic = done ? "✓" : (i === 0 ? CFG.pawSvg : String(i));
+    return `<li><button type="button" class="paw${done ? " done" : ""}" data-i="${i}"${cur ? ' aria-current="step"' : ""}${ok ? "" : " disabled"}
+      aria-label="${esc(c.label)}${done ? " – " + esc(CFG.ui.doneWord) : ""}"><span class="ic">${ic}</span><span class="nm">${esc(c.short)}</span></button></li>`;
+  }).join("");
+  $("#progress").innerHTML = CFG.ui.progress.replace("{n}", `<b>${solvedN()}</b>`).replace("{t}", NCH);
+}
+
+function drawChapter(){
+  const i = state.current, c = CH[i];
+  $("#chk").textContent = c.label;
+  $("#chTitle").textContent = c.title;
+  $("#msg").innerHTML = c.msg;
+  $("#cheatNote").innerHTML = c.cheatNote;
+  $("#cheat").innerHTML = hl(c.cheat);
+  drawSolution();
+}
+
+let lastResults = null;
+function evaluate(){
+  const src = ed.value, d = parse(src), i = state.current, c = CH[i];
+  const res = CHECKS[i](d, src).map(r => Array.isArray(r) ? r : [r, ""]);
+  const req = c.goals.map((g, k) => g.bonus ? true : !!res[k][0]);
+  const okN = c.goals.filter((g, k) => !g.bonus && res[k][0]).length, need = c.goals.filter(g => !g.bonus).length;
+  $("#goals").innerHTML = c.goals.map((g, k) => {
+    const ok = !!res[k][0], tip = [g.tip, res[k][1]].filter(Boolean).join(" ");
+    return `<li class="goal${ok ? " ok" : ""}"><span class="bx" aria-hidden="true">${ok ? "✓" : ""}</span>
+      <span class="gt">${g.bonus ? `<span class="bonus">${esc(CFG.ui.bonus)}</span>` : ""}${g.t}<span class="sr"> – ${ok ? esc(CFG.ui.doneWord) : esc(CFG.ui.todoWord)}</span></span>
+      ${tip && !ok ? `<span class="tip">${tip}</span>` : ""}</li>`;
+  }).join("");
+  $("#count").textContent = `${okN} / ${need}`;
+  if (req.every(Boolean) && !state.solved.includes(i)) solve(i);
+  drawWin();
+  const warn = lint(src, UI);
+  $("#lint").hidden = !warn.length;
+  $("#lint").innerHTML = warn.map(w => `<p>${w}</p>`).join("");
+  lastResults = res;
+}
+
+function solve(i){
+  state.solved.push(i);
+  state.doneAt[i] = Date.now();
+  if (state.solved.filter(k => k > 0).length === NCH && !state.end) state.end = Date.now();
+  save(); drawPath(); confetti();
+  $("#status").textContent = CFG.ui.solvedSay;
+  if (state.end && i === NCH) drawEnding();
+}
+
+function drawWin(){
+  const i = state.current, w = $("#win");
+  if (!state.solved.includes(i)){ w.hidden = true; return; }
+  w.hidden = false;
+  const last = i === NCH;
+  $("#winText").innerHTML = `<b>${esc(CFG.ui.winTitle)}</b><span>${CH[i].success}</span>`;
+  const nb = $("#nextBtn");
+  nb.hidden = last && !state.end;
+  nb.textContent = last ? CFG.ui.toEnd : (i === 0 ? CFG.ui.startWork : CFG.ui.nextCh);
+}
+
+/* ---------- the model solution, after a few minutes ---------- */
+let solTimer = 0;
+function drawSolution(){
+  clearInterval(solTimer);
+  const i = state.current, box = $("#sol");
+  const opened = state.chOpen[i] || Date.now();
+  const tick = () => {
+    const left = Math.ceil((opened + CFG.solutionDelay * 1000 - Date.now()) / 1000);
+    const free = left <= 0 || state.solved.includes(i);
+    const b = $("#solShow");
+    if (!b) return;
+    b.disabled = !free;
+    b.textContent = free ? CFG.ui.solShow : CFG.ui.solWait.replace("{t}", `${Math.floor(left / 60)}:${String(left % 60).padStart(2, "0")}`);
+    if (free) clearInterval(solTimer);
+  };
+  box.innerHTML = `<p>${CFG.ui.solNote}</p><div><button type="button" class="btn ghost" id="solShow"></button></div>`;
+  $("#solShow").onclick = () => {
+    box.innerHTML = `<p>${CFG.ui.solLoadNote}</p><pre class="code">${hl(CFG.models[i])}</pre><div><button type="button" class="btn" id="solLoad">${esc(CFG.ui.solLoad)}</button></div>`;
+    $("#solLoad").onclick = () => {
+      if (!state.solved.includes(i) && !state.helped.includes(i)) state.helped.push(i);
+      setCode(CFG.models[i]); save();
+    };
+  };
+  tick(); solTimer = setInterval(tick, 1000);
+}
+
+function setCode(v){
+  ed.value = v; editor.refit(); ed.scrollTop = 0;
+  state.code = v; saveSoon();
+  browser.show(v, true); evaluate();
+}
+
+function go(i){
+  if (!unlocked(i)) return;
+  state.current = i;
+  if (!state.chOpen[i]) state.chOpen[i] = Date.now();
+  if (!(i in state.chStart)) state.chStart[i] = state.code;
+  save(); drawPath(); drawChapter(); evaluate();
+  try { history.replaceState(null, "", "#" + i); } catch(e){}
+}
+
+/* ---------- ending ---------- */
+const slug = s => norm(s).split(/\s+/)[0].replace(/[^a-z0-9]/g, "") || CFG.ui.noName;
+function guessName(){
+  if (state.name) return state.name;
+  const c = nameComment(parse(state.code));
+  return c.includes(":") ? c.split(":").slice(1).join(":").trim() : c;
+}
+function drawEnding(){
+  const box = $("#ending");
+  if (!state.end){ box.hidden = true; return; }
+  box.hidden = false;
+  const mins = Math.max(1, Math.round((state.end - state.start) / 60000));
+  $("#endStats").innerHTML = `<span class="stat"><b>${NCH} / ${NCH}</b><span>${esc(CFG.ui.stChapters)}</span></span>
+    <span class="stat"><b>${mins}</b><span>${esc(CFG.ui.stMinutes)}</span></span>
+    <span class="stat"><b>${state.helped.length}</b><span>${esc(CFG.ui.stHelped)}</span></span>`;
+  const nm = $("#who"); if (!nm.value) nm.value = guessName();
+  $("#zipName").textContent = slug(nm.value) + "_" + W.fileBase + ".zip";
+}
+
+function withBase(src){
+  const base = `<base href="${new URL(".", location.href).href}">`;
+  return /<head[^>]*>/i.test(src) ? src.replace(/<head[^>]*>/i, m => m + base) : base + src;
+}
+
+function loadZip(){
+  return window.JSZip ? Promise.resolve(window.JSZip) : new Promise((ok, no) => {
+    const s = document.createElement("script");
+    s.src = "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js";
+    s.onload = () => ok(window.JSZip); s.onerror = no; document.head.append(s);
+  });
+}
+async function download(){
+  const b = $("#dl"), name = slug($("#who").value), base = name + "_" + W.fileBase;
+  b.disabled = true; const old = b.textContent; b.textContent = CFG.ui.zipping;
+  try {
+    const Z = await loadZip(), zip = new Z();
+    zip.file(base + ".html", state.code);
+    for (const f of W.allImgs) zip.file(f, await (await fetch(f)).blob());
+    const blob = await zip.generateAsync({ type: "blob" });
+    const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = base + ".zip";
+    document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+    b.textContent = CFG.ui.zipped;
+  } catch(e){
+    const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([state.code], { type: "text/html" })); a.download = base + ".html";
+    document.body.append(a); a.click(); a.remove();
+    b.textContent = CFG.ui.zipFail;
+  }
+  setTimeout(() => { b.disabled = false; b.textContent = old; }, 2500);
+}
+
+function report(){
+  const pad = n => String(n).padStart(2, "0"), dt = t => { const d = new Date(t); return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`; };
+  const L = [CFG.ui.repTitle, `${CFG.ui.repName}: ${$("#who").value || guessName() || "?"}`, `${CFG.ui.repStart}: ${dt(state.start)}`];
+  if (state.end) L.push(`${CFG.ui.repEnd}: ${dt(state.end)} (${Math.max(1, Math.round((state.end - state.start) / 60000))} ${CFG.ui.repMin})`);
+  L.push(`${CFG.ui.repDone}: ${solvedN()} / ${NCH}`);
+  if (state.helped.length) L.push(`${CFG.ui.repHelped}: ${state.helped.filter(i => i > 0).sort((a, b) => a - b).join(", ")}`);
+  L.push("", CFG.ui.repCode, state.code);
+  return L.join("\n");
+}
+
+/* ---------- small joys ---------- */
+function confetti(){
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const c = document.createElement("div"); c.className = "confetti"; c.setAttribute("aria-hidden", "true");
+  const cols = ["#2f7a5a", "#e07b2c", "#f2d264", "#9cc8e8", "#f0a3b8"];
+  for (let k = 0; k < 46; k++){
+    const i = document.createElement("i");
+    i.style.left = (Math.random() * 100) + "vw"; i.style.background = cols[k % cols.length];
+    i.style.setProperty("--dx", (Math.random() * 160 - 80) + "px"); i.style.setProperty("--r", (Math.random() * 720 - 360) + "deg");
+    i.style.animationDelay = (Math.random() * .35) + "s";
+    c.append(i);
+  }
+  document.body.append(c); setTimeout(() => c.remove(), 2400);
+}
+
+/* ---------- wiring ---------- */
+let evalTimer = 0;
+ed.value = state.code; editor.refit();
+ed.addEventListener("input", () => {
+  state.code = ed.value; saveSoon();
+  browser.show(ed.value);
+  clearTimeout(evalTimer); evalTimer = setTimeout(evaluate, 220);
+});
+document.addEventListener("keydown", e => {
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "s"){ e.preventDefault(); save(); $("#status").textContent = CFG.ui.saved; flashSaved(); }
+});
+function flashSaved(){ const s = $("#savedTag"); s.hidden = false; clearTimeout(s._t); s._t = setTimeout(() => s.hidden = true, 1400); }
+$("#path").addEventListener("click", e => { const b = e.target.closest(".paw"); if (b && !b.disabled) go(+b.dataset.i); });
+$("#nextBtn").onclick = () => {
+  if (state.current < NCH) go(state.current + 1);
+  else { drawEnding(); $("#ending").scrollIntoView({ behavior: "smooth", block: "start" }); }
+};
+$("#resetCh").onclick = () => { if (confirm(CFG.ui.resetConfirm)) setCode(state.chStart[state.current] ?? CFG.start); };
+let size = 15;
+try { const s = parseInt(localStorage.getItem("html-mission-size"), 10); if (s >= 12 && s <= 28) size = s; } catch(e){}
+const setSize = n => { size = Math.max(12, Math.min(28, n)); document.documentElement.style.setProperty("--code-size", size + "px"); editor.refit(); try { localStorage.setItem("html-mission-size", String(size)); } catch(e){} };
+setSize(size);
+$("#smaller").onclick = () => setSize(size - 1);
+$("#bigger").onclick = () => setSize(size + 1);
+$("#who").addEventListener("input", () => { state.name = $("#who").value; saveSoon(); $("#zipName").textContent = slug($("#who").value) + "_" + W.fileBase + ".zip"; });
+$("#dl").onclick = download;
+$("#openFull").onclick = () => { const u = URL.createObjectURL(new Blob([withBase(state.code)], { type: "text/html" })); window.open(u, "_blank"); setTimeout(() => URL.revokeObjectURL(u), 60000); };
+$("#copyRep").onclick = async () => {
+  const b = $("#copyRep"), old = b.textContent, txt = report();
+  try { await navigator.clipboard.writeText(txt); b.textContent = CFG.ui.copied; }
+  catch(e){ const t = document.createElement("textarea"); t.value = txt; document.body.append(t); t.select(); document.execCommand("copy"); t.remove(); b.textContent = CFG.ui.copied; }
+  setTimeout(() => b.textContent = old, 1600);
+};
+$("#restart").onclick = () => {
+  if (!confirm(CFG.ui.restartConfirm)) return;
+  state = { solved: [], current: 0, start: Date.now(), end: null, code: CFG.start, chStart: {}, chOpen: {}, helped: [], doneAt: {}, name: "" };
+  save(); ed.value = state.code; editor.refit(); browser.show(state.code, true); go(0); drawEnding();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+};
+
+const hashCh = parseInt(location.hash.slice(1), 10);
+browser.show(state.code, true);
+go(hashCh >= 0 && hashCh < CH.length && unlocked(hashCh) ? hashCh : state.current);
+drawEnding();
+
+</script>
+<script src="../../nav.js" defer></script>
+</body>
+</html>

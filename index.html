@@ -272,7 +272,7 @@ body.subject .hero{display:none}
 
   const TXT = {
     hu:{
-      tagline:"Nyomozz, terelj, formázz, rajzolj: minden küldetés egy történet, amit SQL-lel, CSS-sel vagy Inkscape-pel oldasz meg.",
+      tagline:"Nyomozz, terelj, építs weboldalt, rajzolj: minden küldetés egy történet, amit SQL-lel, HTML-lel és CSS-sel vagy Inkscape-pel oldasz meg.",
       left:"Itt tartasz", start:"Kezdd itt", allDone:"Mindet megoldottad!",
       chapters:(d,n)=>`${d} / ${n} fejezet kész`, chaptersTotal:n=>`${n} fejezet`, min:n=>`kb. ${n} perc`,
       cont:"Folytatás", go:"Indítás", solved:"Megoldva ✓",
@@ -285,7 +285,7 @@ body.subject .hero{display:none}
       againAll:"Bármelyiket újrajátszhatod lent."
     },
     en:{
-      tagline:"Solve a heist, herd a flock, style a page, draw a poster: every mission is a story you crack with SQL, CSS or Inkscape.",
+      tagline:"Solve a heist, herd a flock, build a web page, draw a poster: every mission is a story you crack with SQL, HTML and CSS, or Inkscape.",
       left:"Where you left off", start:"Start here", allDone:"You've solved them all!",
       chapters:(d,n)=>`${d} of ${n} chapters done`, chaptersTotal:n=>`${n} chapters`, min:n=>`about ${n} min`,
       cont:"Continue", go:"Start", solved:"Solved ✓",
@@ -467,6 +467,22 @@ function puliSvg(){
         <rect x="40" y="128" width="180" height="20" fill="#111"/><text x="130" y="143" text-anchor="middle" font-family="Arial Black,Impact,sans-serif" font-weight="900" font-size="13" fill="#1982c4">LONG LIVE ME</text></g>
       <rect x="62" y="16" width="5" height="176" rx="2" fill="#c9a66b"/><circle cx="64.5" cy="14" r="6" fill="#f2d264"/>
     </svg>`,
+    shelter:`<svg viewBox="0 0 400 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <rect width="400" height="200" fill="#f4ecdd"/>
+      <rect width="400" height="34" fill="#2f7a5a"/>
+      <g fill="#2f7a5a">${Array.from({length:12},(_,i)=>`<circle cx="${i*36+18}" cy="34" r="17"/>`).join("")}</g>
+      <circle cx="30" cy="20" r="11" fill="#fff6e0" opacity=".25"/>
+      <g transform="translate(70 62)">
+        <rect width="260" height="128" rx="10" fill="#fff" stroke="#2b2520" stroke-width="3"/>
+        <path d="M0 10a10 10 0 0 1 10-10h240a10 10 0 0 1 10 10v14H0z" fill="#dcd3c0" stroke="#2b2520" stroke-width="3"/>
+        <circle cx="14" cy="12" r="3.5" fill="#e0796b"/><circle cx="25" cy="12" r="3.5" fill="#e6c25a"/><circle cx="36" cy="12" r="3.5" fill="#7fbf6e"/>
+        <rect x="50" y="5" width="86" height="19" rx="5" fill="#fff"/><rect x="58" y="12" width="56" height="5" rx="2" fill="#2f7a5a"/>
+        <rect x="16" y="36" width="120" height="11" rx="3" fill="#2b2520"/><rect x="16" y="53" width="200" height="5" rx="2" fill="#cfc4b0"/>
+        <image href="html/basics/img/morzsa.svg" x="16" y="66" width="52" height="52"/><image href="html/basics/img/cirmi.svg" x="76" y="66" width="52" height="52"/><image href="html/basics/img/pamacs.svg" x="136" y="66" width="52" height="52"/>
+        <g stroke="#cfc4b0" stroke-width="3"><path d="M200 76h44M200 88h44M200 100h44M200 112h44"/></g>
+      </g>
+      <g transform="translate(318 46) rotate(8)"><rect width="66" height="42" rx="6" fill="#1f2a26"/><text x="33" y="29" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="20" fill="#f2d264">&lt;/&gt;</text></g>
+    </svg>`,
     "first-steps":`<svg viewBox="0 0 400 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
       <rect width="400" height="200" fill="#edf0f6"/>
       <rect x="30" y="28" width="190" height="146" rx="6" fill="#f6c99b"/>
@@ -511,6 +527,11 @@ function puliSvg(){
       <circle cx="34" cy="22" r="4.5" stroke="var(--chalk)" stroke-width="2.4"/><circle cx="96" cy="18" r="4.5" stroke="var(--chalk)" stroke-width="2.4"/>
       <path d="M140 84l8-36 14 0 8 36z" stroke="var(--chalk)" stroke-width="2.4"/><path d="M155 48V30" stroke="var(--chalk)" stroke-width="2.4"/><circle cx="155" cy="66" r="3.5" fill="var(--c)" stroke="none"/></svg>`
   };
+  EMBLEMS.web = `<svg viewBox="0 0 170 96" aria-hidden="true" fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="6" y="8" width="110" height="80" rx="6" stroke="var(--chalk)" stroke-width="2.4"/><path d="M6 24h110" stroke="var(--chalk)" stroke-width="2.4"/>
+      <circle cx="16" cy="16" r="2.4" fill="var(--chalk)" stroke="none"/><circle cx="25" cy="16" r="2.4" fill="var(--chalk)" stroke="none"/>
+      <path d="M20 40h50M20 52h70M20 64h40" stroke="var(--chalk)" stroke-width="2.4" opacity=".8"/><rect x="74" y="56" width="30" height="20" rx="2" stroke="var(--c)" stroke-width="2.6"/>
+      <path d="M134 30l-12 18 12 18M154 30l12 18-12 18" stroke="var(--c)" stroke-width="3.4"/><path d="M148 26l-8 44" stroke="var(--chalk)" stroke-width="2.4"/></svg>`;
   const embGen = `<svg viewBox="0 0 170 96" aria-hidden="true" fill="none"><path d="M8 70q40-60 80 0t76-10" stroke="var(--c)" stroke-width="3.4" stroke-linecap="round"/></svg>`;
   const shortTitle = ls => D.t(ls.title).split(/: | – /)[0];
 
@@ -532,8 +553,9 @@ function puliSvg(){
   /* ---------- which view: the subjects (no hash) or one subject (#sql, #sql-joins) ---------- */
   function current(){
     const h = decodeURIComponent(location.hash.slice(1));
-    const tp = D.SITE.topics.find(t => h === t.id || h.startsWith(t.id + "-"));
-    return { tp, lesson: tp && h !== tp.id ? h : null };
+    const hh = h.replace(/^css(?=$|-)/, "web");            /* old #css links still land on the web pages board */
+    const tp = D.SITE.topics.find(t => hh === t.id || hh.startsWith(t.id + "-"));
+    return { tp, lesson: tp && hh !== tp.id ? hh : null };
   }
 
   /* ---------- progress, read from what each mission saves in this browser ---------- */

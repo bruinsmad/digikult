@@ -153,17 +153,46 @@
         ]
       },
       {
-        id: "css",
+        id: "web",
         accent: "#7f9cff",
-        title: { hu: "Weboldalak – CSS", en: "Web pages – CSS" },
+        title: { hu: "Weboldalak – HTML és CSS", en: "Web pages – HTML and CSS" },
         blurb: {
-          hu: "Szelektorok, tulajdonságok, értékek – élő előnézettel.",
-          en: "Selectors, properties and values, with a live preview."
+          hu: "Előbb a szerkezet HTML-címkékkel, aztán a kinézet CSS-sel – élő előnézettel, VS Code-szerű szerkesztőben.",
+          en: "First the structure with HTML tags, then the looks with CSS – with a live preview in a VS Code-style editor."
         },
         lessons: [
           {
+            id: "html",
+            title: { hu: "HTML alapok: címkék, elemek, attribútumok", en: "HTML basics: tags, elements, attributes" },
+            pages: [
+              {
+                id: "html-intro",
+                kind: "theory",
+                minutes: 15,
+                title: { hu: "HTML alapok – elmélet", en: "HTML basics – explainer" },
+                desc: {
+                  hu: "Címkék és attribútumok, az oldal váza, címsorok, listák, linkek, képek és táblázatok. Minden példa szerkeszthető, a végén 6 kérdés.",
+                  en: "Tags and attributes, the page skeleton, headings, lists, links, images and tables. Every example is editable; 6 questions at the end."
+                },
+                files: { en: "html/basics/intro.html", hu: "html/basics/intro-hu.html" }
+              },
+              {
+                id: "shelter",
+                kind: "story",
+                minutes: 35,
+                title: { hu: "A Mancs Menhely honlapja", en: "The Paw Shelter Website" },
+                desc: {
+                  hu: "Teri néni menhelyének szombatig honlap kell. 8 fejezetben, lépésről lépésre építed fel, a végén letöltheted.",
+                  en: "Teri's animal shelter needs a website by Saturday. Build it step by step in 8 chapters, then download it."
+                },
+                files: { en: "html/basics/shelter.html", hu: "html/basics/shelter-hu.html" },
+                progress: { chapters: 8, keys: { en: "shelter-en-v1", hu: "shelter-hu-v1" } }
+              }
+            ]
+          },
+          {
             id: "basics",
-            title: { hu: "Első lépések", en: "First steps" },
+            title: { hu: "CSS: első lépések", en: "CSS: first steps" },
             pages: [
               {
                 id: "first-steps",
