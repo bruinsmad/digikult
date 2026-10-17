@@ -500,6 +500,6 @@ function start(){
 if (typeof initSqlJs !== "function"){ $$(".ex-out, .viz-body").forEach(o=>o.innerHTML = `<div class="err"><b>${UI.engFail}</b></div>`); setupQuiz(); }
 else initSqlJs().then(S=>{ db = new S.Database(); db.run(SEED); start(); }).catch(e=>{ setupQuiz(); });
 </script>
-<script src="../../nav.js?v=b86157b0" defer></script>
+<script src="../../nav.js?v=7801f299" defer></script>
 </body>
 </html>

@@ -369,47 +369,48 @@
   :host { all: initial; }
   * { box-sizing: border-box; font-feature-settings: "calt" 0, "liga" 0; }
   .wrap { position: fixed; left: max(12px, env(safe-area-inset-left)); bottom: max(12px, env(safe-area-inset-bottom));
-    z-index: 2147483000; font: 500 14px/1.3 "Segoe UI", system-ui, -apple-system, sans-serif; color: #eef3f1; }
+    z-index: 2147483000; font: 400 14px/1.3 "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif; color: #eef3f1; }
   button { font: inherit; color: inherit; cursor: pointer; }
-  .toggle { display: inline-flex; align-items: center; gap: 8px; padding: 9px 14px 9px 12px; border-radius: 999px;
-    background: rgba(26,42,36,.94); border: 1px solid rgba(255,255,255,.22); font-weight: 600;
+  .toggle { display: inline-flex; align-items: center; gap: 8px; padding: 9px 14px 9px 12px; border-radius: 6px;
+    background: rgba(26,42,36,.95); border: 1px solid rgba(255,255,255,.22); border-bottom: 3px solid #8a5532; font-weight: 700;
     box-shadow: 0 6px 18px rgba(0,0,0,.35); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); transition: transform .15s, background .15s; }
-  .toggle:hover { background: rgba(36,58,49,.98); transform: translateY(-1px); }
+  .toggle:hover { background: rgba(36,58,49,.98); }
   /* a round icon that hides as little of the page as possible; the label slides out on hover or focus */
   .lbl { display: inline-block; max-width: 8em; overflow: hidden; white-space: nowrap; transition: max-width .2s, opacity .2s; }
   .wrap.mini .toggle { gap: 0; padding: 12px; }
   .wrap.mini .lbl { max-width: 0; opacity: 0; }
   .wrap.mini .toggle:hover, .wrap.mini .toggle:focus-visible, .wrap.mini .toggle[aria-expanded="true"] { gap: 8px; padding: 9px 14px 9px 12px; }
   .wrap.mini .toggle:hover .lbl, .wrap.mini .toggle:focus-visible .lbl, .wrap.mini .toggle[aria-expanded="true"] .lbl { max-width: 8em; opacity: 1; }
-  :focus-visible { outline: 3px solid #f2d264; outline-offset: 2px; }
+  :focus-visible { outline: 3px solid #f2d264; outline-offset: 2px; border-radius: 4px; }
   .bars { width: 16px; height: 12px; display: grid; align-content: space-between; }
   .bars i { display: block; height: 2px; border-radius: 2px; background: currentColor; }
   .panel { position: absolute; left: 0; bottom: calc(100% + 10px); width: min(360px, calc(100vw - 24px));
     max-height: min(72vh, 620px); overflow: auto; overscroll-behavior: contain;
-    background: rgba(30,48,41,.985); border: 1px solid rgba(255,255,255,.18); border-radius: 14px;
-    box-shadow: 0 18px 40px rgba(0,0,0,.45); padding: 8px; animation: pop .16s ease-out; }
+    background: #22362f; border: 1px solid rgba(255,255,255,.14); border-radius: 6px;
+    box-shadow: 0 0 0 6px #8a5532, 0 18px 40px rgba(0,0,0,.45); padding: 8px; animation: pop .16s ease-out; }
   .panel[hidden] { display: none; }
   @keyframes pop { from { opacity: 0; transform: translateY(6px) scale(.97); } to { opacity: 1; transform: none; } }
   .head { display: flex; align-items: center; gap: 8px; padding: 4px 4px 8px 6px; position: sticky; top: -8px;
-    background: rgba(30,48,41,.985); margin: -8px -8px 0; padding: 12px 12px 10px 14px; border-bottom: 1px solid rgba(255,255,255,.1); }
-  .home { flex: 1; color: #eef3f1; text-decoration: none; font-weight: 700; display: flex; align-items: center; gap: 8px; }
-  .home:hover { color: #fff; text-decoration: underline; }
-  .lang { display: inline-flex; border: 1px solid rgba(255,255,255,.22); border-radius: 999px; overflow: hidden; }
-  .lang button { background: none; border: 0; padding: 3px 9px; font-size: 12px; font-weight: 700; color: #b4c4b8; }
-  .lang button[aria-pressed="true"] { background: #eef3f1; color: #1a2a24; }
-  .x { background: none; border: 0; color: #b4c4b8; font-size: 20px; line-height: 1; padding: 2px 6px; border-radius: 6px; }
+    background: #22362f; margin: -8px -8px 0; padding: 12px 12px 10px 14px; border-bottom: 2px dashed rgba(239,238,230,.16); }
+  .home { flex: 1; color: #eef3f1; text-decoration: none; font: 700 19px/1.1 "Kalam", "Atkinson Hyperlegible", system-ui, sans-serif; }
+  .home:hover { color: #fff; text-decoration: underline; text-decoration-color: #f2d264; text-decoration-thickness: 2px; text-underline-offset: 4px; }
+  .lang { display: inline-flex; align-items: center; }
+  .lang button { background: none; border: 0; padding: 4px 6px; font-size: 13px; font-weight: 700; color: #b4c4b8; }
+  .lang button + button { border-left: 1.5px solid rgba(239,238,230,.25); }
+  .lang button:hover { color: #fff; }
+  .lang button[aria-pressed="true"] { color: #eef3f1; text-decoration: underline; text-decoration-color: #f2d264; text-decoration-thickness: 3px; text-underline-offset: 4px; }
+  .x { background: none; border: 0; color: #b4c4b8; font-size: 22px; line-height: 1; padding: 2px 6px; border-radius: 4px; }
   .x:hover { color: #fff; }
   .topic { margin-top: 10px; }
-  .topic h3 { margin: 0; padding: 6px 8px 4px; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--a); display: flex; gap: 8px; align-items: center; }
-  .topic h3::before { content: ""; width: 8px; height: 8px; border-radius: 2px; background: var(--a); }
-  .lesson { padding: 4px 8px 2px 24px; font-size: 12px; color: #b4c4b8; }
+  .topic h3 { margin: 0; padding: 8px 8px 2px; font: 700 20px/1.2 "Kalam", "Atkinson Hyperlegible", system-ui, sans-serif; color: var(--a); }
+  .lesson { padding: 6px 8px 2px 16px; font-size: 13px; color: #b4c4b8; }
   ul { list-style: none; margin: 0; padding: 0 0 0 16px; display: grid; gap: 1px; }
   a.pg { display: grid; grid-template-columns: 1fr auto; gap: 2px 10px; align-items: baseline;
-    padding: 8px 10px; border-radius: 9px; color: #eef3f1; text-decoration: none; }
+    padding: 7px 10px; border-radius: 4px; color: #eef3f1; text-decoration: none; }
   a.pg:hover { background: rgba(255,255,255,.08); }
-  .tt { font-weight: 600; }
-  .kd { font-size: 11px; color: #b4c4b8; white-space: nowrap; }
-  .hr { grid-column: 1 / -1; font-size: 11px; color: #f2d264; }
+  .tt { font-weight: 700; }
+  .kd { font-size: 12px; color: #b4c4b8; white-space: nowrap; }
+  .hr { grid-column: 1 / -1; font: 700 15px/1.1 "Kalam", "Atkinson Hyperlegible", system-ui, sans-serif; color: #f2d264; }
   a.pg[aria-current="page"] { background: rgba(242,210,100,.14); box-shadow: inset 3px 0 0 #f2d264; }
   @media (prefers-reduced-motion: reduce) { .panel { animation: none; } .toggle, .lbl { transition: none; } }
   @media print { .wrap { display: none; } }`;
@@ -420,12 +421,12 @@
       <section class="topic" style="--a:${tp.accent}">
         <h3>${esc(t(tp.title))}</h3>
         ${tp.lessons.map(ls => `
-          <div class="lesson">${esc(t(ls.title))}</div>
+          <div class="lesson">${esc(t(ls.title).split(": ")[0])}</div>
           <ul>${ls.pages.map(p => {
             const cur = isHere(p);
             return `<li><a class="pg" href="${url(fileFor(p))}"${cur ? ' aria-current="page"' : ""}>
               <span class="tt">${esc(t(p.title))}</span><span class="kd">${esc(t(KIND[p.kind]))}</span>
-              ${cur ? `<span class="hr">● ${u.here}</span>` : ""}</a></li>`;
+              ${cur ? `<span class="hr">${u.here}</span>` : ""}</a></li>`;
           }).join("")}</ul>`).join("")}
       </section>`).join("");
     const open = root.querySelector(".panel") && !root.querySelector(".panel").hidden;
@@ -433,7 +434,7 @@
     <nav class="wrap mini" aria-label="${u.btn}">
       <div class="panel" id="p"${open ? "" : " hidden"}>
         <div class="head">
-          <a class="home" href="${url("./")}">⌂ ${u.home}</a>
+          <a class="home" href="${url("./")}">← ${u.home}</a>
           <span class="lang" role="group" aria-label="Language">
             <button type="button" data-l="hu" aria-pressed="${lang === "hu"}">HU</button><button type="button" data-l="en" aria-pressed="${lang === "en"}">EN</button>
           </span>
@@ -461,6 +462,13 @@
   document.addEventListener("click", e => { if (!e.composedPath().includes(host)) setOpen(false); });
   listeners.push(render);
 
+  /* the menu writes in the site's two faces even on a mission page that brings its own fonts */
+  if (![...document.querySelectorAll('link[href*="fonts.googleapis.com"]')].some(l => /Kalam/.test(l.href) && /Atkinson/.test(l.href))) {
+    const fl = document.createElement("link");
+    fl.rel = "stylesheet";
+    fl.href = "https://fonts.googleapis.com/css2?family=Kalam:wght@700&family=Atkinson+Hyperlegible:wght@400;700&display=swap";
+    document.head.appendChild(fl);
+  }
   render();
   const mount = () => document.body.appendChild(host);
   if (document.body) mount(); else document.addEventListener("DOMContentLoaded", mount);
