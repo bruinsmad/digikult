@@ -312,6 +312,21 @@ footer.end{max-width:980px;margin:0 auto;padding:0 22px 60px;color:var(--chalk-d
 .cmw .cm-editor{min-height:100%}
 [hidden]{display:none!important}
 .xr-on .xr-page :is(h1,h2,p,ul){margin-top:22px}.xr-on .xr-page :is(p,li){line-height:2.1}.xr-on .xr-page li{margin:6px 0}
+/* preview: element picking */
+.bw-view{position:relative;min-height:0}
+.bw[data-fixed] .bw-view{flex:1;display:flex;flex-direction:column}
+.bw-bar{display:flex;align-items:center;gap:8px}
+.bw-bar .addr{flex:1;min-width:0}
+.bw-pick{flex:none;display:inline-flex;align-items:center;gap:5px;font:700 12.5px/1 "Atkinson Hyperlegible",system-ui,sans-serif;color:#2b2520;background:#f3ede1;border:1.5px solid #d8ccb4;border-radius:999px;padding:4px 10px 4px 7px;cursor:pointer}
+.bw-pick svg{width:14px;height:14px}
+.bw-pick:hover{border-color:#2b2520}
+.bw-pick[aria-pressed="true"]{background:#e07b2c;border-color:#e07b2c;color:#fff}
+.bw.picking iframe{cursor:crosshair}
+.dk-box{position:absolute;pointer-events:none;border:2px solid #e07b2c;background:rgba(224,123,44,.12);border-radius:3px;z-index:3;transition:left .08s,top .08s,width .08s,height .08s}
+.dk-tag{position:absolute;left:-2px;top:-21px;background:#e07b2c;color:#fff;font:700 11.5px/1 "JetBrains Mono",ui-monospace,monospace;padding:4px 6px;border-radius:4px 4px 4px 0;white-space:nowrap}
+.dk-box.below .dk-tag{top:auto;bottom:-21px;border-radius:0 4px 4px 4px}
+@media (prefers-reduced-motion:reduce){ .dk-box{transition:none} }
+.cm-line.dk-flash,.cm-dk-flash{background:rgba(224,123,44,.28)!important;transition:background .6s}
 
 </style>
 </head>
@@ -647,17 +662,51 @@ function makeEditor(ta, opts={}){
 }
 
 /* A small browser window: the tab shows the page's <title>, the address bar its file name. */
-function makeBrowser(host, file, T){
+/* Mark every element with where it sits in the code: data-dk="start,endOfOpeningTag,end".
+   The preview gets these attributes; downloads and "open in a new tab" use the clean code. */
+function instrument(src){
+  const out = [], stack = [], marks = [];
+  const re = /<!--[\s\S]*?(?:-->|$)|<!doctype[^>]*>|<(\/?)([a-zA-Z][\w-]*)((?:[^>"']|"[^"]*"|'[^']*')*)>/gi;
+  let m;
+  while ((m = re.exec(src))){
+    if (m[2] === undefined) continue;
+    const name = m[2].toLowerCase(), at = m.index, endOpen = re.lastIndex;
+    if (m[1]){                                              /* closing tag */
+      const k = stack.map(e => e.name).lastIndexOf(name);
+      if (k >= 0){ for (let j = stack.length - 1; j >= k; j--) stack[j].mark.end = j === k ? endOpen : at; stack.length = k; }
+      continue;
+    }
+    const mark = { pos: at + 1 + m[2].length, start: at, open: endOpen, end: endOpen };
+    marks.push(mark);
+    if (!VOID.has(name) && !/\/\s*$/.test(m[3])) stack.push({ name, mark });
+    if (name === "script" || name === "style"){              /* skip their contents */
+      const close = new RegExp("</" + name + "\\s*>", "i"); close.lastIndex = 0;
+      const rest = src.slice(endOpen), c = close.exec(rest);
+      if (c){ re.lastIndex = endOpen + c.index; }
+    }
+  }
+  stack.forEach(e => e.mark.end = src.length);
+  let last = 0;
+  for (const mk of marks){ out.push(src.slice(last, mk.pos), ` data-dk="${mk.start},${mk.open},${mk.end}"`); last = mk.pos; }
+  out.push(src.slice(last));
+  return out.join("");
+}
+
+/* A small browser window: the tab shows the page's <title>, the address bar its file name.
+   With opts.pick, a target button turns on "pick" mode: hover shows the element, click jumps to its code. */
+function makeBrowser(host, file, T, opts = {}){
   host.classList.add("bw");
+  const pickBtn = opts.pick ? `<button type="button" class="bw-pick" aria-pressed="false" title="${esc(opts.pick.title)}"><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="5.2" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="8" cy="8" r="1.8" fill="currentColor"/><path d="M8 0.8v3M8 12.2v3M0.8 8h3M12.2 8h3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><span>${esc(opts.pick.label)}</span></button>` : "";
   host.innerHTML = `<div class="bw-top"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
     <span class="bw-tab"><span class="fav" aria-hidden="true"></span><span class="ttl"></span></span></div>
-    <div class="bw-bar"><span class="addr"><span aria-hidden="true">📄</span> ${esc(file)}</span></div>
-    <iframe title="${esc(T.preview)}" sandbox="allow-same-origin allow-popups allow-popups-to-escape-sandbox"></iframe>`;
-  const fr = $("iframe", host), ttl = $(".ttl", host);
+    <div class="bw-bar"><span class="addr"><span aria-hidden="true">📄</span> ${esc(file)}</span>${pickBtn}</div>
+    <div class="bw-view"><iframe title="${esc(T.preview)}" sandbox="allow-same-origin allow-popups allow-popups-to-escape-sandbox"></iframe>
+    <div class="dk-box" hidden><span class="dk-tag"></span></div></div>`;
+  const fr = $("iframe", host), ttl = $(".ttl", host), box = $(".dk-box", host), boxTag = $(".dk-tag", host);
   const nt = document.createElement("div"); nt.className = "bw-note"; nt.setAttribute("role", "status"); host.append(nt);
   let ntTimer = 0;
   const note = msg => { nt.textContent = msg; nt.classList.add("on"); clearTimeout(ntTimer); ntTimer = setTimeout(() => nt.classList.remove("on"), 3200); };
-  let timer = 0, pendingScroll = 0;
+  let timer = 0, pendingScroll = 0, picking = false, boxTimer = 0;
   const size = () => {
     if (host.dataset.fixed) return;
     try {
@@ -666,18 +715,48 @@ function makeBrowser(host, file, T){
       fr.style.height = Math.min(host.dataset.max ? +host.dataset.max : 560, Math.max(+host.dataset.min || 110, h + 4)) + "px";
     } catch(e){}
   };
+  /* the highlight box lives outside the page, so the student's page is never changed */
+  const showBox = (el, stay) => {
+    if (!el || !el.getBoundingClientRect){ box.hidden = true; return; }
+    const r = el.getBoundingClientRect();
+    if (!r.width && !r.height){ box.hidden = true; return; }
+    box.hidden = false;
+    Object.assign(box.style, { left: r.left + "px", top: r.top + "px", width: r.width + "px", height: r.height + "px" });
+    boxTag.textContent = "<" + el.tagName.toLowerCase() + ">";
+    box.classList.toggle("below", r.top < 22);
+    clearTimeout(boxTimer);
+    if (stay) boxTimer = setTimeout(() => { if (!picking) box.hidden = true; }, stay);
+  };
+  const markOf = el => { const e = el && el.closest && el.closest("[data-dk]"); if (!e) return null; const [a, b, c] = e.dataset.dk.split(",").map(Number); return { el: e, start: a, open: b, end: c }; };
+  const setPick = on => {
+    picking = on; host.classList.toggle("picking", on);
+    const b = $(".bw-pick", host); if (b) b.setAttribute("aria-pressed", String(on));
+    if (!on) box.hidden = true;
+  };
+  if (opts.pick) $(".bw-pick", host).onclick = () => setPick(!picking);
   fr.addEventListener("load", () => {
     try {
       const d = fr.contentDocument;
       d.documentElement.scrollTop = pendingScroll;
-      d.addEventListener("click", e => {                         /* links open in a new tab; #anchors scroll inside */
-        const a = e.target.closest && e.target.closest("a[href]"); if (!a) return;
+      d.addEventListener("click", e => {
+        if (opts.pick && (picking || e.altKey)){                  /* jump to the code */
+          const mk = markOf(e.target);
+          if (mk){ e.preventDefault(); e.stopPropagation(); showBox(mk.el, 1600); opts.pick.onPick(mk.start, mk.open, mk.end); }
+          return;
+        }
+        const a = e.target.closest && e.target.closest("a[href]"); if (!a) return;   /* links open in a new tab; #anchors scroll inside */
         e.preventDefault();
         const h = a.getAttribute("href") || "";
         if (h.startsWith("#")){ const t = d.getElementById(h.slice(1)); if (t) t.scrollIntoView({ behavior:"smooth" }); return; }
         if (/^(https?:|mailto:|tel:)/i.test(h)) window.open(a.href, "_blank", "noopener");
         else if (!(T.localLink && T.localLink(h))) note(T.localNote(h));
-      });
+      }, true);
+      if (opts.pick){
+        d.addEventListener("mousemove", e => { if (picking || e.altKey) showBox(markOf(e.target) && markOf(e.target).el); else if (!boxTimer) box.hidden = true; });
+        d.addEventListener("mouseleave", () => { if (picking) box.hidden = true; });
+        d.addEventListener("scroll", () => { box.hidden = true; }, true);
+        d.addEventListener("keydown", e => { if (e.key === "Escape") setPick(false); });
+      }
       $$("img", d).forEach(im => im.addEventListener("load", size));
     } catch(e){}
     size();
@@ -686,11 +765,27 @@ function makeBrowser(host, file, T){
     const t = /<title[^>]*>([\s\S]*?)<\/title>/i.exec(src);
     ttl.textContent = t && t[1].trim() ? t[1].replace(/\s+/g, " ").trim() : file;
     try { pendingScroll = fr.contentDocument ? fr.contentDocument.documentElement.scrollTop : 0; } catch(e){ pendingScroll = 0; }
+    box.hidden = true;
     fr.srcdoc = src;
+  };
+  /* the other way round: the element that contains a position in the code */
+  const highlightAt = pos => {
+    if (!picking) return;
+    try {
+      let best = null, size = Infinity;
+      for (const el of fr.contentDocument.querySelectorAll("[data-dk]")){
+        const [a, , c] = el.dataset.dk.split(",").map(Number);
+        if (a <= pos && pos <= c && c - a < size){ best = el; size = c - a; }
+      }
+      if (best && best.tagName !== "HTML" && best.tagName !== "BODY" && best.tagName !== "HEAD"){
+        if (best.scrollIntoView) best.scrollIntoView({ block: "nearest" });
+        showBox(best);
+      } else box.hidden = true;
+    } catch(e){}
   };
   return {
     show: (src, now) => { clearTimeout(timer); if (now) show(src); else timer = setTimeout(() => show(src), 160); },
-    frame: fr, resize: size, note
+    frame: fr, resize: size, note, highlightAt, setPick, get picking(){ return picking; }
   };
 }
 
