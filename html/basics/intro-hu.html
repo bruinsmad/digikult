@@ -262,7 +262,7 @@ footer.end{max-width:980px;margin:0 auto;padding:0 22px 60px;color:var(--chalk-d
 .xr-page a{color:#0000ee}
 .xr-page img{vertical-align:middle}
 .xr-on .xr-page [data-i]{outline:2px dashed var(--o,#3b82c4);outline-offset:2px;position:relative}
-.xr-on .xr-page [data-i]::before{content:attr(data-tag);position:absolute;top:-10px;left:-2px;font:700 10.5px/1 var(--f-mono);background:var(--o,#3b82c4);color:#fff;padding:2px 4px;border-radius:3px;z-index:1}
+.xr-on .xr-page [data-i]::before{content:attr(data-tag);position:absolute;top:-16px;left:-2px;font:700 10.5px/1 var(--f-mono);background:var(--o,#3b82c4);color:#fff;padding:2px 4px;border-radius:3px;z-index:1}
 .xr-page [data-tag="h1"],.xr-page [data-tag="h2"],.xr-page [data-tag="p"]{--o:#3b82c4}
 .xr-page [data-tag="ul"]{--o:#7b55c4}.xr-page [data-tag="li"]{--o:#4f9a45}
 .xr-page [data-tag="strong"],.xr-page [data-tag="a"],.xr-page [data-tag="img"],.xr-page [data-tag="em"]{--o:#d0782a}
@@ -311,6 +311,7 @@ footer.end{max-width:980px;margin:0 auto;padding:0 22px 60px;color:var(--chalk-d
 @media (max-width:760px){ .ex-grid>.cmw{border-right:0;border-bottom:2px solid var(--ink)} }
 .cmw .cm-editor{min-height:100%}
 [hidden]{display:none!important}
+.xr-on .xr-page :is(h1,h2,p,ul){margin-top:22px}.xr-on .xr-page :is(p,li){line-height:2.1}.xr-on .xr-page li{margin:6px 0}
 
 </style>
 </head>
@@ -555,7 +556,7 @@ function makeEditor(ta, opts={}){
   if (window.CMHTML){                                     /* CodeMirror: completion, auto-closing tags, smart indent */
     const w = document.createElement("div"); w.className = "cmw" + (opts.fixed ? " fixed" : ""); ta.before(w); ta.hidden = true;
     let quiet = false;
-    const cm = CMHTML.create({ parent: w, doc: ta.value, lines: !!opts.lines, fit: !opts.fixed, label: ta.getAttribute("aria-label") || "",
+    const cm = CMHTML.create({ parent: w, doc: ta.value, lines: !!opts.lines, fit: true, label: ta.getAttribute("aria-label") || "",
       onChange: v => { if (quiet) return; ta.value = v; ta.dispatchEvent(new Event("input")); } });
     w.addEventListener("mousedown", e => { if (e.target === w){ e.preventDefault(); cm.focus(); } });
     return { refit: () => { quiet = true; cm.set(ta.value); quiet = false; cm.view.requestMeasure(); }, cm, el: w };
