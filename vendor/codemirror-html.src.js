@@ -175,7 +175,7 @@ const formatAll = view => {
 };
 
 /* ---------- create ---------- */
-export function create({ parent, doc = "", lines = false, onChange = null, label = "", fit = true, lang = "hu",
+export function create({ parent, doc = "", lines = false, onChange = null, onCursor = null, label = "", fit = true, lang = "hu",
                          docs = {}, phrases = {}, files = [], lint = null, fold = false }) {
   const tagDoc = name => docs[(name || "").toLowerCase()];
   /* suggestions: tags and attributes explained in the students' language; attributes arrive as name="" */
@@ -187,7 +187,20 @@ export function create({ parent, doc = "", lines = false, onChange = null, label
         const next = view.state.sliceDoc(to, to + 1), ins = next === "=" ? c.label : c.label + '=""';
         view.dispatch({ changes: { from, to, insert: ins }, selection: { anchor: from + c.label.length + (next === "=" ? 0 : 2) }, userEvent: "input.complete" });
       } };
-      if (o.type === "type") { const d = tagDoc(o.label.replace(/^\//, "")); return d ? { ...o, detail: d } : o; }
+      if (o.type === "type") {
+        const name = o.label.replace(/^\//, ""), d = tagDoc(name);
+        const opt = d ? { ...o, detail: d } : { ...o };
+        if (!o.label.startsWith("/") && TAGS.has(name.toLowerCase())) opt.apply = (view, c, from, to) => {
+          const st = view.state, before = st.sliceDoc(from - 1, from), rest = st.sliceDoc(to, st.doc.lineAt(to).to);
+          if (before !== "<" || /^[^<]*>/.test(rest)) {                       /* renaming an existing tag: just the name */
+            view.dispatch({ changes: { from, to, insert: c.label }, selection: { anchor: from + c.label.length }, userEvent: "input.complete" });
+            return;
+          }
+          const line = st.doc.lineAt(from);
+          applyEmmet(view, { from: from - 1, to, abbr: c.label, indent: /^\s*/.exec(line.text)[0] }, lang);
+        };
+        return opt;
+      }
       return o;
     }) };
   };
@@ -201,6 +214,20 @@ export function create({ parent, doc = "", lines = false, onChange = null, label
     const quoted = /^["']/.test(ctx.state.sliceDoc(n.from, n.from + 1));
     const from = n.from + (quoted ? 1 : 0);
     return { from, options: files.map(f => ({ label: f, type: "file", detail: docs["#file"] || "" })), validFor: /^[\w./-]*$/ };
+  };
+  /* a bare tag name at the start of a line (no "<" yet): offer the whole element */
+  const tagWordSource = ctx => {
+    const line = ctx.state.doc.lineAt(ctx.pos), head = line.text.slice(0, ctx.pos - line.from);
+    const m = /^(\s*)([a-z][a-z0-9]*)$/.exec(head);
+    if (!m) return null;
+    const node = syntaxTree(ctx.state).resolveInner(ctx.pos, -1);
+    if (/Tag|Attribute|Comment/.test(node.name) && node.name !== "Text") return null;
+    if (ctx.state.sliceDoc(ctx.pos, ctx.pos + 1).match(/[a-z0-9]/i)) return null;
+    const word = m[2], from = ctx.pos - word.length;
+    const names = [...TAGS].filter(t => t.startsWith(word) && !["html", "head", "body"].includes(t) || t === word);
+    if (!names.length) return null;
+    return { from, validFor: /^[a-z0-9]*$/, options: names.map(t => ({ label: t, type: "type", detail: (docs[t] ? docs[t] + " · " : "") + "<" + t + ">",
+      boost: t === word ? 20 : -t.length, apply: (view, c, f, to) => applyEmmet(view, { from: f, to, abbr: t, indent: m[1] }, lang) })) };
   };
   /* Emmet shows up in the suggestion list too, so students discover it */
   const emmetSource = ctx => {
@@ -235,7 +262,7 @@ export function create({ parent, doc = "", lines = false, onChange = null, label
     indentUnit.of("  "), EditorState.tabSize.of(2), EditorState.phrases.of(phrases),
     indentOnInput(), bracketMatching(), closeBrackets(),
     html({ autoCloseTags: true, matchClosingTags: true }),
-    autocompletion({ icons: false, override: [emmetSource, fileSource, htmlSource], activateOnTypingDelay: 60 }),
+    autocompletion({ icons: false, override: [emmetSource, tagWordSource, fileSource, htmlSource], activateOnTypingDelay: 60 }),
     syntaxHighlighting(style), theme, search({ top: false }), hover,
     linkField, linkedRename,
     indentationMarkers({ thickness: 1, colors: { light: "#33433c", dark: "#33433c", activeLight: "#5b7a6c", activeDark: "#5b7a6c" } }),
@@ -246,7 +273,10 @@ export function create({ parent, doc = "", lines = false, onChange = null, label
       ...closeBracketsKeymap, ...completionKeymap, ...searchKeymap, ...foldKeymap, ...historyKeymap, indentWithTab, ...defaultKeymap
     ]),
     EditorView.contentAttributes.of({ "aria-label": label, spellcheck: "false", autocapitalize: "off", autocorrect: "off" }),
-    EditorView.updateListener.of(u => { if (u.docChanged && onChange) onChange(u.state.doc.toString()); }),
+    EditorView.updateListener.of(u => {
+      if (u.docChanged && onChange) onChange(u.state.doc.toString());
+      if (onCursor && (u.selectionSet || u.docChanged)) { const h = u.state.selection.main.head, l = u.state.doc.lineAt(h); onCursor(l.number, h - l.from + 1, u.state.doc.lines); }
+    }),
   ];
   if (lines) ext.push(lineNumbers(), highlightActiveLineGutter(), highlightActiveLine());
   if (fold) ext.push(codeFolding(), foldGutter({ openText: "⌄", closedText: "›" }));

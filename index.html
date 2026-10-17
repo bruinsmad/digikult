@@ -280,7 +280,7 @@ body.subject .hero{display:none}
       demoNote:"Tanári bemutató, kivetítőre", readFirst:"olvasd el először",
       foot:"Minden oldal bal alsó sarkában ott a ☰ menü: onnan bármikor visszajutsz ide.",
       back:"← Minden tantárgy", open:n=>`${n} megnyitása`,
-      count:{story:n=>`${n} küldetés`, theory:n=>`${n} elmélet`, lesson:n=>`${n} lecke`, demo:n=>`${n} bemutató`},
+      count:{story:n=>`${n} küldetés`, theory:n=>`${n} elmélet`, lesson:n=>`${n} lecke`, demo:n=>`${n} bemutató`, tool:n=>`${n} eszköz`},
       missionsDone:(d,n)=>`${d} / ${n} küldetés kész`,
       againAll:"Bármelyiket újrajátszhatod lent."
     },
@@ -293,7 +293,7 @@ body.subject .hero{display:none}
       demoNote:"Teacher demo for the projector", readFirst:"read this first",
       foot:"Every page has a ☰ menu in the bottom-left corner that brings you back here.",
       back:"← All subjects", open:n=>`Open ${n}`,
-      count:{story:n=>`${n} mission${n>1?"s":""}`, theory:n=>`${n} explainer${n>1?"s":""}`, lesson:n=>`${n} lesson${n>1?"s":""}`, demo:n=>`${n} demo${n>1?"s":""}`},
+      count:{story:n=>`${n} mission${n>1?"s":""}`, theory:n=>`${n} explainer${n>1?"s":""}`, lesson:n=>`${n} lesson${n>1?"s":""}`, demo:n=>`${n} demo${n>1?"s":""}`, tool:n=>`${n} tool${n>1?"s":""}`},
       missionsDone:(d,n)=>`${d} of ${n} missions done`,
       againAll:"Replay any of them below."
     }
@@ -483,6 +483,31 @@ function puliSvg(){
       </g>
       <g transform="translate(318 46) rotate(8)"><rect width="66" height="42" rx="6" fill="#1f2a26"/><text x="33" y="29" text-anchor="middle" font-family="JetBrains Mono,monospace" font-weight="700" font-size="20" fill="#f2d264">&lt;/&gt;</text></g>
     </svg>`,
+    editor:`<svg viewBox="0 0 400 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <rect width="400" height="200" fill="#2b443b"/>
+      <g transform="translate(22 22)">
+        <rect width="200" height="156" rx="10" fill="#1f2a26" stroke="#14201b" stroke-width="3"/>
+        <rect width="200" height="22" rx="10" fill="#2a3833"/><rect y="12" width="200" height="10" fill="#2a3833"/>
+        <rect x="10" y="6" width="58" height="11" rx="4" fill="#1f2a26"/><circle cx="17" cy="11.5" r="3" fill="#e07b2c"/>
+        <g font-family="JetBrains Mono,monospace" font-size="11" fill="#6f857c"><text x="8" y="44">1</text><text x="8" y="62">2</text><text x="8" y="80">3</text><text x="8" y="98">4</text><text x="8" y="116">5</text></g>
+        <g font-family="JetBrains Mono,monospace" font-size="12">
+          <text x="26" y="44" fill="#c9d3cc">&lt;<tspan fill="#f2d264" font-weight="700">h1</tspan>&gt;<tspan fill="#e9efe9">Szia!</tspan>&lt;/<tspan fill="#f2d264" font-weight="700">h1</tspan>&gt;</text>
+          <text x="26" y="62" fill="#c9d3cc">&lt;<tspan fill="#f2d264" font-weight="700">ul</tspan>&gt;</text>
+          <text x="38" y="80" fill="#c9d3cc">&lt;<tspan fill="#f2d264" font-weight="700">li</tspan>&gt;&lt;/<tspan fill="#f2d264" font-weight="700">li</tspan>&gt;</text>
+          <text x="26" y="98" fill="#e9efe9">ul&gt;li*3</text></g>
+        <rect x="26" y="104" width="118" height="20" rx="4" fill="#2f7a5a"/>
+        <text x="32" y="118" font-family="JetBrains Mono,monospace" font-size="11" fill="#fff">ul&gt;li*3 <tspan font-family="Atkinson Hyperlegible,sans-serif" fill="#d8efe1">Emmet · Tab</tspan></text>
+      </g>
+      <g transform="translate(238 34)">
+        <rect width="142" height="132" rx="9" fill="#fff" stroke="#14201b" stroke-width="3"/>
+        <path d="M0 9a9 9 0 0 1 9-9h124a9 9 0 0 1 9 9v12H0z" fill="#dcd3c0"/>
+        <circle cx="11" cy="10" r="3" fill="#e0796b"/><circle cx="20" cy="10" r="3" fill="#e6c25a"/><circle cx="29" cy="10" r="3" fill="#7fbf6e"/>
+        <text x="12" y="48" font-family="Times New Roman,serif" font-weight="700" font-size="20" fill="#000">Szia!</text>
+        <g fill="#000"><circle cx="18" cy="66" r="2.5"/><circle cx="18" cy="82" r="2.5"/><circle cx="18" cy="98" r="2.5"/></g>
+        <g stroke="#cfc4b0" stroke-width="4" stroke-linecap="round"><path d="M28 66h56M28 82h70M28 98h44"/></g>
+      </g>
+      <path d="M222 100h14" stroke="#f2d264" stroke-width="3" stroke-dasharray="4 4"/>
+    </svg>`,
     "first-steps":`<svg viewBox="0 0 400 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
       <rect width="400" height="200" fill="#edf0f6"/>
       <rect x="30" y="28" width="190" height="146" rx="6" fill="#f6c99b"/>
@@ -538,7 +563,7 @@ function puliSvg(){
   function slate(tp, T){
     const pages = tp.lessons.flatMap(ls => ls.pages), counts = {};
     pages.forEach(p => counts[p.kind] = (counts[p.kind] || 0) + 1);
-    const countTxt = ["story", "lesson", "theory", "demo"].filter(k => counts[k]).map(k => T.count[k](counts[k])).join(", ");
+    const countTxt = ["story", "lesson", "theory", "demo", "tool"].filter(k => counts[k]).map(k => T.count[k](counts[k])).join(", ");
     const tracked = pages.filter(p => p.progress), done = tracked.filter(p => (progressOf(p) || {}).finished).length;
     const name = D.t(tp.title);
     return `<li class="slate" style="--c:${tp.accent}"><div class="slate-in">
@@ -577,7 +602,7 @@ function puliSvg(){
 
   /* ---------- render ---------- */
   const TILTS = ["-.7deg", ".6deg", "-.4deg", ".8deg"];
-  const KCOL = { story:["#fbefc4","#7a5a00"], lesson:["#dbe6fb","#1f3f88"], demo:["#dcefff","#1f5a88"] };
+  const KCOL = { story:["#fbefc4","#7a5a00"], lesson:["#dbe6fb","#1f3f88"], demo:["#dcefff","#1f5a88"], tool:["#dcefe3","#225c43"] };
 
   function draw(){
     const L = D.lang, T = TXT[L];

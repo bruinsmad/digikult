@@ -187,6 +187,16 @@
                 },
                 files: { en: "html/basics/shelter.html", hu: "html/basics/shelter-hu.html" },
                 progress: { chapters: 8, keys: { en: "shelter-en-v1", hu: "shelter-hu-v1" } }
+              },
+              {
+                id: "editor",
+                kind: "tool",
+                title: { hu: "HTML-szerkesztő", en: "HTML editor" },
+                desc: {
+                  hu: "Saját weboldalak írása élő előnézettel: több oldal, saját képek, letöltés .zip-ben. Kiegészítés, Emmet és hibajelzés, mint a VS Code-ban.",
+                  en: "Write your own web pages with a live preview: several pages, your own images, download as .zip. Completion, Emmet and mistake hints as in VS Code."
+                },
+                files: { en: "html/editor.html", hu: "html/editor-hu.html" }
               }
             ]
           },
@@ -304,7 +314,8 @@
     story:  { hu: "Küldetés", en: "Mission" },
     demo:   { hu: "Bemutató", en: "Demo" },
     lesson: { hu: "Lecke", en: "Lesson" },
-    theory: { hu: "Elmélet", en: "Explainer" }
+    theory: { hu: "Elmélet", en: "Explainer" },
+    tool:   { hu: "Eszköz", en: "Tool" }
   };
   const UI = {
     hu: { btn: "Oldalak", home: "Kezdőlap", close: "Bezárás", here: "itt vagy", min: "perc" },

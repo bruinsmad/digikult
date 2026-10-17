@@ -1,0 +1,760 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>HTML-szerkesztő</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kalam:wght@700&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* The standalone editor: a full-height work surface. Brown rail like every page, a chalkboard-green toolbar,
+   then code and a browser window side by side with a draggable divider, and a thin status bar. */
+:root{
+  --board:#22362f; --board-2:#2b443b; --board-3:#355247; --chalk:#eef3f1; --chalk-dim:#b4c4b8; --line:#3c574c;
+  --yellow:#f2d264; --green:#2f7a5a; --orange:#e07b2c; --paper:#f4ecdd; --ink:#2b2520; --muted:#6c6157;
+  --code-bg:#1f2a26; --code-ink:#e9efe9; --tg:#f2d264; --an:#9cc8e8; --av:#a8dba0; --cm:#8fa39a; --en:#f0a3b8; --pu:#c9d3cc;
+  --f-body:"Atkinson Hyperlegible","Segoe UI",system-ui,sans-serif; --f-mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+  --f-hand:"Kalam","Segoe Print","Comic Sans MS",cursive; --code-size:15px; color-scheme:light;
+}
+*{box-sizing:border-box}
+*,*::before,*::after{font-feature-settings:"calt" 0,"liga" 0}
+[hidden]{display:none!important}
+html,body{margin:0;height:100%}
+body{display:grid;grid-template-rows:auto auto minmax(0,1fr) auto;height:100dvh;background:var(--board);color:var(--chalk);font:15px/1.4 var(--f-body);overflow:hidden}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--yellow);outline-offset:2px;border-radius:6px}
+code{font-family:var(--f-mono);font-size:.9em}
+
+.rail{background:linear-gradient(#b07448,#8a5532 45%,#5d3820);box-shadow:0 2px 0 rgba(0,0,0,.25);position:relative;z-index:5}
+.rail .in{padding:0 14px;height:44px;display:flex;align-items:center;gap:14px}
+.rail .home{font:700 18px/1 var(--f-hand);color:#fff6e8;text-decoration:none;white-space:nowrap}
+.rail .crumb{color:#f3dcc4;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.rail .crumb b{color:#fff6e8}
+.rail .langlink{margin-left:auto;flex:none;font:700 13px var(--f-body);color:#5d3820;background:#fff6e8;border-radius:999px;padding:4px 12px;text-decoration:none}
+
+/* toolbar */
+.bar{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;padding:8px 12px;background:var(--board-2);border-bottom:1px solid var(--line)}
+.grp{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.grp.files{min-width:0}
+.sep{width:1px;align-self:stretch;background:var(--line)}
+.tb{display:inline-flex;align-items:center;gap:6px;background:var(--board-3);border:1px solid #4a6a5d;border-radius:8px;padding:6px 10px;cursor:pointer;font-weight:700;font-size:13.5px;color:var(--chalk);white-space:nowrap}
+.tb:hover{background:#40604f}
+.tb svg{width:15px;height:15px;flex:none}
+.tb.go{background:var(--orange);border-color:var(--orange);color:#fff}
+.tb.go:hover{background:#c96a20}
+.tb[aria-pressed="true"],.tb[aria-expanded="true"]{background:var(--green);border-color:#4fae86;color:#fff}
+.tb .n{background:rgba(0,0,0,.25);border-radius:999px;padding:0 7px;font-size:12px}
+.sel{display:flex;align-items:center;gap:6px;background:var(--code-bg);border:1px solid #4a6a5d;border-radius:8px;padding:0 4px 0 10px}
+.sel svg{width:15px;height:15px;color:var(--yellow);flex:none}
+.sel select{background:transparent;border:0;color:var(--code-ink);font:600 13.5px var(--f-mono);padding:6px 4px;max-width:220px;cursor:pointer}
+.sel select option{background:#1f2a26}
+.seg{display:inline-flex;border:1px solid #4a6a5d;border-radius:8px;overflow:hidden}
+.seg button{background:var(--board-3);border:0;padding:6px 10px;font-weight:700;font-size:13px;cursor:pointer;color:var(--chalk-dim)}
+.seg button+button{border-left:1px solid #4a6a5d}
+.seg button[aria-pressed="true"]{background:var(--chalk);color:var(--board)}
+.push{margin-left:auto}
+@media (max-width:1100px){ .tb .lb{display:none} .tb{padding:6px 9px} }
+
+/* work area */
+.work{display:grid;grid-template-columns:var(--split,50%) 8px minmax(0,1fr);min-height:0;padding:8px;gap:0}
+.work.m-code{grid-template-columns:minmax(0,1fr) 0 0}
+.work.m-view{grid-template-columns:0 0 minmax(0,1fr)}
+.work.m-code .view,.work.m-view .code,.work.m-code .gutter,.work.m-view .gutter{visibility:hidden;overflow:hidden}
+.pane{min-width:0;min-height:0;display:flex;flex-direction:column}
+.code{background:var(--code-bg);border:2px solid #14201b;border-radius:12px;overflow:hidden}
+.gutter{cursor:col-resize;display:grid;place-items:center;touch-action:none}
+.gutter::before{content:"";width:4px;height:44px;border-radius:2px;background:#4a6a5d}
+.gutter:hover::before,.gutter.drag::before{background:var(--yellow)}
+.cmw{flex:1;min-height:0;position:relative;background:var(--code-bg)}
+.cmw .cm-editor{height:100%}
+.lint{flex:none;max-height:30%;overflow:auto;border-top:1px solid #33433c;background:#2b2a1d;padding:7px 12px;display:grid;gap:3px}
+.lint p{margin:0;font:13.5px/1.4 var(--f-body);color:#f6e7a6}
+.lint p::before{content:"⚠ "}
+.lint code{background:rgba(255,255,255,.1);border-radius:4px;padding:0 4px;color:#fff}
+@media (max-width:760px){
+  .work{grid-template-columns:minmax(0,1fr)!important;grid-template-rows:minmax(0,1fr) 8px minmax(0,1fr)}
+  .work.m-code{grid-template-rows:minmax(0,1fr) 0 0}.work.m-view{grid-template-rows:0 0 minmax(0,1fr)}
+  .gutter{cursor:default}.gutter::before{width:44px;height:4px}
+}
+
+/* browser */
+.bw{position:relative;flex:1;min-height:0;border:2px solid #14201b;border-radius:12px;overflow:hidden;background:#fff;display:flex;flex-direction:column}
+.bw-top{display:flex;align-items:flex-end;gap:10px;background:#dcd3c0;padding:6px 8px 0}
+.bw-top .dots{display:flex;gap:5px;padding-bottom:9px}
+.bw-top .dots i{width:10px;height:10px;border-radius:50%;background:#b3ad99}
+.bw-top .dots i:first-child{background:#e0796b}.bw-top .dots i:nth-child(2){background:#e6c25a}.bw-top .dots i:nth-child(3){background:#7fbf6e}
+.bw-tab{display:flex;align-items:center;gap:7px;background:#fff;border-radius:9px 9px 0 0;padding:6px 13px;font:600 13px var(--f-body);color:var(--ink);max-width:75%;min-width:0}
+.bw-tab .ttl{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bw-tab .fav{flex:none;width:13px;height:13px;border-radius:3px;background:var(--green)}
+.bw-bar{background:#fff;padding:5px 8px;border-bottom:1px solid #e2d4bd}
+.bw-bar .addr{display:block;background:#f3ede1;border-radius:999px;padding:3px 12px;font:12.5px var(--f-mono);color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bw iframe{display:block;width:100%;flex:1;min-height:0;border:0;background:#fff}
+.bw.flash .bw-tab{animation:flash .9s ease-out}
+@keyframes flash{0%{background:#f8e08e}100%{background:#fff}}
+.bw-note{position:absolute;left:10px;right:10px;bottom:10px;background:var(--ink);color:#fff;font:14px/1.4 var(--f-body);padding:9px 12px;border-radius:9px;opacity:0;transform:translateY(6px);transition:opacity .2s,transform .2s;pointer-events:none}
+.bw-note.on{opacity:1;transform:none}
+.work.dragging iframe{pointer-events:none}
+
+/* status bar */
+.status{display:flex;gap:6px 18px;align-items:center;flex-wrap:wrap;padding:4px 14px 6px;font:12.5px var(--f-mono);color:var(--chalk-dim)}
+.status .ok{color:#a8dba0}
+.status .warn{color:#f6e7a6}
+.status .sp{flex:1}
+.status button{background:none;border:0;color:inherit;font:inherit;cursor:pointer;padding:0;text-decoration:underline dotted}
+
+/* dialogs and sheets */
+dialog{border:0;border-radius:14px;padding:0;background:var(--paper);color:var(--ink);box-shadow:0 20px 50px rgba(0,0,0,.5);width:min(560px,calc(100vw - 24px));max-height:calc(100dvh - 40px)}
+dialog::backdrop{background:rgba(10,20,16,.55)}
+.dlg{display:grid;gap:12px;padding:18px 20px 16px}
+.dlg h2{margin:0;font:700 20px var(--f-body)}
+.dlg p{margin:0;color:var(--muted)}
+.dlg label{font-weight:700;font-size:14px;display:grid;gap:5px}
+.dlg input[type=text]{font:15px var(--f-mono);padding:8px 10px;border:2px solid #d3c2a5;border-radius:9px;background:#fff;color:var(--ink)}
+.dlg .row{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+.dlg .err{color:#b3362f;font-size:14px;margin:0}
+.btn{font:700 14.5px var(--f-body);border:0;border-radius:9px;padding:8px 15px;cursor:pointer;background:var(--ink);color:#fff}
+.btn:hover{background:#000}
+.btn.ghost{background:transparent;color:var(--ink);border:2px solid #d3c2a5}
+.btn.ghost:hover{border-color:var(--ink)}
+.btn.danger{background:#b3362f}
+.choices{display:grid;gap:8px}
+.choice{display:flex;gap:10px;align-items:flex-start;border:2px solid #e2d4bd;border-radius:10px;padding:9px 12px;background:#fff;cursor:pointer;font-weight:400!important}
+.choice:has(input:checked){border-color:var(--green);background:#f3faf5}
+.choice b{display:block}
+.choice span{color:var(--muted);font-size:13.5px}
+.assets{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;max-height:46vh;overflow:auto;padding:2px}
+.asset{background:#fff;border:2px solid #e2d4bd;border-radius:10px;overflow:hidden;display:flex;flex-direction:column}
+.asset .th{aspect-ratio:4/3;background:#f3ede1 center/contain no-repeat}
+.asset .nm{font:600 12.5px var(--f-mono);padding:6px 8px 2px;word-break:break-all}
+.asset .sz{font-size:12px;color:var(--muted);padding:0 8px}
+.asset .acts{display:flex;gap:4px;padding:6px 8px 8px;margin-top:auto}
+.asset .acts button{flex:1;font:700 12px var(--f-body);border:1px solid #d3c2a5;background:#fbf6ec;border-radius:7px;padding:5px 4px;cursor:pointer;color:var(--ink)}
+.asset .acts button:hover{border-color:var(--ink)}
+.asset.sample{border-style:dashed}
+.subh{font:700 13px var(--f-body);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:4px 0 -4px}
+.keys{position:fixed;right:14px;top:96px;z-index:30;width:min(460px,calc(100vw - 28px));max-height:calc(100dvh - 120px);overflow:auto;background:#24312c;color:var(--code-ink);border:1px solid #3a4a44;border-radius:12px;box-shadow:0 14px 30px rgba(0,0,0,.45);padding:10px 14px 12px}
+.keys-h{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px}
+.keys-h b{font:700 16px var(--f-body)}
+.keys dl{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:6px 14px;margin:0;font-size:14px}
+.keys dt{font:600 12.5px/1.6 var(--f-mono);color:var(--yellow);white-space:nowrap}
+.keys dd{margin:0;line-height:1.45;color:#d6e0da}
+.keys code{background:rgba(255,255,255,.08);border-radius:4px;padding:0 4px;color:#a8dba0}
+.keys-n{margin:10px 0 0;font-size:13px;color:#9fb3aa}
+.x{background:none;border:0;color:inherit;font-size:20px;line-height:1;cursor:pointer;padding:2px 6px;border-radius:6px}
+.toast{position:fixed;left:50%;bottom:44px;transform:translate(-50%,10px);background:var(--ink);color:#fff;padding:9px 16px;border-radius:999px;font-weight:700;font-size:14px;opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;z-index:60}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+.drop{position:fixed;inset:0;z-index:70;background:rgba(47,122,90,.85);display:grid;place-items:center;color:#fff;font:700 24px var(--f-body);pointer-events:none}
+@media (prefers-reduced-motion:reduce){ .toast,.bw-note{transition:none} }
+body.focus .rail{display:none}
+#digikult-nav{display:none}
+#renameDoc .lb,#delDoc .lb{display:none}
+.bar{gap:8px 10px}
+.sep{margin:0 2px}
+@media (max-width:1380px){ #fullBtn .lb,#fmtBtn .lb{display:none} }
+body{grid-template-columns:minmax(0,1fr)}
+@media (max-width:760px){ .sep{display:none} .grp.push{margin-left:0} .rail .crumb{display:none} .status{font-size:11.5px} }
+
+</style>
+</head>
+<body>
+<header class="rail"><div class="in">
+  <a class="home" href="../index.html">Digitális kultúra</a>
+  <span class="crumb">Weboldalak › <b>HTML-szerkesztő</b></span>
+  <a class="langlink" href="editor.html" lang="en">English</a>
+</div></header>
+
+<div class="bar" role="toolbar" aria-label="Eszköztár">
+  <div class="grp files">
+    <span class="sel"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 1.5h5l3.5 3.5v9.5h-8.5z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M9 1.5V5h3.5" fill="none" stroke="currentColor" stroke-width="1.5"/></svg><select id="docSel" aria-label="Oldalaid"></select></span>
+    <button type="button" class="tb" id="newDoc" title="Új oldal (fájl) létrehozása">＋<span class="lb">Új</span></button>
+    <button type="button" class="tb" id="renameDoc" title="Az oldal átnevezése">✎<span class="lb">Átnevezés</span></button>
+    <button type="button" class="tb" id="delDoc" title="Az oldal törlése">🗑<span class="lb">Törlés</span></button>
+  </div>
+  <span class="sep" aria-hidden="true"></span>
+  <div class="grp">
+    <button type="button" class="tb" id="openBtn" title="HTML-fájl vagy kép megnyitása a gépedről"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M1.5 4.5v8.5h11l2-6.5h-11L1.5 13" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M1.5 4.5V2.5h4l1.5 1.5h5v2.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg><span class="lb">Megnyitás</span></button>
+    <input type="file" id="openInput" multiple accept=".html,.htm,.css,.txt,image/*" hidden>
+    <button type="button" class="tb" id="imgBtn" title="Saját képek feltöltése és beszúrása"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="1.5" y="2.5" width="13" height="11" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="5.5" cy="6.2" r="1.4" fill="currentColor"/><path d="M2 12.5l4-4 3 3 2-2 3.5 3.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg><span class="lb">Képek</span><span class="n" id="imgCount">0</span></button>
+  </div>
+  <span class="sep" aria-hidden="true"></span>
+  <div class="grp">
+    <button type="button" class="tb" id="findBtn" title="Keresés és csere (Ctrl+F)" aria-label="Keresés és csere (Ctrl+F)"><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="6.8" cy="6.8" r="4.6" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M10.3 10.3l4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+    <button type="button" class="tb" id="fmtBtn" title="Behúzás rendezése (Shift+Alt+F)">⇥<span class="lb">Rendezés</span></button>
+    <button type="button" class="tb" id="keysBtn" aria-expanded="false" aria-controls="keys">⌨<span class="lb">Billentyűk</span></button>
+    <button type="button" class="tb" id="smaller" title="Kisebb kód" aria-label="Kisebb kód">A−</button><button type="button" class="tb" id="bigger" title="Nagyobb kód" aria-label="Nagyobb kód">A+</button>
+  </div>
+  <div class="grp push">
+    <span class="seg" id="modeSeg" role="group" aria-label="Elrendezés"><button type="button" data-m="code">Kód</button><button type="button" data-m="both">Mindkettő</button><button type="button" data-m="view">Előnézet</button></span>
+    <button type="button" class="tb" id="fullBtn" title="Az oldal megnyitása teljes méretben, új lapon"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M9.5 2.5h4v4M13.5 2.5L8 8M6.5 3.5h-4v10h10v-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="lb">Új lapon</span></button>
+    <button type="button" class="tb go" id="dlBtn" title="Letöltés: egy oldal .html-ként, több fájl .zip-ben"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2v8M4.5 6.5L8 10l3.5-3.5M2.5 13.5h11" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="lb">Letöltés</span></button>
+  </div>
+</div>
+
+<main class="work" id="work">
+  <section class="pane code" aria-label="HTML-kód">
+    <textarea id="code" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" aria-label="HTML-kód"></textarea>
+    <div class="lint" id="lint" hidden aria-live="polite"></div>
+  </section>
+  <div class="gutter" id="gutter" role="separator" aria-orientation="vertical" aria-label="A kód és az előnézet közti elválasztó (nyilakkal is mozgatható)" tabindex="0"></div>
+  <section class="pane view" aria-label="Előnézet"><div id="browser" data-fixed="1"></div></section>
+</main>
+
+<footer class="status"><span id="stPos"></span><button type="button" id="stWarn"></button><span class="sp"></span><span>💾 automatikus mentés ebbe a böngészőbe ·</span><span id="stSave"></span></footer>
+
+<div class="keys" id="keys" hidden><div class="keys-h"><b>Billentyűparancsok, mint a VS Code-ban</b><button type="button" class="x" id="keysClose" aria-label="Bezárás">×</button></div>
+  <dl><dt>ul&gt;li*3 + Tab</dt><dd>Emmet: rövidítésből kész kód. Próbáld: <code>p</code>, <code>img</code>, <code>table&gt;tr*3&gt;td*3</code>, <code>!</code></dd><dt>Tab vagy Enter</dt><dd>a felajánlott címke vagy attribútum elfogadása</dd><dt>Ctrl + Szóköz</dt><dd>javaslatok megnyitása</dd><dt>Ctrl + B / Ctrl + I</dt><dd>a kijelölt szöveg köré &lt;strong&gt; / &lt;em&gt;</dd><dt>Ctrl + /</dt><dd>megjegyzés be/ki (&lt;!-- --&gt;)</dd><dt>Alt + ↑ / ↓</dt><dd>a sor mozgatása fel / le</dd><dt>Shift + Alt + ↓</dt><dd>a sor megkettőzése</dd><dt>Ctrl + D</dt><dd>a következő ugyanilyen szó kijelölése: több kurzorral egyszerre írsz</dd><dt>Ctrl + kattintás</dt><dd>újabb kurzor</dd><dt>Ctrl + F</dt><dd>keresés és csere</dd><dt>Shift + Alt + F</dt><dd>a behúzás rendezése</dd><dt>Ctrl + Shift + [ / ]</dt><dd>elem összecsukása / kibontása</dd><dt>Ctrl + Z / Ctrl + Y</dt><dd>visszavonás / újra</dd><dt>egér a címke fölött</dt><dd>megmutatja, mire való a címke</dd><dt>Ctrl + S</dt><dd>mentés (amúgy is ment magától)</dd><dt>húzd ide a fájlokat</dt><dd>HTML-fájl vagy kép megnyitása a gépedről</dd></dl><p class="keys-n">Macen a Ctrl helyett ⌘ (Cmd), az Alt helyett ⌥ (Option).</p></div>
+<dialog id="dlg"></dialog>
+<div class="toast" id="toast" role="status"></div>
+<div class="drop" id="drop" hidden>Engedd el: megnyitom a fájlokat</div>
+
+<script src="../vendor/codemirror-html.js"></script>
+<script>
+const CFG = {"ui": {"title": "HTML-szerkesztő", "preview": "Előnézet", "localTpl": "Ez a link a(z) {h} fájlra vinne, de nincs ilyen oldalad vagy képed. Hozd létre az ＋ Új gombbal!", "switched": "Átváltottam erre: {n}", "saveFail": "Nem sikerült menteni: megtelt a böngésző tárhelye.", "pos": "{l}. sor, {c}. oszlop", "warns": "⚠ {n} figyelmeztetés", "noWarn": "✓ nincs hiba", "saved": "mentve ✓", "saving": "mentés…", "savedToast": "Mentve. (Magától is ment.)", "ok": "OK", "cancel": "Mégse", "fileName": "Fájlnév", "nameEmpty": "Adj meg egy nevet.", "nameTaken": "Már van ilyen nevű oldalad: {n}", "newTitle": "Új oldal", "create": "Létrehozás", "tplSkel": "HTML-váz", "tplSkelD": "DOCTYPE, head, title és body, ahogy a leckében tanultuk", "tplBlank": "Üres", "tplBlankD": "Teljesen üres fájl. Tipp: írj be egy ! jelet, és nyomj Tabot.", "created": "Kész: {n}", "renameTitle": "Átnevezés", "rename": "Átnevezés", "delTitle": "Törlöd az oldalt?", "delText": "A(z) <b>{n}</b> végleg törlődik ebből a böngészőből.", "del": "Törlés", "opened": "Megnyitva: {p} oldal, {i} egyéb fájl", "imgTitle": "Képek", "imgText": "A feltöltött képek ebben a böngészőben maradnak. A kódban a nevükkel hivatkozz rájuk, pl. <code>src=\"kutya.jpg\"</code>. A letöltött .zip-be is bekerülnek.", "imgAdd": "＋ Kép feltöltése", "imgMine": "Saját képeid", "imgNone": "Még nincs saját képed. Tölts fel egyet, vagy húzd be az ablakba!", "imgSamples": "Mintaképek (mindig elérhetők)", "sample": "mintakép", "insert": "Beszúrás", "close": "Bezárás", "downloaded": "Letöltve: {n}", "zipFail": "A .zip nem készült el, csak az oldal töltődött le.", "imported": "Megnyitva a szerkesztőben: {n}"}, "samples": ["img/morzsa.svg", "img/cirmi.svg", "img/pamacs.svg", "img/bodri.svg", "img/logo.svg"], "sampleBase": "basics/img/", "templates": {"skeleton": "<!DOCTYPE html>\n<html lang=\"hu\">\n  <head>\n    <meta charset=\"utf-8\">\n    <title>Új oldal</title>\n  </head>\n  <body>\n    <h1>Helló, világ!</h1>\n\n  </body>\n</html>\n"}};
+const UI = { preview: CFG.ui.preview, localNote: h => CFG.ui.localTpl.replace("{h}", h) };
+/* ---------- shared by the HTML explainer and the HTML mission ---------- */
+const $ = (s, el=document) => el.querySelector(s), $$ = (s, el=document) => [...el.querySelectorAll(s)];
+const esc = s => String(s).replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const VOID = new Set(["area","base","br","col","embed","hr","img","input","link","meta","source","track","wbr"]);
+
+/* ---------- editor texts: suggestions, hover help, search panel, mistake messages ---------- */
+const PAGE_LANG = document.documentElement.lang === "en" ? "en" : "hu";
+const ED_TEXT = {
+  hu: {
+    docs: { html: "az egész oldal", head: "fejrész: adatok az oldalról", body: "törzs: ami az oldalon látszik", title: "a böngésző fülén látszó cím",
+      meta: "adat az oldalról (pl. kódolás)", h1: "főcím, a legfontosabb címsor", h2: "alcím", h3: "harmadszintű címsor", h4: "kisebb címsor", h5: "kisebb címsor", h6: "a legkisebb címsor",
+      p: "bekezdés", br: "sortörés (üres elem)", hr: "vízszintes vonal (üres elem)", strong: "fontos szöveg, félkövér", em: "hangsúlyos szöveg, dőlt",
+      b: "félkövér betű", i: "dőlt betű", u: "aláhúzott szöveg", sub: "alsó index, pl. H₂O", sup: "felső index, pl. m²", ul: "felsorolás pontokkal",
+      ol: "számozott lista", li: "a lista egy eleme", a: "hivatkozás (link)", img: "kép (üres elem)", table: "táblázat", tr: "a táblázat egy sora",
+      th: "fejléccella", td: "cella", div: "doboz, részeket csoportosít", span: "szövegrész, csoportosít", "@href": "hová visz a link", "@src": "a képfájl helye",
+      "@alt": "a kép leírása", "@width": "szélesség képpontban", "@height": "magasság képpontban", "@target": "_blank: új lapon nyílik", "@lang": "az oldal nyelve, pl. hu",
+      "@colspan": "hány oszlopon át ér a cella", "@rowspan": "hány soron át ér a cella", "@border": "keret a cellák körül", "@charset": "karakterkódolás",
+      "@title": "súgó, ha fölé viszed az egeret", "#file": "kép a mappában", "#emmet": "Emmet · Tab" },
+    phrases: { "Find": "Keresés", "Replace": "Csere", "next": "következő", "previous": "előző", "all": "mind", "match case": "kis- és nagybetű",
+      "regexp": "regex", "by word": "egész szó", "replace": "csere", "replace all": "mindet cseréli", "close": "bezárás", "current match": "aktuális találat",
+      "replaced $ matches": "$ találat cserélve", "replaced match on line $": "csere a(z) $. sorban", "on line": "sor", "Go to line": "Ugrás sorra", "go": "ugrás",
+      "Folded lines": "Összecsukott sorok", "Unfolded lines": "Kibontott sorok", "to": "–", "folded code": "összecsukott kód", "unfold": "kibontás",
+      "Fold line": "Összecsukás", "Unfold line": "Kibontás", "Diagnostics": "Figyelmeztetések", "No diagnostics": "Nincs figyelmeztetés" },
+    lint: { lintOpen: "{1}. sor: a címke nincs befejezve, hiányzik a > jel: {0}", lintQuote: "{1}. sor: hiányzik egy idézőjel ebben a címkében: {0}",
+      lintVoidClose: "{1}. sor: {0} üres elem, nincs záró címkéje. Töröld a {c0} címkét.", lintStray: "{1}. sor: {c0} lezár valamit, amit nem nyitottál meg.",
+      lintCross: "{3}. sor: keresztbe zárt címkék. Előbb {c0}, utána {c1} jön.", lintUnclosed: "{1}. sor: {0} nincs lezárva. Valahová kell egy {c0}." }
+  },
+  en: {
+    docs: { html: "the whole page", head: "information about the page", body: "everything visible on the page", title: "the title on the browser tab",
+      meta: "page information (e.g. encoding)", h1: "main heading, the most important", h2: "subheading", h3: "third-level heading", h4: "smaller heading", h5: "smaller heading", h6: "the smallest heading",
+      p: "paragraph", br: "line break (empty element)", hr: "horizontal line (empty element)", strong: "important text, bold", em: "stressed text, italic",
+      b: "bold text", i: "italic text", u: "underlined text", sub: "subscript, e.g. H₂O", sup: "superscript, e.g. m²", ul: "bulleted list",
+      ol: "numbered list", li: "one item of a list", a: "link", img: "image (empty element)", table: "table", tr: "one row of a table",
+      th: "header cell", td: "cell", div: "box that groups parts", span: "piece of text, groups", "@href": "where the link goes", "@src": "where the image file is",
+      "@alt": "description of the image", "@width": "width in pixels", "@height": "height in pixels", "@target": "_blank: opens in a new tab", "@lang": "the page's language, e.g. en",
+      "@colspan": "how many columns the cell spans", "@rowspan": "how many rows the cell spans", "@border": "border round the cells", "@charset": "character encoding",
+      "@title": "tooltip on mouse hover", "#file": "image in the folder", "#emmet": "Emmet · Tab" },
+    phrases: {},
+    lint: { lintOpen: "Line {1}: this tag isn't finished, the > is missing: {0}", lintQuote: "Line {1}: a quote mark is missing in this tag: {0}",
+      lintVoidClose: "Line {1}: {0} is an empty element with no closing tag. Delete the {c0}.", lintStray: "Line {1}: {c0} closes something that was never opened.",
+      lintCross: "Line {3}: tags closed crosswise. First {c0}, then {c1}.", lintUnclosed: "Line {1}: {0} is never closed. Add a {c0} somewhere." }
+  }
+};
+const LINT_T = {};
+Object.entries(ED_TEXT[PAGE_LANG].lint).forEach(([k, tpl]) => {
+  LINT_T[k] = (...a) => tpl.replace(/\{(c?)(\d)\}/g, (_, c, i) => {
+    const v = a[+i];
+    return typeof v === "number" ? String(v) : `<code>&lt;${c ? "/" : ""}${esc(v)}&gt;</code>`;
+  });
+});
+const IMG_FILES = ["img/morzsa.svg", "img/cirmi.svg", "img/pamacs.svg", "img/bodri.svg", "img/logo.svg"];
+
+/* HTML syntax colouring: tags, attribute names, values, comments, entities */
+function hlTag(t){
+  const m = /^(<\/?)([a-zA-Z][\w-]*)?([\s\S]*?)(\/?>)?$/.exec(t);
+  if (!m) return esc(t);
+  let attrs = "", rest = m[3] || "", last = 0, a;
+  const re = /([^\s=\/>"']+)(\s*=\s*)?("[^"]*"?|'[^']*'?|[^\s>"']+)?/g;
+  while ((a = re.exec(rest))){
+    attrs += esc(rest.slice(last, a.index)) + `<span class="an">${esc(a[1])}</span>`;
+    if (a[2]) attrs += `<span class="pu">${esc(a[2])}</span>`;
+    if (a[3]) attrs += `<span class="av">${esc(a[3])}</span>`;
+    last = re.lastIndex;
+  }
+  attrs += esc(rest.slice(last));
+  return `<span class="pu">${esc(m[1])}</span><span class="tg">${esc(m[2]||"")}</span>${attrs}<span class="pu">${esc(m[4]||"")}</span>`;
+}
+const TOKEN = /<!--[\s\S]*?(?:-->|$)|<!doctype[^>]*>?|<\/?[a-zA-Z][^<>]*>?|&#?[a-zA-Z0-9]+;/gi;
+function hl(src){
+  let o = "", last = 0, m;
+  TOKEN.lastIndex = 0;
+  while ((m = TOKEN.exec(src))){
+    o += esc(src.slice(last, m.index));
+    const t = m[0];
+    if (t.startsWith("<!--")) o += `<span class="cm">${esc(t)}</span>`;
+    else if (/^<!doctype/i.test(t)) o += `<span class="dt">${esc(t)}</span>`;
+    else if (t[0] === "&") o += `<span class="en">${esc(t)}</span>`;
+    else o += hlTag(t);
+    last = TOKEN.lastIndex;
+  }
+  return o + esc(src.slice(last));
+}
+
+/* A tolerant check for beginners' mistakes: unclosed, stray and crossed tags, with line numbers. */
+function lint(src, T = LINT_T){
+  const out = [], stack = [];
+  const lineOf = i => src.slice(0, i).split("\n").length;
+  const clean = src.replace(/<!--[\s\S]*?-->/g, c => c.replace(/[^\n]/g, " "));
+  const re = /<(\/?)([a-zA-Z][\w-]*)([^<>]*?)(\/?)>|<(\/?)([a-zA-Z][\w-]*)[^<>]*$/g;
+  const skip = new Set(["html","head","body"]);              /* optional end tags: a forgotten </body> is no drama */
+  const lateClose = {};                                        /* closing tags we already explained (crossed pairs) */
+  let m;
+  while ((m = re.exec(clean))){
+    if (m[6] !== undefined && m[2] === undefined){ out.push({ line: lineOf(m.index), html: T.lintOpen(m[6].toLowerCase(), lineOf(m.index)) }); continue; }
+    const close = !!m[1], name = m[2].toLowerCase(), line = lineOf(m.index), attrs = m[3] || "";
+    if ((attrs.split('"').length - 1) % 2) out.push({ line, html: T.lintQuote(name, line) });
+    if (VOID.has(name)){ if (close) out.push({ line, html: T.lintVoidClose(name, line) }); continue; }
+    if (!close){ stack.push({ name, line }); continue; }
+    const at = stack.map(s => s.name).lastIndexOf(name);
+    if (at < 0){
+      if (lateClose[name]) lateClose[name]--; else out.push({ line, html: T.lintStray(name, line) });
+      continue;
+    }
+    const rest = clean.slice(re.lastIndex).toLowerCase();
+    stack.slice(at + 1).reverse().forEach(inner => {
+      if (skip.has(inner.name)) return;
+      const crossed = new RegExp("^\\s*</" + inner.name + "\\s*>").test(rest);
+      if (crossed){ out.push({ line, html: T.lintCross(inner.name, name, inner.line, line) }); lateClose[inner.name] = (lateClose[inner.name] || 0) + 1; }
+      else out.push({ line: inner.line, html: T.lintUnclosed(inner.name, inner.line) });
+    });
+    stack.length = at;
+  }
+  stack.forEach(s => { if (!skip.has(s.name)) out.push({ line: s.line, html: T.lintUnclosed(s.name, s.line) }); });
+  const seen = new Set();
+  return out.filter(w => !seen.has(w.html) && seen.add(w.html)).slice(0, 6);
+}
+
+/* Highlighted editor: a coloured copy underneath, a see-through textarea on top, line numbers on the left. */
+function makeEditor(ta, opts={}){
+  if (window.CMHTML){                                     /* CodeMirror: VS Code-style comforts */
+    const w = document.createElement("div"); w.className = "cmw" + (opts.fixed ? " fixed" : ""); ta.before(w); ta.hidden = true;
+    let quiet = false;
+    const T = ED_TEXT[PAGE_LANG];
+    const cm = CMHTML.create({ parent: w, doc: ta.value, lines: !!opts.lines, fit: true, label: ta.getAttribute("aria-label") || "",
+      lang: PAGE_LANG, docs: T.docs, phrases: T.phrases, files: opts.files || IMG_FILES, fold: !!opts.fold,
+      lint: opts.lint === false ? null : (src => lint(src)),
+      onCursor: opts.onCursor || null,
+      onChange: v => { if (quiet) return; ta.value = v; ta.dispatchEvent(new Event("input")); } });
+    w.addEventListener("mousedown", e => { if (e.target === w){ e.preventDefault(); cm.focus(); } });
+    return { refit: () => { quiet = true; cm.set(ta.value); quiet = false; cm.view.requestMeasure(); }, cm, el: w };
+  }
+  const w = document.createElement("div"); w.className = "edw" + (opts.lines ? " numbered" : ""); ta.before(w);
+  const gut = document.createElement("pre"); gut.className = "gut"; gut.setAttribute("aria-hidden", "true");
+  const ov = document.createElement("pre"); ov.className = "ov"; ov.setAttribute("aria-hidden", "true");
+  if (opts.lines) w.append(gut);
+  const box = document.createElement("div"); box.className = "edbox"; box.append(ov, ta); w.append(box);
+  const paint = () => {
+    ov.innerHTML = hl(ta.value) + "\n";
+    if (opts.lines){ const n = ta.value.split("\n").length; gut.textContent = Array.from({length:n}, (_, i) => i + 1).join("\n") + "\n"; }
+  };
+  const fit = () => {
+    if (opts.fixed){ paint(); ov.scrollTop = ta.scrollTop; gut.scrollTop = ta.scrollTop; return; }
+    ta.style.height = "auto"; ta.style.height = (ta.scrollHeight + 2) + "px"; paint();
+  };
+  ta.addEventListener("scroll", () => { ov.scrollTop = ta.scrollTop; ov.scrollLeft = ta.scrollLeft; gut.scrollTop = ta.scrollTop; });
+  ta.addEventListener("input", fit);
+  w.addEventListener("mousedown", e => { if (e.target === w || e.target === box || e.target === gut){ e.preventDefault(); ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length); } });
+  ta.addEventListener("keydown", e => {
+    if (e.key === "Tab" && !e.shiftKey && !e.ctrlKey && !e.metaKey && !e.altKey){
+      e.preventDefault();
+      const s = ta.selectionStart;
+      ta.setRangeText("  ", s, ta.selectionEnd, "end");
+      ta.dispatchEvent(new Event("input"));
+    }
+    if (e.key === "Enter" && !e.shiftKey && !e.ctrlKey && !e.metaKey){       /* keep the indentation of the line above */
+      const s = ta.selectionStart, ls = ta.value.lastIndexOf("\n", s - 1) + 1, ind = /^[ \t]*/.exec(ta.value.slice(ls, s))[0];
+      if (ind){ e.preventDefault(); ta.setRangeText("\n" + ind, s, ta.selectionEnd, "end"); ta.dispatchEvent(new Event("input")); }
+    }
+  });
+  fit();
+  return { refit: fit };
+}
+
+/* A small browser window: the tab shows the page's <title>, the address bar its file name. */
+function makeBrowser(host, file, T){
+  host.classList.add("bw");
+  host.innerHTML = `<div class="bw-top"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
+    <span class="bw-tab"><span class="fav" aria-hidden="true"></span><span class="ttl"></span></span></div>
+    <div class="bw-bar"><span class="addr"><span aria-hidden="true">📄</span> ${esc(file)}</span></div>
+    <iframe title="${esc(T.preview)}" sandbox="allow-same-origin allow-popups allow-popups-to-escape-sandbox"></iframe>`;
+  const fr = $("iframe", host), ttl = $(".ttl", host);
+  const nt = document.createElement("div"); nt.className = "bw-note"; nt.setAttribute("role", "status"); host.append(nt);
+  let ntTimer = 0;
+  const note = msg => { nt.textContent = msg; nt.classList.add("on"); clearTimeout(ntTimer); ntTimer = setTimeout(() => nt.classList.remove("on"), 3200); };
+  let timer = 0, pendingScroll = 0;
+  const size = () => {
+    if (host.dataset.fixed) return;
+    try {
+      const d = fr.contentDocument; if (!d || !d.documentElement) return;
+      const h = Math.max(d.documentElement.scrollHeight, d.body ? d.body.scrollHeight : 0);
+      fr.style.height = Math.min(host.dataset.max ? +host.dataset.max : 560, Math.max(+host.dataset.min || 110, h + 4)) + "px";
+    } catch(e){}
+  };
+  fr.addEventListener("load", () => {
+    try {
+      const d = fr.contentDocument;
+      d.documentElement.scrollTop = pendingScroll;
+      d.addEventListener("click", e => {                         /* links open in a new tab; #anchors scroll inside */
+        const a = e.target.closest && e.target.closest("a[href]"); if (!a) return;
+        e.preventDefault();
+        const h = a.getAttribute("href") || "";
+        if (h.startsWith("#")){ const t = d.getElementById(h.slice(1)); if (t) t.scrollIntoView({ behavior:"smooth" }); return; }
+        if (/^(https?:|mailto:|tel:)/i.test(h)) window.open(a.href, "_blank", "noopener");
+        else if (!(T.localLink && T.localLink(h))) note(T.localNote(h));
+      });
+      $$("img", d).forEach(im => im.addEventListener("load", size));
+    } catch(e){}
+    size();
+  });
+  const show = src => {
+    const t = /<title[^>]*>([\s\S]*?)<\/title>/i.exec(src);
+    ttl.textContent = t && t[1].trim() ? t[1].replace(/\s+/g, " ").trim() : file;
+    try { pendingScroll = fr.contentDocument ? fr.contentDocument.documentElement.scrollTop : 0; } catch(e){ pendingScroll = 0; }
+    fr.srcdoc = src;
+  };
+  return {
+    show: (src, now) => { clearTimeout(timer); if (now) show(src); else timer = setTimeout(() => show(src), 160); },
+    frame: fr, resize: size, note
+  };
+}
+
+/* ---------- the standalone HTML editor ---------- */
+const T = CFG.ui, LS = "digikult-editor-v1", IMPORT = "digikult-editor-import";
+const SAMPLES = CFG.samples;                                   /* img/morzsa.svg … served from basics/img/ */
+const SAMPLE_URL = n => new URL(CFG.sampleBase + n.replace(/^img\//, ""), location.href).href;
+const tpl = (k, o = {}) => T[k].replace(/\{(\w+)\}/g, (_, x) => o[x] ?? "");
+
+/* ---------- saved pages ---------- */
+let store = { docs: [], current: null };
+try { const s = JSON.parse(localStorage.getItem(LS)); if (s && Array.isArray(s.docs) && s.docs.length) store = s; } catch(e){}
+if (!store.docs.length) store.docs = [{ name: "index.html", code: CFG.templates.skeleton, updated: Date.now() }];
+if (!store.docs.some(d => d.name === store.current)) store.current = store.docs[0].name;
+const save = () => { try { localStorage.setItem(LS, JSON.stringify(store)); } catch(e){ toast(T.saveFail); } };
+let saveTimer = 0;
+const saveSoon = () => { clearTimeout(saveTimer); setStatusSaved(false); saveTimer = setTimeout(() => { save(); setStatusSaved(true); }, 450); };
+const doc = () => store.docs.find(d => d.name === store.current);
+const uniqueName = base => {
+  base = cleanName(base) || "oldal.html";
+  if (!store.docs.some(d => d.name === base)) return base;
+  const m = /^(.*?)(\d*)(\.[a-z]+)$/i.exec(base) || [null, base, "", ""];
+  for (let i = (+m[2] || 1) + 1; ; i++) { const n = m[1] + i + m[3]; if (!store.docs.some(d => d.name === n)) return n; }
+};
+function cleanName(n){
+  n = String(n || "").trim().replace(/\\/g, "/").split("/").pop().replace(/\s+/g, "-");
+  if (!n) return "";
+  if (!/\.[a-z0-9]+$/i.test(n)) n += ".html";
+  return n;
+}
+
+/* ---------- images and other files: kept in this browser (IndexedDB) ---------- */
+const assets = new Map();                                     /* name -> { blob, url, type, size } */
+let dbp = null;
+function db(){
+  if (!dbp) dbp = new Promise((ok, no) => {
+    const r = indexedDB.open("digikult-editor", 1);
+    r.onupgradeneeded = () => r.result.createObjectStore("assets");
+    r.onsuccess = () => ok(r.result); r.onerror = () => no(r.error);
+  });
+  return dbp;
+}
+async function idb(mode, fn){ const d = await db(); return new Promise((ok, no) => { const tx = d.transaction("assets", mode); const st = tx.objectStore("assets"); const r = fn(st); tx.oncomplete = () => ok(r && r.result); tx.onerror = () => no(tx.error); }); }
+async function loadAssets(){
+  try {
+    const d = await db();
+    await new Promise(ok => {
+      const tx = d.transaction("assets", "readonly"), st = tx.objectStore("assets"), req = st.openCursor();
+      req.onsuccess = () => { const c = req.result; if (!c) return ok(); const v = c.value; assets.set(c.key, { blob: v.blob, type: v.blob.type, size: v.blob.size, url: URL.createObjectURL(v.blob) }); c.continue(); };
+      req.onerror = () => ok();
+    });
+  } catch(e){}
+  syncFiles(); render(true);
+}
+async function addAsset(name, blob){
+  name = name.replace(/\\/g, "/").replace(/^\/+/, "");
+  if (assets.has(name)) URL.revokeObjectURL(assets.get(name).url);
+  assets.set(name, { blob, type: blob.type, size: blob.size, url: URL.createObjectURL(blob) });
+  try { await idb("readwrite", st => st.put({ blob }, name)); } catch(e){ toast(T.saveFail); }
+  syncFiles();
+}
+async function removeAsset(name){
+  const a = assets.get(name); if (a) URL.revokeObjectURL(a.url);
+  assets.delete(name);
+  try { await idb("readwrite", st => st.delete(name)); } catch(e){}
+  syncFiles();
+}
+const FILES = [];                                              /* what src="…" suggests */
+function syncFiles(){
+  FILES.length = 0;
+  FILES.push(...[...assets.keys()].filter(n => /\.(png|jpe?g|gif|svg|webp|avif|bmp|ico)$/i.test(n)), ...SAMPLES);
+  $("#imgCount").textContent = assets.size;
+}
+
+/* ---------- preview: point file names at the stored files ---------- */
+function resolve(code){
+  const map = n => {
+    const k = n.replace(/^\.\//, "");
+    if (assets.has(k)) return assets.get(k).url;
+    if (SAMPLES.includes(k) && !assets.has(k)) return SAMPLE_URL(k);
+    return null;
+  };
+  return code
+    .replace(/(\s(?:src|href|poster)\s*=\s*)(["'])([^"']*)\2/gi, (all, a, q, v) => { const u = map(v); return u ? a + q + u + q : all; })
+    .replace(/url\(\s*(["']?)([^"')]+)\1\s*\)/gi, (all, q, v) => { const u = map(v); return u ? `url(${q}${u}${q})` : all; });
+}
+
+/* ---------- editor + preview ---------- */
+const ta = $("#code");
+ta.value = doc().code;
+const editor = makeEditor(ta, { lines: true, fixed: true, fold: true, files: FILES, onCursor: (l, c) => { cur = [l, c]; drawStatus(); } });
+let cur = [1, 1], warnN = 0, savedOk = true;
+UI.localLink = h => {                                          /* a link to one of your pages opens it */
+  const n = h.split(/[?#]/)[0].replace(/^\.\//, "");
+  if (store.docs.some(d => d.name === n)) { openDoc(n); toast(tpl("switched", { n })); return true; }
+  if (assets.has(n)) { window.open(assets.get(n).url, "_blank"); return true; }
+  return false;
+};
+const browser = makeBrowser($("#browser"), doc().name, UI);
+function render(now){
+  const d = doc();
+  $(".bw-bar .addr", $("#browser")).lastChild.textContent = " " + d.name;
+  browser.show(resolve(ta.value), now);
+  const w = lint(ta.value); warnN = w.length;
+  $("#lint").hidden = !w.length; $("#lint").innerHTML = w.map(x => `<p>${x.html}</p>`).join("");
+  drawStatus();
+}
+ta.addEventListener("input", () => { doc().code = ta.value; doc().updated = Date.now(); saveSoon(); render(false); });
+function setStatusSaved(ok){ savedOk = ok; drawStatus(); }
+function drawStatus(){
+  $("#stPos").textContent = tpl("pos", { l: cur[0], c: cur[1] });
+  const w = $("#stWarn"); w.textContent = warnN ? tpl("warns", { n: warnN }) : T.noWarn; w.className = warnN ? "warn" : "ok";
+  $("#stSave").textContent = savedOk ? T.saved : T.saving;
+}
+
+/* ---------- pages menu ---------- */
+function drawDocs(){
+  const s = $("#docSel");
+  s.innerHTML = store.docs.map(d => `<option value="${esc(d.name)}"${d.name === store.current ? " selected" : ""}>${esc(d.name)}</option>`).join("");
+  $("#delDoc").disabled = store.docs.length < 2;
+  document.title = `${store.current} · ${T.title}`;
+}
+function openDoc(name){
+  if (!store.docs.some(d => d.name === name)) return;
+  store.current = name; save(); drawDocs();
+  ta.value = doc().code; editor.refit(); render(true);
+  if (editor.cm) editor.cm.focus();
+}
+$("#docSel").onchange = e => openDoc(e.target.value);
+
+/* small promise dialogs instead of prompt/confirm */
+function ask({ title, text = "", input = null, choices = null, ok = T.ok, danger = false, validate = null }){
+  return new Promise(res => {
+    const dl = $("#dlg");
+    dl.innerHTML = `<form method="dialog" class="dlg"><h2>${esc(title)}</h2>${text ? `<p>${text}</p>` : ""}
+      ${choices ? `<div class="choices">${choices.map((c, i) => `<label class="choice"><input type="radio" name="ch" value="${c.v}"${i ? "" : " checked"}><span><b>${esc(c.t)}</b><span>${esc(c.d)}</span></span></label>`).join("")}</div>` : ""}
+      ${input !== null ? `<label>${esc(T.fileName)}<input type="text" name="v" value="${esc(input)}" spellcheck="false" autocomplete="off"></label>` : ""}
+      <p class="err" hidden></p>
+      <div class="row"><button type="button" class="btn ghost" value="cancel">${esc(T.cancel)}</button><button type="submit" class="btn${danger ? " danger" : ""}" value="ok">${esc(ok)}</button></div></form>`;
+    const f = $("form", dl), inp = $("input[name=v]", dl), err = $(".err", dl);
+    $("button[value=cancel]", dl).onclick = () => { dl.close(); res(null); };
+    f.onsubmit = e => {
+      e.preventDefault();
+      const v = inp ? inp.value : true, ch = $("input[name=ch]:checked", dl);
+      const msg = validate && validate(v);
+      if (msg){ err.hidden = false; err.textContent = msg; return; }
+      dl.close(); res({ v, ch: ch && ch.value });
+    };
+    dl.oncancel = () => res(null);
+    dl.showModal();
+    if (inp){ inp.focus(); const dot = inp.value.lastIndexOf("."); inp.setSelectionRange(0, dot > 0 ? dot : inp.value.length); }
+  });
+}
+const nameTaken = (v, except) => { const n = cleanName(v); if (!n) return T.nameEmpty; if (n !== except && store.docs.some(d => d.name === n)) return tpl("nameTaken", { n }); return null; };
+
+$("#newDoc").onclick = async () => {
+  const r = await ask({ title: T.newTitle, input: uniqueName("oldal.html"), ok: T.create, validate: v => nameTaken(v),
+    choices: [{ v: "skeleton", t: T.tplSkel, d: T.tplSkelD }, { v: "blank", t: T.tplBlank, d: T.tplBlankD }] });
+  if (!r) return;
+  const name = cleanName(r.v);
+  store.docs.push({ name, code: r.ch === "blank" ? "" : CFG.templates.skeleton, updated: Date.now() });
+  openDoc(name); toast(tpl("created", { n: name }));
+};
+$("#renameDoc").onclick = async () => {
+  const old = store.current;
+  const r = await ask({ title: T.renameTitle, input: old, ok: T.rename, validate: v => nameTaken(v, old) });
+  if (!r) return;
+  const name = cleanName(r.v); if (name === old) return;
+  doc().name = name; store.current = name;
+  store.docs.forEach(d => { d.code = d.code.split(`"${old}"`).join(`"${name}"`); });   /* links to the page follow it */
+  save(); drawDocs(); ta.value = doc().code; editor.refit(); render(true);
+};
+$("#delDoc").onclick = async () => {
+  if (store.docs.length < 2) return;
+  const r = await ask({ title: T.delTitle, text: tpl("delText", { n: esc(store.current) }), ok: T.del, danger: true });
+  if (!r) return;
+  store.docs = store.docs.filter(d => d.name !== store.current);
+  openDoc(store.docs[0].name);
+};
+
+/* ---------- open files from the computer (button or drag and drop) ---------- */
+async function takeFiles(list){
+  let firstHtml = null, nImg = 0;
+  for (const f of list){
+    if (/\.(html?|css|txt|js)$/i.test(f.name) || /^text\//.test(f.type)){
+      const text = await f.text();
+      if (/\.html?$/i.test(f.name)){
+        const existing = store.docs.find(d => d.name === f.name);
+        if (existing){ existing.code = text; existing.updated = Date.now(); }
+        else store.docs.push({ name: cleanName(f.name), code: text, updated: Date.now() });
+        firstHtml = firstHtml || cleanName(f.name);
+      } else { await addAsset(f.webkitRelativePath && f.webkitRelativePath.split("/").slice(1).join("/") || f.name, new Blob([text], { type: f.type || "text/plain" })); nImg++; }
+    } else if (/^image\/|^video\/|^audio\//.test(f.type)){
+      const rel = f.webkitRelativePath ? f.webkitRelativePath.split("/").slice(1).join("/") : f.name;
+      await addAsset(rel, f); nImg++;
+    }
+  }
+  save(); drawDocs();
+  if (firstHtml) openDoc(firstHtml); else render(true);
+  toast(tpl("opened", { p: firstHtml ? 1 : 0, i: nImg }));
+}
+$("#openBtn").onclick = () => $("#openInput").click();
+$("#openInput").onchange = e => { takeFiles([...e.target.files]); e.target.value = ""; };
+let dragN = 0;
+addEventListener("dragenter", e => { if ([...(e.dataTransfer?.types || [])].includes("Files")){ dragN++; $("#drop").hidden = false; } });
+addEventListener("dragleave", () => { if (--dragN <= 0){ dragN = 0; $("#drop").hidden = true; } });
+addEventListener("dragover", e => { if ([...(e.dataTransfer?.types || [])].includes("Files")) e.preventDefault(); });
+addEventListener("drop", e => { if (!e.dataTransfer?.files?.length) return; e.preventDefault(); dragN = 0; $("#drop").hidden = true; takeFiles([...e.dataTransfer.files]); });
+
+/* ---------- images sheet ---------- */
+const kb = n => n < 1024 ? n + " B" : n < 1048576 ? Math.round(n / 1024) + " kB" : (n / 1048576).toFixed(1) + " MB";
+function insertAtCursor(text){
+  if (editor.cm){ const v = editor.cm.view, s = v.state.selection.main; v.dispatch({ changes: { from: s.from, to: s.to, insert: text }, selection: { anchor: s.from + text.length } }); v.focus(); }
+  else { ta.setRangeText(text, ta.selectionStart, ta.selectionEnd, "end"); ta.dispatchEvent(new Event("input")); }
+}
+function openImages(){
+  const dl = $("#dlg");
+  const card = (name, url, size, sample) => `<div class="asset${sample ? " sample" : ""}"><div class="th" style="background-image:url('${url}')"></div>
+    <div class="nm">${esc(name)}</div><div class="sz">${sample ? esc(T.sample) : kb(size)}</div>
+    <div class="acts"><button type="button" data-ins="${esc(name)}">${esc(T.insert)}</button>${sample ? "" : `<button type="button" data-del="${esc(name)}">${esc(T.del)}</button>`}</div></div>`;
+  const mine = [...assets.entries()];
+  dl.innerHTML = `<div class="dlg"><h2>${esc(T.imgTitle)}</h2><p>${T.imgText}</p>
+    <div class="row" style="justify-content:flex-start"><button type="button" class="btn" id="imgAdd">${esc(T.imgAdd)}</button><input type="file" id="imgInput" accept="image/*" multiple hidden></div>
+    ${mine.length ? `<div class="subh">${esc(T.imgMine)}</div><div class="assets">${mine.map(([n, a]) => card(n, a.url, a.size)).join("")}</div>` : `<p>${esc(T.imgNone)}</p>`}
+    <div class="subh">${esc(T.imgSamples)}</div><div class="assets">${SAMPLES.map(n => card(n, SAMPLE_URL(n), 0, true)).join("")}</div>
+    <div class="row"><button type="button" class="btn ghost" id="imgClose">${esc(T.close)}</button></div></div>`;
+  $("#imgClose").onclick = () => dl.close();
+  $("#imgAdd").onclick = () => $("#imgInput").click();
+  $("#imgInput").onchange = async e => { for (const f of e.target.files) await addAsset(f.name, f); render(true); openImages(); };
+  dl.onclick = async e => {
+    const ins = e.target.closest("[data-ins]"), del = e.target.closest("[data-del]");
+    if (ins){ dl.close(); const n = ins.dataset.ins, alt = n.split("/").pop().replace(/\.[a-z]+$/i, ""); insertAtCursor(`<img src="${n}" alt="${alt}" width="200">`); }
+    if (del){ await removeAsset(del.dataset.del); render(true); openImages(); }
+  };
+  if (!dl.open) dl.showModal();
+}
+$("#imgBtn").onclick = openImages;
+
+/* ---------- download, open full size ---------- */
+function loadZip(){
+  return window.JSZip ? Promise.resolve(window.JSZip) : new Promise((ok, no) => {
+    const s = document.createElement("script"); s.src = "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js";
+    s.onload = () => ok(window.JSZip); s.onerror = no; document.head.append(s);
+  });
+}
+function saveBlob(blob, name){
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = name;
+  document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+}
+function usedSamples(){ const all = store.docs.map(d => d.code).join("\n"); return SAMPLES.filter(n => all.includes(n) && !assets.has(n)); }
+$("#dlBtn").onclick = async () => {
+  const one = store.docs.length === 1 && !assets.size && !usedSamples().length;
+  if (one){ saveBlob(new Blob([doc().code], { type: "text/html" }), doc().name); toast(tpl("downloaded", { n: doc().name })); return; }
+  try {
+    const Z = await loadZip(), zip = new Z();
+    store.docs.forEach(d => zip.file(d.name, d.code));
+    for (const [n, a] of assets) zip.file(n, a.blob);
+    for (const n of usedSamples()) zip.file(n, await (await fetch(SAMPLE_URL(n))).blob());
+    const base = (store.docs.find(d => d.name === "index.html") ? "weboldal" : store.current.replace(/\.[a-z]+$/i, ""));
+    saveBlob(await zip.generateAsync({ type: "blob" }), base + ".zip"); toast(tpl("downloaded", { n: base + ".zip" }));
+  } catch(e){ saveBlob(new Blob([doc().code], { type: "text/html" }), doc().name); toast(T.zipFail); }
+};
+$("#fullBtn").onclick = () => {
+  let src = resolve(doc().code);
+  const base = `<base href="${new URL(".", location.href).href}">`;
+  src = /<head[^>]*>/i.test(src) ? src.replace(/<head[^>]*>/i, m => m + base) : base + src;
+  const u = URL.createObjectURL(new Blob([src], { type: "text/html" })); window.open(u, "_blank"); setTimeout(() => URL.revokeObjectURL(u), 60000);
+};
+
+/* ---------- layout: code | both | preview, and a draggable divider ---------- */
+const work = $("#work");
+let mode = "both";
+try { mode = localStorage.getItem("digikult-editor-mode") || (innerWidth < 760 ? "code" : "both"); } catch(e){}
+function setMode(m){
+  mode = m; work.classList.toggle("m-code", m === "code"); work.classList.toggle("m-view", m === "view");
+  $$("#modeSeg button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.m === m)));
+  try { localStorage.setItem("digikult-editor-mode", m); } catch(e){}
+  if (editor.cm) editor.cm.view.requestMeasure();
+}
+$("#modeSeg").onclick = e => { const b = e.target.closest("button"); if (b) setMode(b.dataset.m); };
+setMode(mode);
+let split = 50;
+try { const v = parseFloat(localStorage.getItem("digikult-editor-split")); if (v >= 20 && v <= 80) split = v; } catch(e){}
+const setSplit = v => { split = Math.max(20, Math.min(80, v)); work.style.setProperty("--split", split + "%"); };
+setSplit(split);
+const gut = $("#gutter");
+gut.addEventListener("pointerdown", e => {
+  if (innerWidth < 760 || mode !== "both") return;
+  e.preventDefault(); gut.setPointerCapture(e.pointerId); gut.classList.add("drag"); work.classList.add("dragging");
+  const r = work.getBoundingClientRect();
+  const move = ev => setSplit((ev.clientX - r.left) / r.width * 100);
+  const up = () => { gut.classList.remove("drag"); work.classList.remove("dragging"); gut.removeEventListener("pointermove", move); try { localStorage.setItem("digikult-editor-split", String(split)); } catch(e){} if (editor.cm) editor.cm.view.requestMeasure(); };
+  gut.addEventListener("pointermove", move); gut.addEventListener("pointerup", up, { once: true });
+});
+gut.addEventListener("keydown", e => { if (e.key === "ArrowLeft") setSplit(split - 5); if (e.key === "ArrowRight") setSplit(split + 5); });
+
+/* ---------- toolbar extras ---------- */
+$("#findBtn").onclick = () => editor.cm ? editor.cm.search() : ta.focus();
+$("#fmtBtn").onclick = () => editor.cm && editor.cm.format();
+let size = 15;
+try { const s = parseInt(localStorage.getItem("digikult-editor-size"), 10); if (s >= 12 && s <= 28) size = s; } catch(e){}
+const setSize = n => { size = Math.max(12, Math.min(28, n)); document.documentElement.style.setProperty("--code-size", size + "px"); if (editor.cm) editor.cm.view.requestMeasure(); try { localStorage.setItem("digikult-editor-size", String(size)); } catch(e){} };
+setSize(size);
+$("#smaller").onclick = () => setSize(size - 1);
+$("#bigger").onclick = () => setSize(size + 1);
+const keys = $("#keys"), keysBtn = $("#keysBtn");
+const showKeys = on => { keys.hidden = !on; keysBtn.setAttribute("aria-expanded", String(on)); };
+keysBtn.onclick = () => showKeys(keys.hidden);
+$("#keysClose").onclick = () => { showKeys(false); keysBtn.focus(); };
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape" && !keys.hidden) showKeys(false);
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "s"){ e.preventDefault(); save(); setStatusSaved(true); toast(T.savedToast); }
+});
+$("#stWarn").onclick = () => { if (warnN) $("#lint").scrollIntoView({ block: "nearest" }); };
+if (!editor.cm) ["#findBtn", "#fmtBtn", "#keysBtn"].forEach(s => $(s).hidden = true);
+
+let toastT = 0;
+function toast(msg){ const t = $("#toast"); t.textContent = msg; t.classList.add("on"); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove("on"), 2200); }
+
+/* ---------- code handed over from a lesson ("Open in the editor") ---------- */
+try {
+  const imp = JSON.parse(localStorage.getItem(IMPORT));
+  if (imp && typeof imp.code === "string" && Date.now() - (imp.at || 0) < 10 * 60000){
+    localStorage.removeItem(IMPORT);
+    const same = store.docs.find(d => d.code === imp.code);
+    if (same) store.current = same.name;
+    else { const n = uniqueName(imp.name || "pelda.html"); store.docs.push({ name: n, code: imp.code, updated: Date.now() }); store.current = n; }
+    save(); ta.value = doc().code;
+    setTimeout(() => toast(tpl("imported", { n: store.current })), 400);
+  }
+} catch(e){}
+
+drawDocs(); editor.refit(); render(true); loadAssets();
+
+</script>
+<script src="../nav.js" defer></script>
+</body>
+</html>
