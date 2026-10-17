@@ -300,6 +300,38 @@ body.subject .hero{display:none}
   };
 
   /* ---------- cover art (one per page id; new pages get a generated cover) ---------- */
+/* Bodri, a puli seen from the side, facing left: a dome of black cords that hang to the ground,
+   a fringe over the eyes, a shiny nose, a pink tongue and a mop tail curled over the back. */
+function puliSvg(){
+  const top = x => {                                   /* upper outline: head dome, then the back */
+    if (x < 27){ const dx = (x - 17)/12.5; return 22 - Math.sqrt(Math.max(0, 1 - dx*dx))*12.5; }
+    const dx = (x - 38)/19; return 30 - Math.sqrt(Math.max(0, 1 - dx*dx))*15;
+  };
+  let cords = "", hi = "";
+  for (let i = 0, x = 5.5; x <= 56.5; i++, x += 2.55){
+    const y0 = top(x) + 1.2, sway = ((i*37) % 7 - 3)*.35, len = (x < 9 ? 41 : x < 26 ? 48 : 50) - y0 + ((i*5)%3)*.9;
+    const y1 = y0 + len, mx = x + sway, col = i % 2 ? "#232327" : "#1b1b1e";
+    cords += `<path d="M${x.toFixed(1)} ${y0.toFixed(1)}Q${(mx+.8).toFixed(1)} ${((y0+y1)/2).toFixed(1)} ${(mx-.3).toFixed(1)} ${y1.toFixed(1)}" stroke="${col}" stroke-width="3.4" stroke-linecap="round" fill="none"/>`;
+    hi += `<path d="M${(x-.7).toFixed(1)} ${(y0+1.5).toFixed(1)}Q${(mx).toFixed(1)} ${(y0+len*.35).toFixed(1)} ${(mx-.6).toFixed(1)} ${(y0+len*.6).toFixed(1)}" stroke="#5c5c68" stroke-width=".8" stroke-linecap="round" fill="none" opacity="${i%2 ? .55 : .35}"/>`;
+  }
+  let top2 = "";                                      /* a short second layer of cords for volume */
+  for (let i = 0, x = 8; x <= 54; i++, x += 4.9){
+    const y0 = top(x) + .4, len = 9 + (i%3)*2;
+    top2 += `<path d="M${x.toFixed(1)} ${y0.toFixed(1)}q${(.9 - (i%2)*1.6).toFixed(1)} ${(len/2).toFixed(1)} ${(-.4 + (i%3)*.4).toFixed(1)} ${len}" stroke="#2a2a30" stroke-width="3.1" stroke-linecap="round" fill="none"/><path d="M${(x-.6).toFixed(1)} ${(y0+1).toFixed(1)}q.6 3 .2 ${(len*.55).toFixed(1)}" stroke="#6a6a76" stroke-width=".8" stroke-linecap="round" fill="none" opacity=".5"/>`;
+  }
+  return `<svg viewBox="0 0 64 56" aria-hidden="true">
+    <ellipse cx="32" cy="52.5" rx="27" ry="2.6" fill="#000" opacity=".22"/>
+    <g fill="#0f0f11"><ellipse cx="13" cy="51" rx="3" ry="1.8"/><ellipse cx="22" cy="52" rx="3" ry="1.8"/><ellipse cx="42" cy="52" rx="3" ry="1.8"/><ellipse cx="51" cy="51" rx="3" ry="1.8"/></g>
+    <path d="M5 22a12.5 12.5 0 0 1 24-6c3-2 8-2 12-2 10 0 17 6 17 16v12H5z" fill="#141416"/>
+    ${cords}${hi}${top2}
+    <g stroke-linecap="round" fill="none"><path d="M52 18c4-8 11-6 10 0-1 4-5 5-7 3" stroke="#1b1b1e" stroke-width="4.2"/><path d="M53 17c3-6 8-5 8-1" stroke="#5c5c68" stroke-width=".9" opacity=".5"/></g>
+    <path d="M3 27.6c0-2.3 1.8-3.6 3.8-3.4s2.9 1.8 2.6 3.6-2.2 2.7-4 2.5S3 29.2 3 27.6z" fill="#070708"/>
+    <circle cx="5.2" cy="26.3" r=".9" fill="#fff" opacity=".7"/>
+    <path d="M7.5 31c.4 3 1.6 4.6 3.2 4.4s2-2.4 1.4-4.6z" fill="#ff8fa3" stroke="#d65c78" stroke-width=".6"/>
+    <circle cx="11.5" cy="20.5" r="1.1" fill="#e9eef2" opacity=".85"/>
+  </svg>`;
+}
+  const PULI = puliSvg().replace(/^<svg[^>]*>/, "").replace(/<\/svg>\s*$/, "");   /* Bodri, shared with the Round-Up page */
   const COVERS = {
     heist:`<svg viewBox="0 0 400 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
       <defs><linearGradient id="hb" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0d141b"/><stop offset="1" stop-color="#182230"/></linearGradient>
@@ -331,9 +363,7 @@ body.subject .hero{display:none}
       <g fill="#f4f1e8"><g transform="translate(232 150)"><circle r="10"/><circle cx="10" cy="-3" r="9"/><circle cx="19" cy="1" r="9"/><circle cx="8" cy="6" r="9"/><ellipse cx="-11" cy="0" rx="6" ry="5" fill="#2b2b2b"/></g>
         <g transform="translate(290 162)"><circle r="9"/><circle cx="9" cy="-3" r="8"/><circle cx="17" cy="1" r="8"/><circle cx="7" cy="5" r="8"/><ellipse cx="-10" cy="0" rx="5.5" ry="4.5" fill="#2b2b2b"/></g>
         <g transform="translate(336 146)"><circle r="8"/><circle cx="8" cy="-2" r="7"/><circle cx="15" cy="1" r="7"/><ellipse cx="-9" cy="0" rx="5" ry="4" fill="#2b2b2b"/></g></g>
-      <g transform="translate(176 168)"><ellipse cx="0" cy="0" rx="20" ry="10" fill="#1b1b1b"/><circle cx="-18" cy="-6" r="8" fill="#1b1b1b"/>
-        <path d="M-14 4v8M-6 6v9M2 6v9M10 4v8M16 2v8" stroke="#1b1b1b" stroke-width="3" stroke-linecap="round"/>
-        <path d="M-8 -6v10M-1 -7v11M6 -6v10M13 -4v9" stroke="#333" stroke-width="1.6"/><path d="M19 -4q8-8 4-14" fill="none" stroke="#1b1b1b" stroke-width="4" stroke-linecap="round"/><path d="M-24 -2l-4 3" stroke="#e86b8a" stroke-width="3" stroke-linecap="round"/></g>
+      <g transform="translate(140 130) scale(1.2)">${PULI}</g>
     </svg>`,
     pasture:`<svg viewBox="0 0 400 180" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
       <rect width="400" height="180" fill="#5f8f3b"/>
@@ -342,7 +372,7 @@ body.subject .hero{display:none}
         <rect x="22" y="26" width="110" height="112" rx="4"/><rect x="146" y="26" width="110" height="112" rx="4"/><rect x="270" y="26" width="110" height="112" rx="4"/></g>
       <g fill="#f4f1e8">${[[50,58],[80,52],[105,64],[60,92],[92,98],[108,118],[176,62],[208,70],[230,58],[190,104],[300,66],[338,90]].map(([x,y])=>`<g transform="translate(${x} ${y})"><circle r="8"/><circle cx="7" cy="-2" r="7"/><circle cx="6" cy="5" r="7"/><circle cx="-8" cy="0" r="4" fill="#2b2b2b"/></g>`).join("")}</g>
       <g font-family="Kalam,cursive" font-size="24" font-weight="700" fill="#fff6e8" text-anchor="middle"><text x="77" y="166">6</text><text x="201" y="166">4</text><text x="325" y="166">2</text></g>
-      <g transform="translate(262 128)"><ellipse rx="13" ry="7" fill="#1b1b1b"/><circle cx="-12" cy="-4" r="6" fill="#1b1b1b"/></g>
+      <g transform="translate(240 108) scale(.62)">${PULI}</g>
     </svg>`,
     backstage:`<svg viewBox="0 0 400 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
       <defs><linearGradient id="bsSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0c0820"/><stop offset="1" stop-color="#2a1550"/></linearGradient>
