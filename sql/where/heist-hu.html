@@ -62,6 +62,7 @@ header.top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-
 .plaque::before,.plaque::after{content:"";position:absolute;top:50%;width:9px;height:9px;margin-top:-4px;border-radius:50%;
   background:radial-gradient(circle at 35% 30%,#fff3c4,var(--brass) 55%,#6b4a0d)}
 .plaque::before{left:-17px}.plaque::after{right:-17px}
+@media (max-width:520px){ .plaque{flex-wrap:wrap;row-gap:6px} .plaque>div:not(.gem-badge){flex:1 1 150px;min-width:0} .plaque>.stamp{margin-left:auto} }
 .plaque h1{font-size:clamp(28px,4.6vw,50px);color:#fff1cc;text-shadow:0 0 22px rgba(226,176,74,.45), 0 2px 0 #000}
 .plaque .eyebrow{color:#d9b665}
 .gem-badge{position:relative;flex:none;width:52px;height:52px;display:grid;place-items:center}
@@ -77,7 +78,7 @@ header.top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-
 .meta-item b{font:400 20px var(--f-display);color:#fff1cc}
 
 /* velvet rope chapter path */
-.steps{display:grid;grid-template-columns:repeat(11,minmax(0,1fr));gap:0;padding-top:6px}
+.steps{display:grid;grid-template-columns:repeat(11,minmax(0,1fr));gap:0;padding-top:6px;overflow-x:clip;overflow-y:visible}
 .step{all:unset;position:relative;display:grid;justify-items:center;gap:6px;cursor:pointer;padding:4px 2px;min-width:0}
 .step .n{position:relative;z-index:2;width:42px;height:42px;border-radius:50%;display:grid;place-items:center;
   font:400 18px var(--f-display);color:#2a1d05;
@@ -145,7 +146,7 @@ main{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:26px;ali
     repeating-linear-gradient(to bottom, transparent 0 29px, var(--paper-line) 29px 30px),
     var(--paper);
   box-shadow:0 24px 50px rgba(0,0,0,.6), 0 2px 0 #e3e8ef, 0 4px 0 #cbd3de}
-.case{grid-template-columns:minmax(0,1fr)} .case>*{min-width:0}
+.case{grid-template-columns:minmax(0,1fr)} .case>*{min-width:0} @media (max-width:560px){ .case{transform:none} }
 .case::before{content:"";position:absolute;top:-16px;right:42px;width:20px;height:62px;border:3px solid #a7b3bf;border-radius:12px;transform:rotate(8deg);box-shadow:1px 2px 2px rgba(0,0,0,.3)}
 @media (max-width:560px){ .case{padding-left:46px;background:
     radial-gradient(circle at 14px 50%, var(--bg) 5px, rgba(0,0,0,.25) 6px, transparent 7px) 0 0/28px 70px repeat-y,
@@ -158,10 +159,10 @@ main{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:26px;ali
 mark{background:linear-gradient(transparent 35%, #ffe45c 35%, #ffe45c 88%, transparent 88%);color:inherit;padding:0 .1em}
 .learn{position:relative;background:var(--sticky);border-radius:2px;padding:20px 16px 14px;display:grid;gap:8px;transform:rotate(.6deg);box-shadow:0 8px 16px rgba(30,30,10,.25)}
 .learn::before{content:"";position:absolute;top:-9px;left:50%;width:84px;height:20px;margin-left:-42px;background:rgba(220,230,240,.75);transform:rotate(-3deg);box-shadow:0 1px 2px rgba(0,0,0,.15)}
-.learn{grid-template-columns:minmax(0,1fr)} .learn>*{min-width:0} .learn table{display:block;overflow-x:auto;max-width:100%}
+.learn{grid-template-columns:minmax(0,1fr)} .learn>*{min-width:0} .learn table.ops{width:100%} .learn table.ops :is(td,th){white-space:normal;overflow-wrap:anywhere}
 .learn h3{font:700 20px var(--f-hand);color:#7a5a00}
 .learn p{margin:0}
-.learn pre{margin:0;background:#ffffff;border:1px solid #e5d98a;border-radius:4px;padding:10px 12px;overflow-x:auto;font-size:13.5px;line-height:1.5}
+.learn pre{margin:0;white-space:pre-wrap;overflow-wrap:anywhere;background:#ffffff;border:1px solid #e5d98a;border-radius:4px;padding:10px 12px;overflow-x:auto;font-size:13.5px;line-height:1.5}
 .task{border-left:4px solid #d2333f;padding:4px 0 4px 14px;display:grid;gap:4px}
 .task h3{font:700 22px var(--f-hand);color:#d2333f}
 .task p{margin:0;font-weight:700;font-size:17px}
@@ -170,7 +171,7 @@ details.hint{border:2px dashed #9db0cc;border-radius:8px;padding:8px 12px;backgr
 details.hint summary{cursor:pointer;font:600 12.5px var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:#3b4f78}
 details.hint[open] summary{margin-bottom:6px}
 details.hint p{margin:0}
-details.hint pre{margin:6px 0 0;overflow-x:auto;background:#ffffff;padding:8px 10px;border-radius:5px;font-size:13px}
+details.hint pre{margin:6px 0 0;white-space:pre-wrap;overflow-wrap:anywhere;overflow-x:auto;background:#ffffff;padding:8px 10px;border-radius:5px;font-size:13px}
 form.answer{display:flex;gap:10px;flex-wrap:wrap;align-items:end}
 form.answer input{flex:1 1 180px;min-width:0;font:700 22px var(--f-hand);color:var(--pen);padding:4px 4px 2px;border:none;border-bottom:2px solid var(--pen);border-radius:0;background:transparent}
 form.answer input::placeholder{color:#8f9bb3;font-weight:400}
@@ -239,7 +240,7 @@ td.null{color:var(--muted);font-style:italic}
 .err{background:var(--bad-soft);color:var(--bad);border-radius:8px;padding:12px 14px;font-weight:700}
 .err p{margin:.3em 0 0;font-weight:400;color:var(--ink)}
 .note{color:var(--muted);font-style:italic;margin:0}
-.schema{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:10px}
+.schema{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(270px,100%),1fr));gap:10px}
 .tbl{border:1px solid var(--line);border-radius:8px;padding:10px 12px;background:rgba(0,0,0,.25);min-width:0}
 .tbl button{all:unset;cursor:pointer;font:600 14px var(--f-mono);color:var(--accent)}
 .tbl button:hover{text-decoration:underline}
