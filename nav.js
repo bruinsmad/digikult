@@ -201,8 +201,8 @@
                   hu: "Űrplakát rakétával és kráteres sajtholddal: Unió, Különbség, Metszet és a csomópont-szerkesztő, képregényszerű lépésekben.",
                   en: "A space poster with a rocket and a cratered cheese Moon: Union, Difference, Intersection and the Node tool, in comic-strip steps."
                 },
-                files: { en: "inkscape/path-ops/cheese-moon.html" },
-                progress: { chapters: 6, keys: { en: "cheese-moon-v1" } }
+                files: { en: "inkscape/path-ops/cheese-moon.html", hu: "inkscape/path-ops/cheese-moon-hu.html" },
+                progress: { chapters: 6, keys: { en: "cheese-moon-v1", hu: "cheese-moon-v1" } }
               },
               {
                 id: "haunted-house",
@@ -213,8 +213,8 @@
                   hu: "Éjszakai plakát világító ablakokkal, szellemmel, ferde fával és kerítéssel: lyukak Különbséggel, fény mögöttük.",
                   en: "A night poster with glowing windows, a ghost, a leaning tree and a fence: holes cut with Difference, light behind them."
                 },
-                files: { en: "inkscape/path-ops/haunted-house.html" },
-                progress: { chapters: 7, keys: { en: "haunted-house-v1" } }
+                files: { en: "inkscape/path-ops/haunted-house.html", hu: "inkscape/path-ops/haunted-house-hu.html" },
+                progress: { chapters: 7, keys: { en: "haunted-house-v1", hu: "haunted-house-v1" } }
               }
             ]
           },
@@ -226,25 +226,25 @@
                 id: "slice-shop",
                 kind: "story",
                 minutes: 35,
-                title: { hu: "A Szeletbolt", en: "The Slice Shop" },
+                title: { hu: "Pizza Pont", en: "The Slice Shop" },
                 desc: {
                   hu: "Pizzéria-szórólap: cím körvonallal, szöveg körben a pizza körül, szövegdoboz, szöveg körbe öntve és kivágott betűk.",
                   en: "A pizza-shop flyer: an outlined title, text round the pizza, a text box, text poured into a circle and cut-out letters."
                 },
-                files: { en: "inkscape/text/slice-shop.html" },
-                progress: { chapters: 6, keys: { en: "slice-shop-v1" } }
+                files: { en: "inkscape/text/slice-shop.html", hu: "inkscape/text/slice-shop-hu.html" },
+                progress: { chapters: 6, keys: { en: "slice-shop-v1", hu: "slice-shop-v1" } }
               },
               {
                 id: "band-night",
                 kind: "story",
                 minutes: 35,
-                title: { hu: "Zenekari est", en: "Band Night" },
+                title: { hu: "Zenei est", en: "Band Night" },
                 desc: {
                   hu: "Koncertplakát: betűnként színezett cím, szöveg egy hanghullámon, fellépőlista, szövegbuborék és tüskés betűk a csomópont-szerkesztővel.",
                   en: "A concert poster: a title coloured letter by letter, text on a sound wave, a line-up, a speech bubble and spiky letters with the Node tool."
                 },
-                files: { en: "inkscape/text/band-night.html" },
-                progress: { chapters: 6, keys: { en: "band-night-v1" } }
+                files: { en: "inkscape/text/band-night.html", hu: "inkscape/text/band-night-hu.html" },
+                progress: { chapters: 6, keys: { en: "band-night-v1", hu: "band-night-v1" } }
               }
             ]
           },
@@ -261,8 +261,8 @@
                   hu: "Átveszed a hatalmat egy kitalált puccsban: az ország zászlószínei, a döntéseid és egy csúszka alapján mindenki egyedi zászlót kap – lépésről lépésre, minden eddigi eszközzel.",
                   en: "Take power in a fictional coup: your country's flag colours and your choices give every student a unique banner – guided step by step, with every tool from the year."
                 },
-                files: { en: "inkscape/final/coup.html" },
-                progress: { chapters: 7, keys: { en: "coup-v1" } }
+                files: { en: "inkscape/final/coup.html", hu: "inkscape/final/coup-hu.html" },
+                progress: { chapters: 7, keys: { en: "coup-v1", hu: "coup-hu-v1" } }
               }
             ]
           }
