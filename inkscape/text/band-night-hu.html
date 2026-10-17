@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Zenei est – Inkscape</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap">
+<link rel="stylesheet" href="../mission.css">
+<style>:root{--accent:#4cc9f0}</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+window.MISSION = {
+  lang: "hu",
+  key: "band-night-v1",
+  title: "Zenei est",
+  story: "Pénteken este az iskolai zenekarok játszanak a tornateremben, és még senki sem csinált plakátot. Egy órád van – és néhány új szövegtrükköd.",
+  file: "vezeteknev_zeneiest",
+  poster: "../img/band-night/hu/poster.png",
+  pdf: "../pdf/band-night-feladatlap.pdf",
+  teacherPdf: "../pdf/band-night-tanari.pdf",
+  saveImg: "../img/band-night/hu/save.png",
+  bonusImg: "../img/band-night/hu/bonus.png",
+  buildIntro: "Megint a szöveg a főszereplő – új trükkökkel. A színek, betűtípusok és méretek a te döntésed.",
+  rules: [
+    "<b>Szöveg eszköz:</b> egy <i>kattintás</i> = egy sor, egy <i>húzás</i> = szövegkeret. Szerkesztéshez kattints a szöveg<i>be</i>.",
+    "<b>A szöveg egy része:</b> húzz át néhány betűt a Szöveg eszközzel – a szín és a méret ezután csak azokra a betűkre hat.",
+    "<b>Toll eszköz</b> (tollhegy görbével, a spirál alatt): katt, katt, katt – a kattintások között egyenes vonal –, a végén <i>dupla kattintás</i>.",
+    "<b>Útvonalra illesztés, Tördelés keretbe, Unió:</b> pontosan 2 objektum legyen kijelölve (kattintás, <span class='key'>Shift</span> + kattintás). Az állapotsor megszámolja őket."
+  ],
+  elements: [
+    ["Háttér és hanglemez", "Téglalap és Ellipszis eszköz", "bemelegítés"],
+    ["ZENEI EST neoncím", "húzz át egy betűt, kattints egy színre – betűnként", "a szöveg egy részének formázása"],
+    ["Hanghullám", "cikcakk a Toll eszközzel + szöveg", "Szöveg ▸ Útvonalra való illesztés"],
+    ["Fellépők", "szövegkeret, minden sor után Enter, középre, az első sor nagyobb", "szövegkeret, igazítás"],
+    ["Szövegbuborék", "ellipszis + háromszög → Unió, aztán a szöveg", "Szöveg ▸ Szöveg tördelése keretbe"],
+    ["Tüskés ROCK!", "alakzattá alakított betűk, egy sarok kihúzva", "Útvonallá alakítás + Csomópont eszköz"]
+  ],
+  steps: [
+    { title: "Háttér és hanglemez", img: "../img/band-night/hu/step1.png",
+      alt: "1. lépés: sötétlila téglalap az oldalon, nagy fekete kör, piros címkekör és egy pici lila lyuk",
+      lead: "Gyors bemelegítés ismert alakzatokkal.",
+      note: "A tetejét hagyd szabadon a címnek, bal középen a buboréknak, alul a fellépőknek és a ROCK!-nak.",
+      stuck: ["A téglalapnak körvonala van: <span class='menu'>Objektum ▸ Kitöltés és körvonal…</span> → <i>Körvonalrajzolat</i> fül → <b>X</b>."] },
+    { title: "Neoncím", img: "../img/band-night/hu/step2.png",
+      alt: "2. lépés: ZENEI EST fehérrel, a Szöveg eszközzel áthúzva a Z betű, rózsaszín, ugyanígy minden betű új színt kap",
+      lead: "Egy szöveg, sok szín: a Szöveg eszközzel egyes betűket is kijelölhetsz, és csak azokat változtatod.",
+      note: "A kijelölt betűk kék kiemelést kapnak.",
+      stuck: ["Az egész cím színe változik: a Kijelölő volt aktív. Válaszd a Szöveg eszközt, és csak egy betűt húzz át.",
+              "Ne írd be külön szövegként minden betűt – EGY szövegobjektum maradjon."] },
+    { title: "Szöveg a hanghullámon", img: "../img/band-night/hu/step3.png",
+      alt: "3. lépés: cikcakkos vonal a Toll eszközzel balról jobbra, világoskék körvonal, ÉLŐ ZENE * KAJA * TÁNC szöveg, mindkettő kijelölve, Szöveg ▸ Útvonalra való illesztés",
+      lead: "Rajzold meg a saját útvonaladat a Toll eszközzel, aztán tedd rá a szöveget: <span class='menu'>Szöveg ▸ Útvonalra való illesztés</span>.",
+      note: "A cikcakk legyen lankás – az éles sarkoknál összenyomódnak a betűk.",
+      stuck: ["A vonal egyre nő: nem fejezted be. Kattints duplán az utolsó pontra.",
+              "A cikcakk kitöltést kap: a palettakattintás a <i>kitöltést</i> állítja. Kattints az X-re, a színt pedig a <i>Körvonalrajzolat</i> fülön állítsd.",
+              "A szöveg a jobb végén kezdődik: jobbról balra rajzoltad a vonalat. A vonalon: <span class='menu'>Útvonal ▸ Megfordítás</span>, vagy rajzold újra."] },
+    { title: "A fellépők", img: "../img/band-night/hu/step4.png",
+      alt: "4. lépés: szövegkeret húzása, a zenekarok beírása, minden sor után Enter, középre gomb, csak a FELLÉPŐK szó kijelölése, nagyobb és sárga",
+      lead: "Szövegkeret több sorral – és egy kereten belül többféle méret.",
+      stuck: ["Piros keret: nem fér el a szöveg. Húzd a jobb alsó ◇ fogantyút.",
+              "Minden sor nagyobb lett: méretváltás előtt csak az első sort jelöld ki a Szöveg eszközzel."] },
+    { title: "Szövegbuborék", img: "../img/band-night/hu/step5.png",
+      alt: "5. lépés: fehér ellipszis és háromszög farok, Útvonal ▸ Unió, alá beírt szöveg, buborék és szöveg kijelölve, Szöveg ▸ Szöveg tördelése keretbe, középre, sötét szín",
+      lead: "Az Unió megépíti a buborékot, a <span class='menu'>Szöveg ▸ Szöveg tördelése keretbe</span> megtölti szöveggel.",
+      stuck: ["Az Unió után két darab marad: a farok nem fedte az ellipszist. Vonj vissza, tolj beljebb a farkat, próbáld újra.",
+              "A szöveg vége hiányzik: kicsi neki a buborék. Nagyítsd a buborékot, vagy kicsinyítsd a szöveget."] },
+    { title: "Tüskés ROCK!", img: "../img/band-night/hu/step6.png",
+      alt: "6. lépés: sárga ROCK! szöveg, Útvonal ▸ Objektum átalakítása útvonallá, a Csomópont eszköz mutatja a csomópontokat, a K jobb felső sarka tüskévé húzva",
+      lead: "Az <span class='menu'>Útvonal ▸ Objektum átalakítása útvonallá</span> után a betűk közönséges alakzatok – szerkeszd a csomópontjaikat, mint a fát a Kísértetházban.",
+      note: "Előbb ellenőrizd a helyesírást: útvonallá alakítás után a betűket már nem lehet szövegként szerkeszteni.",
+      stuck: ["Nem jelennek meg csomópontok: még szöveg. Előbb <span class='menu'>Útvonal ▸ Objektum átalakítása útvonallá</span>.",
+              "Az egész szó mozog: a Kijelölő aktív. Válaszd a Csomópont eszközt, és egy csomópontot húzz."] }
+  ],
+  checklist: [
+    "A háttér befedi az oldalt; hanglemez címkével",
+    "A ZENEI EST vastag betűs, minden betű más színű – egy szövegobjektum",
+    "Cikcakkos vonal, rajta az ÉLŐ ZENE * KAJA * TÁNC (Toll eszköz + Útvonalra illesztés)",
+    "Fellépők szövegkeretben: középre igazítva, a FELLÉPŐK nagyobb és sárga",
+    "A szövegbuborék EGY alakzat, benne a szöveg (Unió + Tördelés keretbe)",
+    "ROCK! legalább egy kihúzott tüskével (Útvonallá alakítás + Csomópont eszköz)",
+    "Az SVG és a PNG is elmentve, a fájlnévben a vezetékneveddel"
+  ],
+  bonus: [
+    ["Ragyogó cím", "Jelöld ki a címet, <span class='menu'>Szerkesztés ▸ Kettőzés</span>, <span class='menu'>Objektum ▸ Lejjebb helyezés</span>, aztán a Kitöltés és körvonal panelen <i>Elmosás (%)</i> kb. 10."],
+    ["Szöveg a lemezcímkén", "Kis kör a címkén + A OLDAL * A OLDAL * → <span class='menu'>Szöveg ▸ Útvonalra való illesztés</span>."],
+    ["Jegysor", "JEGY: 500 Ft a bejáratnál – aztán ugyanabban a szövegben egy kisebb, dőlt második sor."],
+    ["Hangjegyek", "Ellipszis + vékony téglalap + kis háromszög → <span class='menu'>Útvonal ▸ Unió</span>, aztán <span class='menu'>Szerkesztés ▸ Kettőzés</span>."],
+    ["Ferde cím", "Kattints kétszer a címre, és húzz egy saroknyilat."]
+  ]
+};
+</script>
+<script src="../mission.js?v=2"></script>
+<script src="../../nav.js" defer></script>
+</body>
+</html>
