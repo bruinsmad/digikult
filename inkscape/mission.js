@@ -1,6 +1,12 @@
 /* Inkscape missions – renders a mission page from window.MISSION.
    Progress is saved in this browser under MISSION.key as {solved:[step numbers], checks:[…], end:bool};
    the landing page reads "solved" to draw the progress bar (see nav.js → progress). */
+const DEFAULT_RULES = [
+  "<b>Colours:</b> click a swatch in the palette = fill colour. Stroke colour and stroke on/off: <span class=\"menu\">Object ▸ Fill and Stroke…</span>, <i>Stroke paint</i> tab.",
+  "<b>Several objects:</b> click the first, hold <span class=\"key\">Shift</span> and click the others. The status bar at the bottom counts them.",
+  "<b>Difference:</b> the object on <i>top</i> is cut out of the one underneath. Exactly two objects must be selected."
+];
+
 (function () {
   const M = window.MISSION;
   const $ = s => document.querySelector(s);
@@ -52,7 +58,7 @@
     </section>
 
     <section class="sec">
-      <div class="sec-head"><h2>What you'll build</h2><p>Every part is made with one operation you already know. Colours and sizes are up to you.</p>
+      <div class="sec-head"><h2>What you'll build</h2><p>${M.buildIntro || "Every part is made with one operation you already know. Colours and sizes are up to you."}</p>
         <svg viewBox="0 0 200 12" aria-hidden="true"><path d="M3 8 C 50 2, 100 12, 150 5 S 190 5, 197 7"/></svg></div>
       <ul class="elements">${M.elements.map(([what, how, op]) => `<li><b>${esc(what)}</b><span>${esc(how)}</span><span><em>${esc(op)}</em></span></li>`).join("")}</ul>
     </section>
@@ -68,11 +74,7 @@
           <div><p class="lead" style="margin:6px 0 8px"><b>Your tools</b> – the toolbox on the left edge. Hover an icon to see its name.</p>
           ${shot("../img/common/tools.png", "Toolbox icons: Selector, Node tool, Rectangle, Ellipse, Star/Polygon, Text")}</div>
           <div><p class="lead" style="margin:6px 0 8px"><b>First:</b> <span class="menu">File ▸ New</span>, then <span class="menu">File ▸ Save As…</span> <code>${esc(M.file)}.svg</code>, then <span class="menu">View ▸ Zoom ▸ Zoom Page</span>.</p></div>
-          <ul class="rules">
-            <li><span class="ic">1</span><span><b>Colours:</b> click a swatch in the palette = fill colour. Stroke colour and stroke on/off: <span class="menu">Object ▸ Fill and Stroke…</span>, <i>Stroke paint</i> tab.</span></li>
-            <li><span class="ic">2</span><span><b>Several objects:</b> click the first, hold <span class="key">Shift</span> and click the others. The status bar at the bottom counts them.</span></li>
-            <li><span class="ic">3</span><span><b>Difference:</b> the object on <i>top</i> is cut out of the one underneath. Exactly two objects must be selected.</span></li>
-          </ul>
+          <ul class="rules">${(M.rules || DEFAULT_RULES).map((r, i) => `<li><span class="ic">${i + 1}</span><span>${r}</span></li>`).join("")}</ul>
         </div>
       </article>
     </section>
