@@ -493,9 +493,9 @@ function layout(){
     gridPens(o.pens, px + pad, py + sign + pad, pw - 2*pad, ph - sign - 2*pad, best.c);
     /* shrink the wall to hug its pens */
     const x0 = Math.min(...o.pens.map(p=>p.x)), x1 = Math.max(...o.pens.map(p=>p.x + p.w));
-    const y0 = Math.min(...o.pens.map(p=>p.y)), y1 = Math.max(...o.pens.map(p=>p.fy + p.fh + p.lab));
+    const y0 = Math.min(...o.pens.map(p=>p.y)), y1 = Math.max(...o.pens.map(p=>p.fy + p.fh + p.lab*1.12));   /* the result label pokes a little below its band */
     o.x = Math.max(px, x0 - pad); o.w = Math.min(px + pw, x1 + pad) - o.x;
-    o.y = Math.max(py, y0 - sign - pad*.6); o.h = Math.min(py + ph, y1 + pad*.6) - o.y;
+    o.y = Math.max(py, y0 - sign - pad*.6); o.h = Math.min(py + ph + gapO*.5, y1 + pad*.6 + 4*S) - o.y;   /* keep the wall clear of the labels */
     o.sign = sign; o.pad = pad; o.gate = { x: o.x + o.w/2, y: o.y + o.h + 4*S };
   });
   pv.paddocks = outers;
@@ -748,11 +748,12 @@ function fencePath(g, p, prog){
   }
   g.stroke();
 }
-function drawPen(g, p, t){
+function drawPen(g, p, t, part = "base"){                 /* "base" = fence and title, "tags" = counter and result label (drawn last, on top) */
   const SL = SLF(), a = clamp((t - p.appearAt)/(450*SL), 0, 1);
   if (a <= 0) return;
   const S = pv.S, dropped = p.dropped && pv.dropAt && t >= pv.dropAt, fade = dropped ? clamp((t - pv.dropAt)/400, 0, 1) : 0;
   g.save(); g.globalAlpha = 1 - fade*.55;
+  if (part === "base"){
   g.fillStyle = `rgba(255,244,217,${.10*a})`; g.fillRect(p.fx, p.fy, p.fw, p.fh);
   const lw = clamp(p.c*.18, 1.6, 4*S);
   g.strokeStyle = "#8a5a2e"; g.lineWidth = lw; g.lineCap = "round";
@@ -765,6 +766,8 @@ function drawPen(g, p, t){
   let title = p.title; while (g.measureText(title).width > p.w - 4 && title.length > 2) title = title.slice(0,-2);
   if (title !== p.title) title = title.trimEnd() + "…";
   g.fillStyle = "#fff4d9"; g.fillText(title, p.fx + p.fw/2, p.fy - p.head*.28);
+  } else {
+  g.globalAlpha *= a; g.textAlign = "center";
   /* live counter */
   if (p.arrived > 0 && p.fw > 26){
     const r = clamp(p.head*.42, 7, 13*S), bx = p.fx + p.fw - r*.4, by = p.fy - r*.2 + r*.4;
@@ -784,8 +787,10 @@ function drawPen(g, p, t){
     g.fillStyle = dropped ? "#d9d9d9" : "#f5c542"; g.textBaseline = "middle"; g.fillText(lab, 0, 1);
     g.restore();
   }
+  }
   g.restore();
-  /* HAVING stamp */
+  if (part !== "tags") return;
+  /* HAVING stamp (on top of the faded sheep) */
   if (dropped){
     const k = clamp((t - pv.dropAt)/300, 0, 1), fsz = clamp(p.fw*.2, 9, 22*S);
     g.save(); g.globalAlpha = k; g.translate(p.fx + p.fw/2, p.fy + p.fh/2); g.rotate(-.25); g.scale(1 + (1-k)*1.5, 1 + (1-k)*1.5);
@@ -859,6 +864,7 @@ function pvFrame(t){
     if (dist <= sp){ d.x = p.x; d.y = p.y; d.path.shift(); if (p.cb) p.cb(); }
     else { d.x += dx/dist*sp; d.y += dy/dist*sp; d.face = dx < 0 ? -1 : 1; }
   }
+  pv.pens.forEach(p=>drawPen(g, p, t, "tags"));   /* counters and labels sit above fences, paddocks and sheep */
   drawDog(g, t);
   if (pv.steps.length) updateCaption(t);
 }
@@ -1001,8 +1007,9 @@ pv.c.addEventListener("mouseleave", ()=>setHi(null, false));
 
 /* tint each pen with its group colour so the pens and the table rows match */
 const _drawPen = drawPen;
-drawPen = function(g, p, t){
-  _drawPen(g, p, t);
+drawPen = function(g, p, t, part = "base"){
+  _drawPen(g, p, t, part);
+  if (part !== "base") return;
   const k = pv.pens.indexOf(p), a = clamp((t - p.appearAt)/(450*SLF()), 0, 1);
   if (k < 0 || a <= 0) return;
   const col = p.col || PEN_COLS[k % PEN_COLS.length], dropped = p.dropped && pv.dropAt && t >= pv.dropAt;
