@@ -188,6 +188,10 @@ a{color:inherit}
 .slate h2 a::after{content:"";position:absolute;inset:-10px;z-index:1;border-radius:4px}
 .slate h2 a:focus-visible{outline:none}
 .slate:has(h2 a:focus-visible){outline:3px solid var(--yellow);outline-offset:4px}
+/* a card's whole surface is its link, so the focus ring goes round the card, not the title text */
+.poster h4 a:focus-visible,.notes h4 a:focus-visible,.demo h4 a:focus-visible{outline:none}
+.poster:has(h4 a:focus-visible),.notes:has(h4 a:focus-visible),.demo:has(h4 a:focus-visible){outline:3px solid var(--yellow);outline-offset:5px;transform:rotate(0)}
+.slate--inkscape:has(h2 a:focus-visible){outline-offset:6px}
 .slate .bl{margin:0;color:var(--chalk-dim);font-size:15px}
 .slate ol{list-style:none;margin:4px 0 0;padding:0;display:grid;gap:6px;counter-reset:ls}
 .slate ol a{position:relative;z-index:2;display:flex;gap:10px;align-items:baseline;text-decoration:none;color:var(--chalk);font-size:15px;line-height:1.3}
