@@ -246,7 +246,7 @@
     background: rgba(26,42,36,.94); border: 1px solid rgba(255,255,255,.22); font-weight: 600;
     box-shadow: 0 6px 18px rgba(0,0,0,.35); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); transition: transform .15s, background .15s; }
   .toggle:hover { background: rgba(36,58,49,.98); transform: translateY(-1px); }
-  /* once the reader scrolls, the button shrinks to a round icon so it hides less of the page */
+  /* a round icon that hides as little of the page as possible; the label slides out on hover or focus */
   .lbl { display: inline-block; max-width: 8em; overflow: hidden; white-space: nowrap; transition: max-width .2s, opacity .2s; }
   .wrap.mini .toggle { gap: 0; padding: 12px; }
   .wrap.mini .lbl { max-width: 0; opacity: 0; }
@@ -301,7 +301,7 @@
       </section>`).join("");
     const open = root.querySelector(".panel") && !root.querySelector(".panel").hidden;
     root.innerHTML = `<style>${style}</style>
-    <nav class="wrap${scrollY > 160 ? " mini" : ""}" aria-label="${u.btn}">
+    <nav class="wrap mini" aria-label="${u.btn}">
       <div class="panel" id="p"${open ? "" : " hidden"}>
         <div class="head">
           <a class="home" href="${url("./")}">⌂ ${u.home}</a>
@@ -331,7 +331,6 @@
   root.addEventListener("keydown", e => { if (e.key === "Escape") { setOpen(false); root.querySelector(".toggle").focus(); } });
   document.addEventListener("click", e => { if (!e.composedPath().includes(host)) setOpen(false); });
   listeners.push(render);
-  addEventListener("scroll", () => { const w = root.querySelector(".wrap"); if (w) w.classList.toggle("mini", scrollY > 160); }, { passive: true });
 
   render();
   const mount = () => document.body.appendChild(host);
