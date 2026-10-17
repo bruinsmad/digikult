@@ -15,6 +15,7 @@
   --chalk:#efeee6; --chalk-dim:#b4c4b8; --chalk-faint:rgba(239,238,230,.16);
   --yellow:#f2d264; --blue:#9cc8e8; --pink:#f0a3b8; --green:#a8dba0;
   --wood:#8a5532; --wood-hi:#b07448; --wood-lo:#5d3820;
+  --tape:rgba(222,207,164,.88);
   --paper:#fbfaf4; --paper-ink:#1d2622; --paper-muted:#5b6660; --paper-line:#e4e1d4;
   --f-chalk:"Kalam", "Segoe Print", "Comic Sans MS", cursive;
   --f-body:"Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
@@ -47,6 +48,7 @@ a{color:inherit}
 .logo{display:flex;align-items:center;gap:10px;text-decoration:none;font:700 22px/1 var(--f-chalk);color:#fff6e8;text-shadow:0 1px 0 rgba(0,0,0,.35)}
 .logo svg{flex:none}
 .topics{display:flex;gap:4px;margin-left:auto}
+.topics a{white-space:nowrap}
 .topics a{text-decoration:none;font-weight:700;font-size:15px;color:#fff1dc;padding:7px 12px;border-radius:4px}
 .topics a:hover{background:rgba(0,0,0,.18)}
 .lang{display:inline-flex;align-items:center}
@@ -68,17 +70,18 @@ a{color:inherit}
 /* the "where you left off" note pinned to the board */
 .note{position:relative;background:var(--paper);color:var(--paper-ink);border-radius:2px;padding:22px 22px 20px;
   transform:rotate(1.2deg);box-shadow:0 2px 0 rgba(0,0,0,.08),0 18px 30px rgba(0,0,0,.35)}
-.note::before{content:"";position:absolute;top:-12px;left:50%;width:110px;height:26px;transform:translateX(-50%) rotate(-3deg);
-  background:rgba(242,210,100,.75);box-shadow:0 1px 2px rgba(0,0,0,.15)}
+.note::before{content:"";position:absolute;top:-12px;left:50%;width:96px;height:24px;transform:translateX(-50%) rotate(-3deg);
+  background:var(--tape);box-shadow:0 1px 2px rgba(0,0,0,.2)}
 .note .who{font:700 22px/1.2 var(--f-chalk);color:#8a6a10;margin:0}
 .note h2{margin:6px 0 4px;font:700 26px/1.15 var(--f-body)}
 .note .sub{margin:0;color:var(--paper-muted);font-size:15px}
+.note .kind{margin:2px 0 0;--kfg:#9a5b00}
 /* progress as chalk/pencil tally marks, five to a bundle */
 .tally{display:inline-block;height:20px;width:auto;vertical-align:middle;overflow:visible;flex:none}
 .tally path{fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;opacity:.22}
 .tally path.on{stroke:var(--c);opacity:1}
-.note .tally{display:block;height:24px;margin:16px 0 4px}
-.note .count{margin:0 0 16px;color:var(--paper-muted);font-size:15px}
+.note .tally{display:block;height:24px;margin:14px 0 2px}
+.note .count{margin:10px 0 16px;color:var(--paper-muted);font-size:15px}
 .btn{display:inline-flex;align-items:center;gap:8px;text-decoration:none;font-weight:700;font-size:16px;
   padding:11px 20px;border-radius:4px;background:var(--paper-ink);color:var(--paper);border:0;cursor:pointer}
 .btn:hover{background:#000}
@@ -108,7 +111,7 @@ a{color:inherit}
   box-shadow:0 2px 0 rgba(0,0,0,.08),0 16px 28px rgba(0,0,0,.32);transform:rotate(var(--tilt,-.6deg));
   transition:transform .18s ease, box-shadow .18s ease}
 .poster:hover{transform:rotate(0)}
-.poster .tape{position:absolute;z-index:2;top:-4px;width:64px;height:20px;background:rgba(246,239,214,.92);box-shadow:0 1px 2px rgba(0,0,0,.2)}
+.poster .tape{position:absolute;z-index:2;top:-4px;width:64px;height:20px;background:var(--tape);box-shadow:0 1px 2px rgba(0,0,0,.2)}
 .poster .tape.l{left:-18px;transform:rotate(-34deg)}
 .poster .tape.r{right:-18px;transform:rotate(34deg)}
 .cover{display:block;aspect-ratio:2/1;background:#ccc;overflow:hidden}
@@ -158,13 +161,13 @@ a{color:inherit}
 }
 
 /* ---------- the subjects: one small slate per subject, hung on the big board ---------- */
-.subjects{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr));gap:52px 34px;padding:36px 0 20px;list-style:none;margin:0}
+.subjects{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr));gap:64px 34px;padding:64px 0 20px;list-style:none;margin:0}
 .slate{position:relative;padding:10px;border-radius:4px;background:linear-gradient(135deg,var(--wood-hi),var(--wood) 45%,var(--wood-lo));
   box-shadow:0 3px 0 rgba(0,0,0,.25),0 18px 30px rgba(0,0,0,.35);transition:transform .2s ease}
 .slate::before{content:"";position:absolute;left:50%;top:-30px;width:70%;height:32px;transform:translateX(-50%);
-  background:linear-gradient(to top right,transparent calc(50% - 1px),#d9cbb0 50%,transparent calc(50% + 1px)) left/50% 100% no-repeat,
-             linear-gradient(to top left,transparent calc(50% - 1px),#d9cbb0 50%,transparent calc(50% + 1px)) right/50% 100% no-repeat;opacity:.7}
-.slate::after{content:"";position:absolute;left:50%;top:-36px;width:12px;height:12px;margin-left:-6px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#e8e2d2,#8b8576);box-shadow:0 2px 2px rgba(0,0,0,.4)}
+  background:linear-gradient(to bottom right,transparent calc(50% - 1px),#d9cbb0 50%,transparent calc(50% + 1px)) left/50% 100% no-repeat,
+             linear-gradient(to bottom left,transparent calc(50% - 1px),#d9cbb0 50%,transparent calc(50% + 1px)) right/50% 100% no-repeat;opacity:.7}
+.slate::after{content:"";position:absolute;left:50%;top:-37px;width:14px;height:14px;margin-left:-7px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#e8e2d2,#8b8576);box-shadow:0 2px 2px rgba(0,0,0,.4)}
 .slate-in{position:relative;height:100%;display:flex;flex-direction:column;gap:10px;padding:18px 20px 18px;border-radius:2px;background:var(--board-deep);
   background-image:radial-gradient(70% 60% at 30% 20%,rgba(255,255,255,.05),transparent 70%)}
 .slate .emb{height:96px;display:block;margin:2px 0 4px}
@@ -210,13 +213,15 @@ body.subject .hero{display:none}
 @media (max-width:820px){
   .hero{grid-template-columns:1fr;gap:38px;padding-top:44px}
   .note{max-width:460px}
+  .note{margin:0 4px 8px}
+}
+@media (max-width:600px){
   /* the subject links drop to a second row of the rail instead of disappearing */
   .rail .wrap{flex-wrap:wrap;height:auto;padding-top:10px;gap:4px 18px}
   .lang{margin-left:auto}
   .topics{order:3;flex-basis:100%;margin:0 0 6px -12px;overflow-x:auto}
   .topics a{white-space:nowrap}
   .topic{scroll-margin-top:118px}.step{scroll-margin-top:126px}
-  .note{margin:0 4px 8px}
 }
 @media (min-width:700px) and (max-width:1043px){
   /* two slates per row: an odd one out hangs centred under the pair */
@@ -274,7 +279,7 @@ body.subject .hero{display:none}
 (function(){
   const D = window.DIGIKULT;
   const $ = s => document.querySelector(s);
-  const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])).replace(/([\p{L}\d])-(?=\p{L})/gu, "$1\u2011");
 
   const TXT = {
     hu:{
@@ -627,7 +632,7 @@ function puliSvg(){
     document.documentElement.lang = L;
     document.title = D.t(D.SITE.name);
     $("#name").textContent = D.t(D.SITE.name);
-    $("#tagline").textContent = T.tagline;
+    $("#tagline").textContent = T.tagline.replace(/([\p{L}\d])-(?=\p{L})/gu, "$1\u2011");
     $("#foot").textContent = T.foot;
     document.querySelectorAll(".lang button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.l === L)));
     $("#topics").innerHTML = D.SITE.topics.map(tp => `<a href="#${tp.id}">${esc(D.t(tp.title).split(" – ").pop())}</a>`).join("");
@@ -643,7 +648,7 @@ function puliSvg(){
       const doneN = pr ? pr.done : 0, total = pr ? pr.total : 0;
       $("#note").innerHTML = `<p class="who">${inProg ? T.left : T.start}</p>
         <h2>${esc(D.t(p.title))}</h2>
-        <p class="sub">${esc(D.t(tp.title))}</p>
+        <span class="kind">${esc(D.t(tp.title).split(" – ").pop())}</span>
         ${inProg ? tally(doneN, total, "#b8860b") : ""}
         <p class="count">${[p.minutes ? T.min(p.minutes) : "", total ? (inProg ? T.chapters(doneN, total) : T.chaptersTotal(total)) : ""].filter(Boolean).join(", ")}</p>
         <a class="btn" href="${href}">${inProg ? T.cont : T.go}</a>`;
