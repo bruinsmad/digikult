@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>A kísértetház – Inkscape</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap">
+<link rel="stylesheet" href="../mission.css">
+<style>:root{--accent:#c9a7f5}</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+window.MISSION = {
+  lang: "hu",
+  key: "haunted-house-v1",
+  title: "A kísértetház",
+  story: "Az utca végén áll egy ház, ahová senki sem megy be. Ma este te tervezed meg a Kísértetház-est plakátját.",
+  file: "vezeteknev_kisertethaz",
+  poster: "../img/haunted-house/hu/poster.png",
+  pdf: "../pdf/haunted-house-feladatlap.pdf",
+  teacherPdf: "../pdf/haunted-house-tanari.pdf",
+  saveImg: "../img/haunted-house/hu/save.png",
+  bonusImg: "../img/haunted-house/hu/bonus.png",
+  elements: [
+    ["Éjszakai ég, csillagok, hold", "Téglalap, Csillag és Ellipszis eszköz", "kitöltés, körvonal"],
+    ["Domb", "széles ellipszis + téglalap", "Metszet"],
+    ["A ház sziluettje", "téglalap + háromszög", "Unió"],
+    ["Világító ablakok és ajtó", "nyílások → Unió → kivágás; mögötte sárga", "Különbség + rétegsorrend"],
+    ["Szellem", "kör + téglalap; három kis kör", "Unió → Különbség"],
+    ["Ferde fa", "téglalap → útvonal → csomópontok", "Csomópont eszköz"],
+    ["Kerítés", "egy deszka, négyszer lemásolva", "Szerkesztés ▸ Kettőzés"]
+  ],
+  steps: [
+    { title: "Éjszakai ég, csillagok és hold", img: "../img/haunted-house/hu/step1.png",
+      alt: "1. lépés: lila téglalap az oldalon, csillagok a Csillag eszközzel, telihold narancs körvonallal",
+      lead: "Egy nagy téglalap az ég, a csillagokat a Csillag eszköz rajzolja, a holdnak körvonala van.",
+      note: "Az oldal alsó harmadát hagyd üresen – oda kerül a domb, a ház és a fa.",
+      stuck: ["A hold körvonala: <span class='menu'>Objektum ▸ Kitöltés és körvonal…</span> → <i>Körvonalrajzolat</i> fül → Egyenletes szín, válassz narancsot."] },
+    { title: "Domb", img: "../img/haunted-house/hu/step2.png",
+      alt: "2. lépés: széles sötétzöld ellipszis, a fele lelóg az oldalról, rajta téglalap, Útvonal ▸ Metszet",
+      lead: "A Metszet csak a két alakzat közös részét tartja meg – itt az oldalhoz vágja az ellipszist.",
+      stuck: ["Eltűnt a domb: a téglalap nem fedte az ellipszist. Vonj vissza, és rajzold az ellipszis felső felére."] },
+    { title: "A ház sziluettje", img: "../img/haunted-house/hu/step3.png",
+      alt: "3. lépés: sötét téglalap a dombon, háromszög tető a Csillag eszközzel Sokszög módban, Útvonal ▸ Unió",
+      lead: "A falak és a tető az Unióval egy alakzattá válnak.",
+      stuck: ["Rés van a tető és a falak között: Unió előtt a tetőnek kicsit rá kell lógnia a falak tetejére."] },
+    { title: "Világító ablakok", img: "../img/haunted-house/hu/step4.png",
+      alt: "4. lépés: ablak-téglalapok és ajtó, a nyílások Uniója, Különbség a házból, sárga téglalap hátrébb helyezve",
+      lead: "Az ablakokból és az ajtóból lyuk lesz; a ház mögötti sárga téglalap átvilágít rajtuk.",
+      stuck: ["A ház tűnt el a nyílások helyett: a ház volt felül. <span class='menu'>Szerkesztés ▸ Visszavonás</span>, jelöld ki a nyílásokat, <span class='menu'>Objektum ▸ Felülre helyezés</span>, és próbáld újra.",
+              "A Különbség szürke: a nyílásoknak előbb EGY objektummá kell válniuk (<span class='menu'>Útvonal ▸ Unió</span>).",
+              "A sárga mindent eltakar: használd az <span class='menu'>Objektum ▸ Lejjebb helyezés</span> parancsot – ne az Alulra helyezést, az az ég mögé rejti."] },
+    { title: "Szellem", img: "../img/haunted-house/hu/step5.png",
+      alt: "5. lépés: fehér kör és téglalap, Unió, három kis kör az alsó szélen, ezek Uniója, Különbség, sötét szemek",
+      lead: "Az Unió megépíti a testet, a Különbség kiharapja a hullámos szegélyt.",
+      stuck: ["Nem változik a szegély: a kis köröknek az alsó szélen kell ülniük – félig belül, félig kívül –, és előbb egyesíteni kell őket."] },
+    { title: "Ferde fa", img: "../img/haunted-house/hu/step6.png",
+      alt: "6. lépés: vékony téglalap, Objektum átalakítása útvonallá, a bal felső csomópont elhúzása, egy ág ugyanígy",
+      lead: "Egy sarokcsomópont elmozdításával a téglalapból görbe fatörzs lesz.",
+      note: "Második ág: kattints az ágra, <span class='menu'>Szerkesztés ▸ Kettőzés</span>, <span class='menu'>Objektum ▸ Vízszintes tükrözés</span>, és húzd a másik oldalra.",
+      stuck: ["Az egész alakzat mozog, amikor egy csomópontot húzol: a Csomópont eszközt válaszd, ne a Kijelölőt.",
+              "Sarkok helyett kerek fogantyúk: előbb <span class='menu'>Útvonal ▸ Objektum átalakítása útvonallá</span>."] },
+    { title: "Kerítés", img: "../img/haunted-house/hu/step7.png",
+      alt: "7. lépés: egy vékony deszka, Szerkesztés ▸ Kettőzés, a másolatok sorba húzva (öt deszka), hosszú lapos léc keresztben",
+      lead: "Rajzolj egy deszkát, aztán <span class='menu'>Szerkesztés ▸ Kettőzés</span> – a másolat pontosan az eredetire kerül, csak el kell húznod.",
+      stuck: ["Úgy tűnik, a másolás nem csinált semmit: a másolat az eredetin ül. Egyszerűen húzd jobbra."] }
+  ],
+  checklist: [
+    "Az ég az egész oldalt befedi",
+    "Legalább 8 csillag és egy hold narancs körvonallal",
+    "A domb teteje ív, az alja egyenes (Metszet)",
+    "A ház EGY objektum: a falak és a tető egyesítve (Unió)",
+    "Az ablakok és az ajtó lyukak, mögöttük sárga fény (Különbség + Objektum ▸ Lejjebb helyezés)",
+    "A szellemnek hullámos szegélye és két szeme van (Unió + Különbség)",
+    "A fa ferde, és van legalább egy ága (Csomópont eszköz)",
+    "Legalább 5 deszkás kerítés léccel (Szerkesztés ▸ Kettőzés)",
+    "Az SVG és a PNG is elmentve, a fájlnévben a vezetékneveddel"
+  ],
+  bonus: [
+    ["Denevér a hold előtt", "Kis ellipszis + két oldalán egy-egy háromszög → <span class='menu'>Útvonal ▸ Unió</span> → majdnem fekete."],
+    ["Tök a dombon", "Narancs ellipszis; háromszög szemek és száj → Unió → <span class='menu'>Útvonal ▸ Különbség</span>; mögé sötétebb ellipszis."],
+    ["Holdsarló", "Égszínű kör a holdon, kicsit oldalra tolva → <span class='menu'>Útvonal ▸ Különbség</span>."],
+    ["Kémény", "Kis téglalap a tetőn → jelöld ki a házzal együtt → <span class='menu'>Útvonal ▸ Unió</span>."],
+    ["Plakátcím", "Szöveg eszköz: KÍSÉRTETHÁZ-EST – nagy betűk, halványsárga."]
+  ]
+};
+</script>
+<script src="../mission.js?v=2"></script>
+<script src="../../nav.js" defer></script>
+</body>
+</html>
