@@ -104,6 +104,11 @@ a{color:inherit}
   font:700 26px/1 var(--f-chalk);color:var(--c);background:var(--board)}
 .step h3{margin:10px 0 18px;font:700 clamp(22px,2.6vw,27px)/1.25 var(--f-chalk);color:var(--chalk)}
 .step h3 code{font:inherit;color:var(--c)}
+/* "Szűrés" on top, what it covers on a quieter second line */
+.step h3 .what{display:block;margin-top:2px;font:400 clamp(17px,1.9vw,20px)/1.35 var(--f-chalk);color:var(--chalk-dim);overflow-wrap:anywhere}
+.step h3 .what code{font-weight:700}
+/* headings that only receive focus from a link landing on them */
+[tabindex="-1"]:focus{outline:none}
 .items{container:items/inline-size;display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:26px 26px;align-items:start}
 
 /* poster = a student mission, taped to the board */
@@ -636,6 +641,10 @@ function puliSvg(){
       <path d="M134 30l-12 18 12 18M154 30l12 18-12 18" stroke="var(--c)" stroke-width="3.4"/><path d="M148 26l-8 44" stroke="var(--chalk)" stroke-width="2.4"/></svg>`;
   const embGen = `<svg viewBox="0 0 170 96" aria-hidden="true" fill="none"><path d="M8 70q40-60 80 0t76-10" stroke="var(--c)" stroke-width="3.4" stroke-linecap="round"/></svg>`;
   const splitName = n => { const [field, tool] = n.split(" – "); return tool ? `<small>${esc(field)}</small>${esc(tool)}` : esc(n); };
+  const lessonTitle = t => {
+    const i = t.indexOf(": "), code = h => h.replace(/(SELECT|FROM|WHERE|GROUP BY)/g, "<code>$1</code>");
+    return i < 0 ? code(esc(t)) : `${code(esc(t.slice(0, i)))}<span class="what">${code(esc(t.slice(i + 2)))}</span>`;
+  };
   const shortTitle = ls => D.t(ls.title).split(/: | – /)[0];
 
   const DECO = {
@@ -743,7 +752,7 @@ function puliSvg(){
       <span class="switch">${D.SITE.topics.map(tp => `<a href="#${tp.id}" style="--c:${tp.accent}"${tp === open ? ' aria-current="page"' : ""}>${esc(D.t(tp.title).split(" – ").pop())}</a>`).join("")}</span></nav>` + [open].map(tp => `
       <section class="topic" id="${tp.id}" style="--c:${tp.accent}">
         <div class="topic-head">
-          <h2>${splitName(D.t(tp.title))}</h2>
+          <h2 tabindex="-1">${splitName(D.t(tp.title))}</h2>
           <p>${esc(D.t(tp.blurb))}</p>
           <svg viewBox="0 0 220 14" aria-hidden="true"><path d="M3 9 C 50 3, 100 13, 150 6 S 200 5, 217 8"/></svg>
         </div>
@@ -752,7 +761,7 @@ function puliSvg(){
           <li class="step" id="${tp.id}-${ls.id}">
             <span class="dot" aria-hidden="true">${li + 1}</span>
             <div>
-              <h3>${esc(D.t(ls.title)).replace(/(SELECT|FROM|WHERE|GROUP BY)/g, "<code>$1</code>")}</h3>
+              <h3 tabindex="-1">${lessonTitle(D.t(ls.title))}</h3>
               <div class="items">${ls.pages.map(p => p.kind === "demo" ? demoCard(p, tp, T) : p.kind === "theory" ? notesCard(p, tp, T) : poster(p, tp, T, TILTS[tilt++ % TILTS.length])).join("")}</div>
             </div>
           </li>`).join("")}
@@ -814,7 +823,7 @@ function puliSvg(){
   function place(){
     const { tp, lesson } = current(), el = lesson && document.getElementById(lesson);
     if (el) el.scrollIntoView({ block: "start" }); else window.scrollTo({ top: 0, behavior: "auto" });
-    if (tp) (el || document.querySelector(".crumb a.back")).focus({ preventScroll: true });
+    if (tp) (el ? el.querySelector("h3") : document.querySelector(".topic-head h2")).focus({ preventScroll: true });
   }
   window.addEventListener("hashchange", () => { draw(); place(); });
   draw();
