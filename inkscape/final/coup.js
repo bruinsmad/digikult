@@ -69,7 +69,10 @@
     const pick = list => list.filter(ok).sort((a, b) => contrast(bg, b) - contrast(bg, a))[0];
     const fromPal = pick(cands.filter(c => palette.some(p => close(p, c))));
     if (fromPal && contrast(bg, fromPal) >= 2.6) return fromPal;
-    return pick(cands) || (lum(bg) > .4 ? BLACK : WHITE);
+    const any = pick(cands);
+    if (any && contrast(bg, any) >= 2.2) return any;
+    const ext = [...cands, WHITE, BLACK].filter(c => !close(c, bg)).sort((a, b) => contrast(bg, b) - contrast(bg, a))[0];
+    return ext || (lum(bg) > .4 ? BLACK : WHITE);
   }
   /* one colour that must stand out on several backgrounds: maximise the worst contrast */
   function bestMulti(bgs, cands, palette, avoid) {
@@ -83,6 +86,16 @@
   const worstC = (c, bgs) => Math.min(...bgs.map(b => contrast(b, c)));
   const uniq = a => a.filter((c, i) => a.findIndex(d => close(c, d)) === i);
   const hex6 = h => h.replace("#", "").toLowerCase();
+  /* real text width (em units) from the browser's font engine; falls back to an estimate */
+  const FONT_B = "Arial Black,Impact,sans-serif", FONT_R = "Atkinson Hyperlegible,Arial,sans-serif";
+  let ctx2d = null;
+  function emWidth(text, family, weight, spacingEm = 0) {
+    try {
+      ctx2d = ctx2d || document.createElement("canvas").getContext("2d");
+      ctx2d.font = `${weight} 100px ${family}`;
+      return ctx2d.measureText(text).width / 100 + spacingEm * text.length;
+    } catch (e) { return text.length * (weight >= 800 ? .95 : .62) + spacingEm * text.length; }
+  }
 
   /* ------------------------------------------------------------------ geometry helpers */
   const r1 = v => Math.round(v * 10) / 10;
@@ -159,6 +172,7 @@
     if (layout === "border") { r = regime === "auth" ? 42 : 38; }
 
     const items = [];          /* {step, svg, b: bbox} */
+    const dx = {};             /* debug: colours chosen for text (used by the test sweep) */
     const add = (step, svg, b) => items.push({ step, svg, b });
     const steps = {};          /* step → {title, lead, list:[html], note, stuck:[]} */
     const skills = new Set(["Rectangle & Ellipse tools", "Exact colours (RGBA)", "Exact sizes (X, Y, W, H)", "Text tool"]);
@@ -242,7 +256,8 @@
     const extraCol = bestMulti(around(cx, cy, r * 1.25), cands, pal, [frameCol]);
     const innerCol = frameKind === "ring" ? best(frameCol, cands, pal, [frameCol]) : null;
     const symBg = frameKind === "ring" ? innerCol : frameCol;
-    const symCol = best(symBg, cands, pal, [frameCol]);
+    const symCol = best(symBg, cands, pal, frameKind === "ring" ? [] : [frameCol]);
+    const frameOutl = frameKind !== "disc" && worstC(frameCol, bgRing) < 1.6 ? best(frameCol, [WHITE, BLACK, ...pal], pal) : null;
 
     /* ---------- STEP 2: behind the emblem ---------- */
     const L2 = [];
@@ -283,11 +298,12 @@
     const L3 = [];
     if (frameKind === "ring") {
       const cid = id("m");
-      add(3, `<mask id="${cid}"><rect width="${W}" height="${H}" fill="#fff"/><circle cx="${cx}" cy="${cy}" r="${r - 7}" fill="#000"/></mask><circle cx="${cx}" cy="${cy}" r="${r}" fill="${frameCol}" mask="url(#${cid})"/><circle cx="${cx}" cy="${cy}" r="${r - 7}" fill="${innerCol}"/>`, circB(cx, cy, r));
+      add(3, `<mask id="${cid}"><rect width="${W}" height="${H}" fill="#fff"/><circle cx="${cx}" cy="${cy}" r="${r - 7}" fill="#000"/></mask><circle cx="${cx}" cy="${cy}" r="${r}" fill="${frameCol}" mask="url(#${cid})"/><circle cx="${cx}" cy="${cy}" r="${r - 7}" fill="${innerCol}"/>${frameOutl ? `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${frameOutl}" stroke-width="1.5"/>` : ""}`, circB(cx, cy, r));
       L3.push(`${T("ellipse")} Circle ${SIZE(circB(cx, cy, r))}. ${fillRow(frameCol)}.`,
         `${T("ellipse")} A smaller circle on top: ${SIZE(circB(cx, cy, r - 7))}.`,
         `${T("selector")} Select both → ${M("Path ▸ Difference")}: a ring.`,
         `${T("ellipse")} Fill the hole: one more circle with the small numbers again, RGBA ${C(innerCol)}.`);
+      if (frameOutl) L3.push(`The ring blends into the stripes, so outline it: click the ring, <i>Stroke paint</i> RGBA ${C(frameOutl)}, width <b>1.5 mm</b>.`);
       skills.add("Difference");
       why.push(`<b>Left</b> → the emblem sits in a ring`);
     }
@@ -300,10 +316,11 @@
     }
     if (frameKind === "shield") {
       const rb = [cx - .8 * r, cy - .9 * r, cx + .8 * r, cy + .1 * r], cc = [cx, cy + .1 * r, .8 * r];
-      add(3, `<path d="M${r1(rb[0])} ${r1(rb[1])}H${r1(rb[2])}V${r1(cc[1])}A${r1(cc[2])} ${r1(cc[2])} 0 0 1 ${r1(rb[0])} ${r1(cc[1])}Z" fill="${frameCol}"/>`, [rb[0], rb[1], rb[2], cc[1] + cc[2]]);
+      add(3, `<path d="M${r1(rb[0])} ${r1(rb[1])}H${r1(rb[2])}V${r1(cc[1])}A${r1(cc[2])} ${r1(cc[2])} 0 0 1 ${r1(rb[0])} ${r1(cc[1])}Z" fill="${frameCol}"${frameOutl ? ` stroke="${frameOutl}" stroke-width="1.5"` : ""}/>`, [rb[0], rb[1], rb[2], cc[1] + cc[2]]);
       L3.push(`${T("rect")} Rectangle ${SIZE(rb)}, RGBA ${C(frameCol)}.`,
         `${T("ellipse")} Circle ${SIZE(circB(cc[0], cc[1], cc[2]))}, same colour.`,
         `${T("selector")} Select both → ${M("Path ▸ Union")}: a shield with a round bottom.`);
+      if (frameOutl) L3.push(`The shield blends into the stripes, so outline it: <i>Stroke paint</i> RGBA ${C(frameOutl)}, width <b>1.5 mm</b>.`);
       skills.add("Union");
       why.push(`<b>Right</b> → the emblem sits on a shield`);
     }
@@ -416,14 +433,17 @@
         starPos.push([65 + (cc - (inRow - 1) / 2) * 34, 45 + (rr - (rows - 1) / 2) * 26]);
       }
     } else {
-      const R = r + (extra === "rays" ? r * .32 : 9) + 6, step = N > 1 ? Math.min(24, 120 / (N - 1)) : 0;
+      const R = Math.max(r + sR + 2, Math.min(r + (extra === "rays" ? r * .32 : 9) + 6, 140 - sR - cy)), step = N > 1 ? Math.min(24, 120 / (N - 1)) : 0;
       for (let i = 0; i < N; i++) { const a = (90 + (i - (N - 1) / 2) * step) * Math.PI / 180; starPos.push([cx + R * Math.cos(a), cy + R * Math.sin(a)]); }
     }
     const starCol = bestMulti(layout === "canton" ? [f0] : uniq(starPos.map(([x, y]) => colorAt(x, y))), cands, pal);
-    starPos.forEach(([x, y]) => add(5, `<polygon points="${ptsAttr(starPts(x, y, sR, .4, 5))}" fill="${starCol}"/>`, bboxPts(starPts(x, y, sR, .4, 5))));
+    const starBgs = layout === "canton" ? [f0] : uniq(starPos.map(([x, y]) => colorAt(x, y)));
+    const starOutl = worstC(starCol, starBgs) < 1.8 ? best(starCol, [WHITE, BLACK, ...pal], pal) : null;
+    starPos.forEach(([x, y]) => add(5, `<polygon points="${ptsAttr(starPts(x, y, sR, .4, 5))}" fill="${starCol}"${starOutl ? ` stroke="${starOutl}" stroke-width=".7" stroke-linejoin="round"` : ""}/>`, bboxPts(starPts(x, y, sR, .4, 5))));
     L5.push(`${T("star")} Star tool, star mode, Corners 5, Spoke ratio 0.4. One small star, RGBA ${C(starCol)}.`,
       N > 1 ? `${M("Edit ▸ Duplicate")} it ${N - 1}× and type the positions (keep W and H):` : `Type its size and place:`,
       `<span class="nums starlist">${starPos.map(([x, y], i) => { const b = bboxPts(starPts(x, y, sR, .4, 5)); return `★${i + 1}: ${xywh(b)}`; }).join("<br>")}</span>`);
+    if (starOutl) L5.splice(1, 0, `The stars cross different colours, so outline the first one before duplicating: <i>Stroke paint</i> RGBA ${C(starOutl)}, width <b>0.7 mm</b>.`);
     steps[5] = { title: N === 1 ? "One province, one star" : `${N} provinces, ${N} stars`, lead: layout === "canton" ? "Your provinces shine in the canton." : "Your provinces form an arc under the emblem.", list: L5,
       stuck: ["All copies are in one place: Duplicate puts the copy exactly on the original – just type the next X and Y."] };
     why.push(`<b>${N} province${N > 1 ? "s" : ""}</b> → ${N} star${N > 1 ? "s" : ""}${layout === "canton" ? " in the canton" : " under the emblem"}`);
@@ -431,13 +451,17 @@
     /* ---------- STEP 6: name ---------- */
     const L6 = [];
     if (regime === "auth") {
-      const Rn = r + (extra === "rays" ? r * .32 : 9) + 8;
-      const fs = Math.min(13, (Math.PI * Rn * .9) / (NAME.length * .9 + .5));
+      const Rn0 = r + (extra === "rays" ? r * .32 : 9) + 8;
+      const em = emWidth(NAME, FONT_B, 900) + .05 * NAME.length;   /* letter-spacing .5 at size 10 ≈ .05 em */
+      let Rn = Math.min(Math.max(Rn0, 7 * em / (Math.PI * .9)), Math.min(cx, W - cx) - 9, cy - 10);
+      let fs = Math.min(13, (Math.PI * Rn * .9) / em);
+      if (cy - Rn - fs * .85 < 3) { Rn = Math.max(r + 6, cy - 3 - fs * .85); fs = Math.min(fs, (Math.PI * Rn * .9) / em); }
       const nBgs = uniq(Array.from({ length: 13 }, (_, i) => { const a = Math.PI * (1 + i / 12); return colorAt(cx + (Rn + fs * .35) * Math.cos(a), cy + (Rn + fs * .35) * Math.sin(a)); }));
       const nameCol = bestMulti(nBgs, cands, pal);
       const outl = worstC(nameCol, nBgs) < 2.2 ? best(nameCol, [WHITE, BLACK, ...pal], pal) : null;
+      Object.assign(dx, { nameCol, nBgs, outl, fs });
       const pid = id("arc");
-      add(6, `<path id="${pid}" d="M${r1(cx - Rn)} ${cy} A${r1(Rn)} ${r1(Rn)} 0 0 1 ${r1(cx + Rn)} ${cy}" fill="none"/><text font-family="Arial Black,Impact,sans-serif" font-weight="900" font-size="${r1(fs)}" fill="${nameCol}" letter-spacing=".5"${outl ? ` stroke="${outl}" stroke-width="1.1" paint-order="stroke" stroke-linejoin="round"` : ""}><textPath href="#${pid}" startOffset="50%" text-anchor="middle">${esc(NAME)}</textPath></text>`, [cx - Rn - fs, cy - Rn - fs, cx + Rn + fs, cy]);
+      add(6, `<path id="${pid}" d="M${r1(cx - Rn)} ${cy} A${r1(Rn)} ${r1(Rn)} 0 0 1 ${r1(cx + Rn)} ${cy}" fill="none"/><text font-family="Arial Black,Impact,sans-serif" font-weight="900" font-size="${r1(fs)}" fill="${nameCol}" letter-spacing="${r1(fs * .05)}"${outl ? ` stroke="${outl}" stroke-width="1.1" paint-order="stroke" stroke-linejoin="round"` : ""}><textPath href="#${pid}" startOffset="50%" text-anchor="middle">${esc(NAME)}</textPath></text>`, [cx - Rn - fs, cy - Rn - fs, cx + Rn + fs, cy]);
       L6.push(`${T("ellipse")} A helper circle around the emblem: ${SIZE(circB(cx, cy, Rn))}.`,
         `${M("Path ▸ Object to Path")}, then ${M("Object ▸ Rotate 90° CW")} <b>twice</b> – now the path starts on the left.`,
         `${T("text")} Click outside the banner and type <b>${esc(NAME)}</b>. Bold font, size about <b>${pt(fs)}</b>, RGBA ${C(nameCol)}.`,
@@ -451,11 +475,13 @@
       why.push(`<b>Authoritarian</b> → the name in an arc, the motto cut out of a band`);
     } else {
       const nx = layout === "canton" ? 215 : 150, avail = layout === "canton" ? 160 : 270;
-      const fs = Math.min(15, avail / (NAME.length * .9 + .5)), ny = cy - r - (extra === "rays" ? r * .32 : 9) - 8;
-      const tw = NAME.length * fs * .86;
+      const em = emWidth(NAME, FONT_B, 900);
+      const fs = Math.min(15, avail / em), ny = cy - r - (extra === "rays" ? r * .32 : 9) - 8;
+      const tw = em * fs;
       const nBgs = uniq(Array.from({ length: 9 }, (_, i) => colorAt(nx - tw / 2 + tw * i / 8, ny - fs * .35)));
       const nameCol = bestMulti(nBgs, cands, pal);
       const outl = worstC(nameCol, nBgs) < 2.2 ? best(nameCol, [WHITE, BLACK, ...pal], pal) : null;
+      Object.assign(dx, { nameCol, nBgs, outl, fs });
       add(6, `<text x="${nx}" y="${r1(ny)}" text-anchor="middle" font-family="Arial Black,Impact,sans-serif" font-weight="900" font-size="${r1(fs)}" fill="${nameCol}"${outl ? ` stroke="${outl}" stroke-width="1.1" paint-order="stroke" stroke-linejoin="round"` : ""}>${esc(NAME)}</text>`, [nx - tw / 2, ny - fs * .8, nx + tw / 2, ny]);
       L6.push(`${T("text")} Click above the emblem and type <b>${esc(NAME)}</b>. Bold font, size about <b>${pt(fs)}</b>, RGBA ${C(nameCol)}.`,
         `${T("selector")} Look at the text's <b>W</b> in the tool controls bar and type <b>X = (${nx * 2} − W) ÷ 2</b> – it is centred${layout === "canton" ? " in the right part" : ""}. Bottom of the letters at about <b>Y ${r1(ny)}</b>.`);
@@ -471,17 +497,21 @@
       const bb = [40, 148, 260, 172];
       const underBand = uniq([40, 95, 150, 205, 258].map(x => colorAt(x, 160)));
       const bandCol = bestMulti(underBand, [...pal, BLACK, WHITE], pal);
-      const fs = Math.min(13, 205 / (MOTTO.length * .86 + .5)), cid = id("m");
-      add(7, `<mask id="${cid}"><rect width="${W}" height="${H}" fill="#fff"/><text x="150" y="${r1(160 + fs * .36)}" text-anchor="middle" font-family="Arial Black,Impact,sans-serif" font-weight="900" font-size="${r1(fs)}" fill="#000">${esc(MOTTO)}</text></mask><rect mask="url(#${cid})" x="40" y="148" width="220" height="24" fill="${bandCol}"/>`, bb);
-      L7.push(`${T("rect")} The motto band: ${SIZE(bb)}, RGBA ${C(bandCol)}.`,
+      const backing = worstC(bandCol, underBand) < 1.8 ? best(bandCol, [WHITE, ...pal, BLACK], pal, [bandCol]) : null;
+      Object.assign(dx, { bandCol, underBand, backing });
+      const fs = Math.min(13, 205 / emWidth(MOTTO, FONT_B, 900)), cid = id("m");
+      add(7, `<mask id="${cid}"><rect width="${W}" height="${H}" fill="#fff"/><text x="150" y="${r1(160 + fs * .36)}" text-anchor="middle" font-family="Arial Black,Impact,sans-serif" font-weight="900" font-size="${r1(fs)}" fill="#000">${esc(MOTTO)}</text></mask>${backing ? `<rect x="40" y="148" width="220" height="24" fill="${backing}"/>` : ""}<rect mask="url(#${cid})" x="40" y="148" width="220" height="24" fill="${bandCol}"/>`, bb);
+      if (backing) L7.push(`${T("rect")} First a backing strip ${SIZE(bb)}, RGBA ${C(backing)} – it will shine through the letters.`);
+      L7.push(`${T("rect")} The motto band${backing ? " on top of it, same numbers" : ""}: ${SIZE(bb)}, RGBA ${C(bandCol)}.`,
         `${T("text")} Click on the band, type <b>${esc(MOTTO)}</b>. Bold, size about <b>${pt(fs)}</b>. Centre it on the band (X = (300 − W) ÷ 2).`,
         `Check the spelling! Then ${M("Path ▸ Object to Path")} on the text.`,
-        `Select band + text → ${M("Path ▸ Difference")}: the letters are cut out and the field shows through.`);
+        `Select band + text → ${M("Path ▸ Difference")}: the letters are cut out and ${backing ? "the backing" : "the field"} shows through.`);
       skills.add("Difference"); skills.add("Object to Path");
     } else {
       const ribCol = bestMulti(uniq([52, 100, 150, 200, 248].map(x => colorAt(x, 157))), [WHITE, ...pal, BLACK], pal);
       const txtCol = best(ribCol, cands, pal, [ribCol]);
-      const fs = Math.min(10, 180 / (motto.length * .62 + .5));
+      Object.assign(dx, { ribCol, txtCol });
+      const fs = Math.min(10, 186 / emWidth(motto, FONT_R, 700));
       add(7, `<g fill="${ribCol}"><rect x="60" y="146" width="180" height="22"/><circle cx="60" cy="157" r="11"/><circle cx="240" cy="157" r="11"/></g><text x="150" y="${r1(157 + fs * .36)}" text-anchor="middle" font-family="Atkinson Hyperlegible,Arial,sans-serif" font-weight="700" font-size="${r1(fs)}" fill="${txtCol}">${esc(motto)}</text>`, [49, 146, 251, 168]);
       L7.push(`${T("rect")} Ribbon: rectangle ${SIZE([60, 146, 240, 168])}; ${T("ellipse")} two circles ${SIZE(circB(60, 157, 11))} and ${SIZE(circB(240, 157, 11))}. All RGBA ${C(ribCol)}.`,
         `Select the three → ${M("Path ▸ Union")}: one ribbon.`,
@@ -492,13 +522,14 @@
     const edgeCol = regime === "auth" ? best(colorAt(2, 2), [...pal, BLACK], pal) : best(colorAt(2, 2), [WHITE, ...pal], pal);
     const ew = regime === "auth" ? 6 : 3;
     add(7, `<rect x="${ew / 2}" y="${ew / 2}" width="${W - ew}" height="${H - ew}" fill="none" stroke="${edgeCol}" stroke-width="${ew}"/>`, [0, 0, W, H]);
-    L7.push(`${T("rect")} Last: a frame. Rectangle ${SIZE([0, 0, W, H])}, <i>Fill</i> → X, <i>Stroke paint</i> RGBA ${C(edgeCol)}, width <b>${ew} mm</b>.`);
+    L7.push(`${T("rect")} Last: a frame. Draw a rectangle; <i>Fill</i> → X, <i>Stroke paint</i> RGBA ${C(edgeCol)}, width <b>${ew} mm</b>. Then type ${SIZE([0, 0, W, H])} – the size includes the stroke, so the frame sits exactly on the edge.`);
     skills.add("Fill and stroke");
     steps[7] = { title: regime === "auth" ? "Motto band and frame" : "Motto ribbon and frame", lead: regime === "auth" ? "The motto is cut out of a dark band – nobody can erase it." : "The motto flows into a ribbon.", list: L7,
       stuck: regime === "auth" ? ["The band disappeared instead: the text was underneath. Undo, click the text, Object ▸ Raise to Top.", "Difference is greyed out: the text must be converted first (Path ▸ Object to Path)."]
         : ["The text sticks out of the ribbon: make the size smaller, or the ribbon wider.", "Flow into Frame does nothing: exactly 2 objects – the ribbon and the text."] };
 
-    return { items, steps, skills: [...skills], why, layout, pal, name, motto, N, pride, regime, frameKind, extra, sym };
+    const dbg = { bgE, bgRing, frameCol, innerCol, symBg, symCol, extraCol, starCol, starBgs, starOutl, frameOutl, starPos, sR, cx, cy, r, ...dx };
+    return { items, steps, skills: [...skills], why, layout, pal, name, motto, N, pride, regime, frameKind, extra, sym, dbg };
   }
 
   let G = 0;
@@ -516,24 +547,45 @@
     }
     return `<svg class="banner ${cls}" viewBox="-6 -6 312 192" role="img" aria-label="Banner of ${esc(model.name)}${upto < 7 ? ", after step " + upto : ""}"><rect x="-6" y="-6" width="312" height="192" fill="#e9e7dd"/>${parts}${hl}</svg>`;
   }
-  window.COUP_BUILD = build; window.COUP_SVG = svg;   /* used by the teacher-notes gallery script */
+  window.COUP_BUILD = build; window.COUP_SVG = svg; window.COUP_COUNTRIES = COUNTRIES; window.COUP_CONTRAST = contrast;   /* used by the teacher-notes gallery script */
 
   /* ------------------------------------------------------------------ state */
   const DEF = { country: "", palette: [], main: "", name: "", motto: "", regime: "", lr: 50, army: 50, pride: "", provinces: 3, custom: ["#CE2939", "#FFFFFF", "#477050"] };
   const fresh = () => JSON.parse(JSON.stringify(DEF));
   let S = { answers: fresh(), locked: false, solved: [], checks: [], end: false };
-  try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.answers) { S = Object.assign(S, s); S.answers = Object.assign(fresh(), s.answers); } } catch (e) {}
-  const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} };
-  const A = () => S.answers;
-  const missing = () => {
-    const a = A(), m = [];
+  /* repair whatever is in storage: wrong types would break the page */
+  function clean(raw) {
+    const d = fresh(), a = raw && typeof raw === "object" ? raw : {};
+    const str = (v, def) => typeof v === "string" ? v : def;
+    const num = (v, lo, hi, def) => { v = +v; return Number.isFinite(v) ? Math.min(hi, Math.max(lo, Math.round(v))) : def; };
+    const hexes = v => Array.isArray(v) ? v.filter(c => typeof c === "string" && /^#[0-9a-f]{6}$/i.test(c)).map(c => c.toUpperCase()).slice(0, 6) : [];
+    const custom = hexes(a.custom);
+    return {
+      country: str(a.country, ""), palette: hexes(a.palette), main: str(a.main, ""), name: str(a.name, "").slice(0, 26), motto: str(a.motto, "").slice(0, 32),
+      regime: a.regime === "auth" || a.regime === "demo" ? a.regime : "", lr: num(a.lr, 0, 100, 50), army: num(a.army, 0, 100, 50),
+      pride: PRIDE[a.pride] ? a.pride : "", provinces: num(a.provinces, 1, 9, 3), custom: custom.length === 3 ? custom : d.custom
+    };
+  }
+  try {
+    const s = JSON.parse(localStorage.getItem(KEY));
+    if (s && typeof s === "object") {
+      const nums = v => Array.isArray(v) ? v.map(Number).filter(n => Number.isInteger(n) && n >= 0 && n <= 7) : [];
+      S = { answers: clean(s.answers), locked: !!s.locked, solved: nums(s.solved).filter(n => n >= 1), checks: nums(s.checks), end: !!s.end };
+      if (S.locked && missing0(S.answers).length) S.locked = false;
+    }
+  } catch (e) {}
+  function missing0(a) {
+    const m = [];
     if (!a.palette.length) m.push("a country");
     if (!a.name.trim()) m.push("a state name");
     if (!a.motto.trim()) m.push("a motto");
     if (!a.regime) m.push("authoritarian or democratic");
     if (!a.pride) m.push("what your nation is proud of");
     return m;
-  };
+  }
+  const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} };
+  const A = () => S.answers;
+  const missing = () => missing0(A());
 
   /* ------------------------------------------------------------------ page */
   const tape = `<span class="tape l" aria-hidden="true"></span><span class="tape r" aria-hidden="true"></span>`;
