@@ -40,7 +40,7 @@ code,pre,textarea{font-family:var(--f-mono)}
 
 /* hero on the board */
 .hero{max-width:980px;margin:0 auto;padding:44px 22px 30px}
-.kicker{font:700 15px var(--f-body);letter-spacing:.06em;text-transform:uppercase;color:var(--yellow)}
+.kicker{font:700 21px/1.2 var(--f-chalk);color:var(--yellow)}
 .hero h1{margin:6px 0 8px;font:700 clamp(38px,6vw,64px)/1.05 var(--f-chalk);text-shadow:0 0 12px rgba(255,255,255,.08)}
 .hero h1 code{font:700 .62em var(--f-mono);color:var(--yellow);background:rgba(0,0,0,.2);padding:0 .25em;border-radius:6px}
 .lead{max-width:62ch;margin:0;font-size:clamp(18px,2.2vw,20px);color:var(--chalk-dim)}
@@ -88,13 +88,13 @@ pre.code{margin:12px 0;background:var(--code-bg);color:var(--code-ink);border-ra
 /* operator table */
 .ops{border-collapse:collapse;margin:12px 0;font-size:15.5px;max-width:76ch;width:100%}
 .ops th,.ops td{border-bottom:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
-.ops th{font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.ops th{font-size:14px;color:var(--muted)}
 .ops td:first-child{font:700 16px var(--f-mono);white-space:nowrap}
 
 /* live example */
 .ex{margin:14px 0 18px;max-width:80ch;border:2px solid var(--ink);border-radius:12px;overflow:hidden;background:#fff}
 .ex-tag{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--ink);color:var(--chalk);padding:5px 12px;font-size:13px;font-weight:700;letter-spacing:.04em}
-.ex-tag .t{text-transform:uppercase}
+.ex-tag .t{font-weight:700}
 .ex-tag .kb{font-weight:400;color:var(--chalk-dim);letter-spacing:0}
 .ex textarea{display:block;width:100%;border:0;resize:vertical;min-height:52px;padding:12px 14px;font-size:15px;line-height:1.55;background:var(--code-bg);color:var(--code-ink);caret-color:var(--yellow);tab-size:2}
 .ex textarea:focus{outline:none;box-shadow:inset 0 0 0 3px var(--yellow)}
@@ -136,7 +136,7 @@ pre.code{margin:12px 0;background:var(--code-bg);color:var(--code-ink);border-ra
 .mist .side{border-radius:10px;padding:10px 12px 12px;border:2px solid}
 .mist .bad{background:var(--bad-bg);border-color:#e4aaa2}
 .mist .good{background:var(--ok-bg);border-color:#a9d3a0}
-.mist .lbl{font:700 13px var(--f-body);text-transform:uppercase;letter-spacing:.05em}
+.mist .lbl{font:700 17px var(--f-chalk)}
 .mist .bad .lbl{color:var(--bad)}.mist .good .lbl{color:var(--ok)}
 .mist pre.code{margin:6px 0 0;font-size:14px}
 .mist-why{margin:0 0 18px!important;max-width:86ch!important;font-size:15.5px;color:var(--muted)}
@@ -208,7 +208,7 @@ pre.code{margin:12px 0;background:var(--code-bg);color:var(--code-ink);border-ra
 .jgrid{border-collapse:separate;border-spacing:4px;font:13px/1.25 var(--f-mono)}
 .jgrid th{font-weight:700;padding:5px 7px;border-radius:7px;background:#ece9dd;text-align:left;vertical-align:bottom}
 .jgrid th.rh{white-space:nowrap}
-.jgrid th .tn{display:block;font:700 11px var(--f-body);color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.jgrid th .tn{display:block;font:700 12px var(--f-body);color:var(--muted)}
 .jgrid td{width:52px;height:38px;text-align:center;border-radius:8px;background:#f1efe6;color:#bdb9a9;font-weight:700;font-size:15px;transition:background .25s,color .25s,transform .25s}
 .jgrid td.on{background:#fbe9b8;color:#7a5a00}
 .jgrid td.match{background:var(--ok);color:#fff;transform:scale(1.04)}
@@ -241,10 +241,10 @@ footer.end{max-width:980px;margin:0 auto;padding:0 22px 60px;color:var(--chalk-d
 </div></header>
 
 <section class="hero">
-  <div class="kicker">SQL · Lesson 3 · Explainer</div>
+  <div class="kicker">SQL, Lesson 3: explainer</div>
   <h1>Joining tables</h1>
   <p class="lead">In a good database every piece of data lives in <b>exactly one place</b>, and tables refer to each other with numbers. When a question needs several tables, you list them after <code>FROM</code> and say in <code>WHERE</code> which row belongs to which.</p>
-  <div class="meta"><span>⏱ about 15 minutes</span><span>🧪 every example can be run</span><span>✅ 4 questions at the end</span></div>
+  <div class="meta"><span>about 15 minutes</span><span>every example can be run</span><span>4 questions at the end</span></div>
   <ul class="toc"><li><a href="#tables">The example tables</a></li><li><a href="#reference">Why just a number?</a></li><li><a href="#cross">Two tables after FROM: every row with every row</a></li><li><a href="#rule">The matching rule</a></li><li><a href="#filters">Rule + filters</a></li><li><a href="#three">Three tables</a></li><li><a href="#types">Kinds of links</a></li><li><a href="#mistakes">Common mistakes</a></li><li><a href="#quiz">Check yourself</a></li><li><a href="#practice">Practise</a></li></ul>
 </section>
 
