@@ -148,7 +148,13 @@
   const sP = pts => a => `<polygon points="${P(pts)}" ${a}/>`;
   const sD = (d, extra = "") => a => `<path d="${d}" ${extra} ${a}/>`;
   const sG = (...fs) => a => fs.map(f => f(a)).join("");
-  const fa = c => `fill="${c}"`;
+  const OUT = "#1b1b1b";                                   /* every banner shape gets this outline (Stroke paint), 1 mm; stars 0.6 mm */
+  const fa0 = c => `fill="${c}"`;                          /* background: no outline */
+  const fa = c => `fill="${c}" filter="url(#olf1)"`;
+  const OL1 = `filter="url(#olf1)"`, OL2 = `filter="url(#olf2)"`;
+  const OLG = s => `<g ${OL1}>${s}</g>`;                     /* outline the finished (cut / clipped) shape */
+  const olFilter = (k, rad) => `<filter id="${k}" filterUnits="userSpaceOnUse" x="-80" y="-100" width="460" height="380" color-interpolation-filters="sRGB"><feMorphology in="SourceAlpha" operator="dilate" radius="${rad}" result="d"/><feFlood flood-color="${OUT}"/><feComposite in2="d" operator="in"/><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter>`;
+  const DEFS = `<defs>${olFilter("olf1", .75)}${olFilter("olf2", .45)}</defs>`;
   const VE = `vector-effect="non-scaling-stroke"`;
   const CUT = `fill="#5fa8ff" fill-opacity=".62" stroke="#1d5fb8" stroke-width="1.2" ${VE}`;
   const SEE = c => `fill="${c}" fill-opacity=".72"`;
@@ -192,6 +198,8 @@
   const NOX = `<span class="chipx" title="${t("Stroke paint: X", "Körvonalrajzolat: X")}">${t("stroke", "körvonal")} ✕</span>`;
   const NOFILL = `<span class="chipx" title="${t("Fill: X", "Kitöltés: X")}">${t("fill", "kitöltés")} ✕</span>`;
   const STROKE = (h, w) => `<span class="chex"><span class="sw ring" style="--c:${h}"></span><code class="hex">${hex6(h)}ff</code></span><span class="nums">${w} mm</span>`;
+  const OLC = (w = 1) => `<span class="chex" title="${t("Outline: Stroke paint + Stroke style", "Körvonal: Körvonalrajzolat + Körvonalstílus")}"><span class="sw ring" style="--c:${OUT}"></span><span class="nums">${w} mm</span></span>`;
+  const CO = h => C(h) + OLC();
   const TXT = s => `<span class="txt">${esc(s)}</span>`;
   const PT = v => `<span class="nums">${Math.round(v / 0.3528)} pt</span>`;
   const TIMES = n => `<span class="nums">× ${n}</span>`;
@@ -256,7 +264,7 @@
     /* ---------- STEP 1: field ---------- */
     let colorAt = () => f0; let cur = "";
     const bgFrames = c => {
-      cur = sR(0, 0, W, H)(fa(c));
+      cur = sR(0, 0, W, H)(fa0(c));
       fr({ svg: cur, sel: [[0, 0, W, H]], view: FULL, chips: [T("rect"), T("selector"), SZ(W, H), C(c), NOX],
         cap: t("Background rectangle: exact size and colour, no stroke.", "Háttértéglalap: pontos méret és szín, körvonal nélkül.") });
       fr({ svg: cur, page: true, view: FULL, chips: [M("resize")], cap: t("The page shrinks to the banner – everything else aligns to it.", "Az oldal a zászló méretére zsugorodik – minden más ehhez igazodik.") });
@@ -268,45 +276,45 @@
     };
     if (layout === "tri-h" || layout === "canton") {
       const top = layout === "canton" ? f1 : f0, mid = layout === "canton" ? f2 : f1, bot = layout === "canton" ? f1 : f2;
-      add(1, sR(0, 0, W, H)(fa(mid)), [0, 0, W, H]); add(1, sR(0, 0, W, 60)(fa(top)) + sR(0, 120, W, 60)(fa(bot)), [0, 0, W, H]);
+      add(1, sR(0, 0, W, H)(fa0(mid)), [0, 0, W, H]); add(1, sR(0, 0, W, 60)(fa(top)) + sR(0, 120, W, 60)(fa(bot)), [0, 0, W, H]);
       bgFrames(mid);
-      placeF(sR(0, 0, W, 60), top, [0, 0, W, 60], 0, 55, [T("rect"), SZ(W, 60), C(top), TO, M("align"), AL("cv", "top")], t("Top stripe, aligned to the top edge.", "Felső sáv, a felső élhez igazítva."));
-      placeF(sR(0, 120, W, 60), bot, [0, 120, W, 60], 0, -120, [M("dup"), C(bot), TO, AL("cv", "bottom")], t("Duplicate, new colour, align to the bottom edge.", "Kettőzés, új szín, igazítás az alsó élhez."));
+      placeF(sR(0, 0, W, 60), top, [0, 0, W, 60], 0, 55, [T("rect"), SZ(W, 60), CO(top), TO, M("align"), AL("cv", "top")], t("Top stripe, aligned to the top edge.", "Felső sáv, a felső élhez igazítva."));
+      placeF(sR(0, 120, W, 60), bot, [0, 120, W, 60], 0, -120, [M("dup"), CO(bot), TO, AL("cv", "bottom")], t("Duplicate, new colour, align to the bottom edge.", "Kettőzés, új szín, igazítás az alsó élhez."));
       colorAt = (x, y) => y < 60 ? top : y < 120 ? mid : bot;
       if (layout === "canton") {
         add(1, sR(0, 0, 96, 72)(fa(f0)), [0, 0, 96, 72]); const prev = colorAt;
-        placeF(sR(0, 0, 96, 72), f0, [0, 0, 96, 72], 70, 45, [T("rect"), SZ(96, 72), C(f0), TO, AL("left", "top")], t("The canton, in the top-left corner. Stars go here later.", "A kanton a bal felső sarokba. Ide jönnek majd a csillagok."));
+        placeF(sR(0, 0, 96, 72), f0, [0, 0, 96, 72], 70, 45, [T("rect"), SZ(96, 72), CO(f0), TO, AL("left", "top")], t("The canton, in the top-left corner. Stars go here later.", "A kanton a bal felső sarokba. Ide jönnek majd a csillagok."));
         colorAt = (x, y) => x < 96 && y < 72 ? f0 : prev(x, y);
       }
     }
     if (layout === "tri-v") {
-      add(1, sR(0, 0, W, H)(fa(f1)), [0, 0, W, H]); add(1, sR(0, 0, 100, H)(fa(f0)) + sR(200, 0, 100, H)(fa(f2)), [0, 0, W, H]);
+      add(1, sR(0, 0, W, H)(fa0(f1)), [0, 0, W, H]); add(1, sR(0, 0, 100, H)(fa(f0)) + sR(200, 0, 100, H)(fa(f2)), [0, 0, W, H]);
       bgFrames(f1);
-      placeF(sR(0, 0, 100, H), f0, [0, 0, 100, H], 70, 0, [T("rect"), SZ(100, H), C(f0), TO, M("align"), AL("left", "ch")], t("Left stripe, aligned to the left edge.", "Bal sáv, a bal élhez igazítva."));
-      placeF(sR(200, 0, 100, H), f2, [200, 0, 100, H], -200, 0, [M("dup"), C(f2), TO, AL("right", "ch")], t("Duplicate, new colour, align to the right edge.", "Kettőzés, új szín, igazítás a jobb élhez."));
+      placeF(sR(0, 0, 100, H), f0, [0, 0, 100, H], 70, 0, [T("rect"), SZ(100, H), CO(f0), TO, M("align"), AL("left", "ch")], t("Left stripe, aligned to the left edge.", "Bal sáv, a bal élhez igazítva."));
+      placeF(sR(200, 0, 100, H), f2, [200, 0, 100, H], -200, 0, [M("dup"), CO(f2), TO, AL("right", "ch")], t("Duplicate, new colour, align to the right edge.", "Kettőzés, új szín, igazítás a jobb élhez."));
       colorAt = x => x < 100 ? f0 : x < 200 ? f1 : f2;
     }
     if (layout === "bi-h") {
-      add(1, sR(0, 0, W, H)(fa(f1)), [0, 0, W, H]); add(1, sR(0, 0, W, 90)(fa(f0)), [0, 0, W, 90]);
+      add(1, sR(0, 0, W, H)(fa0(f1)), [0, 0, W, H]); add(1, sR(0, 0, W, 90)(fa(f0)), [0, 0, W, 90]);
       bgFrames(f1);
-      placeF(sR(0, 0, W, 90), f0, [0, 0, W, 90], 0, 50, [T("rect"), SZ(W, 90), C(f0), TO, M("align"), AL("cv", "top")], t("Upper half, aligned to the top edge.", "Felső fél, a felső élhez igazítva."));
+      placeF(sR(0, 0, W, 90), f0, [0, 0, W, 90], 0, 50, [T("rect"), SZ(W, 90), CO(f0), TO, M("align"), AL("cv", "top")], t("Upper half, aligned to the top edge.", "Felső fél, a felső élhez igazítva."));
       colorAt = (x, y) => y < 90 ? f0 : f1;
     }
     if (layout === "cross") {
-      add(1, sR(0, 0, W, H)(fa(f1)), [0, 0, W, H]);
-      add(1, `<path d="M0 72H300V108H0Z M132 0H168V180H132Z" fill="${f0}"/>`, [0, 0, W, H]);
+      add(1, sR(0, 0, W, H)(fa0(f1)), [0, 0, W, H]);
+      add(1, `<path d="M0 72H300V108H0Z M132 0H168V180H132Z" fill="${f0}" ${OL1}/>`, [0, 0, W, H]);
       bgFrames(f1);
-      placeF(sR(0, 72, W, 36), f0, [0, 72, W, 36], 0, 50, [T("rect"), SZ(W, 36), C(f0), TO, M("align"), CENTRE], t("A horizontal bar, centred.", "Vízszintes rúd, középre igazítva."));
-      placeF(sR(132, 0, 36, H), f0, [132, 0, 168, H], 75, 0, [T("rect"), SZ(36, H), C(f0), TO, CENTRE], t("A vertical bar, centred.", "Függőleges rúd, középre igazítva."));
+      placeF(sR(0, 72, W, 36), f0, [0, 72, W, 36], 0, 50, [T("rect"), SZ(W, 36), CO(f0), TO, M("align"), CENTRE], t("A horizontal bar, centred.", "Vízszintes rúd, középre igazítva."));
+      placeF(sR(132, 0, 36, H), f0, [132, 0, 168, H], 75, 0, [T("rect"), SZ(36, H), CO(f0), TO, CENTRE], t("A vertical bar, centred.", "Függőleges rúd, középre igazítva."));
       fr({ svg: cur, sel: [[0, 72, W, 108], [132, 0, 168, H]], status: ST(2), view: FULL, chips: [T("selector"), K("Shift"), TO, M("union")], cap: t("Select both bars → Union: one cross.", "Jelöld ki a két rudat → Unió: egy kereszt.") });
       colorAt = (x, y) => (y > 72 && y < 108) || (x > 132 && x < 168) ? f0 : f1;
       skills.add(t("Union", "Unió"));
     }
     if (layout === "triangle") {
       const tt = triR(0, CY, 100, H);
-      add(1, sR(0, 0, W, H)(fa(f2)), [0, 0, W, H]); add(1, sR(0, 0, W, 90)(fa(f1)), [0, 0, W, 90]); add(1, sP(tt)(fa(f0)), [0, 0, 100, H]);
+      add(1, sR(0, 0, W, H)(fa0(f2)), [0, 0, W, H]); add(1, sR(0, 0, W, 90)(fa(f1)), [0, 0, W, 90]); add(1, sP(tt)(fa(f0)), [0, 0, 100, H]);
       bgFrames(f2);
-      placeF(sR(0, 0, W, 90), f1, [0, 0, W, 90], 0, 50, [T("rect"), SZ(W, 90), C(f1), TO, M("align"), AL("cv", "top")], t("Upper half, aligned to the top edge.", "Felső fél, a felső élhez igazítva."));
+      placeF(sR(0, 0, W, 90), f1, [0, 0, W, 90], 0, 50, [T("rect"), SZ(W, 90), CO(f1), TO, M("align"), AL("cv", "top")], t("Upper half, aligned to the top edge.", "Felső fél, a felső élhez igazítva."));
       const up = tri(150, 95, 70, 60);
       fr({ svg: cur + sP(up)(fa(f0)), sel: [bb(up)], view: FULL, chips: [T("star"), STARB("poly", 3)], cap: t("Star tool in Polygon mode, 3 corners: a triangle.", "Csillag eszköz, Sokszög mód, 3 csúcs: háromszög.") });
       const rt = up.map(q => rotPt(q, 90, 150, 95));
@@ -319,45 +327,45 @@
       const flat = [[-40, 69], [340, 69], [340, 111], [-40, 111]];
       const band = flat.map(q => rotPt(q, -31, CX, CY));
       const cid = id("c");
-      add(1, sR(0, 0, W, H)(fa(f1)), [0, 0, W, H]);
-      add(1, `<clipPath id="${cid}"><rect width="${W}" height="${H}"/></clipPath><polygon clip-path="url(#${cid})" points="${P(band)}" fill="${f0}"/>`, [0, 0, W, H]);
+      add(1, sR(0, 0, W, H)(fa0(f1)), [0, 0, W, H]);
+      add(1, `<clipPath id="${cid}"><rect width="${W}" height="${H}"/></clipPath>` + OLG(`<polygon clip-path="url(#${cid})" points="${P(band)}" fill="${f0}"/>`), [0, 0, W, H]);
       bgFrames(f1);
       const wide = [-50, -70, 350, 250];
-      fr({ svg: cur + sP(flat)(fa(f0)), sel: [bb(flat)], view: wide, chips: [T("rect"), SZ(380, 42), C(f0), TO, M("align"), CENTRE], cap: t("A long band, centred – wider than the banner.", "Hosszú sáv, középre – szélesebb a zászlónál.") });
+      fr({ svg: cur + sP(flat)(fa(f0)), sel: [bb(flat)], view: wide, chips: [T("rect"), SZ(380, 42), CO(f0), TO, M("align"), CENTRE], cap: t("A long band, centred – wider than the banner.", "Hosszú sáv, középre – szélesebb a zászlónál.") });
       fr({ svg: cur + sP(band)(fa(f0)) + ghost(sP(flat)), sel: [bb(band)], view: wide, chips: [ROT(31, true), TO, CENTRE], cap: t("Rotate 31° anticlockwise, centre again. It sticks out!", "Forgatás 31°-kal balra, újra középre. Kilóg!") });
       fr({ svg: cur + sP(band)(fa(f0)) + sR(0, 0, W, H)(CUT), sel: [[0, 0, W, H], bb(band)], status: ST(2), view: wide, chips: [M("dup"), M("raise"), PLUS, K("Shift")],
         cap: t("Duplicate the background, raise it to the top, Shift + click the band.", "Kettőzd a hátteret, hozd felülre, Shift + kattintás a sávra.") });
       const ck = id("c");
-      fr({ svg: cur + `<clipPath id="${ck}"><rect width="${W}" height="${H}"/></clipPath><g clip-path="url(#${ck})">${sP(band)(fa(f0))}</g>`, view: FULL, chips: [M("inter")], cap: t("Intersection: only the part inside the banner stays.", "Metszet: csak a zászlón belüli rész marad.") });
+      fr({ svg: cur + `<clipPath id="${ck}"><rect width="${W}" height="${H}"/></clipPath>` + OLG(`<g clip-path="url(#${ck})">${sP(band)(fa0(f0))}</g>`), view: FULL, chips: [M("inter")], cap: t("Intersection: only the part inside the banner stays.", "Metszet: csak a zászlón belüli rész marad.") });
       colorAt = (x, y) => inPoly(x, y, band) ? f0 : f1;
       skills.add(t("Transform (rotate)", "Transzformáció (forgatás)")); skills.add(t("Intersection", "Metszet"));
     }
     if (layout === "border") {
-      add(1, sR(0, 0, W, H)(fa(f0)), [0, 0, W, H]); add(1, sR(14, 14, 272, 152)(fa(f1)), [14, 14, 286, 166]);
+      add(1, sR(0, 0, W, H)(fa0(f0)), [0, 0, W, H]); add(1, sR(14, 14, 272, 152)(fa(f1)), [14, 14, 286, 166]);
       bgFrames(f0);
-      placeF(sR(14, 14, 272, 152), f1, [14, 14, 286, 166], 22, 16, [T("rect"), SZ(272, 152), C(f1), TO, M("align"), CENTRE], t("Inner field, centred: a border appears all round.", "Belső mező, középre: körben megjelenik a szegély."));
+      placeF(sR(14, 14, 272, 152), f1, [14, 14, 286, 166], 22, 16, [T("rect"), SZ(272, 152), CO(f1), TO, M("align"), CENTRE], t("Inner field, centred: a border appears all round.", "Belső mező, középre: körben megjelenik a szegély."));
       colorAt = (x, y) => x < 14 || y < 14 || x > 286 || y > 166 ? f0 : f1;
     }
     if (layout === "chevron") {
       const outer = triR(0, CY, 150, H), inner = triR(0, CY, 100, 120), cid = id("m");
-      add(1, sR(0, 0, W, H)(fa(f1)), [0, 0, W, H]);
-      add(1, `<mask id="${cid}"><rect width="${W}" height="${H}" fill="#fff"/><polygon points="${P(inner)}" fill="#000"/></mask><polygon mask="url(#${cid})" points="${P(outer)}" fill="${f0}"/>`, [0, 0, 150, H]);
+      add(1, sR(0, 0, W, H)(fa0(f1)), [0, 0, W, H]);
+      add(1, `<mask id="${cid}"><rect width="${W}" height="${H}" fill="#fff"/><polygon points="${P(inner)}" fill="#000"/></mask>` + OLG(`<polygon mask="url(#${cid})" points="${P(outer)}" fill="${f0}"/>`), [0, 0, 150, H]);
       bgFrames(f1);
       const small = triR(170, CY, 55, 64);
       fr({ svg: cur + sP(small)(fa(f0)), sel: [bb(small)], view: FULL, chips: [T("star"), STARB("poly", 3), TO, M("rot90")], cap: t("A 3-corner polygon, rotated 90°: it points right.", "3 csúcsú sokszög, 90°-kal elforgatva: jobbra mutat.") });
-      fr({ svg: cur + sP(outer)(fa(f0)) + ghost(sP(small)), sel: [[0, 0, 150, H]], arrow: [...ctrOf(bb(small)), 50, CY], view: FULL, chips: [SZ(150, H), C(f0), TO, M("align"), AL("left", "ch")], cap: t("Exact size, aligned to the left edge.", "Pontos méret, a bal élhez igazítva.") });
+      fr({ svg: cur + sP(outer)(fa(f0)) + ghost(sP(small)), sel: [[0, 0, 150, H]], arrow: [...ctrOf(bb(small)), 50, CY], view: FULL, chips: [SZ(150, H), CO(f0), TO, M("align"), AL("left", "ch")], cap: t("Exact size, aligned to the left edge.", "Pontos méret, a bal élhez igazítva.") });
       fr({ svg: cur + sP(outer)(fa(f0)) + sP(inner)(CUT), sel: [[0, 0, 150, H], [0, 30, 100, 150]], status: ST(2), view: FULL, chips: [M("dup"), SZ(100, 120), TO, AL("left", "ch")], cap: t("Duplicate, make it smaller, align it left again.", "Kettőzés, kisebb méret, újra balra igazítva.") });
-      fr({ svg: cur + `<mask id="${cid}f"><rect width="${W}" height="${H}" fill="#fff"/><polygon points="${P(inner)}" fill="#000"/></mask><polygon mask="url(#${cid}f)" points="${P(outer)}" fill="${f0}"/>`, view: FULL, chips: [T("selector"), K("Shift"), TO, M("diff")], cap: t("Select both → Difference: a chevron.", "Mindkettő kijelölve → Különbség: ék (chevron).") });
+      fr({ svg: cur + `<mask id="${cid}f"><rect width="${W}" height="${H}" fill="#fff"/><polygon points="${P(inner)}" fill="#000"/></mask>` + OLG(`<polygon mask="url(#${cid}f)" points="${P(outer)}" fill="${f0}"/>`), view: FULL, chips: [T("selector"), K("Shift"), TO, M("diff")], cap: t("Select both → Difference: a chevron.", "Mindkettő kijelölve → Különbség: ék (chevron).") });
       colorAt = (x, y) => inPoly(x, y, outer) && !inPoly(x, y, inner) ? f0 : f1;
       skills.add(t("Difference", "Különbség")); skills.add(t("Rotate 90°", "Elforgatás 90°-kal"));
     }
     if (layout === "wave") {
       const xs = [32, 91, 150, 209, 268], jit = [[6, -2], [-7, 3], [4, 2], [-5, -3], [3, 1]];
-      const waveSvg = `<g fill="${f1}">${sR(0, 90, W, 90)("")}${xs.map(x => sE(x, 90, 32, 13)("")).join("")}</g>`;
-      add(1, sR(0, 0, W, H)(fa(f0)), [0, 0, W, H]); add(1, waveSvg, [0, 77, W, H]);
+      const waveSvg = `<g fill="${f1}" ${OL1}>${sR(0, 90, W, 90)("")}${xs.map(x => sE(x, 90, 32, 13)("")).join("")}</g>`;
+      add(1, sR(0, 0, W, H)(fa0(f0)), [0, 0, W, H]); add(1, waveSvg, [0, 77, W, H]);
       bgFrames(f0);
-      placeF(sR(0, 90, W, 90), f1, [0, 90, W, H], 0, -60, [T("rect"), SZ(W, 90), C(f1), TO, M("align"), AL("cv", "bottom")], t("Lower half, aligned to the bottom edge.", "Alsó fél, az alsó élhez igazítva."));
-      fr({ svg: cur + sE(70, 60, 32, 13)(fa(f1)), sel: [[38, 47, 102, 73]], view: FULL, chips: [T("ellipse"), SZ(64, 26), C(f1)], cap: t("One ellipse, same colour.", "Egy ellipszis, ugyanilyen színnel.") });
+      placeF(sR(0, 90, W, 90), f1, [0, 90, W, H], 0, -60, [T("rect"), SZ(W, 90), CO(f1), TO, M("align"), AL("cv", "bottom")], t("Lower half, aligned to the bottom edge.", "Alsó fél, az alsó élhez igazítva."));
+      fr({ svg: cur + sE(70, 60, 32, 13)(fa(f1)), sel: [[38, 47, 102, 73]], view: FULL, chips: [T("ellipse"), SZ(64, 26), CO(f1)], cap: t("One ellipse, same colour.", "Egy ellipszis, ugyanilyen színnel.") });
       const rough = xs.map((x, i) => sE(x + jit[i][0], 90 + jit[i][1], 32, 13)(fa(f1))).join("");
       fr({ svg: cur + rough, view: FULL, chips: [M("dup"), TIMES(4)], cap: t("Duplicate it 4×, drag the 5 ellipses along the edge.", "Kettőzd 4×, húzd az 5 ellipszist a szél mentén.") });
       const even = xs.map(x => sE(x, 90, 32, 13)(fa(f1))).join("");
@@ -382,7 +390,7 @@
     const innerCol = inner ? best(frameCol, cands, pal, [frameCol]) : null;
     const symBg = inner ? innerCol : frameCol;
     const symCol = best(symBg, cands, pal, inner ? [] : [frameCol]);
-    const frameOutl = econ !== 2 && worstC(frameCol, bgRing) < 1.6 ? best(frameCol, [WHITE, BLACK, ...pal], pal) : null;
+    const frameOutl = null;
     const EMB = cb(CX, CY, r * 1.55);
     const cen = (f, c, b, chips, cap, extra = {}) => {          /* draw somewhere, then centre it on the page */
       const [dx, dy] = offOf(b);
@@ -393,23 +401,23 @@
     const ec = extraCol; cur = "";
     if (army === 0) {
       const p = starPts(CX, CY, r * 1.3, .45, 24); add(2, sP(p)(fa(ec)), bb(p));
-      cen(sP(p), fa(ec), bb(p), [T("star"), STARB("star", 24, "0.45"), SZ(bb(p)[2] - bb(p)[0], bb(p)[3] - bb(p)[1]), C(ec), TO, M("align"), CENTRE], t("A 24-corner star with thin spokes, centred: a sunburst.", "24 csúcsú, vékony ágú csillag, középre: napsugár."));
+      cen(sP(p), fa(ec), bb(p), [T("star"), STARB("star", 24, "0.45"), SZ(bb(p)[2] - bb(p)[0], bb(p)[3] - bb(p)[1]), CO(ec), TO, M("align"), CENTRE], t("A 24-corner star with thin spokes, centred: a sunburst.", "24 csúcsú, vékony ágú csillag, középre: napsugár."));
     }
     if (army === 1) {
       const p = starPts(CX, CY, r * 1.32, .32, 8), c = r * .62;
-      add(2, `<g fill="${ec}">${sP(p)("")}${sC(CX, CY, c)("")}</g>`, bb(p));
-      cen(sP(p), fa(ec), bb(p), [T("star"), STARB("star", 8, "0.32"), SZ(bb(p)[2] - bb(p)[0], bb(p)[3] - bb(p)[1]), C(ec), TO, CENTRE], t("An 8-corner star, centred.", "8 csúcsú csillag, középre."));
+      add(2, `<g fill="${ec}" ${OL1}>${sP(p)("")}${sC(CX, CY, c)("")}</g>`, bb(p));
+      cen(sP(p), fa(ec), bb(p), [T("star"), STARB("star", 8, "0.32"), SZ(bb(p)[2] - bb(p)[0], bb(p)[3] - bb(p)[1]), CO(ec), TO, CENTRE], t("An 8-corner star, centred.", "8 csúcsú csillag, középre."));
       cur = sP(p)(fa(ec));
-      cen(sC(CX, CY, c), fa(ec), cb(CX, CY, c), [T("ellipse"), SZ(2 * c, 2 * c), C(ec), TO, CENTRE], t("A circle in the same colour, centred too.", "Ugyanilyen színű kör, szintén középre."));
+      cen(sC(CX, CY, c), fa(ec), cb(CX, CY, c), [T("ellipse"), SZ(2 * c, 2 * c), CO(ec), TO, CENTRE], t("A circle in the same colour, centred too.", "Ugyanilyen színű kör, szintén középre."));
       cur += sC(CX, CY, c)(fa(ec));
       fr({ svg: cur, sel: [bb(p)], status: ST(2), chips: [T("selector"), K("Shift"), TO, M("union")], cap: t("Select both → Union: a compass star.", "Mindkettő kijelölve → Unió: szélrózsa.") });
       skills.add(t("Union", "Unió"));
     }
     if (army === 2) {
       const R1 = r + 9, R2 = r + 5, cid = id("m");
-      const halo = `<mask id="${cid}"><rect width="${W}" height="${H}" fill="#fff"/><circle cx="${CX}" cy="${CY}" r="${R2}" fill="#000"/></mask><circle mask="url(#${cid})" cx="${CX}" cy="${CY}" r="${R1}" fill="${ec}"/>`;
+      const halo = `<mask id="${cid}"><rect width="${W}" height="${H}" fill="#fff"/><circle cx="${CX}" cy="${CY}" r="${R2}" fill="#000"/></mask>` + OLG(`<circle mask="url(#${cid})" cx="${CX}" cy="${CY}" r="${R1}" fill="${ec}"/>`);
       add(2, halo, cb(CX, CY, R1));
-      cen(sC(CX, CY, R1), fa(ec), cb(CX, CY, R1), [T("ellipse"), SZ(2 * R1, 2 * R1), C(ec), TO, M("align"), CENTRE], t("A big circle, centred.", "Nagy kör, középre."));
+      cen(sC(CX, CY, R1), fa(ec), cb(CX, CY, R1), [T("ellipse"), SZ(2 * R1, 2 * R1), CO(ec), TO, M("align"), CENTRE], t("A big circle, centred.", "Nagy kör, középre."));
       cur = sC(CX, CY, R1)(fa(ec));
       cen(sC(CX, CY, R2), CUT, cb(CX, CY, R2), [T("ellipse"), SZ(2 * R2, 2 * R2), TO, CENTRE], t("A slightly smaller circle on top, centred.", "Egy kicsit kisebb kör felülre, középre."), { status: ST(2) });
       fr({ svg: halo.replace(`id="${cid}"`, `id="${cid}f"`).replace(`url(#${cid})`, `url(#${cid}f)`), chips: [T("selector"), K("Shift"), TO, M("diff")], cap: t("Select both → Difference: a thin halo.", "Mindkettő kijelölve → Különbség: vékony glória.") });
@@ -421,12 +429,12 @@
       if (army === 3) shape = [[CX - len / 2, CY - th / 2], [CX + len / 2, CY - th / 2], [CX + len / 2, CY + th / 2], [CX - len / 2, CY + th / 2]];
       else shape = [[CX - len / 2, CY - th / 2], [CX + len / 2 - tl, CY - th / 2], [CX + len / 2 - tl, CY - th * .95], [CX + len / 2, CY], [CX + len / 2 - tl, CY + th * .95], [CX + len / 2 - tl, CY + th / 2], [CX - len / 2, CY + th / 2]];
       const a = shape.map(q => rotPt(q, 45, CX, CY)), b2 = a.map(([x, y]) => [2 * CX - x, y]);
-      add(2, `<g fill="${ec}">${sP(a)("")}${sP(b2)("")}</g>`, bb([...a, ...b2]));
+      add(2, `<g fill="${ec}" ${OL1}>${sP(a)("")}${sP(b2)("")}</g>`, bb([...a, ...b2]));
       const vb = ub(bb(shape), bb([...a, ...b2]));
-      if (army === 3) cen(sP(shape), fa(ec), bb(shape), [T("rect"), SZ(len, th), C(ec), TO, M("align"), CENTRE], t("A long thin bar, centred.", "Hosszú, vékony rúd, középre."), { b: vb });
+      if (army === 3) cen(sP(shape), fa(ec), bb(shape), [T("rect"), SZ(len, th), CO(ec), TO, M("align"), CENTRE], t("A long thin bar, centred.", "Hosszú, vékony rúd, középre."), { b: vb });
       else {
         const bar = sR(CX - len / 2, CY - th / 2, len - tl, th), tip = [[CX + len / 2 - tl, CY - th * .95], [CX + len / 2, CY], [CX + len / 2 - tl, CY + th * .95]];
-        fr({ svg: bar(fa(ec)) + sP(tip)(fa(ec)), sel: [bb(shape)], b: vb, chips: [T("rect"), SZ(len - tl, th), PLUS, T("star"), STARB("poly", 3), M("rot90"), SZ(tl, th * 1.9), C(ec)], cap: t("A bar and a small triangle touching its right end.", "Egy rúd és egy kis háromszög a jobb végénél.") });
+        fr({ svg: bar(fa(ec)) + sP(tip)(fa(ec)), sel: [bb(shape)], b: vb, chips: [T("rect"), SZ(len - tl, th), PLUS, T("star"), STARB("poly", 3), M("rot90"), SZ(tl, th * 1.9), CO(ec)], cap: t("A bar and a small triangle touching its right end.", "Egy rúd és egy kis háromszög a jobb végénél.") });
         fr({ svg: sP(shape)(fa(ec)), sel: [bb(shape)], status: ST(2), b: vb, chips: [K("Shift"), TO, M("union"), TO, CENTRE], cap: t("Union: a blade. Centre it.", "Unió: penge. Igazítsd középre.") });
       }
       fr({ svg: sP(a)(fa(ec)) + ghost(sP(shape)), sel: [bb(a)], b: vb, chips: [ROT(45)], cap: t("Rotate it 45°.", "Forgasd el 45°-kal.") });
@@ -447,46 +455,46 @@
     if (econ <= 1) {
       const ri = r - 8, cid = id("m");
       const outerF = econ === 0 ? sP(starPts(CX, CY, r, .86, 20)) : sC(CX, CY, r);
-      const ring = `<mask id="${cid}"><rect width="${W}" height="${H}" fill="#fff"/><circle cx="${CX}" cy="${CY}" r="${ri}" fill="#000"/></mask>${outerF(`fill="${fc}" mask="url(#${cid})"${outl}`)}`;
+      const ring = `<mask id="${cid}"><rect width="${W}" height="${H}" fill="#fff"/><circle cx="${CX}" cy="${CY}" r="${ri}" fill="#000"/></mask>` + OLG(outerF(`fill="${fc}" mask="url(#${cid})"`));
       add(3, ring + sC(CX, CY, ri)(fa(innerCol)), cb(CX, CY, r));
-      if (econ === 0) { const p = starPts(CX, CY, r, .86, 20); cen(outerF, fa(fc), bb(p), [T("star"), STARB("star", 20, "0.86"), SZ(bb(p)[2] - bb(p)[0], bb(p)[3] - bb(p)[1]), C(fc), TO, M("align"), CENTRE], t("A 20-corner star with short spokes, centred.", "20 csúcsú, rövid ágú csillag, középre.")); }
-      else cen(outerF, fa(fc), cb(CX, CY, r), [T("ellipse"), SZ(2 * r, 2 * r), C(fc), TO, M("align"), CENTRE], t("A circle, centred.", "Egy kör, középre."));
+      if (econ === 0) { const p = starPts(CX, CY, r, .86, 20); cen(outerF, fa(fc), bb(p), [T("star"), STARB("star", 20, "0.86"), SZ(bb(p)[2] - bb(p)[0], bb(p)[3] - bb(p)[1]), CO(fc), TO, M("align"), CENTRE], t("A 20-corner star with short spokes, centred.", "20 csúcsú, rövid ágú csillag, középre.")); }
+      else cen(outerF, fa(fc), cb(CX, CY, r), [T("ellipse"), SZ(2 * r, 2 * r), CO(fc), TO, M("align"), CENTRE], t("A circle, centred.", "Egy kör, középre."));
       cur = outerF(fa(fc));
       cen(sC(CX, CY, ri), CUT, cb(CX, CY, ri), [T("ellipse"), SZ(2 * ri, 2 * ri), TO, CENTRE], t("A smaller circle on top, centred.", "Kisebb kör felülre, középre."), { status: ST(2) });
       const ringF = ring.replace(`id="${cid}"`, `id="${cid}f"`).replace(`url(#${cid})`, `url(#${cid}f)`);
       fr({ svg: ringF, chips: [T("selector"), K("Shift"), TO, M("diff")], cap: econ === 0 ? t("Difference: a cog ring.", "Különbség: fogaskerék-gyűrű.") : t("Difference: a ring.", "Különbség: gyűrű.") });
       cur = ringF;
-      cen(sC(CX, CY, ri), fa(innerCol), cb(CX, CY, ri), [T("ellipse"), SZ(2 * ri, 2 * ri), C(innerCol), TO, CENTRE], t("Fill the hole: one more circle, centred.", "Töltsd ki a lyukat: még egy kör, középre."));
+      cen(sC(CX, CY, ri), fa(innerCol), cb(CX, CY, ri), [T("ellipse"), SZ(2 * ri, 2 * ri), CO(innerCol), TO, CENTRE], t("Fill the hole: one more circle, centred.", "Töltsd ki a lyukat: még egy kör, középre."));
       cur += sC(CX, CY, ri)(fa(innerCol));
       rs = ri * .86;
       skills.add(t("Difference", "Különbség"));
     }
     if (econ === 2) {
       add(3, `<circle cx="${CX}" cy="${CY}" r="${r}" fill="${fc}" stroke="${extraCol}" stroke-width="2"/>`, cb(CX, CY, r));
-      cen(sC(CX, CY, r), fa(fc), cb(CX, CY, r), [T("ellipse"), SZ(2 * r, 2 * r), C(fc), TO, M("align"), CENTRE], t("A circle, centred.", "Egy kör, középre."));
+      cen(sC(CX, CY, r), fa(fc), cb(CX, CY, r), [T("ellipse"), SZ(2 * r, 2 * r), CO(fc), TO, M("align"), CENTRE], t("A circle, centred.", "Egy kör, középre."));
       fr({ svg: sC(CX, CY, r)(`fill="${fc}" stroke="${extraCol}" stroke-width="2"`), sel: [cb(CX, CY, r + 1)], chips: [M("fs"), STROKE(extraCol, 2)], cap: t("Stroke paint + Stroke style: a 2 mm outline.", "Körvonalrajzolat + Körvonalstílus: 2 mm-es körvonal.") });
       rs = (r - 4) * .86; skills.add(t("Fill and stroke", "Kitöltés és körvonal"));
     }
     if (econ === 3) {
       const rc = .8 * r;
       const shield = `M${r1(CX - rc)} ${r1(CY - r)}H${r1(CX + rc)}V${CY}A${r1(rc)} ${r1(rc)} 0 0 1 ${r1(CX - rc)} ${CY}Z`;
-      add(3, sD(shield)(`fill="${fc}"${outl}`), [CX - rc, CY - r, CX + rc, CY + rc]);
+      add(3, sD(shield)(fa(fc)), [CX - rc, CY - r, CX + rc, CY + rc]);
       const rectC = sR(CX - rc, CY - r / 2, 2 * rc, r), rectU = sR(CX - rc, CY - r, 2 * rc, r);
-      fr({ svg: rectC(fa(fc)) + sC(CX, CY, rc)(SEE(fc)), sel: [cb(CX, CY, rc)], chips: [T("rect"), SZ(2 * rc, r), PLUS, T("ellipse"), SZ(2 * rc, 2 * rc), C(fc), TO, M("align"), CENTRE], cap: t("A rectangle and a circle, both centred.", "Egy téglalap és egy kör, mindkettő középre.") });
+      fr({ svg: rectC(fa(fc)) + sC(CX, CY, rc)(SEE(fc)), sel: [cb(CX, CY, rc)], chips: [T("rect"), SZ(2 * rc, r), PLUS, T("ellipse"), SZ(2 * rc, 2 * rc), CO(fc), TO, M("align"), CENTRE], cap: t("A rectangle and a circle, both centred.", "Egy téglalap és egy kör, mindkettő középre.") });
       fr({ svg: rectU(fa(fc)) + sC(CX, CY, rc)(SEE(fc)) + ghost(rectC), sel: [bR(CX - rc, CY - r, 2 * rc, r)], arrow: [CX, CY, CX, CY - r / 2], chips: [LB(t("rectangle only:", "csak a téglalap:")), MV(0, -r / 2)], cap: t("Move only the rectangle up.", "Csak a téglalapot told feljebb.") });
-      fr({ svg: sD(shield)(`fill="${fc}"${outl}`), sel: [[CX - rc, CY - r, CX + rc, CY + rc]], status: ST(2), chips: [K("Shift"), TO, M("union")], cap: t("Select both → Union: a round-bottomed shield.", "Mindkettő kijelölve → Unió: kerek aljú pajzs.") });
+      fr({ svg: sD(shield)(fa(fc)), sel: [[CX - rc, CY - r, CX + rc, CY + rc]], status: ST(2), chips: [K("Shift"), TO, M("union")], cap: t("Select both → Union: a round-bottomed shield.", "Mindkettő kijelölve → Unió: kerek aljú pajzs.") });
       rs = rc * .8; sy = CY - r * .1; skills.add(t("Union", "Unió")); skills.add(t("Transform (move)", "Transzformáció (áthelyezés)"));
     }
     if (econ === 4) {
       const R = 1.6 * r, d = .8 * r, oy = -.45 * r, cA = id("c"), cB = id("c");
-      const shieldSvg = (a1, a2) => `<clipPath id="${a1}"><circle cx="${r1(CX + d)}" cy="${r1(CY + oy)}" r="${r1(R)}"/></clipPath><clipPath id="${a2}"><circle cx="${r1(CX - d)}" cy="${r1(CY + oy)}" r="${r1(R)}"/></clipPath><g clip-path="url(#${a1})"><rect clip-path="url(#${a2})" x="${r1(CX - d)}" y="${r1(CY - .95 * r)}" width="${r1(2 * d)}" height="${r1(1.9 * r)}" fill="${fc}"/></g>${frameOutl ? `<path d="M${r1(CX - d)} ${r1(CY - .95 * r)}H${r1(CX + d)}V${r1(CY + .1 * r)}Q${r1(CX + d * .7)} ${r1(CY + .7 * r)} ${CX} ${r1(CY + .94 * r)}Q${r1(CX - d * .7)} ${r1(CY + .7 * r)} ${r1(CX - d)} ${r1(CY + .1 * r)}Z" fill="none" stroke="${frameOutl}" stroke-width="1.5"/>` : ""}`;
+      const shieldSvg = (a1, a2) => `<clipPath id="${a1}"><circle cx="${r1(CX + d)}" cy="${r1(CY + oy)}" r="${r1(R)}"/></clipPath><clipPath id="${a2}"><circle cx="${r1(CX - d)}" cy="${r1(CY + oy)}" r="${r1(R)}"/></clipPath>` + OLG(`<g clip-path="url(#${a1})"><rect clip-path="url(#${a2})" x="${r1(CX - d)}" y="${r1(CY - .95 * r)}" width="${r1(2 * d)}" height="${r1(1.9 * r)}" fill="${fc}"/></g>`) + `${frameOutl ? `<path d="M${r1(CX - d)} ${r1(CY - .95 * r)}H${r1(CX + d)}V${r1(CY + .1 * r)}Q${r1(CX + d * .7)} ${r1(CY + .7 * r)} ${CX} ${r1(CY + .94 * r)}Q${r1(CX - d * .7)} ${r1(CY + .7 * r)} ${r1(CX - d)} ${r1(CY + .1 * r)}Z" fill="none" stroke="${frameOutl}" stroke-width="1.5"/>` : ""}`;
       add(3, shieldSvg(cA, cB), [CX - d, CY - .95 * r, CX + d, CY + .94 * r]);
       const big = ub(cb(CX + d, CY + oy, R), cb(CX - d, CY + oy, R));
       const cR = sC(CX + d, CY + oy, R), cL = sC(CX - d, CY + oy, R);
-      fr({ svg: cR(SEE(fc)) + ghost(sC(CX, CY, R)), sel: [cb(CX + d, CY + oy, R)], arrow: [CX, CY, CX + d, CY + oy], b: big, chips: [T("ellipse"), SZ(2 * R, 2 * R), C(fc), CENTRE, TO, MV(d, oy)], cap: t("A big circle: centre it, then move it right and up.", "Nagy kör: középre, aztán jobbra és fel.") });
+      fr({ svg: cR(SEE(fc)) + ghost(sC(CX, CY, R)), sel: [cb(CX + d, CY + oy, R)], arrow: [CX, CY, CX + d, CY + oy], b: big, chips: [T("ellipse"), SZ(2 * R, 2 * R), CO(fc), CENTRE, TO, MV(d, oy)], cap: t("A big circle: centre it, then move it right and up.", "Nagy kör: középre, aztán jobbra és fel.") });
       fr({ svg: cR(SEE(fc)) + cL(SEE(fc)) + ghostAt(cL, 2 * d, 0), sel: [cb(CX - d, CY + oy, R)], arrow: [CX + d, CY + oy, CX - d, CY + oy], b: big, chips: [M("dup"), TO, MV(-2 * d, 0)], cap: t("Duplicate and move the copy to the left.", "Kettőzd, és told a másolatot balra.") });
       const c1 = id("c"), c2 = id("c");
-      const lens = `<clipPath id="${c1}"><circle cx="${r1(CX + d)}" cy="${r1(CY + oy)}" r="${r1(R)}"/></clipPath><g clip-path="url(#${c1})">${cL(fa(fc))}</g>`;
+      const lens = `<clipPath id="${c1}"><circle cx="${r1(CX + d)}" cy="${r1(CY + oy)}" r="${r1(R)}"/></clipPath>` + OLG(`<g clip-path="url(#${c1})">${cL(fa0(fc))}</g>`);
       fr({ svg: lens, sel: [[CX - d - .2 * R, CY + oy - R * .6, CX + d + .2 * R, CY + oy + R * .9]], status: ST(2), b: big, chips: [K("Shift"), TO, M("inter")], cap: t("Select both circles → Intersection: a pointed lens.", "Mindkét kör kijelölve → Metszet: hegyes lencse.") });
       fr({ svg: lens.replace(new RegExp(c1, "g"), c2) + sR(CX - d, CY - .95 * r, 2 * d, 1.9 * r)(CUT), sel: [bR(CX - d, CY - .95 * r, 2 * d, 1.9 * r)], status: ST(2), b: big, chips: [T("rect"), SZ(2 * d, 1.9 * r), TO, CENTRE], cap: t("A rectangle on top, centred.", "Egy téglalap felülre, középre.") });
       const s1 = id("c"), s2 = id("c");
@@ -510,8 +518,8 @@
     const symF = (f, a, b, chips, cap, extra = {}) => fr(Object.assign({ svg: cur + f(a), sel: [b], chips, cap }, extra));
     if (sym === "gear") {
       const p = starPts(CX, sy, rs, .8, 12), cid = id("m");
-      symSvg = `<mask id="${cid}"><rect width="${W}" height="${H}" fill="#fff"/><circle cx="${CX}" cy="${r1(sy)}" r="${r1(rs * .38)}" fill="#000"/></mask><polygon mask="url(#${cid})" points="${P(p)}" fill="${sc}"/>`; symB = bb(p);
-      symF(sP(p), fa(sc), bb(p), [T("star"), STARB("star", 12, "0.8"), SZ(bb(p)[2] - bb(p)[0], bb(p)[3] - bb(p)[1]), C(sc), TO, ...ctrChips(0, 0)], t("A 12-corner star with short spokes, centred.", "12 csúcsú, rövid ágú csillag, középre."));
+      symSvg = `<mask id="${cid}"><rect width="${W}" height="${H}" fill="#fff"/><circle cx="${CX}" cy="${r1(sy)}" r="${r1(rs * .38)}" fill="#000"/></mask>` + OLG(`<polygon mask="url(#${cid})" points="${P(p)}" fill="${sc}"/>`); symB = bb(p);
+      symF(sP(p), fa(sc), bb(p), [T("star"), STARB("star", 12, "0.8"), SZ(bb(p)[2] - bb(p)[0], bb(p)[3] - bb(p)[1]), CO(sc), TO, ...ctrChips(0, 0)], t("A 12-corner star with short spokes, centred.", "12 csúcsú, rövid ágú csillag, középre."));
       cur = sP(p)(fa(sc));
       symF(sC(CX, sy, rs * .38), CUT, cb(CX, sy, rs * .38), [T("ellipse"), SZ(rs * .76, rs * .76), TO, ...ctrChips(0, 0)], t("A small circle on top, centred.", "Kis kör felülre, középre."), { status: ST(2) });
       cur = ""; symF(() => symSvg.replace(`id="${cid}"`, `id="${cid}f"`).replace(`url(#${cid})`, `url(#${cid}f)`), "", bb(p), [K("Shift"), TO, M("diff")], t("Difference: a gear.", "Különbség: fogaskerék."));
@@ -520,20 +528,20 @@
     if (sym === "sun") {
       const p = starPts(CX, sy, rs * .95, .55, 16), cid = id("c");
       const sunAll = sG(sP(p), sC(CX, sy, rs * .5));
-      symSvg = `<clipPath id="${cid}"><rect width="${W}" height="${r1(sy)}"/></clipPath><g clip-path="url(#${cid})" fill="${sc}">${sunAll("")}</g>${sR(CX - rs, sy + rs * .1, 2 * rs, rs * .14)(fa(sc))}`;
-      symF(sunAll, fa(sc), bb(p), [T("ellipse"), SZ(rs, rs), PLUS, T("star"), STARB("star", 16, "0.55"), SZ(bb(p)[2] - bb(p)[0], bb(p)[3] - bb(p)[1]), C(sc)], t("A circle and a 16-corner star, same colour.", "Egy kör és egy 16 csúcsú csillag, azonos színnel."));
+      symSvg = `<clipPath id="${cid}"><rect width="${W}" height="${r1(sy)}"/></clipPath>` + OLG(`<g clip-path="url(#${cid})" fill="${sc}">${sunAll("")}</g>`) + `${sR(CX - rs, sy + rs * .1, 2 * rs, rs * .14)(fa(sc))}`;
+      symF(sunAll, fa(sc), bb(p), [T("ellipse"), SZ(rs, rs), PLUS, T("star"), STARB("star", 16, "0.55"), SZ(bb(p)[2] - bb(p)[0], bb(p)[3] - bb(p)[1]), CO(sc)], t("A circle and a 16-corner star, same colour.", "Egy kör és egy 16 csúcsú csillag, azonos színnel."));
       symF(sunAll, fa(sc), bb(p), [...ctrChips(0, 0), TO, M("union")], t("Centre both → Union.", "Mindkettőt középre → Unió."), { status: ST(2) });
       cur = sunAll(fa(sc));
       symF(sR(CX - 1.1 * rs, sy, 2.2 * rs, 1.1 * rs), CUT, bR(CX - 1.1 * rs, sy, 2.2 * rs, 1.1 * rs), [T("rect"), SZ(2.2 * rs, 1.1 * rs), TO, ...ctrChips(0, .55 * rs)], t("A rectangle over the lower half.", "Egy téglalap az alsó félre."), { status: ST(2) });
       const c2 = id("c");
-      cur = `<clipPath id="${c2}"><rect width="${W}" height="${r1(sy)}"/></clipPath><g clip-path="url(#${c2})" fill="${sc}">${sunAll("")}</g>`;
+      cur = `<clipPath id="${c2}"><rect width="${W}" height="${r1(sy)}"/></clipPath>` + OLG(`<g clip-path="url(#${c2})" fill="${sc}">${sunAll("")}</g>`);
       symF(sR(CX - rs, sy + rs * .1, 2 * rs, rs * .14), fa(sc), bR(CX - rs, sy + rs * .1, 2 * rs, rs * .14), [M("diff"), PLUS, T("rect"), SZ(2 * rs, .14 * rs), ...ctrChips(0, .17 * rs)], t("Difference: the sun rises. Add a thin horizon.", "Különbség: felkel a nap. Alá egy vékony horizont."));
       skills.add(t("Union", "Unió")); skills.add(t("Difference", "Különbség"));
     }
     if (sym === "waves") {
       const cid = id("m"), ys = [-.44, 0, .44];
-      symSvg = `<mask id="${cid}"><rect width="${W}" height="${H}" fill="#fff"/>${ys.map(k => sE(CX, sy + k * rs, rs * 1.2, rs * .11)(`fill="#000"`)).join("")}</mask><circle mask="url(#${cid})" cx="${CX}" cy="${r1(sy)}" r="${r1(rs)}" fill="${sc}"/>`;
-      symF(sC(CX, sy, rs), fa(sc), cb(CX, sy, rs), [T("ellipse"), SZ(2 * rs, 2 * rs), C(sc), TO, ...ctrChips(0, 0)], t("A circle, centred.", "Egy kör, középre."));
+      symSvg = `<mask id="${cid}"><rect width="${W}" height="${H}" fill="#fff"/>${ys.map(k => sE(CX, sy + k * rs, rs * 1.2, rs * .11)(`fill="#000"`)).join("")}</mask>` + OLG(`<circle mask="url(#${cid})" cx="${CX}" cy="${r1(sy)}" r="${r1(rs)}" fill="${sc}"/>`);
+      symF(sC(CX, sy, rs), fa(sc), cb(CX, sy, rs), [T("ellipse"), SZ(2 * rs, 2 * rs), CO(sc), TO, ...ctrChips(0, 0)], t("A circle, centred.", "Egy kör, középre."));
       cur = sC(CX, sy, rs)(fa(sc));
       const ells = sG(...ys.map(k => sE(CX, sy + k * rs, rs * 1.2, rs * .11)));
       symF(ells, CUT, bR(CX - 1.2 * rs, sy - .55 * rs, 2.4 * rs, 1.1 * rs), [T("ellipse"), SZ(2.4 * rs, .22 * rs), ...ctrChips(0, 0), TO, M("dup"), MV(0, -.44 * rs), M("dup"), MV(0, .88 * rs)], t("A flat ellipse, centred; duplicate it up and down.", "Lapos ellipszis középre; kettőzd fel és le."));
@@ -543,8 +551,8 @@
     if (sym === "mountains") {
       const big = tri(CX - .25 * rs, sy, 1.6 * rs, 1.3 * rs), small = tri(CX + .45 * rs, sy + .225 * rs, 1.1 * rs, .85 * rs), cid = id("c");
       const mts = sG(sP(big), sP(small));
-      symSvg = `<clipPath id="${cid}"><circle cx="${CX}" cy="${r1(sy)}" r="${r1(rs)}"/></clipPath><g clip-path="url(#${cid})" fill="${sc}">${mts("")}</g>`;
-      symF(mts, fa(sc), bb([...big, ...small]), [T("star"), STARB("poly", 3), SZ(1.6 * rs, 1.3 * rs), PLUS, SZ(1.1 * rs, .85 * rs), C(sc), TO, M("union")], t("A big and a small triangle → Union: mountains.", "Egy nagy és egy kis háromszög → Unió: hegyek."));
+      symSvg = `<clipPath id="${cid}"><circle cx="${CX}" cy="${r1(sy)}" r="${r1(rs)}"/></clipPath>` + OLG(`<g clip-path="url(#${cid})" fill="${sc}">${mts("")}</g>`);
+      symF(mts, fa(sc), bb([...big, ...small]), [T("star"), STARB("poly", 3), SZ(1.6 * rs, 1.3 * rs), PLUS, SZ(1.1 * rs, .85 * rs), CO(sc), TO, M("union")], t("A big and a small triangle → Union: mountains.", "Egy nagy és egy kis háromszög → Unió: hegyek."));
       cur = mts(fa(sc));
       symF(sC(CX, sy, rs), CUT, cb(CX, sy, rs), [T("ellipse"), SZ(2 * rs, 2 * rs), TO, ...ctrChips(0, 0)], t("A circle on top, centred.", "Egy kör felülre, középre."), { status: ST(2) });
       cur = ""; symF(() => symSvg.replace(`id="${cid}"`, `id="${cid}f"`).replace(`url(#${cid})`, `url(#${cid}f)`), "", cb(CX, sy, rs), [K("Shift"), TO, M("inter")], t("Intersection: mountains in a round window.", "Metszet: hegyek kerek ablakban."));
@@ -554,8 +562,8 @@
       const parts = [[1.0, .8, -.5], [1.3, .9, -.12], [1.6, 1.0, .3]].map(([w, h, o]) => tri(CX, sy + o * rs, w * rs, h * rs));
       const tr = sR(CX - .14 * rs, sy + .7 * rs, .28 * rs, .3 * rs);
       const tris = sG(...parts.map(p => sP(p)));
-      symSvg = `<g fill="${sc}">${tris("")}${tr("")}</g>`; symB = [CX - .8 * rs, sy - .9 * rs, CX + .8 * rs, sy + rs];
-      symF(tris, fa(sc), bb(parts.flat()), [T("star"), STARB("poly", 3), SZ(rs, .8 * rs), SZ(1.3 * rs, .9 * rs), SZ(1.6 * rs, rs), C(sc)], t("Three triangles, each centred, then moved down a bit more.", "Három háromszög, mind középre, aztán egyre lejjebb tolva."));
+      symSvg = `<g fill="${sc}" ${OL1}>${tris("")}${tr("")}</g>`; symB = [CX - .8 * rs, sy - .9 * rs, CX + .8 * rs, sy + rs];
+      symF(tris, fa(sc), bb(parts.flat()), [T("star"), STARB("poly", 3), SZ(rs, .8 * rs), SZ(1.3 * rs, .9 * rs), SZ(1.6 * rs, rs), CO(sc)], t("Three triangles, each centred, then moved down a bit more.", "Három háromszög, mind középre, aztán egyre lejjebb tolva."));
       cur = tris(fa(sc));
       symF(tr, fa(sc), bR(CX - .14 * rs, sy + .7 * rs, .28 * rs, .3 * rs), [T("rect"), SZ(.28 * rs, .3 * rs), TO, ...ctrChips(0, .85 * rs)], t("A small trunk under them.", "Alájuk egy kis törzs."));
       cur = ""; symF(() => symSvg, "", symB, [M("selAll"), TO, M("union")], t("Select all four → Union: one tree.", "Mind a négy kijelölve → Unió: egy fa."), { status: ST(4) });
@@ -564,8 +572,8 @@
     if (sym === "atom") {
       const ring0 = sD(`${ellPath(CX, sy, rs, rs * .38)} ${ellPath(CX, sy, rs * .86, rs * .25)}`, `fill-rule="evenodd"`);
       const rings = [0, 60, 120].map(a => `<g transform="rotate(${a} ${CX} ${r1(sy)})">${ring0(fa(sc))}</g>`);
-      symSvg = `<g fill="${sc}">${[0, 60, 120].map(a => `<g transform="rotate(${a} ${CX} ${r1(sy)})">${ring0("")}</g>`).join("")}${sC(CX, sy, rs * .18)("")}</g>`;
-      symF(sE(CX, sy, rs, rs * .38), fa(sc), bR(CX - rs, sy - .38 * rs, 2 * rs, .76 * rs), [T("ellipse"), SZ(2 * rs, .76 * rs), C(sc), TO, ...ctrChips(0, 0)], t("A flat ellipse, centred.", "Lapos ellipszis, középre."));
+      symSvg = `<g fill="${sc}" ${OL1}>${[0, 60, 120].map(a => `<g transform="rotate(${a} ${CX} ${r1(sy)})">${ring0("")}</g>`).join("")}${sC(CX, sy, rs * .18)("")}</g>`;
+      symF(sE(CX, sy, rs, rs * .38), fa(sc), bR(CX - rs, sy - .38 * rs, 2 * rs, .76 * rs), [T("ellipse"), SZ(2 * rs, .76 * rs), CO(sc), TO, ...ctrChips(0, 0)], t("A flat ellipse, centred.", "Lapos ellipszis, középre."));
       cur = sE(CX, sy, rs, rs * .38)(fa(sc));
       symF(sE(CX, sy, rs * .86, rs * .25), CUT, bR(CX - .86 * rs, sy - .25 * rs, 1.72 * rs, .5 * rs), [T("ellipse"), SZ(1.72 * rs, .5 * rs), TO, ...ctrChips(0, 0), TO, M("diff")], t("A thinner one on top → Difference: an orbit.", "Egy vékonyabb felülre → Különbség: pálya."), { status: ST(2) });
       cur = rings[0];
@@ -579,9 +587,9 @@
       const tips = [-.55, 0, .55].map(k => tri(CX + k * rs, sy - .2 * rs, .6 * rs, .85 * rs));
       const holes = [-.5, 0, .5].map(k => [CX + k * rs, sy + .35 * rs]), cid = id("m");
       const crownF = sG(sR(base[0], base[1], base[2] - base[0], base[3] - base[1]), ...tips.map(p => sP(p)));
-      symSvg = `<mask id="${cid}"><rect width="${W}" height="${H}" fill="#fff"/>${holes.map(([x, y]) => sC(x, y, rs * .11)(`fill="#000"`)).join("")}</mask><g mask="url(#${cid})" fill="${sc}">${crownF("")}</g>`;
+      symSvg = `<mask id="${cid}"><rect width="${W}" height="${H}" fill="#fff"/>${holes.map(([x, y]) => sC(x, y, rs * .11)(`fill="#000"`)).join("")}</mask>` + OLG(`<g mask="url(#${cid})" fill="${sc}">${crownF("")}</g>`);
       symB = [base[0], sy - .63 * rs, base[2], base[3]];
-      symF(sR(base[0], base[1], base[2] - base[0], base[3] - base[1]), fa(sc), base, [T("rect"), SZ(1.6 * rs, .5 * rs), C(sc), TO, ...ctrChips(0, .35 * rs)], t("The crown's band.", "A korona pántja."));
+      symF(sR(base[0], base[1], base[2] - base[0], base[3] - base[1]), fa(sc), base, [T("rect"), SZ(1.6 * rs, .5 * rs), CO(sc), TO, ...ctrChips(0, .35 * rs)], t("The crown's band.", "A korona pántja."));
       cur = sR(base[0], base[1], base[2] - base[0], base[3] - base[1])(fa(sc));
       symF(sG(...tips.map(p => sP(p))), fa(sc), bb(tips.flat()), [T("star"), STARB("poly", 3), SZ(.6 * rs, .85 * rs), TIMES(3), TO, MV(.55 * rs, 0)], t("Three triangles on top, moved apart with Transform.", "Három háromszög a tetejére, Transzformációval széthúzva."));
       cur = crownF(fa(sc));
@@ -591,9 +599,9 @@
     }
     if (sym === "crescent") {
       const c1 = [CX - .15 * rs, sy, .78 * rs], c2 = [CX + .12 * rs, sy - .08 * rs, .65 * rs], st = starPts(CX + .5 * rs, sy, .3 * rs, .4, 5), cid = id("m");
-      const cres = k => `<mask id="${k}"><rect width="${W}" height="${H}" fill="#fff"/><circle cx="${r1(c2[0])}" cy="${r1(c2[1])}" r="${r1(c2[2])}" fill="#000"/></mask><circle mask="url(#${k})" cx="${r1(c1[0])}" cy="${r1(c1[1])}" r="${r1(c1[2])}" fill="${sc}"/>`;
+      const cres = k => `<mask id="${k}"><rect width="${W}" height="${H}" fill="#fff"/><circle cx="${r1(c2[0])}" cy="${r1(c2[1])}" r="${r1(c2[2])}" fill="#000"/></mask>` + OLG(`<circle mask="url(#${k})" cx="${r1(c1[0])}" cy="${r1(c1[1])}" r="${r1(c1[2])}" fill="${sc}"/>`);
       symSvg = cres(cid) + sP(st)(fa(sc));
-      symF(sC(...c1), fa(sc), cb(...c1), [T("ellipse"), SZ(1.56 * rs, 1.56 * rs), C(sc), TO, ...ctrChips(-.15 * rs, 0)], t("A circle, slightly left of centre.", "Egy kör, kicsit balra a középtől."));
+      symF(sC(...c1), fa(sc), cb(...c1), [T("ellipse"), SZ(1.56 * rs, 1.56 * rs), CO(sc), TO, ...ctrChips(-.15 * rs, 0)], t("A circle, slightly left of centre.", "Egy kör, kicsit balra a középtől."));
       cur = sC(...c1)(fa(sc));
       symF(sC(...c2), CUT, cb(...c2), [T("ellipse"), SZ(1.3 * rs, 1.3 * rs), TO, ...ctrChips(.12 * rs, -.08 * rs)], t("A second circle on top, a bit to the right.", "Második kör felülre, kicsit jobbra."), { status: ST(2) });
       cur = cres(cid + "f");
@@ -603,8 +611,8 @@
     }
     if (sym === "star") {
       const p = starPts(CX, sy + rs * .05, rs, .4, 5), q = starPts(CX, sy + rs * .05, rs * .55, .4, 5), cid = id("m");
-      symSvg = `<mask id="${cid}"><rect width="${W}" height="${H}" fill="#fff"/><polygon points="${P(q)}" fill="#000"/></mask><polygon mask="url(#${cid})" points="${P(p)}" fill="${sc}"/>`; symB = bb(p);
-      symF(sP(p), fa(sc), bb(p), [T("star"), STARB("star", 5, "0.4"), SZ(bb(p)[2] - bb(p)[0], bb(p)[3] - bb(p)[1]), C(sc), TO, ...ctrChips(0, 0)], t("A 5-corner star, centred.", "5 csúcsú csillag, középre."));
+      symSvg = `<mask id="${cid}"><rect width="${W}" height="${H}" fill="#fff"/><polygon points="${P(q)}" fill="#000"/></mask>` + OLG(`<polygon mask="url(#${cid})" points="${P(p)}" fill="${sc}"/>`); symB = bb(p);
+      symF(sP(p), fa(sc), bb(p), [T("star"), STARB("star", 5, "0.4"), SZ(bb(p)[2] - bb(p)[0], bb(p)[3] - bb(p)[1]), CO(sc), TO, ...ctrChips(0, 0)], t("A 5-corner star, centred.", "5 csúcsú csillag, középre."));
       cur = sP(p)(fa(sc));
       symF(sP(q), CUT, bb(q), [M("dup"), SZ(bb(q)[2] - bb(q)[0], bb(q)[3] - bb(q)[1]), TO, ...ctrChips(0, 0)], t("Duplicate, smaller, centred again.", "Kettőzés, kisebbre, újra középre."), { status: ST(2) });
       cur = ""; symF(() => symSvg.replace(`id="${cid}"`, `id="${cid}f"`).replace(`url(#${cid})`, `url(#${cid}f)`), "", bb(p), [K("Shift"), TO, M("diff")], t("Difference: a star outline.", "Különbség: csillagkörvonal."));
@@ -629,8 +637,8 @@
     }
     const starBgs = layout === "canton" ? [f0] : uniq(starPos.map(([x, y]) => colorAt(x, y)));
     const starCol = bestMulti(starBgs, cands, pal);
-    const starOutl = worstC(starCol, starBgs) < 1.8 ? best(starCol, [WHITE, BLACK, ...pal], pal) : null;
-    const starA = starOutl ? `fill="${starCol}" stroke="${starOutl}" stroke-width=".7" stroke-linejoin="round"` : fa(starCol);
+    const starOutl = null;
+    const starA = `fill="${starCol}" ${OL2}`;
     const starAt = (x, y) => sP(starPts(x, y, sR5, .4, 5));
     starPos.forEach(([x, y]) => add(5, starAt(x, y)(starA), bb(starPts(x, y, sR5, .4, 5))));
     const s1 = bb(starPts(0, 0, sR5, .4, 5));
@@ -639,7 +647,7 @@
     const jit5 = starPos.map(([x, y], i) => [x + [3, -4, 2, -2, 4, -3, 1, -4, 3][i % 9], y + [-3, 2, 4, -2, 1, 3, -4, 2, -1][i % 9]]);
     cur = "";
     fr({ svg: starAt(...(layout === "canton" ? starPos[0] : [CX, 141]))(starA), sel: [cb(...(layout === "canton" ? starPos[0] : [CX, 141]), sR5 + 1)],
-      chips: [T("star"), STARB("star", 5, "0.4"), SZ(s1[2] - s1[0], s1[3] - s1[1]), C(starCol), ...(starOutl ? [STROKE(starOutl, .7)] : [])], cap: t("One small star.", "Egy kis csillag.") });
+      chips: [T("star"), STARB("star", 5, "0.4"), SZ(s1[2] - s1[0], s1[3] - s1[1]), C(starCol), OLC(.6)], cap: t("One small star.", "Egy kis csillag.") });
     if (N > 1) {
       fr({ svg: jit5.map(([x, y]) => starAt(x, y)(starA)).join(""), chips: [M("dup"), TIMES(N - 1)], cap: layout === "canton" ? t("Duplicate it and drag the copies into the canton.", "Kettőzd, és húzd a másolatokat a kantonba.") : t("Duplicate it and drag the copies into a row.", "Kettőzd, és húzd a másolatokat egy sorba.") });
       fr({ svg: starPos.map(([x, y]) => starAt(x, y)(starA)).join(""), sel: [rowB], status: ST(N), chips: N >= 3 ? [M("selAll"), TO, M("align"), AL("dh")] : [LB(t("drag by eye", "szemre igazítva"))], cap: N >= 3 ? t("Select all the stars → equal gaps.", "Jelöld ki az összes csillagot → egyenlő közök.") : t("Two stars: just line them up by eye.", "Két csillag: csak állítsd őket szemre egy vonalba.") });
@@ -661,7 +669,7 @@
       let fs = Math.min(13, Math.PI * Rn * .9 / em);
       if (CY - Rn - fs * .85 < 3) { Rn = CY - 3 - fs * .85; fs = Math.min(fs, Math.PI * Rn * .9 / em); }
       const nBgs = uniq(Array.from({ length: 13 }, (_, i) => { const a = Math.PI * (1 + i / 12); return colorAt(CX + (Rn + fs * .35) * Math.cos(a), CY + (Rn + fs * .35) * Math.sin(a)); }));
-      const nameCol = bestMulti(nBgs, cands, pal), nOut = worstC(nameCol, nBgs) < 2.5 ? best(nameCol, [WHITE, BLACK, ...pal], pal) : null;
+      const nameCol = bestMulti(nBgs, cands, pal), nOut = OUT;
       const arcText = pid => `<path id="${pid}" d="M${r1(CX - Rn)} ${CY} A${r1(Rn)} ${r1(Rn)} 0 0 1 ${r1(CX + Rn)} ${CY}" fill="none"/><text font-family="${FONT_B}" font-weight="900" font-size="${r1(fs)}" fill="${nameCol}" letter-spacing="${r1(fs * .05)}"${nOut ? ` stroke="${nOut}" stroke-width="1.1" paint-order="stroke" stroke-linejoin="round"` : ""}><textPath href="#${pid}" startOffset="50%" text-anchor="middle">${esc(NAME)}</textPath></text>`;
       add(6, arcText(id("arc")), [CX - Rn - fs, CY - Rn - fs, CX + Rn + fs, CY]);
       const helper = sC(CX, CY, Rn)(`fill="none" stroke="#1d2622" stroke-width="3" ${VE}`) + sC(CX, CY, Rn)(`fill="none" stroke="#5fa8ff" stroke-width="1.6" ${VE}`);
@@ -669,7 +677,7 @@
       fr({ svg: helper, sel: [cb(CX, CY, Rn)], b: B6s, chips: [T("ellipse"), SZ(2 * Rn, 2 * Rn), NOFILL, TO, M("align"), CENTRE], cap: t("A helper circle around the emblem, centred, no fill.", "Segédkör a címer körül, középre, kitöltés nélkül.") });
       fr({ svg: helper + `<circle cx="${r1(CX - Rn)}" cy="${CY}" r="${r1(Rn * .09 + 2)}" fill="#ffd60a" stroke="#1d2622" stroke-width="2" ${VE}/>`, b: B6s, chips: [M("o2p"), TO, M("rot90"), TIMES(2)], cap: t("Object to Path, rotate twice: the path now starts at the yellow dot.", "Útvonallá alakítás, kétszer forgatás: az útvonal most a sárga pontnál kezdődik.") });
       const ty = H + 12;
-      fr({ svg: helper + nameTxt(CX, ty, fs, nameCol, nOut || "#3b3f3d"), sel: [[CX - em * fs / 2, ty - fs * .8, CX + em * fs / 2, ty + 1]], b: B6, chips: [T("text"), TXT(NAME), PT(fs), C(nameCol), ...(nOut ? [STROKE(nOut, 1)] : [])], cap: t("Click outside the banner and type the name. Bold font.", "Kattints a zászlón kívül, és írd be a nevet. Vastag betű.") });
+      fr({ svg: helper + nameTxt(CX, ty, fs, nameCol, nOut), sel: [[CX - em * fs / 2, ty - fs * .8, CX + em * fs / 2, ty + 1]], b: B6, chips: [T("text"), TXT(NAME), PT(fs), C(nameCol), ...(nOut ? [STROKE(nOut, 1)] : [])], cap: t("Click outside the banner and type the name. Bold font.", "Kattints a zászlón kívül, és írd be a nevet. Vastag betű.") });
       fr({ svg: helper + arcText(id("arc")), sel: [cb(CX, CY, Rn + fs)], status: ST(2), b: B6s, chips: [T("selector"), K("Shift"), TO, M("putPath")], cap: t("Select the circle AND the text → Put on Path.", "Jelöld ki a kört ÉS a szöveget → Útvonalra illesztés.") });
       fr({ svg: arcText(id("arc")), b: B6s, chips: [LB(t("circle:", "kör:")), NOFILL, NOX], cap: t("Click the circle: no fill, no stroke – only the arc of letters stays.", "Kattints a körre: se kitöltés, se körvonal – csak a betűív marad.") });
       skills.add(t("Put on Path", "Útvonalra illesztés")); skills.add(t("Object to Path", "Útvonallá alakítás"));
@@ -683,10 +691,10 @@
       const em = emWidth(NAME, FONT_B, 900), fs = Math.min(15, avail / em), top = army <= 1 ? CY - r * 1.32 : army >= 3 ? CY - r * 1.45 : CY - r - 9;
       const ny = Math.max(fs * .8 + 6, top - 7), tw = em * fs;
       const nBgs = uniq(Array.from({ length: 9 }, (_, i) => colorAt(nx - tw / 2 + tw * i / 8, ny - fs * .35)));
-      const nameCol = bestMulti(nBgs, cands, pal), nOut = worstC(nameCol, nBgs) < 2.5 ? best(nameCol, [WHITE, BLACK, ...pal], pal) : null;
+      const nameCol = bestMulti(nBgs, cands, pal), nOut = OUT;
       add(6, nameTxt(nx, ny, fs, nameCol, nOut), [nx - tw / 2, ny - fs * .8, nx + tw / 2, ny]);
       const nb = [nx - tw / 2, ny - fs * .8, nx + tw / 2, ny + 1], drop = H + 6 + fs * .8 - ny, V6 = [-2, ny - fs - 4, 302, H + fs + 12];
-      fr({ svg: nameTxt(nx, ny + drop, fs, nameCol, nOut || "#3b3f3d"), sel: [[nb[0], nb[1] + drop, nb[2], nb[3] + drop]], view: V6, chips: [T("text"), TXT(NAME), PT(fs), C(nameCol), ...(nOut ? [STROKE(nOut, 1)] : [])], cap: t("Click outside the banner and type the name. Bold font.", "Kattints a zászlón kívül, és írd be a nevet. Vastag betű.") });
+      fr({ svg: nameTxt(nx, ny + drop, fs, nameCol, nOut), sel: [[nb[0], nb[1] + drop, nb[2], nb[3] + drop]], view: V6, chips: [T("text"), TXT(NAME), PT(fs), C(nameCol), ...(nOut ? [STROKE(nOut, 1)] : [])], cap: t("Click outside the banner and type the name. Bold font.", "Kattints a zászlón kívül, és írd be a nevet. Vastag betű.") });
       fr({ svg: nameTxt(nx, ny, fs, nameCol, nOut) + `<g transform="translate(0 ${drop})">${ghost(sR(nb[0], nb[1], tw, fs * .8 + 1))}</g>`, sel: [nb], arrow: [nx, ny + drop - fs * .3, nx, ny - fs * .3], view: V6,
         chips: layout === "canton" ? [T("selector"), LB(t("drag", "húzás"))] : [T("selector"), M("align"), AL("cv"), TO, LB(t("drag up", "húzás fel"))], cap: layout === "canton" ? t("Drag it right of the canton, above the emblem.", "Húzd a kantontól jobbra, a címer fölé.") : t("Centre it, then drag it straight up above the emblem.", "Igazítsd középre, aztán húzd egyenesen a címer fölé.") });
       steps[6] = { title: t("The name", "A név"), frames: take(), lead: t("Your state's name, plain and clear across the top.", "Az állam neve, egyszerűen és jól olvashatóan felül."), stuck: [t("Too wide: make the size smaller or pick a narrower bold font.", "Túl széles: csökkentsd a méretet, vagy válassz keskenyebb vastag betűt.")] };
@@ -702,13 +710,13 @@
       const bandCol = bestMulti(underBand, [...pal, BLACK, WHITE], pal);
       const backing = worstC(bandCol, underBand) < 2 ? best(bandCol, [WHITE, ...pal, BLACK], pal, [bandCol]) : null;
       const fs = Math.min(13, 205 / emWidth(MOTTO_U, FONT_B, 900));
-      const cut = k => `<mask id="${k}"><rect width="${W}" height="${H}" fill="#fff"/><text x="${CX}" y="${r1(160 + fs * .36)}" text-anchor="middle" font-family="${FONT_B}" font-weight="900" font-size="${r1(fs)}" fill="#000">${esc(MOTTO_U)}</text></mask>${backing ? sR(40, 148, 220, 24)(fa(backing)) : ""}<rect mask="url(#${k})" x="40" y="148" width="220" height="24" fill="${bandCol}"/>`;
+      const cut = k => `<mask id="${k}"><rect width="${W}" height="${H}" fill="#fff"/><text x="${CX}" y="${r1(160 + fs * .36)}" text-anchor="middle" font-family="${FONT_B}" font-weight="900" font-size="${r1(fs)}" fill="#000">${esc(MOTTO_U)}</text></mask>${backing ? sR(40, 148, 220, 24)(fa0(backing)) : ""}<rect mask="url(#${k})" x="40" y="148" width="220" height="24" fill="${bandCol}"/>`;
       add(7, cut(id("m")), [40, 148, 260, 172]);
       const band = sR(40, 148, 220, 24);
-      if (backing) fr({ svg: band(fa(backing)) + ghostAt(band, 0, 8), sel: [[40, 148, 260, 172]], arrow: [CX, 168, CX, 160], b: B7, chips: [T("rect"), SZ(220, 24), C(backing), TO, M("align"), AL("cv", "bottom"), TO, MV(0, -8)], cap: t("First a backing strip – it will shine through the letters.", "Előbb egy háttércsík – ez látszik majd át a betűkön.") });
-      cur = backing ? band(fa(backing)) : "";
-      fr({ svg: cur + band(fa(bandCol)) + (backing ? "" : ghostAt(band, 0, 8)), sel: [[40, 148, 260, 172]], arrow: backing ? null : [CX, 168, CX, 160], b: B7, chips: [T("rect"), SZ(220, 24), C(bandCol), TO, M("align"), AL("cv", "bottom"), TO, MV(0, -8)], cap: t("The motto band: bottom-centre, then 8 mm up.", "A jelmondatsáv: alul középre, aztán 8 mm-rel feljebb.") });
-      cur += band(fa(bandCol));
+      if (backing) fr({ svg: band(fa0(backing)) + ghostAt(band, 0, 8), sel: [[40, 148, 260, 172]], arrow: [CX, 168, CX, 160], b: B7, chips: [T("rect"), SZ(220, 24), C(backing), TO, M("align"), AL("cv", "bottom"), TO, MV(0, -8)], cap: t("First a backing strip – it will shine through the letters.", "Előbb egy háttércsík – ez látszik majd át a betűkön.") });
+      cur = backing ? band(fa0(backing)) : "";
+      fr({ svg: cur + band(fa0(bandCol)) + (backing ? "" : ghostAt(band, 0, 8)), sel: [[40, 148, 260, 172]], arrow: backing ? null : [CX, 168, CX, 160], b: B7, chips: [T("rect"), SZ(220, 24), C(bandCol), NOX, TO, M("align"), AL("cv", "bottom"), TO, MV(0, -8)], cap: t("The motto band: bottom-centre, then 8 mm up.", "A jelmondatsáv: alul középre, aztán 8 mm-rel feljebb.") });
+      cur += band(fa0(bandCol));
       fr({ svg: cur + `<text x="${CX}" y="${r1(160 + fs * .36)}" text-anchor="middle" font-family="${FONT_B}" font-weight="900" font-size="${r1(fs)}" fill="#5fa8ff" stroke="#1d5fb8" stroke-width=".8" ${VE}>${esc(MOTTO_U)}</text>`, sel: [[CX - 104, 160 - fs * .5, CX + 104, 160 + fs * .5]], b: B7,
         chips: [T("text"), TXT(MOTTO_U), PT(fs), TO, AL("cv"), LB(t("+ drag", "+ húzás"))], cap: t("Type the motto in capitals, bold, and drag it onto the band.", "Írd be nagybetűkkel, vastagon, és húzd a sávra.") });
       fr({ svg: cut(id("m")), sel: [[40, 148, 260, 172]], status: ST(2), b: B7, chips: [M("o2p"), TO, K("Shift"), TO, M("diff")], cap: t("Check the spelling! Object to Path, then band + text → Difference.", "Helyesírás! Útvonallá alakítás, aztán sáv + szöveg → Különbség.") });
@@ -720,10 +728,10 @@
       const fs = Math.min(10, 186 / emWidth(MOTTO, FONT_R, 700));
       const ribbon = sG(sR(60, 146, 180, 22), sC(60, 157, 11), sC(240, 157, 11));
       const mtext = (y, col, out) => `<text x="${CX}" y="${r1(y)}" text-anchor="middle" font-family="${FONT_R}" font-weight="700" font-size="${r1(fs)}" fill="${col}"${out ? ` stroke="${out}" stroke-width=".9" paint-order="stroke"` : ""}>${esc(MOTTO)}</text>`;
-      add(7, `<g fill="${ribCol}">${ribbon("")}</g>` + mtext(157 + fs * .36, txtCol), [49, 146, 251, 168]);
+      add(7, `<g fill="${ribCol}" ${OL1}>${ribbon("")}</g>` + mtext(157 + fs * .36, txtCol), [49, 146, 251, 168]);
       const up = 12, rb = [49, 146, 251, 168];
       fr({ svg: sR(60, 146 + up, 180, 22)(fa(ribCol)) + sC(60, 157 + up, 11)(SEE(ribCol)) + sC(240, 157 + up, 11)(SEE(ribCol)), sel: [[49, 146 + up, 251, 168 + up]], b: ub(B7, [0, 120, 300, 194]),
-        chips: [T("rect"), SZ(180, 22), PLUS, T("ellipse"), SZ(22, 22), TIMES(2), C(ribCol)], cap: t("A rectangle and two circles on its ends.", "Egy téglalap és két kör a két végén.") });
+        chips: [T("rect"), SZ(180, 22), PLUS, T("ellipse"), SZ(22, 22), TIMES(2), CO(ribCol)], cap: t("A rectangle and two circles on its ends.", "Egy téglalap és két kör a két végén.") });
       fr({ svg: ribbon(fa(ribCol)) + ghostAt(ribbon, 0, up), sel: [rb], arrow: [CX, 157 + up, CX, 157], b: ub(B7, [0, 120, 300, 194]), status: ST(3), chips: [M("union"), TO, M("align"), AL("cv", "bottom"), TO, MV(0, -up)], cap: t("Union: a ribbon. Bottom-centre, then 12 mm up.", "Unió: szalag. Alul középre, aztán 12 mm-rel fel.") });
       cur = ribbon(fa(ribCol));
       fr({ svg: cur + mtext(H + 12, txtCol, lum(txtCol) > .5 ? "#3b3f3d" : null), sel: [[CX - 95, H + 4, CX + 95, H + 14]], b: [20, 120, 280, H + 18], chips: [T("text"), TXT(MOTTO), PT(fs), C(txtCol)], cap: t("Type the motto beside the banner.", "Írd be a jelmondatot a zászló mellé.") });
@@ -752,7 +760,7 @@
   const pfx = s => { const p = "g" + (++G) + "_"; return s.replace(/(id="|url\(#|href="#)([a-z]+\d+[a-z]?)/g, (m0, a, b) => a + p + b); };
   function svg(model, upto = 7, cls = "") {
     const parts = model.items.filter(i => i.step <= upto).map(i => i.svg).join("");
-    return pfx(`<svg class="banner ${cls}" viewBox="-6 -6 312 192" role="img" aria-label="${t("Banner of", "Zászló:")} ${esc(model.name)}"><rect x="-6" y="-6" width="312" height="192" fill="#e9e7dd"/>${parts}</svg>`);
+    return pfx(`<svg class="banner ${cls}" viewBox="-6 -6 312 192" role="img" aria-label="${t("Banner of", "Zászló:")} ${esc(model.name)}">${DEFS}<rect x="-6" y="-6" width="312" height="192" fill="#e9e7dd"/>${parts}</svg>`);
   }
   const ASP = 5 / 3;
   function fitView(b, full) {
@@ -776,7 +784,7 @@
     const vv = isFull(f.view) ? [-6, -6, 312, 192] : f.view ? fitView(f.view) : (f.b || focus) ? fitView(f.b || ub(focus, ...(f.sel || []))) : [-6, -6, 312, 192];
     const sel = (f.sel || []).map(b => { const rr = `x="${r1(b[0] - 1.5)}" y="${r1(b[1] - 1.5)}" width="${r1(b[2] - b[0] + 3)}" height="${r1(b[3] - b[1] + 3)}" fill="none" stroke-width="1.4" stroke-dasharray="5 4" ${VE}`; return `<rect ${rr} stroke="#1d2622"/><rect ${rr} stroke="#fff" stroke-dashoffset="4.5"/>`; }).join("");
     const page = f.page ? `<rect x="0" y="0" width="${W}" height="${H}" fill="none" stroke="#e0a800" stroke-width="3" stroke-dasharray="7 5" ${VE}/>` : "";
-    return pfx(`<svg class="fsvg" viewBox="${vv.map(r1).join(" ")}" role="img" aria-label="${esc(f.cap.replace(/<[^>]+>/g, ""))}"><rect x="-2000" y="-2000" width="4300" height="4200" fill="#e9e7dd"/><rect width="${W}" height="${H}" fill="#fff"/>${prev}${f.svg}<rect width="${W}" height="${H}" fill="none" stroke="#9a978a" stroke-width="1" ${VE}/>${page}${sel}${f.arrow ? arrowSvg(f.arrow, vv[2]) : ""}</svg>`);
+    return pfx(`<svg class="fsvg" viewBox="${vv.map(r1).join(" ")}" role="img" aria-label="${esc(f.cap.replace(/<[^>]+>/g, ""))}">${DEFS}<rect x="-2000" y="-2000" width="4300" height="4200" fill="#e9e7dd"/><rect width="${W}" height="${H}" fill="#fff"/>${prev}${f.svg}<rect width="${W}" height="${H}" fill="none" stroke="#9a978a" stroke-width="1" ${VE}/>${page}${sel}${f.arrow ? arrowSvg(f.arrow, vv[2]) : ""}</svg>`);
   }
   const MYSTERY = `<svg class="banner" viewBox="-6 -6 312 192" role="img" aria-label="${t("Hidden banner", "Rejtett zászló")}"><rect x="-6" y="-6" width="312" height="192" fill="#e9e7dd"/><rect width="300" height="180" fill="#3a3f3c"/><path d="M0 0L300 180M300 0L0 180" stroke="#4a504c" stroke-width="2"/><text x="150" y="118" text-anchor="middle" font-family="${FONT_B}" font-weight="900" font-size="96" fill="#efeee6" opacity=".85">?</text></svg>`;
   window.COUP_BUILD = build; window.COUP_SVG = svg; window.COUP_FRAME = frameSvg; window.COUP_COUNTRIES = COUNTRIES; window.COUP_CONTRAST = contrast; window.COUP_MOTTO = motto;
@@ -968,12 +976,13 @@
     box.innerHTML = `
     <section class="sec">${head(t("Skills on your banner", "Készségek a zászlódon"), t("Everything from this year – your banner uses these:", "Minden az idei évből – a zászlód ezeket használja:"))}<ul class="badges">${m.skills.map(s => `<li>${s}</li>`).join("")}</ul></section>
     <section class="sec" id="start">${head(t("Before you start", "Mielőtt elkezded"), t("No keyboard shortcuts: every command is in a menu or on a toolbar.", "Nincs billentyűparancs: minden parancs egy menüben vagy egy eszköztáron van."))}
-      <article class="sheet" style="--tilt:-.2deg">${tape}<h3>${t("Four tricks you will use all the time", "Négy trükk, amit folyton használni fogsz")}</h3>
+      <article class="sheet" style="--tilt:-.2deg">${tape}<h3>${t("Five tricks you will use all the time", "Öt trükk, amit folyton használni fogsz")}</h3>
         <ol class="do">
           <li>${M("new")}, ${M("saveAs")} <code>${fileName}.svg</code>.</li>
           <li>${t(`<b>Sizes</b> ${SZ(300, 180)}: with the ${T("selector")} Selector, type <b>W</b> and <b>H</b> in the tool controls bar (mm, lock open, Enter after each).`, `<b>Méretek</b> ${SZ(300, 180)}: a ${T("selector")} Kijelölővel írd be az eszközvezérlő-sávon az <b>Sz</b> (szélesség) és <b>M</b> (magasság) értékét (mm, a lakat nyitva, mindegyik után Enter).`)}</li>
           <li>${t(`<b>Colours</b> ${C(m.pal[0])}: ${M("fs")} → <i>Fill</i> → flat colour → type the code into <b>RGBA</b>.`, `<b>Színek</b> ${C(m.pal[0])}: ${M("fs")} → <i>Kitöltés</i> → Egyenletes szín → írd be a kódot az <b>RGBA</b> mezőbe.`)}</li>
           <li>${t(`<b>Placing</b> ${CENTRE}: ${M("align")} with <i>Relative to: <b>Page</b></i>. Exact shifts like <span class="nums">↑ −17</span>: ${M("transform")} → <i>Move</i>, tick <i>Relative move</i> (+ = right/down, − = left/up).`, `<b>Elhelyezés</b> ${CENTRE}: ${M("align")}, <i>Relatív ehhez: <b>Oldal</b></i>. Pontos eltolás, pl. <span class="nums">↑ −17</span>: ${M("transform")} → <i>Áthelyezés</i>, pipáld be a <i>Relatív áthelyezés</i> négyzetet (+ = jobbra/le, − = balra/fel).`)}</li>
+          <li>${t(`<b>Outlines</b> ${OLC()}: every shape except the background and the motto band gets a dark outline – ${M("fs")} → <i>Stroke paint</i> → flat colour <code class="hex">${hex6(OUT)}ff</code>, <i>Stroke style</i> → width <b>1 mm</b> (stars 0.6 mm). Tip: style one shape, then the next ones you draw keep the same stroke.`, `<b>Körvonalak</b> ${OLC()}: a háttér és a jelmondatsáv kivételével minden alakzat sötét körvonalat kap – ${M("fs")} → <i>Körvonalrajzolat</i> → Egyenletes szín <code class="hex">${hex6(OUT)}ff</code>, <i>Körvonalstílus</i> → szélesség <b>1 mm</b> (csillagok 0,6 mm). Tipp: ha egy alakzatot beállítasz, a következők általában megtartják ezt a körvonalat.`)}</li>
         </ol>
         <h3 style="margin-top:14px">${t("How to read the pictures", "Hogyan olvasd a képeket?")}</h3>${LEGEND}
         <p class="note">${t("Your palette:", "A palettád:")} ${uniq([...m.pal, WHITE, BLACK]).map(c => C(c)).join(" ")}</p>
