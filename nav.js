@@ -377,6 +377,36 @@
     document.head.appendChild(ic);
   }
 
+  /* small modern touches on every page: even line breaks in headings, no lone last words in paragraphs,
+     and the phone's browser bar in the colour of the wooden rail */
+  if (!document.getElementById("dk-touch")) {
+    const st = document.createElement("style"); st.id = "dk-touch";
+    st.textContent = "h1,h2,h3,h4{text-wrap:balance}p,li,dd,figcaption,blockquote{text-wrap:pretty}";
+    document.head.prepend(st);
+  }
+  if (!document.querySelector('meta[name="theme-color"]')) {
+    const tc = document.createElement("meta"); tc.name = "theme-color"; tc.content = "#8a5532";
+    document.head.appendChild(tc);
+  }
+  /* explainers are long reads: a thin chalk line along the top fills up as you go */
+  const herePage = SITE.topics.flatMap(tp => tp.lessons.flatMap(ls => ls.pages)).find(isHere);
+  if (herePage && herePage.kind === "theory" && !document.getElementById("dk-read")) {
+    const bar = document.createElement("div"); bar.id = "dk-read"; bar.setAttribute("aria-hidden", "true");
+    bar.style.cssText = "position:fixed;left:0;top:0;z-index:2147483645;width:100%;height:3px;background:#f2d264;" +
+      "transform-origin:0 50%;transform:scaleX(0);pointer-events:none;box-shadow:0 0 6px rgba(242,210,100,.45)";
+    let queued = false;
+    const paint = () => {
+      queued = false;
+      const max = document.documentElement.scrollHeight - innerHeight;
+      bar.style.transform = `scaleX(${max > 0 ? Math.min(1, Math.max(0, scrollY / max)) : 0})`;
+    };
+    const soon = () => { if (!queued) { queued = true; requestAnimationFrame(paint); } };
+    addEventListener("scroll", soon, { passive: true });
+    addEventListener("resize", soon);
+    const add = () => { document.body.appendChild(bar); paint(); };
+    if (document.body) add(); else document.addEventListener("DOMContentLoaded", add);
+  }
+
   /* offline support: sw.js saves the site in the browser; the first time it's done, say so once */
   if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost") && !window.__digikultSW) {
     window.__digikultSW = true;

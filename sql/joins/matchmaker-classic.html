@@ -756,6 +756,6 @@ if (typeof initSqlJs !== "function"){ $("verdicts").innerHTML = `<div class="err
 else initSqlJs().then(s=>{ SQL = s; db = new SQL.Database(); db.run(SEED); loadSchema(); renderTableChips(); $("verdicts").innerHTML = `<p class="note">${T.ready}</p>`; $("caption").textContent = T.idle; })
   .catch(e=>{ $("verdicts").innerHTML = `<div class="err">${T.engFail}<p>${esc(e.message)}</p></div>`; });
 </script>
-<script src="../../nav.js?v=edd4ad87" defer></script>
+<script src="../../nav.js?v=b7f68d0c" defer></script>
 </body>
 </html>

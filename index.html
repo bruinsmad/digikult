@@ -50,6 +50,10 @@ a{color:inherit}
   background:linear-gradient(var(--wood-hi),var(--wood) 45%,var(--wood-lo));
   box-shadow:0 3px 0 rgba(0,0,0,.25),0 8px 18px rgba(0,0,0,.25);}
 .rail .wrap{display:flex;align-items:center;gap:18px;height:58px}
+/* on phones the rail slides away while you read down the page and comes back as soon as you scroll up */
+.rail{transition:transform .28s cubic-bezier(.2,.8,.2,1),box-shadow .28s}
+.rail.tuck{transform:translateY(-100%);box-shadow:none}
+.rail.tuck:focus-within{transform:none}
 .logo{display:flex;align-items:center;gap:10px;text-decoration:none;font:700 22px/1 var(--f-chalk);color:#fff6e8;text-shadow:0 1px 0 rgba(0,0,0,.35)}
 .logo svg{flex:none}
 .topics{display:flex;gap:4px;margin-left:auto}
@@ -93,6 +97,8 @@ a{color:inherit}
 .btn{display:inline-flex;align-items:center;gap:8px;text-decoration:none;font-weight:700;font-size:16px;
   padding:11px 20px;border-radius:4px;background:var(--paper-ink);color:var(--paper);border:0;cursor:pointer}
 .btn:hover{background:#000}
+.btn:active{transform:translateY(1px)}
+a,button{-webkit-tap-highlight-color:transparent}
 
 /* ---------- topic ---------- */
 .topic{padding:22px 0 10px;scroll-margin-top:76px}
@@ -102,6 +108,8 @@ a{color:inherit}
 .topic-head .emb svg{display:block;height:88px;width:auto;overflow:visible}
 .topic-head h2{margin:0;font:700 clamp(32px,4.4vw,46px)/1.1 var(--f-chalk);color:var(--c)}
 .topic-head p{margin:6px 0 4px;color:var(--chalk-dim);max-width:56ch}
+.topic-head .prog{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;margin:10px 0 0;font-size:15px;color:var(--chalk-dim)}
+.topic-head .prog .tally{height:20px}
 .topic-head .line{grid-column:1/-1;height:14px;width:220px;max-width:60%;overflow:visible}
 .topic-head .line path{fill:none;stroke:var(--c);stroke-width:3.5;stroke-linecap:round;opacity:.75}
 
@@ -143,7 +151,8 @@ main:focus{outline:none}
 .poster{position:relative;background:var(--paper);color:var(--paper-ink);border-radius:2px;
   box-shadow:0 2px 0 rgba(0,0,0,.08),0 16px 28px rgba(0,0,0,.32);transform:rotate(var(--tilt,-.6deg));
   transition:transform .18s ease, box-shadow .18s ease}
-.poster:hover{transform:rotate(0)}
+.poster:hover,.notes:hover{transform:rotate(0) translateY(-3px);box-shadow:0 2px 0 rgba(0,0,0,.08),0 24px 36px rgba(0,0,0,.4)}
+.poster:active,.notes:active{transform:rotate(0) translateY(-1px);transition-duration:.06s}
 .poster .tape{position:absolute;z-index:2;top:-4px;width:64px;height:20px;background:var(--tape);box-shadow:0 1px 2px rgba(0,0,0,.2)}
 .poster .tape.l{left:-18px;transform:rotate(-34deg)}
 .poster .tape.r{right:-18px;transform:rotate(34deg)}
@@ -159,14 +168,12 @@ main:focus{outline:none}
 .foot{display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px;margin-top:14px;font-size:14px;color:var(--paper-muted)}
 .foot .prog{display:flex;align-items:center;gap:8px}
 .foot .done{color:#2f7a3a;font-weight:700}
-.foot a.other{position:relative;z-index:2;font-weight:700;color:var(--paper-ink)}
 .foot .tag{border:1px solid var(--paper-line);border-radius:3px;padding:0 6px}
 
 /* notes = the explainer for a lesson: a sheet torn from an exercise book */
 .notes{position:relative;background:var(--paper);color:var(--paper-ink);border-radius:2px;padding:16px 18px 16px 40px;
   background-image:linear-gradient(90deg,transparent 0 26px,rgba(214,90,90,.4) 26px 28px,transparent 28px),repeating-linear-gradient(transparent 0 27px,#e7e4d8 27px 28px);
   box-shadow:0 2px 0 rgba(0,0,0,.08),0 16px 28px rgba(0,0,0,.32);transform:rotate(var(--tilt,.5deg));transition:transform .18s ease, box-shadow .18s ease}
-.notes:hover{transform:rotate(0)}
 .notes .pin{position:absolute;top:-9px;left:50%;width:18px;height:18px;margin-left:-9px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#f7a6a6,#c0392b 60%,#7d1f17);box-shadow:0 2px 3px rgba(0,0,0,.35)}
 .notes .kind{--kfg:#2f6a35}
 .notes .first{margin-left:8px;font:700 17px var(--f-chalk);color:#2f6a35}
@@ -179,6 +186,10 @@ main:focus{outline:none}
 .demo{position:relative;border:2px dashed rgba(156,200,232,.55);border-radius:6px;padding:12px;background:rgba(0,0,0,.12);
   transition:border-color .18s, background .18s}
 .demo:hover{border-color:var(--blue);background:rgba(0,0,0,.18)}
+.demo:active{background:rgba(0,0,0,.24)}
+/* touch screens keep the tilt: a tap shouldn't leave a card stuck in its hover state */
+@media (hover:none){.poster:hover,.notes:hover{transform:rotate(var(--tilt,-.6deg));box-shadow:0 2px 0 rgba(0,0,0,.08),0 16px 28px rgba(0,0,0,.32)}
+  .notes:hover{transform:rotate(var(--tilt,.5deg))}}
 .demo .cover{border-radius:3px;overflow:hidden;aspect-ratio:2.2/1}
 .demo .kind{margin-top:12px;--kfg:var(--blue)}
 .demo h4{margin:8px 0 4px;font:700 21px/1.2 var(--f-body)}
@@ -348,6 +359,7 @@ body.subject .hero{display:none}
   .sticks i:nth-child(n+2),.eraser{display:none}
 }
 @media (prefers-reduced-motion:reduce){
+  .rail{transition:none}
   .scribble path{animation:none;stroke-dashoffset:0}
   .poster,.demo{transition:none}.poster:hover{transform:rotate(var(--tilt,-.6deg))}
 }
@@ -388,7 +400,7 @@ body.subject .hero{display:none}
   </div>
 </footer>
 
-<script src="nav.js?v=edd4ad87"></script>
+<script src="nav.js?v=b7f68d0c"></script>
 <script>
 (function(){
   const D = window.DIGIKULT;
@@ -809,7 +821,7 @@ function puliSvg(){
         <div class="topic-head">
           <span class="emb">${EMBLEMS[tp.id] || embGen}</span>
           <div><h2 tabindex="-1">${splitName(D.t(tp.title))}</h2>
-          <p>${esc(D.t(tp.blurb))}</p></div>
+          <p>${esc(D.t(tp.blurb))}</p>${subjectProgress(tp, T)}</div>
           <svg class="line" viewBox="0 0 220 14" aria-hidden="true"><path d="M3 9 C 50 3, 100 13, 150 6 S 200 5, 217 8"/></svg>
         </div>
         <ol class="path">
@@ -826,6 +838,14 @@ function puliSvg(){
       </section>`).join("");
   }
 
+  /* once you've started, the subject says how far you are, in the same tally marks as the missions */
+  function subjectProgress(tp, T){
+    const tracked = tp.lessons.flatMap(ls => ls.pages).filter(p => p.progress);
+    const prs = tracked.map(progressOf), done = prs.filter(pr => pr && pr.finished).length;
+    if (!prs.some(pr => pr && (pr.finished || pr.done > 0))) return "";
+    return `<p class="prog">${tally(done, tracked.length, tp.accent)}<span>${esc(T.missionsDone(done, tracked.length))}</span></p>`;
+  }
+
   /* the end of one subject points on to the next, so nobody has to scroll back up for the rail */
   function nextSubject(tp, T){
     const all = D.SITE.topics, nx = all[(all.indexOf(tp) + 1) % all.length];
@@ -839,11 +859,8 @@ function puliSvg(){
   function langLine(p, T, L){
     const langs = Object.keys(p.files);
     const main = p.files[L] ? L : langs[0];
-    const others = langs.filter(k => k !== main);
-    const parts = [];
-    if (!p.files[L]) parts.push(`<span class="tag">${main === "en" ? T.enOnly : (T.huOnly || "magyar")}</span>`);
-    others.forEach(k => parts.push(`<a class="other" href="${D.url(p.files[k])}" lang="${k}">${T.other[k]}</a>`));
-    return parts.join("");
+    /* only say so when a page exists in one language; switching language is the HU/EN switch in the rail */
+    return p.files[L] ? "" : `<span class="tag">${main === "en" ? T.enOnly : (T.huOnly || "magyar")}</span>`;
   }
 
   function poster(p, tp, T, tilt){
@@ -920,6 +937,20 @@ function puliSvg(){
     /* a quick second click skips the first transition; that's fine, so don't report it */
     [t.ready, t.finished, t.updateCallbackDone].forEach(p => p.catch(() => {}));
   });
+  /* phones: the rail tucks away while scrolling down, back on the way up or near the top */
+  const narrow = matchMedia("(max-width:600px)"), rail = $(".rail");
+  let lastY = scrollY, tick = false;
+  addEventListener("scroll", () => {
+    if (tick) return; tick = true;
+    requestAnimationFrame(() => {
+      const y = scrollY;
+      if (!narrow.matches || y < 90) rail.classList.remove("tuck");
+      else if (y > lastY + 6) rail.classList.add("tuck");
+      else if (y < lastY - 6) rail.classList.remove("tuck");
+      lastY = y; tick = false;
+    });
+  }, { passive: true });
+  narrow.addEventListener("change", () => rail.classList.remove("tuck"));
   draw();
   if (location.hash) requestAnimationFrame(place);
 })();
