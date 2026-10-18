@@ -82,8 +82,17 @@ code{font-family:var(--f-mono);font-size:.9em}
 .cmw .cm-editor{height:100%}
 .lint{flex:none;max-height:30%;overflow:auto;border-top:1px solid #33433c;background:#2b2a1d;padding:7px 12px;display:grid;gap:3px}
 .lint p{margin:0;font:13.5px/1.4 var(--f-body);color:#f6e7a6}
-.lint p::before{content:"⚠ "}
-.lint code{background:rgba(255,255,255,.1);border-radius:4px;padding:0 4px;color:#fff}
+.lint code{background:rgba(255,255,255,.1);border-radius:4px;padding:0 4px;color:#fff;white-space:pre-wrap}
+.lrow{display:grid;grid-template-columns:auto minmax(0,1fr);gap:2px 10px;align-items:baseline;width:100%;text-align:left;background:none;border:0;border-radius:4px;padding:4px 6px;margin:0 -6px;cursor:pointer;font:13.5px/1.45 var(--f-body);color:#f6e7a6}
+.lrow:hover,.lrow:focus-visible{background:rgba(255,255,255,.07)}
+.lrow:focus-visible{outline:2px solid var(--yellow);outline-offset:0}
+.lrow .ln{font:600 12px var(--f-mono);color:#f2b84a;white-space:nowrap}
+.lrow .ln::before{content:"⚠ "}
+.lrow.tip{color:#cfe3f3}
+.lrow.tip .ln{color:#8cc4ee}
+.lrow.tip .ln::before{content:none}
+.lrow .tp{display:inline-block;margin-right:6px;padding:0 5px;border:1px solid #8cc4ee;border-radius:3px;font:600 11px/1.5 var(--f-body);color:#8cc4ee;vertical-align:1px}
+.lint .lmore{color:#c9c2a0;font-size:13px}
 @media (max-width:760px){
   .work{grid-template-columns:minmax(0,1fr)!important;grid-template-rows:minmax(0,1fr) 8px minmax(0,1fr)}
   .work.m-code{grid-template-rows:minmax(0,1fr) 0 0}.work.m-view{grid-template-rows:0 0 minmax(0,1fr)}
@@ -239,7 +248,8 @@ body{grid-template-columns:minmax(0,1fr)}
 <div class="toast" id="toast" role="status"></div>
 <div class="drop" id="drop" hidden>Engedd el: megnyitom a fájlokat</div>
 
-<script src="../vendor/codemirror-html.js?v=3e562a7b"></script>
+<script src="../vendor/codemirror-html.js?v=74cc7286"></script>
+<script src="checks.js?v=2"></script>
 <script>
 const CFG = {"ui": {"pick": "Kijelölés", "pickT": "Kattints egy elemre az előnézetben, és a kódban odaugrik. Alt+kattintással mindig működik.", "title": "HTML-szerkesztő", "preview": "Előnézet", "localTpl": "Ez a link a(z) {h} fájlra vinne, de nincs ilyen oldalad vagy képed. Hozd létre az ＋ Új gombbal!", "switched": "Átváltottam erre: {n}", "saveFail": "Nem sikerült menteni: megtelt a böngésző tárhelye.", "pos": "{l}. sor, {c}. oszlop", "warns": "⚠ {n} figyelmeztetés", "noWarn": "✓ nincs hiba", "saved": "mentve ✓", "saving": "mentés…", "savedToast": "Mentve. (Magától is ment.)", "ok": "OK", "cancel": "Mégse", "fileName": "Fájlnév", "nameEmpty": "Adj meg egy nevet.", "nameTaken": "Már van ilyen nevű oldalad: {n}", "newTitle": "Új oldal", "create": "Létrehozás", "tplSkel": "HTML-váz", "tplSkelD": "DOCTYPE, head, title és body, ahogy a leckében tanultuk", "tplBlank": "Üres", "tplBlankD": "Teljesen üres fájl. Tipp: írj be egy ! jelet, és nyomj Tabot.", "created": "Kész: {n}", "renameTitle": "Átnevezés", "rename": "Átnevezés", "delTitle": "Törlöd az oldalt?", "delText": "A(z) <b>{n}</b> végleg törlődik ebből a böngészőből.", "del": "Törlés", "opened": "Megnyitva: {p} oldal, {i} egyéb fájl", "imgTitle": "Képek", "imgText": "A feltöltött képek ebben a böngészőben maradnak. A kódban a nevükkel hivatkozz rájuk, pl. <code>src=\"kutya.jpg\"</code>. A letöltött .zip-be is bekerülnek.", "imgAdd": "＋ Kép feltöltése", "imgMine": "Saját képeid", "imgNone": "Még nincs saját képed. Tölts fel egyet, vagy húzd be az ablakba!", "imgSamples": "Mintaképek (mindig elérhetők)", "sample": "mintakép", "insert": "Beszúrás", "close": "Bezárás", "downloaded": "Letöltve: {n}", "zipFail": "A .zip nem készült el, csak az oldal töltődött le.", "imported": "Megnyitva a szerkesztőben: {n}"}, "samples": ["img/morzsa.svg", "img/cirmi.svg", "img/pamacs.svg", "img/bodri.svg", "img/logo.svg"], "sampleBase": "basics/img/", "templates": {"skeleton": "<!DOCTYPE html>\n<html lang=\"hu\">\n  <head>\n    <meta charset=\"utf-8\">\n    <title>Új oldal</title>\n  </head>\n  <body>\n    <h1>Helló, világ!</h1>\n\n  </body>\n</html>\n"}};
 const UI = { preview: CFG.ui.preview, localNote: h => CFG.ui.localTpl.replace("{h}", h) };
@@ -677,14 +687,20 @@ function lintCss(src){
   });
   return out.slice(0, 6);
 }
-const lintNow = src => isCss(store.current) ? lintCss(src) : lint(src);
+/* mistakes are explained by checks.js (all the common slips, in plain words); the older checks stay as a fallback */
+const checkFiles = () => [...new Set([...store.docs.map(d => d.name), ...assets.keys(), ...SAMPLES])];
+const lintNow = src => {
+  if (!window.DKCheck) return isCss(store.current) ? lintCss(src) : lint(src);
+  if (isCss(store.current)) { const h = hostFor(store.current); return DKCheck.css(src, { lang: PAGE_LANG, page: h ? h.code : undefined }); }
+  return DKCheck.html(src, { lang: PAGE_LANG, files: checkFiles() });
+};
 Object.assign(ED_TEXT[PAGE_LANG].docs, CSS_DOCS);
 
 /* ---------- editor + preview ---------- */
 const ta = $("#code");
 ta.value = doc().code;
 const editor = makeEditor(ta, { lines: true, fixed: true, fold: true, files: FILES, mode: isCss(store.current) ? "css" : "html", lintFn: lintNow, onCursor: (l, c) => { try { cur = [l, c]; drawStatus(); if (browser.picking) browser.highlightAt(editor.cm.view.state.selection.main.head); } catch(e){} } });
-let cur = [1, 1], warnN = 0, savedOk = true;
+let cur = [1, 1], warnN = 0, tipN = 0, savedOk = true, lintList = [], lintTimer = 0;
 UI.localLink = h => {                                          /* a link to one of your pages opens it */
   const n = h.split(/[?#]/)[0].replace(/^\.\//, "");
   if (store.docs.some(d => d.name === n)) { openDoc(n); toast(tpl("switched", { n })); return true; }
@@ -708,15 +724,38 @@ function render(now){
   $("#work").classList.toggle("css", css);
   if (host) browser.show(resolve(instrument(host.code)), now);
   else browser.show(`<!doctype html><meta charset="utf-8"><style>body{font:16px/1.5 system-ui,sans-serif;color:#2b3a33;margin:28px;max-width:46ch}code{font:14px ui-monospace,monospace;background:#eef1ec;padding:1px 4px;border-radius:3px}</style><p>${tpl("noHost", { n: esc(d.name) })}</p>`, now);
-  const w = lintNow(ta.value); warnN = w.length;
-  $("#lint").hidden = !w.length; $("#lint").innerHTML = w.map(x => `<p>${x.html}</p>`).join("");
+  /* while typing, wait for a pause: half-written tags aren't mistakes yet */
+  clearTimeout(lintTimer);
+  if (now) drawLint(); else lintTimer = setTimeout(drawLint, 600);
   drawStatus();
 }
+const LINT_MAX = 8;
+function drawLint(){
+  const w = lintNow(ta.value), M = window.DKCheck ? DKCheck.text(PAGE_LANG) : null;
+  lintList = w; tipN = w.filter(x => x.tip).length; warnN = w.length - tipN;
+  const box = $("#lint");
+  box.hidden = !w.length;
+  box.innerHTML = !M ? w.map(x => `<p>⚠ ${x.html}</p>`).join("") :
+    w.slice(0, LINT_MAX).map((x, i) => `<button type="button" class="lrow${x.tip ? " tip" : ""}" data-i="${i}"><span class="ln">${M.line(x.line)}</span><span class="lm">${x.tip ? `<span class="tp">${M.tip}</span>` : ""}${x.html}</span></button>`).join("") +
+    (w.length > LINT_MAX ? `<p class="lmore">${M.more(w.length - LINT_MAX)}</p>` : "");
+  drawStatus();
+}
+/* clicking a mistake selects the exact spot in the code */
+$("#lint").addEventListener("click", e => {
+  const b = e.target.closest(".lrow"); if (!b) return;
+  const x = lintList[+b.dataset.i]; if (!x) return;
+  const from = typeof x.from === "number" ? x.from : 0, to = typeof x.to === "number" ? x.to : from;
+  if (mode === "view") setMode(innerWidth < 760 ? "code" : "both");
+  if (editor.cm){ const v = editor.cm.view, n = v.state.doc.length; v.dispatch({ selection: { anchor: Math.min(from, n), head: Math.min(to, n) }, scrollIntoView: true }); v.focus(); }
+  else { ta.focus(); ta.setSelectionRange(from, to); }
+});
 ta.addEventListener("input", () => { doc().code = ta.value; doc().updated = Date.now(); saveSoon(); render(false); });
 function setStatusSaved(ok){ savedOk = ok; drawStatus(); }
 function drawStatus(){
   $("#stPos").textContent = (isCss(store.current) ? "CSS · " : "HTML · ") + tpl("pos", { l: cur[0], c: cur[1] });
-  const w = $("#stWarn"); w.textContent = warnN ? tpl("warns", { n: warnN }) : T.noWarn; w.className = warnN ? "warn" : "ok";
+  const w = $("#stWarn");
+  w.textContent = window.DKCheck ? DKCheck.text(PAGE_LANG).status(warnN, tipN) : (warnN ? tpl("warns", { n: warnN }) : T.noWarn);
+  w.className = warnN ? "warn" : "ok";
   $("#stSave").textContent = savedOk ? T.saved : T.saving;
 }
 
@@ -943,7 +982,7 @@ document.addEventListener("keydown", e => {
   if (e.key === "Escape" && !keys.hidden) showKeys(false);
   if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "s"){ e.preventDefault(); save(); setStatusSaved(true); toast(T.savedToast); }
 });
-$("#stWarn").onclick = () => { if (warnN) $("#lint").scrollIntoView({ block: "nearest" }); };
+$("#stWarn").onclick = () => { if (warnN || tipN) { const r = $("#lint .lrow"); if (r) r.focus(); else $("#lint").scrollIntoView({ block: "nearest" }); } };
 if (!editor.cm) ["#findBtn", "#fmtBtn", "#keysBtn"].forEach(s => $(s).hidden = true);
 
 let toastT = 0;
