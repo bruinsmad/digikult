@@ -390,7 +390,7 @@ body.subject .hero{display:none}
       back:"← Minden tantárgy", open:n=>`${n} megnyitása`, nextLabel:"Következő tantárgy",
       count:{story:n=>`${n} küldetés`, theory:n=>`${n} elmélet`, lesson:n=>`${n} lecke`, demo:n=>`${n} bemutató`, tool:n=>`${n} eszköz`},
       missionsDone:(d,n)=>`${d} / ${n} küldetés kész`,
-      againAll:"Bármelyiket újrajátszhatod lent.", skip:"Ugrás a tartalomra",
+      againAll:"Bármelyiket újrajátszhatod lent.", skip:"Ugrás a tartalomra", browse:"Küldetések újra",
       sticky:"Ctrl+S, ne felejtsd!"
     },
     en:{
@@ -404,7 +404,7 @@ body.subject .hero{display:none}
       back:"← All subjects", open:n=>`Open ${n}`, nextLabel:"Next subject",
       count:{story:n=>`${n} mission${n>1?"s":""}`, theory:n=>`${n} explainer${n>1?"s":""}`, lesson:n=>`${n} lesson${n>1?"s":""}`, demo:n=>`${n} demo${n>1?"s":""}`, tool:n=>`${n} tool${n>1?"s":""}`},
       missionsDone:(d,n)=>`${d} of ${n} missions done`,
-      againAll:"Replay any of them below.", skip:"Skip to content",
+      againAll:"Replay any of them below.", skip:"Skip to content", browse:"Replay a mission",
       sticky:"Ctrl+S, don't forget!"
     }
   };
@@ -767,7 +767,12 @@ function puliSvg(){
         <p class="count">${[p.minutes ? T.min(p.minutes) : "", total ? (inProg ? T.chapters(doneN, total) : T.chaptersTotal(total)) : ""].filter(Boolean).join(", ")}</p>
         <a class="btn" href="${href}">${inProg ? T.cont : T.go}</a>`;
     } else {
-      $("#note").innerHTML = `<p class="who">${T.allDone}</p><p class="sub">${T.againAll}</p>`;
+      /* every mission solved: the note becomes the full tally, one stroke per mission */
+      $("#note").innerHTML = `<p class="who">${T.allDone}</p>
+        <h2>${esc(T.missionsDone(missions.length, missions.length))}</h2>
+        ${tally(missions.length, missions.length, "#2f7a3a")}
+        <p class="count">${T.againAll}</p>
+        <a class="btn" href="#${D.SITE.topics[0].id}">${esc(T.browse)}</a>`;
     }
 
     const { tp: open } = current();
