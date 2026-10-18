@@ -530,12 +530,12 @@ const CHAPTERS = [
   "traps": {
    "216": "Ez a sorok száma (COUNT). Egy eladás több lángos is lehet: add össze a darab oszlopot SUM-mal."
   },
-  "success": "469 lángos. Ez egyetlen szám az egész hétre. Mostantól minden csoportnak saját száma lesz: minden napnak, minden eladónak, minden fizetési módnak."
+  "success": "469 lángos. Ez egyetlen szám az egész hétre. Innentől minden válasz a csoportok összehasonlításában rejtőzik: napok, termékek, eladók."
  },
  {
   "title": "A legforgalmasabb nap",
   "story": "<p>Nádas strand, Balaton, július utolsó vasárnapja, este. A strand kiürült, a víz rózsaszín, <b>Margit néni</b> pedig épp most kapcsolta le a lángossütő olaját. Idén nyáron tabletes kasszát kapott: <mark>minden eladás egy sor az <code>eladasok</code> táblában.</mark></p>\n  <p>Négy diák dolgozik nála: <b>Bence</b>, <b>Lili</b>, <b>Ádám</b> és <b>Noémi</b>, naponta ketten. „A tészta a héten az utolsó grammig elfogyott – mondja Margit néni –, a kasszában mégis kevesebb a pénz, mint amennyinek lennie kéne. Te értesz a táblázatokhoz. Először mutasd meg, hogyan ment a hét, napról napra!”</p>",
-  "learn": "<p>A <code>GROUP BY</code> a sorokat <b>csoportokba</b> rakja: az azonos értékű sorok ugyanabba a csoportba kerülnek. Az összesítő függvény ezután <b>minden csoportban külön</b> számol, és minden csoportból <b>egy eredménysor</b> lesz.</p>\n  <div class=\"piles\" aria-hidden=\"true\"><div class=\"col\"><span class=\"chip c1\">kártya</span><span class=\"chip c3\">ingyen</span><span class=\"chip c1\">kártya</span><span class=\"chip c2\">készpénz</span><span class=\"chip c3\">ingyen</span><span class=\"chip c1\">kártya</span></div><span class=\"arrow\">→</span><div class=\"col\"><div class=\"pile\"><span class=\"chip c1\">kártya</span><span class=\"chip c1\">kártya</span><span class=\"chip c1\">kártya</span></div><div class=\"pile\"><span class=\"chip c2\">készpénz</span></div><div class=\"pile\"><span class=\"chip c3\">ingyen</span><span class=\"chip c3\">ingyen</span></div></div><span class=\"arrow\">→</span><div class=\"col\"><span class=\"out\">kártya · <b>3</b></span><span class=\"out\">készpénz · <b>1</b></span><span class=\"out\">ingyen · <b>2</b></span></div></div><p class=\"piles-cap\"><code>GROUP BY fizetes</code>: 6 sor → 3 csoport → 3 eredménysor. A <code>COUNT(*)</code> minden csoportban külön számol.</p>\n  <p>Az oszlop, ami szerint csoportosítasz, a <code>SELECT</code>-be is kerüljön, így látod, melyik szám melyik csoporté. A csoportokat a számuk szerint is rendezheted: <code>ORDER BY COUNT(*) DESC</code>.</p>\n  <div class=\"tries\">\n    <button type=\"button\" class=\"try\" data-sql=\"SELECT elado, COUNT(*) FROM eladasok GROUP BY elado;\">SELECT elado, COUNT(*) FROM eladasok GROUP BY elado;</button>\n    <button type=\"button\" class=\"try\" data-sql=\"SELECT termek, COUNT(*) FROM eladasok GROUP BY termek ORDER BY COUNT(*) DESC;\">SELECT termek, COUNT(*) FROM eladasok GROUP BY termek ORDER BY COUNT(*) DESC;</button>\n  </div>",
+  "learn": "<p>A <code>GROUP BY</code> a sorokat <b>csoportokba</b> rakja: az azonos értékű sorok ugyanabba a csoportba kerülnek. Az összesítő függvény ezután <b>minden csoportban külön</b> számol, és minden csoportból <b>egy eredménysor</b> lesz.</p>\n  <div class=\"piles\" aria-hidden=\"true\"><div class=\"col\"><span class=\"chip c1\">kártya</span><span class=\"chip c3\">ingyen</span><span class=\"chip c1\">kártya</span><span class=\"chip c2\">készpénz</span><span class=\"chip c3\">ingyen</span><span class=\"chip c1\">kártya</span></div><span class=\"arrow\">→</span><div class=\"col\"><div class=\"pile\"><span class=\"chip c1\">kártya</span><span class=\"chip c1\">kártya</span><span class=\"chip c1\">kártya</span></div><div class=\"pile\"><span class=\"chip c2\">készpénz</span></div><div class=\"pile\"><span class=\"chip c3\">ingyen</span><span class=\"chip c3\">ingyen</span></div></div><span class=\"arrow\">→</span><div class=\"col\"><span class=\"out\">kártya · <b>3</b></span><span class=\"out\">készpénz · <b>1</b></span><span class=\"out\">ingyen · <b>2</b></span></div></div><p class=\"piles-cap\"><code>GROUP BY fizetes</code>: 6 sor → 3 csoport → 3 eredménysor. A <code>COUNT(*)</code> minden csoportban külön számol.</p>\n  <p>Az oszlop, ami szerint csoportosítasz, a <code>SELECT</code>-be is kerüljön, így látod, melyik szám melyik csoporté. A csoportokat a számuk szerint is rendezheted: <code>ORDER BY COUNT(*) DESC</code>.</p>\n  <div class=\"tries\">\n    <button type=\"button\" class=\"try\" data-sql=\"SELECT elado, COUNT(*) FROM eladasok GROUP BY elado;\">SELECT elado, COUNT(*) FROM eladasok GROUP BY elado;</button>\n    <button type=\"button\" class=\"try\" data-sql=\"SELECT ora, COUNT(*) FROM eladasok GROUP BY ora ORDER BY COUNT(*) DESC;\">SELECT ora, COUNT(*) FROM eladasok GROUP BY ora ORDER BY COUNT(*) DESC;</button>\n  </div>",
   "task": "Számold meg az eladásokat naponként! Melyik napon volt a legtöbb eladás?",
   "hints": [
    "GROUP BY nap, a SELECT-be pedig nap és COUNT(*). Rendezd: ORDER BY COUNT(*) DESC.",
@@ -551,30 +551,50 @@ const CHAPTERS = [
   "success": "Szombaton, 38 eladással. 216 sor ment be, 7 sor jött ki: minden napból egy. Ez a GROUP BY."
  },
  {
-  "title": "Ingyen lángos",
-  "story": "<p>Margit néni szabálya: <mark>minden eladó naponta legfeljebb 2 lángost ehet meg vagy adhat oda ingyen.</mark> Ez a munkaebéd. A kassza ilyenkor <code>'ingyen'</code> fizetési módot és <code>0</code> forintot ír be.</p>\n  <p>Naponta két eladó, hét nap, fejenként kettő: a héten legfeljebb <b>28</b> ingyen lángos lehetett.</p>",
-  "learn": "<p>A csoportokon belül bármelyik összesítő függvény működik, és több is állhat egymás mellett. Vigyázz: a <code>COUNT(*)</code> a csoport <b>eladásait</b> (sorait) számolja, a <code>SUM(darab)</code> a <b>lángosait</b> adja össze.</p>\n  <pre>SELECT nap, COUNT(*), SUM(darab), SUM(osszeg)\nFROM eladasok\nGROUP BY nap;</pre>\n  <div class=\"tries\">\n    <button type=\"button\" class=\"try\" data-sql=\"SELECT termek, SUM(darab) FROM eladasok GROUP BY termek;\">SELECT termek, SUM(darab) FROM eladasok GROUP BY termek;</button>\n    <button type=\"button\" class=\"try\" data-sql=\"SELECT elado, SUM(osszeg) FROM eladasok GROUP BY elado;\">SELECT elado, SUM(osszeg) FROM eladasok GROUP BY elado;</button>\n  </div>",
-  "task": "Csoportosítsd az eladásokat fizetési mód szerint, és add össze, hány lángos ment ki az egyes fizetési módokkal! Hány lángos ment ki ingyen?",
+  "title": "Miből jön a pénz?",
+  "story": "<p>„Mielőtt a hiányzó pénzt keressük – mondja Margit néni –, mondd meg, honnan jön a pénz! Melyik lángos tartja el ezt a büfét?”</p>",
+  "learn": "<p>A csoportokon belül bármelyik összesítő függvény működik, és több is állhat egymás mellett. Vigyázz: a <code>COUNT(*)</code> a csoport <b>eladásait</b> (sorait) számolja, a <code>SUM(darab)</code> a <b>lángosokat</b>, a <code>SUM(osszeg)</code> a <b>forintokat</b> adja össze.</p>\n  <pre>SELECT nap, COUNT(*), SUM(darab), SUM(osszeg)\nFROM eladasok\nGROUP BY nap;</pre>\n  <div class=\"tries\">\n    <button type=\"button\" class=\"try\" data-sql=\"SELECT elado, SUM(darab) FROM eladasok GROUP BY elado;\">SELECT elado, SUM(darab) FROM eladasok GROUP BY elado;</button>\n    <button type=\"button\" class=\"try\" data-sql=\"SELECT fizetes, COUNT(*), SUM(osszeg) FROM eladasok GROUP BY fizetes;\">SELECT fizetes, COUNT(*), SUM(osszeg) FROM eladasok GROUP BY fizetes;</button>\n  </div>",
+  "task": "Csoportosítsd az eladásokat termék szerint, és add össze mindegyiknél a pénzt! Melyik termék hozta a legtöbb pénzt?",
   "hints": [
-   "GROUP BY fizetes, a SELECT-be pedig fizetes és SUM(darab).",
+   "GROUP BY termek, a SELECT-be pedig termek és SUM(osszeg). Rendezd: ORDER BY SUM(osszeg) DESC.",
    {
-    "sql": "SELECT fizetes, COUNT(*), SUM(darab)\nFROM eladasok\nGROUP BY fizetes;"
+    "sql": "SELECT termek, COUNT(*), SUM(darab), SUM(osszeg)\nFROM eladasok\nGROUP BY termek\nORDER BY SUM(osszeg) DESC;"
    }
   ],
   "answers": [
-   "34"
+   "sajtos-tejfölös",
+   "sajtos",
+   "sajtos-tejfölös lángos",
+   "sajtos lángos"
   ],
-  "placeholder": "egy szám",
+  "placeholder": "egy termék",
   "traps": {
-   "26": "Ennyi ingyenes eladás (sor) volt: ezt a COUNT(*) adja. Egy eladás több lángos is lehet: SUM(darab) kell.",
-   "28": "A 28 a megengedett legtöbb. Kérdezd meg a táblát, mennyi volt valójában!"
+   "sima": "A simából is sok fogy, de olcsó. A pénzt nézd, a SUM(osszeg)-et, ne a COUNT(*)-ot vagy a SUM(darab)-ot."
   },
-  "success": "34 ingyen lángos, pedig legfeljebb 28 lehetett volna: legalább hat a szabályon felül. Nézd meg a COUNT(*)-ot is: csak 26 ingyenes eladás volt, mert néha egyszerre több lángos ment ki."
+  "success": "A sajtos-tejfölös: 226 500 forint, az összes pénz majdnem fele, pedig darabra a simából is majdnem ugyanennyi fogyott. Jegyezd meg: valaki ingyen osztogatja őket."
+ },
+ {
+  "title": "Ingyen lángos",
+  "story": "<p>Margit néni szabálya: <mark>minden eladó naponta legfeljebb 2 lángost ehet meg vagy adhat oda ingyen.</mark> Ez a munkaebéd. A kassza ilyenkor <code>'ingyen'</code> fizetési módot és <code>0</code> forintot ír be. Naponta két eladó van, tehát az egész büféből <b>naponta legfeljebb 4</b> ingyen lángos mehet ki.</p>",
+  "learn": "<p>A <code>WHERE</code> <b>a GROUP BY előtt</b> fut le: először kidobja a felesleges sorokat, és csak a megmaradtakat csoportosítjuk. A sorrend: <b>FROM → WHERE → GROUP BY</b>.</p>\n  <pre>SELECT nap, SUM(osszeg)\nFROM eladasok\nWHERE fizetes = 'kártya'\nGROUP BY nap\nORDER BY SUM(osszeg) DESC;</pre>\n  <p>Ez a kártyás bevétel naponként, a legjobb nappal kezdve.</p>",
+  "task": "Csak az ingyenes eladásokat tartsd meg, és add össze naponként az ingyen lángosokat! Melyik napon ment ki a legtöbb ingyen lángos?",
+  "hints": [
+   "WHERE fizetes = 'ingyen', aztán GROUP BY nap és SUM(darab). Rendezd SUM(darab) DESC szerint.",
+   {
+    "sql": "SELECT nap, SUM(darab)\nFROM eladasok\nWHERE fizetes = 'ingyen'\nGROUP BY nap\nORDER BY SUM(darab) DESC;"
+   }
+  ],
+  "answers": [
+   "pentek",
+   "penteken"
+  ],
+  "placeholder": "egy nap",
+  "success": "Pénteken: 7 ingyen lángos, pedig 4 a határ. Kedden és szombaton is túllépték, 6-6 darabbal. Itt valami nem stimmel."
  },
  {
   "title": "Ki eszi meg?",
   "story": "<p>Margit néninek már van gyanúsítottja. „Biztos Bence. Az a fiú mindig éhes.” Számoljuk meg az ingyen lángosokat <b>eladónként</b>!</p>",
-  "learn": "<p>A <code>WHERE</code> <b>a GROUP BY előtt</b> fut le: először kidobja a felesleges sorokat, és csak a megmaradtakat csoportosítjuk. A sorrend: <b>FROM → WHERE → GROUP BY</b>.</p>\n  <pre>SELECT nap, SUM(osszeg)\nFROM eladasok\nWHERE fizetes = 'kártya'\nGROUP BY nap\nORDER BY SUM(osszeg) DESC;</pre>\n  <p>Ez a kártyás bevétel naponként, a legjobb nappal kezdve.</p>",
+  "learn": "<p>Ugyanaz az ötlet, más csoport: a <code>GROUP BY elado</code> minden eladónak egy csoportot csinál. Ha a legnagyobb csoportot akarod látni elsőként, rendezz az összesítő függvény szerint.</p>\n  <pre>SELECT elado, SUM(osszeg)\nFROM eladasok\nWHERE fizetes = 'készpénz'\nGROUP BY elado\nORDER BY SUM(osszeg) DESC;</pre>\n  <p>Ez megmutatja, ki mennyi készpénzt vett át.</p>",
   "task": "Csak az ingyenes eladásokat nézd, és add össze eladónként az ingyen lángosokat! Melyik eladónál a legtöbb?",
   "hints": [
    "Először WHERE fizetes = 'ingyen', aztán GROUP BY elado és SUM(darab). Rendezd SUM(darab) DESC szerint.",
@@ -589,57 +609,15 @@ const CHAPTERS = [
   "traps": {
    "noemi": "Nem ő a legtöbb. Rendezd a csoportokat SUM(darab) szerint csökkenő sorrendbe, és nézd a legfelső sort."
   },
-  "success": "Bence: 14 ingyen lángos. „Na ugye!” – mondja Margit néni. Csakhogy Bence szinte minden nap a pultnál áll. Mielőtt ítélkezünk, nézzük meg, ki hány napot dolgozott."
+  "success": "Bence: 14 ingyen lángos. „Na ugye!” – mondja Margit néni. De várjunk csak: Bence a hét minden egyes napján a pultnál állt. A szabály napra szól, egy heti összeg még semmit sem bizonyít."
  },
  {
-  "title": "Ki hány napot dolgozott?",
-  "story": "<p>A szabály <b>napra</b> szól: aki több napot dolgozik, annak több ingyen lángos jár.</p>",
-  "learn": "<p>A <code>COUNT(DISTINCT oszlop)</code> egy oszlop <b>különböző</b> értékeit számolja meg, mindegyiket csak egyszer. <code>GROUP BY</code>-jal ezt minden csoportban külön teszi. Ez például megmutatja, naponként hány különböző eladó dolgozott:</p>\n  <pre>SELECT nap, COUNT(DISTINCT elado)\nFROM eladasok\nGROUP BY nap;</pre>",
-  "task": "Számold meg eladónként, hány különböző napon dolgoztak a héten! Hány napot dolgozott Bence?",
-  "hints": [
-   "GROUP BY elado, a SELECT-be pedig elado és COUNT(DISTINCT nap).",
-   {
-    "sql": "SELECT elado, COUNT(DISTINCT nap)\nFROM eladasok\nGROUP BY elado;"
-   }
-  ],
-  "answers": [
-   "7",
-   "het"
-  ],
-  "placeholder": "egy szám",
-  "traps": {
-   "103": "Ennyi eladása volt Bencének: ezt a COUNT(*) adja. A napokat kell megszámolni, mindegyiket csak egyszer: COUNT(DISTINCT nap)."
-  },
-  "success": "Hét napot. Napi 2 × 7 nap = 14: Bence pontosan a keretét használta ki, egy lángossal sem többet. Akkor kinél a többlet? Nézd Noémit: csak 3 napot dolgozott, mégis 13 ingyen lángos jutott rá…"
- },
- {
-  "title": "Napról napra",
+  "title": "Eladónként és naponként",
   "story": "<p>Egy <b>napi</b> szabály megszegését csak úgy lehet tetten érni, ha az ingyen lángosokat <mark>eladónként és naponként egyszerre</mark> csoportosítjuk.</p>",
-  "learn": "<p>Két oszloppal a <code>GROUP BY elado, nap</code> minden <b>(eladó, nap)</b> párnak külön csoportot csinál: a „Bence, hétfő” egy csoport, a „Bence, kedd” egy másik. Mindkét oszlop a <code>SELECT</code>-be is kerül.</p>\n  <pre>SELECT elado, nap, COUNT(*)\nFROM eladasok\nGROUP BY elado, nap\nORDER BY COUNT(*) DESC\nLIMIT 3;</pre>\n  <p>A <code>LIMIT 3</code> a rendezett eredménynek csak az első 3 sorát tartja meg.</p>",
-  "task": "Csoportosítsd az ingyen lángosokat eladó és nap szerint egyszerre! Melyik napon adott ki egy eladó a legtöbb ingyen lángost?",
+  "learn": "<p>Két oszloppal a <code>GROUP BY elado, nap</code> minden <b>(eladó, nap)</b> párnak külön csoportot csinál: a „Bence, hétfő” egy csoport, a „Bence, kedd” egy másik.</p>\n  <p>A <code>WHERE</code> <b>sorokat</b> szűr, még a csoportosítás előtt. A <code>HAVING</code> <b>csoportokat</b> szűr, a csoportosítás után, ezért használhatja a <code>COUNT</code>-ot, a <code>SUM</code>-ot és a többit. A sorrend: <b>WHERE → GROUP BY → HAVING</b>.</p>\n  <pre>SELECT elado, nap, COUNT(*)\nFROM eladasok\nGROUP BY elado, nap\nHAVING COUNT(*) &gt; 15;</pre>\n  <p>Ez csak azokat az (eladó, nap) csoportokat tartja meg, amelyekben 15-nél több eladás volt.</p>",
+  "task": "Csoportosítsd az ingyen lángosokat eladó és nap szerint egyszerre, és a HAVING-gel csak a 2-nél nagyobb csoportokat tartsd meg! Hány csoport marad?",
   "hints": [
-   "WHERE fizetes = 'ingyen', aztán GROUP BY elado, nap és SUM(darab). Rendezd csökkenő sorrendbe, és a LIMIT 1 tartsa meg a legfelső sort.",
-   {
-    "sql": "SELECT elado, nap, SUM(darab)\nFROM eladasok\nWHERE fizetes = 'ingyen'\nGROUP BY elado, nap\nORDER BY SUM(darab) DESC\nLIMIT 1;"
-   }
-  ],
-  "answers": [
-   "pentek",
-   "penteken"
-  ],
-  "placeholder": "egy nap",
-  "traps": {
-   "noemi": "A feladat egy napot kérdez. Melyik nap áll abban a sorban?"
-  },
-  "success": "Pénteken: Noémi egyetlen nap alatt 5 ingyen lángost adott ki. Bence egyik csoportja sem több 2-nél."
- },
- {
-  "title": "Szabályszegés",
-  "story": "<p>Egy rossz nap még lehet véletlen. Margit néni tudni akarja, <b>hányszor</b> szegték meg a héten a napi 2-es szabályt.</p>",
-  "learn": "<p>A <code>WHERE</code> <b>sorokat</b> szűr, még a csoportosítás előtt. A <code>HAVING</code> <b>csoportokat</b> szűr, a csoportosítás után, ezért használhatja a <code>COUNT</code>-ot, a <code>SUM</code>-ot és a többit. A sorrend: <b>WHERE → GROUP BY → HAVING</b>.</p>\n  <pre>SELECT nap, COUNT(*)\nFROM eladasok\nGROUP BY nap\nHAVING COUNT(*) &gt; 30;</pre>\n  <p>Ez csak azokat a napokat tartja meg, amelyeken 30-nál több eladás volt.</p>",
-  "task": "A HAVING-gel tartsd meg csak azokat az (eladó, nap) csoportokat, amelyekben 2-nél több az ingyen lángos! Hány csoport marad?",
-  "hints": [
-   "Vedd az előző fejezet lekérdezését, hagyd el az ORDER BY-t és a LIMIT-et, és írd hozzá: HAVING SUM(darab) > 2. Számold meg az eredmény sorait.",
+   "WHERE fizetes = 'ingyen', GROUP BY elado, nap, aztán HAVING SUM(darab) > 2. Számold meg az eredmény sorait.",
    {
     "sql": "SELECT elado, nap, SUM(darab)\nFROM eladasok\nWHERE fizetes = 'ingyen'\nGROUP BY elado, nap\nHAVING SUM(darab) > 2;"
    }
@@ -652,27 +630,30 @@ const CHAPTERS = [
   "traps": {
    "1": "A csoportokat számold, vagyis az (eladó, nap) párokat, ne az eladókat. Hány sora van az eredménynek?"
   },
-  "success": "Három csoport, és mindhárom Noémié: kedden 4, pénteken 5, szombaton 4. Minden egyes napon, amikor dolgozott."
+  "success": "Három csoport: kedd, péntek és szombat, és mindhárom Noémié. Bence egyik napja sem több 2-nél."
  },
  {
-  "title": "Este nyolckor",
-  "story": "<p>Még egy bizonyíték hiányzik. <mark>Az ebédnek 14 órára vége, ami utána megy ki ingyen, az már nem munkaebéd.</mark> Eladónként: mikor ment ki a legkésőbbi ingyen lángosuk?</p>",
-  "learn": "<p>A <code>HAVING</code> bármelyik összesítő függvénnyel működik. A <code>HAVING MAX(ora) &gt; 14</code> azokat a csoportokat tartja meg, amelyekben a legkésőbbi sor 14 óra utáni. Itt van egy lekérdezés összes része, sorrendben:</p>\n  <pre>SELECT elado, MIN(ora)\nFROM eladasok\nWHERE nap = 'vasárnap'\nGROUP BY elado\nHAVING MIN(ora) = 10\nORDER BY elado;</pre>\n  <p>(Ez azt mutatja meg, ki szolgált ki vasárnap nyitáskor.)</p>",
-  "task": "Csoportosítsd az ingyen lángosokat eladónként, a MAX-szal keresd meg mindenkinél a legkésőbbi órát, és csak azt tartsd meg, akinél ez 14 óra utáni! Ki az?",
+  "title": "A napi adag",
+  "story": "<p>Margit néni még nincs meggyőzve. „Mutasd meg az egész hétre! Mindenkinek napi 2 jár. Ki hány ingyen lángost vitt el <b>egy munkanapra</b>?”</p>",
+  "learn": "<p>A <code>COUNT(DISTINCT oszlop)</code> egy csoportban a <b>különböző</b> értékeket számolja meg, mindegyiket csak egyszer. Az összesítő függvényekkel számolni is lehet: a <code>SUM(…) / COUNT(…)</code> ugyanannak a csoportnak két számát osztja el egymással.</p>\n  <pre>SELECT elado, COUNT(DISTINCT nap), SUM(osszeg) / COUNT(DISTINCT nap)\nFROM eladasok\nGROUP BY elado;</pre>\n  <p>Ez megmutatja, ki hány napot dolgozott, és átlagosan mennyi pénzt vett át egy nap alatt. Ha tizedesjegyek is kellenek, írd a <code>SUM(…)</code> után: <code>* 1.0</code>.</p>",
+  "task": "Csak az ingyenes eladásokat tartsd meg, és eladónként oszd el az ingyen lángosok számát a ledolgozott napok számával! Kinél jut egy munkanapra a legtöbb ingyen lángos?",
   "hints": [
-   "WHERE fizetes = 'ingyen', GROUP BY elado, aztán HAVING MAX(ora) > 14.",
+   "WHERE fizetes = 'ingyen', GROUP BY elado, a SELECT-be pedig: SUM(darab) * 1.0 / COUNT(DISTINCT nap). Rendezd e szerint csökkenő sorrendbe.",
    {
-    "sql": "SELECT elado, MAX(ora), SUM(darab)\nFROM eladasok\nWHERE fizetes = 'ingyen'\nGROUP BY elado\nHAVING MAX(ora) > 14;"
+    "sql": "SELECT elado, SUM(darab), COUNT(DISTINCT nap),\n       SUM(darab) * 1.0 / COUNT(DISTINCT nap)\nFROM eladasok\nWHERE fizetes = 'ingyen'\nGROUP BY elado\nORDER BY SUM(darab) * 1.0 / COUNT(DISTINCT nap) DESC;"
    }
   ],
   "answers": [
    "noemi"
   ],
   "placeholder": "név",
-  "success": "Noémi, este 8-kor. Margit néni átsétál a röplabdapályához, és ott ül a strandröplabda-csapat, Noémi barátai, mindegyik kezében egy sajtos-tejfölös. Noémi elpirul: „Edzés után jönnek, és olyan éhesek…” Margit néni nevet. „A barátaidnak holnap is jár lángos. Fél áron. És kifizetik.”"
+  "traps": {
+   "bence": "Bencénél a legtöbb az összes, de mind a 7 napon dolgozott: 14 / 7 = 2, pont a keret. Oszd el a napok számával!"
+  },
+  "success": "Noémi: 3 nap alatt 13 ingyen lángos, napi több mint 4. Bence: pontosan 2. A kassza azt is elárulja, mikor: este 8-kor, minden nap, amikor dolgozott. Margit néni átsétál a röplabdapályához, és ott ül a strandröplabda-csapat, Noémi barátai, mindegyik kezében egy sajtos-tejfölös. Noémi elpirul: „Edzés után jönnek, és olyan éhesek…” Margit néni nevet. „A barátaidnak holnap is jár lángos. Fél áron. És kifizetik.”"
  }
 ];
-const BONUS = ["Melyik lángosból fogyott a legtöbb a héten? (SUM(darab), GROUP BY termek)", "Melyik napon jött be a legtöbb pénz? (SUM(osszeg), GROUP BY nap)", "Mennyi pénz jött be kártyával és mennyi készpénzzel?", "Melyik órában volt a legtöbb eladás? (GROUP BY ora)", "Eladónként mennyi egy fizetős eladás átlagos összege? Az ingyeneseket hagyd ki a WHERE-rel, és kerekíts: ROUND(AVG(osszeg)).", "Nehéz: melyik (termék, fizetési mód) párhoz tartozik a legtöbb lángos? Csoportosíts két oszlop szerint."];
+const BONUS = ["Melyik órában volt a legtöbb eladás? (GROUP BY ora)", "Melyik napon jött be a legtöbb pénz? (SUM(osszeg), GROUP BY nap)", "Eladónként mennyi egy fizetős eladás átlagos összege? Az ingyeneseket hagyd ki a WHERE-rel, és kerekíts: ROUND(AVG(osszeg)).", "Milyen lángosokat adtak ki ingyen, és melyikből mennyit? (WHERE + GROUP BY termek)", "Mely napokon volt 30-nál több eladás? (HAVING COUNT(*) > 30)", "Nehéz: melyik (termék, fizetési mód) párhoz tartozik a legtöbb lángos? Csoportosíts két oszlop szerint."];
 const COLDOCS = {"eladasok": {"id": "Az eladás sorszáma.", "nap": "A hét napja: <code>'hétfő'</code>, <code>'kedd'</code> … <code>'vasárnap'</code>.", "ora": "Hány órakor volt az eladás, számként <code>10</code> és <code>21</code> között.", "elado": "Ki szolgálta ki: <code>'Bence'</code>, <code>'Lili'</code>, <code>'Ádám'</code> vagy <code>'Noémi'</code>.", "termek": "<code>'sima'</code>, <code>'fokhagymás'</code>, <code>'sajtos-tejfölös'</code> vagy <code>'lekváros'</code>.", "darab": "Hány lángos ment ki ebben az eladásban.", "osszeg": "Mennyit fizettek, forintban. Az ingyen lángos <code>0</code>.", "fizetes": "<code>'kártya'</code>, <code>'készpénz'</code> vagy <code>'ingyen'</code>."}};
 const HAND_STEPS = ["Írd be lent a neved.", "Kattints a <b>Válaszok mentése (.txt)</b> gombra. A fájl a Letöltések mappába kerül.", "Nyisd meg a feladatot a <b>Google Classroomban</b>, töltsd fel a fájlt a <b>Hozzáadás vagy létrehozás → Fájl</b> alatt, majd nyomd meg a <b>Beadás</b> gombot."];
 const RANKS = ["Főnyomozó", "Kasszamester", "Pultos", "Kukta"];
@@ -682,7 +663,7 @@ const T = {
   correct:"Helyes.", wrong:"Nem egészen.", wrongTip:"Nézd meg újra az eredményt. A feladat sorok számát (COUNT) vagy lángosok számát (SUM(darab)) kérdezi? Nevet, napot vagy számot kér?", prev:"Előző fejezet", next:"Következő fejezet", start:"Nyissuk ki a kasszát", yourans:"A válaszod",
   ready:"A kassza be van kapcsolva. Írj egy lekérdezést, és nyomd meg a Futtatást.", empty:"Üres a lekérdezés. Először írj valamit.", zero:"0 sor. Egyetlen sor sem felel meg az összes feltételnek. Ellenőrizd a szövegek írásmódját, pl. 'ingyen'.", sound:"Hang", reset:"Újrakezdés", reset2:"Kattints még egyszer a törléshez",
   errGeneric:"Ellenőrizd a helyesírást, a vesszőket, a zárójeleket és az idézőjeleket. A szövegek egyszeres idézőjelbe kerülnek: 'ingyen'.", errCol:"Ilyen oszlop nincs. Az oszlopok: id, nap, ora, elado, termek, darab, osszeg, fizetes (ékezet nélkül).", errTab:"Ilyen tábla nincs. Egyetlen tábla van: eladasok.", errAmb:"A COUNT, SUM, AVG, MIN és MAX nem állhat a WHERE-ben: a WHERE egyszerre csak egy sort lát. Az egész csoportra vonatkozó feltétel a GROUP BY után, a HAVING-be kerül.", sqlErr:"Hiba van a lekérdezésben.", engFail:"Az SQL-motor nem töltődött be.", engFail2:"Ellenőrizd az internetkapcsolatot, és töltsd újra az oldalt.", engStart:"Az SQL-motor nem indult el.",
-  endH:"A kassza rendben", endP:m=>`A rejtély megoldva, a kassza rendben, és a strandröplabda-csapat mostantól fél árat fizet a semmi helyett. Kb. <b>${m} perc</b> alatt jöttél rá, csoportosítással: GROUP BY egy és két oszlop szerint, SUM és COUNT különbsége, COUNT(DISTINCT), és HAVING a csoportok szűrésére.`, endBonus:"Bónuszfeladatok gyors nyomozóknak:", handH:"Add be a válaszaidat", name:"A neved", namePh:"Írd ide a neved", save:"Válaszok mentése (.txt)", copy:"Másolás szövegként", replay:"Ünneplés újra",
+  endH:"A kassza rendben", endP:m=>`A rejtély megoldva, a kassza rendben, és a strandröplabda-csapat mostantól fél árat fizet a semmi helyett. Kb. <b>${m} perc</b> alatt jöttél rá, csoportok összehasonlításával: GROUP BY egy és két oszlop szerint, WHERE a csoportosítás előtt, HAVING utána, és COUNT(DISTINCT)-tel elosztott összegek.`, endBonus:"Bónuszfeladatok gyors nyomozóknak:", handH:"Add be a válaszaidat", name:"A neved", namePh:"Írd ide a neved", save:"Válaszok mentése (.txt)", copy:"Másolás szövegként", replay:"Ünneplés újra",
   xNameFirst:"Először írd be a neved.", xCopied:"Kimásolva. Illeszd be a Classroom-feladathoz privát megjegyzésként, majd nyomd meg a Beadást.", xBlocked:"A másolás itt le van tiltva. Használd a mentést.", xSaved:f=>`Mentve: ${f}. Most töltsd fel a Google Classroom feladathoz, és nyomd meg a Beadást.`, xSaveBlocked:"A mentés itt le van tiltva. Használd a másolást.",
   filePrefix:"langos-rejtely", reportTitle:"LANGOS-REJTELY A BALATONON - VALASZLAP", rName:"Név", rFinished:"Befejezve", rTime:"Eltelt idő", rQueries:"Futtatott lekérdezések", rDev:"MEGJEGYZÉS: tanári kóddal lett befejezve, ezért hiányozhatnak válaszok.",
   rTask:"Feladat", rAnswer:"Válasz", rSkipped:"(kihagyva)", rUnsolved:"(nincs megoldva)", rWrong:"Rossz válaszok", rQuery:"Lekérdezés", rNone:"(nincs mentve)",
@@ -690,7 +671,7 @@ const T = {
 };
 
 /* ---------- state ---------- */
-const KEY = "langos-hu-v2";
+const KEY = "langos-hu-v3";
 let state = { solved: [], current: 0, start: Date.now(), end: null, drafts: {} };
 try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && Array.isArray(s.solved)) state = Object.assign(state, s); } catch(e){}
 function save(){ try { localStorage.setItem(KEY, JSON.stringify(state)); } catch(e){} }
@@ -1118,6 +1099,6 @@ $("sql").value = state.drafts[state.current] ?? starterFor(state.current);
 if (typeof initSqlJs !== "function"){ $("out").innerHTML = `<div class="err">${T.engFail}<p>${T.engFail2}</p></div>`; }
 else { initSqlJs().then(s=>{ SQL = s; resetDb(); }).catch(e=>{ $("out").innerHTML = `<div class="err">${T.engStart}<p>${esc(e.message)}</p></div>`; }); }
 </script>
-<script src="../../nav.js?v=5a2b33fe" defer></script>
+<script src="../../nav.js?v=1cff4815" defer></script>
 </body>
 </html>

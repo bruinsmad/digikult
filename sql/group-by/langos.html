@@ -530,13 +530,13 @@ const CHAPTERS = [
   "traps": {
    "216": "That's the number of rows (COUNT). One sale can be several lángos: add up the qty column with SUM."
   },
-  "success": "469 lángos. That is one number for the whole week. From now on you'll get one number for each group: each day, each seller, each way of paying.",
+  "success": "469 lángos. That is one number for the whole week. From now on every answer hides in a comparison of groups: days, products, sellers.",
   "starter": "SELECT * FROM sales;"
  },
  {
   "title": "The busiest day",
   "story": "<p>Reed Beach, Lake Balaton, the last Sunday evening of July. The beach is empty, the lake is pink, and <b>Aunt Margit</b> has just switched off the fryer of her lángos stand. This summer she got a tablet till: <mark>every sale is one row in the <code>sales</code> table.</mark></p>\n  <p>Four students work for her: <b>Bence</b>, <b>Lili</b>, <b>Ádám</b> and <b>Noémi</b>, two of them each day. \"Every bit of dough was used this week,\" says Aunt Margit, \"yet there's less money in the till than there should be. You're good with tables. First, show me how the week went, day by day.\"</p>",
-  "learn": "<p><code>GROUP BY</code> sorts the rows into <b>groups</b>: rows with the same value in that column go into the same group. The aggregate function then works <b>inside each group separately</b>, and every group becomes <b>one row</b> of the result.</p>\n  <div class=\"piles\" aria-hidden=\"true\"><div class=\"col\"><span class=\"chip c1\">card</span><span class=\"chip c3\">free</span><span class=\"chip c1\">card</span><span class=\"chip c2\">cash</span><span class=\"chip c3\">free</span><span class=\"chip c1\">card</span></div><span class=\"arrow\">→</span><div class=\"col\"><div class=\"pile\"><span class=\"chip c1\">card</span><span class=\"chip c1\">card</span><span class=\"chip c1\">card</span></div><div class=\"pile\"><span class=\"chip c2\">cash</span></div><div class=\"pile\"><span class=\"chip c3\">free</span><span class=\"chip c3\">free</span></div></div><span class=\"arrow\">→</span><div class=\"col\"><span class=\"out\">card · <b>3</b></span><span class=\"out\">cash · <b>1</b></span><span class=\"out\">free · <b>2</b></span></div></div><p class=\"piles-cap\"><code>GROUP BY payment</code>: 6 rows → 3 groups → 3 result rows. <code>COUNT(*)</code> counts inside each group separately.</p>\n  <p>The column you group by goes in <code>SELECT</code> too, so you can see which number belongs to which group. To sort the groups by their number: <code>ORDER BY COUNT(*) DESC</code>.</p>\n  <div class=\"tries\">\n    <button type=\"button\" class=\"try\" data-sql=\"SELECT seller, COUNT(*) FROM sales GROUP BY seller;\">SELECT seller, COUNT(*) FROM sales GROUP BY seller;</button>\n    <button type=\"button\" class=\"try\" data-sql=\"SELECT product, COUNT(*) FROM sales GROUP BY product ORDER BY COUNT(*) DESC;\">SELECT product, COUNT(*) FROM sales GROUP BY product ORDER BY COUNT(*) DESC;</button>\n  </div>",
+  "learn": "<p><code>GROUP BY</code> sorts the rows into <b>groups</b>: rows with the same value in that column go into the same group. The aggregate function then works <b>inside each group separately</b>, and every group becomes <b>one row</b> of the result.</p>\n  <div class=\"piles\" aria-hidden=\"true\"><div class=\"col\"><span class=\"chip c1\">card</span><span class=\"chip c3\">free</span><span class=\"chip c1\">card</span><span class=\"chip c2\">cash</span><span class=\"chip c3\">free</span><span class=\"chip c1\">card</span></div><span class=\"arrow\">→</span><div class=\"col\"><div class=\"pile\"><span class=\"chip c1\">card</span><span class=\"chip c1\">card</span><span class=\"chip c1\">card</span></div><div class=\"pile\"><span class=\"chip c2\">cash</span></div><div class=\"pile\"><span class=\"chip c3\">free</span><span class=\"chip c3\">free</span></div></div><span class=\"arrow\">→</span><div class=\"col\"><span class=\"out\">card · <b>3</b></span><span class=\"out\">cash · <b>1</b></span><span class=\"out\">free · <b>2</b></span></div></div><p class=\"piles-cap\"><code>GROUP BY payment</code>: 6 rows → 3 groups → 3 result rows. <code>COUNT(*)</code> counts inside each group separately.</p>\n  <p>The column you group by goes in <code>SELECT</code> too, so you can see which number belongs to which group. To sort the groups by their number: <code>ORDER BY COUNT(*) DESC</code>.</p>\n  <div class=\"tries\">\n    <button type=\"button\" class=\"try\" data-sql=\"SELECT seller, COUNT(*) FROM sales GROUP BY seller;\">SELECT seller, COUNT(*) FROM sales GROUP BY seller;</button>\n    <button type=\"button\" class=\"try\" data-sql=\"SELECT hour, COUNT(*) FROM sales GROUP BY hour ORDER BY COUNT(*) DESC;\">SELECT hour, COUNT(*) FROM sales GROUP BY hour ORDER BY COUNT(*) DESC;</button>\n  </div>",
   "task": "Count the sales day by day. On which day were there the most sales?",
   "hints": [
    "GROUP BY day, with day and COUNT(*) in SELECT. Sort with ORDER BY COUNT(*) DESC.",
@@ -552,33 +552,52 @@ const CHAPTERS = [
   "success": "Saturday, with 38 sales. 216 rows went in, 7 rows came out: one for each day. That's GROUP BY."
  },
  {
-  "title": "Free lángos",
-  "story": "<p>Aunt Margit's rule: <mark>every seller may eat or give away at most 2 free lángos a day.</mark> That's the staff lunch. The till records it as payment <code>'free'</code>, for <code>0</code> forints.</p>\n  <p>Two sellers a day, seven days, two lángos each: at most <b>28</b> free lángos this week.</p>",
-  "learn": "<p>Any aggregate works inside the groups, and you can put several side by side. Careful: <code>COUNT(*)</code> counts the <b>sales</b> (rows) in a group, <code>SUM(qty)</code> adds up the <b>lángos</b>.</p>\n  <pre>SELECT day, COUNT(*), SUM(qty), SUM(amount)\nFROM sales\nGROUP BY day;</pre>\n  <div class=\"tries\">\n    <button type=\"button\" class=\"try\" data-sql=\"SELECT product, SUM(qty) FROM sales GROUP BY product;\">SELECT product, SUM(qty) FROM sales GROUP BY product;</button>\n    <button type=\"button\" class=\"try\" data-sql=\"SELECT seller, SUM(amount) FROM sales GROUP BY seller;\">SELECT seller, SUM(amount) FROM sales GROUP BY seller;</button>\n  </div>",
-  "task": "Group the sales by payment type and add up how many lángos went out with each. How many lángos went out free?",
+  "title": "Where the money comes from",
+  "story": "<p>\"Before we hunt for missing money,\" says Aunt Margit, \"tell me where the money comes from. Which lángos keeps this stand alive?\"</p>",
+  "learn": "<p>Any aggregate works inside the groups, and you can put several side by side. Careful: <code>COUNT(*)</code> counts the <b>sales</b> (rows) in a group, <code>SUM(qty)</code> adds up the <b>lángos</b>, <code>SUM(amount)</code> the <b>forints</b>.</p>\n  <pre>SELECT day, COUNT(*), SUM(qty), SUM(amount)\nFROM sales\nGROUP BY day;</pre>\n  <div class=\"tries\">\n    <button type=\"button\" class=\"try\" data-sql=\"SELECT seller, SUM(qty) FROM sales GROUP BY seller;\">SELECT seller, SUM(qty) FROM sales GROUP BY seller;</button>\n    <button type=\"button\" class=\"try\" data-sql=\"SELECT payment, COUNT(*), SUM(amount) FROM sales GROUP BY payment;\">SELECT payment, COUNT(*), SUM(amount) FROM sales GROUP BY payment;</button>\n  </div>",
+  "task": "Group the sales by product and add up the money for each. Which product brought in the most money?",
   "hints": [
-   "GROUP BY payment, with payment and SUM(qty) in SELECT.",
+   "GROUP BY product, with product and SUM(amount) in SELECT. Sort with ORDER BY SUM(amount) DESC.",
    {
-    "sql": "SELECT payment, COUNT(*), SUM(qty)\nFROM sales\nGROUP BY payment;"
+    "sql": "SELECT product, COUNT(*), SUM(qty), SUM(amount)\nFROM sales\nGROUP BY product\nORDER BY SUM(amount) DESC;"
    }
   ],
   "answers": [
-   "34"
+   "cheese",
+   "cheese lángos",
+   "cheese langos"
   ],
-  "placeholder": "a number",
+  "placeholder": "a product",
   "traps": {
-   "26": "That's how many free sales (rows) there were: COUNT(*). One sale can be several lángos. Use SUM(qty).",
-   "28": "28 is the most there should be. Ask the table how many there really were!"
+   "plain": "Plain lángos sell well, but they're cheap. Look at SUM(amount), the money, not COUNT(*) or SUM(qty)."
   },
-  "success": "34 free lángos, but there should be 28 at most: at least six over the limit. And look at COUNT(*): only 26 free sales, because some of them were more than one lángos."
+  "success": "The cheese lángos: 226,500 forints, almost half of all the money, though plain sold nearly as many pieces. Remember them; someone has been handing them out for free."
+ },
+ {
+  "title": "Free lángos",
+  "story": "<p>Aunt Margit's rule: <mark>every seller may eat or give away at most 2 free lángos a day.</mark> That's the staff lunch. The till records it as payment <code>'free'</code>, for <code>0</code> forints. With two sellers a day, that's at most <b>4 free lángos a day</b> for the whole stand.</p>",
+  "learn": "<p><code>WHERE</code> runs <b>before</b> <code>GROUP BY</code>: first it throws out the rows you don't need, then only the rows that are left get grouped. The order is <b>FROM → WHERE → GROUP BY</b>.</p>\n  <pre>SELECT day, SUM(amount)\nFROM sales\nWHERE payment = 'card'\nGROUP BY day\nORDER BY SUM(amount) DESC;</pre>\n  <p>That's the card money, day by day, the best day first.</p>",
+  "task": "Keep only the free sales and add up the free lángos day by day. On which day did the most free lángos go out?",
+  "hints": [
+   "WHERE payment = 'free', then GROUP BY day with SUM(qty). Sort by SUM(qty) DESC.",
+   {
+    "sql": "SELECT day, SUM(qty)\nFROM sales\nWHERE payment = 'free'\nGROUP BY day\nORDER BY SUM(qty) DESC;"
+   }
+  ],
+  "answers": [
+   "friday",
+   "fri"
+  ],
+  "placeholder": "a day",
+  "success": "Friday: 7 free lángos, when 4 is the limit. And Tuesday and Saturday are over the limit too, with 6 each. Something is going on."
  },
  {
   "title": "Who is eating them?",
   "story": "<p>Aunt Margit already has a suspect. \"It's Bence, I'm sure. That boy is always hungry.\" Let's count the free lángos <b>seller by seller</b>.</p>",
-  "learn": "<p><code>WHERE</code> runs <b>before</b> <code>GROUP BY</code>: first it throws out the rows you don't need, then only the rows that are left get grouped. The order is <b>FROM → WHERE → GROUP BY</b>.</p>\n  <pre>SELECT day, SUM(amount)\nFROM sales\nWHERE payment = 'card'\nGROUP BY day\nORDER BY SUM(amount) DESC;</pre>\n  <p>That's the card money, day by day, the best day first.</p>",
-  "task": "Look at the free sales only and add up the free lángos for each seller. Which seller has the most?",
+  "learn": "<p>Same idea, different group: <code>GROUP BY seller</code> makes one group per seller. To see the biggest group first, sort by the aggregate.</p>\n  <pre>SELECT seller, SUM(amount)\nFROM sales\nWHERE payment = 'cash'\nGROUP BY seller\nORDER BY SUM(amount) DESC;</pre>\n  <p>That's how much cash each seller took.</p>",
+  "task": "Keep only the free sales and add up the free lángos for each seller. Which seller has the most?",
   "hints": [
-   "WHERE payment = 'free' first, then GROUP BY seller with SUM(qty). Sort by SUM(qty) DESC.",
+   "WHERE payment = 'free', then GROUP BY seller with SUM(qty). Sort by SUM(qty) DESC.",
    {
     "sql": "SELECT seller, SUM(qty)\nFROM sales\nWHERE payment = 'free'\nGROUP BY seller\nORDER BY SUM(qty) DESC;"
    }
@@ -590,57 +609,15 @@ const CHAPTERS = [
   "traps": {
    "noemi": "Not the most. Sort the groups by SUM(qty), largest first, and look at the top row."
   },
-  "success": "Bence: 14 free lángos. \"I knew it!\" says Aunt Margit. But Bence is at the stand almost every day. Before you blame him, find out how many days each of them worked."
+  "success": "Bence: 14 free lángos. \"I knew it!\" says Aunt Margit. But wait: Bence is at the stand every single day. The rule is per day, so a weekly total doesn't prove anything."
  },
  {
-  "title": "Days on duty",
-  "story": "<p>The rule is <b>per day</b>: the more days someone works, the more free lángos they're allowed.</p>",
-  "learn": "<p><code>COUNT(DISTINCT column)</code> counts the <b>different</b> values in a column, each one only once. With <code>GROUP BY</code> it does that inside every group. This one shows how many different sellers worked on each day:</p>\n  <pre>SELECT day, COUNT(DISTINCT seller)\nFROM sales\nGROUP BY day;</pre>",
-  "task": "For each seller, count how many different days they worked this week. How many days did Bence work?",
-  "hints": [
-   "GROUP BY seller, with seller and COUNT(DISTINCT day) in SELECT.",
-   {
-    "sql": "SELECT seller, COUNT(DISTINCT day)\nFROM sales\nGROUP BY seller;"
-   }
-  ],
-  "answers": [
-   "7",
-   "seven"
-  ],
-  "placeholder": "a number",
-  "traps": {
-   "103": "That's how many sales Bence made: COUNT(*). Count the days instead, each day only once: COUNT(DISTINCT day)."
-  },
-  "success": "Seven days. 2 a day × 7 days = 14: Bence used exactly his allowance, not one lángos more. Then who's over the limit? Look at Noémi: only 3 days, and 13 free lángos…"
- },
- {
-  "title": "Day by day",
+  "title": "Day by day, seller by seller",
   "story": "<p>To catch someone breaking a <b>per-day</b> rule, the free lángos have to be grouped <mark>by seller and by day at the same time</mark>.</p>",
-  "learn": "<p>With two columns, <code>GROUP BY seller, day</code> makes a group for every <b>(seller, day)</b> pair: \"Bence, Monday\" is one group, \"Bence, Tuesday\" another. Both columns go in <code>SELECT</code> as well.</p>\n  <pre>SELECT seller, day, COUNT(*)\nFROM sales\nGROUP BY seller, day\nORDER BY COUNT(*) DESC\nLIMIT 3;</pre>\n  <p><code>LIMIT 3</code> keeps only the first 3 rows of the sorted result.</p>",
-  "task": "Group the free lángos by seller and day together. On which day did one seller hand out the most free lángos?",
+  "learn": "<p>With two columns, <code>GROUP BY seller, day</code> makes a group for every <b>(seller, day)</b> pair: \"Bence, Monday\" is one group, \"Bence, Tuesday\" another.</p>\n  <p><code>WHERE</code> filters <b>rows</b>, before grouping. <code>HAVING</code> filters <b>groups</b>, after grouping, so it can use <code>COUNT</code>, <code>SUM</code> and the rest. The order is <b>WHERE → GROUP BY → HAVING</b>.</p>\n  <pre>SELECT seller, day, COUNT(*)\nFROM sales\nGROUP BY seller, day\nHAVING COUNT(*) &gt; 15;</pre>\n  <p>That keeps only the (seller, day) groups with more than 15 sales.</p>",
+  "task": "Group the free lángos by seller and day together, and keep only the groups with more than 2, using HAVING. How many groups are left?",
   "hints": [
-   "WHERE payment = 'free', then GROUP BY seller, day with SUM(qty). Sort it DESC and keep the top row with LIMIT 1.",
-   {
-    "sql": "SELECT seller, day, SUM(qty)\nFROM sales\nWHERE payment = 'free'\nGROUP BY seller, day\nORDER BY SUM(qty) DESC\nLIMIT 1;"
-   }
-  ],
-  "answers": [
-   "friday",
-   "fri"
-  ],
-  "placeholder": "a day",
-  "traps": {
-   "noemi": "The task asks for a day. Which day is in that row?"
-  },
-  "success": "Friday: Noémi handed out 5 free lángos in one day. None of Bence's groups is above 2."
- },
- {
-  "title": "Breaking the rule",
-  "story": "<p>One bad day could be an accident. Aunt Margit wants to know <b>how many times</b> the 2-a-day rule was broken this week.</p>",
-  "learn": "<p><code>WHERE</code> filters <b>rows</b>, before grouping. <code>HAVING</code> filters <b>groups</b>, after grouping, so it can use <code>COUNT</code>, <code>SUM</code> and the rest. The order is <b>WHERE → GROUP BY → HAVING</b>.</p>\n  <pre>SELECT day, COUNT(*)\nFROM sales\nGROUP BY day\nHAVING COUNT(*) &gt; 30;</pre>\n  <p>That keeps only the days with more than 30 sales.</p>",
-  "task": "Keep only the (seller, day) groups with more than 2 free lángos, using HAVING. How many groups are left?",
-  "hints": [
-   "Take the last chapter's query, drop ORDER BY and LIMIT, and add HAVING SUM(qty) > 2. Count the rows of the result.",
+   "WHERE payment = 'free', GROUP BY seller, day, then HAVING SUM(qty) > 2. Count the rows of the result.",
    {
     "sql": "SELECT seller, day, SUM(qty)\nFROM sales\nWHERE payment = 'free'\nGROUP BY seller, day\nHAVING SUM(qty) > 2;"
    }
@@ -653,27 +630,30 @@ const CHAPTERS = [
   "traps": {
    "1": "Count the groups, the (seller, day) pairs, not the sellers. How many rows does the result have?"
   },
-  "success": "Three groups, and all three are Noémi: 4 on Tuesday, 5 on Friday, 4 on Saturday. Every single day she worked."
+  "success": "Three groups: Tuesday, Friday and Saturday, and every one of them is Noémi. None of Bence's days is above 2."
  },
  {
-  "title": "Eight o'clock",
-  "story": "<p>One last piece of proof. <mark>Lunch is over by 14:00, so a free lángos after that is not a staff lunch.</mark> For each seller, when did their latest free lángos go out?</p>",
-  "learn": "<p><code>HAVING</code> works with any aggregate. <code>HAVING MAX(hour) &gt; 14</code> keeps the groups whose latest row is after 14 o'clock. Here is every part of a query, in order:</p>\n  <pre>SELECT seller, MIN(hour)\nFROM sales\nWHERE day = 'Sunday'\nGROUP BY seller\nHAVING MIN(hour) = 10\nORDER BY seller;</pre>\n  <p>(That one shows who served at opening time on Sunday.)</p>",
-  "task": "Group the free lángos by seller, take each seller's latest hour with MAX, and keep only those whose latest free lángos went out after 14 o'clock. Who is it?",
+  "title": "The fair share",
+  "story": "<p>Aunt Margit isn't convinced yet. \"Show me for the whole week. Everyone gets 2 a day, so how many free lángos did each of them take <b>per working day</b>?\"</p>",
+  "learn": "<p><code>COUNT(DISTINCT column)</code> counts the <b>different</b> values in a group, each one only once. With aggregates you can also calculate: <code>SUM(…) / COUNT(…)</code> divides two numbers of the same group.</p>\n  <pre>SELECT seller, COUNT(DISTINCT day), SUM(amount) / COUNT(DISTINCT day)\nFROM sales\nGROUP BY seller;</pre>\n  <p>That's how many days each seller worked, and how much money they took on an average day. Write <code>* 1.0</code> after <code>SUM(…)</code> if you want decimals.</p>",
+  "task": "Keep only the free sales, then for each seller divide their free lángos by the number of days they worked. Who took the most free lángos per working day?",
   "hints": [
-   "WHERE payment = 'free', GROUP BY seller, then HAVING MAX(hour) > 14.",
+   "WHERE payment = 'free', GROUP BY seller, and in SELECT: SUM(qty) * 1.0 / COUNT(DISTINCT day). Sort by it DESC.",
    {
-    "sql": "SELECT seller, MAX(hour), SUM(qty)\nFROM sales\nWHERE payment = 'free'\nGROUP BY seller\nHAVING MAX(hour) > 14;"
+    "sql": "SELECT seller, SUM(qty), COUNT(DISTINCT day),\n       SUM(qty) * 1.0 / COUNT(DISTINCT day)\nFROM sales\nWHERE payment = 'free'\nGROUP BY seller\nORDER BY SUM(qty) * 1.0 / COUNT(DISTINCT day) DESC;"
    }
   ],
   "answers": [
    "noemi"
   ],
   "placeholder": "name",
-  "success": "Noémi, at 20:00. At eight in the evening Aunt Margit walks over to the volleyball court, and there sits the beach volleyball team, Noémi's friends, each with a cheese lángos. Noémi blushes: \"They come after training and they're so hungry…\" Aunt Margit laughs. \"Your friends can have lángos tomorrow too. Half price. And they pay.\""
+  "traps": {
+   "bence": "Bence has the most in total, but he worked all 7 days: 14 / 7 = 2, exactly his allowance. Divide by the days!"
+  },
+  "success": "Noémi: 13 free lángos in 3 days, more than 4 a day. Bence: exactly 2. And the till shows when: 20:00, every day she worked. At eight in the evening Aunt Margit walks over to the volleyball court, and there sits the beach volleyball team, Noémi's friends, each with a cheese lángos. Noémi blushes: \"They come after training and they're so hungry…\" Aunt Margit laughs. \"Your friends can have lángos tomorrow too. Half price. And they pay.\""
  }
 ];
-const BONUS = ["Which product sold the most lángos this week? (SUM(qty), GROUP BY product)", "Which day brought in the most money? (SUM(amount), GROUP BY day)", "How much money came in by card and how much in cash?", "Which hour of the day had the most sales? (GROUP BY hour)", "For each seller, what is the average amount of a paid sale? Leave the free ones out with WHERE, and round with ROUND(AVG(amount)).", "Hard: which (product, payment) pair has the most lángos? Group by two columns."];
+const BONUS = ["Which hour of the day had the most sales? (GROUP BY hour)", "Which day brought in the most money? (SUM(amount), GROUP BY day)", "For each seller, what is the average amount of a paid sale? Leave the free ones out with WHERE, and round with ROUND(AVG(amount)).", "Which products were handed out free, and how many of each? (WHERE + GROUP BY product)", "Which days had more than 30 sales? (HAVING COUNT(*) > 30)", "Hard: which (product, payment) pair has the most lángos? Group by two columns."];
 const COLDOCS = {"sales": {"id": "Row number of the sale.", "day": "Day of the week: <code>'Monday'</code> … <code>'Sunday'</code>.", "hour": "The hour of the sale, as a number from <code>10</code> to <code>21</code>.", "seller": "Who served it: <code>'Bence'</code>, <code>'Lili'</code>, <code>'Ádám'</code> or <code>'Noémi'</code>.", "product": "<code>'plain'</code>, <code>'garlic'</code>, <code>'cheese'</code> or <code>'jam'</code>.", "qty": "How many lángos went out in this sale.", "amount": "How much was paid, in forints. A free lángos is <code>0</code>.", "payment": "<code>'card'</code>, <code>'cash'</code> or <code>'free'</code>."}};
 const HAND_STEPS = ["Write your name below.", "Click <b>Save answers (.txt)</b>. The file goes to your Downloads folder.", "Open the assignment in <b>Google Classroom</b>, upload the file under <b>Add or create → File</b>, then press <b>Turn in</b>."];
 const RANKS = ["Chief Detective", "Till Master", "Counter Hand", "Kitchen Helper"];
@@ -683,7 +663,7 @@ const T = {
   correct:"Correct.", wrong:"Not quite.", wrongTip:"Look at your result again. Does the task ask for a number of rows (COUNT) or a number of lángos (SUM of qty)? A name, a day or a number?", prev:"Previous chapter", next:"Next chapter", start:"Open the till", yourans:"Your answer",
   ready:"The till is on. Write a query and press Run.", empty:"The query box is empty. Type a query first.", zero:"0 rows. No rows match all of your conditions. Check the spelling of text values, like 'free'.", sound:"Sound", reset:"Start over", reset2:"Click again to erase progress",
   errGeneric:"Check spelling, commas, brackets and quotes. Text values need single quotes, like 'free'.", errCol:"That column name doesn't exist. The columns are: id, day, hour, seller, product, qty, amount, payment.", errTab:"That table doesn't exist. There is one table: sales.", errAmb:"COUNT, SUM, AVG, MIN and MAX can't go in WHERE: WHERE looks at one row at a time. A condition on a whole group goes after GROUP BY, in HAVING.", sqlErr:"The query has an error.", engFail:"The SQL engine could not load.", engFail2:"Check the internet connection and reload the page.", engStart:"The SQL engine could not start.",
-  endH:"The till adds up", endP:m=>`The mystery is solved, the till adds up, and the beach volleyball team now pays half price instead of nothing. You cracked it in about <b>${m} minutes</b> by grouping: GROUP BY on one and two columns, SUM against COUNT, COUNT(DISTINCT), and HAVING to filter the groups.`, endBonus:"Bonus tasks for fast detectives:", handH:"Hand in your answers", name:"Your name", namePh:"Write your name here", save:"Save answers (.txt)", copy:"Copy as text", replay:"Replay the celebration",
+  endH:"The till adds up", endP:m=>`The mystery is solved, the till adds up, and the beach volleyball team now pays half price instead of nothing. You cracked it in about <b>${m} minutes</b> by comparing groups: GROUP BY on one and two columns, WHERE before grouping, HAVING after it, and sums divided by COUNT(DISTINCT).`, endBonus:"Bonus tasks for fast detectives:", handH:"Hand in your answers", name:"Your name", namePh:"Write your name here", save:"Save answers (.txt)", copy:"Copy as text", replay:"Replay the celebration",
   xNameFirst:"Write your name first.", xCopied:"Copied. Paste it into the assignment in Google Classroom as a private comment, then press Turn in.", xBlocked:"Copying is blocked here. Use Save answers instead.", xSaved:f=>`Saved as ${f}. Now upload it to the assignment in Google Classroom and press Turn in.`, xSaveBlocked:"Saving is blocked here. Use Copy as text instead.",
   filePrefix:"langos-mystery", reportTitle:"THE LAKE BALATON LANGOS MYSTERY - ANSWER SHEET", rName:"Name", rFinished:"Finished", rTime:"Time taken", rQueries:"Queries run", rDev:"NOTE: completed with the teacher code, so some answers may be missing.",
   rTask:"Task", rAnswer:"Answer", rSkipped:"(skipped)", rUnsolved:"(not solved)", rWrong:"Wrong answers", rQuery:"Query", rNone:"(none saved)",
@@ -691,7 +671,7 @@ const T = {
 };
 
 /* ---------- state ---------- */
-const KEY = "langos-en-v2";
+const KEY = "langos-en-v3";
 let state = { solved: [], current: 0, start: Date.now(), end: null, drafts: {} };
 try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && Array.isArray(s.solved)) state = Object.assign(state, s); } catch(e){}
 function save(){ try { localStorage.setItem(KEY, JSON.stringify(state)); } catch(e){} }
@@ -1119,6 +1099,6 @@ $("sql").value = state.drafts[state.current] ?? starterFor(state.current);
 if (typeof initSqlJs !== "function"){ $("out").innerHTML = `<div class="err">${T.engFail}<p>${T.engFail2}</p></div>`; }
 else { initSqlJs().then(s=>{ SQL = s; resetDb(); }).catch(e=>{ $("out").innerHTML = `<div class="err">${T.engStart}<p>${esc(e.message)}</p></div>`; }); }
 </script>
-<script src="../../nav.js?v=5a2b33fe" defer></script>
+<script src="../../nav.js?v=1cff4815" defer></script>
 </body>
 </html>

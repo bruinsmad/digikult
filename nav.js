@@ -97,7 +97,7 @@
                   en: "The dough runs out every day, yet the till is short. A week of sales, grouped: GROUP BY on one and two columns, COUNT(DISTINCT) and HAVING."
                 },
                 files: { en: "sql/group-by/langos.html", hu: "sql/group-by/langos-hu.html" },
-                progress: { chapters: 7, keys: { en: "langos-en-v2", hu: "langos-hu-v2" } }
+                progress: { chapters: 6, keys: { en: "langos-en-v3", hu: "langos-hu-v3" } }
               },
               {
                 id: "pasture",
