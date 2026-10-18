@@ -1,0 +1,1135 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>/* moving between pages: the old page drifts aside and fades, the new one glides in; the rail holds still */@view-transition{navigation:auto}.rail{view-transition-name:rail}::view-transition-group(root){animation:none}::view-transition-old(root){animation:dk-out .2s cubic-bezier(.4,0,1,1) both}::view-transition-new(root){animation:dk-in .38s cubic-bezier(.16,1,.3,1) .06s both}::view-transition-old(rail),::view-transition-new(rail){animation:none}@keyframes dk-out{to{opacity:0;transform:translateX(-18px)}}@keyframes dk-in{from{opacity:0;transform:translateX(26px)}}@media (prefers-reduced-motion:reduce){::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none!important}}</style>
+<title>The Lake Balaton Lángos Mystery</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<script src="https://cdn.jsdelivr.net/npm/sql.js@1.10.3/dist/sql-asm.js"></script>
+<style>
+/* Layout: a lángos stand on the beach at Lake Balaton, summer evening. A striped awning sign as the header,
+   the chapter strip as order tickets on a line, then the order pad (story + task) beside the cash register (SQL). */
+:root{
+  --night:#0b2230; --night-2:#123747; --ink:#f4f1e6; --muted:#a9c3c6; --line:#2e5664;
+  --pink:#ff6b57; --cyan:#7fdbe6; --lime:#b8e986; --gold:#ffc845; --bad:#ff9a8a; --bad-soft:#40201c; --ok:#b8e986; --ok-soft:#173022;
+  --paper:#fff8e6; --paper-ink:#253238; --paper-muted:#6b7a7c; --paper-line:#e9dcb8;
+  --laptop:#0a1c24;
+  --f-display:"Fredoka", "Trebuchet MS", system-ui, sans-serif;
+  --f-body:"Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono:"JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+*,*::before,*::after{font-feature-settings:"calt" 0,"liga" 0}
+html,body{margin:0}
+body{color:var(--ink);font:16px/1.55 var(--f-body);min-height:100vh;
+  background:
+    radial-gradient(520px 260px at 82% -6%, rgba(255,170,80,.34), transparent 70%),
+    radial-gradient(900px 300px at 50% -12%, rgba(255,107,87,.20), transparent 70%),
+    radial-gradient(1000px 520px at 50% 118%, rgba(127,219,230,.12), transparent 60%),
+    repeating-linear-gradient(176deg, rgba(255,255,255,.025) 0 2px, transparent 2px 38px),
+    linear-gradient(var(--night-2), var(--night) 55%);
+  background-attachment:fixed;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));padding-block:18px 48px}
+.wrap{max-width:1280px;margin:0 auto;display:grid;gap:18px}
+.wrap{grid-template-columns:minmax(0,1fr)} .wrap>*{min-width:0}
+@media (max-width:640px){ .sign{flex-wrap:wrap} .sign .stamp{order:3} .sign h1{font-size:26px} }
+h1,h2,h3{font-family:var(--f-display);font-weight:600;margin:0;line-height:1.15;text-wrap:balance}
+code,pre,textarea{font-family:var(--f-mono)}
+:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.eyebrow{font:600 12px/1.2 var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.btn{font:700 15px var(--f-body);border:1px solid var(--line);background:#16404f;color:var(--ink);padding:9px 15px;border-radius:999px;cursor:pointer}
+.btn:hover{border-color:var(--gold)}
+.btn.primary{background:#e8493a;border-color:#e8493a;color:#fff;box-shadow:0 3px 0 #8f2419}
+.btn.small{padding:6px 12px;font-size:13px}
+.btn.danger{color:#ffb3a8}
+.btn.ghost{background:transparent}
+
+/* ---- header: the stand's sign under a striped awning ---- */
+header.top{position:relative;z-index:2;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px 20px}
+.sign{position:relative;display:flex;align-items:center;gap:16px;padding:34px 26px 14px 18px;max-width:100%;color:var(--paper-ink);border-radius:8px 8px 14px 14px;
+  background:
+    radial-gradient(circle at 11px -2px, #fff8e6 10px, transparent 10.5px) 0 20px/22px 12px repeat-x,
+    repeating-linear-gradient(90deg, #e8493a 0 22px, #fff4dc 22px 44px) 0 0/100% 22px no-repeat,
+    linear-gradient(#fff8e6, #fbecc4);
+  box-shadow:0 14px 34px rgba(0,0,0,.45), inset 0 -4px 0 #e7c983}
+.sign .hole{display:none}
+.sign h1{font-size:clamp(26px,3.6vw,40px);color:#b8331f;letter-spacing:.01em}
+.sign .eyebrow{color:#2b7f8a}
+.guitar{flex:none;width:62px;height:62px;filter:drop-shadow(0 3px 0 rgba(120,70,10,.25))}
+.stamp{font:800 12px var(--f-mono);letter-spacing:.1em;text-transform:uppercase;color:#fff;background:#e8493a;border-radius:6px;padding:7px 12px;transform:rotate(-5deg);box-shadow:0 2px 0 #8f2419, inset 0 0 0 2px rgba(255,255,255,.3)}
+.stamp.closed{background:#2f9a6a;box-shadow:0 2px 0 #19573b, inset 0 0 0 2px rgba(255,255,255,.3)}
+.meta{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px}
+.meta-item{display:flex;flex-direction:column;gap:2px}
+.meta-item .lbl{font:600 11px/1 var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.meta-item b{font:600 22px/1 var(--f-display)}
+
+/* ---- chapter strip: order tickets pegged on a line ---- */
+.field{position:relative;border-radius:12px;padding:20px 16px 14px;background:linear-gradient(#123d4c,#0d2c38);border:1px solid var(--line)}
+.field::before{content:"";position:absolute;left:12px;right:12px;top:13px;height:2px;background:#5d8a94;border-radius:2px;opacity:.8}
+.steps{display:flex;gap:8px;overflow-x:auto;padding:4px 2px 8px;scrollbar-width:thin}
+.step{flex:1 0 96px;min-width:96px;display:grid;justify-items:center;gap:6px;padding:12px 6px 10px;border-radius:4px 4px 8px 8px;border:0;color:var(--paper-ink);cursor:pointer;font:inherit;position:relative;
+  background:linear-gradient(#fff8e6,#f6e8c4);box-shadow:0 3px 0 rgba(0,0,0,.25)}
+.step::after{content:"";position:absolute;left:0;right:0;bottom:-5px;height:6px;background:radial-gradient(circle at 6px 0, #f6e8c4 5px, transparent 5.5px) 0 0/12px 6px repeat-x}
+.step.current::after{background-image:radial-gradient(circle at 6px 0, #fff1c9 5px, transparent 5.5px)}
+.step::before{content:"";position:absolute;top:-3px;left:50%;width:10px;height:12px;margin-left:-5px;border-radius:3px;background:#e8493a;box-shadow:0 1px 0 #8f2419}
+.step .post{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:#fff;border:2px dashed #c9b27a;font:600 16px var(--f-display);color:#6b5a30}
+.step .t{font:600 12px/1.25 var(--f-body);text-align:center;color:var(--paper-muted);text-wrap:balance}
+.step .who{height:18px;font-size:16px;line-height:18px}
+.step.done .post{background:var(--gold);border:2px solid #d99a10;color:#5a3a00}
+.step.current{background:linear-gradient(#fffdf5,#fff1c9);box-shadow:0 0 0 3px var(--gold), 0 0 24px rgba(255,200,69,.35)}
+.step.current .t{color:var(--paper-ink)}
+.step.locked{opacity:.45;cursor:not-allowed}
+.step.just .post{animation:pop .6s ease-out}
+@keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.35)}100%{transform:scale(1)}}
+.field.wave .step{animation:wave .9s ease-in-out}
+@keyframes wave{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-12px) rotate(-3deg)}}
+.step-caption{font:600 14px var(--f-body);color:var(--muted);display:flex;gap:10px;align-items:baseline;padding:0 4px}
+.step-caption span{font:600 11px var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--gold)}
+
+/* ---- main ---- */
+main{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:18px;align-items:start}
+@media (max-width:980px){ main{grid-template-columns:minmax(0,1fr)} }
+.panel{border-radius:12px}
+.case{color:var(--paper-ink);padding:22px 24px 20px 30px;box-shadow:0 14px 34px rgba(0,0,0,.45);position:relative;
+  background:
+    linear-gradient(90deg, transparent 14px, rgba(232,73,58,.35) 14px 16px, transparent 16px),
+    repeating-linear-gradient(transparent 0 27px, rgba(43,127,138,.13) 27px 28px),
+    var(--paper)}
+.case .eyebrow{color:var(--paper-muted)}
+.case h2{font-size:clamp(23px,2.8vw,30px);margin:4px 0 10px;color:#b8331f}
+.case p{margin:.5em 0}
+.case mark{background:#ffe08a;color:#3a2b00;padding:0 4px;border-radius:3px}
+.case code{background:#f3e3b6;color:#7a2a12;padding:1px 5px;border-radius:4px;font-size:.92em}
+.case pre{background:var(--laptop);color:#eaf6f4;padding:12px 14px;border-radius:8px;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;font-size:14px;line-height:1.5;margin:8px 0}
+.learn{margin-top:14px;padding:12px 14px;border-left:4px solid #2b7f8a;background:rgba(43,127,138,.10);border-radius:0 8px 8px 0}
+.learn h3,.task h3{font:600 14px var(--f-display);letter-spacing:.08em;text-transform:uppercase;color:#1f6670;margin-bottom:4px}
+.task{margin-top:14px;padding:12px 14px;border-left:4px solid #e8493a;background:rgba(232,73,58,.09);border-radius:0 8px 8px 0}
+.task h3{color:#b8331f}
+.task p{font-weight:700;font-size:17px}
+.anatomy{display:grid;gap:4px;margin:8px 0}
+.anatomy [role=row]{display:grid;grid-template-columns:minmax(0,auto) 1fr;gap:10px;align-items:baseline}
+.anatomy code{white-space:nowrap}
+@media (max-width:520px){ .anatomy [role=row]{grid-template-columns:minmax(0,1fr);gap:2px;margin-bottom:4px} .anatomy code{white-space:normal} }
+.rules{margin:6px 0 0;padding-left:20px}
+.tries{display:grid;gap:6px;margin-top:8px}
+.try{text-align:left;font:600 13px var(--f-mono);background:var(--laptop);color:#eaf6f4;border:1px solid #2e5664;border-radius:6px;padding:8px 10px;cursor:pointer}
+.try:hover{border-color:var(--gold)}
+details.hint{margin-top:10px;border:1px dashed #b9a670;border-radius:8px;padding:8px 12px;background:rgba(255,255,255,.5)}
+details.hint summary{cursor:pointer;font-weight:700;color:#1f6670}
+.hint.locked{margin-top:10px;border:1px dashed #b9a670;border-radius:8px;padding:8px 12px;color:var(--paper-muted);background:rgba(0,0,0,.03)}
+.answer{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.answer input{flex:1 1 180px;font:16px var(--f-body);padding:10px 12px;border:2px solid #d8c48f;border-radius:8px;background:#fff;color:var(--paper-ink)}
+.answer input:focus{border-color:#e8493a;outline:none}
+.verdict{margin-top:10px;padding:10px 12px;border-radius:8px;font-weight:700}
+.verdict.ok{background:#dff2e2;color:#1d5a32}
+.verdict.bad{background:#fbe0da;color:#9a2216}
+.verdict p{font-weight:400;margin:.3em 0 0}
+.navrow{display:flex;justify-content:space-between;gap:8px;margin-top:16px}
+.ending{margin-top:18px}
+.export{margin-top:14px;padding:12px 14px;border:2px solid #d8c48f;border-radius:10px;background:#fff}
+.export h3{font-size:16px;margin-bottom:6px}
+.export-steps{padding-left:20px;margin:6px 0 10px}
+.export label{display:block;font-weight:700;margin-bottom:4px}
+.export input{width:100%;font:16px var(--f-body);padding:10px 12px;border:2px solid #d8c48f;border-radius:8px;background:#fff;color:var(--paper-ink);margin-bottom:10px}
+.export-btns{display:flex;gap:8px;flex-wrap:wrap}
+.export-note{min-height:1.4em;font-size:14px;color:#1f6670;margin:8px 0 0}
+
+/* ---- grouping picture: rows -> piles -> one row per pile ---- */
+.piles{display:grid;grid-template-columns:minmax(0,auto) auto minmax(0,1fr) auto minmax(0,auto);align-items:center;gap:8px;margin:10px 0 6px;font:600 12px/1.2 var(--f-mono)}
+.piles .col{display:grid;gap:4px}
+.piles .arrow{color:var(--paper-muted);font-size:18px}
+.piles .chip{display:block;padding:3px 7px;border-radius:5px;color:#fff;white-space:nowrap}
+.piles .pile{display:flex;flex-wrap:wrap;gap:3px;padding:4px;border:2px dashed #cdb784;border-radius:8px;background:rgba(255,255,255,.6)}
+.piles .pile .chip{padding:3px 6px}
+.piles .out{display:block;padding:3px 7px;border-radius:5px;background:var(--laptop);color:#eaf6f4;white-space:nowrap}
+.piles .out b{color:var(--gold)}
+.piles .c1{background:#2b7f8a}.piles .c2{background:#e8493a}.piles .c3{background:#c98a0c}
+.piles-cap{font-size:13px;color:var(--paper-muted);margin:0!important}
+@media (max-width:520px){ .piles{grid-template-columns:minmax(0,1fr)} .piles .arrow{transform:rotate(90deg);justify-self:center} .piles .col{grid-auto-flow:column;justify-content:start;grid-auto-columns:max-content;overflow-x:auto} }
+
+/* ---- cash register ---- */
+.board-frame{background:linear-gradient(#2b8a96,#1b5f6a);padding:10px;border:1px solid #0f3c44;box-shadow:0 14px 34px rgba(0,0,0,.45), inset 0 2px 0 rgba(255,255,255,.25), inset 0 -3px 0 rgba(0,0,0,.25)}
+.chalk{display:grid;gap:10px;padding:16px;border-radius:8px;background:var(--laptop);box-shadow:inset 0 0 0 1px #1d4552, inset 0 0 50px rgba(127,219,230,.06);min-width:0}
+.chalk-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:6px 14px}
+.chalk h2{font-size:22px;color:var(--gold)}
+.rule{font-size:13px;color:var(--muted)}
+textarea#sql{width:100%;min-height:150px;resize:vertical;font-size:16px;line-height:1.5;padding:12px 14px;border:1px solid var(--line);border-radius:8px;background:#06141a;color:#eaf6f4;caret-color:var(--gold)}
+.run-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.kbd{font:12px var(--f-mono);color:var(--muted)}
+.result-meta{font:600 13px var(--f-mono);color:var(--gold);margin-bottom:6px}
+.tablebox{overflow-x:auto;max-height:360px;overflow-y:auto;border:1px solid var(--line);border-radius:8px;background:rgba(255,255,255,.03)}
+table{border-collapse:collapse;width:100%;font-size:15px;font-variant-numeric:tabular-nums}
+th,td{text-align:left;padding:7px 12px;border-bottom:1px solid var(--line);white-space:nowrap}
+th{position:sticky;top:0;background:#0f2a34;font:600 13px var(--f-mono);color:var(--gold)}
+td.num{text-align:right}
+td.null{color:var(--muted);font-style:italic}
+tr:last-child td{border-bottom:none}
+.err{background:var(--bad-soft);color:var(--bad);border-radius:8px;padding:12px 14px;font-weight:700}
+.err p{margin:.3em 0 0;font-weight:400;color:var(--ink)}
+.note{color:var(--muted);font-style:italic;margin:0}
+.schema{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(250px,100%),1fr));gap:10px}
+.tbl{border:1px solid var(--line);border-radius:8px;padding:10px 12px;background:rgba(255,255,255,.03)}
+.tbl button{font:700 15px var(--f-mono);background:none;border:0;color:var(--gold);cursor:pointer;padding:0}
+.tbl button:hover{text-decoration:underline}
+.tbl ul{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:7px}
+.tbl li{display:grid;grid-template-columns:auto 1fr;align-items:baseline;column-gap:8px;row-gap:1px}
+.tbl li .k{font:600 13px var(--f-mono);color:var(--ink)}
+.tbl li .k.fk{color:var(--cyan)}
+.tbl li .ty{justify-self:start;font:600 10px var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);border:1px solid var(--line);border-radius:3px;padding:0 4px}
+.tbl li .d{grid-column:1/-1;font:13px/1.4 var(--f-body);color:var(--muted)}
+.tbl li .d code{color:var(--gold)}
+
+/* ---- celebrations ---- */
+#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:60}
+.plus{position:fixed;z-index:61;pointer-events:none;font:600 30px var(--f-display);color:var(--gold);text-shadow:0 2px 0 #000;animation:plus 1.2s ease-out forwards;transform:translate(-50%,-50%)}
+@keyframes plus{0%{opacity:0;transform:translate(-50%,-50%) scale(.6)}20%{opacity:1;transform:translate(-50%,-70%) scale(1.15)}100%{opacity:0;transform:translate(-50%,-160%) scale(1)}}
+.shake{animation:shake .45s}
+@keyframes shake{0%,100%{transform:translate(0)}20%{transform:translate(-5px,2px)}40%{transform:translate(5px,-2px)}60%{transform:translate(-4px,1px)}80%{transform:translate(4px,-1px)}}
+#finale{position:fixed;inset:0;z-index:55;display:grid;place-items:center;overflow:auto;
+  background:linear-gradient(#ff9a5a 0%, #e8493a 30%, #6a2f5c 58%, #123747 80%, #0b2230 100%)}
+#finale .beams{position:absolute;inset:-20%;background:
+  repeating-conic-gradient(from 0deg at 50% 48%, rgba(255,230,160,.16) 0 6deg, transparent 6deg 18deg);
+  animation:beams 24s linear infinite;transform-origin:50% 48%}
+@keyframes beams{to{transform:rotate(360deg)}}
+.finale-inner{position:relative;text-align:center;padding:28px 20px;max-width:760px}
+.big-stamp{display:inline-block;font:700 clamp(40px,8vw,88px)/1.05 var(--f-display);color:#fff8e6;
+  text-shadow:0 0 18px rgba(255,200,69,.9), 0 0 42px rgba(255,200,69,.45), 0 4px 0 #8f2419;transform:rotate(-3deg);animation:stampin .6s cubic-bezier(.2,1.6,.3,1) both}
+@keyframes stampin{from{transform:rotate(-20deg) scale(3);opacity:0}to{transform:rotate(-3deg) scale(1);opacity:1}}
+.finale-sub{font-size:clamp(17px,2.4vw,22px);color:var(--ink);margin:16px auto 0;max-width:40ch}
+.finale-stats{display:flex;justify-content:center;gap:28px;margin-top:22px;flex-wrap:wrap}
+.finale-stats div{display:grid;gap:2px}
+.finale-stats span{font:600 11px var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:#ffe3c2}
+.finale-stats b{font:600 28px var(--f-display);color:var(--gold)}
+.caught{margin-top:18px;display:inline-block;padding:8px 14px;border:2px dashed var(--gold);border-radius:8px;color:var(--gold);font:600 14px var(--f-mono);background:rgba(11,34,48,.35)}
+.finale-btns{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:24px}
+.hero-guitar{width:150px;height:150px;margin:0 auto;animation:flip 2.4s ease-in-out infinite;transform-origin:50% 60%}
+@keyframes flip{0%,100%{transform:translateY(0) rotate(-6deg)}50%{transform:translateY(-16px) rotate(8deg)}}
+.flash{position:absolute;inset:0;background:#fff8e6;opacity:0;pointer-events:none;animation:flash .5s ease-out}
+@keyframes flash{0%{opacity:.9}100%{opacity:0}}
+@media (prefers-reduced-motion:reduce){ .big-stamp,.hero-guitar,.flash,#finale .beams,.step.just .post,.field.wave .step,.shake{animation:none} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="sign">
+            <svg class="guitar" viewBox="0 0 64 64" aria-hidden="true">
+        <path d="M32 5c7 0 11 3 16 5s11 7 11 15c0 5 3 9 1 15s-7 9-11 13-10 6-17 6-12-2-17-6-9-8-10-14 1-9 1-14 3-11 9-14S25 5 32 5z" fill="#e3a23f" stroke="#9a5e1c" stroke-width="2.5" stroke-linejoin="round"/>
+        <path d="M32 11c6 0 9 2 13 4s9 6 9 12c0 4 2 7 1 12s-6 8-9 10-8 5-14 5-10-2-14-5-7-6-8-11 1-7 1-11 2-9 7-11 8-5 14-5z" fill="#f2c56a"/>
+        <circle cx="20" cy="22" r="1.6" fill="#c9852c"/><circle cx="46" cy="44" r="1.8" fill="#c9852c"/><circle cx="44" cy="19" r="1.3" fill="#c9852c"/><circle cx="17" cy="41" r="1.4" fill="#c9852c"/>
+        <path d="M21 31c1-6 7-9 12-8s10 3 11 8-2 9-7 10-8 2-12 0-5-6-4-10z" fill="#fffaf0" stroke="#efe1c4" stroke-width="1"/>
+        <g stroke="#ffd23f" stroke-width="2.4" stroke-linecap="round"><path d="M25 29l4 2"/><path d="M33 27l3-2"/><path d="M38 31l3 3"/><path d="M28 36l3-1"/><path d="M35 37l1 3"/><path d="M24 34l-1 3"/></g>
+        <g stroke="#e8a400" stroke-width="1.6" stroke-linecap="round"><path d="M31 32l2 1"/><path d="M39 28l2-1"/></g>
+      </svg>
+      <div>
+        <div class="eyebrow">Reed Beach · Aunt Margit's Lángos · the last week of July</div>
+        <h1>The Lake Balaton Lángos Mystery</h1>
+      </div>
+      <span class="stamp" id="stamp">Case open</span>
+    </div>
+    <div class="meta">
+      <span class="meta-item"><span class="lbl">Time</span><b id="timer">00:00</b></span>
+      <span class="meta-item"><span class="lbl">Progress</span><b id="solvedCount">–</b></span>
+      <button class="btn small" id="soundToggle" type="button" aria-pressed="true">Sound: on</button>
+      <button class="btn small danger" id="resetProgress" type="button">Start over</button>
+    </div>
+  </header>
+
+  <div class="field" id="field">
+    <nav class="steps" id="steps" aria-label="Chapters"></nav>
+  </div>
+  <div class="step-caption" id="stepCaption" aria-hidden="true"></div>
+
+  <main>
+    <section class="panel case" id="case" aria-live="polite"></section>
+    <section class="panel board-frame">
+      <div class="chalk">
+        <div class="chalk-head">
+          <h2>Aunt Margit's till</h2>
+          <span class="rule">Many rows, one number: COUNT, SUM, AVG, MIN, MAX – group by group with GROUP BY</span>
+        </div>
+        <label for="sql" class="eyebrow">Your SQL query</label>
+        <textarea id="sql" spellcheck="false" autocapitalize="off" autocomplete="off"></textarea>
+        <div class="run-row">
+          <button class="btn primary" id="run" type="button">Run query</button>
+          <button class="btn" id="resetDb" type="button">Restore data</button>
+          <span class="kbd">Ctrl + Enter runs the query</span>
+        </div>
+        <div id="out"><p class="note">Switching on the till…</p></div>
+        <div class="eyebrow">Tables and columns (click a table name to see everything in it)</div>
+        <div class="schema" id="schema"></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<canvas id="fx" aria-hidden="true"></canvas>
+<div id="finale" hidden role="dialog" aria-modal="true" aria-labelledby="finaleTitle">
+  <div class="beams" aria-hidden="true"></div>
+  <div class="finale-inner" id="finaleInner">
+    <div class="hero-guitar" id="heroGuitar" aria-hidden="true"></div>
+    <div class="big-stamp" id="finaleTitle">CASE CLOSED!</div>
+    <p class="finale-sub">The till adds up, the volleyball team pays from now on, and Aunt Margit fries one for you too.</p>
+    <div class="finale-stats">
+      <div><span>Time</span><b id="fTime">–</b></div>
+      <div><span>Queries run</span><b id="fQueries">–</b></div>
+      <div><span>Rank</span><b id="fRank">–</b></div>
+    </div>
+    <div class="caught">Noémi · 20:00 at the volleyball court · 13 free lángos</div>
+    <div class="finale-btns">
+      <button class="btn" id="finaleClose" type="button">See bonus tasks</button>
+      <button class="btn ghost" id="finaleAgain" type="button">One more round!</button>
+      <button class="btn ghost" id="finaleSave" type="button">Save answers</button>
+    </div>
+  </div>
+  <div class="flash"></div>
+</div>
+
+<script>
+const SEED = `
+CREATE TABLE sales (id INTEGER PRIMARY KEY, day TEXT, hour INTEGER, seller TEXT, product TEXT, qty INTEGER, amount INTEGER, payment TEXT);
+INSERT INTO sales VALUES (1,'Monday',10,'Bence','garlic',2,2200,'card');
+INSERT INTO sales VALUES (2,'Monday',11,'Bence','cheese',4,6000,'card');
+INSERT INTO sales VALUES (3,'Monday',12,'Bence','plain',1,0,'free');
+INSERT INTO sales VALUES (4,'Monday',13,'Bence','garlic',4,4400,'card');
+INSERT INTO sales VALUES (5,'Monday',13,'Bence','plain',1,900,'card');
+INSERT INTO sales VALUES (6,'Monday',13,'Bence','plain',2,1800,'cash');
+INSERT INTO sales VALUES (7,'Monday',13,'Lili','cheese',9,13500,'card');
+INSERT INTO sales VALUES (8,'Monday',13,'Bence','jam',1,0,'free');
+INSERT INTO sales VALUES (9,'Monday',13,'Lili','plain',2,0,'free');
+INSERT INTO sales VALUES (10,'Monday',14,'Lili','garlic',1,1100,'card');
+INSERT INTO sales VALUES (11,'Monday',14,'Lili','jam',2,2400,'cash');
+INSERT INTO sales VALUES (12,'Monday',15,'Lili','jam',2,2400,'card');
+INSERT INTO sales VALUES (13,'Monday',15,'Lili','plain',2,1800,'card');
+INSERT INTO sales VALUES (14,'Monday',15,'Bence','jam',1,1200,'card');
+INSERT INTO sales VALUES (15,'Monday',15,'Bence','plain',4,3600,'cash');
+INSERT INTO sales VALUES (16,'Monday',16,'Lili','cheese',3,4500,'cash');
+INSERT INTO sales VALUES (17,'Monday',17,'Lili','cheese',3,4500,'cash');
+INSERT INTO sales VALUES (18,'Monday',17,'Bence','cheese',3,4500,'card');
+INSERT INTO sales VALUES (19,'Monday',17,'Bence','plain',1,900,'card');
+INSERT INTO sales VALUES (20,'Monday',18,'Bence','garlic',2,2200,'card');
+INSERT INTO sales VALUES (21,'Monday',19,'Lili','plain',1,900,'card');
+INSERT INTO sales VALUES (22,'Monday',20,'Bence','cheese',2,3000,'cash');
+INSERT INTO sales VALUES (23,'Monday',20,'Bence','cheese',2,3000,'cash');
+INSERT INTO sales VALUES (24,'Monday',21,'Bence','plain',3,2700,'card');
+INSERT INTO sales VALUES (25,'Monday',21,'Lili','plain',3,2700,'card');
+INSERT INTO sales VALUES (26,'Monday',21,'Lili','cheese',2,3000,'card');
+INSERT INTO sales VALUES (27,'Monday',21,'Lili','cheese',3,4500,'cash');
+INSERT INTO sales VALUES (28,'Monday',21,'Bence','garlic',2,2200,'card');
+INSERT INTO sales VALUES (29,'Tuesday',12,'Noémi','plain',2,1800,'card');
+INSERT INTO sales VALUES (30,'Tuesday',12,'Bence','plain',1,900,'card');
+INSERT INTO sales VALUES (31,'Tuesday',12,'Bence','jam',1,0,'free');
+INSERT INTO sales VALUES (32,'Tuesday',13,'Noémi','plain',1,900,'card');
+INSERT INTO sales VALUES (33,'Tuesday',13,'Noémi','plain',1,900,'cash');
+INSERT INTO sales VALUES (34,'Tuesday',13,'Bence','garlic',1,0,'free');
+INSERT INTO sales VALUES (35,'Tuesday',13,'Noémi','garlic',2,0,'free');
+INSERT INTO sales VALUES (36,'Tuesday',14,'Noémi','cheese',3,4500,'card');
+INSERT INTO sales VALUES (37,'Tuesday',14,'Noémi','cheese',2,3000,'cash');
+INSERT INTO sales VALUES (38,'Tuesday',14,'Bence','plain',2,1800,'card');
+INSERT INTO sales VALUES (39,'Tuesday',14,'Noémi','cheese',1,1500,'card');
+INSERT INTO sales VALUES (40,'Tuesday',14,'Noémi','cheese',2,3000,'cash');
+INSERT INTO sales VALUES (41,'Tuesday',15,'Noémi','cheese',2,3000,'card');
+INSERT INTO sales VALUES (42,'Tuesday',15,'Bence','cheese',1,1500,'card');
+INSERT INTO sales VALUES (43,'Tuesday',16,'Noémi','plain',2,1800,'card');
+INSERT INTO sales VALUES (44,'Tuesday',16,'Noémi','plain',3,2700,'cash');
+INSERT INTO sales VALUES (45,'Tuesday',16,'Bence','cheese',1,1500,'cash');
+INSERT INTO sales VALUES (46,'Tuesday',16,'Noémi','garlic',3,3300,'card');
+INSERT INTO sales VALUES (47,'Tuesday',18,'Noémi','plain',5,4500,'card');
+INSERT INTO sales VALUES (48,'Tuesday',19,'Noémi','plain',1,900,'cash');
+INSERT INTO sales VALUES (49,'Tuesday',19,'Noémi','cheese',2,3000,'card');
+INSERT INTO sales VALUES (50,'Tuesday',20,'Bence','cheese',1,1500,'card');
+INSERT INTO sales VALUES (51,'Tuesday',20,'Bence','cheese',5,7500,'card');
+INSERT INTO sales VALUES (52,'Tuesday',20,'Noémi','cheese',3,4500,'cash');
+INSERT INTO sales VALUES (53,'Tuesday',20,'Noémi','garlic',2,0,'free');
+INSERT INTO sales VALUES (54,'Tuesday',21,'Bence','jam',2,2400,'card');
+INSERT INTO sales VALUES (55,'Wednesday',10,'Bence','cheese',2,3000,'card');
+INSERT INTO sales VALUES (56,'Wednesday',10,'Ádám','garlic',2,2200,'card');
+INSERT INTO sales VALUES (57,'Wednesday',11,'Ádám','plain',1,900,'card');
+INSERT INTO sales VALUES (58,'Wednesday',12,'Ádám','cheese',2,3000,'card');
+INSERT INTO sales VALUES (59,'Wednesday',12,'Bence','plain',4,3600,'card');
+INSERT INTO sales VALUES (60,'Wednesday',12,'Bence','garlic',1,0,'free');
+INSERT INTO sales VALUES (61,'Wednesday',12,'Ádám','jam',1,0,'free');
+INSERT INTO sales VALUES (62,'Wednesday',13,'Ádám','garlic',3,3300,'card');
+INSERT INTO sales VALUES (63,'Wednesday',13,'Bence','cheese',2,3000,'card');
+INSERT INTO sales VALUES (64,'Wednesday',13,'Bence','cheese',1,0,'free');
+INSERT INTO sales VALUES (65,'Wednesday',14,'Ádám','plain',3,2700,'card');
+INSERT INTO sales VALUES (66,'Wednesday',14,'Bence','garlic',4,4400,'cash');
+INSERT INTO sales VALUES (67,'Wednesday',14,'Ádám','cheese',1,0,'free');
+INSERT INTO sales VALUES (68,'Wednesday',16,'Ádám','cheese',1,1500,'card');
+INSERT INTO sales VALUES (69,'Wednesday',16,'Bence','plain',5,4500,'card');
+INSERT INTO sales VALUES (70,'Wednesday',17,'Ádám','plain',2,1800,'card');
+INSERT INTO sales VALUES (71,'Wednesday',18,'Ádám','garlic',3,3300,'cash');
+INSERT INTO sales VALUES (72,'Wednesday',18,'Bence','plain',4,3600,'card');
+INSERT INTO sales VALUES (73,'Wednesday',18,'Ádám','plain',5,4500,'card');
+INSERT INTO sales VALUES (74,'Wednesday',18,'Bence','garlic',3,3300,'cash');
+INSERT INTO sales VALUES (75,'Wednesday',18,'Ádám','garlic',2,2200,'card');
+INSERT INTO sales VALUES (76,'Wednesday',20,'Bence','plain',1,900,'card');
+INSERT INTO sales VALUES (77,'Wednesday',20,'Bence','cheese',2,3000,'card');
+INSERT INTO sales VALUES (78,'Wednesday',20,'Ádám','plain',3,2700,'card');
+INSERT INTO sales VALUES (79,'Wednesday',20,'Ádám','cheese',1,1500,'card');
+INSERT INTO sales VALUES (80,'Wednesday',21,'Ádám','plain',2,1800,'cash');
+INSERT INTO sales VALUES (81,'Wednesday',21,'Ádám','cheese',3,4500,'cash');
+INSERT INTO sales VALUES (82,'Thursday',10,'Lili','cheese',1,1500,'card');
+INSERT INTO sales VALUES (83,'Thursday',10,'Lili','cheese',1,1500,'card');
+INSERT INTO sales VALUES (84,'Thursday',10,'Bence','cheese',1,1500,'cash');
+INSERT INTO sales VALUES (85,'Thursday',11,'Lili','plain',1,900,'cash');
+INSERT INTO sales VALUES (86,'Thursday',11,'Lili','cheese',2,3000,'cash');
+INSERT INTO sales VALUES (87,'Thursday',11,'Bence','garlic',1,1100,'card');
+INSERT INTO sales VALUES (88,'Thursday',12,'Bence','plain',2,1800,'cash');
+INSERT INTO sales VALUES (89,'Thursday',12,'Lili','cheese',1,1500,'card');
+INSERT INTO sales VALUES (90,'Thursday',12,'Bence','jam',2,2400,'card');
+INSERT INTO sales VALUES (91,'Thursday',12,'Bence','cheese',1,0,'free');
+INSERT INTO sales VALUES (92,'Thursday',12,'Lili','garlic',1,0,'free');
+INSERT INTO sales VALUES (93,'Thursday',13,'Bence','plain',1,900,'cash');
+INSERT INTO sales VALUES (94,'Thursday',13,'Bence','plain',1,900,'card');
+INSERT INTO sales VALUES (95,'Thursday',13,'Bence','garlic',2,2200,'card');
+INSERT INTO sales VALUES (96,'Thursday',13,'Bence','plain',1,900,'cash');
+INSERT INTO sales VALUES (97,'Thursday',13,'Lili','cheese',1,1500,'cash');
+INSERT INTO sales VALUES (98,'Thursday',13,'Lili','cheese',2,3000,'card');
+INSERT INTO sales VALUES (99,'Thursday',13,'Bence','plain',1,0,'free');
+INSERT INTO sales VALUES (100,'Thursday',14,'Lili','garlic',3,3300,'card');
+INSERT INTO sales VALUES (101,'Thursday',15,'Lili','plain',2,1800,'card');
+INSERT INTO sales VALUES (102,'Thursday',16,'Lili','cheese',2,3000,'cash');
+INSERT INTO sales VALUES (103,'Thursday',16,'Bence','garlic',2,2200,'cash');
+INSERT INTO sales VALUES (104,'Thursday',18,'Bence','jam',2,2400,'cash');
+INSERT INTO sales VALUES (105,'Thursday',18,'Lili','plain',1,900,'cash');
+INSERT INTO sales VALUES (106,'Thursday',18,'Lili','garlic',4,4400,'cash');
+INSERT INTO sales VALUES (107,'Thursday',19,'Bence','cheese',1,1500,'cash');
+INSERT INTO sales VALUES (108,'Thursday',19,'Lili','cheese',2,3000,'card');
+INSERT INTO sales VALUES (109,'Thursday',21,'Bence','jam',1,1200,'card');
+INSERT INTO sales VALUES (110,'Friday',10,'Noémi','plain',2,1800,'cash');
+INSERT INTO sales VALUES (111,'Friday',11,'Noémi','jam',2,2400,'card');
+INSERT INTO sales VALUES (112,'Friday',12,'Noémi','cheese',2,3000,'cash');
+INSERT INTO sales VALUES (113,'Friday',12,'Noémi','cheese',2,3000,'card');
+INSERT INTO sales VALUES (114,'Friday',12,'Bence','plain',1,0,'free');
+INSERT INTO sales VALUES (115,'Friday',12,'Noémi','plain',1,0,'free');
+INSERT INTO sales VALUES (116,'Friday',13,'Noémi','plain',2,1800,'card');
+INSERT INTO sales VALUES (117,'Friday',13,'Noémi','garlic',1,1100,'card');
+INSERT INTO sales VALUES (118,'Friday',13,'Bence','cheese',1,1500,'card');
+INSERT INTO sales VALUES (119,'Friday',13,'Bence','garlic',1,0,'free');
+INSERT INTO sales VALUES (120,'Friday',13,'Noémi','garlic',1,0,'free');
+INSERT INTO sales VALUES (121,'Friday',14,'Bence','jam',1,1200,'card');
+INSERT INTO sales VALUES (122,'Friday',14,'Noémi','jam',2,2400,'cash');
+INSERT INTO sales VALUES (123,'Friday',14,'Noémi','garlic',2,2200,'card');
+INSERT INTO sales VALUES (124,'Friday',14,'Bence','cheese',1,1500,'card');
+INSERT INTO sales VALUES (125,'Friday',14,'Bence','jam',1,1200,'cash');
+INSERT INTO sales VALUES (126,'Friday',14,'Noémi','plain',2,1800,'card');
+INSERT INTO sales VALUES (127,'Friday',14,'Bence','plain',3,2700,'cash');
+INSERT INTO sales VALUES (128,'Friday',16,'Bence','cheese',1,1500,'cash');
+INSERT INTO sales VALUES (129,'Friday',17,'Noémi','plain',4,3600,'card');
+INSERT INTO sales VALUES (130,'Friday',17,'Bence','garlic',2,2200,'card');
+INSERT INTO sales VALUES (131,'Friday',17,'Bence','garlic',1,1100,'cash');
+INSERT INTO sales VALUES (132,'Friday',18,'Noémi','cheese',4,6000,'card');
+INSERT INTO sales VALUES (133,'Friday',18,'Bence','cheese',3,4500,'card');
+INSERT INTO sales VALUES (134,'Friday',18,'Noémi','cheese',2,3000,'card');
+INSERT INTO sales VALUES (135,'Friday',18,'Noémi','cheese',3,4500,'cash');
+INSERT INTO sales VALUES (136,'Friday',18,'Noémi','plain',5,4500,'cash');
+INSERT INTO sales VALUES (137,'Friday',19,'Noémi','garlic',2,2200,'card');
+INSERT INTO sales VALUES (138,'Friday',19,'Bence','jam',4,4800,'cash');
+INSERT INTO sales VALUES (139,'Friday',19,'Bence','plain',2,1800,'card');
+INSERT INTO sales VALUES (140,'Friday',19,'Noémi','plain',2,1800,'card');
+INSERT INTO sales VALUES (141,'Friday',20,'Bence','plain',1,900,'card');
+INSERT INTO sales VALUES (142,'Friday',20,'Noémi','jam',3,3600,'card');
+INSERT INTO sales VALUES (143,'Friday',20,'Noémi','garlic',3,0,'free');
+INSERT INTO sales VALUES (144,'Friday',21,'Noémi','plain',2,1800,'cash');
+INSERT INTO sales VALUES (145,'Saturday',10,'Noémi','jam',1,1200,'card');
+INSERT INTO sales VALUES (146,'Saturday',11,'Bence','plain',1,900,'cash');
+INSERT INTO sales VALUES (147,'Saturday',12,'Bence','garlic',1,0,'free');
+INSERT INTO sales VALUES (148,'Saturday',13,'Bence','plain',4,3600,'card');
+INSERT INTO sales VALUES (149,'Saturday',13,'Noémi','jam',6,7200,'card');
+INSERT INTO sales VALUES (150,'Saturday',13,'Noémi','cheese',2,3000,'card');
+INSERT INTO sales VALUES (151,'Saturday',13,'Bence','jam',4,4800,'cash');
+INSERT INTO sales VALUES (152,'Saturday',13,'Bence','plain',2,1800,'card');
+INSERT INTO sales VALUES (153,'Saturday',13,'Bence','cheese',1,0,'free');
+INSERT INTO sales VALUES (154,'Saturday',14,'Bence','jam',1,1200,'cash');
+INSERT INTO sales VALUES (155,'Saturday',14,'Noémi','cheese',2,3000,'cash');
+INSERT INTO sales VALUES (156,'Saturday',14,'Bence','garlic',3,3300,'cash');
+INSERT INTO sales VALUES (157,'Saturday',14,'Bence','cheese',2,3000,'card');
+INSERT INTO sales VALUES (158,'Saturday',14,'Noémi','plain',1,0,'free');
+INSERT INTO sales VALUES (159,'Saturday',15,'Bence','plain',1,900,'card');
+INSERT INTO sales VALUES (160,'Saturday',15,'Bence','garlic',2,2200,'card');
+INSERT INTO sales VALUES (161,'Saturday',16,'Noémi','plain',3,2700,'card');
+INSERT INTO sales VALUES (162,'Saturday',17,'Bence','cheese',3,4500,'card');
+INSERT INTO sales VALUES (163,'Saturday',17,'Noémi','plain',3,2700,'card');
+INSERT INTO sales VALUES (164,'Saturday',17,'Bence','plain',2,1800,'cash');
+INSERT INTO sales VALUES (165,'Saturday',17,'Bence','garlic',4,4400,'cash');
+INSERT INTO sales VALUES (166,'Saturday',18,'Bence','garlic',2,2200,'cash');
+INSERT INTO sales VALUES (167,'Saturday',18,'Bence','cheese',1,1500,'card');
+INSERT INTO sales VALUES (168,'Saturday',18,'Bence','cheese',2,3000,'card');
+INSERT INTO sales VALUES (169,'Saturday',18,'Bence','cheese',2,3000,'cash');
+INSERT INTO sales VALUES (170,'Saturday',18,'Noémi','cheese',1,1500,'card');
+INSERT INTO sales VALUES (171,'Saturday',18,'Noémi','cheese',2,3000,'card');
+INSERT INTO sales VALUES (172,'Saturday',19,'Bence','plain',2,1800,'card');
+INSERT INTO sales VALUES (173,'Saturday',19,'Bence','garlic',4,4400,'card');
+INSERT INTO sales VALUES (174,'Saturday',19,'Bence','cheese',3,4500,'card');
+INSERT INTO sales VALUES (175,'Saturday',19,'Noémi','jam',5,6000,'card');
+INSERT INTO sales VALUES (176,'Saturday',19,'Noémi','plain',4,3600,'cash');
+INSERT INTO sales VALUES (177,'Saturday',20,'Noémi','garlic',1,1100,'cash');
+INSERT INTO sales VALUES (178,'Saturday',20,'Noémi','plain',3,2700,'cash');
+INSERT INTO sales VALUES (179,'Saturday',20,'Noémi','cheese',3,0,'free');
+INSERT INTO sales VALUES (180,'Saturday',21,'Noémi','plain',4,3600,'card');
+INSERT INTO sales VALUES (181,'Saturday',21,'Noémi','garlic',5,5500,'card');
+INSERT INTO sales VALUES (182,'Saturday',21,'Bence','cheese',4,6000,'cash');
+INSERT INTO sales VALUES (183,'Sunday',11,'Bence','cheese',1,1500,'cash');
+INSERT INTO sales VALUES (184,'Sunday',11,'Ádám','plain',2,1800,'card');
+INSERT INTO sales VALUES (185,'Sunday',11,'Bence','cheese',6,9000,'cash');
+INSERT INTO sales VALUES (186,'Sunday',12,'Ádám','plain',3,2700,'card');
+INSERT INTO sales VALUES (187,'Sunday',12,'Ádám','plain',1,900,'card');
+INSERT INTO sales VALUES (188,'Sunday',12,'Ádám','garlic',2,2200,'card');
+INSERT INTO sales VALUES (189,'Sunday',12,'Bence','garlic',1,1100,'cash');
+INSERT INTO sales VALUES (190,'Sunday',12,'Bence','cheese',4,6000,'card');
+INSERT INTO sales VALUES (191,'Sunday',12,'Bence','cheese',1,0,'free');
+INSERT INTO sales VALUES (192,'Sunday',13,'Bence','plain',1,900,'card');
+INSERT INTO sales VALUES (193,'Sunday',13,'Ádám','cheese',2,3000,'cash');
+INSERT INTO sales VALUES (194,'Sunday',13,'Bence','jam',1,1200,'card');
+INSERT INTO sales VALUES (195,'Sunday',13,'Bence','garlic',3,3300,'cash');
+INSERT INTO sales VALUES (196,'Sunday',13,'Bence','plain',1,0,'free');
+INSERT INTO sales VALUES (197,'Sunday',13,'Ádám','cheese',2,0,'free');
+INSERT INTO sales VALUES (198,'Sunday',14,'Bence','cheese',1,1500,'cash');
+INSERT INTO sales VALUES (199,'Sunday',14,'Bence','plain',5,4500,'card');
+INSERT INTO sales VALUES (200,'Sunday',14,'Ádám','plain',4,3600,'cash');
+INSERT INTO sales VALUES (201,'Sunday',14,'Bence','plain',1,900,'card');
+INSERT INTO sales VALUES (202,'Sunday',14,'Ádám','cheese',1,1500,'card');
+INSERT INTO sales VALUES (203,'Sunday',15,'Ádám','cheese',1,1500,'card');
+INSERT INTO sales VALUES (204,'Sunday',15,'Ádám','cheese',2,3000,'card');
+INSERT INTO sales VALUES (205,'Sunday',15,'Bence','garlic',2,2200,'cash');
+INSERT INTO sales VALUES (206,'Sunday',17,'Bence','cheese',1,1500,'card');
+INSERT INTO sales VALUES (207,'Sunday',17,'Ádám','jam',3,3600,'card');
+INSERT INTO sales VALUES (208,'Sunday',17,'Bence','plain',2,1800,'cash');
+INSERT INTO sales VALUES (209,'Sunday',17,'Bence','garlic',3,3300,'card');
+INSERT INTO sales VALUES (210,'Sunday',17,'Ádám','cheese',3,4500,'card');
+INSERT INTO sales VALUES (211,'Sunday',18,'Bence','plain',4,3600,'cash');
+INSERT INTO sales VALUES (212,'Sunday',18,'Ádám','plain',1,900,'cash');
+INSERT INTO sales VALUES (213,'Sunday',19,'Ádám','cheese',1,1500,'cash');
+INSERT INTO sales VALUES (214,'Sunday',19,'Ádám','cheese',1,1500,'card');
+INSERT INTO sales VALUES (215,'Sunday',20,'Ádám','cheese',3,4500,'card');
+INSERT INTO sales VALUES (216,'Sunday',21,'Ádám','jam',3,3600,'cash');
+`;
+const CHAPTERS = [
+ {
+  "refresher": true,
+  "title": "Quick refresher",
+  "story": "<p>Before you start, a 3-minute reminder of the basics. Every query has the same parts, always in this order.</p>\n  <div class=\"anatomy\" role=\"table\" aria-label=\"Parts of a query\">\n    <div role=\"row\"><code role=\"cell\">SELECT seller, qty</code><span role=\"cell\">which <b>columns</b> to show. <code>*</code> means all of them.</span></div>\n    <div role=\"row\"><code role=\"cell\">FROM sales</code><span role=\"cell\">which <b>table</b> to read</span></div>\n    <div role=\"row\"><code role=\"cell\">WHERE day = 'Monday'</code><span role=\"cell\">which <b>rows</b> to keep</span></div>\n    <div role=\"row\"><code role=\"cell\">ORDER BY qty DESC;</code><span role=\"cell\">how to <b>sort</b> the result</span></div>\n  </div>\n  <ul class=\"rules\">\n    <li>Text values go in single quotes: <code>'free'</code>. Numbers don't: <code>13</code>.</li>\n    <li>Combine conditions with <code>AND</code> and <code>OR</code>.</li>\n    <li>Today's new idea: turning <b>many rows into one number</b>.</li>\n  </ul>",
+  "learn": "<p>One row in <code>sales</code> is one sale at the counter. Click one to load and run it:</p>\n  <div class=\"tries\">\n    <button type=\"button\" class=\"try\" data-sql=\"SELECT * FROM sales;\">SELECT * FROM sales;</button>\n    <button type=\"button\" class=\"try\" data-sql=\"SELECT seller, product, qty FROM sales WHERE day = 'Monday';\">SELECT seller, product, qty FROM sales WHERE day = 'Monday';</button>\n    <button type=\"button\" class=\"try\" data-sql=\"SELECT * FROM sales WHERE payment = 'free';\">SELECT * FROM sales WHERE payment = 'free';</button>\n  </div>",
+  "task": "Warm-up: who served the biggest single order of the week (the most lángos in one row)?",
+  "hints": [
+   "Sort the sales by qty, largest first: ORDER BY qty DESC.",
+   {
+    "sql": "SELECT seller, qty, day, hour FROM sales\nORDER BY qty DESC;"
+   }
+  ],
+  "answers": [
+   "lili"
+  ],
+  "placeholder": "name",
+  "success": "Lili: on Monday at 13:00 a family of nine came up from the water and ordered nine cheese lángos at once. Remember the qty column: one sale can mean several lángos.",
+  "starter": "SELECT * FROM sales;"
+ },
+ {
+  "title": "How many sales?",
+  "story": "<p>Reed Beach, Lake Balaton, Sunday evening at the end of July. The beach is empty, the lake is pink, and <b>Aunt Margit</b> has just switched off the fryer of her lángos stand. This summer she got a new tablet till: <mark>every sale is one row in the <code>sales</code> table.</mark></p>\n  <p>Four students work for her this summer: <b>Bence</b>, <b>Lili</b>, <b>Ádám</b> and <b>Noémi</b>. \"The dough runs out every evening,\" says Aunt Margit, \"but there's less money in the till than there should be. Something doesn't add up. You're good with tables – take a look.\"</p>",
+  "learn": "<p><code>COUNT(*)</code> counts the rows. Many rows go in, <b>one number</b> comes out.</p>\n  <pre>SELECT COUNT(*) FROM sales;</pre>\n  <p>With <code>WHERE</code>, it only counts the rows that are left:</p>\n  <div class=\"tries\">\n    <button type=\"button\" class=\"try\" data-sql=\"SELECT COUNT(*) FROM sales WHERE day = 'Monday';\">SELECT COUNT(*) FROM sales WHERE day = 'Monday';</button>\n    <button type=\"button\" class=\"try\" data-sql=\"SELECT COUNT(*) FROM sales WHERE seller = 'Lili';\">SELECT COUNT(*) FROM sales WHERE seller = 'Lili';</button>\n  </div>",
+  "task": "How many sales did the till record this week?",
+  "hints": [
+   "No WHERE needed: count every row of the table.",
+   {
+    "sql": "SELECT COUNT(*) FROM sales;"
+   }
+  ],
+  "answers": [
+   "216"
+  ],
+  "placeholder": "a number",
+  "success": "216 rows, 216 sales in a week. Reading them one by one would take all evening. COUNT(*) does it in a blink."
+ },
+ {
+  "title": "How many lángos?",
+  "story": "<p>Aunt Margit weighs the dough every morning and writes in her notebook how many lángos it makes. \"This week every bit of it was used. Let's see if the till knows about every single lángos.\"</p>",
+  "learn": "<p><code>COUNT(*)</code> counts rows, but one row can be several lángos (the <code>qty</code> column). <code>SUM(column)</code> <b>adds up</b> the values of a column. <code>AVG(column)</code> gives their <b>average</b>.</p>\n  <div class=\"tries\">\n    <button type=\"button\" class=\"try\" data-sql=\"SELECT SUM(amount) FROM sales;\">SELECT SUM(amount) FROM sales;</button>\n    <button type=\"button\" class=\"try\" data-sql=\"SELECT AVG(qty) FROM sales;\">SELECT AVG(qty) FROM sales;</button>\n    <button type=\"button\" class=\"try\" data-sql=\"SELECT COUNT(*), SUM(qty) FROM sales WHERE day = 'Monday';\">SELECT COUNT(*), SUM(qty) FROM sales WHERE day = 'Monday';</button>\n  </div>",
+  "task": "How many lángos went over the counter this week in total?",
+  "hints": [
+   "Add up the qty column of the whole table.",
+   {
+    "sql": "SELECT SUM(qty) FROM sales;"
+   }
+  ],
+  "answers": [
+   "469"
+  ],
+  "placeholder": "a number",
+  "traps": {
+   "216": "That's the number of rows (COUNT). One sale can be several lángos: add up the qty column with SUM."
+  },
+  "success": "469: exactly the number in Aunt Margit's dough notebook. So every lángos is in the table, none vanished in secret. Then where did the money go?"
+ },
+ {
+  "title": "Free lángos",
+  "story": "<p>Aunt Margit's rule: <mark>every seller may eat or give away at most 2 free lángos a day.</mark> That's the staff lunch. The till records it with <code>'free'</code> as the payment and <code>0</code> forints.</p>\n  <p>Two sellers a day, seven days, two lángos each: at most <b>28</b> free lángos this week. Let's check.</p>",
+  "learn": "<p><code>WHERE</code> runs first and keeps only some rows. Then <code>SUM</code> adds up what's left. The order is: <b>FROM → WHERE → SUM</b>.</p>\n  <div class=\"tries\">\n    <button type=\"button\" class=\"try\" data-sql=\"SELECT SUM(qty) FROM sales WHERE day = 'Saturday';\">SELECT SUM(qty) FROM sales WHERE day = 'Saturday';</button>\n    <button type=\"button\" class=\"try\" data-sql=\"SELECT COUNT(*), SUM(amount) FROM sales WHERE payment = 'card';\">SELECT COUNT(*), SUM(amount) FROM sales WHERE payment = 'card';</button>\n  </div>",
+  "task": "How many lángos were handed out free this week?",
+  "hints": [
+   "Keep only the rows WHERE payment = 'free', then add up qty.",
+   {
+    "sql": "SELECT SUM(qty) FROM sales\nWHERE payment = 'free';"
+   }
+  ],
+  "answers": [
+   "34"
+  ],
+  "placeholder": "a number",
+  "traps": {
+   "26": "That's the number of free rows. One row can be several lángos: use SUM(qty), not COUNT(*).",
+   "28": "28 is the most there should be. Ask the table how many there really were!"
+  },
+  "success": "34 free lángos, but there should be 28 at most. At least six went out against the rules. Aunt Margit raises an eyebrow: \"Who's eating all that?\""
+ },
+ {
+  "title": "When?",
+  "story": "<p>The staff lunch is at midday, between 12 and 14 o'clock. If everyone keeps to the rule, the free rows only have 12, 13 or 14 in the <code>hour</code> column.</p>",
+  "learn": "<p><code>MIN(column)</code> gives the <b>smallest</b> value, <code>MAX(column)</code> the <b>largest</b>. They work on numbers and on text too.</p>\n  <div class=\"tries\">\n    <button type=\"button\" class=\"try\" data-sql=\"SELECT MIN(hour), MAX(hour) FROM sales;\">SELECT MIN(hour), MAX(hour) FROM sales;</button>\n    <button type=\"button\" class=\"try\" data-sql=\"SELECT MAX(amount) FROM sales WHERE payment = 'cash';\">SELECT MAX(amount) FROM sales WHERE payment = 'cash';</button>\n  </div>",
+  "task": "What is the latest hour at which a free lángos went out?",
+  "hints": [
+   "Keep the free rows with WHERE, then take MAX(hour).",
+   {
+    "sql": "SELECT MAX(hour) FROM sales\nWHERE payment = 'free';"
+   }
+  ],
+  "answers": [
+   "20",
+   "20 00",
+   "20 h",
+   "8 pm",
+   "8pm",
+   "8"
+  ],
+  "placeholder": "an hour",
+  "success": "20 o'clock! That's no lunch break. Someone hands out free lángos at eight in the evening. But who?"
+ },
+ {
+  "title": "Who?",
+  "story": "<p>Aunt Margit already has a suspect. \"It's Bence, I'm sure. That boy is always hungry.\" Let's count it <b>seller by seller</b>.</p>",
+  "learn": "<p><code>GROUP BY seller</code> sorts the rows into <b>groups</b>, one for each seller. The aggregate function then counts <b>inside each group separately</b>, and every group becomes one row of the result.</p>\n  <div class=\"piles\" aria-hidden=\"true\"><div class=\"col\"><span class=\"chip c1\">card</span><span class=\"chip c3\">free</span><span class=\"chip c1\">card</span><span class=\"chip c2\">cash</span><span class=\"chip c3\">free</span><span class=\"chip c1\">card</span></div><span class=\"arrow\">→</span><div class=\"col\"><div class=\"pile\"><span class=\"chip c1\">card</span><span class=\"chip c1\">card</span><span class=\"chip c1\">card</span></div><div class=\"pile\"><span class=\"chip c2\">cash</span></div><div class=\"pile\"><span class=\"chip c3\">free</span><span class=\"chip c3\">free</span></div></div><span class=\"arrow\">→</span><div class=\"col\"><span class=\"out\">card · <b>3</b></span><span class=\"out\">cash · <b>1</b></span><span class=\"out\">free · <b>2</b></span></div></div><p class=\"piles-cap\"><code>GROUP BY payment</code>: 6 rows → 3 groups → 3 result rows. <code>COUNT(*)</code> counts inside each group separately.</p>\n  <pre>SELECT seller, COUNT(*)\nFROM sales\nGROUP BY seller;</pre>\n  <p>Whatever stands next to the aggregate in <code>SELECT</code> should also be in <code>GROUP BY</code>. You can sort the groups too: <code>ORDER BY SUM(qty) DESC</code>.</p>\n  <div class=\"tries\">\n    <button type=\"button\" class=\"try\" data-sql=\"SELECT payment, COUNT(*) FROM sales GROUP BY payment;\">SELECT payment, COUNT(*) FROM sales GROUP BY payment;</button>\n    <button type=\"button\" class=\"try\" data-sql=\"SELECT day, SUM(amount) FROM sales GROUP BY day;\">SELECT day, SUM(amount) FROM sales GROUP BY day;</button>\n  </div>",
+  "task": "Which seller handed out the most free lángos this week?",
+  "hints": [
+   "WHERE payment = 'free' first, then GROUP BY seller with SUM(qty). Sort by SUM(qty) DESC.",
+   {
+    "sql": "SELECT seller, SUM(qty)\nFROM sales\nWHERE payment = 'free'\nGROUP BY seller\nORDER BY SUM(qty) DESC;"
+   }
+  ],
+  "answers": [
+   "bence"
+  ],
+  "placeholder": "name",
+  "traps": {
+   "noemi": "Not the most. Sort the groups by SUM(qty), largest first, and look at the top row."
+  },
+  "success": "Bence: 14 free lángos. \"I knew it!\" says Aunt Margit. But wait. Bence worked all seven days this week. Seven days, two a day: that's exactly 14. Maybe Bence never broke the rule at all?"
+ },
+ {
+  "title": "Day by day",
+  "story": "<p>The rule is <b>per day</b>: at most 2 a day. So the free lángos have to be grouped <mark>by seller and by day at the same time</mark>.</p>",
+  "learn": "<p>With two columns, <code>GROUP BY seller, day</code> makes a group for every <b>(seller, day)</b> pair: \"Bence, Monday\" is one group, \"Bence, Tuesday\" another.</p>\n  <pre>SELECT seller, day, COUNT(*)\nFROM sales\nGROUP BY seller, day\nORDER BY COUNT(*) DESC\nLIMIT 3;</pre>\n  <p><code>LIMIT 3</code> keeps only the first 3 rows of the sorted result.</p>",
+  "task": "On which day did one seller hand out the most free lángos in a single day?",
+  "hints": [
+   "WHERE payment = 'free', then GROUP BY seller, day with SUM(qty). Sort it DESC and keep the top row with LIMIT 1.",
+   {
+    "sql": "SELECT seller, day, SUM(qty)\nFROM sales\nWHERE payment = 'free'\nGROUP BY seller, day\nORDER BY SUM(qty) DESC\nLIMIT 1;"
+   }
+  ],
+  "answers": [
+   "friday",
+   "fri"
+  ],
+  "placeholder": "a day",
+  "success": "Friday: 5 free lángos in one day from Noémi. Bence never went above 2. Hmm. Noémi…"
+ },
+ {
+  "title": "Breaking the rule",
+  "story": "<p>One bad day could be an accident. Aunt Margit wants to know <b>how many times</b> the 2-a-day rule was broken this week.</p>",
+  "learn": "<p><code>WHERE</code> filters <b>rows</b>, before grouping. <code>HAVING</code> filters <b>groups</b>, after grouping, so it can use <code>COUNT</code>, <code>SUM</code> and the rest. The order is: <b>WHERE → GROUP BY → HAVING</b>.</p>\n  <pre>SELECT day, COUNT(*)\nFROM sales\nGROUP BY day\nHAVING COUNT(*) &gt; 30;</pre>",
+  "task": "How many (seller, day) groups have more than 2 free lángos?",
+  "hints": [
+   "Take the query from the last chapter, drop ORDER BY and LIMIT, and add HAVING SUM(qty) > 2. Count the rows of the result.",
+   {
+    "sql": "SELECT seller, day, SUM(qty)\nFROM sales\nWHERE payment = 'free'\nGROUP BY seller, day\nHAVING SUM(qty) > 2;"
+   }
+  ],
+  "answers": [
+   "3",
+   "three"
+  ],
+  "placeholder": "a number",
+  "success": "Three times, and every time it was Noémi: 4 on Tuesday, 5 on Friday, 4 on Saturday. Every single day she worked."
+ },
+ {
+  "title": "Eight o'clock",
+  "story": "<p>One last piece of proof: the free lángos at 20:00. <mark>Lunch is over by 14:00, so a free lángos after that is not a staff lunch.</mark></p>",
+  "learn": "<p><code>HAVING</code> works with any aggregate. <code>HAVING MAX(hour) &gt; 14</code> keeps the groups whose latest row is after 14 o'clock. Here is every part of a query, in order:</p>\n  <pre>SELECT seller, MIN(hour)\nFROM sales\nWHERE day = 'Sunday'\nGROUP BY seller\nHAVING MIN(hour) = 10\nORDER BY seller;</pre>\n  <p>(That one shows who served at opening time on Sunday.)</p>",
+  "task": "Who handed out free lángos after lunchtime (after 14 o'clock)? That's the answer to the mystery.",
+  "hints": [
+   "WHERE payment = 'free', GROUP BY seller, then HAVING MAX(hour) > 14.",
+   {
+    "sql": "SELECT seller, MAX(hour), SUM(qty)\nFROM sales\nWHERE payment = 'free'\nGROUP BY seller\nHAVING MAX(hour) > 14;"
+   }
+  ],
+  "answers": [
+   "noemi"
+  ],
+  "placeholder": "name",
+  "success": "Noémi. At eight in the evening Aunt Margit walks over to the volleyball court, and there sits the beach volleyball team, Noémi's friends, each with a cheese lángos. Noémi blushes: \"They come after training and they're so hungry…\" Aunt Margit laughs. \"Your friends can have lángos tomorrow too. Half price. And they pay.\""
+ }
+];
+const BONUS = ["Which product sold the most lángos this week? (SUM(qty) with GROUP BY product)", "Which day brought in the most money?", "How much money came in by card and how much in cash?", "What was the busiest hour of the week: the hour with the most sales?", "What is the average amount of a paid sale (leave the free ones out)?", "Hard: which seller has the highest average sale amount, counting paid sales only? Round it with ROUND(AVG(amount))."];
+const COLDOCS = {"sales": {"id": "Row number of the sale.", "day": "Day of the week: <code>'Monday'</code> … <code>'Sunday'</code>.", "hour": "The hour of the sale, as a number from <code>10</code> to <code>21</code>.", "seller": "Who served it: <code>'Bence'</code>, <code>'Lili'</code>, <code>'Ádám'</code> or <code>'Noémi'</code>.", "product": "<code>'plain'</code>, <code>'garlic'</code>, <code>'cheese'</code> or <code>'jam'</code>.", "qty": "How many lángos went out in this sale.", "amount": "How much was paid, in forints. A free lángos is <code>0</code>.", "payment": "<code>'card'</code>, <code>'cash'</code> or <code>'free'</code>."}};
+const HAND_STEPS = ["Write your name below.", "Click <b>Save answers (.txt)</b>. The file goes to your Downloads folder.", "Open the assignment in <b>Google Classroom</b>, upload the file under <b>Add or create → File</b>, then press <b>Turn in</b>."];
+const RANKS = ["Chief Detective", "Till Master", "Counter Hand", "Kitchen Helper"];
+const T = {
+  refresher:"Refresher", before:"Before closing time · about 3 minutes", chapter:(i,n)=>`Chapter ${i} of ${n}`, solved:(n,t)=>`${n} / ${t} chapters solved`, sealed:n=>`Clue 2 · sealed. It opens after ${n} more wrong answer${n===1?'':'s'}.`, rows:n=>`${n} row${n===1?'':'s'}`,
+  try_:"Try it", learn:"SQL for this step", task:"Your task", hint1:"Clue 1 · hint", hint2:"Clue 2 · a working query", answer:"Answer", check:"Check answer",
+  correct:"Correct.", wrong:"Not quite.", wrongTip:"Look at your result again. Does the task ask for a number of rows (COUNT) or a number of lángos (SUM of qty)? A name, a day or a number?", prev:"Previous chapter", next:"Next chapter", start:"Open the till", yourans:"Your answer",
+  ready:"The till is on. Write a query and press Run.", empty:"The query box is empty. Type a query first.", zero:"0 rows. No rows match all of your conditions. Check the spelling of text values, like 'free'.", sound:"Sound", reset:"Start over", reset2:"Click again to erase progress",
+  errGeneric:"Check spelling, commas, brackets and quotes. Text values need single quotes, like 'free'.", errCol:"That column name doesn't exist. The columns are: id, day, hour, seller, product, qty, amount, payment.", errTab:"That table doesn't exist. There is one table: sales.", errAmb:"COUNT, SUM, AVG, MIN and MAX can't go in WHERE: WHERE looks at one row at a time. A condition on a whole group goes after GROUP BY, in HAVING.", sqlErr:"The query has an error.", engFail:"The SQL engine could not load.", engFail2:"Check the internet connection and reload the page.", engStart:"The SQL engine could not start.",
+  endH:"The till adds up", endP:m=>`The mystery is solved, the till adds up, and the beach volleyball team now pays half price instead of nothing. You cracked it in about <b>${m} minutes</b> with COUNT, SUM, MAX, GROUP BY and HAVING: many rows turned into a few numbers, group by group.`, endBonus:"Bonus tasks for fast detectives:", handH:"Hand in your answers", name:"Your name", namePh:"Write your name here", save:"Save answers (.txt)", copy:"Copy as text", replay:"Replay the celebration",
+  xNameFirst:"Write your name first.", xCopied:"Copied. Paste it into the assignment in Google Classroom as a private comment, then press Turn in.", xBlocked:"Copying is blocked here. Use Save answers instead.", xSaved:f=>`Saved as ${f}. Now upload it to the assignment in Google Classroom and press Turn in.`, xSaveBlocked:"Saving is blocked here. Use Copy as text instead.",
+  filePrefix:"langos-mystery", reportTitle:"THE LAKE BALATON LANGOS MYSTERY - ANSWER SHEET", rName:"Name", rFinished:"Finished", rTime:"Time taken", rQueries:"Queries run", rDev:"NOTE: completed with the teacher code, so some answers may be missing.",
+  rTask:"Task", rAnswer:"Answer", rSkipped:"(skipped)", rUnsolved:"(not solved)", rWrong:"Wrong answers", rQuery:"Query", rNone:"(none saved)",
+  stampOpen:"Case open", stampDone:"Case closed", plusReady:"Ready!", plusGood:"Well done!", num:"number", text:"text"
+};
+
+/* ---------- state ---------- */
+const KEY = "langos-en-v1";
+let state = { solved: [], current: 0, start: Date.now(), end: null, drafts: {} };
+try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && Array.isArray(s.solved)) state = Object.assign(state, s); } catch(e){}
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(state)); } catch(e){} }
+const num = i => CHAPTERS[0].refresher ? i : i+1;
+const NCH = CHAPTERS.filter(c=>!c.refresher).length;
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const norm = s => s.normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().replace(/[^a-z0-9 ]/g," ").replace(/\s+/g," ").trim();
+const isUnlocked = i => i === 0 || state.solved.includes(i-1);
+const allDone = () => state.solved.length === CHAPTERS.length;
+const starterFor = i => CHAPTERS[i].starter || `-- ${CHAPTERS[i].refresher ? T.refresher : num(i)}: ${CHAPTERS[i].title}\n`;
+const crestSvg = () => document.querySelector(".guitar").outerHTML.replace('class="guitar"', 'width="100%" height="100%"');
+$("heroGuitar").innerHTML = crestSvg();
+
+/* ---------- line-up strip ---------- */
+/* chapter-strip markers: a guitar pick over the chapter you are on, nothing extra on solved ones (their post turns lime) */
+const WHO_CUR = `<svg viewBox="0 0 20 20" width="18" height="18"><ellipse cx="10" cy="10" rx="8.6" ry="7.6" fill="#e3a23f" stroke="#9a5e1c" stroke-width="1.3"/><ellipse cx="10" cy="9.6" rx="4.2" ry="3.1" fill="#fffaf0"/><path d="M8 9l2 1M11.2 8.2l1.6-.6" stroke="#ffc845" stroke-width="1.3" stroke-linecap="round"/></svg>`; const _unusedPick = `<svg viewBox="0 0 20 20" width="18" height="18"><path d="M10 18C5 13 2 9 2.5 5.5 3 2.5 6 1.5 10 1.5s7 1 7.5 4C18 9 15 13 10 18z" fill="var(--pink)" stroke="#7a1248" stroke-width="1.2"/><path d="M6 5.5c1.5-1 3-1.2 4-1.2" stroke="#fff" stroke-opacity=".6" stroke-width="1.3" stroke-linecap="round" fill="none"/></svg>`;
+const WHO_DONE = "☀️";
+function renderSteps(){
+  $("steps").innerHTML = CHAPTERS.map((c,i)=>{
+    const cls = ["step"];
+    if (state.solved.includes(i)) cls.push("done");
+    if (i === state.current) cls.push("current");
+    if (!isUnlocked(i)) cls.push("locked");
+    const who = i === state.current ? WHO_CUR : (state.solved.includes(i) ? WHO_DONE : "");
+    return `<button type="button" class="${cls.join(" ")}" data-i="${i}" ${isUnlocked(i)?"":"aria-disabled=\"true\""} title="${esc(c.title)}">
+      <span class="who" aria-hidden="true">${who}</span><span class="post">${c.refresher ? "R" : num(i)}</span><span class="t">${esc(c.title)}</span></button>`;
+  }).join("");
+  { const cc = CHAPTERS[state.current]; $("stepCaption").innerHTML = `<span>${cc.refresher ? T.refresher : T.chapter(num(state.current), NCH)}</span>${esc(cc.title)}`; }
+  $("solvedCount").textContent = T.solved(state.solved.filter(i=>!CHAPTERS[i].refresher).length, NCH);
+  const st = $("stamp"); st.textContent = allDone() ? T.stampDone : T.stampOpen; st.classList.toggle("closed", allDone());
+}
+$("steps").addEventListener("click", e=>{ const b = e.target.closest(".step"); if (!b) return; const i = +b.dataset.i; if (isUnlocked(i)) goTo(i); });
+$("case").addEventListener("click", e=>{ const b = e.target.closest("button.try"); if (!b) return; $("sql").value = b.dataset.sql; run(); });
+function goTo(i){ state.drafts[state.current] = $("sql").value; state.current = i; save(); renderSteps(); renderCase(); $("sql").value = state.drafts[i] ?? starterFor(i); }
+
+/* ---------- notebook ---------- */
+function renderCase(){
+  const i = state.current, c = CHAPTERS[i], solved = state.solved.includes(i);
+  const hints = c.hints.map(h=>{
+    if (typeof h === "string") return `<details class="hint"><summary>${T.hint1}</summary><p>${esc(h)}</p></details>`;
+    const tries = (state.wrong && state.wrong[i]) || 0;
+    if (!solved && tries < 2) return `<div class="hint locked">${T.sealed(2 - tries)}</div>`;
+    return `<details class="hint"><summary>${T.hint2}</summary><pre>${esc(h.sql)}</pre></details>`;
+  }).join("");
+  const last = i === CHAPTERS.length - 1;
+  $("case").innerHTML = `
+    <div class="eyebrow">${c.refresher ? T.before : T.chapter(num(i), NCH)}</div>
+    <h2>${esc(c.title)}</h2>
+    <div class="story">${c.story}</div>
+    <div class="learn"><h3>${c.refresher ? T.try_ : T.learn}</h3>${c.learn}</div>
+    <div class="links" id="links"></div>
+    <div class="task"><h3>${T.task}</h3><p>${esc(c.task)}</p></div>
+    ${hints}
+    <form class="answer" id="answerForm" autocomplete="off">
+      <input id="answer" type="text" placeholder="${T.answer}: ${esc(c.placeholder)}" aria-label="${T.yourans}" ${solved?"disabled":""}>
+      <button class="btn primary" type="submit" ${solved?"disabled":""}>${T.check}</button>
+    </form>
+    <div id="verdict">${solved ? `<div class="verdict ok">${T.correct}<p>${esc(c.success)}</p></div>` : ""}</div>
+    <div class="navrow">
+      <button class="btn" type="button" id="prev" ${i===0?"hidden":""}>${T.prev}</button>
+      <button class="btn primary" type="button" id="next" ${solved && !last ? "" : "hidden"}>${c.refresher ? T.start : T.next}</button>
+    </div>
+    ${allDone() && last ? endingHtml() : ""}`;
+  renderLinks();
+  $("answerForm").addEventListener("submit", e=>{ e.preventDefault(); check(); });
+  $("prev").onclick = ()=> goTo(i-1);
+  $("next").onclick = ()=> goTo(i+1);
+}
+/* ---------- connection map: which tables a chapter uses and how they plug together ---------- */
+const LT = document.documentElement.lang === "hu" ? {
+  h:"A fejezet táblái és kapcsolataik", hR:"Az adatbázis térképe · így kapcsolódnak a táblák",
+  noRule:"Még nincs párosítási szabály: minden sor minden sorral párosul.",
+  byHand:"Még nincs összekapcsolva: két külön lekérdezés, a számot kézzel viszed át.",
+  n1:(a,b)=>`N : 1 — ${az(a)} ${a} tábla sok sora mutathat ${az(b)} ${b} tábla egy sorára`,
+  one:(a,b)=>`1 : 1 — ${az(b)} ${b} tábla minden sorához pontosan egy sor tartozik ${az(a)} ${a} táblában`,
+  nn:(a,b,j)=>`${a} ↔ ${b}: N : N kapcsolat ${az(j)} ${j} táblán keresztül`, more:n=>`+${n} további`
+} : {
+  h:"Tables in this chapter and how they connect", hR:"Database map · how the tables connect",
+  noRule:"No matching rule yet: every row is paired with every row.",
+  byHand:"Not joined yet: two separate queries, and you carry the number across by hand.",
+  n1:(a,b)=>`N : 1 — many ${a} rows can point to the same ${b} row`,
+  one:(a,b)=>`1 : 1 — every ${b} row has exactly one ${a} row`,
+  nn:(a,b,j)=>`${a} ↔ ${b}: N : N, through the ${j} table`, more:n=>`+${n} more`
+};
+function az(w){ return /^[aáeéiíoóöőuúüű]/i.test(w) ? "az" : "a"; }
+const SCHEMA = (()=>{ const o = {}; for (const m of SEED.matchAll(/CREATE TABLE (\w+) \(([^)]*)\)/g)) o[m[1]] = m[2].split(",").map(x=>x.trim().split(/\s+/)[0]); return o; })();
+function chapterLinks(c){
+  const h = c.hints.find(x=>typeof x !== "string"); const sql = h ? h.sql : "";
+  const tables = [], froms = [];
+  for (const m of sql.matchAll(/FROM\s+([\w\s,]+?)(?=\s+WHERE|\s+GROUP|\s+ORDER|;|$)/gi)){
+    const list = m[1].split(",").map(x=>x.trim().split(/\s+/)[0]).filter(t=>SCHEMA[t]);
+    froms.push(list); list.forEach(t=>{ if (!tables.includes(t)) tables.push(t); });
+  }
+  const links = [];
+  for (const m of sql.matchAll(/(\w+)\.(\w+)\s*=\s*(\w+)\.(\w+)/g)){
+    let [ , ta, ca, tb, cb ] = m;
+    if (!SCHEMA[ta] || !SCHEMA[tb]) continue;
+    if (ca === "id" && cb !== "id") [ta, ca, tb, cb] = [tb, cb, ta, ca];   /* fk side first */
+    if (!links.some(l=>l.ft===ta && l.fc===ca && l.pt===tb)) links.push({ ft:ta, fc:ca, pt:tb, pc:cb });
+  }
+  return { tables, links, joined: froms.some(f=>f.length > 1) };
+}
+function mapFor(i){
+  const c = CHAPTERS[i];
+  if (!c.refresher) return chapterLinks(c);
+  const names = Object.keys(SCHEMA), all = { tables:names.slice(), links:[], joined:true, map:true };
+  Object.entries(SCHEMA).forEach(([t, cols])=>cols.forEach(col=>{
+    const m = col.match(/^(.+)_id$/); if (!m) return;
+    const pt = names.find(x=>x !== t && x.startsWith(m[1])); if (pt) all.links.push({ ft:t, fc:col, pt, pc:"id" }); }));
+  return all;
+}
+function chainOrder(tables, links){          /* line the tables up along their links: A — B — C */
+  if (!links.length) return tables;
+  const nb = t => links.filter(l=>l.ft===t || l.pt===t).map(l=>l.ft===t ? l.pt : l.ft);
+  const ends = tables.filter(t=>nb(t).length <= 1);
+  const start = ends.find(t=>links.some(l=>l.ft===t)) || ends[0] || tables[0];
+  const out = [start];
+  while (out.length < tables.length){ const nxt = nb(out[out.length-1]).find(t=>!out.includes(t)) || tables.find(t=>!out.includes(t)); out.push(nxt); }
+  return out;
+}
+const uniqCache = {};
+function isUnique(t, col){
+  const k = t + "." + col; if (k in uniqCache) return uniqCache[k]; if (!db) return null;
+  try { const r = db.exec(`SELECT COUNT(${col}) = COUNT(DISTINCT ${col}) FROM ${t}`); return uniqCache[k] = !!r[0].values[0][0]; } catch(e){ return null; }
+}
+function lkColor(k){ return `var(--lk${k % 6 + 1})`; }
+function renderLinks(){
+  const box = $("links"); if (!box) return; box.hidden = true; return;
+  const spec = mapFor(state.current);
+  if (!spec.tables.length){ box.hidden = true; return; }
+  box.hidden = false;
+  const tables = chainOrder(spec.tables, spec.links);
+  const used = {}; spec.links.forEach((l,k)=>{ (used[l.ft+"."+l.fc] ??= k); (used[l.pt+"."+l.pc] ??= k); });
+  const cards = tables.map(t=>{
+    const cols = SCHEMA[t], show = cols, more = 0;      /* every column of the table */
+    return `<div class="lk-card" data-t="${t}"><div class="h">${t}</div>${show.map(c=>{
+      const k = used[t+"."+c];
+      return `<div class="r${c==="id"?" k":""}${k!==undefined?" on":""}" data-c="${c}"${k!==undefined?` style="--c:${lkColor(k)}"`:""}><span class="ic">${c==="id"?"🔑":(/_id$/.test(c)?"→":"")}</span>${c}</div>`;
+    }).join("")}${more ? `<div class="r more">${LT.more(more)}</div>` : ""}</div>`;
+  }).join("");
+  const rules = spec.links.map((l,k)=>{
+    const u = isUnique(l.ft, l.fc);
+    const kind = u === null ? "" : `<span class="kind">${u ? LT.one(l.ft, l.pt) : LT.n1(l.ft, l.pt)}</span>`;
+    return `<li><span class="sw" style="background:${lkColor(k)}"></span><code>${l.ft}.${l.fc} = ${l.pt}.${l.pc}</code>${kind}</li>`;
+  });
+  let note = "";
+  if (!spec.links.length && tables.length > 1) note = `<p class="lk-note">${spec.joined ? LT.noRule : LT.byHand}</p>`;
+  box.innerHTML = `<h3>${spec.map ? LT.hR : LT.h}</h3><div class="lk-board"><svg class="lk-svg" aria-hidden="true"></svg>${cards}</div>${note}${rules.length ? `<ul class="lk-rules">${rules.join("")}</ul>` : ""}`;
+  box.dataset.spec = JSON.stringify({ links: spec.links, loose: !spec.links.length && tables.length > 1 ? [tables[0], tables[1], spec.joined ? "×" : "?"] : null });
+  requestAnimationFrame(drawLinks);
+}
+function drawLinks(){                        /* straight arrows: _id column → the id it points to */
+  const box = $("links"); if (!box || box.hidden || !box.dataset.spec) return;
+  const board = box.querySelector(".lk-board"), svg = box.querySelector(".lk-svg"); if (!board) return;
+  const spec = JSON.parse(box.dataset.spec);
+  const cardEls = [...board.querySelectorAll(".lk-card")];
+  board.classList.remove("stack");
+  const gap = parseFloat(getComputedStyle(board).columnGap) || 46;
+  const need = cardEls.reduce((s,c)=>s + c.getBoundingClientRect().width, 0) + gap * (cardEls.length - 1);
+  const stack = cardEls.length > 1 && need > board.clientWidth - 8;
+  board.classList.toggle("stack", stack);
+  const B = board.getBoundingClientRect(); if (!B.width) return;
+  svg.setAttribute("viewBox", `0 0 ${B.width} ${B.height}`);
+  const rel = el => { const r = el.getBoundingClientRect(); return { l:r.left-B.left, r:r.right-B.left, t:r.top-B.top, b:r.bottom-B.top, cy:(r.top+r.bottom)/2-B.top, cx:(r.left+r.right)/2-B.left }; };
+  const card = t => board.querySelector(`.lk-card[data-t="${t}"]`);
+  const head = (x, y, dx, dy, color)=>{ const L = 9, W = 5.5, px = -dy, py = dx;
+    return `<polygon points="${x},${y} ${x - dx*L + px*W},${y - dy*L + py*W} ${x - dx*L - px*W},${y - dy*L - py*W}" fill="${color}"/>`; };
+  const tag = (x, y, txt, color, anchor)=> txt ? `<text x="${x}" y="${y}" text-anchor="${anchor}" class="lk-end" fill="${color}">${txt}</text>` : "";
+  const right = Math.max(...cardEls.map(c=>rel(c).r));
+  let html = "";
+  spec.links.forEach((l,k)=>{
+    const A = card(l.ft), P = card(l.pt); if (!A || !P) return;
+    const a = rel(A.querySelector(`[data-c="${l.fc}"]`)), b = rel(P.querySelector(`[data-c="${l.pc}"]`)), ca = rel(A), cp = rel(P);
+    const color = lkColor(k), u = isUnique(l.ft, l.fc), la = u === null ? "" : (u ? "1" : "N"), lb = u === null ? "" : "1";
+    if (!stack){
+      const lr = ca.r <= cp.l, x1 = lr ? ca.r : ca.l, x2 = lr ? cp.l : cp.r, d = lr ? 1 : -1;
+      html += `<circle cx="${x1}" cy="${a.cy}" r="4" fill="${color}"/><line x1="${x1}" y1="${a.cy}" x2="${x2 - d*8}" y2="${b.cy}" stroke="${color}" stroke-width="3" stroke-linecap="round"/>`;
+      const len = Math.hypot(x2 - x1, b.cy - a.cy) || 1;
+      html += head(x2, b.cy, (x2 - x1)/len, (b.cy - a.cy)/len, color);
+      const up = b.cy < a.cy - 1;
+      html += tag(x1 + d*7, up ? a.cy + 18 : a.cy - 8, la, color, lr ? "start" : "end") + tag(x2 - d*12, up ? b.cy - 9 : b.cy + 19, lb, color, lr ? "end" : "start");
+    } else {
+      const X = right + 18;
+      html += `<circle cx="${ca.r}" cy="${a.cy}" r="4" fill="${color}"/><path d="M${ca.r},${a.cy} H${X} V${b.cy} H${cp.r + 8}" fill="none" stroke="${color}" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>`;
+      html += head(cp.r, b.cy, -1, 0, color);
+      html += tag(X + 6, a.cy + 5, la, color, "start") + tag(X + 6, b.cy + 5, lb, color, "start");
+    }
+  });
+  if (spec.loose){ const A = card(spec.loose[0]), P = card(spec.loose[1]);
+    if (A && P){ const ca = rel(A), cp = rel(P), ha = rel(A.querySelector(".h")), hp = rel(P.querySelector(".h"));
+      const [x1,y1,x2,y2] = stack ? [ca.cx, ca.b, cp.cx, cp.t] : [ca.r, ha.cy, cp.l, hp.cy], mx = (x1+x2)/2, my = (y1+y2)/2;
+      html += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="var(--lk-loose)" stroke-width="3" stroke-dasharray="6 6"/>`;
+      html += `<circle cx="${mx}" cy="${my}" r="11" class="lk-mid"/><text x="${mx}" y="${my+5}" text-anchor="middle" class="lk-midt">${spec.loose[2]}</text>`; } }
+  svg.innerHTML = html;
+}
+addEventListener("resize", ()=>requestAnimationFrame(drawLinks));
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(()=>drawLinks());
+function check(){
+  const i = state.current, c = CHAPTERS[i], v = norm($("answer").value);
+  if (!v) return;
+  if (devHash(v) === 2236979087){ devComplete(); return; }
+  if (c.answers.map(norm).includes(v)){
+    if (!state.solved.includes(i)){ state.answers = state.answers || {}; state.answers[i] = $("answer").value.trim(); state.solvedSql = state.solvedSql || {}; state.solvedSql[i] = $("sql").value; }
+    const r = document.querySelector("#answerForm button").getBoundingClientRect();
+    const first = !state.solved.includes(i);
+    if (first) state.solved.push(i);
+    const finished = first && allDone();
+    if (allDone() && !state.end) state.end = Date.now();
+    save(); renderSteps(); renderCase();
+    const n = $("next"); if (n && !n.hidden) n.focus();
+    if (finished) finale(); else if (first) chapterWin(r.left + r.width/2, r.top + r.height/2, i);
+  } else {
+    state.wrong = state.wrong || {}; state.wrong[i] = (state.wrong[i] || 0) + 1; save();
+    if (state.wrong[i] <= 2){ renderCase(); $("answer").focus(); }
+    $("verdict").innerHTML = `<div class="verdict bad">${T.wrong}<p>${(c.traps && c.traps[v]) || T.wrongTip}</p></div>`;
+  }
+}
+/* teacher shortcut: a secret answer that solves every chapter (only its hash is stored here) */
+function devHash(s){ let x = 5381; for (const ch of s) x = ((x*33) ^ ch.charCodeAt(0)) >>> 0; return x; }
+function devComplete(){ state.dev = true; state.solved = CHAPTERS.map((_,k)=>k); state.current = CHAPTERS.length - 1; if (!state.end) state.end = Date.now(); save(); renderSteps(); renderCase(); $("sql").value = starterFor(state.current); finale(); }
+function endingHtml(){
+  const mins = Math.max(1, Math.round(((state.end||Date.now()) - state.start)/60000));
+  return `<div class="ending learn">
+    <h3>${T.endH}</h3><p>${T.endP(mins)}</p>
+    <p><b>${T.endBonus}</b></p><ol>${BONUS.map(b=>`<li>${esc(b)}</li>`).join("")}</ol>
+    <div class="export">
+      <h3>${T.handH}</h3>
+      <ol class="export-steps">${HAND_STEPS.map(s=>`<li>${s}</li>`).join("")}</ol>
+      <label for="studentName">${T.name}</label>
+      <input id="studentName" type="text" autocomplete="off" placeholder="${T.namePh}" value="${esc(state.student || "")}">
+      <div class="export-btns"><button class="btn primary" type="button" id="saveTxt">${T.save}</button><button class="btn" type="button" id="copyTxt">${T.copy}</button></div>
+      <p class="export-note" id="exportNote" aria-live="polite"></p>
+    </div>
+    <div><button class="btn" type="button" id="replayFinale">${T.replay}</button></div>
+  </div>`;
+}
+$("case").addEventListener("click", e=>{ if (e.target.id === "replayFinale") finale(); if (e.target.id === "saveTxt") exportAnswers("save"); if (e.target.id === "copyTxt") exportAnswers("copy"); });
+$("case").addEventListener("input", e=>{ if (e.target.id === "studentName"){ state.student = e.target.value; save(); } });
+
+/* ---------- answer sheet export ---------- */
+function fmtTime(ms){ const m = Math.floor(ms/60000), s = Math.floor(ms/1000)%60; return `${m}:${String(s).padStart(2,"0")}`; }
+function buildReport(){
+  const pad = n => String(n).padStart(2,"0"), d = new Date(state.end || Date.now()), L = [];
+  L.push(T.reportTitle); L.push("=".repeat(T.reportTitle.length));
+  L.push(`${T.rName}: ${(state.student || "").trim()}`);
+  L.push(`${T.rFinished}: ${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`);
+  L.push(`${T.rTime}: ${fmtTime((state.end || Date.now()) - state.start)}`);
+  L.push(`${T.rQueries}: ${state.queries || 0}`);
+  if (state.dev) L.push(T.rDev);
+  L.push("");
+  CHAPTERS.forEach((c,i)=>{
+    L.push(`${c.refresher ? T.refresher : T.chapter(num(i), NCH)}: ${c.title}`); L.push("-".repeat(40));
+    L.push(`${T.rTask}: ${c.task}`);
+    L.push(`${T.rAnswer}: ${(state.answers && state.answers[i]) || (state.solved.includes(i) ? T.rSkipped : T.rUnsolved)}`);
+    L.push(`${T.rWrong}: ${(state.wrong && state.wrong[i]) || 0}`);
+    const q = ((state.solvedSql && state.solvedSql[i]) || "").trim();
+    L.push(`${T.rQuery}:`); L.push(q ? q.split("\n").map(x=>"    " + x).join("\n") : "    " + T.rNone); L.push("");
+  });
+  return L.join("\r\n");
+}
+function exportAnswers(mode){
+  const note = $("exportNote"), nameEl = $("studentName"), name = (state.student || "").trim();
+  if (!name){ note.textContent = T.xNameFirst; nameEl.focus(); return; }
+  const text = buildReport();
+  if (mode === "copy"){
+    const done = ()=> note.textContent = T.xCopied;
+    const fallback = ()=>{ const t = document.createElement("textarea"); t.value = text; document.body.appendChild(t); t.select(); try { document.execCommand("copy"); done(); } catch(e){ note.textContent = T.xBlocked; } t.remove(); };
+    try { navigator.clipboard.writeText(text).then(done, fallback); } catch(e){ fallback(); }
+    return;
+  }
+  const slug = name.normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[^A-Za-z0-9]+/g,"-").replace(/^-|-$/g,"") || "student";
+  const file = `${T.filePrefix}-${slug}.txt`;
+  try {
+    const url = URL.createObjectURL(new Blob(["﻿" + text], {type:"text/plain;charset=utf-8"}));
+    const a = document.createElement("a"); a.href = url; a.download = file; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=> URL.revokeObjectURL(url), 2000);
+    note.textContent = T.xSaved(file);
+  } catch(e){ note.textContent = T.xSaveBlocked; }
+}
+
+/* ---------- timer + reset ---------- */
+function tick(){ const ms = (state.end || Date.now()) - state.start; const m = Math.floor(ms/60000), s = Math.floor(ms/1000)%60; $("timer").textContent = `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`; }
+setInterval(tick, 1000); tick();
+let resetArmed = null;
+$("resetProgress").onclick = ()=>{
+  const b = $("resetProgress");
+  if (!resetArmed){ b.textContent = T.reset2; resetArmed = setTimeout(()=>{ b.textContent = T.reset; resetArmed = null; }, 3000); return; }
+  clearTimeout(resetArmed); resetArmed = null; b.textContent = T.reset;
+  state = { solved: [], current: 0, start: Date.now(), end: null, drafts: {} };
+  save(); renderSteps(); renderCase(); $("sql").value = starterFor(0); resetDb();
+};
+
+/* ---------- celebrations ---------- */
+const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const FXC = ["#e8493a","#ffc845","#2b8a96","#fff8e6","#7fdbe6"];
+const fx = { c: $("fx"), ctx: $("fx").getContext("2d"), parts: [], raf: 0, w: 0, h: 0 };
+function fxSize(){ const d = devicePixelRatio || 1; fx.w = innerWidth; fx.h = innerHeight; fx.c.width = fx.w*d; fx.c.height = fx.h*d; fx.ctx.setTransform(d,0,0,d,0,0); }
+addEventListener("resize", fxSize); fxSize();
+const rnd = (a,b) => a + Math.random()*(b-a);
+function spawn(p){ fx.parts.push(p); if (!fx.raf) fx.raf = requestAnimationFrame(fxLoop); }
+function fxLoop(){
+  const g = fx.ctx; g.clearRect(0,0,fx.w,fx.h);
+  fx.parts = fx.parts.filter(p => p.life > 0 && p.y < fx.h + 60);
+  for (const p of fx.parts){
+    p.vx *= p.drag; p.vy = p.vy*p.drag + p.g; p.x += p.vx; p.y += p.vy; p.rot += p.vr; p.life--;
+    g.save(); g.globalAlpha = Math.min(1, p.life/30); g.translate(p.x, p.y); g.rotate(p.rot); g.fillStyle = p.color;
+    if (p.type === "confetti"){ g.scale(1, Math.cos(p.life*0.2)); g.fillRect(-p.s/2, -p.s/4, p.s, p.s/2); }
+    else if (p.type === "note"){ g.font = `${p.s*2}px serif`; g.textAlign = "center"; g.fillText("☀", 0, p.s); }
+    else { g.globalCompositeOperation = "lighter"; g.beginPath(); g.arc(0,0,p.s,0,6.283); g.fill(); }
+    g.restore();
+  }
+  fx.raf = fx.parts.length ? requestAnimationFrame(fxLoop) : 0;
+}
+function burst(x, y, n, power=9){
+  for (let k=0; k<n; k++){ const ang = rnd(0, Math.PI*2), sp = rnd(power*.3, power), note = Math.random() < .3;
+    spawn({ type: note ? "note" : "confetti", x, y, vx: Math.cos(ang)*sp, vy: Math.sin(ang)*sp - power*.5, g: .25, drag: .985, rot: rnd(0,6), vr: rnd(-.3,.3), s: rnd(7,13), color: FXC[k % FXC.length], life: rnd(70,120) }); }
+}
+function firework(x, y){
+  const col = FXC[Math.floor(rnd(0, 4))], n = 90;
+  for (let k=0; k<n; k++){ const ang = k/n*Math.PI*2, sp = rnd(3,7.5);
+    spawn({ type:"spark", x, y, vx: Math.cos(ang)*sp, vy: Math.sin(ang)*sp, g:.06, drag:.975, rot:0, vr:0, s: rnd(1.6,3.2), color: col, life: rnd(60,95) }); }
+  tone(rnd(90,160), .35, "sawtooth", .05, 40);
+}
+function rain(ms){
+  const end = performance.now() + ms;
+  (function drop(){ for (let k=0; k<6; k++){ const note = Math.random() < .35;
+      spawn({ type: note ? "note" : "confetti", x: rnd(0, fx.w), y: -20, vx: rnd(-1.5,1.5), vy: rnd(2,5), g:.05, drag:.995, rot: rnd(0,6), vr: rnd(-.2,.2), s: rnd(8,14), color: FXC[Math.floor(rnd(0,5))], life: 400 }); }
+    if (performance.now() < end) setTimeout(drop, 60); })();
+}
+function fireworkShow(count){ for (let k=0; k<count; k++) setTimeout(()=> firework(rnd(fx.w*.12, fx.w*.88), rnd(fx.h*.1, fx.h*.5)), 400 + k*rnd(280,420)); }
+
+let soundOn = true;
+try { soundOn = localStorage.getItem(KEY+"-sound") !== "off"; } catch(e){}
+const ONOFF = document.documentElement.lang === "hu" ? ["be", "ki"] : ["on", "off"];
+function paintSound(){ const b = $("soundToggle"); b.textContent = `${T.sound}: ${soundOn?ONOFF[0]:ONOFF[1]}`; b.setAttribute("aria-pressed", soundOn); }
+paintSound();
+$("soundToggle").onclick = ()=>{ soundOn = !soundOn; paintSound(); try { localStorage.setItem(KEY+"-sound", soundOn?"on":"off"); } catch(e){} };
+let actx = null;
+function tone(freq, dur, type="triangle", vol=.12, slideTo=null, delay=0){
+  if (!soundOn) return;
+  try { actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+    const t = actx.currentTime + delay, o = actx.createOscillator(), g = actx.createGain();
+    o.type = type; o.frequency.setValueAtTime(freq, t); if (slideTo) o.frequency.exponentialRampToValueAtTime(slideTo, t + dur);
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + .02); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(g).connect(actx.destination); o.start(t); o.stop(t + dur + .05); } catch(e){}
+}
+function riff(){ [523,659,784,1047].forEach((f,k)=>{ tone(f, .22, "triangle", .09, null, k*.08); tone(f*2, .08, "sine", .03, null, k*.08); }); tone(2093, .25, "square", .025, null, .36); tone(2637, .35, "square", .02, null, .42); }
+function powerChord(){ [262,330,392,523,659].forEach((f,k)=>{ tone(f, 1.3, "triangle", .07, null, k*.06); }); tone(2093, .3, "square", .03, null, .5); tone(2637, .5, "square", .025, null, .58); tone(90, .35, "sine", .22, 50, 0); }
+function fanfare(){ riff(); setTimeout(powerChord, 520); setTimeout(()=>{ [392,523,659,784,1047].forEach((f,k)=> tone(f, k===4?1.2:.2, "triangle", .12, null, k*.14)); }, 1400); }
+function chapterWin(x, y, i){
+  riff();
+  const el = document.createElement("div"); el.className = "plus"; el.textContent = CHAPTERS[i].refresher ? T.plusReady : T.plusGood;
+  el.style.left = x+"px"; el.style.top = (y-30)+"px"; document.body.appendChild(el); setTimeout(()=>el.remove(), 1300);
+  const s = document.querySelector(`.step[data-i="${i+1}"]`) || document.querySelector(`.step[data-i="${i}"]`); if (s) s.classList.add("just");
+  if (reduceMotion) return;
+  burst(x, y, 60);
+  const wrap = document.querySelector(".wrap"); wrap.classList.remove("shake"); void wrap.offsetWidth; wrap.classList.add("shake");
+}
+function rankFor(min){ return min <= 20 ? RANKS[0] : min <= 28 ? RANKS[1] : min <= 35 ? RANKS[2] : RANKS[3]; }
+function finale(){
+  const ms = (state.end || Date.now()) - state.start, mins = Math.floor(ms/60000), secs = Math.floor(ms/1000)%60;
+  $("fTime").textContent = `${mins}:${String(secs).padStart(2,"0")}`; $("fQueries").textContent = state.queries || 0; $("fRank").textContent = rankFor(ms/60000);
+  const f = $("finale"); f.hidden = true; void f.offsetWidth; f.hidden = false;
+  const inner = $("finaleInner"); inner.classList.remove("shake"); void inner.offsetWidth; inner.classList.add("shake");
+  fanfare(); $("finaleClose").focus();
+  if (reduceMotion) return;
+  setTimeout(()=>{ burst(fx.w/2, fx.h*.35, 160, 16); }, 950); setTimeout(()=> rain(5000), 1200); setTimeout(()=> fireworkShow(8), 1400);
+}
+function closeFinale(){
+  $("finale").hidden = true;
+  const st = $("field"); st.classList.remove("wave"); [...$("steps").children].forEach((b,k)=> b.style.animationDelay = (k*.08)+"s"); void st.offsetWidth; st.classList.add("wave");
+  const end = document.querySelector(".ending"); if (end) end.scrollIntoView({behavior: reduceMotion?"auto":"smooth", block:"center"});
+}
+$("finaleClose").onclick = closeFinale;
+$("finaleSave").onclick = ()=>{ closeFinale(); setTimeout(()=>{ const n = $("studentName"); if (n){ n.scrollIntoView({block:"center"}); n.focus(); } }, 400); };
+$("finaleAgain").onclick = ()=>{ powerChord(); if (reduceMotion) return; fireworkShow(6); rain(2500); };
+addEventListener("keydown", e=>{ if (e.key === "Escape" && !$("finale").hidden) closeFinale(); });
+
+/* ---------- database ---------- */
+let SQL = null, db = null;
+function resetDb(){ if (!SQL) return; if (db) db.close(); db = new SQL.Database(); db.run(SEED); $("out").innerHTML = `<p class="note">${T.ready}</p>`; renderSchema(); renderLinks(); }
+function renderSchema(){
+  const t = db.exec("SELECT name FROM sqlite_master WHERE type='table' ORDER BY rowid");
+  if (!t.length){ $("schema").innerHTML = ""; return; }
+  $("schema").innerHTML = t[0].values.map(([name])=>{
+    const cols = db.exec(`PRAGMA table_info("${name.replace(/"/g,'""')}")`), docs = COLDOCS[name] || {};
+    const lis = cols.length ? cols[0].values.map(r=>`<li><span class="k${/_id$/.test(r[1]) ? " fk" : ""}">${esc(r[1])}</span><span class="ty">${/INT|REAL/i.test(r[2]) ? T.num : T.text}</span>${docs[r[1]] ? `<span class="d">${docs[r[1]]}</span>` : ""}</li>`).join("") : "";
+    return `<div class="tbl"><button type="button" data-t="${esc(name)}">${esc(name)}</button><ul>${lis}</ul></div>`;
+  }).join("");
+}
+$("schema").addEventListener("click", e=>{ const b = e.target.closest("button[data-t]"); if (!b) return; $("sql").value = `SELECT * FROM ${b.dataset.t};`; run(); });
+function fmt(x){ return typeof x === "number" && !Number.isInteger(x) ? String(Math.round(x*1000)/1000) : String(x); }
+function run(){
+  if (!db) return;
+  const sql = $("sql").value;
+  state.drafts[state.current] = sql; state.queries = (state.queries||0) + 1; save();
+  const bare = sql.replace(/--[^\n]*/g," ").replace(/\/\*[\s\S]*?\*\//g," ").trim();
+  if (!bare){ $("out").innerHTML = `<p class="note">${T.empty}</p>`; return; }
+  try {
+    const res = db.exec(sql);
+    renderSchema();
+    if (!res.length){ $("out").innerHTML = `<p class="note">${T.zero}</p>`; return; }
+    $("out").innerHTML = res.map(r=>`<div class="result-meta">${T.rows(r.values.length)}</div>
+      <div class="tablebox"><table><thead><tr>${r.columns.map(c=>`<th>${esc(c)}</th>`).join("")}</tr></thead>
+      <tbody>${r.values.map(v=>`<tr>${v.map(x=> x===null ? `<td class="null">NULL</td>` : `<td${typeof x==="number"?' class="num"':""}>${esc(fmt(x))}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`).join("");
+  } catch(e){
+    let tip = T.errGeneric;
+    if (/no such column/i.test(e.message)) tip = T.errCol;
+    if (/misuse of aggregate/i.test(e.message)) tip = T.errAmb;
+    if (/no such table/i.test(e.message)) tip = T.errTab;
+    $("out").innerHTML = `<div class="err">${T.sqlErr}<p>${esc(e.message)}</p><p>${tip}</p></div>`;
+  }
+}
+$("run").onclick = run; $("resetDb").onclick = resetDb;
+$("sql").addEventListener("keydown", e=>{
+  if ((e.ctrlKey || e.metaKey) && e.key === "Enter"){ e.preventDefault(); run(); }
+  if (e.key === "Tab" && !e.shiftKey){ e.preventDefault(); const t = e.target, s = t.selectionStart; t.value = t.value.slice(0,s) + "  " + t.value.slice(t.selectionEnd); t.selectionStart = t.selectionEnd = s + 2; }
+});
+
+/* ---------- boot ---------- */
+if (state.current >= CHAPTERS.length || !isUnlocked(state.current)) state.current = 0;
+renderSteps(); renderCase();
+$("sql").value = state.drafts[state.current] ?? starterFor(state.current);
+if (typeof initSqlJs !== "function"){ $("out").innerHTML = `<div class="err">${T.engFail}<p>${T.engFail2}</p></div>`; }
+else { initSqlJs().then(s=>{ SQL = s; resetDb(); }).catch(e=>{ $("out").innerHTML = `<div class="err">${T.engStart}<p>${esc(e.message)}</p></div>`; }); }
+</script>
+<script src="../../nav.js?v=957c1fcf" defer></script>
+</body>
+</html>

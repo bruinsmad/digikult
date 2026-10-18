@@ -88,6 +88,18 @@
                 progress: { chapters: 9, keys: { en: "round-up-v1" } }
               },
               {
+                id: "langos",
+                kind: "story",
+                minutes: 35,
+                title: { hu: "Lángos-rejtély a Balatonon", en: "The Lake Balaton Lángos Mystery" },
+                desc: {
+                  hu: "A tészta mindennap elfogy, a kasszában mégis kevés a pénz. Egy tábla, egy hét eladásai: COUNT, SUM, MAX, GROUP BY két oszlop szerint és HAVING.",
+                  en: "The dough runs out every day, yet the till is short. One table, a week of sales: COUNT, SUM, MAX, GROUP BY on two columns and HAVING."
+                },
+                files: { en: "sql/group-by/langos.html", hu: "sql/group-by/langos-hu.html" },
+                progress: { chapters: 8, keys: { en: "langos-en-v1", hu: "langos-hu-v1" } }
+              },
+              {
                 id: "pasture",
                 kind: "demo",
                 title: { hu: "Bodri legelője", en: "Bodri's Pasture" },
