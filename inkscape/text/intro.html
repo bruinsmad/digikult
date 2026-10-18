@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>/* moving between pages: the old page drifts aside and fades, the new one glides in; the rail holds still */@view-transition{navigation:auto}.rail{view-transition-name:rail}::view-transition-group(root){animation:none}::view-transition-old(root){animation:dk-out .2s cubic-bezier(.4,0,1,1) both}::view-transition-new(root){animation:dk-in .38s cubic-bezier(.16,1,.3,1) .06s both}::view-transition-old(rail),::view-transition-new(rail){animation:none}@keyframes dk-out{to{opacity:0;transform:translateX(-18px)}}@keyframes dk-in{from{opacity:0;transform:translateX(26px)}}@media (prefers-reduced-motion:reduce){::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none!important}}</style>
+<title>Text and text boxes – explainer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600;700&display=swap">
+<link rel="stylesheet" href="../explainer.css?v=3">
+</head>
+<body>
+<header class="rail"><div class="in">
+  <a class="home" href="../../index.html">Digital Culture</a>
+  <span class="crumb"><a href="../../index.html#inkscape">Vector graphics – Inkscape</a> › <a href="../../index.html#inkscape-text">Lesson 2</a></span>
+  <a class="langlink" href="intro-hu.html" lang="hu">Magyar</a>
+</div></header>
+
+<section class="hero">
+  <div class="kicker">Inkscape, Lesson 2: explainer</div>
+  <h1>Text and text boxes</h1>
+  <p class="lead">On a poster, text is drawing too: it can be bold and outlined, run round a circle or along a wave, fill a shape, and even become a shape. This lesson shows which method is for what.</p>
+  <div class="meta"><span>about 12 minutes</span><span>every example can be tried</span><span>4 questions at the end</span></div>
+  <ul class="toc"><li><a href="#line-or-box">Click or drag</a></li><li><a href="#looks">Font, size, fill, outline</a></li><li><a href="#on-path">Text on a path</a></li><li><a href="#in-shape">Text poured into a shape</a></li><li><a href="#to-path">Text into a shape</a></li><li><a href="#mistakes">Common mistakes</a></li><li><a href="#quiz">Check yourself</a></li><li><a href="#practise">Practise</a></li></ul>
+</section>
+
+<main class="sheet">
+<section class="sec" id="line-or-box"><h2><span class="n">1</span>Click or drag</h2>
+<p>With the <b>Text tool</b> (<span class="key">T</span>) you can start typing in two ways:</p><ul><li><b>Click:</b> one line of text. It goes on until you press <span class="key">Enter</span> – it never wraps by itself.</li><li><b>Drag:</b> a text box (a frame). Lines wrap at the frame's edge on their own, and you can resize the frame later.</li></ul><div class="viz" data-w="textbox"><div class="viz-head">Try it: a line or a frame</div><div class="viz-body"></div></div>
+</section>
+<section class="sec" id="looks"><h2><span class="n">2</span>Font, size, fill, outline</h2>
+<p>Font and size are set in the tool controls bar above the canvas while the Text tool is active. Text colour is a <b>fill</b>, just like a shape's, and text can have an <b>outline</b> too: <span class="menu">Object ▸ Fill and Stroke…</span>.</p><div class="viz" data-w="textstyle"><div class="viz-head">Try it: size, spacing, outline</div><div class="viz-body"></div></div><div class="idea"><span class="i" aria-hidden="true">💡</span><p>You can colour a single letter: select it with the Text tool, as in a word processor, and click a colour in the palette.</p></div>
+</section>
+<section class="sec" id="on-path"><h2><span class="n">3</span>Text on a path</h2>
+<p>Draw a circle or a line, type the text, select both, and <span class="menu">Text ▸ Put on Path</span>. The text runs along the line, and if you reshape the line later, the text follows.</p><div class="viz" data-w="onpath"><div class="viz-head">Try it: circle or wave, start point, direction</div><div class="viz-body"></div></div><div class="rule-box"><b>If the text runs upside down or on the inside,</b> don't rotate the text: select the path and <span class="menu">Path ▸ Reverse</span>.</div>
+</section>
+<section class="sec" id="in-shape"><h2><span class="n">4</span>Text poured into a shape</h2>
+<p><span class="menu">Text ▸ Flow into Frame</span> uses a shape – a circle, a star, anything – as the frame: the lines reach right to its edge. Select the text and the shape, then the menu item. The shape stays where it is; if it shouldn't show, remove its fill.</p><div class="viz"><div class="viz-head">What it looks like: text flowed into a circle</div><div class="viz-body"><svg viewBox="0 0 300 230" role="img" aria-label="Ask for the pizza of the week: tomato, mozzarella, basil and a little spicy sausage – only on Fridays, while it lasts!" style="display:block;width:100%;max-width:420px;height:auto;margin:0 auto"><circle cx="150" cy="115" r="104" fill="#fff3d6" stroke="#9a9484" stroke-width="1.5" stroke-dasharray="5 5"/><g font-family="Atkinson Hyperlegible,sans-serif" font-weight="700" font-size="14.5" fill="#2b2d42" text-anchor="middle"><text x="150" y="40">Ask for the</text><text x="150" y="65">pizza of the week:</text><text x="150" y="90">tomato, mozzarella,</text><text x="150" y="115">basil and a little</text><text x="150" y="140">spicy sausage – only</text><text x="150" y="165">on Fridays, while</text><text x="150" y="190">it lasts!</text></g></svg></div></div>
+</section>
+<section class="sec" id="to-path"><h2><span class="n">5</span>Text into a shape</h2>
+<p><span class="menu">Path ▸ Object to Path</span> turns text into letter-shaped paths. After that the letters behave like any other shape: cut them out of another one (<span class="menu">Path ▸ Difference</span>) or pull spikes out of them with the Node tool.</p><div class="viz" data-w="outline"><div class="viz-head">Try it: text or path</div><div class="viz-body"></div></div><div class="idea"><span class="i" aria-hidden="true">💡</span><p>Before converting, make a copy (<span class="menu">Edit ▸ Duplicate</span>) and set it aside. If you spot a typo later, you can start again from the copy.</p></div>
+</section>
+<section class="sec" id="mistakes"><h2><span class="n">6</span>Common mistakes</h2>
+<div class="mist"><div class="side bad"><span class="lbl">✗ What happened</span><p>The text runs off the page and doesn't wrap.</p></div><div class="side good"><span class="lbl">✓ How to fix it</span><p>Drag a frame with the Text tool instead of clicking.</p></div></div><p class="mist-why">A click gives you one line, and a line doesn't wrap.</p><div class="mist"><div class="side bad"><span class="lbl">✗ What happened</span><p>The text on the circle runs upside down, inside the circle.</p></div><div class="side good"><span class="lbl">✓ How to fix it</span><p>Select the circle, then <span class="menu">Path ▸ Reverse</span>.</p></div></div><p class="mist-why">The path's direction decides which side the text sits on.</p><div class="mist"><div class="side bad"><span class="lbl">✗ What happened</span><p>I spotted a typo after Object to Path.</p></div><div class="side good"><span class="lbl">✓ How to fix it</span><p><span class="menu">Edit ▸ Undo</span>, fix it, and convert afterwards.</p></div></div><p class="mist-why">A path isn't text any more; it can't be retyped.</p><div class="mist"><div class="side bad"><span class="lbl">✗ What happened</span><p>Flow into Frame is greyed out.</p></div><div class="side good"><span class="lbl">✓ How to fix it</span><p>Exactly two things must be selected: the text and the shape.</p></div></div>
+</section>
+<section class="sec" id="quiz"><h2><span class="n">7</span>Check yourself</h2>
+<div class="quiz"><fieldset class="q" data-ok="1"><legend>How do you get text that wraps onto new lines by itself?</legend><div class="opts"><button type="button" class="opt">Click with the Text tool</button><button type="button" class="opt">Drag a frame with the Text tool</button><button type="button" class="opt">Press Enter at the end of every line</button><button type="button" class="opt">Text ▸ Put on Path</button></div><p class="fb"><b></b> In a text box made by dragging, lines wrap at the edge on their own.</p></fieldset><fieldset class="q" data-ok="1"><legend>The text on a circle runs inside it, upside down. What do you do?</legend><div class="opts"><button type="button" class="opt">Rotate the text 180°</button><button type="button" class="opt">On the circle: Path ▸ Reverse</button><button type="button" class="opt">Pick a bigger font size</button><button type="button" class="opt">Text ▸ Flow into Frame</button></div><p class="fb"><b></b> Reverse the path's direction, and the text moves to the outside of the circle.</p></fieldset><fieldset class="q" data-ok="1"><legend>What does text become after <b>Object to Path</b>?</legend><div class="opts"><button type="button" class="opt">Text you can still retype</button><button type="button" class="opt">Letter-shaped paths: you can reshape them but not retype them</button><button type="button" class="opt">It loses its fill</button><button type="button" class="opt">It gets an outline automatically</button></div><p class="fb"><b></b> So fix the text first, and convert it afterwards.</p></fieldset><fieldset class="q" data-ok="1"><legend>You want letters cut out of a red rectangle (stencil letters). What's the right order?</legend><div class="opts"><button type="button" class="opt">Put the text under the rectangle, Difference</button><button type="button" class="opt">Convert the text to a path, put it above the rectangle, select both, Difference</button><button type="button" class="opt">Flow the text into the rectangle</button><button type="button" class="opt">Intersection of the text and the rectangle</button></div><p class="fb"><b></b> Same as the craters: the text becomes a path first, and the top one cuts.</p></fieldset><p class="score" aria-live="polite"></p></div>
+</section>
+<section class="sec" id="practise"><h2><span class="n">8</span>Practise</h2>
+<div class="practice"><a class="pcard" href="slice-shop.html"><span class="k">Mission</span><h4>The Slice Shop</h4><p>A flyer: an outlined title, text round the pizza, a text box, text poured into a circle and cut-out letters.</p></a><a class="pcard" href="band-night.html"><span class="k">Mission</span><h4>Band Night</h4><p>A concert poster: a title coloured letter by letter, text on a sound wave, a speech bubble and spiky letters.</p></a></div>
+</section>
+</main>
+<footer class="end">Digital Culture. The examples run in your browser; nothing is sent anywhere.</footer>
+
+<script>
+window.EXPL = { ui: Object.assign({"qRight": "Right!", "qWrong": "Not this one.", "click": "Click: one line", "drag": "Drag: a text box", "frameWidth": "Frame width", "sampleText": "The Slice Shop – fresh pizza every day from 4 pm, and we deliver to your door!", "lineNote": "A <b>line of text</b> keeps going as long as you type – here it already runs off the page.", "frameNote": "In a <b>text box</b> the lines wrap by themselves at the edge. Move the slider: it's like dragging the frame's corner.", "size": "Size", "spacing": "Letter spacing", "stroke": "Outline", "titleText": "SLICE SHOP", "styleNote": "On bold letters a dark outline makes a title easy to read on a colourful background. On thin letters the outline swallows the letter.", "pathLabel": "Path:", "circle": "Circle", "wave": "Wave", "startAt": "Start", "reverseMenu": "Path ▸ Reverse", "pathText": "HOT ✱ FRESH ✱ FAST ✱ HOT ✱ FRESH ✱ FAST ✱", "pathNote2": "The text starts at the path's <b>start point</b> (the pink dot) and runs in the path's direction.", "revNote": "After <b>Reverse</b> the path runs the other way, so the text moves to the other side of the line.", "isText": "Text (you can retype it)", "isPath": "Path (made of nodes)", "textNote": "While it's <b>text</b>, you can retype it any time with the Text tool.", "pathNote3": "After Object to Path the letter is made of <b>nodes</b>: you can reshape it and cut with it, but you can't retype it."}, { score: (r, n) => `Score: ${r} / ${n} right.${r===n?' Well done!':' Have another look at the parts marked in red.'}` }) };
+</script>
+<script src="../explainer.js?v=2"></script>
+<script src="../../nav.js?v=f117c860" defer></script>
+</body>
+</html>

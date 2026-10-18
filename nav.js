@@ -232,6 +232,17 @@
             title: { hu: "Halmazműveletek és a csomópont-szerkesztő", en: "Path operations and the Node tool" },
             pages: [
               {
+                id: "path-ops-intro",
+                kind: "theory",
+                minutes: 12,
+                title: { hu: "Halmazműveletek – elmélet", en: "Path operations – explainer" },
+                desc: {
+                  hu: "Alakzat vagy útvonal, Unió, Különbség, Metszet, Kizárás, melyik vág, csomópontok és fogantyúk. Kipróbálható példák és egy rövid kvíz.",
+                  en: "Shape or path, Union, Difference, Intersection, Exclusion, which one cuts, nodes and handles. Interactive examples and a short quiz."
+                },
+                files: { en: "inkscape/path-ops/intro.html", hu: "inkscape/path-ops/intro-hu.html" }
+              },
+              {
                 id: "cheese-moon",
                 kind: "story",
                 minutes: 35,
@@ -261,6 +272,17 @@
             id: "text",
             title: { hu: "Szövegek és szövegdobozok", en: "Text and text boxes" },
             pages: [
+              {
+                id: "text-intro",
+                kind: "theory",
+                minutes: 12,
+                title: { hu: "Szövegek – elmélet", en: "Text – explainer" },
+                desc: {
+                  hu: "Szövegsor vagy szövegdoboz, betű és körvonal, szöveg útvonalon és alakzatban, szövegből útvonal. Kipróbálható példák és egy rövid kvíz.",
+                  en: "A line or a text box, font and outline, text on a path and in a shape, text into a path. Interactive examples and a short quiz."
+                },
+                files: { en: "inkscape/text/intro.html", hu: "inkscape/text/intro-hu.html" }
+              },
               {
                 id: "slice-shop",
                 kind: "story",
