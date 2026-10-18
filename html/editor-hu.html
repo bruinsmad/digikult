@@ -47,6 +47,16 @@ code{font-family:var(--f-mono);font-size:.9em}
 .tb.go:hover{background:#c96a20}
 .tb[aria-pressed="true"],.tb[aria-expanded="true"]{background:var(--green);border-color:#4fae86;color:#fff}
 .tb .n{background:rgba(0,0,0,.25);border-radius:999px;padding:0 7px;font-size:12px}
+/* file tabs, like VS Code: <> pages, # stylesheets */
+.tabs{display:flex;gap:4px;overflow-x:auto;max-width:min(560px,52vw);scrollbar-width:thin;padding-bottom:1px}
+.ftab{flex:none;display:inline-flex;align-items:center;gap:7px;background:var(--code-bg);border:1px solid #4a6a5d;border-radius:4px;padding:6px 11px;cursor:pointer;
+  font:600 13.5px var(--f-mono);color:#b9c7bf;white-space:nowrap}
+.ftab i{font:700 12px var(--f-mono);font-style:normal;color:var(--yellow)}
+.ftab.is-css i{color:#f0a3b8}
+.ftab:hover{color:var(--code-ink);border-color:#6b8f80}
+.ftab[aria-selected="true"]{color:var(--code-ink);background:#2a3833;border-color:var(--yellow);box-shadow:inset 0 -2px 0 var(--yellow)}
+.ftab.is-css[aria-selected="true"]{border-color:#f0a3b8;box-shadow:inset 0 -2px 0 #f0a3b8}
+@media (max-width:760px){ .tabs{max-width:100%;flex:1 1 100%} }
 .sel{display:flex;align-items:center;gap:6px;background:var(--code-bg);border:1px solid #4a6a5d;border-radius:8px;padding:0 4px 0 10px}
 .sel svg{width:15px;height:15px;color:var(--yellow);flex:none}
 .sel select{background:transparent;border:0;color:var(--code-ink);font:600 13.5px var(--f-mono);padding:6px 4px;max-width:220px;cursor:pointer}
@@ -183,7 +193,7 @@ body{grid-template-columns:minmax(0,1fr)}
 
 <div class="bar" role="toolbar" aria-label="Eszköztár">
   <div class="grp files">
-    <span class="sel"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 1.5h5l3.5 3.5v9.5h-8.5z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M9 1.5V5h3.5" fill="none" stroke="currentColor" stroke-width="1.5"/></svg><select id="docSel" aria-label="Oldalaid"></select></span>
+    <div class="tabs" id="tabs" role="tablist" aria-label="A fájljaid"></div>
     <button type="button" class="tb" id="newDoc" title="Új oldal (fájl) létrehozása">＋<span class="lb">Új</span></button>
     <button type="button" class="tb" id="renameDoc" title="Az oldal átnevezése">✎<span class="lb">Átnevezés</span></button>
     <button type="button" class="tb" id="delDoc" title="Az oldal törlése">🗑<span class="lb">Törlés</span></button>
@@ -220,15 +230,38 @@ body{grid-template-columns:minmax(0,1fr)}
 <footer class="status"><span id="stPos"></span><button type="button" id="stWarn"></button><span class="sp"></span><span>💾 automatikus mentés ebbe a böngészőbe ·</span><span id="stSave"></span></footer>
 
 <div class="keys" id="keys" hidden><div class="keys-h"><b>Billentyűparancsok, mint a VS Code-ban</b><button type="button" class="x" id="keysClose" aria-label="Bezárás">×</button></div>
-  <dl><dt>ul&gt;li*3 + Tab</dt><dd>Emmet: rövidítésből kész kód. Próbáld: <code>p</code>, <code>img</code>, <code>table&gt;tr*3&gt;td*3</code>, <code>!</code></dd><dt>Tab vagy Enter</dt><dd>a felajánlott címke vagy attribútum elfogadása</dd><dt>Ctrl + Szóköz</dt><dd>javaslatok megnyitása</dd><dt>Ctrl + B / Ctrl + I</dt><dd>a kijelölt szöveg köré &lt;strong&gt; / &lt;em&gt;</dd><dt>Ctrl + /</dt><dd>megjegyzés be/ki (&lt;!-- --&gt;)</dd><dt>Alt + ↑ / ↓</dt><dd>a sor mozgatása fel / le</dd><dt>Shift + Alt + ↓</dt><dd>a sor megkettőzése</dd><dt>Ctrl + D</dt><dd>a következő ugyanilyen szó kijelölése: több kurzorral egyszerre írsz</dd><dt>Ctrl + kattintás</dt><dd>újabb kurzor</dd><dt>Ctrl + F</dt><dd>keresés és csere</dd><dt>Shift + Alt + F</dt><dd>a behúzás rendezése</dd><dt>Ctrl + Shift + [ / ]</dt><dd>elem összecsukása / kibontása</dd><dt>Ctrl + Z / Ctrl + Y</dt><dd>visszavonás / újra</dd><dt>egér a címke fölött</dt><dd>megmutatja, mire való a címke</dd><dt>Alt + kattintás az előnézetben</dt><dd>a kódban odaugrik az elemhez (vagy a 🎯 Kijelölés gomb)</dd><dt>Ctrl + S</dt><dd>mentés (amúgy is ment magától)</dd><dt>húzd ide a fájlokat</dt><dd>HTML-fájl vagy kép megnyitása a gépedről</dd></dl><p class="keys-n">Macen a Ctrl helyett ⌘ (Cmd), az Alt helyett ⌥ (Option).</p></div>
+  <dl><dt>ul&gt;li*3 + Tab</dt><dd>Emmet: rövidítésből kész kód. Próbáld: <code>p</code>, <code>img</code>, <code>table&gt;tr*3&gt;td*3</code>, <code>!</code></dd><dt>m10 + Tab (CSS-ben)</dt><dd>Emmet CSS-hez: <code>m10</code> → <code>margin: 10px;</code>, <code>c</code> → <code>color</code>, <code>bgc</code> → <code>background-color</code>. A színek mellé kis színminta kerül.</dd><dt>Tab vagy Enter</dt><dd>a felajánlott címke vagy attribútum elfogadása</dd><dt>Ctrl + Szóköz</dt><dd>javaslatok megnyitása</dd><dt>Ctrl + B / Ctrl + I</dt><dd>a kijelölt szöveg köré &lt;strong&gt; / &lt;em&gt;</dd><dt>Ctrl + /</dt><dd>megjegyzés be/ki (&lt;!-- --&gt;)</dd><dt>Alt + ↑ / ↓</dt><dd>a sor mozgatása fel / le</dd><dt>Shift + Alt + ↓</dt><dd>a sor megkettőzése</dd><dt>Ctrl + D</dt><dd>a következő ugyanilyen szó kijelölése: több kurzorral egyszerre írsz</dd><dt>Ctrl + kattintás</dt><dd>újabb kurzor</dd><dt>Ctrl + F</dt><dd>keresés és csere</dd><dt>Shift + Alt + F</dt><dd>a behúzás rendezése</dd><dt>Ctrl + Shift + [ / ]</dt><dd>elem összecsukása / kibontása</dd><dt>Ctrl + Z / Ctrl + Y</dt><dd>visszavonás / újra</dd><dt>egér a címke fölött</dt><dd>megmutatja, mire való a címke</dd><dt>Alt + kattintás az előnézetben</dt><dd>a kódban odaugrik az elemhez (vagy a 🎯 Kijelölés gomb)</dd><dt>Ctrl + S</dt><dd>mentés (amúgy is ment magától)</dd><dt>húzd ide a fájlokat</dt><dd>HTML-fájl vagy kép megnyitása a gépedről</dd></dl><p class="keys-n">Macen a Ctrl helyett ⌘ (Cmd), az Alt helyett ⌥ (Option).</p></div>
 <dialog id="dlg"></dialog>
 <div class="toast" id="toast" role="status"></div>
 <div class="drop" id="drop" hidden>Engedd el: megnyitom a fájlokat</div>
 
-<script src="../vendor/codemirror-html.js?v=4d85dc2d"></script>
+<script src="../vendor/codemirror-html.js?v=e92a945e"></script>
 <script>
 const CFG = {"ui": {"pick": "Kijelölés", "pickT": "Kattints egy elemre az előnézetben, és a kódban odaugrik. Alt+kattintással mindig működik.", "title": "HTML-szerkesztő", "preview": "Előnézet", "localTpl": "Ez a link a(z) {h} fájlra vinne, de nincs ilyen oldalad vagy képed. Hozd létre az ＋ Új gombbal!", "switched": "Átváltottam erre: {n}", "saveFail": "Nem sikerült menteni: megtelt a böngésző tárhelye.", "pos": "{l}. sor, {c}. oszlop", "warns": "⚠ {n} figyelmeztetés", "noWarn": "✓ nincs hiba", "saved": "mentve ✓", "saving": "mentés…", "savedToast": "Mentve. (Magától is ment.)", "ok": "OK", "cancel": "Mégse", "fileName": "Fájlnév", "nameEmpty": "Adj meg egy nevet.", "nameTaken": "Már van ilyen nevű oldalad: {n}", "newTitle": "Új oldal", "create": "Létrehozás", "tplSkel": "HTML-váz", "tplSkelD": "DOCTYPE, head, title és body, ahogy a leckében tanultuk", "tplBlank": "Üres", "tplBlankD": "Teljesen üres fájl. Tipp: írj be egy ! jelet, és nyomj Tabot.", "created": "Kész: {n}", "renameTitle": "Átnevezés", "rename": "Átnevezés", "delTitle": "Törlöd az oldalt?", "delText": "A(z) <b>{n}</b> végleg törlődik ebből a böngészőből.", "del": "Törlés", "opened": "Megnyitva: {p} oldal, {i} egyéb fájl", "imgTitle": "Képek", "imgText": "A feltöltött képek ebben a böngészőben maradnak. A kódban a nevükkel hivatkozz rájuk, pl. <code>src=\"kutya.jpg\"</code>. A letöltött .zip-be is bekerülnek.", "imgAdd": "＋ Kép feltöltése", "imgMine": "Saját képeid", "imgNone": "Még nincs saját képed. Tölts fel egyet, vagy húzd be az ablakba!", "imgSamples": "Mintaképek (mindig elérhetők)", "sample": "mintakép", "insert": "Beszúrás", "close": "Bezárás", "downloaded": "Letöltve: {n}", "zipFail": "A .zip nem készült el, csak az oldal töltődött le.", "imported": "Megnyitva a szerkesztőben: {n}"}, "samples": ["img/morzsa.svg", "img/cirmi.svg", "img/pamacs.svg", "img/bodri.svg", "img/logo.svg"], "sampleBase": "basics/img/", "templates": {"skeleton": "<!DOCTYPE html>\n<html lang=\"hu\">\n  <head>\n    <meta charset=\"utf-8\">\n    <title>Új oldal</title>\n  </head>\n  <body>\n    <h1>Helló, világ!</h1>\n\n  </body>\n</html>\n"}};
 const UI = { preview: CFG.ui.preview, localNote: h => CFG.ui.localTpl.replace("{h}", h) };
+/* separate CSS files: their strings, and short explanations of the common properties */
+Object.assign(CFG.ui, {
+  tplCss: "CSS-fájl", tplCssD: "A stílusok külön fájlban. Az épp megnyitott oldalhoz kötöm.",
+  cssStarter: "/* Az oldalad stílusai. Írj át egy értéket, és figyeld az előnézetet. */\n\nbody {\n  font-family: sans-serif;\n  line-height: 1.5;\n  margin: 24px;\n}\n\nh1 {\n  color: teal;\n}\n",
+  cssLinked: "Összekötve: a(z) {c} mostantól a(z) {p} stílusa", previewOf: "előnézet: {p}",
+  noHost: "Még egyik oldal sem használja ezt a CSS-fájlt. Írd be egy oldal <code>&lt;head&gt;</code> részébe: <code>&lt;link rel=\"stylesheet\" href=\"{n}\"&gt;</code>",
+  lintBrace: "A kapcsos zárójelek nem stimmelnek: {o} × <code>{</code>, de {c} × <code>}</code>.",
+  lintSemi: "{l}. sor: a sor végéről hiányzik a <code>;</code>.",
+  lintColon: "{l}. sor: a tulajdonság neve és értéke közé <code>:</code> kell.",
+  newPage: "Új fájl", tabsLabel: "A fájljaid", cssKey: "m10 + Tab (CSS-ben)", cssKeyD: "Emmet CSS-hez: <code>m10</code> → <code>margin: 10px;</code>, <code>c</code> → <code>color</code>, <code>bgc</code> → <code>background-color</code>"
+});
+const CSS_DOCS = {
+  "css:color": "a szöveg színe", "css:background": "háttérszín vagy háttérkép", "css:background-color": "háttérszín",
+  "css:font-family": "betűtípus, pl. sans-serif", "css:font-size": "betűméret, pl. 20px", "css:font-weight": "vastagság: normal, bold, 700",
+  "css:font-style": "dőlt (italic) vagy normál", "css:text-align": "igazítás: left, center, right", "css:text-decoration": "aláhúzás, áthúzás, none",
+  "css:line-height": "sortávolság, pl. 1.5", "css:margin": "külső margó: hely a doboz körül", "css:padding": "belső margó: hely a tartalom körül",
+  "css:border": "keret: vastagság, stílus, szín, pl. 2px solid black", "css:border-radius": "lekerekített sarkok", "css:width": "a doboz szélessége",
+  "css:height": "a doboz magassága", "css:display": "block, inline, flex, grid, none", "css:gap": "hézag a flex- vagy grid-elemek között",
+  "css:justify-content": "hova kerülnek a flex-elemek a sorban", "css:align-items": "hova kerülnek a flex-elemek keresztben", "css:flex-direction": "sorba (row) vagy oszlopba (column)",
+  "css:box-shadow": "árnyék a doboz körül", "css:opacity": "átlátszóság: 0-tól 1-ig", "css:max-width": "ennél szélesebb nem lehet a doboz",
+  "css:list-style": "a lista pöttyei vagy számai", "css:cursor": "egérmutató, pl. pointer", "css:transition": "animált változás, pl. all .3s",
+  "css:transform": "mozgatás, forgatás, méretezés, pl. rotate(5deg)", "css:position": "static, relative, absolute, fixed", "css:object-fit": "hogyan tölti ki a kép a dobozát"
+};
 /* ---------- shared by the HTML explainer and the HTML mission ---------- */
 const $ = (s, el=document) => el.querySelector(s), $$ = (s, el=document) => [...el.querySelectorAll(s)];
 const esc = s => String(s).replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
@@ -354,11 +387,12 @@ function makeEditor(ta, opts={}){
     const T = ED_TEXT[PAGE_LANG];
     const cm = CMHTML.create({ parent: w, doc: ta.value, lines: !!opts.lines, fit: true, label: ta.getAttribute("aria-label") || "",
       lang: PAGE_LANG, docs: T.docs, phrases: T.phrases, files: opts.files || IMG_FILES, fold: !!opts.fold,
-      lint: opts.lint === false ? null : (src => lint(src)),
+      lint: opts.lint === false ? null : (opts.lintFn || (src => lint(src))), mode: opts.mode || "html",
       onCursor: opts.onCursor || null,
       onChange: v => { if (quiet) return; ta.value = v; ta.dispatchEvent(new Event("input")); } });
     w.addEventListener("mousedown", e => { if (e.target === w){ e.preventDefault(); cm.focus(); } });
-    return { refit: () => { quiet = true; cm.set(ta.value); quiet = false; cm.view.requestMeasure(); }, cm, el: w };
+    return { refit: () => { quiet = true; cm.set(ta.value); quiet = false; cm.view.requestMeasure(); }, cm, el: w,
+             setMode: m => { quiet = true; cm.setMode(m, ta.value); quiet = false; cm.view.requestMeasure(); } };
   }
   const w = document.createElement("div"); w.className = "edw" + (opts.lines ? " numbered" : ""); ta.before(w);
   const gut = document.createElement("pre"); gut.className = "gut"; gut.setAttribute("aria-hidden", "true");
@@ -535,6 +569,16 @@ const save = () => { try { localStorage.setItem(LS, JSON.stringify(store)); } ca
 let saveTimer = 0;
 const saveSoon = () => { clearTimeout(saveTimer); setStatusSaved(false); saveTimer = setTimeout(() => { save(); setStatusSaved(true); }, 450); };
 const doc = () => store.docs.find(d => d.name === store.current);
+const isCss = n => /\.css$/i.test(n || "");
+const pages = () => store.docs.filter(d => !isCss(d.name));
+/* the HTML page that shows a CSS file: the one last open that links it, else any page that links it */
+const linksTo = (page, css) => [...page.code.matchAll(/<link\b[^>]*>/gi)].some(m => /rel\s*=\s*["']?stylesheet/i.test(m[0]) &&
+  new RegExp(`href\\s*=\\s*["']?(?:\\./)?${css.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}["'\\s>]`, "i").test(m[0]));
+function hostFor(css){
+  const last = store.docs.find(d => d.name === store.lastPage);
+  if (last && !isCss(last.name) && linksTo(last, css)) return last;
+  return pages().find(p => linksTo(p, css)) || null;
+}
 const uniqueName = base => {
   base = cleanName(base) || "oldal.html";
   if (!store.docs.some(d => d.name === base)) return base;
@@ -599,15 +643,43 @@ function resolve(code){
     if (SAMPLES.includes(k) && !assets.has(k)) return SAMPLE_URL(k);
     return null;
   };
+  const files = u => u.replace(/url\(\s*(["']?)([^"')]+)\1\s*\)/gi, (all, q, v) => { const x = map(v); return x ? `url(${q}${x}${q})` : all; });
+  code = code.replace(/<link\b[^>]*>/gi, tag => {                 /* <link rel="stylesheet" href="style.css">: the CSS you are writing */
+    if (!/rel\s*=\s*["']?stylesheet/i.test(tag)) return tag;
+    const h = /href\s*=\s*(["']?)([^"'\s>]+)\1/i.exec(tag); if (!h) return tag;
+    const d = store.docs.find(x => isCss(x.name) && x.name === h[2].replace(/^\.\//, ""));
+    return d ? `<style data-file="${esc(d.name)}">\n${files(d.code).replace(/<\/style/gi, "<\\/style")}\n</style>` : tag;
+  });
   return code
     .replace(/(\s(?:src|href|poster)\s*=\s*)(["'])([^"']*)\2/gi, (all, a, q, v) => { const u = map(v); return u ? a + q + u + q : all; })
     .replace(/url\(\s*(["']?)([^"')]+)\1\s*\)/gi, (all, q, v) => { const u = map(v); return u ? `url(${q}${u}${q})` : all; });
 }
 
+/* ---------- a few plain checks for CSS files ---------- */
+function lintCss(src){
+  const out = [], plain = src.replace(/\/\*[\s\S]*?(\*\/|$)/g, m => m.replace(/[^\n]/g, " ")).replace(/(["'])(?:\\.|(?!\1).)*\1/g, m => " ".repeat(m.length));
+  const o = (plain.match(/\{/g) || []).length, c = (plain.match(/\}/g) || []).length;
+  if (o !== c) out.push({ line: 1, html: tpl("lintBrace", { o, c }) });
+  let depth = 0;
+  plain.split("\n").forEach((L, i) => {
+    const t = L.trim(), was = depth;
+    depth += (L.match(/\{/g) || []).length - (L.match(/\}/g) || []).length;
+    if (!t || was < 1 || /[{}]$/.test(t) || t.startsWith("@") || /^[}]/.test(t)) return;
+    if (!/:/.test(t) && /^[a-z-]+\s+\S/i.test(t)) { out.push({ line: i + 1, html: tpl("lintColon", { l: i + 1 }) }); return; }
+    if (/:/.test(t) && !/[;,]$/.test(t)) {
+      const next = plain.split("\n").slice(i + 1).find(x => x.trim());
+      if (next !== undefined && !/^\s*\}/.test(next)) out.push({ line: i + 1, html: tpl("lintSemi", { l: i + 1 }) });
+    }
+  });
+  return out.slice(0, 6);
+}
+const lintNow = src => isCss(store.current) ? lintCss(src) : lint(src);
+Object.assign(ED_TEXT[PAGE_LANG].docs, CSS_DOCS);
+
 /* ---------- editor + preview ---------- */
 const ta = $("#code");
 ta.value = doc().code;
-const editor = makeEditor(ta, { lines: true, fixed: true, fold: true, files: FILES, onCursor: (l, c) => { try { cur = [l, c]; drawStatus(); if (browser.picking) browser.highlightAt(editor.cm.view.state.selection.main.head); } catch(e){} } });
+const editor = makeEditor(ta, { lines: true, fixed: true, fold: true, files: FILES, mode: isCss(store.current) ? "css" : "html", lintFn: lintNow, onCursor: (l, c) => { try { cur = [l, c]; drawStatus(); if (browser.picking) browser.highlightAt(editor.cm.view.state.selection.main.head); } catch(e){} } });
 let cur = [1, 1], warnN = 0, savedOk = true;
 UI.localLink = h => {                                          /* a link to one of your pages opens it */
   const n = h.split(/[?#]/)[0].replace(/^\.\//, "");
@@ -615,45 +687,59 @@ UI.localLink = h => {                                          /* a link to one 
   if (assets.has(n)) { window.open(assets.get(n).url, "_blank"); return true; }
   return false;
 };
-const browser = makeBrowser($("#browser"), doc().name, UI, { pick: { label: T.pick, title: T.pickT, onPick: (start, open) => jumpTo(start, open) } });
+const browser = makeBrowser($("#browser"), doc().name, UI, { pick: { label: T.pick, title: T.pickT, onPick: (start, open) => {
+  if (isCss(store.current)) { const h = hostFor(store.current); if (h) openDoc(h.name); }   /* picking while on a CSS file jumps into its page */
+  jumpTo(start, open);
+} } });
 function jumpTo(start, open){
   if (mode === "view") setMode(innerWidth < 760 ? "code" : "both");
   if (editor.cm){ const v = editor.cm.view; v.dispatch({ selection: { anchor: open, head: start }, scrollIntoView: true }); v.focus(); }
   else { ta.focus(); ta.setSelectionRange(start, open); }
 }
 function render(now){
-  const d = doc();
-  $(".bw-bar .addr", $("#browser")).lastChild.textContent = " " + d.name;
-  browser.show(resolve(instrument(ta.value)), now);
-  const w = lint(ta.value); warnN = w.length;
+  const d = doc(), css = isCss(d.name), host = css ? hostFor(d.name) : d;
+  $(".bw-bar .addr", $("#browser")).lastChild.textContent = " " + (host ? host.name : d.name);
+  $("#work").classList.toggle("css", css);
+  if (host) browser.show(resolve(instrument(host.code)), now);
+  else browser.show(`<!doctype html><meta charset="utf-8"><style>body{font:16px/1.5 system-ui,sans-serif;color:#2b3a33;margin:28px;max-width:46ch}code{font:14px ui-monospace,monospace;background:#eef1ec;padding:1px 4px;border-radius:3px}</style><p>${tpl("noHost", { n: esc(d.name) })}</p>`, now);
+  const w = lintNow(ta.value); warnN = w.length;
   $("#lint").hidden = !w.length; $("#lint").innerHTML = w.map(x => `<p>${x.html}</p>`).join("");
   drawStatus();
 }
 ta.addEventListener("input", () => { doc().code = ta.value; doc().updated = Date.now(); saveSoon(); render(false); });
 function setStatusSaved(ok){ savedOk = ok; drawStatus(); }
 function drawStatus(){
-  $("#stPos").textContent = tpl("pos", { l: cur[0], c: cur[1] });
+  $("#stPos").textContent = (isCss(store.current) ? "CSS · " : "HTML · ") + tpl("pos", { l: cur[0], c: cur[1] });
   const w = $("#stWarn"); w.textContent = warnN ? tpl("warns", { n: warnN }) : T.noWarn; w.className = warnN ? "warn" : "ok";
   $("#stSave").textContent = savedOk ? T.saved : T.saving;
 }
 
 /* ---------- pages menu ---------- */
 function drawDocs(){
-  const s = $("#docSel");
-  s.innerHTML = store.docs.map(d => `<option value="${esc(d.name)}"${d.name === store.current ? " selected" : ""}>${esc(d.name)}</option>`).join("");
+  /* pages first, then their CSS files; each tab says what kind of file it is */
+  const list = [...pages(), ...store.docs.filter(d => isCss(d.name))];
+  $("#tabs").innerHTML = list.map(d => `<button type="button" role="tab" class="ftab ${isCss(d.name) ? "is-css" : "is-html"}" data-n="${esc(d.name)}" aria-selected="${d.name === store.current}"><i aria-hidden="true">${isCss(d.name) ? "#" : "&lt;&gt;"}</i>${esc(d.name)}</button>`).join("");
+  const on = $("#tabs .ftab[aria-selected=true]"); if (on) on.scrollIntoView({ block: "nearest", inline: "nearest" });
   $("#delDoc").disabled = store.docs.length < 2;
   document.title = `${store.current} · ${T.title}`;
 }
 function openDoc(name){
   if (!store.docs.some(d => d.name === name)) return;
-  store.current = name; save(); drawDocs();
-  ta.value = doc().code; editor.refit(); render(true);
+  store.current = name; if (!isCss(name)) store.lastPage = name; save(); drawDocs();
+  ta.value = doc().code;
+  if (editor.setMode) editor.setMode(isCss(name) ? "css" : "html"); else editor.refit();
+  render(true);
   if (editor.cm) editor.cm.focus();
 }
-$("#docSel").onchange = e => openDoc(e.target.value);
+$("#tabs").onclick = e => { const b = e.target.closest(".ftab"); if (b) openDoc(b.dataset.n); };
+$("#tabs").onkeydown = e => {                                   /* arrow keys move between the tabs */
+  if (!/^Arrow(Left|Right)$/.test(e.key)) return;
+  const t = $$("#tabs .ftab"), i = t.indexOf(document.activeElement); if (i < 0) return;
+  e.preventDefault(); const n = t[(i + (e.key === "ArrowRight" ? 1 : -1) + t.length) % t.length]; n.focus(); openDoc(n.dataset.n);
+};
 
 /* small promise dialogs instead of prompt/confirm */
-function ask({ title, text = "", input = null, choices = null, ok = T.ok, danger = false, validate = null }){
+function ask({ title, text = "", input = null, choices = null, ok = T.ok, danger = false, validate = null, onChoice = null }){
   return new Promise(res => {
     const dl = $("#dlg");
     dl.innerHTML = `<form method="dialog" class="dlg"><h2>${esc(title)}</h2>${text ? `<p>${text}</p>` : ""}
@@ -662,6 +748,7 @@ function ask({ title, text = "", input = null, choices = null, ok = T.ok, danger
       <p class="err" hidden></p>
       <div class="row"><button type="button" class="btn ghost" value="cancel">${esc(T.cancel)}</button><button type="submit" class="btn${danger ? " danger" : ""}" value="ok">${esc(ok)}</button></div></form>`;
     const f = $("form", dl), inp = $("input[name=v]", dl), err = $(".err", dl);
+    if (onChoice && inp) $$("input[name=ch]", dl).forEach(c => c.onchange = () => { onChoice(c.value, inp); const dot = inp.value.lastIndexOf("."); inp.focus(); inp.setSelectionRange(0, dot > 0 ? dot : inp.value.length); });
     $("button[value=cancel]", dl).onclick = () => { dl.close(); res(null); };
     f.onsubmit = e => {
       e.preventDefault();
@@ -678,11 +765,25 @@ function ask({ title, text = "", input = null, choices = null, ok = T.ok, danger
 const nameTaken = (v, except) => { const n = cleanName(v); if (!n) return T.nameEmpty; if (n !== except && store.docs.some(d => d.name === n)) return tpl("nameTaken", { n }); return null; };
 
 $("#newDoc").onclick = async () => {
-  const r = await ask({ title: T.newTitle, input: uniqueName("oldal.html"), ok: T.create, validate: v => nameTaken(v),
-    choices: [{ v: "skeleton", t: T.tplSkel, d: T.tplSkelD }, { v: "blank", t: T.tplBlank, d: T.tplBlankD }] });
+  const r = await ask({ title: T.newPage, input: uniqueName("oldal.html"), ok: T.create,
+    validate: v => nameTaken(v),
+    choices: [{ v: "skeleton", t: T.tplSkel, d: T.tplSkelD }, { v: "css", t: T.tplCss, d: T.tplCssD }, { v: "blank", t: T.tplBlank, d: T.tplBlankD }],
+    onChoice: (v, inp) => {                                       /* the suggested name follows the kind of file */
+      const base = inp.value.replace(/\.[a-z0-9]+$/i, "");
+      if (v === "css" && !isCss(inp.value)) inp.value = uniqueName((/^oldal\d*$/.test(base) || !base ? "style" : base) + ".css");
+      if (v !== "css" && isCss(inp.value)) inp.value = uniqueName((base === "style" ? "oldal" : base) + ".html");
+    } });
   if (!r) return;
-  const name = cleanName(r.v);
-  store.docs.push({ name, code: r.ch === "blank" ? "" : CFG.templates.skeleton, updated: Date.now() });
+  let name = cleanName(r.v);
+  if (r.ch === "css" && !isCss(name)) name = uniqueName(name.replace(/\.[a-z0-9]+$/i, "") + ".css");
+  const page = isCss(store.current) ? (hostFor(store.current) || pages()[0]) : doc();
+  store.docs.push({ name, code: r.ch === "blank" ? "" : r.ch === "css" ? T.cssStarter : CFG.templates.skeleton, updated: Date.now() });
+  if (r.ch === "css" && page && !linksTo(page, name)) {            /* hook it into the page so it shows at once */
+    const tag = `<link rel="stylesheet" href="${name}">`;
+    page.code = /<\/head>/i.test(page.code) ? page.code.replace(/([ \t]*)<\/head>/i, (m, ind) => `${ind}  ${tag}\n${ind}</head>`) : tag + "\n" + page.code;
+    page.updated = Date.now(); store.lastPage = page.name;
+    openDoc(name); toast(tpl("cssLinked", { c: name, p: page.name })); return;
+  }
   openDoc(name); toast(tpl("created", { n: name }));
 };
 $("#renameDoc").onclick = async () => {
@@ -708,7 +809,7 @@ async function takeFiles(list){
   for (const f of list){
     if (/\.(html?|css|txt|js)$/i.test(f.name) || /^text\//.test(f.type)){
       const text = await f.text();
-      if (/\.html?$/i.test(f.name)){
+      if (/\.(html?|css)$/i.test(f.name)){
         const existing = store.docs.find(d => d.name === f.name);
         if (existing){ existing.code = text; existing.updated = Date.now(); }
         else store.docs.push({ name: cleanName(f.name), code: text, updated: Date.now() });
@@ -785,7 +886,8 @@ $("#dlBtn").onclick = async () => {
   } catch(e){ saveBlob(new Blob([doc().code], { type: "text/html" }), doc().name); toast(T.zipFail); }
 };
 $("#fullBtn").onclick = () => {
-  let src = resolve(doc().code);
+  const host = isCss(store.current) ? hostFor(store.current) : doc(); if (!host) return;
+  let src = resolve(host.code);
   const base = `<base href="${new URL(".", location.href).href}">`;
   src = /<head[^>]*>/i.test(src) ? src.replace(/<head[^>]*>/i, m => m + base) : base + src;
   const u = URL.createObjectURL(new Blob([src], { type: "text/html" })); window.open(u, "_blank"); setTimeout(() => URL.revokeObjectURL(u), 60000);

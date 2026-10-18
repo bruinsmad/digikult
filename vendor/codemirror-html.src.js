@@ -1,9 +1,12 @@
-/* digikult HTML editor: CodeMirror 6 with the comforts students know from VS Code.
+/* digikult HTML + CSS editor: CodeMirror 6 with the comforts students know from VS Code.
    Bundled into ../codemirror-html.js with:
-   esbuild entry.js --bundle --minify --format=iife --global-name=CMHTML */
+   esbuild entry.js --bundle --minify --format=iife --global-name=CMHTML
+   (npm: @codemirror/view state commands language autocomplete search lint lang-html lang-css,
+    @replit/codemirror-indentation-markers, @lezer/highlight, emmet, esbuild) */
 import { EditorView, keymap, lineNumbers, highlightActiveLine, highlightActiveLineGutter, drawSelection, dropCursor,
-         highlightSpecialChars, hoverTooltip, rectangularSelection, crosshairCursor } from "@codemirror/view";
-import { EditorState, EditorSelection, StateField, StateEffect, Annotation } from "@codemirror/state";
+         highlightSpecialChars, hoverTooltip, rectangularSelection, crosshairCursor,
+         Decoration, ViewPlugin, WidgetType, MatchDecorator } from "@codemirror/view";
+import { EditorState, EditorSelection, StateField, StateEffect, Annotation, Compartment } from "@codemirror/state";
 import { defaultKeymap, history, historyKeymap, indentWithTab, indentSelection } from "@codemirror/commands";
 import { indentOnInput, bracketMatching, syntaxHighlighting, HighlightStyle, indentUnit, syntaxTree,
          foldGutter, foldKeymap, codeFolding } from "@codemirror/language";
@@ -11,6 +14,7 @@ import { autocompletion, closeBrackets, closeBracketsKeymap, completionKeymap, a
 import { search, searchKeymap, highlightSelectionMatches, openSearchPanel } from "@codemirror/search";
 import { linter, lintGutter } from "@codemirror/lint";
 import { html, htmlCompletionSource } from "@codemirror/lang-html";
+import { css, cssCompletionSource } from "@codemirror/lang-css";
 import { indentationMarkers } from "@replit/codemirror-indentation-markers";
 import { tags as t } from "@lezer/highlight";
 import expandEmmet, { extract as extractEmmet } from "emmet";
@@ -24,6 +28,12 @@ const style = HighlightStyle.define([
   { tag: t.comment, color: "#8fa39a", fontStyle: "italic" },
   { tag: [t.documentMeta, t.character, t.processingInstruction], color: "#f0a3b8" },
   { tag: t.invalid, color: "#ff8a80" },
+  /* CSS: selectors yellow like tags, properties blue like attributes, values green, numbers pink */
+  { tag: [t.className, t.labelName], color: "#f2d264" },
+  { tag: t.propertyName, color: "#9cc8e8" },
+  { tag: [t.number, t.unit, t.color], color: "#f0a3b8" },
+  { tag: [t.keyword, t.atom, t.string, t.variableName, t.constant(t.name)], color: "#a8dba0" },
+  { tag: t.modifier, color: "#ff8a80", fontWeight: "700" },
 ]);
 
 const theme = EditorView.theme({
@@ -68,7 +78,50 @@ const theme = EditorView.theme({
   ".cm-diagnostic code": { fontFamily: "'JetBrains Mono', monospace", color: "#f2d264" },
   ".cm-lint-marker-warning": { content: "none" },
   ".cm-gutter-lint .cm-gutterElement": { padding: "0 2px" },
+  ".cm-swatch": { display: "inline-block", width: ".8em", height: ".8em", margin: "0 .35em 0 .05em", verticalAlign: "-.06em",
+                  borderRadius: "2px", boxShadow: "0 0 0 1px rgba(255,255,255,.35)", backgroundImage: "linear-gradient(45deg,#888 25%,transparent 25%,transparent 75%,#888 75%),linear-gradient(45deg,#888 25%,transparent 25%,transparent 75%,#888 75%)",
+                  backgroundSize: "6px 6px", backgroundPosition: "0 0,3px 3px", position: "relative", overflow: "hidden" },
+  ".cm-swatch > i": { position: "absolute", inset: "0" },
 }, { dark: true });
+
+/* ---------- CSS: a small colour square in front of every colour value ---------- */
+const NAMED = new Set(("black white red green blue yellow orange purple pink brown gray grey silver gold navy teal olive maroon lime aqua " +
+  "fuchsia cyan magenta coral salmon tomato crimson orchid violet indigo turquoise khaki beige ivory lavender plum tan chocolate " +
+  "darkred darkgreen darkblue darkorange lightblue lightgreen lightgray lightgrey skyblue steelblue royalblue tomato hotpink deeppink " +
+  "forestgreen seagreen limegreen springgreen slategray dimgray whitesmoke snow mintcream honeydew aliceblue transparent").split(" "));
+class Swatch extends WidgetType {
+  constructor(color) { super(); this.color = color; }
+  eq(o) { return o.color === this.color; }
+  toDOM() { const s = document.createElement("span"); s.className = "cm-swatch"; s.setAttribute("aria-hidden", "true");
+            const i = document.createElement("i"); i.style.background = this.color; s.append(i); return s; }
+  ignoreEvent() { return true; }
+}
+const swatchMatcher = new MatchDecorator({
+  regexp: /#(?:[0-9a-fA-F]{8}|[0-9a-fA-F]{6}|[0-9a-fA-F]{3,4})\b|\b(?:rgba?|hsla?)\([^)]*\)|(?<=:\s*|\s)[a-z]+(?=\s*[;}!]|\s*$)/g,
+  decorate: (add, from, to, m) => {
+    const v = m[0];
+    if (/^[a-z]+$/.test(v) && !NAMED.has(v)) return;
+    if (typeof CSS !== "undefined" && CSS.supports && !CSS.supports("color", v)) return;
+    add(from, from, Decoration.widget({ widget: new Swatch(v), side: -1 }));
+  }
+});
+const swatches = ViewPlugin.fromClass(class {
+  constructor(view) { this.deco = swatchMatcher.createDeco(view); }
+  update(u) { this.deco = swatchMatcher.updateDeco(u, this.deco); }
+}, { decorations: v => v.deco });
+
+/* ---------- CSS Emmet: m10 + Tab gives margin: 10px; like VS Code ---------- */
+function cssEmmetAt(state, pos) {
+  const line = state.doc.lineAt(pos), col = pos - line.from;
+  const before = line.text.slice(0, col);
+  if (/[:{]\s*[^;{}]*$/.test(before) && /:/.test(before.split(/[;{]/).pop())) return null;   /* already in a value */
+  const ex = extractEmmet(line.text, col, { type: "stylesheet", lookAhead: false });
+  if (!ex || !ex.abbreviation || !/^[a-z][a-z0-9.:-]*$/i.test(ex.abbreviation)) return null;
+  let out;
+  try { out = expandEmmet(ex.abbreviation, { type: "stylesheet", options: { "output.field": () => "" } }); } catch (e) { return null; }
+  if (!out || out === ex.abbreviation || !/:/.test(out)) return null;
+  return { from: line.from + ex.start, to: pos, text: out };
+}
 
 /* ---------- Emmet: ul>li*3 + Tab, like VS Code ---------- */
 const TAGS = new Set(("a abbr address article aside audio b blockquote body br button caption cite code col colgroup dd del details div dl dt em " +
@@ -176,7 +229,7 @@ const formatAll = view => {
 
 /* ---------- create ---------- */
 export function create({ parent, doc = "", lines = false, onChange = null, onCursor = null, label = "", fit = true, lang = "hu",
-                         docs = {}, phrases = {}, files = [], lint = null, fold = false }) {
+                         docs = {}, phrases = {}, files = [], lint = null, fold = false, mode = "html" }) {
   const tagDoc = name => docs[(name || "").toLowerCase()];
   /* suggestions: tags and attributes explained in the students' language; attributes arrive as name="" */
   const htmlSource = ctx => {
@@ -239,9 +292,44 @@ export function create({ parent, doc = "", lines = false, onChange = null, onCur
   const tabKey = view => {
     if (completionStatus(view.state) === "active") return acceptCompletion(view);
     const pos = view.state.selection.main;
+    if (pos.empty && mode === "css") {
+      const m = cssEmmetAt(view.state, pos.head);
+      if (m) { view.dispatch({ changes: { from: m.from, to: m.to, insert: m.text }, selection: { anchor: m.from + m.text.length }, userEvent: "input.complete" }); return true; }
+      return false;
+    }
     if (pos.empty) { const m = emmetAt(view.state, pos.head); if (m) return applyEmmet(view, m, lang); }
     return false;
   };
+  /* CSS suggestions: property names explained in the students' language, a colon and a space added */
+  const cssSource = ctx => {
+    const r = cssCompletionSource(ctx);
+    if (!r || !r.options) return r;
+    return { ...r, options: r.options.map(o => {
+      if (o.type !== "property") return o;
+      const d = docs["css:" + o.label];
+      return { ...o, detail: d || o.detail, boost: d ? 5 : 0, apply: (view, c, from, to) => {
+        const next = view.state.sliceDoc(to, to + 1), ins = next === ":" ? c.label : c.label + ": ";
+        view.dispatch({ changes: { from, to, insert: ins }, selection: { anchor: from + ins.length }, userEvent: "input.complete" });
+      } };
+    }) };
+  };
+  const cssHover = hoverTooltip((view, pos, side) => {
+    const n = syntaxTree(view.state).resolveInner(pos, side);
+    if (n.name !== "PropertyName") return null;
+    const name = view.state.sliceDoc(n.from, n.to).toLowerCase(), text = docs["css:" + name];
+    if (!text) return null;
+    return { pos: n.from, end: n.to, above: true, create() {
+      const d = document.createElement("div"); d.className = "cm-doc";
+      const b = document.createElement("b"); b.textContent = name; d.append(b, document.createTextNode(" " + text));
+      return { dom: d };
+    } };
+  }, { hoverTime: 350 });
+  const langFor = m => m === "css"
+    ? [css(), autocompletion({ icons: false, override: [cssSource], activateOnTypingDelay: 60 }), cssHover, swatches]
+    : [html({ autoCloseTags: true, matchClosingTags: true }),
+       autocompletion({ icons: false, override: [emmetSource, tagWordSource, fileSource, htmlSource], activateOnTypingDelay: 60 }),
+       hover, linkField, linkedRename];
+  const langComp = new Compartment();
   const hover = hoverTooltip((view, pos, side) => {
     const n = syntaxTree(view.state).resolveInner(pos, side);
     let key = null, shown = "";
@@ -261,14 +349,12 @@ export function create({ parent, doc = "", lines = false, onChange = null, onCur
     rectangularSelection(), crosshairCursor(), highlightSelectionMatches(),
     indentUnit.of("  "), EditorState.tabSize.of(2), EditorState.phrases.of(phrases),
     indentOnInput(), bracketMatching(), closeBrackets(),
-    html({ autoCloseTags: true, matchClosingTags: true }),
-    autocompletion({ icons: false, override: [emmetSource, tagWordSource, fileSource, htmlSource], activateOnTypingDelay: 60 }),
-    syntaxHighlighting(style), theme, search({ top: false }), hover,
-    linkField, linkedRename,
+    langComp.of(langFor(mode)),
+    syntaxHighlighting(style), theme, search({ top: false }),
     indentationMarkers({ thickness: 1, colors: { light: "#33433c", dark: "#33433c", activeLight: "#5b7a6c", activeDark: "#5b7a6c" } }),
     keymap.of([
       { key: "Tab", run: tabKey },
-      { key: "Mod-b", run: wrapWith("strong") }, { key: "Mod-i", run: wrapWith("em") },
+      { key: "Mod-b", run: v => mode === "html" && wrapWith("strong")(v) }, { key: "Mod-i", run: v => mode === "html" && wrapWith("em")(v) },
       { key: "Shift-Alt-f", run: formatAll },
       ...closeBracketsKeymap, ...completionKeymap, ...searchKeymap, ...foldKeymap, ...historyKeymap, indentWithTab, ...defaultKeymap
     ]),
@@ -295,5 +381,12 @@ export function create({ parent, doc = "", lines = false, onChange = null, onCur
     focus: () => view.focus(),
     format: () => { formatAll(view); view.focus(); },
     search: () => { openSearchPanel(view); },
+    /* switch between an HTML page and a CSS file in the same editor; the new text replaces the old */
+    setMode: (m, text) => {
+      mode = m === "css" ? "css" : "html";
+      view.dispatch({ effects: langComp.reconfigure(langFor(mode)),
+                      changes: text == null ? undefined : { from: 0, to: view.state.doc.length, insert: text }, annotations: syncAnn.of(true) });
+    },
+    get mode() { return mode; },
   };
 }
