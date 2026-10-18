@@ -5,14 +5,14 @@
     @replit/codemirror-indentation-markers, @lezer/highlight, emmet, esbuild) */
 import { EditorView, keymap, lineNumbers, highlightActiveLine, highlightActiveLineGutter, drawSelection, dropCursor,
          highlightSpecialChars, hoverTooltip, rectangularSelection, crosshairCursor,
-         Decoration, ViewPlugin, WidgetType, MatchDecorator } from "@codemirror/view";
-import { EditorState, EditorSelection, StateField, StateEffect, Annotation, Compartment } from "@codemirror/state";
+         Decoration, ViewPlugin, WidgetType, MatchDecorator, GutterMarker, gutterLineClass } from "@codemirror/view";
+import { EditorState, EditorSelection, StateField, StateEffect, Annotation, Compartment, RangeSet } from "@codemirror/state";
 import { defaultKeymap, history, historyKeymap, indentWithTab, indentSelection } from "@codemirror/commands";
 import { indentOnInput, bracketMatching, syntaxHighlighting, HighlightStyle, indentUnit, syntaxTree,
          foldGutter, foldKeymap, codeFolding } from "@codemirror/language";
 import { autocompletion, closeBrackets, closeBracketsKeymap, completionKeymap, acceptCompletion, completionStatus } from "@codemirror/autocomplete";
 import { search, searchKeymap, highlightSelectionMatches, openSearchPanel } from "@codemirror/search";
-import { linter, lintGutter } from "@codemirror/lint";
+import { linter, lintGutter, forEachDiagnostic, setDiagnosticsEffect } from "@codemirror/lint";
 import { html, htmlCompletionSource } from "@codemirror/lang-html";
 import { css, cssCompletionSource } from "@codemirror/lang-css";
 import { indentationMarkers } from "@replit/codemirror-indentation-markers";
@@ -81,6 +81,11 @@ const theme = EditorView.theme({
   ".cm-lintRange-info": { backgroundImage: "none", textDecoration: "underline dotted #8cc4ee", textDecorationSkipInk: "none", textUnderlineOffset: "3px" },
   ".cm-diagnostic-info": { borderLeft: "4px solid #8cc4ee" },
   ".cm-lint-marker-info": { content: "none" },
+  ".cm-errLine": { backgroundColor: "rgba(242,120,74,.13)", boxShadow: "inset 3px 0 0 #f2784a" },
+  ".cm-tipLine": { backgroundColor: "rgba(140,196,238,.07)", boxShadow: "inset 3px 0 0 rgba(140,196,238,.55)" },
+  ".cm-errLine.cm-activeLine": { backgroundColor: "rgba(242,120,74,.2)" },
+  ".cm-lineNumbers .cm-errLineNo": { color: "#ff9a70", fontWeight: "700" },
+  ".cm-lineNumbers .cm-tipLineNo": { color: "#8cc4ee" },
   ".cm-gutter-lint .cm-gutterElement": { padding: "0 2px" },
   ".cm-swatch": { display: "inline-block", width: ".8em", height: ".8em", margin: "0 .35em 0 .05em", verticalAlign: "-.06em",
                   borderRadius: "2px", boxShadow: "0 0 0 1px rgba(255,255,255,.35)", backgroundImage: "linear-gradient(45deg,#888 25%,transparent 25%,transparent 75%,#888 75%),linear-gradient(45deg,#888 25%,transparent 25%,transparent 75%,#888 75%)",
@@ -111,6 +116,33 @@ const flashField = StateField.define({
     return v;
   },
   provide: f => EditorView.decorations.from(f)
+});
+
+/* ---------- lines with a mistake get a tinted background and a coloured line number ---------- */
+const errGutter = new class extends GutterMarker { constructor(){ super(); this.elementClass = "cm-errLineNo"; } }();
+const tipGutter = new class extends GutterMarker { constructor(){ super(); this.elementClass = "cm-tipLineNo"; } }();
+function problemLines(state){
+  const worst = new Map();                                   /* line start -> "err" | "tip" */
+  forEachDiagnostic(state, d => {
+    const doc = state.doc, a = doc.lineAt(Math.min(d.from, doc.length)).number, b = doc.lineAt(Math.min(Math.max(d.from, d.to - 1), doc.length)).number;
+    for (let n = a; n <= Math.min(b, a + 30); n++) {
+      const at = doc.line(n).from, k = d.severity === "info" ? "tip" : "err";
+      if (worst.get(at) !== "err") worst.set(at, k);
+    }
+  });
+  const at = [...worst.keys()].sort((x, y) => x - y);
+  return {
+    deco: Decoration.set(at.map(p => Decoration.line({ class: worst.get(p) === "err" ? "cm-errLine" : "cm-tipLine" }).range(p))),
+    gut: RangeSet.of(at.map(p => (worst.get(p) === "err" ? errGutter : tipGutter).range(p)))
+  };
+}
+const problemField = StateField.define({
+  create: () => ({ deco: Decoration.none, gut: RangeSet.empty }),
+  update(v, tr) {
+    if (tr.effects.some(e => e.is(setDiagnosticsEffect))) return problemLines(tr.state);
+    return tr.docChanged ? { deco: v.deco.map(tr.changes), gut: v.gut.map(tr.changes) } : v;
+  },
+  provide: f => [EditorView.decorations.from(f, v => v.deco), gutterLineClass.from(f, v => v.gut)]
 });
 
 /* ---------- CSS: a small colour square in front of every colour value ---------- */
@@ -397,7 +429,7 @@ export function create({ parent, doc = "", lines = false, onChange = null, onCur
   if (lines) ext.push(lineNumbers(), highlightActiveLineGutter(), highlightActiveLine());
   if (fold) ext.push(codeFolding(), foldGutter({ openText: "⌄", closedText: "›" }));
   if (fit) ext.push(EditorView.lineWrapping);
-  if (lint) ext.push(lintGutter(), linter(view => lint(view.state.doc.toString()).map(w => {
+  if (lint) ext.push(lintGutter(), problemField, linter(view => lint(view.state.doc.toString()).map(w => {
     const len = view.state.doc.length, L = view.state.doc.line(Math.min(Math.max(1, w.line), view.state.doc.lines));
     const ind = /^\s*/.exec(L.text)[0].length;
     /* a checker that knows the exact spot underlines just that; otherwise the whole line. Tips get a calmer mark. */
