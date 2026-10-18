@@ -1,6 +1,19 @@
 /* Inkscape missions – renders a mission page from window.MISSION.
+
    Progress is saved in this browser under MISSION.key as {solved:[step numbers], checks:[…], end:bool};
    the landing page reads "solved" to draw the progress bar (see nav.js → progress). */
+
+/* progress as chalk tally marks (four strokes and a slash per bundle), like the landing page */
+function tallyMarks(n){
+  let d = "";
+  for (let i = 0; i < n; i++){
+    const g = Math.floor(i / 5), k = i % 5, x0 = g * 34, w = ((i * 7) % 3 - 1) * .7;
+    d += k < 4 ? `<path d="M${x0 + 3 + k * 6} ${3 + (i % 2)}L${x0 + 3 + k * 6 + w} 19"/>` : `<path d="M${x0} 15L${x0 + 24} 6"/>`;
+  }
+  const wd = Math.ceil(n / 5) * 34 - 6;
+  return `<svg class="tally" viewBox="-2 0 ${wd + 4} 22" width="${wd + 4}" height="22" aria-hidden="true">${d}</svg>`;
+}
+
 const DEFAULT_RULES = [
   "<b>Colours:</b> click a swatch in the palette = fill colour. Stroke colour and stroke on/off: <span class=\"menu\">Object ▸ Fill and Stroke…</span>, <i>Stroke paint</i> tab.",
   "<b>Several objects:</b> click the first, hold <span class=\"key\">Shift</span> and click the others. The status bar at the bottom counts them.",
@@ -92,7 +105,7 @@ const DEFAULT_RULES_HU = [
         <p class="story">${esc(M.story)}</p>
         <div class="meter" aria-live="polite">
           <div class="row"><span>${U.progress}</span><b id="count"></b></div>
-          <span class="bar" id="bar">${M.steps.map(() => "<i></i>").join("")}</span>
+          <span class="bar" id="bar">${tallyMarks(M.steps.length)}</span>
         </div>
         <div class="actions">
           <a class="btn chalk" href="#start">${U.start}</a>
@@ -186,7 +199,7 @@ const DEFAULT_RULES_HU = [
       b.querySelector(".t").textContent = d ? U.done : U.did;
     });
     document.querySelectorAll(".dots a").forEach(a => a.classList.toggle("done", isDone(+a.dataset.n)));
-    document.querySelectorAll("#bar i").forEach((i, k) => i.classList.toggle("on", isDone(k + 1)));
+    document.querySelectorAll("#bar path").forEach((i, k) => i.classList.toggle("on", isDone(k + 1)));
     $("#count").textContent = U.nSteps(S.solved.length, N);
     document.querySelectorAll(".check input").forEach(c => { c.checked = S.checks.includes(+c.dataset.c); });
     const allSteps = S.solved.length >= N, allChecks = S.checks.length >= M.checklist.length;

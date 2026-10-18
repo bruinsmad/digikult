@@ -1,9 +1,22 @@
 /* Coup! / Puccs! – the Inkscape final project (v3, bilingual: set window.COUP_LANG = "hu" before loading for Hungarian).
+
    One question at a time; the banner stays hidden until every question is answered. The answers deterministically produce
    a banner, and the guided Inkscape steps for exactly that banner. Every step is a comic strip of small panels (like the
    earlier missions): each panel shows the banner at that moment, with the selection box, the blue see-through "cutter"
    shape and a dashed outline + arrow where something was moved from; chips under the panel give the tool, menu, sizes
    and colour codes. Saved under KEY as {answers, q, revealed, solved:[1..7], checks:[…], end}. */
+
+/* progress as chalk tally marks (four strokes and a slash per bundle), like the landing page */
+function tallyMarks(n){
+  let d = "";
+  for (let i = 0; i < n; i++){
+    const g = Math.floor(i / 5), k = i % 5, x0 = g * 34, w = ((i * 7) % 3 - 1) * .7;
+    d += k < 4 ? `<path d="M${x0 + 3 + k * 6} ${3 + (i % 2)}L${x0 + 3 + k * 6 + w} 19"/>` : `<path d="M${x0} 15L${x0 + 24} 6"/>`;
+  }
+  const wd = Math.ceil(n / 5) * 34 - 6;
+  return `<svg class="tally" viewBox="-2 0 ${wd + 4} 22" width="${wd + 4}" height="22" aria-hidden="true">${d}</svg>`;
+}
+
 (function () {
   "use strict";
   const HU = window.COUP_LANG === "hu";
@@ -861,7 +874,7 @@
         <p class="story">${t("03:00. The palace is quiet, the old government has left by helicopter, and the TV station is yours. You are a morally grey general with a brand-new country – and no banner. Answer the questions of your command tent one by one: when the last one is answered, your banner is revealed.",
           "Hajnali 3 óra. Csend van a palotában, a régi kormány helikopterrel távozott, a tévészékház a tiéd. Erkölcsileg szürke tábornok vagy egy vadonatúj országgal – és zászló nélkül. Válaszold meg egyenként a parancsnoki sátor kérdéseit: az utolsó válasz után előkerül a zászlód.")}</p>
         <p class="disclaimer">${t("A design game: the coup is pure fiction, no real government is harmed by your SVG file.", "Tervezőjáték: a puccs színtiszta kitaláció, az SVG-fájlod egyetlen valódi kormánynak sem árt.")}</p>
-        <div class="meter" aria-live="polite"><div class="row"><span>${t("Your progress", "Haladásod")}</span><b id="count"></b></div><span class="bar" id="bar">${STEP_TITLES.map(() => "<i></i>").join("")}</span></div>
+        <div class="meter" aria-live="polite"><div class="row"><span>${t("Your progress", "Haladásod")}</span><b id="count"></b></div><span class="bar" id="bar">${tallyMarks(STEP_TITLES.length)}</span></div>
         <div class="actions"><a class="btn chalk" href="#tent">${t("To the command tent", "Irány a parancsnoki sátor")}</a><button class="btn ghost" type="button" id="print">${t("Print my plan", "A tervem nyomtatása")}</button></div>
       </div>
       <figure class="poster flag-poster"><div id="hero-flag"></div><figcaption id="hero-cap"></figcaption></figure>
@@ -1041,7 +1054,7 @@
       const b = el.querySelector(".done-btn"); b.setAttribute("aria-pressed", String(d)); b.querySelector(".box").textContent = d ? "✓" : ""; b.querySelector(".t").textContent = d ? t("Done", "Kész") : t("I did this step", "Ezt a lépést megcsináltam");
     });
     document.querySelectorAll(".dots a").forEach(a => a.classList.toggle("done", S.solved.includes(+a.dataset.n)));
-    document.querySelectorAll("#bar i").forEach((i, k) => i.classList.toggle("on", S.solved.includes(k + 1)));
+    document.querySelectorAll("#bar path").forEach((i, k) => i.classList.toggle("on", S.solved.includes(k + 1)));
     $("#count").textContent = t(`${S.solved.length} / 7 steps`, `${S.solved.length} / 7 lépés`);
     document.querySelectorAll(".check input").forEach(c => { c.checked = S.checks.includes(+c.dataset.c); });
     const was = S.end; S.end = S.revealed && S.solved.length >= 7 && S.checks.length >= 8;
