@@ -377,6 +377,25 @@
     document.head.appendChild(ic);
   }
 
+  /* offline support: sw.js saves the site in the browser; the first time it's done, say so once */
+  if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost") && !window.__digikultSW) {
+    window.__digikultSW = true;
+    navigator.serviceWorker.register(url("sw.js")).catch(() => {});
+    navigator.serviceWorker.addEventListener("message", e => {
+      if (!e.data || e.data.type !== "digikult-offline-ready") return;
+      const en = (document.documentElement.lang || lang) === "en";
+      const n = document.createElement("div");
+      n.setAttribute("role", "status");
+      n.textContent = en ? "Saved: the lessons and the editor now work without internet too." : "Elmentve: a tananyag és a szerkesztő mostantól internet nélkül is működik.";
+      n.style.cssText = "position:fixed;left:50%;bottom:20px;transform:translate(-50%,8px);z-index:2147483646;max-width:calc(100vw - 32px);box-sizing:border-box;" +
+        "padding:10px 16px;border-radius:4px;background:#fdf8ec;color:#1c2f28;font:15px/1.4 'Atkinson Hyperlegible',system-ui,sans-serif;" +
+        "box-shadow:0 8px 24px rgba(0,0,0,.35);opacity:0;transition:opacity .3s,transform .3s";
+      document.body.appendChild(n);
+      requestAnimationFrame(() => { n.style.opacity = "1"; n.style.transform = "translate(-50%,0)"; });
+      setTimeout(() => { n.style.opacity = "0"; setTimeout(() => n.remove(), 400); }, 6000);
+    });
+  }
+
   /* The landing page draws its own full map; no floating menu there. */
   if (document.documentElement.hasAttribute("data-digikult-home")) return;
   if (window.__digikultNav) return;

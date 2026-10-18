@@ -996,6 +996,6 @@ $("sql").value = state.drafts[state.current] ?? starterFor(state.current);
 if (typeof initSqlJs !== "function"){ $("out").innerHTML = `<div class="err">${T.engFail}<p>${T.engFail2}</p></div>`; }
 else { initSqlJs().then(s=>{ SQL = s; resetDb(); }).catch(e=>{ $("out").innerHTML = `<div class="err">${T.engStart}<p>${esc(e.message)}</p></div>`; }); }
 </script>
-<script src="../../nav.js?v=f117c860" defer></script>
+<script src="../../nav.js?v=edd4ad87" defer></script>
 </body>
 </html>
