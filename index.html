@@ -119,22 +119,21 @@ a{color:inherit}
 .step h3 .what code{font-weight:700}
 /* headings that only receive focus from a link landing on them */
 [tabindex="-1"]:focus{outline:none}
-/* page transitions, like wiping the board: an eraser swipe clears the old view across the board
-   while the new one settles in underneath; the rail holds still and the subject's drawing travels.
-   Going back to all subjects wipes the other way. Off for reduced motion. */
+/* page transitions: the old view drifts aside and fades out quickly, the new one glides in from the
+   other side; only opacity and transform move, so it stays smooth. The subject's drawing travels,
+   the rail holds still, and going back to all subjects runs the other way. Off for reduced motion. */
 @view-transition{navigation:auto}
 .rail{view-transition-name:rail}
 ::view-transition-group(root){animation:none}
-::view-transition-old(root){animation:wipe-away .56s cubic-bezier(.55,.1,.35,1) both;
-  -webkit-mask-image:linear-gradient(100deg,transparent 0 38%,#000 62% 100%);mask-image:linear-gradient(100deg,transparent 0 38%,#000 62% 100%);
-  -webkit-mask-size:280% 100%;mask-size:280% 100%}
-::view-transition-new(root){animation:settle-in .56s cubic-bezier(.2,.75,.25,1) both}
-html[data-vt="back"]::view-transition-old(root){animation-name:wipe-away-back;
-  -webkit-mask-image:linear-gradient(-100deg,transparent 0 38%,#000 62% 100%);mask-image:linear-gradient(-100deg,transparent 0 38%,#000 62% 100%)}
-@keyframes wipe-away{from{-webkit-mask-position:100% 0;mask-position:100% 0}to{-webkit-mask-position:0 0;mask-position:0 0}}
-@keyframes wipe-away-back{from{-webkit-mask-position:0 0;mask-position:0 0}to{-webkit-mask-position:100% 0;mask-position:100% 0}}
-@keyframes settle-in{from{opacity:.25;transform:translateY(10px) scale(.992)}to{opacity:1;transform:none}}
-::view-transition-group(*){animation-duration:.56s;animation-timing-function:cubic-bezier(.2,.8,.2,1)}
+::view-transition-old(root){animation:vt-out .2s cubic-bezier(.4,0,1,1) both}
+::view-transition-new(root){animation:vt-in .38s cubic-bezier(.16,1,.3,1) .06s both}
+html[data-vt="back"]::view-transition-old(root){animation-name:vt-out-back}
+html[data-vt="back"]::view-transition-new(root){animation-name:vt-in-back}
+@keyframes vt-out{to{opacity:0;transform:translateX(-18px)}}
+@keyframes vt-in{from{opacity:0;transform:translateX(26px)}}
+@keyframes vt-out-back{to{opacity:0;transform:translateX(18px)}}
+@keyframes vt-in-back{from{opacity:0;transform:translateX(-26px)}}
+::view-transition-group(*){animation-duration:.44s;animation-timing-function:cubic-bezier(.16,1,.3,1)}
 ::view-transition-old(rail),::view-transition-new(rail){animation:none}
 @media (prefers-reduced-motion:reduce){::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none!important}}
 main:focus{outline:none}
@@ -710,7 +709,7 @@ function puliSvg(){
       ${tp.id === "web" ? `<span class="titlebar" aria-hidden="true"><i></i><i></i><i></i><span>index.html</span></span>` : ""}
       ${tp.id === "sql" ? `<span class="deco ghost" aria-hidden="true">SELECT *<br>FROM&nbsp;…</span>` : ""}
       ${tp.id === "inkscape" ? `<span class="deco guides" aria-hidden="true"></span><span class="deco curl" aria-hidden="true"></span>` : ""}
-      <span class="emb" style="view-transition-name:emb-${tp.id}">${EMBLEMS[tp.id] || embGen}</span>
+      <span class="emb">${EMBLEMS[tp.id] || embGen}</span>
       <h2><a href="#${tp.id}" aria-label="${esc(T.open(name))}">${splitName(name)}${tp.id === "web" ? `<span class="caret" aria-hidden="true"></span>` : ""}</a></h2>
       <p class="bl">${esc(D.t(tp.blurb))}</p>
       <ol>${tp.lessons.map((ls, i) => `<li><a href="#${tp.id}-${ls.id}"><b>${i + 1}</b><span>${esc(shortTitle(ls))}</span></a></li>`).join("")}</ol>
@@ -758,6 +757,7 @@ function puliSvg(){
   const TILTS = ["-.7deg", ".6deg", "-.4deg", ".8deg"];
   const KCOL = { story:"#9a5b00", lesson:"#1f3f88", demo:"#1f5a88", tool:"#225c43" };   /* stamp ink per kind */
 
+  let shown = null;     /* the subject currently on screen, for the transition between views */
   function draw(){
     const L = D.lang, T = TXT[L];
     document.documentElement.lang = L;
@@ -794,6 +794,7 @@ function puliSvg(){
     }
 
     const { tp: open } = current();
+    shown = open || null;
     document.body.classList.toggle("subject", !!open);
     $("#topics").querySelectorAll("a").forEach(a => { if (open && a.getAttribute("href") === "#" + open.id) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); });
     if (!open){
@@ -806,7 +807,7 @@ function puliSvg(){
       <span class="switch">${D.SITE.topics.map(tp => `<a href="#${tp.id}" style="--c:${tp.accent}"${tp === open ? ' aria-current="page"' : ""}>${esc(D.t(tp.title).split(" – ").pop())}</a>`).join("")}</span></nav>` + [open].map(tp => `
       <section class="topic" id="${tp.id}" style="--c:${tp.accent}">
         <div class="topic-head">
-          <span class="emb" style="view-transition-name:emb-${tp.id}">${EMBLEMS[tp.id] || embGen}</span>
+          <span class="emb">${EMBLEMS[tp.id] || embGen}</span>
           <div><h2 tabindex="-1">${splitName(D.t(tp.title))}</h2>
           <p>${esc(D.t(tp.blurb))}</p></div>
           <svg class="line" viewBox="0 0 220 14" aria-hidden="true"><path d="M3 9 C 50 3, 100 13, 150 6 S 200 5, 217 8"/></svg>
@@ -898,9 +899,23 @@ function puliSvg(){
   window.addEventListener("hashchange", () => {
     const go = () => { draw(); place(); };
     if (!document.startViewTransition || calm.matches) return go();
-    document.documentElement.dataset.vt = current().tp ? "fwd" : "back";
-    const t = document.startViewTransition(go);
-    const clear = () => delete document.documentElement.dataset.vt;
+    const to = current().tp, from = shown;
+    document.documentElement.dataset.vt = to ? "fwd" : "back";
+    /* only the clicked subject's drawing travels (landing <-> subject), so everything else moves as one */
+    const slateEmb = id => document.querySelector(`.slate--${id} .emb`);
+    const headEmb = () => document.querySelector(".topic-head .emb");
+    const name = (el, id) => { if (el) el.style.viewTransitionName = `emb-${id}`; };
+    if (to && !from) name(slateEmb(to.id), to.id);
+    if (!to && from) name(headEmb(), from.id);
+    const t = document.startViewTransition(() => {
+      go();
+      if (to && !from) name(headEmb(), to.id);
+      if (!to && from) name(slateEmb(from.id), from.id);
+    });
+    const clear = () => {
+      delete document.documentElement.dataset.vt;
+      document.querySelectorAll(".slate .emb, .topic-head .emb").forEach(e => e.style.viewTransitionName = "");
+    };
     t.finished.then(clear, clear);
     /* a quick second click skips the first transition; that's fine, so don't report it */
     [t.ready, t.finished, t.updateCallbackDone].forEach(p => p.catch(() => {}));
