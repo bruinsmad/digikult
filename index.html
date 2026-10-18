@@ -14,7 +14,7 @@
 /* Concept: the classroom chalkboard. Chalk handwriting for headings, lessons drawn as a
    numbered chalk path (they really are taught in order), each mission a poster taped to the board. */
 :root{
-  --board:#22362f; --board-deep:#1a2a24; --board-hi:#2b4339;
+  --board:#1c2f28; --board-deep:#15241e; --board-hi:#284036;
   --chalk:#efeee6; --chalk-dim:#b4c4b8; --chalk-faint:rgba(239,238,230,.16);
   --yellow:#f2d264; --blue:#9cc8e8; --pink:#f0a3b8; --green:#a8dba0;
   --wood:#8a5532; --wood-hi:#b07448; --wood-lo:#5d3820;
@@ -32,12 +32,12 @@ html{scroll-behavior:smooth}
 body{
   color:var(--chalk); font:17px/1.55 var(--f-body); min-height:100vh;
   background-color:var(--board);
-  /* chalk dust: soft smudges + fine grain */
+  /* a deep green board: light falls on it from above, the edges sink into shadow; fine grain over all */
   background-image:
-    radial-gradient(60% 40% at 18% 22%, rgba(255,255,255,.055), transparent 70%),
-    radial-gradient(50% 35% at 82% 58%, rgba(255,255,255,.04), transparent 70%),
-    radial-gradient(40% 30% at 40% 92%, rgba(255,255,255,.035), transparent 70%),
+    radial-gradient(90% 55% at 50% -8%, rgba(255,255,255,.075), transparent 72%),
+    radial-gradient(140% 105% at 50% 35%, transparent 52%, rgba(0,0,0,.34) 100%),
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .05 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-attachment:fixed,fixed,scroll;
 }
 a{color:inherit}
 :focus-visible{outline:3px solid var(--yellow);outline-offset:3px;border-radius:6px}
