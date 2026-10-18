@@ -119,11 +119,23 @@ a{color:inherit}
 .step h3 .what code{font-weight:700}
 /* headings that only receive focus from a link landing on them */
 [tabindex="-1"]:focus{outline:none}
-/* page transitions: the rail stays put, everything else cross-fades; off for reduced motion */
+/* page transitions, like wiping the board: an eraser swipe clears the old view across the board
+   while the new one settles in underneath; the rail holds still and the subject's drawing travels.
+   Going back to all subjects wipes the other way. Off for reduced motion. */
 @view-transition{navigation:auto}
 .rail{view-transition-name:rail}
-::view-transition-old(root),::view-transition-new(root){animation-duration:.28s}
-::view-transition-group(*){animation-duration:.42s;animation-timing-function:cubic-bezier(.3,.7,.2,1)}
+::view-transition-group(root){animation:none}
+::view-transition-old(root){animation:wipe-away .56s cubic-bezier(.55,.1,.35,1) both;
+  -webkit-mask-image:linear-gradient(100deg,transparent 0 38%,#000 62% 100%);mask-image:linear-gradient(100deg,transparent 0 38%,#000 62% 100%);
+  -webkit-mask-size:280% 100%;mask-size:280% 100%}
+::view-transition-new(root){animation:settle-in .56s cubic-bezier(.2,.75,.25,1) both}
+html[data-vt="back"]::view-transition-old(root){animation-name:wipe-away-back;
+  -webkit-mask-image:linear-gradient(-100deg,transparent 0 38%,#000 62% 100%);mask-image:linear-gradient(-100deg,transparent 0 38%,#000 62% 100%)}
+@keyframes wipe-away{from{-webkit-mask-position:100% 0;mask-position:100% 0}to{-webkit-mask-position:0 0;mask-position:0 0}}
+@keyframes wipe-away-back{from{-webkit-mask-position:0 0;mask-position:0 0}to{-webkit-mask-position:100% 0;mask-position:100% 0}}
+@keyframes settle-in{from{opacity:.25;transform:translateY(10px) scale(.992)}to{opacity:1;transform:none}}
+::view-transition-group(*){animation-duration:.56s;animation-timing-function:cubic-bezier(.2,.8,.2,1)}
+::view-transition-old(rail),::view-transition-new(rail){animation:none}
 @media (prefers-reduced-motion:reduce){::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none!important}}
 main:focus{outline:none}
 .items{container:items/inline-size;display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:26px 26px;align-items:start}
@@ -886,7 +898,10 @@ function puliSvg(){
   window.addEventListener("hashchange", () => {
     const go = () => { draw(); place(); };
     if (!document.startViewTransition || calm.matches) return go();
+    document.documentElement.dataset.vt = current().tp ? "fwd" : "back";
     const t = document.startViewTransition(go);
+    const clear = () => delete document.documentElement.dataset.vt;
+    t.finished.then(clear, clear);
     /* a quick second click skips the first transition; that's fine, so don't report it */
     [t.ready, t.finished, t.updateCallbackDone].forEach(p => p.catch(() => {}));
   });
