@@ -119,6 +119,12 @@ a{color:inherit}
 .step h3 .what code{font-weight:700}
 /* headings that only receive focus from a link landing on them */
 [tabindex="-1"]:focus{outline:none}
+/* page transitions: the rail stays put, everything else cross-fades; off for reduced motion */
+@view-transition{navigation:auto}
+.rail{view-transition-name:rail}
+::view-transition-old(root),::view-transition-new(root){animation-duration:.28s}
+::view-transition-group(*){animation-duration:.42s;animation-timing-function:cubic-bezier(.3,.7,.2,1)}
+@media (prefers-reduced-motion:reduce){::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none!important}}
 main:focus{outline:none}
 .items{container:items/inline-size;display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:26px 26px;align-items:start}
 
@@ -692,7 +698,7 @@ function puliSvg(){
       ${tp.id === "web" ? `<span class="titlebar" aria-hidden="true"><i></i><i></i><i></i><span>index.html</span></span>` : ""}
       ${tp.id === "sql" ? `<span class="deco ghost" aria-hidden="true">SELECT *<br>FROM&nbsp;…</span>` : ""}
       ${tp.id === "inkscape" ? `<span class="deco guides" aria-hidden="true"></span><span class="deco curl" aria-hidden="true"></span>` : ""}
-      <span class="emb">${EMBLEMS[tp.id] || embGen}</span>
+      <span class="emb" style="view-transition-name:emb-${tp.id}">${EMBLEMS[tp.id] || embGen}</span>
       <h2><a href="#${tp.id}" aria-label="${esc(T.open(name))}">${splitName(name)}${tp.id === "web" ? `<span class="caret" aria-hidden="true"></span>` : ""}</a></h2>
       <p class="bl">${esc(D.t(tp.blurb))}</p>
       <ol>${tp.lessons.map((ls, i) => `<li><a href="#${tp.id}-${ls.id}"><b>${i + 1}</b><span>${esc(shortTitle(ls))}</span></a></li>`).join("")}</ol>
@@ -788,7 +794,7 @@ function puliSvg(){
       <span class="switch">${D.SITE.topics.map(tp => `<a href="#${tp.id}" style="--c:${tp.accent}"${tp === open ? ' aria-current="page"' : ""}>${esc(D.t(tp.title).split(" – ").pop())}</a>`).join("")}</span></nav>` + [open].map(tp => `
       <section class="topic" id="${tp.id}" style="--c:${tp.accent}">
         <div class="topic-head">
-          <span class="emb">${EMBLEMS[tp.id] || embGen}</span>
+          <span class="emb" style="view-transition-name:emb-${tp.id}">${EMBLEMS[tp.id] || embGen}</span>
           <div><h2 tabindex="-1">${splitName(D.t(tp.title))}</h2>
           <p>${esc(D.t(tp.blurb))}</p></div>
           <svg class="line" viewBox="0 0 220 14" aria-hidden="true"><path d="M3 9 C 50 3, 100 13, 150 6 S 200 5, 217 8"/></svg>
@@ -875,7 +881,15 @@ function puliSvg(){
     if (el) el.scrollIntoView({ block: "start" }); else window.scrollTo({ top: 0, behavior: "auto" });
     if (tp) (el ? el.querySelector("h3") : document.querySelector(".topic-head h2")).focus({ preventScroll: true });
   }
-  window.addEventListener("hashchange", () => { draw(); place(); });
+  /* moving between all subjects and one subject: the subject's drawing travels, the rest cross-fades */
+  const calm = matchMedia("(prefers-reduced-motion: reduce)");
+  window.addEventListener("hashchange", () => {
+    const go = () => { draw(); place(); };
+    if (!document.startViewTransition || calm.matches) return go();
+    const t = document.startViewTransition(go);
+    /* a quick second click skips the first transition; that's fine, so don't report it */
+    [t.ready, t.finished, t.updateCallbackDone].forEach(p => p.catch(() => {}));
+  });
   draw();
   if (location.hash) requestAnimationFrame(place);
 })();
