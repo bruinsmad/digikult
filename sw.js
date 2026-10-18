@@ -261,7 +261,9 @@ async function fromCache(req){
 async function networkFirst(req, page){
   const cache = await caches.open(CACHE);
   try {
-    const res = await timeout(fetch(req), 4000);
+    /* "no-cache" asks the server whether the page changed (a tiny 304 when it didn't), instead of taking the
+       browser's own copy, which GitHub Pages lets it keep for 10 minutes; a just-pushed update shows at once */
+    const res = await timeout(fetch(req.url, { cache: "no-cache", credentials: "same-origin" }), 4000);
     if (res.ok) {
       cache.put(req, res.clone());
       if (page) saveImagesFor(new URL(req.url));
