@@ -81,6 +81,16 @@ const theme = EditorView.theme({
   ".cm-lintRange-info": { backgroundImage: "none", textDecoration: "underline dotted #8cc4ee", textDecorationSkipInk: "none", textUnderlineOffset: "3px" },
   ".cm-diagnostic-info": { borderLeft: "4px solid #8cc4ee" },
   ".cm-lint-marker-info": { content: "none" },
+  ".cm-tagPair": { backgroundColor: "rgba(255,216,77,.12)", boxShadow: "0 0 0 1px rgba(255,216,77,.45)", borderRadius: "2px" },
+  ".cm-tagPairName": { textDecoration: "underline 2px rgba(255,216,77,.85)", textUnderlineOffset: "4px" },
+  ".cm-tagLonely": { backgroundColor: "rgba(242,120,74,.12)", boxShadow: "0 0 0 1px rgba(242,120,74,.6)" },
+  ".cm-tagpeek": { position: "absolute", right: "12px", bottom: "8px", zIndex: "6", maxWidth: "calc(100% - 80px)", display: "flex", gap: "8px", alignItems: "baseline",
+                   padding: "3px 9px", border: "1px solid rgba(255,216,77,.4)", borderRadius: "4px", backgroundColor: "rgba(24,36,31,.94)", color: "#c9d6cf",
+                   font: "12.5px/1.5 'JetBrains Mono', monospace", cursor: "pointer", whiteSpace: "nowrap", overflow: "hidden", boxShadow: "0 4px 12px rgba(0,0,0,.35)" },
+  ".cm-tagpeek.above": { bottom: "auto", top: "8px" },
+  ".cm-tagpeek:hover": { borderColor: "#ffd84d", color: "#fff" },
+  ".cm-tagpeek .n": { color: "#ffd84d", fontWeight: "700", flex: "none" },
+  ".cm-tagpeek .t": { overflow: "hidden", textOverflow: "ellipsis" },
   ".cm-errLine": { backgroundColor: "rgba(242,120,74,.13)", boxShadow: "inset 3px 0 0 #f2784a" },
   ".cm-tipLine": { backgroundColor: "rgba(140,196,238,.07)", boxShadow: "inset 3px 0 0 rgba(140,196,238,.55)" },
   ".cm-errLine.cm-activeLine": { backgroundColor: "rgba(242,120,74,.2)" },
@@ -116,6 +126,93 @@ const flashField = StateField.define({
     return v;
   },
   provide: f => EditorView.decorations.from(f)
+});
+
+/* ---------- matching tags: the tag under the cursor (or mouse) lights up together with its partner;
+   when the partner is scrolled out of view, a small note at the edge shows it and jumps there on click ---------- */
+const setHoverTag = StateEffect.define();
+const VOID_TAGS = new Set("area base br col embed hr img input link meta source track wbr".split(" "));
+function elementTags(state, pos){
+  if (pos == null) return null;
+  const tree = syntaxTree(state);
+  for (const side of [1, -1]) {
+    let n = tree.resolveInner(pos, side);
+    while (n && !["OpenTag", "CloseTag", "SelfClosingTag"].includes(n.name)) { if (n.name === "Element" || n.name === "Document") { n = null; break; } n = n.parent; }
+    if (!n || n.name === "SelfClosingTag") continue;
+    const el = n.parent;
+    if (!el || el.name !== "Element") continue;
+    const open = el.firstChild && el.firstChild.name === "OpenTag" ? el.firstChild : null;
+    const close = el.lastChild && el.lastChild.name === "CloseTag" ? el.lastChild : null;
+    if (!open) continue;
+    const nameNode = open.getChild("TagName"), name = nameNode ? state.sliceDoc(nameNode.from, nameNode.to).toLowerCase() : "";
+    if (VOID_TAGS.has(name)) return null;                    /* <img>, <br>…: nothing to pair */
+    return { open, close, on: n.name === "OpenTag" ? "open" : "close" };
+  }
+  return null;
+}
+const tagMatchPlugin = ViewPlugin.fromClass(class {
+  constructor(view){
+    this.view = view; this.hover = null; this.pair = null; this.deco = Decoration.none;
+    this.peek = document.createElement("button"); this.peek.type = "button"; this.peek.className = "cm-tagpeek"; this.peek.hidden = true;
+    this.peek.addEventListener("mousedown", e => { e.preventDefault(); const t = this.peekAt; if (t == null) return;
+      view.dispatch({ selection: { anchor: t }, scrollIntoView: true }); view.focus(); });
+    view.dom.appendChild(this.peek);
+    this.onScroll = () => this.measure();
+    view.scrollDOM.addEventListener("scroll", this.onScroll, { passive: true });
+    this.compute();
+  }
+  compute(){
+    const st = this.view.state, pos = this.hover != null ? this.hover : st.selection.main.head;
+    const p = elementTags(st, pos); this.pair = p;
+    if (!p) { this.deco = Decoration.none; this.measure(); return; }
+    const marks = [], tag = (node, cls) => {
+      marks.push(Decoration.mark({ class: cls }).range(node.from, node.to));
+      const nm = node.getChild("TagName"); if (nm) marks.push(Decoration.mark({ class: "cm-tagPairName" }).range(nm.from, nm.to));
+    };
+    tag(p.open, p.close ? "cm-tagPair" : "cm-tagPair cm-tagLonely");
+    if (p.close) tag(p.close, "cm-tagPair");
+    this.deco = Decoration.set(marks, true);
+    this.measure();
+  }
+  measure(){
+    const view = this.view, p = this.pair;
+    const other = p && p.close ? (p.on === "open" ? p.close : p.open) : null;
+    view.requestMeasure({ key: this, read: () => {
+      if (!other) return null;
+      const rect = view.scrollDOM.getBoundingClientRect(), b = view.lineBlockAt(other.from), top = view.documentTop + b.top;
+      if (top >= rect.top - 2 && top + b.height <= rect.bottom + 2) return null;
+      return { above: top < rect.top, line: view.state.doc.lineAt(other.from).number, text: view.state.sliceDoc(other.from, Math.min(other.to, other.from + 70)) };
+    }, write: m => {
+      this.peekAt = m ? other.from : null;
+      this.peek.hidden = !m; if (!m) return;
+      this.peek.classList.toggle("above", m.above);
+      this.peek.textContent = "";
+      const n = document.createElement("span"); n.className = "n"; n.textContent = (m.above ? "↑ " : "↓ ") + m.line;
+      const t = document.createElement("span"); t.className = "t"; t.textContent = m.text.replace(/\s+/g, " ");
+      this.peek.append(n, t);
+    } });
+  }
+  update(u){
+    let h = this.hover;
+    for (const tr of u.transactions) for (const e of tr.effects) if (e.is(setHoverTag)) h = e.value;
+    if (u.docChanged && h != null) h = null;
+    const changed = h !== this.hover; this.hover = h;
+    if (changed || u.docChanged || u.selectionSet || syntaxTree(u.startState) !== syntaxTree(u.state)) this.compute();
+    else if (u.viewportChanged || u.geometryChanged) this.measure();
+  }
+  destroy(){ this.view.scrollDOM.removeEventListener("scroll", this.onScroll); this.peek.remove(); }
+}, {
+  decorations: v => v.deco,
+  eventHandlers: {
+    mousemove(e, view){
+      const pos = view.posAtCoords({ x: e.clientX, y: e.clientY }, false);
+      const p = elementTags(view.state, pos), cur = this.hover != null ? elementTags(view.state, this.hover) : null;
+      if (!p && this.hover == null) return;
+      if (p && cur && p.open.from === cur.open.from) return;
+      view.dispatch({ effects: setHoverTag.of(p ? pos : null) });
+    },
+    mouseleave(e, view){ if (this.hover != null) view.dispatch({ effects: setHoverTag.of(null) }); }
+  }
 });
 
 /* ---------- lines with a mistake get a tinted background and a coloured line number ---------- */
@@ -389,7 +486,7 @@ export function create({ parent, doc = "", lines = false, onChange = null, onCur
     ? [css(), autocompletion({ icons: false, override: [cssSource], activateOnTypingDelay: 60 }), cssHover, swatches]
     : [html({ autoCloseTags: true, matchClosingTags: true }),
        autocompletion({ icons: false, override: [emmetSource, tagWordSource, fileSource, htmlSource], activateOnTypingDelay: 60 }),
-       hover, linkField, linkedRename];
+       hover, linkField, linkedRename, tagMatchPlugin];
   const langComp = new Compartment();
   let flashTimer = 0;
   const hover = hoverTooltip((view, pos, side) => {
