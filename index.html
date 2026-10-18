@@ -32,16 +32,12 @@ html{scroll-behavior:smooth}
 body{
   color:var(--chalk); font:17px/1.55 var(--f-body); min-height:100vh;
   background-color:var(--board);
-  /* the big board: darker towards its edges, last lessons half wiped off, chalk dust and grain */
+  /* chalk dust: soft smudges + fine grain */
   background-image:
-    radial-gradient(120% 90% at 50% 40%, transparent 55%, rgba(0,0,0,.22) 100%),
     radial-gradient(60% 40% at 18% 22%, rgba(255,255,255,.055), transparent 70%),
     radial-gradient(50% 35% at 82% 58%, rgba(255,255,255,.04), transparent 70%),
     radial-gradient(40% 30% at 40% 92%, rgba(255,255,255,.035), transparent 70%),
-    url("img/board.svg"),
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .05 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
-  background-size:auto,auto,auto,auto,1400px 1100px,160px 160px;
-  background-attachment:fixed,scroll,scroll,scroll,scroll,scroll;
 }
 a{color:inherit}
 :focus-visible{outline:3px solid var(--yellow);outline-offset:3px;border-radius:6px}
