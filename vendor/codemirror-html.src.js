@@ -83,7 +83,32 @@ const theme = EditorView.theme({
                   borderRadius: "2px", boxShadow: "0 0 0 1px rgba(255,255,255,.35)", backgroundImage: "linear-gradient(45deg,#888 25%,transparent 25%,transparent 75%,#888 75%),linear-gradient(45deg,#888 25%,transparent 25%,transparent 75%,#888 75%)",
                   backgroundSize: "6px 6px", backgroundPosition: "0 0,3px 3px", position: "relative", overflow: "hidden" },
   ".cm-swatch > i": { position: "absolute", inset: "0" },
+  ".cm-flash-line": { backgroundColor: "rgba(224,123,44,.16)", boxShadow: "inset 4px 0 0 #e07b2c", animation: "cm-flash-fade 2s ease-in 2s forwards" },
+  ".cm-flash-line.first": { borderTop: "1px solid rgba(224,123,44,.55)" },
+  ".cm-flash-line.last": { borderBottom: "1px solid rgba(224,123,44,.55)" },
+  ".cm-flash": { backgroundColor: "rgba(224,123,44,.22)", borderRadius: "2px", animation: "cm-flash-fade 2s ease-in 2s forwards" },
+  "@keyframes cm-flash-fade": { to: { backgroundColor: "transparent", boxShadow: "inset 4px 0 0 transparent", borderColor: "transparent" } },
 }, { dark: true });
+
+/* ---------- "this is the element you clicked": a block that lights up, then fades ---------- */
+const setFlash = StateEffect.define();
+const flashField = StateField.define({
+  create: () => Decoration.none,
+  update(v, tr) {
+    v = v.map(tr.changes);
+    for (const e of tr.effects) if (e.is(setFlash)) {
+      if (!e.value) return Decoration.none;
+      const { from, to } = e.value, doc = tr.state.doc, ranges = [];
+      const a = doc.lineAt(from).number, b = doc.lineAt(Math.max(from, to - 1)).number;
+      for (let n = a; n <= b; n++) ranges.push(Decoration.line({ class: "cm-flash-line" + (n === a ? " first" : "") + (n === b ? " last" : "") }).range(doc.line(n).from));
+      if (to > from) ranges.push(Decoration.mark({ class: "cm-flash" }).range(from, to));
+      return Decoration.set(ranges, true);
+    }
+    if (tr.docChanged) return Decoration.none;
+    return v;
+  },
+  provide: f => EditorView.decorations.from(f)
+});
 
 /* ---------- CSS: a small colour square in front of every colour value ---------- */
 const NAMED = new Set(("black white red green blue yellow orange purple pink brown gray grey silver gold navy teal olive maroon lime aqua " +
@@ -331,6 +356,7 @@ export function create({ parent, doc = "", lines = false, onChange = null, onCur
        autocompletion({ icons: false, override: [emmetSource, tagWordSource, fileSource, htmlSource], activateOnTypingDelay: 60 }),
        hover, linkField, linkedRename];
   const langComp = new Compartment();
+  let flashTimer = 0;
   const hover = hoverTooltip((view, pos, side) => {
     const n = syntaxTree(view.state).resolveInner(pos, side);
     let key = null, shown = "";
@@ -349,7 +375,7 @@ export function create({ parent, doc = "", lines = false, onChange = null, onCur
     highlightSpecialChars(), history(), drawSelection(), dropCursor(), EditorState.allowMultipleSelections.of(true),
     rectangularSelection(), crosshairCursor(), highlightSelectionMatches(),
     indentUnit.of("  "), EditorState.tabSize.of(2), EditorState.phrases.of(phrases),
-    indentOnInput(), bracketMatching(), closeBrackets(),
+    indentOnInput(), bracketMatching(), closeBrackets(), flashField,
     langComp.of(langFor(mode)),
     syntaxHighlighting(style), theme, search({ top: false }),
     indentationMarkers({ thickness: 1, colors: { light: "#33433c", dark: "#33433c", activeLight: "#5b7a6c", activeDark: "#5b7a6c" } }),
@@ -389,5 +415,14 @@ export function create({ parent, doc = "", lines = false, onChange = null, onCur
                       changes: text == null ? undefined : { from: 0, to: view.state.doc.length, insert: text }, annotations: syncAnn.of(true) });
     },
     get mode() { return mode; },
+    /* light up from..to (a whole element), select its opening tag, and bring it to the middle of the editor */
+    flash: (from, to, sel) => {
+      const len = view.state.doc.length; from = Math.min(from, len); to = Math.min(Math.max(to, from), len);
+      view.dispatch({ effects: [setFlash.of(null)] });
+      view.dispatch({ effects: [setFlash.of({ from, to }), EditorView.scrollIntoView(from, { y: "center" })],
+                      selection: sel ? { anchor: Math.min(sel.anchor, len), head: Math.min(sel.head, len) } : undefined });
+      view.focus();
+      clearTimeout(flashTimer); flashTimer = setTimeout(() => view.dispatch({ effects: setFlash.of(null) }), 4200);
+    },
   };
 }

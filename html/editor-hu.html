@@ -176,7 +176,11 @@ body{grid-template-columns:minmax(0,1fr)}
 .bw-pick:hover{border-color:#2b2520}
 .bw-pick[aria-pressed="true"]{background:#e07b2c;border-color:#e07b2c;color:#fff}
 .bw.picking iframe{cursor:crosshair}
-.dk-box{position:absolute;pointer-events:none;border:2px solid #e07b2c;background:rgba(224,123,44,.12);border-radius:3px;z-index:3;transition:left .08s,top .08s,width .08s,height .08s}
+.dk-box{position:absolute;pointer-events:none;border:3px solid #e07b2c;background:rgba(224,123,44,.18);border-radius:3px;z-index:3;
+  box-shadow:0 0 0 3px rgba(224,123,44,.25),0 0 0 9999px rgba(20,28,25,.08);transition:left .08s,top .08s,width .08s,height .08s}
+.dk-box.hit{animation:dk-hit .5s ease-out}
+@keyframes dk-hit{0%{box-shadow:0 0 0 0 rgba(224,123,44,.7),0 0 0 9999px rgba(20,28,25,.14)}100%{box-shadow:0 0 0 14px rgba(224,123,44,0),0 0 0 9999px rgba(20,28,25,.08)}}
+@media (prefers-reduced-motion:reduce){.dk-box.hit{animation:none}}
 .dk-tag{position:absolute;left:-2px;top:-21px;background:#e07b2c;color:#fff;font:700 11.5px/1 "JetBrains Mono",ui-monospace,monospace;padding:4px 6px;border-radius:4px 4px 4px 0;white-space:nowrap}
 .dk-box.below .dk-tag{top:auto;bottom:-21px;border-radius:0 4px 4px 4px}
 @media (prefers-reduced-motion:reduce){ .dk-box{transition:none} }
@@ -235,7 +239,7 @@ body{grid-template-columns:minmax(0,1fr)}
 <div class="toast" id="toast" role="status"></div>
 <div class="drop" id="drop" hidden>Engedd el: megnyitom a fájlokat</div>
 
-<script src="../vendor/codemirror-html.js?v=3e98adc6"></script>
+<script src="../vendor/codemirror-html.js?v=3e562a7b"></script>
 <script>
 const CFG = {"ui": {"pick": "Kijelölés", "pickT": "Kattints egy elemre az előnézetben, és a kódban odaugrik. Alt+kattintással mindig működik.", "title": "HTML-szerkesztő", "preview": "Előnézet", "localTpl": "Ez a link a(z) {h} fájlra vinne, de nincs ilyen oldalad vagy képed. Hozd létre az ＋ Új gombbal!", "switched": "Átváltottam erre: {n}", "saveFail": "Nem sikerült menteni: megtelt a böngésző tárhelye.", "pos": "{l}. sor, {c}. oszlop", "warns": "⚠ {n} figyelmeztetés", "noWarn": "✓ nincs hiba", "saved": "mentve ✓", "saving": "mentés…", "savedToast": "Mentve. (Magától is ment.)", "ok": "OK", "cancel": "Mégse", "fileName": "Fájlnév", "nameEmpty": "Adj meg egy nevet.", "nameTaken": "Már van ilyen nevű oldalad: {n}", "newTitle": "Új oldal", "create": "Létrehozás", "tplSkel": "HTML-váz", "tplSkelD": "DOCTYPE, head, title és body, ahogy a leckében tanultuk", "tplBlank": "Üres", "tplBlankD": "Teljesen üres fájl. Tipp: írj be egy ! jelet, és nyomj Tabot.", "created": "Kész: {n}", "renameTitle": "Átnevezés", "rename": "Átnevezés", "delTitle": "Törlöd az oldalt?", "delText": "A(z) <b>{n}</b> végleg törlődik ebből a böngészőből.", "del": "Törlés", "opened": "Megnyitva: {p} oldal, {i} egyéb fájl", "imgTitle": "Képek", "imgText": "A feltöltött képek ebben a böngészőben maradnak. A kódban a nevükkel hivatkozz rájuk, pl. <code>src=\"kutya.jpg\"</code>. A letöltött .zip-be is bekerülnek.", "imgAdd": "＋ Kép feltöltése", "imgMine": "Saját képeid", "imgNone": "Még nincs saját képed. Tölts fel egyet, vagy húzd be az ablakba!", "imgSamples": "Mintaképek (mindig elérhetők)", "sample": "mintakép", "insert": "Beszúrás", "close": "Bezárás", "downloaded": "Letöltve: {n}", "zipFail": "A .zip nem készült el, csak az oldal töltődött le.", "imported": "Megnyitva a szerkesztőben: {n}"}, "samples": ["img/morzsa.svg", "img/cirmi.svg", "img/pamacs.svg", "img/bodri.svg", "img/logo.svg"], "sampleBase": "basics/img/", "templates": {"skeleton": "<!DOCTYPE html>\n<html lang=\"hu\">\n  <head>\n    <meta charset=\"utf-8\">\n    <title>Új oldal</title>\n  </head>\n  <body>\n    <h1>Helló, világ!</h1>\n\n  </body>\n</html>\n"}};
 const UI = { preview: CFG.ui.preview, localNote: h => CFG.ui.localTpl.replace("{h}", h) };
@@ -506,7 +510,7 @@ function makeBrowser(host, file, T, opts = {}){
       d.addEventListener("click", e => {
         if (opts.pick && (picking || e.altKey)){                  /* jump to the code */
           const mk = markOf(e.target);
-          if (mk){ e.preventDefault(); e.stopPropagation(); showBox(mk.el, 1600); opts.pick.onPick(mk.start, mk.open, mk.end); }
+          if (mk){ e.preventDefault(); e.stopPropagation(); showBox(mk.el, 3200); box.classList.remove("hit"); void box.offsetWidth; box.classList.add("hit"); opts.pick.onPick(mk.start, mk.open, mk.end); }
           return;
         }
         const a = e.target.closest && e.target.closest("a[href]"); if (!a) return;   /* links open in a new tab; #anchors scroll inside */
@@ -687,13 +691,15 @@ UI.localLink = h => {                                          /* a link to one 
   if (assets.has(n)) { window.open(assets.get(n).url, "_blank"); return true; }
   return false;
 };
-const browser = makeBrowser($("#browser"), doc().name, UI, { pick: { label: T.pick, title: T.pickT, onPick: (start, open) => {
+const browser = makeBrowser($("#browser"), doc().name, UI, { pick: { label: T.pick, title: T.pickT, onPick: (start, open, end) => {
   if (isCss(store.current)) { const h = hostFor(store.current); if (h) openDoc(h.name); }   /* picking while on a CSS file jumps into its page */
-  jumpTo(start, open);
+  jumpTo(start, open, end);
 } } });
-function jumpTo(start, open){
+function jumpTo(start, open, end){
   if (mode === "view") setMode(innerWidth < 760 ? "code" : "both");
-  if (editor.cm){ const v = editor.cm.view; v.dispatch({ selection: { anchor: open, head: start }, scrollIntoView: true }); v.focus(); }
+  /* the whole element lights up in the code and fades; its opening tag stays selected */
+  if (editor.cm && editor.cm.flash){ editor.cm.flash(start, end || open, { anchor: open, head: start }); }
+  else if (editor.cm){ const v = editor.cm.view; v.dispatch({ selection: { anchor: open, head: start }, scrollIntoView: true }); v.focus(); }
   else { ta.focus(); ta.setSelectionRange(start, open); }
 }
 function render(now){
