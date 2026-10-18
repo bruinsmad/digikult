@@ -52,9 +52,10 @@ img{max-width:100%;height:auto;display:block}
 .meter{margin:22px 0 0;max-width:420px}
 .meter .row{display:flex;justify-content:space-between;font-size:14px;color:var(--chalk-dim);margin-bottom:6px}
 .meter .row b{color:var(--chalk);font:700 18px var(--f-chalk)}
-.bar{display:flex;gap:4px}
-.bar i{flex:1;height:11px;border-radius:2px;background:var(--chalk-faint);transition:background .25s}
-.bar i.on{background:var(--accent)}
+.bar{display:block;line-height:0}
+.bar .tally{height:24px;width:auto;overflow:visible}
+.bar .tally path{fill:none;stroke:var(--chalk-faint);stroke-width:2.6;stroke-linecap:round;transition:stroke .25s}
+.bar .tally path.on{stroke:var(--accent)}
 .actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}
 .btn{display:inline-flex;align-items:center;gap:8px;text-decoration:none;font:700 15.5px var(--f-body);padding:10px 18px;border-radius:4px;border:0;cursor:pointer}
 .btn.chalk{background:var(--chalk);color:var(--paper-ink)}
