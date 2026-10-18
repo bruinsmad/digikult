@@ -862,7 +862,7 @@
           "Hajnali 3 óra. Csend van a palotában, a régi kormány helikopterrel távozott, a tévészékház a tiéd. Erkölcsileg szürke tábornok vagy egy vadonatúj országgal – és zászló nélkül. Válaszold meg egyenként a parancsnoki sátor kérdéseit: az utolsó válasz után előkerül a zászlód.")}</p>
         <p class="disclaimer">${t("A design game: the coup is pure fiction, no real government is harmed by your SVG file.", "Tervezőjáték: a puccs színtiszta kitaláció, az SVG-fájlod egyetlen valódi kormánynak sem árt.")}</p>
         <div class="meter" aria-live="polite"><div class="row"><span>${t("Your progress", "Haladásod")}</span><b id="count"></b></div><span class="bar" id="bar">${STEP_TITLES.map(() => "<i></i>").join("")}</span></div>
-        <div class="actions"><a class="btn chalk" href="#tent">${t("To the command tent ▸", "Irány a parancsnoki sátor ▸")}</a><button class="btn ghost" type="button" id="print">${t("🖨 Print my plan", "🖨 A tervem nyomtatása")}</button></div>
+        <div class="actions"><a class="btn chalk" href="#tent">${t("To the command tent", "Irány a parancsnoki sátor")}</a><button class="btn ghost" type="button" id="print">${t("Print my plan", "A tervem nyomtatása")}</button></div>
       </div>
       <figure class="poster flag-poster"><div id="hero-flag"></div><figcaption id="hero-cap"></figcaption></figure>
     </section>
