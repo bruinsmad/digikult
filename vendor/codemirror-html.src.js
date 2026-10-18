@@ -78,6 +78,9 @@ const theme = EditorView.theme({
   ".cm-diagnostic-warning": { borderLeft: "4px solid #f2b84a" },
   ".cm-diagnostic code": { fontFamily: "'JetBrains Mono', monospace", color: "#f2d264" },
   ".cm-lint-marker-warning": { content: "none" },
+  ".cm-lintRange-info": { backgroundImage: "none", textDecoration: "underline dotted #8cc4ee", textDecorationSkipInk: "none", textUnderlineOffset: "3px" },
+  ".cm-diagnostic-info": { borderLeft: "4px solid #8cc4ee" },
+  ".cm-lint-marker-info": { content: "none" },
   ".cm-gutter-lint .cm-gutterElement": { padding: "0 2px" },
   ".cm-swatch": { display: "inline-block", width: ".8em", height: ".8em", margin: "0 .35em 0 .05em", verticalAlign: "-.06em",
                   borderRadius: "2px", boxShadow: "0 0 0 1px rgba(255,255,255,.35)", backgroundImage: "linear-gradient(45deg,#888 25%,transparent 25%,transparent 75%,#888 75%),linear-gradient(45deg,#888 25%,transparent 25%,transparent 75%,#888 75%)",
@@ -395,9 +398,12 @@ export function create({ parent, doc = "", lines = false, onChange = null, onCur
   if (fold) ext.push(codeFolding(), foldGutter({ openText: "⌄", closedText: "›" }));
   if (fit) ext.push(EditorView.lineWrapping);
   if (lint) ext.push(lintGutter(), linter(view => lint(view.state.doc.toString()).map(w => {
-    const L = view.state.doc.line(Math.min(Math.max(1, w.line), view.state.doc.lines));
+    const len = view.state.doc.length, L = view.state.doc.line(Math.min(Math.max(1, w.line), view.state.doc.lines));
     const ind = /^\s*/.exec(L.text)[0].length;
-    return { from: L.from + ind, to: Math.max(L.from + ind, L.to), severity: "warning", message: w.html.replace(/<[^>]+>/g, "").replace(/&lt;/g, "<").replace(/&gt;/g, ">"),
+    /* a checker that knows the exact spot underlines just that; otherwise the whole line. Tips get a calmer mark. */
+    const exact = typeof w.from === "number" && w.from <= len;
+    const from = exact ? w.from : L.from + ind, to = exact ? Math.min(len, Math.max(w.to, w.from + 1)) : Math.max(L.from + ind, L.to);
+    return { from, to, severity: w.tip ? "info" : "warning", message: w.html.replace(/<[^>]+>/g, "").replace(/&lt;/g, "<").replace(/&gt;/g, ">"),
              renderMessage: () => { const s = document.createElement("span"); s.innerHTML = w.html; return s; } };
   }), { delay: 450 }));
   const view = new EditorView({ parent, state: EditorState.create({ doc, extensions: ext }) });
