@@ -21,19 +21,20 @@ import expandEmmet, { extract as extractEmmet } from "emmet";
 
 /* ---------- looks: colours match the static code blocks on the site ---------- */
 const style = HighlightStyle.define([
-  { tag: t.tagName, color: "#f2d264", fontWeight: "700" },
-  { tag: t.attributeName, color: "#9cc8e8" },
-  { tag: t.attributeValue, color: "#a8dba0" },
-  { tag: [t.angleBracket, t.definitionOperator, t.operator, t.punctuation], color: "#c9d3cc" },
-  { tag: t.comment, color: "#8fa39a", fontStyle: "italic" },
-  { tag: [t.documentMeta, t.character, t.processingInstruction], color: "#f0a3b8" },
-  { tag: t.invalid, color: "#ff8a80" },
-  /* CSS: selectors yellow like tags, properties blue like attributes, values green, numbers pink */
-  { tag: [t.className, t.labelName], color: "#f2d264" },
-  { tag: t.propertyName, color: "#9cc8e8" },
-  { tag: [t.number, t.unit, t.color], color: "#f0a3b8" },
-  { tag: [t.keyword, t.atom, t.string, t.variableName, t.constant(t.name)], color: "#a8dba0" },
-  { tag: t.modifier, color: "#ff8a80", fontWeight: "700" },
+  /* strong, clearly separate colours so each kind of code is easy to spot; punctuation steps back */
+  { tag: t.tagName, color: "#ffd84d", fontWeight: "700" },
+  { tag: t.attributeName, color: "#6ec3ff" },
+  { tag: [t.attributeValue, t.string], color: "#9be57a" },
+  { tag: [t.angleBracket, t.definitionOperator, t.operator, t.punctuation, t.separator, t.brace, t.paren, t.squareBracket], color: "#7f978c" },
+  { tag: t.comment, color: "#7d9489", fontStyle: "italic" },
+  { tag: [t.documentMeta, t.character, t.processingInstruction], color: "#ff9cc6" },
+  { tag: t.invalid, color: "#ff6b6b", textDecoration: "underline wavy" },
+  /* CSS: selectors orange and bold, properties blue, numbers and units pink, values green */
+  { tag: [t.className, t.labelName], color: "#ffa64d", fontWeight: "700" },
+  { tag: t.propertyName, color: "#6ec3ff" },
+  { tag: [t.number, t.unit, t.color], color: "#ff8fb8" },
+  { tag: [t.keyword, t.atom, t.variableName, t.constant(t.name)], color: "#9be57a" },
+  { tag: t.modifier, color: "#ff6b6b", fontWeight: "700" },
 ]);
 
 const theme = EditorView.theme({
