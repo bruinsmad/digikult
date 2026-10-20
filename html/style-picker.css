@@ -99,6 +99,7 @@
 [data-editor-theme="kitty"] :is(.code,.bw){box-shadow:0 5px 0 #b64781,0 9px 20px #a5176325}
 [data-editor-theme="kitty"] .rail{border-top:5px solid #e77fb1}
 [data-editor-theme="kitty"] .tb{border-radius:18px}
+[data-editor-theme="kitty"] .gutter::before{content:'🎀';background:none;width:auto;height:auto;font-size:19px;transform:translateX(-4px)}
 [data-editor-theme="kitty"] .theme-scene{border-top-style:dashed}
 :root[data-editor-theme="war"]{
   --board:#1c241c;--board-2:#283324;--board-3:#38432e;--chalk:#e6e9ca;--chalk-dim:#c0c5a6;--line:#8b9764;
@@ -159,26 +160,3 @@
 [data-editor-theme="treasure"] :is(.code,.bw){border:3px dashed #8b6240;box-shadow:4px 4px 0 #9e794c}
 [data-editor-theme="treasure"] .theme-scene{font-family:Georgia,serif;border-top:2px dashed #8b6240}
 @media(max-width:560px){.theme-scene{gap:8px;padding:5px 8px;font-size:10px;letter-spacing:.03em}.theme-scene>span{font-size:17px;letter-spacing:.12em}.style-dialog .row{bottom:-16px}[data-editor-theme] .rail .in{padding-inline:10px}}
-
-/* Generated illustrations, cropped from a 4 × 3 atlas without stretching. */
-:root{--theme-art-url:url('theme-art/worlds.webp')}
-.style-dialog{width:min(860px,calc(100vw - 24px))}
-.style-dialog .style-swatch{display:block;aspect-ratio:16/9;height:auto;min-height:100px;padding:0;background-size:cover;background-position:center}
-.style-swatch.has-art{background-image:var(--theme-art-url);background-size:400% auto;background-repeat:no-repeat}
-.style-option[data-theme="none"] .style-swatch{background:repeating-linear-gradient(0deg,transparent 0 22px,#eef3f11c 23px,transparent 24px),#22362f}
-[data-editor-theme] .theme-scene{height:164px;position:relative;isolation:isolate;overflow:hidden;display:flex;align-items:flex-end;justify-content:flex-start;padding:16px 22px;background:var(--board);border-top:1px solid var(--line);letter-spacing:.16em}
-.theme-art{position:absolute;z-index:-2;right:0;top:50%;width:100%;max-width:640px;aspect-ratio:1;transform:translateY(calc(-1 * var(--theme-art-crop,50%)));background-image:var(--theme-art-url);background-size:400% 300%;background-position:var(--theme-art-position);background-repeat:no-repeat}
-[data-editor-theme] .theme-scene::after{content:'';position:absolute;z-index:-1;inset:0;background:linear-gradient(0deg,#000a,transparent 85%);pointer-events:none}
-[data-editor-theme] .theme-scene b{color:#fff;font:700 clamp(16px,2vw,24px)/1.2 var(--f-body);text-shadow:0 2px 6px #000;letter-spacing:.12em}
-[data-editor-theme] .rail{background:var(--board-3)}
-[data-editor-theme] .work{position:relative;isolation:isolate;background:var(--board)}
- .theme-wallpaper{display:none;position:absolute;z-index:-1;inset:0;overflow:hidden;pointer-events:none;opacity:.3}
-[data-editor-theme] .theme-wallpaper{display:block}
-.theme-wallpaper .theme-art{max-width:none;transform:translateY(-50%)}
-.theme-wallpaper::after{content:'';position:absolute;inset:0;background:linear-gradient(var(--board),transparent)}
-:root[data-editor-theme="kitty"]{--theme-art-crop:35%}
-
-@media(max-width:560px){[data-editor-theme] .theme-scene{height:112px;padding:12px 14px}.style-dialog .style-swatch{min-height:90px}.style-options{gap:10px}}
-@media(max-height:720px) and (min-width:561px){[data-editor-theme] .theme-scene{height:110px}}
-[data-editor-theme] .theme-scene::before{content:'';position:absolute;z-index:-3;inset:-12px;background-image:var(--theme-art-url);background-position:var(--theme-art-position);background-size:400% 300%;filter:blur(12px);opacity:.45}
-.theme-scene .theme-art{mask-image:linear-gradient(90deg,transparent,#000 18%)}
