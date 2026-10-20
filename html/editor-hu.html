@@ -196,7 +196,7 @@ body{grid-template-columns:minmax(0,1fr)}
 .cm-line.dk-flash,.cm-dk-flash{background:rgba(224,123,44,.28)!important;transition:background .6s}
 
 </style>
-<link rel="stylesheet" href="style-picker.css?v=2">
+<link rel="stylesheet" href="style-picker.css?v=3">
 </head>
 <body>
 <header class="rail"><div class="in">
@@ -252,7 +252,7 @@ body{grid-template-columns:minmax(0,1fr)}
 
 <script src="../vendor/codemirror-html.js?v=8aa23aa2"></script>
 <script src="checks.js?v=2"></script>
-<script src="style-picker.js?v=2"></script>
+<script src="style-picker.js?v=3"></script>
 <script>
 const CFG = {"ui": {"pick": "Kijelölés", "pickT": "Kattints egy elemre az előnézetben, és a kódban odaugrik. Alt+kattintással mindig működik.", "title": "HTML-szerkesztő", "preview": "Előnézet", "localTpl": "Ez a link a(z) {h} fájlra vinne, de nincs ilyen oldalad vagy képed. Hozd létre az ＋ Új gombbal!", "switched": "Átváltottam erre: {n}", "saveFail": "Nem sikerült menteni: megtelt a böngésző tárhelye.", "pos": "{l}. sor, {c}. oszlop", "warns": "⚠ {n} figyelmeztetés", "noWarn": "✓ nincs hiba", "saved": "mentve ✓", "saving": "mentés…", "savedToast": "Mentve. (Magától is ment.)", "ok": "OK", "cancel": "Mégse", "fileName": "Fájlnév", "nameEmpty": "Adj meg egy nevet.", "nameTaken": "Már van ilyen nevű oldalad: {n}", "newTitle": "Új oldal", "create": "Létrehozás", "tplSkel": "HTML-váz", "tplSkelD": "DOCTYPE, head, title és body, ahogy a leckében tanultuk", "tplBlank": "Üres", "tplBlankD": "Teljesen üres fájl. Tipp: írj be egy ! jelet, és nyomj Tabot.", "created": "Kész: {n}", "renameTitle": "Átnevezés", "rename": "Átnevezés", "delTitle": "Törlöd az oldalt?", "delText": "A(z) <b>{n}</b> végleg törlődik ebből a böngészőből.", "del": "Törlés", "opened": "Megnyitva: {p} oldal, {i} egyéb fájl", "imgTitle": "Képek", "imgText": "A feltöltött képek ebben a böngészőben maradnak. A kódban a nevükkel hivatkozz rájuk, pl. <code>src=\"kutya.jpg\"</code>. A letöltött .zip-be is bekerülnek.", "imgAdd": "＋ Kép feltöltése", "imgMine": "Saját képeid", "imgNone": "Még nincs saját képed. Tölts fel egyet, vagy húzd be az ablakba!", "imgSamples": "Mintaképek (mindig elérhetők)", "sample": "mintakép", "insert": "Beszúrás", "close": "Bezárás", "downloaded": "Letöltve: {n}", "zipFail": "A .zip nem készült el, csak az oldal töltődött le.", "imported": "Megnyitva a szerkesztőben: {n}"}, "samples": ["img/morzsa.svg", "img/cirmi.svg", "img/pamacs.svg", "img/bodri.svg", "img/logo.svg"], "sampleBase": "basics/img/", "templates": {"skeleton": "<!DOCTYPE html>\n<html lang=\"hu\">\n  <head>\n    <meta charset=\"utf-8\">\n    <title>Új oldal</title>\n  </head>\n  <body>\n    <h1>Helló, világ!</h1>\n\n  </body>\n</html>\n"}};
 const UI = { preview: CFG.ui.preview, localNote: h => CFG.ui.localTpl.replace("{h}", h) };
