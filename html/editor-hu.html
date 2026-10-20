@@ -196,7 +196,7 @@ body{grid-template-columns:minmax(0,1fr)}
 .cm-line.dk-flash,.cm-dk-flash{background:rgba(224,123,44,.28)!important;transition:background .6s}
 
 </style>
-<link rel="stylesheet" href="style-picker.css?v=4">
+<link rel="stylesheet" href="style-picker.css?v=3">
 </head>
 <body>
 <header class="rail"><div class="in">
@@ -210,7 +210,7 @@ body{grid-template-columns:minmax(0,1fr)}
     <div class="tabs" id="tabs" role="tablist" aria-label="A fájljaid"></div>
     <button type="button" class="tb" id="newDoc" title="Új oldal (fájl) létrehozása">＋<span class="lb">Új</span></button>
     <button type="button" class="tb" id="renameDoc" title="Az oldal átnevezése">✎<span class="lb">Átnevezés</span></button>
-    <button type="button" class="tb" id="delDoc" title="Az oldal törlése"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 10v7M14 10v7" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="lb">Törlés</span></button>
+    <button type="button" class="tb" id="delDoc" title="Az oldal törlése">🗑<span class="lb">Törlés</span></button>
   </div>
   <span class="sep" aria-hidden="true"></span>
   <div class="grp">
@@ -221,9 +221,9 @@ body{grid-template-columns:minmax(0,1fr)}
   <span class="sep" aria-hidden="true"></span>
   <div class="grp">
     <button type="button" class="tb" id="findBtn" title="Keresés és csere (Ctrl+F)" aria-label="Keresés és csere (Ctrl+F)"><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="6.8" cy="6.8" r="4.6" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M10.3 10.3l4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
-    <button type="button" class="tb" id="styleBtn" aria-label="Szerkesztőstílusok" title="Válassz stílust a szerkesztőhöz"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18h1.5a2.5 2.5 0 0 0 0-5h-.7a1.8 1.8 0 0 1 0-3.6H16a5 5 0 0 0 5-5C21 4.8 16.5 3 12 3Z" fill="none" stroke="currentColor" stroke-width="1.7"/><circle cx="7" cy="10" r="1.3" fill="currentColor"/><circle cx="10" cy="6.5" r="1.3" fill="currentColor"/><circle cx="15" cy="6.5" r="1.3" fill="currentColor"/></svg><span class="lb">Stílusok</span></button>
+    <button type="button" class="tb" id="styleBtn" aria-label="Szerkesztőstílusok" title="Válassz stílust a szerkesztőhöz">🎨<span class="lb">Stílusok</span></button>
     <button type="button" class="tb" id="fmtBtn" title="Behúzás rendezése (Shift+Alt+F)">⇥<span class="lb">Rendezés</span></button>
-    <button type="button" class="tb" id="keysBtn" aria-expanded="false" aria-controls="keys"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M5 9h2m3 0h2m3 0h2m2 0h1M5 12h2m3 0h2m3 0h2m2 0h1M7 16h10" fill="none" stroke="currentColor" stroke-width="1.7"/></svg><span class="lb">Billentyűk</span></button>
+    <button type="button" class="tb" id="keysBtn" aria-expanded="false" aria-controls="keys">⌨<span class="lb">Billentyűk</span></button>
     <button type="button" class="tb" id="smaller" title="Kisebb kód" aria-label="Kisebb kód">A−</button><button type="button" class="tb" id="bigger" title="Nagyobb kód" aria-label="Nagyobb kód">A+</button>
   </div>
   <div class="grp push">
@@ -242,7 +242,7 @@ body{grid-template-columns:minmax(0,1fr)}
   <section class="pane view" aria-label="Előnézet"><div id="browser" data-fixed="1"></div></section>
 </main>
 
-<footer class="status"><span id="stPos"></span><button type="button" id="stWarn"></button><span class="sp"></span><span>automatikus mentés ebbe a böngészőbe ·</span><span id="stSave"></span></footer>
+<footer class="status"><span id="stPos"></span><button type="button" id="stWarn"></button><span class="sp"></span><span>💾 automatikus mentés ebbe a böngészőbe ·</span><span id="stSave"></span></footer>
 
 <div class="keys" id="keys" hidden><div class="keys-h"><b>Billentyűparancsok, mint a VS Code-ban</b><button type="button" class="x" id="keysClose" aria-label="Bezárás">×</button></div>
   <dl><dt>ul&gt;li*3 + Tab</dt><dd>Emmet: rövidítésből kész kód. Próbáld: <code>p</code>, <code>img</code>, <code>table&gt;tr*3&gt;td*3</code>, <code>!</code></dd><dt>m10 + Tab (CSS-ben)</dt><dd>Emmet CSS-hez: <code>m10</code> → <code>margin: 10px;</code>, <code>c</code> → <code>color</code>, <code>bgc</code> → <code>background-color</code>. A színek mellé kis színminta kerül.</dd><dt>Tab vagy Enter</dt><dd>a felajánlott címke vagy attribútum elfogadása</dd><dt>Ctrl + Szóköz</dt><dd>javaslatok megnyitása</dd><dt>Ctrl + B / Ctrl + I</dt><dd>a kijelölt szöveg köré &lt;strong&gt; / &lt;em&gt;</dd><dt>Ctrl + /</dt><dd>megjegyzés be/ki (&lt;!-- --&gt;)</dd><dt>Alt + ↑ / ↓</dt><dd>a sor mozgatása fel / le</dd><dt>Shift + Alt + ↓</dt><dd>a sor megkettőzése</dd><dt>Ctrl + D</dt><dd>a következő ugyanilyen szó kijelölése: több kurzorral egyszerre írsz</dd><dt>Ctrl + kattintás</dt><dd>újabb kurzor</dd><dt>Ctrl + F</dt><dd>keresés és csere</dd><dt>Shift + Alt + F</dt><dd>a behúzás rendezése</dd><dt>Ctrl + Shift + [ / ]</dt><dd>elem összecsukása / kibontása</dd><dt>Ctrl + Z / Ctrl + Y</dt><dd>visszavonás / újra</dd><dt>egér a címke fölött</dt><dd>megmutatja, mire való a címke</dd><dt>Alt + kattintás az előnézetben</dt><dd>a kódban odaugrik az elemhez (vagy a 🎯 Kijelölés gomb)</dd><dt>Ctrl + S</dt><dd>mentés (amúgy is ment magától)</dd><dt>húzd ide a fájlokat</dt><dd>HTML-fájl vagy kép megnyitása a gépedről</dd></dl><p class="keys-n">Macen a Ctrl helyett ⌘ (Cmd), az Alt helyett ⌥ (Option).</p></div>
@@ -252,7 +252,7 @@ body{grid-template-columns:minmax(0,1fr)}
 
 <script src="../vendor/codemirror-html.js?v=8aa23aa2"></script>
 <script src="checks.js?v=2"></script>
-<script src="style-picker.js?v=4"></script>
+<script src="style-picker.js?v=3"></script>
 <script>
 const CFG = {"ui": {"pick": "Kijelölés", "pickT": "Kattints egy elemre az előnézetben, és a kódban odaugrik. Alt+kattintással mindig működik.", "title": "HTML-szerkesztő", "preview": "Előnézet", "localTpl": "Ez a link a(z) {h} fájlra vinne, de nincs ilyen oldalad vagy képed. Hozd létre az ＋ Új gombbal!", "switched": "Átváltottam erre: {n}", "saveFail": "Nem sikerült menteni: megtelt a böngésző tárhelye.", "pos": "{l}. sor, {c}. oszlop", "warns": "⚠ {n} figyelmeztetés", "noWarn": "✓ nincs hiba", "saved": "mentve ✓", "saving": "mentés…", "savedToast": "Mentve. (Magától is ment.)", "ok": "OK", "cancel": "Mégse", "fileName": "Fájlnév", "nameEmpty": "Adj meg egy nevet.", "nameTaken": "Már van ilyen nevű oldalad: {n}", "newTitle": "Új oldal", "create": "Létrehozás", "tplSkel": "HTML-váz", "tplSkelD": "DOCTYPE, head, title és body, ahogy a leckében tanultuk", "tplBlank": "Üres", "tplBlankD": "Teljesen üres fájl. Tipp: írj be egy ! jelet, és nyomj Tabot.", "created": "Kész: {n}", "renameTitle": "Átnevezés", "rename": "Átnevezés", "delTitle": "Törlöd az oldalt?", "delText": "A(z) <b>{n}</b> végleg törlődik ebből a böngészőből.", "del": "Törlés", "opened": "Megnyitva: {p} oldal, {i} egyéb fájl", "imgTitle": "Képek", "imgText": "A feltöltött képek ebben a böngészőben maradnak. A kódban a nevükkel hivatkozz rájuk, pl. <code>src=\"kutya.jpg\"</code>. A letöltött .zip-be is bekerülnek.", "imgAdd": "＋ Kép feltöltése", "imgMine": "Saját képeid", "imgNone": "Még nincs saját képed. Tölts fel egyet, vagy húzd be az ablakba!", "imgSamples": "Mintaképek (mindig elérhetők)", "sample": "mintakép", "insert": "Beszúrás", "close": "Bezárás", "downloaded": "Letöltve: {n}", "zipFail": "A .zip nem készült el, csak az oldal töltődött le.", "imported": "Megnyitva a szerkesztőben: {n}"}, "samples": ["img/morzsa.svg", "img/cirmi.svg", "img/pamacs.svg", "img/bodri.svg", "img/logo.svg"], "sampleBase": "basics/img/", "templates": {"skeleton": "<!DOCTYPE html>\n<html lang=\"hu\">\n  <head>\n    <meta charset=\"utf-8\">\n    <title>Új oldal</title>\n  </head>\n  <body>\n    <h1>Helló, világ!</h1>\n\n  </body>\n</html>\n"}};
 const UI = { preview: CFG.ui.preview, localNote: h => CFG.ui.localTpl.replace("{h}", h) };
