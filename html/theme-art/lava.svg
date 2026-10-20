@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 140" fill="none">
+  <title>Dragon Forge — chalk illustration</title>
+  <g stroke="#efeee6" stroke-width="2.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M179 102c32 12 43-13 22-30m-36 30c17-31-4-61-20-69l2-18-21 12c-26-2-44 8-45 27l-16 6 8 16 31-4c-7 18-3 34 13 46" fill="#f0b079" fill-opacity=".12"/><path d="m145 50 26-30 22 22-12 6 17 18-20-3 12 23-29-8m-47 3-17 33m0 0H82m15 0 8 6m40-15-2 18h18m-55-70h1" stroke="#f0b079"/><path d="m70 66-25-8 10 20-25 5 29 15m-17 30 11-22 8 20 9-13 9 14m90-2 10-15 9 15" stroke="#f2d264"/>
+  </g>
+  <path d="M24 135q70-3 190 0" stroke="#f0b079" stroke-width="1.5" stroke-linecap="round" opacity=".35"/>
+</svg>

@@ -6,7 +6,7 @@
    The file list below is written by tools/build-sw.py: run it before pushing. */
 
 /* FILES:BEGIN (written by tools/build-sw.py, don't edit by hand) */
-const VERSION = "94ba2d179c";
+const VERSION = "c150d3643b";
 const CORE = [
 "./",
 "css/basics/first-steps.html",
@@ -29,6 +29,19 @@ const CORE = [
 "html/index.html",
 "html/style-picker.css",
 "html/style-picker.js",
+"html/theme-art/candy.svg",
+"html/theme-art/comic.svg",
+"html/theme-art/cyber.svg",
+"html/theme-art/forest.svg",
+"html/theme-art/kitty.svg",
+"html/theme-art/lava.svg",
+"html/theme-art/none.svg",
+"html/theme-art/ocean.svg",
+"html/theme-art/rainbow.svg",
+"html/theme-art/space.svg",
+"html/theme-art/treasure.svg",
+"html/theme-art/vampire.svg",
+"html/theme-art/war.svg",
 "index.html",
 "inkscape/explainer.css",
 "inkscape/explainer.js",

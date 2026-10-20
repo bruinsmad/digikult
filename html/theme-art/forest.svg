@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 140" fill="none">
+  <title>Enchanted Forest — chalk illustration</title>
+  <g stroke="#efeee6" stroke-width="2.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M89 119 94 74h27l5 45" fill="#a8dba0" fill-opacity=".14"/><path d="M53 73c5-67 101-68 109 0-25 13-82 15-109 0Z" fill="#f0a3b8" fill-opacity=".18"/><circle cx="90" cy="49" r="6"/><circle cx="124" cy="38" r="7"/><circle cx="138" cy="62" r="5"/><path d="M177 125V39m0 50c-25 0-36-22-33-30 22-2 32 12 33 30Zm0-21c23-1 33-20 29-29-22 0-30 14-29 29ZM36 116c-6-20 0-36 13-45-1 22-3 34-13 45Zm-15 7c39-11 123-1 186 0" stroke="#a8dba0"/><path d="m36 34 0 11m-5-5h10m153-22v10m-5-5h10" stroke="#f2d264"/>
+  </g>
+  <path d="M24 135q70-3 190 0" stroke="#a8dba0" stroke-width="1.5" stroke-linecap="round" opacity=".35"/>
+</svg>
