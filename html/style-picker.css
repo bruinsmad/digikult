@@ -1,0 +1,84 @@
+.style-dialog{width:min(780px,calc(100vw - 24px))}
+.style-dialog .dlg{gap:14px;padding:24px}
+.style-heading{display:flex;align-items:center;gap:10px}
+.style-heading>span{font-size:30px}
+.style-dialog .style-target{font:600 13px var(--f-mono);color:var(--ink);overflow-wrap:anywhere}
+.style-options{border:0;padding:3px;margin:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.style-dialog .style-option{position:relative;display:flex;flex-direction:column;gap:6px;padding:10px;border:2px solid #d3c2a5;border-radius:12px;background:#fffaf1;cursor:pointer;font-weight:400;min-width:0}
+.style-option:hover{border-color:#8a5532}
+.style-option:has(input:checked){border-color:#2f7a5a;box-shadow:0 0 0 2px #2f7a5a;background:#f0f7eb}
+.style-option:has(input:focus-visible){outline:3px solid #8a5532;outline-offset:3px}
+.style-option input{position:absolute;top:17px;right:17px;accent-color:#2f7a5a;width:17px;height:17px;margin:0}
+.style-swatch{height:88px;display:flex;align-items:center;justify-content:center;gap:12px;padding:12px 22px 12px 10px;overflow:hidden}
+.style-swatch>span{font-size:26px}
+.style-swatch b{font-size:30px}
+.style-swatch i{font-size:12px;font-style:normal;align-self:flex-end}
+.style-name{font-weight:700;color:var(--ink)}
+.style-desc{font-size:12px;line-height:1.4;color:#6c6157}
+.style-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+@media(max-width:560px){.style-options{grid-template-columns:repeat(2,minmax(0,1fr))}.style-dialog .dlg{padding:16px}.style-swatch{height:72px}.style-swatch i{display:none}}
+
+/* Themes belong to the editor shell. Preview documents never inherit these rules. */
+:root[data-editor-theme="space"]{
+  --board:#11122d;--board-2:#1b1d41;--board-3:#292b55;--chalk:#edf3ff;--chalk-dim:#bfc6e7;--line:#535783;
+  --yellow:#75f4df;--green:#217a70;--orange:#a42c76;--code-bg:#101127;--code-ink:#edf3ff;
+  --theme-pattern:radial-gradient(circle at 12px 12px,#ffffff35 1px,transparent 2px);--theme-size:48px 48px;--theme-radius:12px;
+}
+:root[data-editor-theme="candy"]{
+  --board:#ffe5ef;--board-2:#fff1f6;--board-3:#ffd4e5;--chalk:#582440;--chalk-dim:#79415e;--line:#c781a2;
+  --yellow:#aa1754;--green:#963b72;--orange:#aa1754;--code-bg:#302034;--code-ink:#ffedf7;
+  --theme-pattern:repeating-linear-gradient(135deg,transparent 0 24px,#ffffff66 24px 48px);--theme-size:auto;--theme-radius:22px;
+}
+:root[data-editor-theme="forest"]{
+  --board:#142e26;--board-2:#203d30;--board-3:#2e503b;--chalk:#f2f0d8;--chalk-dim:#c5d3b4;--line:#779c70;
+  --yellow:#ebce82;--green:#3f6d46;--orange:#785128;--code-bg:#13271f;--code-ink:#f2f0d8;
+  --theme-pattern:radial-gradient(ellipse at top left,#547c4255,transparent 65%);--theme-size:auto;--theme-radius:20px 4px 20px 4px;
+}
+:root[data-editor-theme="ocean"]{
+  --board:#bce9f1;--board-2:#e6f8fc;--board-3:#c4edf4;--chalk:#123e56;--chalk-dim:#305e70;--line:#559bac;
+  --yellow:#075f7c;--green:#267f88;--orange:#a43536;--code-bg:#112d40;--code-ink:#e4faff;
+  --theme-pattern:radial-gradient(circle at 25px 25px,#ffffff70 9px,transparent 10px);--theme-size:72px 72px;--theme-radius:8px 24px 8px 24px;
+}
+:root[data-editor-theme="comic"]{
+  --board:#ffe681;--board-2:#fff5be;--board-3:#ffe681;--chalk:#242136;--chalk-dim:#51466a;--line:#242136;
+  --yellow:#a8213b;--green:#254aa5;--orange:#a8213b;--code-bg:#242136;--code-ink:#fff5d9;
+  --theme-pattern:radial-gradient(#24213640 1px,transparent 1px);--theme-size:10px 10px;--theme-radius:3px;
+}
+:root[data-editor-theme="treasure"]{
+  --board:#dfc390;--board-2:#f5e4bb;--board-3:#e8ce9e;--chalk:#51341f;--chalk-dim:#765536;--line:#8b6240;
+  --yellow:#8b3022;--green:#426044;--orange:#8b3022;--code-bg:#30271e;--code-ink:#f5e4bb;
+  --theme-pattern:radial-gradient(ellipse at center,transparent 40%,#8b624033);--theme-size:auto;--theme-radius:3px 18px 3px 18px;
+}
+:root[data-editor-theme]{--editor-caret:#f2d264;--editor-gutter:#b2b7b3;--editor-selection:#a7b9de44}
+[data-editor-theme] .rail{background:var(--board-3);border-bottom:2px solid var(--line)}
+[data-editor-theme] .rail :is(.home,.crumb,.crumb b,.langlink){color:var(--chalk)}
+[data-editor-theme] .rail .langlink{border-color:var(--line)}
+[data-editor-theme] .bar,[data-editor-theme] .work{background-image:var(--theme-pattern);background-size:var(--theme-size)}
+[data-editor-theme] :is(.tb,.seg,.seg button+button,.ftab,.sel){border-color:var(--line)}
+[data-editor-theme] .tb:hover{background:var(--board);border-color:var(--yellow)}
+[data-editor-theme] .tb.go{background:var(--orange);color:#fff}
+[data-editor-theme] .tb.go:hover{filter:brightness(1.15)}
+[data-editor-theme] .ftab{color:var(--code-ink)}
+[data-editor-theme] .ftab[aria-selected="true"]{background:var(--code-bg);border-color:var(--yellow);box-shadow:inset 0 -2px 0 var(--yellow)}
+[data-editor-theme] :is(.code,.bw){border-color:var(--line);border-radius:var(--theme-radius)}
+[data-editor-theme] .gutter::before{background:var(--line)}
+[data-editor-theme] .gutter:hover::before{background:var(--yellow)}
+[data-editor-theme] .bw-top{background:var(--board-3)}
+[data-editor-theme] .bw-tab{color:#2b2520}
+[data-editor-theme] .status :is(.ok,.warn){color:var(--chalk)}
+/* CodeMirror's syntax colours stay bright against each theme's dark code surface. */
+[data-editor-theme] .cmw .cm-editor{background:var(--code-bg);color:var(--code-ink)}
+[data-editor-theme] .cmw .cm-content{caret-color:var(--editor-caret)}
+[data-editor-theme] .cmw .cm-cursor{border-left-color:var(--editor-caret)}
+[data-editor-theme] .cmw .cm-editor.cm-focused{outline-color:var(--editor-caret)}
+[data-editor-theme] .cmw .cm-gutters{background:var(--code-bg);color:var(--editor-gutter);border-right-color:var(--line)}
+[data-editor-theme] .cmw .cm-foldGutter .cm-gutterElement{color:var(--editor-gutter)}
+[data-editor-theme] .cmw .cm-selectionBackground{background:var(--editor-selection)}
+[data-editor-theme] .cmw :is(.cm-tooltip,.cm-panels){background:var(--code-bg);color:var(--code-ink);border-color:var(--line)}
+[data-editor-theme] .cmw .cm-tooltip-autocomplete>ul>li[aria-selected]{background:var(--board-3);color:var(--chalk)}
+[data-editor-theme] .cmw :is(.cm-textfield,.cm-button){background:var(--code-bg);color:var(--code-ink);border-color:var(--line)}
+[data-editor-theme] .keys{background:var(--code-bg);color:var(--code-ink);border-color:var(--line)}
+/* Help text is on a dark surface even for light interface themes. */
+[data-editor-theme] .keys dt{color:var(--editor-caret)}
+[data-editor-theme="comic"] :is(.code,.bw){box-shadow:3px 3px 0 var(--line)}
+[data-editor-theme="treasure"] :is(.code,.bw){border-style:dashed}

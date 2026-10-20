@@ -6,7 +6,7 @@
    The file list below is written by tools/build-sw.py: run it before pushing. */
 
 /* FILES:BEGIN (written by tools/build-sw.py, don't edit by hand) */
-const VERSION = "9e9aab116c";
+const VERSION = "0e4518835f";
 const CORE = [
 "./",
 "css/basics/first-steps.html",
@@ -27,6 +27,8 @@ const CORE = [
 "html/editor-hu.html",
 "html/editor.html",
 "html/index.html",
+"html/style-picker.css",
+"html/style-picker.js",
 "index.html",
 "inkscape/explainer.css",
 "inkscape/explainer.js",
