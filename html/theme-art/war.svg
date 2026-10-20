@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 140" fill="none">
+  <title>War Room — chalk illustration</title>
+  <g stroke="#efeee6" stroke-width="2.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M45 88h147V77H45Zm12-13c0-65 122-65 123 0" fill="#a8dba0" fill-opacity=".17"/><path d="M114 29v47m15-46v45m-58-9 10-16 14 9-9 17m60-28 18 8-4 20" stroke="#a8dba0"/><path d="m39 110 16-8 45 14 35-13 55 19m-138 4 3-24m45 14v17m35-30v25" stroke-dasharray="4 6"/><path d="M195 43v32m-9-24h18m-18 8h18m-19 17h21v36h-21Z"/><path d="m34 25 2 8 9 1-7 5 2 9-7-5-7 5 3-9-7-5 9-1Z" stroke="#f2d264"/>
+  </g>
+  <path d="M24 135q70-3 190 0" stroke="#a8dba0" stroke-width="1.5" stroke-linecap="round" opacity=".35"/>
+</svg>

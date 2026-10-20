@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 140" fill="none">
+  <title>Classic Chalkboard — chalk illustration</title>
+  <g stroke="#efeee6" stroke-width="2.7" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="48" y="20" width="145" height="90" rx="4"/><path d="M58 31h125v67H58Zm30 80-13 20m81-20 14 20"/><path d="m77 53 22 0m-22 15h72m-72 15h46" stroke="#f2d264"/><path d="m150 94 23-1" stroke="#f0a3b8" stroke-width="7"/>
+  </g>
+  <path d="M24 135q70-3 190 0" stroke="#f2d264" stroke-width="1.5" stroke-linecap="round" opacity=".35"/>
+</svg>

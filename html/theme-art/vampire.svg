@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 140" fill="none">
+  <title>Vampire Castle — chalk illustration</title>
+  <g stroke="#efeee6" stroke-width="2.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M58 127V70h29v57m9 0V50h49v77m9 0V70h29v57M54 69l18-33 19 33M91 49l29-34 30 34m0 20 19-33 18 33" fill="#f0a3b8" fill-opacity=".1"/><path d="M111 126v-23q10-16 20 0v23m-11-61v17m-48 1v13m97-13v13" stroke="#f2d264"/><path d="M35 23c17 14 19 6 23-3 3 8 8 14 24 3-8 20-16 17-24 28-5-12-17-8-23-28Zm126-4c11 8 15 4 17-1 4 6 7 9 19 1-6 15-12 13-19 20-4-8-12-6-17-20Z"/><path d="M209 73c-12 4-23-5-20-18-17 14-8 37 12 32Z" stroke="#f2d264"/>
+  </g>
+  <path d="M24 135q70-3 190 0" stroke="#f0a3b8" stroke-width="1.5" stroke-linecap="round" opacity=".35"/>
+</svg>

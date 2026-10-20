@@ -196,7 +196,7 @@ body{grid-template-columns:minmax(0,1fr)}
 .cm-line.dk-flash,.cm-dk-flash{background:rgba(224,123,44,.28)!important;transition:background .6s}
 
 </style>
-<link rel="stylesheet" href="style-picker.css?v=3">
+<link rel="stylesheet" href="style-picker.css?v=5">
 </head>
 <body>
 <header class="rail"><div class="in">
@@ -221,7 +221,7 @@ body{grid-template-columns:minmax(0,1fr)}
   <span class="sep" aria-hidden="true"></span>
   <div class="grp">
     <button type="button" class="tb" id="findBtn" title="Find and replace (Ctrl+F)" aria-label="Find and replace (Ctrl+F)"><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="6.8" cy="6.8" r="4.6" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M10.3 10.3l4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
-    <button type="button" class="tb" id="styleBtn" aria-label="Editor themes" title="Choose a theme for the editor">🎨<span class="lb">Styles</span></button>
+    <button type="button" class="tb" id="styleBtn" aria-label="Editor themes" title="Choose a theme for the editor"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18h1.5a2.5 2.5 0 0 0 0-5h-.7a1.8 1.8 0 0 1 0-3.6H16a5 5 0 0 0 5-5C21 4.8 16.5 3 12 3Z" fill="none" stroke="currentColor" stroke-width="1.7"/><circle cx="7" cy="10" r="1.3" fill="currentColor"/><circle cx="10" cy="6.5" r="1.3" fill="currentColor"/><circle cx="15" cy="6.5" r="1.3" fill="currentColor"/></svg><span class="lb">Styles</span></button>
     <button type="button" class="tb" id="fmtBtn" title="Fix the indentation (Shift+Alt+F)">⇥<span class="lb">Format</span></button>
     <button type="button" class="tb" id="keysBtn" aria-expanded="false" aria-controls="keys">⌨<span class="lb">Shortcuts</span></button>
     <button type="button" class="tb" id="smaller" title="Smaller code" aria-label="Smaller code">A−</button><button type="button" class="tb" id="bigger" title="Larger code" aria-label="Larger code">A+</button>
@@ -252,7 +252,7 @@ body{grid-template-columns:minmax(0,1fr)}
 
 <script src="../vendor/codemirror-html.js?v=8aa23aa2"></script>
 <script src="checks.js?v=2"></script>
-<script src="style-picker.js?v=3"></script>
+<script src="style-picker.js?v=5"></script>
 <script>
 const CFG = {"ui": {"pick": "Pick", "pickT": "Click an element in the preview to jump to its code. Alt+click always works.", "title": "HTML editor", "preview": "Preview", "localTpl": "This link would open {h}, but you have no page or image with that name. Create it with ＋ New!", "switched": "Switched to {n}", "saveFail": "Couldn't save: the browser's storage is full.", "pos": "Line {l}, column {c}", "warns": "⚠ {n} warnings", "noWarn": "✓ no mistakes", "saved": "saved ✓", "saving": "saving…", "savedToast": "Saved. (It saves by itself too.)", "ok": "OK", "cancel": "Cancel", "fileName": "File name", "nameEmpty": "Type a name.", "nameTaken": "You already have a page called {n}", "newTitle": "New page", "create": "Create", "tplSkel": "HTML skeleton", "tplSkelD": "DOCTYPE, head, title and body, as in the lesson", "tplBlank": "Empty", "tplBlankD": "A completely empty file. Tip: type ! and press Tab.", "created": "Created {n}", "renameTitle": "Rename", "rename": "Rename", "delTitle": "Delete the page?", "delText": "<b>{n}</b> will be deleted from this browser for good.", "del": "Delete", "opened": "Opened: {p} page(s), {i} other file(s)", "imgTitle": "Images", "imgText": "Uploaded images stay in this browser. Refer to them by name in your code, e.g. <code>src=\"dog.jpg\"</code>. They go into the downloaded .zip too.", "imgAdd": "＋ Upload an image", "imgMine": "Your images", "imgNone": "No images of your own yet. Upload one, or drop it into the window!", "imgSamples": "Sample images (always available)", "sample": "sample", "insert": "Insert", "close": "Close", "downloaded": "Downloaded {n}", "zipFail": "The .zip couldn't be made; only the page was downloaded.", "imported": "Opened in the editor: {n}"}, "samples": ["img/morzsa.svg", "img/cirmi.svg", "img/pamacs.svg", "img/bodri.svg", "img/logo.svg"], "sampleBase": "basics/img/", "templates": {"skeleton": "<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <title>New page</title>\n  </head>\n  <body>\n    <h1>Hello, world!</h1>\n\n  </body>\n</html>\n"}};
 const UI = { preview: CFG.ui.preview, localNote: h => CFG.ui.localTpl.replace("{h}", h) };

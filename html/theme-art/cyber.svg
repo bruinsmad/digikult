@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 140" fill="none">
+  <title>Cyberpunk City — chalk illustration</title>
+  <g stroke="#efeee6" stroke-width="2.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M28 126V67h28v59m8 0V39h35v87m10 0V56h28v70m8 0V25h36v101m10 0V78h25v48" fill="#c3b1e1" fill-opacity=".1"/><path d="M156 25V14m-8 12h30M76 48h12m-12 12h12m-12 12h12m-12 12h12m44-18v42m34-69h12m-12 12h12m-12 12h12m-12 12h12m-12 12h12m-12 12h12" stroke="#9cc8e8"/><path d="M22 126h198M103 18h21m-11-10v21m79 19h13m-6-6v13" stroke="#f0a3b8"/>
+  </g>
+  <path d="M24 135q70-3 190 0" stroke="#c3b1e1" stroke-width="1.5" stroke-linecap="round" opacity=".35"/>
+</svg>

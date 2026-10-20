@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 140" fill="none">
+  <title>Treasure Map — chalk illustration</title>
+  <g stroke="#efeee6" stroke-width="2.7" stroke-linecap="round" stroke-linejoin="round">
+    <path d="m26 35 52-12 77 15 43-13v91l-44 12-77-16-51 12Z" fill="#f2d264" fill-opacity=".09"/><path d="M78 24v88m76-74v89" stroke-dasharray="4 7"/><path d="M47 84c0-36 60 37 63-9 2-39 39 1 64-20" stroke="#f0a3b8" stroke-dasharray="3 8"/><path d="m166 47 16 17m-16 0 16-17" stroke="#f0a3b8"/><circle cx="203" cy="98" r="23" fill="#22362f" stroke="#f2d264"/><path d="m202 77 7 21-6 20-8-20Z" fill="#f2d264" fill-opacity=".25"/><path d="m185 98h34" stroke="#f2d264"/>
+  </g>
+  <path d="M24 135q70-3 190 0" stroke="#f2d264" stroke-width="1.5" stroke-linecap="round" opacity=".35"/>
+</svg>
