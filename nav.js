@@ -461,6 +461,21 @@
     for (const k of ["hu", "en"]) if (norm(new URL(p.files[k], BASE).pathname) === herePath) lang = k;
   })));
 
+  /* the same page in the other language, if there is one */
+  const twinOf = l => {
+    for (const tp of SITE.topics) for (const ls of tp.lessons) for (const p of ls.pages) {
+      const f = p.files[l];
+      if (f && isHere(p) && norm(new URL(f, BASE).pathname) !== herePath) return url(f);
+    }
+    return null;
+  };
+  /* a page's own language link remembers the choice too, so the landing page and the menu follow it */
+  document.addEventListener("click", e => {
+    const a = e.target.closest && e.target.closest("a.langlink[lang], a[hreflang]");
+    const l = a && (a.getAttribute("hreflang") || a.getAttribute("lang"));
+    if (l === "hu" || l === "en") try { localStorage.setItem(LKEY, l); } catch (err) {}
+  }, true);
+
   /* ---------- floating menu ---------- */
   const host = document.createElement("div");
   host.id = "digikult-nav";
@@ -562,7 +577,11 @@
   function wire() {
     root.querySelector(".toggle").addEventListener("click", () => setOpen(root.querySelector(".panel").hidden));
     root.querySelector(".x").addEventListener("click", () => { setOpen(false); root.querySelector(".toggle").focus(); });
-    root.querySelectorAll(".lang button").forEach(b => b.addEventListener("click", () => setLang(b.dataset.l)));
+    root.querySelectorAll(".lang button").forEach(b => b.addEventListener("click", () => {
+      const l = b.dataset.l, tw = twinOf(l);
+      setLang(l);
+      if (tw) location.href = tw;          /* a page with a twin opens it; an English-only page just changes the menu */
+    }));
   }
   root.addEventListener("keydown", e => { if (e.key === "Escape") { setOpen(false); root.querySelector(".toggle").focus(); } });
   document.addEventListener("click", e => { if (!e.composedPath().includes(host)) setOpen(false); });
