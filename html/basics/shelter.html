@@ -3,7 +3,6 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<style>/* moving between pages: the old page drifts aside and fades, the new one glides in; the rail holds still */@view-transition{navigation:auto}.rail{view-transition-name:rail}::view-transition-group(root){animation:none}::view-transition-old(root){animation:dk-out .2s cubic-bezier(.4,0,1,1) both}::view-transition-new(root){animation:dk-in .38s cubic-bezier(.16,1,.3,1) .06s both}::view-transition-old(rail),::view-transition-new(rail){animation:none}@keyframes dk-out{to{opacity:0;transform:translateX(-18px)}}@keyframes dk-in{from{opacity:0;transform:translateX(26px)}}@media (prefers-reduced-motion:reduce){::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none!important}}</style>
 <title>The Paw Shelter Website</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -40,8 +39,7 @@ button{font:inherit;color:inherit}
 .rail .in{max-width:1500px;margin:0 auto;padding:0 18px;height:50px;display:flex;align-items:center;gap:14px}
 .rail .home{font:700 19px/1 var(--f-hand);color:#fff6e8;text-decoration:none;white-space:nowrap}
 .rail .crumb{color:#f3dcc4;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
-.rail .langlink{margin-left:auto;flex:none;font:700 14px var(--f-body);color:#fff6e8;border:1.5px solid rgba(255,246,232,.45);border-radius:4px;padding:4px 10px;text-decoration:none}
-.rail .langlink:hover{border-color:#fff6e8;background:rgba(0,0,0,.15)}
+.rail .langlink{margin-left:auto;flex:none;font:700 13px var(--f-body);color:#5d3820;background:#fff6e8;border-radius:999px;padding:5px 12px;text-decoration:none}
 
 /* awning header */
 .sign{position:relative;background:var(--green);color:#fff8ea;padding:18px 0 18px}
@@ -50,7 +48,7 @@ button{font:inherit;color:inherit}
 .sign .in{max-width:1500px;margin:0 auto;padding:0 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
 .sign img{width:58px;height:58px;flex:none;border-radius:50%;box-shadow:0 0 0 4px rgba(255,248,234,.25)}
 .sign .tt{min-width:0;flex:1}
-.sign .kick{font:700 19px/1.2 var(--f-hand);color:#bfe6cf}
+.sign .kick{font:700 13px var(--f-body);letter-spacing:.08em;text-transform:uppercase;color:#bfe6cf}
 .sign h1{margin:2px 0 0;font:600 clamp(26px,3.6vw,40px)/1.1 var(--f-display);letter-spacing:.01em}
 .sign .meta{display:flex;gap:10px 18px;flex-wrap:wrap;font-size:14.5px;color:#d8efe1}
 .sign .meta b{color:#fff}
@@ -79,7 +77,7 @@ button{font:inherit;color:inherit}
 .extra{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;margin-top:16px;align-items:start}
 @media (max-width:980px){ .band,.work,.extra{grid-template-columns:minmax(0,1fr)} }
 .card{background:var(--panel);border:2px solid var(--line-2);border-radius:14px;box-shadow:0 2px 0 rgba(90,60,30,.08)}
-.card-h{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px;border-bottom:2px solid var(--line);font:700 14px var(--f-body);color:var(--muted)}
+.card-h{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px;border-bottom:2px solid var(--line);font:700 13px var(--f-body);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
 
 /* Teri's note */
 .note{display:flex;gap:14px;padding:16px}
@@ -102,7 +100,7 @@ button{font:inherit;color:inherit}
 .goal .gt code{font-size:.88em}
 .goal .tip{grid-column:2;font-size:14px;color:var(--orange-d)}
 .goal.ok .tip{display:none}
-.goal .bonus{display:inline-block;font:700 15px/1.2 var(--f-hand);background:var(--orange-soft);color:var(--orange-d);border-radius:999px;padding:1px 8px;margin-right:6px;vertical-align:1px}
+.goal .bonus{display:inline-block;font:700 11px var(--f-body);letter-spacing:.06em;text-transform:uppercase;background:var(--orange-soft);color:var(--orange-d);border-radius:999px;padding:1px 8px;margin-right:6px;vertical-align:1px}
 .todo .count{font:700 13px var(--f-body);color:var(--muted);text-transform:none;letter-spacing:0}
 .win{margin:0 12px 12px;padding:12px 14px;border-radius:12px;background:var(--green);color:#fff;display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;animation:pop .3s ease-out}
 .win .wt{flex:1;min-width:200px}
@@ -163,7 +161,7 @@ button{font:inherit;color:inherit}
 .cheat{padding:12px 14px 14px}
 .cheat p{margin:0 0 8px;font-size:15px;color:var(--muted)}
 pre.code{margin:0;background:var(--code-bg);color:var(--code-ink);border-radius:10px;padding:10px 14px;font:14.5px/1.55 var(--f-mono);white-space:pre-wrap;overflow-wrap:anywhere}
-pre.code .tg{color:var(--tg);font-weight:700}pre.code .an{color:var(--an)}pre.code .av{color:var(--av)}pre.code .pu{color:var(--pu)}pre.code .cm{color:var(--cm);font-style:italic}pre.code .dt{color:var(--en)}
+pre.code .tg{color:var(--tg);font-weight:700}pre.code .an{color:var(--an)}pre.code .av{color:var(--av)}pre.code .pu{color:var(--pu)}pre.code .cm{color:var(--cm);font-style:italic}pre.code .dt{color:var(--en)}pre.code .sl{color:var(--tg);font-weight:700}pre.code .cp{color:var(--an)}pre.code .cv{color:var(--av)}
 .sol{padding:12px 14px 14px;display:grid;gap:10px}
 .sol p{margin:0;font-size:15px;color:var(--muted)}
 .sol pre.code{max-height:340px;overflow:auto;white-space:pre}
@@ -191,7 +189,7 @@ pre.code .tg{color:var(--tg);font-weight:700}pre.code .an{color:var(--an)}pre.co
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 footer.end{max-width:1500px;margin:0 auto;padding:0 20px 40px;color:var(--muted);font-size:14px}
 .note .nb{min-width:0;flex:1}
-.kick2{margin:0;font:700 18px/1.2 var(--f-hand);color:var(--orange-d)}
+.kick2{margin:0;font:700 12.5px var(--f-body);letter-spacing:.08em;text-transform:uppercase;color:var(--orange-d)}
 .note .sig{margin:8px 0 0;font:700 17px var(--f-hand);color:var(--green-d)}
 .saved{font:600 12.5px var(--f-body);color:#a8dba0}
 @media (max-width:560px){ .note{flex-direction:column;gap:8px} .note .av{width:56px;height:56px} }
@@ -238,6 +236,7 @@ body.focus #digikult-nav{display:none}
 @media (prefers-reduced-motion:reduce){ .dk-box{transition:none} }
 .cm-line.dk-flash,.cm-dk-flash{background:rgba(224,123,44,.28)!important;transition:background .6s}
 
+
 </style>
 </head>
 <body>
@@ -248,7 +247,7 @@ body.focus #digikult-nav{display:none}
 </div></header>
 <section class="sign"><div class="in">
   <img src="img/logo.svg" alt="">
-  <div class="tt"><div class="kick">Mission: HTML basics</div><h1>The Paw Shelter Website</h1></div>
+  <div class="tt"><div class="kick">Mission · HTML basics</div><h1>The Paw Shelter Website</h1></div>
   <div class="meta"><span id="progress"></span><span>⏱ about 35 min</span><span>💾 saves automatically</span></div>
 </div></section>
 <nav aria-label="Chapters"><ol class="path" id="path"></ol></nav>
@@ -329,7 +328,7 @@ body.focus #digikult-nav{display:none}
 </div>
 <footer class="end">Digital Culture · Everything stays in your browser; nothing is sent anywhere.</footer>
 <span class="sr" role="status" id="status"></span>
-<script src="../../vendor/codemirror-html.js?v=8aa23aa2"></script>
+<script src="../../vendor/codemirror-html.js?v=6e60cf59"></script>
 <script>
 const CFG = {"editorUrl": "../editor.html", "key": "shelter-en-v1", "words": {"h1": "Paw Shelter", "h2s": ["About us", "Opening hours", "Our animals", "Contact"], "strongWord": "Saturday", "animals": ["Morzsa", "Cirmi", "Pamacs"], "imgs": ["img/morzsa.svg", "img/cirmi.svg", "img/pamacs.svg"], "allImgs": ["img/morzsa.svg", "img/cirmi.svg", "img/pamacs.svg", "img/bodri.svg", "img/logo.svg"], "lang": "en", "oldTitle": "New page", "file": "shelter.html", "fileBase": "shelter"}, "start": "<!DOCTYPE html>\n<html>\n  <head>\n    <meta charset=\"utf-8\">\n    <title>New page</title>\n  </head>\n  <body>\n    <h1>Hello, world!</h1>\n  </body>\n</html>\n", "models": ["<!DOCTYPE html>\n<html>\n  <head>\n    <meta charset=\"utf-8\">\n    <title>New page</title>\n  </head>\n  <body>\n    <h1>Paw Shelter</h1>\n  </body>\n</html>\n", "<!DOCTYPE html>\n<html>\n  <head>\n    <meta charset=\"utf-8\">\n    <title>New page</title>\n  </head>\n  <body>\n    <h1>Paw Shelter</h1>\n    <h2>About us</h2>\n    <h2>Opening hours</h2>\n    <h2>Our animals</h2>\n    <h2>Contact</h2>\n  </body>\n</html>\n", "<!DOCTYPE html>\n<html>\n  <head>\n    <meta charset=\"utf-8\">\n    <title>New page</title>\n  </head>\n  <body>\n    <h1>Paw Shelter</h1>\n    <p>Dogs, cats and bunnies are looking for a loving home.</p>\n    <h2>About us</h2>\n    <p>The Paw Shelter has looked after abandoned dogs, cats and rabbits since 2009. Right now 34 animals are waiting for a loving owner to take them home.</p>\n    <h2>Opening hours</h2>\n    <h2>Our animals</h2>\n    <h2>Contact</h2>\n  </body>\n</html>\n", "<!DOCTYPE html>\n<html>\n  <head>\n    <meta charset=\"utf-8\">\n    <title>New page</title>\n  </head>\n  <body>\n    <h1>Paw Shelter</h1>\n    <p>Dogs, cats and bunnies are looking for a loving home. Adoption day: <strong>Saturday from 10 am</strong>!</p>\n    <h2>About us</h2>\n    <p>The Paw Shelter has looked after abandoned dogs, cats and rabbits since 2009. Right now 34 animals are waiting for a <em>loving owner</em> to take them home.</p>\n    <h2>Opening hours</h2>\n    <h2>Our animals</h2>\n    <h2>Contact</h2>\n  </body>\n</html>\n", "<!DOCTYPE html>\n<html>\n  <head>\n    <meta charset=\"utf-8\">\n    <title>New page</title>\n  </head>\n  <body>\n    <h1>Paw Shelter</h1>\n    <p>Dogs, cats and bunnies are looking for a loving home. Adoption day: <strong>Saturday from 10 am</strong>!</p>\n    <h2>About us</h2>\n    <p>The Paw Shelter has looked after abandoned dogs, cats and rabbits since 2009. Right now 34 animals are waiting for a <em>loving owner</em> to take them home.</p>\n    <ol>\n      <li>Meet the animals.</li>\n      <li>Talk to the keepers.</li>\n      <li>Sign the agreement.</li>\n    </ol>\n    <h2>Opening hours</h2>\n    <ul>\n      <li>Monday–Friday: 10–17</li>\n      <li>Saturday: 9–13</li>\n      <li>Sunday: closed</li>\n    </ul>\n    <h2>Our animals</h2>\n    <h2>Contact</h2>\n  </body>\n</html>\n", "<!DOCTYPE html>\n<html>\n  <head>\n    <meta charset=\"utf-8\">\n    <title>New page</title>\n  </head>\n  <body>\n    <h1>Paw Shelter</h1>\n    <p>Dogs, cats and bunnies are looking for a loving home. Adoption day: <strong>Saturday from 10 am</strong>!</p>\n    <h2>About us</h2>\n    <p>The Paw Shelter has looked after abandoned dogs, cats and rabbits since 2009. Right now 34 animals are waiting for a <em>loving owner</em> to take them home.</p>\n    <ol>\n      <li>Meet the animals.</li>\n      <li>Talk to the keepers.</li>\n      <li>Sign the agreement.</li>\n    </ol>\n    <h2>Opening hours</h2>\n    <ul>\n      <li>Monday–Friday: 10–17</li>\n      <li>Saturday: 9–13</li>\n      <li>Sunday: closed</li>\n    </ul>\n    <h2>Our animals</h2>\n    <img src=\"img/morzsa.svg\" alt=\"Morzsa, a brown dog\" width=\"150\">\n    <img src=\"img/cirmi.svg\" alt=\"Cirmi, a ginger cat\" width=\"150\">\n    <img src=\"img/pamacs.svg\" alt=\"Pamacs, a grey bunny\" width=\"150\">\n    <h2>Contact</h2>\n  </body>\n</html>\n", "<!DOCTYPE html>\n<html>\n  <head>\n    <meta charset=\"utf-8\">\n    <title>New page</title>\n  </head>\n  <body>\n    <h1>Paw Shelter</h1>\n    <p>Dogs, cats and bunnies are looking for a loving home. Adoption day: <strong>Saturday from 10 am</strong>!</p>\n    <h2>About us</h2>\n    <p>The Paw Shelter has looked after abandoned dogs, cats and rabbits since 2009. Right now 34 animals are waiting for a <em>loving owner</em> to take them home.</p>\n    <ol>\n      <li>Meet the animals.</li>\n      <li>Talk to the keepers.</li>\n      <li>Sign the agreement.</li>\n    </ol>\n    <h2>Opening hours</h2>\n    <ul>\n      <li>Monday–Friday: 10–17</li>\n      <li>Saturday: 9–13</li>\n      <li>Sunday: closed</li>\n    </ul>\n    <h2>Our animals</h2>\n    <img src=\"img/morzsa.svg\" alt=\"Morzsa, a brown dog\" width=\"150\">\n    <img src=\"img/cirmi.svg\" alt=\"Cirmi, a ginger cat\" width=\"150\">\n    <img src=\"img/pamacs.svg\" alt=\"Pamacs, a grey bunny\" width=\"150\">\n    <h2>Contact</h2>\n    <p>Write to us: <a href=\"mailto:info@pawshelter.org\">info@pawshelter.org</a></p>\n    <p>How to find us: <a href=\"https://www.openstreetmap.org\" target=\"_blank\">map</a></p>\n  </body>\n</html>\n", "<!DOCTYPE html>\n<html>\n  <head>\n    <meta charset=\"utf-8\">\n    <title>New page</title>\n  </head>\n  <body>\n    <h1>Paw Shelter</h1>\n    <p>Dogs, cats and bunnies are looking for a loving home. Adoption day: <strong>Saturday from 10 am</strong>!</p>\n    <h2>About us</h2>\n    <p>The Paw Shelter has looked after abandoned dogs, cats and rabbits since 2009. Right now 34 animals are waiting for a <em>loving owner</em> to take them home.</p>\n    <ol>\n      <li>Meet the animals.</li>\n      <li>Talk to the keepers.</li>\n      <li>Sign the agreement.</li>\n    </ol>\n    <h2>Opening hours</h2>\n    <ul>\n      <li>Monday–Friday: 10–17</li>\n      <li>Saturday: 9–13</li>\n      <li>Sunday: closed</li>\n    </ul>\n    <h2>Our animals</h2>\n    <img src=\"img/morzsa.svg\" alt=\"Morzsa, a brown dog\" width=\"150\">\n    <img src=\"img/cirmi.svg\" alt=\"Cirmi, a ginger cat\" width=\"150\">\n    <img src=\"img/pamacs.svg\" alt=\"Pamacs, a grey bunny\" width=\"150\">\n    <table border=\"1\">\n      <tr><th>Name</th><th>Species</th><th>Age</th></tr>\n      <tr><td>Morzsa</td><td>dog</td><td>3 years</td></tr>\n      <tr><td>Cirmi</td><td>cat</td><td>2 years</td></tr>\n      <tr><td>Pamacs</td><td>rabbit</td><td>1 year</td></tr>\n    </table>\n    <h2>Contact</h2>\n    <p>Write to us: <a href=\"mailto:info@pawshelter.org\">info@pawshelter.org</a></p>\n    <p>How to find us: <a href=\"https://www.openstreetmap.org\" target=\"_blank\">map</a></p>\n  </body>\n</html>\n", "<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <title>Paw Shelter – Adoption</title>\n  </head>\n  <body>\n    <!-- Made by: Sample Student -->\n    <h1>Paw Shelter</h1>\n    <p>Dogs, cats and bunnies are looking for a loving home. Adoption day: <strong>Saturday from 10 am</strong>!</p>\n    <h2>About us</h2>\n    <p>The Paw Shelter has looked after abandoned dogs, cats and rabbits since 2009. Right now 34 animals are waiting for a <em>loving owner</em> to take them home.</p>\n    <ol>\n      <li>Meet the animals.</li>\n      <li>Talk to the keepers.</li>\n      <li>Sign the agreement.</li>\n    </ol>\n    <h2>Opening hours</h2>\n    <ul>\n      <li>Monday–Friday: 10–17</li>\n      <li>Saturday: 9–13</li>\n      <li>Sunday: closed</li>\n    </ul>\n    <h2>Our animals</h2>\n    <img src=\"img/morzsa.svg\" alt=\"Morzsa, a brown dog\" width=\"150\">\n    <img src=\"img/cirmi.svg\" alt=\"Cirmi, a ginger cat\" width=\"150\">\n    <img src=\"img/pamacs.svg\" alt=\"Pamacs, a grey bunny\" width=\"150\">\n    <table border=\"1\">\n      <tr><th>Name</th><th>Species</th><th>Age</th></tr>\n      <tr><td>Morzsa</td><td>dog</td><td>3 years</td></tr>\n      <tr><td>Cirmi</td><td>cat</td><td>2 years</td></tr>\n      <tr><td>Pamacs</td><td>rabbit</td><td>1 year</td></tr>\n    </table>\n    <h2>Contact</h2>\n    <p>Write to us: <a href=\"mailto:info@pawshelter.org\">info@pawshelter.org</a></p>\n    <p>How to find us: <a href=\"https://www.openstreetmap.org\" target=\"_blank\">map</a></p>\n  </body>\n</html>\n"], "chapters": [{"short": "Start", "label": "Warm-up", "title": "Getting started", "msg": "<p>Hi! I'm Teri, I run the Paw Shelter. On Saturday we're holding an adoption day, but we don't have a website yet. A colleague made a start, but… well, this is as far as it got.</p><p>Below on the left is the code; on the right is what visitors see. Let's start small: change the main heading to the shelter's name, <b>Paw Shelter</b>.</p>", "goals": [{"t": "The <code>&lt;h1&gt;</code> says: <b>Paw Shelter</b>", "tip": "Only change the text between <code>&lt;h1&gt;</code> and <code>&lt;/h1&gt;</code>; keep the tags."}], "cheat": "<h1>Paw Shelter</h1>", "cheatNote": "The tags stay; only the text between them changes. Tip: the editor closes tags for you and makes suggestions as you type. Press Enter to pick one. The ⌨ Shortcuts button shows the other tricks.", "success": "See? As you type, the page changes too. That's the job: you write the code, the browser shows it."}, {"short": "Headings", "label": "Chapter 1", "title": "Headings", "msg": "<p>The page will have four parts: <b>About us</b>, <b>Opening hours</b>, <b>Our animals</b> and <b>Contact</b>. Each needs a subheading under the main heading, in exactly that order.</p><p>The main heading stays on its own: a page has just one <code>&lt;h1&gt;</code>; subheadings are <code>&lt;h2&gt;</code>.</p>", "goals": [{"t": "Exactly one <code>&lt;h1&gt;</code> on the page", "tip": ""}, {"t": "Four <code>&lt;h2&gt;</code> subheadings: About us, Opening hours, Our animals, Contact", "tip": "Check the spelling."}, {"t": "In this order: main heading, About us, Opening hours, Our animals, Contact", "tip": ""}], "cheat": "<h1>Paw Shelter</h1>\n<h2>About us</h2>\n<h2>…</h2>", "cheatNote": "Each subheading on its own line, inside the <code>body</code>, under the main heading.", "success": "The page's skeleton is showing! Now let's fill it in."}, {"short": "Paragraphs", "label": "Chapter 2", "title": "Paragraphs", "msg": "<p>Now for the text. Under the main heading, a short, friendly sentence to introduce us. And under <b>About us</b>, this:</p><span class=\"quote\">The Paw Shelter has looked after abandoned dogs, cats and rabbits since 2009. Right now 34 animals are waiting for a loving owner to take them home.</span><p>It's fine to put it in your own words.</p>", "goals": [{"t": "A paragraph (<code>&lt;p&gt;</code>) between the main heading and the first subheading", "tip": "At least one short sentence."}, {"t": "A paragraph of at least two sentences under <b>About us</b>", "tip": "End each sentence with a full stop (or ! or ?) followed by a space."}], "cheat": "<h1>Paw Shelter</h1>\n<p>A short introduction.</p>\n<h2>About us</h2>\n<p>First sentence. Second sentence.</p>", "cheatNote": "A paragraph starts with <code>&lt;p&gt;</code> and ends with <code>&lt;/p&gt;</code>. A new line in the code is not a new line on the page.", "success": "Lovely! Now people know who we are."}, {"short": "Emphasis", "label": "Chapter 3", "title": "Emphasis", "msg": "<p>The most important thing is that everyone knows when to come! Add this to the end of the introduction paragraph:</p><span class=\"quote\">Adoption day: Saturday from 10 am!</span><p>Make <b>Saturday from 10 am</b> strong. And in the About us paragraph, give <b>loving owner</b> emphasis, in italics.</p>", "goals": [{"t": "A <code>&lt;strong&gt;</code> element containing the word <b>Saturday</b>", "tip": ""}, {"t": "The <code>&lt;strong&gt;</code> is inside a paragraph", "tip": "Put the <code>&lt;strong&gt;</code> between <code>&lt;p&gt;</code> and <code>&lt;/p&gt;</code>."}, {"t": "An <code>&lt;em&gt;</code> element in the <b>About us</b> paragraph", "tip": ""}], "cheat": "<p>Adoption day: <strong>Saturday from 10 am</strong>!</p>\n<p>… waiting for a <em>loving owner</em> …</p>", "cheatNote": "The emphasis sits inside the paragraph: close the inner tag first, then the paragraph.", "success": "Nobody will miss that now! The yard will be packed on Saturday."}, {"short": "Lists", "label": "Chapter 4", "title": "Lists", "msg": "<p>Under <b>Opening hours</b> we need a bulleted list:</p><span class=\"quote\">Monday–Friday: 10–17 · Saturday: 9–13 · Sunday: closed</span><p>And in the <b>About us</b> part, under the paragraph, a numbered list of how adoption works: 1. Meet the animals. 2. Talk to the keepers. 3. Sign the agreement.</p>", "goals": [{"t": "Under <b>Opening hours</b>: a <code>&lt;ul&gt;</code> with at least 3 <code>&lt;li&gt;</code>", "tip": ""}, {"t": "In the <b>About us</b> part: an <code>&lt;ol&gt;</code> with at least 3 <code>&lt;li&gt;</code>", "tip": "Under the About us subheading, before the next subheading."}, {"t": "Every <code>&lt;li&gt;</code> is inside a <code>&lt;ul&gt;</code> or an <code>&lt;ol&gt;</code>", "tip": ""}], "cheat": "<ul>\n  <li>Monday–Friday: 10–17</li>\n  <li>…</li>\n</ul>\n\n<ol>\n  <li>Meet the animals.</li>\n  <li>…</li>\n</ol>", "cheatNote": "<code>ul</code>: bullets, <code>ol</code>: numbers. Each line is an <code>li</code>. Faster: type <code>ul&gt;li*3</code> and press Tab.", "success": "Clear, short, to the point. Just how I like it."}, {"short": "Images", "label": "Chapter 5", "title": "Images", "msg": "<p><b>Our animals</b> is the most important part: let's show them! We took photos of three, and they're in the <b>img</b> folder:</p><span class=\"quote\">img/morzsa.svg · img/cirmi.svg · img/pamacs.svg</span><p>Give each one a description (<code>alt</code>), and don't make them huge: set the width to 150.</p>", "goals": [{"t": "Three <code>&lt;img&gt;</code> under <b>Our animals</b>", "tip": ""}, {"t": "All three images show up (correct <code>src</code>)", "tip": "The file names: img/morzsa.svg, img/cirmi.svg, img/pamacs.svg – exactly like this, in lower case."}, {"t": "Every image has <code>alt</code> text", "tip": "Describe the picture, e.g. alt=\"Morzsa, a brown dog\"."}, {"t": "Every image has a <code>width</code> attribute (e.g. 150)", "tip": ""}, {"t": "Add Bodri, the shelter's guard dog, too: img/bodri.svg", "tip": "", "bonus": true}], "cheat": "<img src=\"img/morzsa.svg\" alt=\"Morzsa, a brown dog\" width=\"150\">", "cheatNote": "<code>img</code> is an empty element: no closing tag. Attributes are separated by spaces.", "success": "Oh, they're so sweet! Morzsa is already my favourite."}, {"short": "Links", "label": "Chapter 6", "title": "Links", "msg": "<p>If anyone has questions, they can write to us: <b>info@pawshelter.org</b>. Put this under <b>Contact</b> as a clickable email link.</p><p>Let's add a link to a map as well, so people can find us: <b>https://www.openstreetmap.org</b>. It should open in a new tab, so our page doesn't disappear.</p>", "goals": [{"t": "An email link under <b>Contact</b> (<code>mailto:</code>)", "tip": "The <code>href</code> starts with mailto:"}, {"t": "A link to a website (<code>https://</code>…)", "tip": ""}, {"t": "The website link opens in a new tab (<code>target</code>)", "tip": "<code>target=&quot;_blank&quot;</code> in the opening tag."}, {"t": "Every link has text to click on", "tip": "The text goes between <code>&lt;a …&gt;</code> and <code>&lt;/a&gt;</code>."}], "cheat": "<p>Write to us: <a href=\"mailto:info@pawshelter.org\">info@pawshelter.org</a></p>\n<p><a href=\"https://www.openstreetmap.org\" target=\"_blank\">map</a></p>", "cheatNote": "<code>href</code> says where the link goes; the text between the tags is what people click.", "success": "I tried it, it works! The email link even opened my mail app."}, {"short": "Table", "label": "Chapter 7", "title": "Table", "msg": "<p>Under the pictures I'd like a table of the animals, so they're easy to compare. Columns: <b>Name</b>, <b>Species</b>, <b>Age</b>.</p><span class=\"quote\">Morzsa – dog – 3 years · Cirmi – cat – 2 years · Pamacs – rabbit – 1 year</span><p>Give it a border too (<code>border=\"1\"</code>), so the cells are easy to see.</p>", "goals": [{"t": "A <code>&lt;table&gt;</code> in the <b>Our animals</b> part", "tip": "Under the pictures, before the Contact subheading."}, {"t": "The first row is the header: at least 3 <code>&lt;th&gt;</code> cells", "tip": ""}, {"t": "At least 3 data rows, each with 3 <code>&lt;td&gt;</code>", "tip": "Each row is a <code>&lt;tr&gt;</code> with its cells inside."}, {"t": "All three animals' names are in the table", "tip": ""}], "cheat": "<table border=\"1\">\n  <tr><th>Name</th><th>Species</th><th>Age</th></tr>\n  <tr><td>Morzsa</td><td>dog</td><td>3 years</td></tr>\n</table>", "cheatNote": "Row by row: each <code>tr</code> is a row, with its cells left to right. Header: <code>th</code>, data: <code>td</code>. Faster: <code>table&gt;tr*4&gt;td*3</code>, then Tab.", "success": "Now you can see everyone's age at a glance. Very professional!"}, {"short": "Head", "label": "Chapter 8", "title": "The finishing touches", "msg": "<p>Nearly done! But the browser tab still says <b>New page</b>. Change the <code>title</code> to:</p><span class=\"quote\">Paw Shelter – Adoption</span><p>Set the page's language to English (<code>lang</code>), and write your name in a comment at the start of the <code>body</code>, so we know who made it.</p>", "goals": [{"t": "The <code>&lt;title&gt;</code> contains: Paw Shelter", "tip": "The title is in the head. Watch the tab at the top of the preview!"}, {"t": "The <code>&lt;html&gt;</code> opening tag has <code>lang=&quot;en&quot;</code>", "tip": ""}, {"t": "A comment (<code>&lt;!-- … --&gt;</code>) with your name", "tip": "Comments don't show on the page, only in the code."}, {"t": "The skeleton is intact: DOCTYPE on the first line, head and body in place", "tip": "If you deleted something by accident, ↺ Chapter start brings it back."}], "cheat": "<html lang=\"en\">\n  <head>\n    <title>Paw Shelter – Adoption</title>\n  …\n  <body>\n    <!-- Made by: Anna Kovács -->", "cheatNote": "Whatever is in the <code>head</code> doesn't show on the page, but on the tab or behind the scenes.", "success": "Thank you! This is what everyone will see on Saturday. Morzsa, Cirmi and Pamacs say thanks too!"}], "ui": {"pick": "Pick", "pickT": "Click an element in the preview to jump to its code. Alt+click always works.", "preview": "Page preview", "localTpl": "This link would open the file {h}, but there's no such file here.", "progress": "{n} / {t} chapters done", "doneWord": "done", "todoWord": "not done yet", "bonus": "bonus", "missing": "Missing: ", "badSrc": "No such image: ", "winTitle": "Done!", "nextCh": "Next chapter ▸", "startWork": "Let's get to work ▸", "toEnd": "Finish ▸", "solvedSay": "Chapter done!", "saved": "Saved.", "solNote": "If you're really stuck, you can look at a model solution. Have a go on your own first, though!", "solWait": "Model solution (in {t})", "solShow": "Show the model solution", "solLoadNote": "This is how the code could look at the end of this chapter. Compare it with yours! If you load it, it replaces the code in the editor.", "solLoad": "Load into the editor", "resetConfirm": "Put the code back the way it was at the start of this chapter?", "restartConfirm": "Start again from the beginning? All your work so far will be deleted from this browser.", "stChapters": "chapters", "stMinutes": "minutes", "stHelped": "model solutions", "noName": "noname", "zipping": "Packing…", "zipped": "Downloaded ✓", "zipFail": "Only the HTML file was downloaded", "copied": "Copied ✓", "repTitle": "The Paw Shelter Website – report", "repName": "Name", "repStart": "Started", "repEnd": "Finished", "repDone": "Chapters done", "repHelped": "With model solution", "repMin": "min", "repCode": "--- The website's code ---"}, "pawSvg": "<svg viewBox=\"0 0 20 20\" aria-hidden=\"true\"><g fill=\"currentColor\"><ellipse cx=\"10\" cy=\"13\" rx=\"4.6\" ry=\"3.8\"/><ellipse cx=\"4.6\" cy=\"8.6\" rx=\"1.8\" ry=\"2.3\"/><ellipse cx=\"8\" cy=\"5.2\" rx=\"1.8\" ry=\"2.4\"/><ellipse cx=\"12\" cy=\"5.2\" rx=\"1.8\" ry=\"2.4\"/><ellipse cx=\"15.4\" cy=\"8.6\" rx=\"1.8\" ry=\"2.3\"/></g></svg>", "solutionDelay": 240};
 const UI = { preview: CFG.ui.preview };
@@ -350,7 +349,8 @@ const ED_TEXT = {
       th: "fejléccella", td: "cella", div: "doboz, részeket csoportosít", span: "szövegrész, csoportosít", "@href": "hová visz a link", "@src": "a képfájl helye",
       "@alt": "a kép leírása", "@width": "szélesség képpontban", "@height": "magasság képpontban", "@target": "_blank: új lapon nyílik", "@lang": "az oldal nyelve, pl. hu",
       "@colspan": "hány oszlopon át ér a cella", "@rowspan": "hány soron át ér a cella", "@border": "keret a cellák körül", "@charset": "karakterkódolás",
-      "@title": "súgó, ha fölé viszed az egeret", "#file": "kép a mappában", "#emmet": "Emmet · Tab" },
+      "@title": "súgó, ha fölé viszed az egeret", "#file": "kép a mappában", "#emmet": "Emmet · Tab",
+      "css:color": "a szöveg színe", "css:background-color": "a háttér színe", "css:background": "háttér (szín, kép) egyszerre", "css:font-family": "a betűtípus, pl. Arial, sans-serif", "css:font-size": "a betűméret, pl. 18px", "css:font-weight": "a betű vastagsága, pl. bold", "css:font-style": "dőlt betű: italic", "css:text-align": "igazítás: left, center, right", "css:text-decoration": "aláhúzás: underline, vagy none: nincs", "css:line-height": "sortávolság, pl. 1.5", "css:letter-spacing": "betűköz", "css:text-transform": "uppercase: csupa nagybetű", "css:margin": "külső margó: távolság a többi elemtől", "css:margin-top": "külső margó fent", "css:margin-bottom": "külső margó lent", "css:margin-left": "külső margó balra", "css:margin-right": "külső margó jobbra", "css:padding": "belső margó: távolság a doboz széle és a tartalom között", "css:padding-top": "belső margó fent", "css:padding-bottom": "belső margó lent", "css:padding-left": "belső margó balra", "css:padding-right": "belső margó jobbra", "css:border": "keret: vastagság, stílus, szín, pl. 2px solid green", "css:border-radius": "lekerekített sarkok, pl. 10px vagy 50%", "css:border-collapse": "collapse: a cellák keretei összeolvadnak", "css:border-bottom": "keret csak alul", "css:width": "szélesség", "css:max-width": "legnagyobb szélesség", "css:height": "magasság", "css:box-shadow": "árnyék a doboz körül, pl. 0 2px 6px gray", "css:display": "megjelenés: block, inline, flex, none", "css:list-style-type": "a lista jele: disc, square, none", "css:opacity": "átlátszatlanság 0 és 1 között", "css:cursor": "az egérmutató alakja, pl. pointer", "css:transform": "elforgatás, nagyítás, pl. scale(1.1)", "css:transition": "áttűnés: a változás ideje, pl. 0.3s", "css:vertical-align": "függőleges igazítás", "css:gap": "rés a rugalmas doboz elemei között" },
     phrases: { "Find": "Keresés", "Replace": "Csere", "next": "következő", "previous": "előző", "all": "mind", "match case": "kis- és nagybetű",
       "regexp": "regex", "by word": "egész szó", "replace": "csere", "replace all": "mindet cseréli", "close": "bezárás", "current match": "aktuális találat",
       "replaced $ matches": "$ találat cserélve", "replaced match on line $": "csere a(z) $. sorban", "on line": "sor", "Go to line": "Ugrás sorra", "go": "ugrás",
@@ -358,7 +358,14 @@ const ED_TEXT = {
       "Fold line": "Összecsukás", "Unfold line": "Kibontás", "Diagnostics": "Figyelmeztetések", "No diagnostics": "Nincs figyelmeztetés" },
     lint: { lintOpen: "{1}. sor: a címke nincs befejezve, hiányzik a > jel: {0}", lintQuote: "{1}. sor: hiányzik egy idézőjel ebben a címkében: {0}",
       lintVoidClose: "{1}. sor: {0} üres elem, nincs záró címkéje. Töröld a {c0} címkét.", lintStray: "{1}. sor: {c0} lezár valamit, amit nem nyitottál meg.",
-      lintCross: "{3}. sor: keresztbe zárt címkék. Előbb {c0}, utána {c1} jön.", lintUnclosed: "{1}. sor: {0} nincs lezárva. Valahová kell egy {c0}." }
+      lintCross: "{3}. sor: keresztbe zárt címkék. Előbb {c0}, utána {c1} jön.", lintUnclosed: "{1}. sor: {0} nincs lezárva. Valahová kell egy {c0}.",
+      cssProp: "{1}. sor: nincs ilyen CSS-tulajdonság: {p0}. Elírtad?", cssVal: "{2}. sor: a(z) {p0} nem érti ezt az értéket: {p1}",
+      cssNoVal: "{1}. sor: a(z) {p0} után hiányzik az érték.", cssNoColon: "{1}. sor: hiányzik a kettőspont ( : ) a(z) {p0} után.",
+      cssSemi: "{1}. sor: a(z) {p0} sora végéről hiányzik a pontosvessző ( ; ).", cssUnclosed: "{1}. sor: a(z) {p0} szabály nincs lezárva: hiányzik a }}.",
+      cssStray: "{0}. sor: ez a }} nem zár le semmit.", cssNoSel: "{0}. sor: a {{ elől hiányzik a kijelölő (pl. h1 vagy .kiemelt).",
+      cssAngle: "{1}. sor: a CSS-ben a címkét kacsacsőrök nélkül írjuk: {p0}", cssBadSel: "{1}. sor: ezt a kijelölőt a böngésző nem érti: {p0}",
+      cssNoBlock: "{1}. sor: a(z) {p0} után hiányzik a {{ … }} rész.",
+      cssHtmlCm: "{0}. sor: ez HTML-megjegyzés, a CSS-ben nem működik. A CSS-ben így írd: /* … */" }
   },
   en: {
     docs: { html: "the whole page", head: "information about the page", body: "everything visible on the page", title: "the title on the browser tab",
@@ -369,18 +376,28 @@ const ED_TEXT = {
       th: "header cell", td: "cell", div: "box that groups parts", span: "piece of text, groups", "@href": "where the link goes", "@src": "where the image file is",
       "@alt": "description of the image", "@width": "width in pixels", "@height": "height in pixels", "@target": "_blank: opens in a new tab", "@lang": "the page's language, e.g. en",
       "@colspan": "how many columns the cell spans", "@rowspan": "how many rows the cell spans", "@border": "border round the cells", "@charset": "character encoding",
-      "@title": "tooltip on mouse hover", "#file": "image in the folder", "#emmet": "Emmet · Tab" },
+      "@title": "tooltip on mouse hover", "#file": "image in the folder", "#emmet": "Emmet · Tab",
+      "css:color": "text colour", "css:background-color": "background colour", "css:background": "background (colour, image) in one go", "css:font-family": "the typeface, e.g. Arial, sans-serif", "css:font-size": "text size, e.g. 18px", "css:font-weight": "how bold, e.g. bold", "css:font-style": "italic text: italic", "css:text-align": "alignment: left, center, right", "css:text-decoration": "underline, or none", "css:line-height": "line spacing, e.g. 1.5", "css:letter-spacing": "space between letters", "css:text-transform": "uppercase: all capitals", "css:margin": "outer space: distance from other elements", "css:margin-top": "outer space at the top", "css:margin-bottom": "outer space at the bottom", "css:margin-left": "outer space on the left", "css:margin-right": "outer space on the right", "css:padding": "inner space: between the box edge and its content", "css:padding-top": "inner space at the top", "css:padding-bottom": "inner space at the bottom", "css:padding-left": "inner space on the left", "css:padding-right": "inner space on the right", "css:border": "border: width, style, colour, e.g. 2px solid green", "css:border-radius": "rounded corners, e.g. 10px or 50%", "css:border-collapse": "collapse: cell borders merge", "css:border-bottom": "border at the bottom only", "css:width": "width", "css:max-width": "largest width", "css:height": "height", "css:box-shadow": "shadow round the box, e.g. 0 2px 6px gray", "css:display": "how it shows: block, inline, flex, none", "css:list-style-type": "the list marker: disc, square, none", "css:opacity": "opacity from 0 to 1", "css:cursor": "mouse pointer shape, e.g. pointer", "css:transform": "rotate, scale, e.g. scale(1.1)", "css:transition": "how long a change takes, e.g. 0.3s", "css:vertical-align": "vertical alignment", "css:gap": "gap between items in a flex box" },
     phrases: {},
     lint: { lintOpen: "Line {1}: this tag isn't finished, the > is missing: {0}", lintQuote: "Line {1}: a quote mark is missing in this tag: {0}",
       lintVoidClose: "Line {1}: {0} is an empty element with no closing tag. Delete the {c0}.", lintStray: "Line {1}: {c0} closes something that was never opened.",
-      lintCross: "Line {3}: tags closed crosswise. First {c0}, then {c1}.", lintUnclosed: "Line {1}: {0} is never closed. Add a {c0} somewhere." }
+      lintCross: "Line {3}: tags closed crosswise. First {c0}, then {c1}.", lintUnclosed: "Line {1}: {0} is never closed. Add a {c0} somewhere.",
+      cssProp: "Line {1}: there's no CSS property called {p0}. A typo?", cssVal: "Line {2}: {p0} doesn't understand this value: {p1}",
+      cssNoVal: "Line {1}: the value after {p0} is missing.", cssNoColon: "Line {1}: the colon ( : ) after {p0} is missing.",
+      cssSemi: "Line {1}: the semicolon ( ; ) at the end of the {p0} line is missing.", cssUnclosed: "Line {1}: the {p0} rule isn't closed: the }} is missing.",
+      cssStray: "Line {0}: this }} doesn't close anything.", cssNoSel: "Line {0}: the selector in front of {{ is missing (e.g. h1 or .highlight).",
+      cssAngle: "Line {1}: in CSS, write the tag without angle brackets: {p0}", cssBadSel: "Line {1}: the browser doesn't understand this selector: {p0}",
+      cssNoBlock: "Line {1}: the {{ … }} part after {p0} is missing.",
+      cssHtmlCm: "Line {0}: this is an HTML comment, and it doesn't work in CSS. In CSS, write: /* … */" }
   }
 };
 const LINT_T = {};
 Object.entries(ED_TEXT[PAGE_LANG].lint).forEach(([k, tpl]) => {
-  LINT_T[k] = (...a) => tpl.replace(/\{(c?)(\d)\}/g, (_, c, i) => {
+  LINT_T[k] = (...a) => tpl.replace(/\{\{|\}\}|\{([cp]?)(\d)\}/g, (all, c, i) => {
+    if (all === "{{") return "<code>{</code>"; if (all === "}}") return "<code>}</code>";
     const v = a[+i];
-    return typeof v === "number" ? String(v) : `<code>&lt;${c ? "/" : ""}${esc(v)}&gt;</code>`;
+    if (typeof v === "number") return String(v);
+    return c === "p" ? `<code>${esc(v)}</code>` : `<code>&lt;${c ? "/" : ""}${esc(v)}&gt;</code>`;
   });
 });
 const IMG_FILES = ["img/morzsa.svg", "img/cirmi.svg", "img/pamacs.svg", "img/bodri.svg", "img/logo.svg"];
@@ -410,17 +427,103 @@ function hl(src){
     if (t.startsWith("<!--")) o += `<span class="cm">${esc(t)}</span>`;
     else if (/^<!doctype/i.test(t)) o += `<span class="dt">${esc(t)}</span>`;
     else if (t[0] === "&") o += `<span class="en">${esc(t)}</span>`;
-    else o += hlTag(t);
+    else {
+      o += hlTag(t);
+      if (/^<style[\s>]/i.test(t)){                          /* the stylesheet inside is CSS */
+        const end = src.toLowerCase().indexOf("</style", TOKEN.lastIndex);
+        const stop = end < 0 ? src.length : end;
+        o += hlCss(src.slice(TOKEN.lastIndex, stop));
+        TOKEN.lastIndex = stop;
+      }
+    }
     last = TOKEN.lastIndex;
   }
   return o + esc(src.slice(last));
 }
 
+/* CSS colouring: selectors, properties, values, comments */
+function hlCss(src){
+  let o = "", i = 0, inBlock = 0;
+  const re = /\/\*[\s\S]*?(?:\*\/|$)|[{}]|[^{}/]+|\//g;
+  let m;
+  while ((m = re.exec(src))){
+    const t = m[0];
+    if (t.startsWith("/*")) o += `<span class="cm">${esc(t)}</span>`;
+    else if (t === "{"){ inBlock++; o += `<span class="pu">{</span>`; }
+    else if (t === "}"){ inBlock = Math.max(0, inBlock - 1); o += `<span class="pu">}</span>`; }
+    else if (!inBlock) o += `<span class="sl">${esc(t)}</span>`;
+    else o += esc(t).replace(/([\w-]+)(\s*:)([^;]*)(;?)/g, (a, p, c, v, sc) => `<span class="cp">${p}</span><span class="pu">${c}</span><span class="cv">${v}</span><span class="pu">${sc}</span>`);
+  }
+  return o;
+}
+
 /* A tolerant check for beginners' mistakes: unclosed, stray and crossed tags, with line numbers. */
+/* CSS inside <style>: the browser quietly ignores what it doesn't understand, so we say it out loud */
+function cssLint(src, T = LINT_T){
+  const out = [], re = /<style[^>]*>([\s\S]*?)(?:<\/style\s*>|$)/gi;
+  const lineOf = i => src.slice(0, i).split("\n").length;
+  const ok = (p, v) => { try { return typeof CSS === "undefined" || !CSS.supports || CSS.supports(p, v); } catch(e){ return true; } };
+  const decls = (css, from, body, at) => {
+    let off = from;
+    for (const part of body.split(";")){
+      const decl = part.trim(), pos = off + (part.length - part.trimStart().length);
+      off += part.length + 1;
+      if (!decl) continue;
+      const c = decl.indexOf(":");
+      if (c < 0){ out.push({ line: at(pos), html: T.cssNoColon(decl.split(/\s+/)[0], at(pos)) }); continue; }
+      const prop = decl.slice(0, c).trim().toLowerCase(), val = decl.slice(c + 1).replace(/!important\s*$/i, "").trim();
+      if (prop.startsWith("--")) continue;
+      if (/\n\s*[a-z-]+\s*:/i.test(val) || (/\s[a-z-]+\s*:/i.test(val) && !ok(prop, val))){ out.push({ line: at(pos), html: T.cssSemi(prop, at(pos)) }); continue; }
+      if (!/^[a-z-]+$/.test(prop) || !ok(prop, "inherit")){ out.push({ line: at(pos), html: T.cssProp(prop, at(pos)) }); continue; }
+      if (!val){ out.push({ line: at(pos), html: T.cssNoVal(prop, at(pos)) }); continue; }
+      if (!ok(prop, val)) out.push({ line: at(pos), html: T.cssVal(prop, val.length > 30 ? val.slice(0, 30) + "…" : val, at(pos)) });
+    }
+  };
+  let m;
+  while ((m = re.exec(src))){
+    const base = m.index + m[0].indexOf(">") + 1;
+    const at = k => lineOf(base + k);
+    const css = m[1].replace(/\/\*[\s\S]*?(\*\/|$)/g, c => c.replace(/[^\n]/g, " "))
+      .replace(/<!--|-->/g, (c, k) => { out.push({ line: at(k), html: T.cssHtmlCm(at(k)) }); return "    ".slice(0, c.length); });
+    let k = 0, depth = 0, selStart = 0;
+    while (k < css.length){
+      const ch = css[k];
+      if (ch === "{"){
+        const sel = css.slice(selStart, k).trim(), sp = selStart + (css.slice(selStart, k).length - css.slice(selStart, k).trimStart().length);
+        if (sel.startsWith("@")){ depth++; k++; selStart = k; continue; }
+        if (!sel) out.push({ line: at(k), html: T.cssNoSel(at(k)) });
+        else if (sel.includes("<")) out.push({ line: at(sp), html: T.cssAngle(sel.replace(/[<>\/]/g, "").trim(), at(sp)) });
+        else { try { document.createDocumentFragment().querySelector(sel); } catch(e){ out.push({ line: at(sp), html: T.cssBadSel(sel, at(sp)) }); } }
+        let e = k + 1;
+        while (e < css.length && css[e] !== "}" && css[e] !== "{") e++;
+        const body = css.slice(k + 1, e);
+        if (e >= css.length || css[e] === "{"){
+          out.push({ line: at(k), html: T.cssUnclosed(sel || "?", at(k)) });
+          if (e >= css.length){ decls(css, k + 1, body, at); selStart = css.length; break; }
+          const cut = body.lastIndexOf(";");                       /* the next rule's selector starts after the last ; */
+          decls(css, k + 1, cut < 0 ? "" : body.slice(0, cut), at);
+          selStart = cut < 0 ? k + 1 : k + 1 + cut + 1; k = e; continue;
+        }
+        decls(css, k + 1, body, at);
+        k = e + 1; selStart = k; continue;
+      }
+      if (ch === "}"){
+        if (depth > 0) depth--; else out.push({ line: at(k), html: T.cssStray(at(k)) });
+        k++; selStart = k; continue;
+      }
+      k++;
+    }
+    const tail = css.slice(selStart), tt = tail.trim();
+    if (tt) out.push({ line: at(selStart + tail.indexOf(tt[0])), html: T.cssNoBlock(tt.split(/\s+/)[0], at(selStart + tail.indexOf(tt[0]))) });
+  }
+  return out;
+}
+
 function lint(src, T = LINT_T){
   const out = [], stack = [];
   const lineOf = i => src.slice(0, i).split("\n").length;
-  const clean = src.replace(/<!--[\s\S]*?-->/g, c => c.replace(/[^\n]/g, " "));
+  const clean = src.replace(/<!--[\s\S]*?-->/g, c => c.replace(/[^\n]/g, " "))
+                   .replace(/(<style[^>]*>)([\s\S]*?)(?=<\/style|$)/gi, (a, t, c) => t + c.replace(/[^\n]/g, " "));
   const re = /<(\/?)([a-zA-Z][\w-]*)([^<>]*?)(\/?)>|<(\/?)([a-zA-Z][\w-]*)[^<>]*$/g;
   const skip = new Set(["html","head","body"]);              /* optional end tags: a forgotten </body> is no drama */
   const lateClose = {};                                        /* closing tags we already explained (crossed pairs) */
@@ -446,6 +549,8 @@ function lint(src, T = LINT_T){
     stack.length = at;
   }
   stack.forEach(s => { if (!skip.has(s.name)) out.push({ line: s.line, html: T.lintUnclosed(s.name, s.line) }); });
+  out.push(...cssLint(src, T));
+  out.sort((a, b) => a.line - b.line);
   const seen = new Set();
   return out.filter(w => !seen.has(w.html) && seen.add(w.html)).slice(0, 6);
 }
@@ -595,6 +700,7 @@ function makeBrowser(host, file, T, opts = {}){
       $$("img", d).forEach(im => im.addEventListener("load", size));
     } catch(e){}
     size();
+    if (opts.onLoad) try { opts.onLoad(fr.contentDocument); } catch(e){}
   });
   const show = src => {
     const t = /<title[^>]*>([\s\S]*?)<\/title>/i.exec(src);
@@ -721,10 +827,12 @@ const CHECKS = [
   }
 ];
 
+
+
 /* ---------- page parts ---------- */
 const ed = $("#code"), editor = makeEditor(ed, { lines: true, fixed: true, fold: true, files: W.allImgs,
   onCursor: () => { try { if (browser.picking) browser.highlightAt(editor.cm.view.state.selection.main.head); } catch(e){} } });
-const browser = makeBrowser($("#browser"), W.file, UI, { pick: { label: CFG.ui.pick, title: CFG.ui.pickT, onPick: (start, open) => {
+const browser = makeBrowser($("#browser"), W.file, UI, { onLoad: () => { if (CFG.live) evaluate(); }, pick: { label: CFG.ui.pick, title: CFG.ui.pickT, onPick: (start, open) => {
   if (editor.cm){ const v = editor.cm.view; v.dispatch({ selection: { anchor: open, head: start }, scrollIntoView: true }); v.focus(); }
   else { ed.focus(); ed.setSelectionRange(start, open); }
 } } });
@@ -749,13 +857,14 @@ function drawChapter(){
   $("#chTitle").textContent = c.title;
   $("#msg").innerHTML = c.msg;
   $("#cheatNote").innerHTML = c.cheatNote;
-  $("#cheat").innerHTML = hl(c.cheat);
+  $("#cheat").innerHTML = /^\s*</.test(c.cheat) ? hl(c.cheat) : hlCss(c.cheat);
   drawSolution();
 }
 
 let lastResults = null;
 function evaluate(){
-  const src = ed.value, d = parse(src), i = state.current, c = CH[i];
+  const src = ed.value, d = CFG.live ? browser.frame.contentDocument : parse(src), i = state.current, c = CH[i];
+  if (!d || !d.body) return;
   const res = CHECKS[i](d, src).map(r => Array.isArray(r) ? r : [r, ""]);
   const req = c.goals.map((g, k) => g.bonus ? true : !!res[k][0]);
   const okN = c.goals.filter((g, k) => !g.bonus && res[k][0]).length, need = c.goals.filter(g => !g.bonus).length;
@@ -768,10 +877,13 @@ function evaluate(){
   $("#count").textContent = `${okN} / ${need}`;
   if (req.every(Boolean) && !state.solved.includes(i)) solve(i);
   drawWin();
-  const warn = lint(src);
+  drawLint();
+  lastResults = res;
+}
+function drawLint(){
+  const warn = lint(ed.value);
   $("#lint").hidden = !warn.length;
   $("#lint").innerHTML = warn.map(w => `<p>${w.html}</p>`).join("");
-  lastResults = res;
 }
 
 function solve(i){
@@ -916,7 +1028,9 @@ ed.value = state.code; editor.refit();
 ed.addEventListener("input", () => {
   state.code = ed.value; saveSoon();
   browser.show(instrument(ed.value));
-  clearTimeout(evalTimer); evalTimer = setTimeout(evaluate, 220);
+  clearTimeout(evalTimer);
+  if (CFG.live) evalTimer = setTimeout(drawLint, 220);       /* the goals are re-checked when the preview has loaded */
+  else evalTimer = setTimeout(evaluate, 220);
 });
 document.addEventListener("keydown", e => {
   if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "s"){ e.preventDefault(); save(); $("#status").textContent = CFG.ui.saved; flashSaved(); }
@@ -980,6 +1094,6 @@ go(hashCh >= 0 && hashCh < CH.length && unlocked(hashCh) ? hashCh : state.curren
 drawEnding();
 
 </script>
-<script src="../../nav.js?v=1cff4815" defer></script>
+<script src="../../nav.js?v=d9bcb2b4" defer></script>
 </body>
 </html>

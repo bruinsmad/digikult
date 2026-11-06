@@ -3,7 +3,6 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<style>/* moving between pages: the old page drifts aside and fades, the new one glides in; the rail holds still */@view-transition{navigation:auto}.rail{view-transition-name:rail}::view-transition-group(root){animation:none}::view-transition-old(root){animation:dk-out .2s cubic-bezier(.4,0,1,1) both}::view-transition-new(root){animation:dk-in .38s cubic-bezier(.16,1,.3,1) .06s both}::view-transition-old(rail),::view-transition-new(rail){animation:none}@keyframes dk-out{to{opacity:0;transform:translateX(-18px)}}@keyframes dk-in{from{opacity:0;transform:translateX(26px)}}@media (prefers-reduced-motion:reduce){::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none!important}}</style>
 <title>A Mancs Menhely honlapja</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -40,8 +39,7 @@ button{font:inherit;color:inherit}
 .rail .in{max-width:1500px;margin:0 auto;padding:0 18px;height:50px;display:flex;align-items:center;gap:14px}
 .rail .home{font:700 19px/1 var(--f-hand);color:#fff6e8;text-decoration:none;white-space:nowrap}
 .rail .crumb{color:#f3dcc4;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
-.rail .langlink{margin-left:auto;flex:none;font:700 14px var(--f-body);color:#fff6e8;border:1.5px solid rgba(255,246,232,.45);border-radius:4px;padding:4px 10px;text-decoration:none}
-.rail .langlink:hover{border-color:#fff6e8;background:rgba(0,0,0,.15)}
+.rail .langlink{margin-left:auto;flex:none;font:700 13px var(--f-body);color:#5d3820;background:#fff6e8;border-radius:999px;padding:5px 12px;text-decoration:none}
 
 /* awning header */
 .sign{position:relative;background:var(--green);color:#fff8ea;padding:18px 0 18px}
@@ -50,7 +48,7 @@ button{font:inherit;color:inherit}
 .sign .in{max-width:1500px;margin:0 auto;padding:0 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
 .sign img{width:58px;height:58px;flex:none;border-radius:50%;box-shadow:0 0 0 4px rgba(255,248,234,.25)}
 .sign .tt{min-width:0;flex:1}
-.sign .kick{font:700 19px/1.2 var(--f-hand);color:#bfe6cf}
+.sign .kick{font:700 13px var(--f-body);letter-spacing:.08em;text-transform:uppercase;color:#bfe6cf}
 .sign h1{margin:2px 0 0;font:600 clamp(26px,3.6vw,40px)/1.1 var(--f-display);letter-spacing:.01em}
 .sign .meta{display:flex;gap:10px 18px;flex-wrap:wrap;font-size:14.5px;color:#d8efe1}
 .sign .meta b{color:#fff}
@@ -79,7 +77,7 @@ button{font:inherit;color:inherit}
 .extra{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;margin-top:16px;align-items:start}
 @media (max-width:980px){ .band,.work,.extra{grid-template-columns:minmax(0,1fr)} }
 .card{background:var(--panel);border:2px solid var(--line-2);border-radius:14px;box-shadow:0 2px 0 rgba(90,60,30,.08)}
-.card-h{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px;border-bottom:2px solid var(--line);font:700 14px var(--f-body);color:var(--muted)}
+.card-h{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px;border-bottom:2px solid var(--line);font:700 13px var(--f-body);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
 
 /* Teri's note */
 .note{display:flex;gap:14px;padding:16px}
@@ -102,7 +100,7 @@ button{font:inherit;color:inherit}
 .goal .gt code{font-size:.88em}
 .goal .tip{grid-column:2;font-size:14px;color:var(--orange-d)}
 .goal.ok .tip{display:none}
-.goal .bonus{display:inline-block;font:700 15px/1.2 var(--f-hand);background:var(--orange-soft);color:var(--orange-d);border-radius:999px;padding:1px 8px;margin-right:6px;vertical-align:1px}
+.goal .bonus{display:inline-block;font:700 11px var(--f-body);letter-spacing:.06em;text-transform:uppercase;background:var(--orange-soft);color:var(--orange-d);border-radius:999px;padding:1px 8px;margin-right:6px;vertical-align:1px}
 .todo .count{font:700 13px var(--f-body);color:var(--muted);text-transform:none;letter-spacing:0}
 .win{margin:0 12px 12px;padding:12px 14px;border-radius:12px;background:var(--green);color:#fff;display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;animation:pop .3s ease-out}
 .win .wt{flex:1;min-width:200px}
@@ -163,7 +161,7 @@ button{font:inherit;color:inherit}
 .cheat{padding:12px 14px 14px}
 .cheat p{margin:0 0 8px;font-size:15px;color:var(--muted)}
 pre.code{margin:0;background:var(--code-bg);color:var(--code-ink);border-radius:10px;padding:10px 14px;font:14.5px/1.55 var(--f-mono);white-space:pre-wrap;overflow-wrap:anywhere}
-pre.code .tg{color:var(--tg);font-weight:700}pre.code .an{color:var(--an)}pre.code .av{color:var(--av)}pre.code .pu{color:var(--pu)}pre.code .cm{color:var(--cm);font-style:italic}pre.code .dt{color:var(--en)}
+pre.code .tg{color:var(--tg);font-weight:700}pre.code .an{color:var(--an)}pre.code .av{color:var(--av)}pre.code .pu{color:var(--pu)}pre.code .cm{color:var(--cm);font-style:italic}pre.code .dt{color:var(--en)}pre.code .sl{color:var(--tg);font-weight:700}pre.code .cp{color:var(--an)}pre.code .cv{color:var(--av)}
 .sol{padding:12px 14px 14px;display:grid;gap:10px}
 .sol p{margin:0;font-size:15px;color:var(--muted)}
 .sol pre.code{max-height:340px;overflow:auto;white-space:pre}
@@ -191,7 +189,7 @@ pre.code .tg{color:var(--tg);font-weight:700}pre.code .an{color:var(--an)}pre.co
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 footer.end{max-width:1500px;margin:0 auto;padding:0 20px 40px;color:var(--muted);font-size:14px}
 .note .nb{min-width:0;flex:1}
-.kick2{margin:0;font:700 18px/1.2 var(--f-hand);color:var(--orange-d)}
+.kick2{margin:0;font:700 12.5px var(--f-body);letter-spacing:.08em;text-transform:uppercase;color:var(--orange-d)}
 .note .sig{margin:8px 0 0;font:700 17px var(--f-hand);color:var(--green-d)}
 .saved{font:600 12.5px var(--f-body);color:#a8dba0}
 @media (max-width:560px){ .note{flex-direction:column;gap:8px} .note .av{width:56px;height:56px} }
@@ -238,6 +236,7 @@ body.focus #digikult-nav{display:none}
 @media (prefers-reduced-motion:reduce){ .dk-box{transition:none} }
 .cm-line.dk-flash,.cm-dk-flash{background:rgba(224,123,44,.28)!important;transition:background .6s}
 
+
 </style>
 </head>
 <body>
@@ -248,7 +247,7 @@ body.focus #digikult-nav{display:none}
 </div></header>
 <section class="sign"><div class="in">
   <img src="img/logo.svg" alt="">
-  <div class="tt"><div class="kick">Küldetés: HTML alapok</div><h1>A Mancs Menhely honlapja</h1></div>
+  <div class="tt"><div class="kick">Küldetés · HTML alapok</div><h1>A Mancs Menhely honlapja</h1></div>
   <div class="meta"><span id="progress"></span><span>⏱ kb. 35 perc</span><span>💾 automatikus mentés</span></div>
 </div></section>
 <nav aria-label="Fejezetek"><ol class="path" id="path"></ol></nav>
@@ -329,7 +328,7 @@ body.focus #digikult-nav{display:none}
 </div>
 <footer class="end">Digitális kultúra · Minden a böngésződben marad, semmi sem kerül elküldésre.</footer>
 <span class="sr" role="status" id="status"></span>
-<script src="../../vendor/codemirror-html.js?v=8aa23aa2"></script>
+<script src="../../vendor/codemirror-html.js?v=6e60cf59"></script>
 <script>
 const CFG = {"editorUrl": "../editor-hu.html", "key": "shelter-hu-v1", "words": {"h1": "Mancs Menhely", "h2s": ["Rólunk", "Nyitvatartás", "Állataink", "Kapcsolat"], "strongWord": "szombat", "animals": ["Morzsa", "Cirmi", "Pamacs"], "imgs": ["img/morzsa.svg", "img/cirmi.svg", "img/pamacs.svg"], "allImgs": ["img/morzsa.svg", "img/cirmi.svg", "img/pamacs.svg", "img/bodri.svg", "img/logo.svg"], "lang": "hu", "oldTitle": "Új oldal", "file": "menhely.html", "fileBase": "menhely"}, "start": "<!DOCTYPE html>\n<html>\n  <head>\n    <meta charset=\"utf-8\">\n    <title>Új oldal</title>\n  </head>\n  <body>\n    <h1>Helló, világ!</h1>\n  </body>\n</html>\n", "models": ["<!DOCTYPE html>\n<html>\n  <head>\n    <meta charset=\"utf-8\">\n    <title>Új oldal</title>\n  </head>\n  <body>\n    <h1>Mancs Menhely</h1>\n  </body>\n</html>\n", "<!DOCTYPE html>\n<html>\n  <head>\n    <meta charset=\"utf-8\">\n    <title>Új oldal</title>\n  </head>\n  <body>\n    <h1>Mancs Menhely</h1>\n    <h2>Rólunk</h2>\n    <h2>Nyitvatartás</h2>\n    <h2>Állataink</h2>\n    <h2>Kapcsolat</h2>\n  </body>\n</html>\n", "<!DOCTYPE html>\n<html>\n  <head>\n    <meta charset=\"utf-8\">\n    <title>Új oldal</title>\n  </head>\n  <body>\n    <h1>Mancs Menhely</h1>\n    <p>Kutyák, cicák és nyuszik keresnek szerető otthont.</p>\n    <h2>Rólunk</h2>\n    <p>A Mancs Menhely 2009 óta ad otthont elhagyott kutyáknak, macskáknak és nyulaknak. Jelenleg 34 állat várja, hogy szerető gazdi vigye haza.</p>\n    <h2>Nyitvatartás</h2>\n    <h2>Állataink</h2>\n    <h2>Kapcsolat</h2>\n  </body>\n</html>\n", "<!DOCTYPE html>\n<html>\n  <head>\n    <meta charset=\"utf-8\">\n    <title>Új oldal</title>\n  </head>\n  <body>\n    <h1>Mancs Menhely</h1>\n    <p>Kutyák, cicák és nyuszik keresnek szerető otthont. Örökbefogadási nap: <strong>szombaton 10 órától</strong>!</p>\n    <h2>Rólunk</h2>\n    <p>A Mancs Menhely 2009 óta ad otthont elhagyott kutyáknak, macskáknak és nyulaknak. Jelenleg 34 állat várja, hogy <em>szerető gazdi</em> vigye haza.</p>\n    <h2>Nyitvatartás</h2>\n    <h2>Állataink</h2>\n    <h2>Kapcsolat</h2>\n  </body>\n</html>\n", "<!DOCTYPE html>\n<html>\n  <head>\n    <meta charset=\"utf-8\">\n    <title>Új oldal</title>\n  </head>\n  <body>\n    <h1>Mancs Menhely</h1>\n    <p>Kutyák, cicák és nyuszik keresnek szerető otthont. Örökbefogadási nap: <strong>szombaton 10 órától</strong>!</p>\n    <h2>Rólunk</h2>\n    <p>A Mancs Menhely 2009 óta ad otthont elhagyott kutyáknak, macskáknak és nyulaknak. Jelenleg 34 állat várja, hogy <em>szerető gazdi</em> vigye haza.</p>\n    <ol>\n      <li>Nézd meg az állatokat.</li>\n      <li>Beszélgess a gondozókkal.</li>\n      <li>Írd alá a szerződést.</li>\n    </ol>\n    <h2>Nyitvatartás</h2>\n    <ul>\n      <li>Hétfő–péntek: 10–17</li>\n      <li>Szombat: 9–13</li>\n      <li>Vasárnap: zárva</li>\n    </ul>\n    <h2>Állataink</h2>\n    <h2>Kapcsolat</h2>\n  </body>\n</html>\n", "<!DOCTYPE html>\n<html>\n  <head>\n    <meta charset=\"utf-8\">\n    <title>Új oldal</title>\n  </head>\n  <body>\n    <h1>Mancs Menhely</h1>\n    <p>Kutyák, cicák és nyuszik keresnek szerető otthont. Örökbefogadási nap: <strong>szombaton 10 órától</strong>!</p>\n    <h2>Rólunk</h2>\n    <p>A Mancs Menhely 2009 óta ad otthont elhagyott kutyáknak, macskáknak és nyulaknak. Jelenleg 34 állat várja, hogy <em>szerető gazdi</em> vigye haza.</p>\n    <ol>\n      <li>Nézd meg az állatokat.</li>\n      <li>Beszélgess a gondozókkal.</li>\n      <li>Írd alá a szerződést.</li>\n    </ol>\n    <h2>Nyitvatartás</h2>\n    <ul>\n      <li>Hétfő–péntek: 10–17</li>\n      <li>Szombat: 9–13</li>\n      <li>Vasárnap: zárva</li>\n    </ul>\n    <h2>Állataink</h2>\n    <img src=\"img/morzsa.svg\" alt=\"Morzsa, a barna kutya\" width=\"150\">\n    <img src=\"img/cirmi.svg\" alt=\"Cirmi, a vörös cica\" width=\"150\">\n    <img src=\"img/pamacs.svg\" alt=\"Pamacs, a szürke nyuszi\" width=\"150\">\n    <h2>Kapcsolat</h2>\n  </body>\n</html>\n", "<!DOCTYPE html>\n<html>\n  <head>\n    <meta charset=\"utf-8\">\n    <title>Új oldal</title>\n  </head>\n  <body>\n    <h1>Mancs Menhely</h1>\n    <p>Kutyák, cicák és nyuszik keresnek szerető otthont. Örökbefogadási nap: <strong>szombaton 10 órától</strong>!</p>\n    <h2>Rólunk</h2>\n    <p>A Mancs Menhely 2009 óta ad otthont elhagyott kutyáknak, macskáknak és nyulaknak. Jelenleg 34 állat várja, hogy <em>szerető gazdi</em> vigye haza.</p>\n    <ol>\n      <li>Nézd meg az állatokat.</li>\n      <li>Beszélgess a gondozókkal.</li>\n      <li>Írd alá a szerződést.</li>\n    </ol>\n    <h2>Nyitvatartás</h2>\n    <ul>\n      <li>Hétfő–péntek: 10–17</li>\n      <li>Szombat: 9–13</li>\n      <li>Vasárnap: zárva</li>\n    </ul>\n    <h2>Állataink</h2>\n    <img src=\"img/morzsa.svg\" alt=\"Morzsa, a barna kutya\" width=\"150\">\n    <img src=\"img/cirmi.svg\" alt=\"Cirmi, a vörös cica\" width=\"150\">\n    <img src=\"img/pamacs.svg\" alt=\"Pamacs, a szürke nyuszi\" width=\"150\">\n    <h2>Kapcsolat</h2>\n    <p>Írj nekünk: <a href=\"mailto:info@mancsmenhely.hu\">info@mancsmenhely.hu</a></p>\n    <p>Így találsz ide: <a href=\"https://www.openstreetmap.org\" target=\"_blank\">térkép</a></p>\n  </body>\n</html>\n", "<!DOCTYPE html>\n<html>\n  <head>\n    <meta charset=\"utf-8\">\n    <title>Új oldal</title>\n  </head>\n  <body>\n    <h1>Mancs Menhely</h1>\n    <p>Kutyák, cicák és nyuszik keresnek szerető otthont. Örökbefogadási nap: <strong>szombaton 10 órától</strong>!</p>\n    <h2>Rólunk</h2>\n    <p>A Mancs Menhely 2009 óta ad otthont elhagyott kutyáknak, macskáknak és nyulaknak. Jelenleg 34 állat várja, hogy <em>szerető gazdi</em> vigye haza.</p>\n    <ol>\n      <li>Nézd meg az állatokat.</li>\n      <li>Beszélgess a gondozókkal.</li>\n      <li>Írd alá a szerződést.</li>\n    </ol>\n    <h2>Nyitvatartás</h2>\n    <ul>\n      <li>Hétfő–péntek: 10–17</li>\n      <li>Szombat: 9–13</li>\n      <li>Vasárnap: zárva</li>\n    </ul>\n    <h2>Állataink</h2>\n    <img src=\"img/morzsa.svg\" alt=\"Morzsa, a barna kutya\" width=\"150\">\n    <img src=\"img/cirmi.svg\" alt=\"Cirmi, a vörös cica\" width=\"150\">\n    <img src=\"img/pamacs.svg\" alt=\"Pamacs, a szürke nyuszi\" width=\"150\">\n    <table border=\"1\">\n      <tr><th>Név</th><th>Faj</th><th>Kor</th></tr>\n      <tr><td>Morzsa</td><td>kutya</td><td>3 év</td></tr>\n      <tr><td>Cirmi</td><td>macska</td><td>2 év</td></tr>\n      <tr><td>Pamacs</td><td>nyúl</td><td>1 év</td></tr>\n    </table>\n    <h2>Kapcsolat</h2>\n    <p>Írj nekünk: <a href=\"mailto:info@mancsmenhely.hu\">info@mancsmenhely.hu</a></p>\n    <p>Így találsz ide: <a href=\"https://www.openstreetmap.org\" target=\"_blank\">térkép</a></p>\n  </body>\n</html>\n", "<!DOCTYPE html>\n<html lang=\"hu\">\n  <head>\n    <meta charset=\"utf-8\">\n    <title>Mancs Menhely – Örökbefogadás</title>\n  </head>\n  <body>\n    <!-- Készítette: Minta Diák -->\n    <h1>Mancs Menhely</h1>\n    <p>Kutyák, cicák és nyuszik keresnek szerető otthont. Örökbefogadási nap: <strong>szombaton 10 órától</strong>!</p>\n    <h2>Rólunk</h2>\n    <p>A Mancs Menhely 2009 óta ad otthont elhagyott kutyáknak, macskáknak és nyulaknak. Jelenleg 34 állat várja, hogy <em>szerető gazdi</em> vigye haza.</p>\n    <ol>\n      <li>Nézd meg az állatokat.</li>\n      <li>Beszélgess a gondozókkal.</li>\n      <li>Írd alá a szerződést.</li>\n    </ol>\n    <h2>Nyitvatartás</h2>\n    <ul>\n      <li>Hétfő–péntek: 10–17</li>\n      <li>Szombat: 9–13</li>\n      <li>Vasárnap: zárva</li>\n    </ul>\n    <h2>Állataink</h2>\n    <img src=\"img/morzsa.svg\" alt=\"Morzsa, a barna kutya\" width=\"150\">\n    <img src=\"img/cirmi.svg\" alt=\"Cirmi, a vörös cica\" width=\"150\">\n    <img src=\"img/pamacs.svg\" alt=\"Pamacs, a szürke nyuszi\" width=\"150\">\n    <table border=\"1\">\n      <tr><th>Név</th><th>Faj</th><th>Kor</th></tr>\n      <tr><td>Morzsa</td><td>kutya</td><td>3 év</td></tr>\n      <tr><td>Cirmi</td><td>macska</td><td>2 év</td></tr>\n      <tr><td>Pamacs</td><td>nyúl</td><td>1 év</td></tr>\n    </table>\n    <h2>Kapcsolat</h2>\n    <p>Írj nekünk: <a href=\"mailto:info@mancsmenhely.hu\">info@mancsmenhely.hu</a></p>\n    <p>Így találsz ide: <a href=\"https://www.openstreetmap.org\" target=\"_blank\">térkép</a></p>\n  </body>\n</html>\n"], "chapters": [{"short": "Start", "label": "Bemelegítés", "title": "Ismerkedés", "msg": "<p>Szia! Teri néni vagyok, a Mancs Menhely vezetője. Szombaton örökbefogadási napot tartunk, de még nincs honlapunk. Egy kolléga elkezdte, csak hát… ennyi lett belőle.</p><p>Lent balra a kód, jobbra az, amit a látogató lát. Kezdjük kicsiben: írd át a főcímet úgy, hogy a menhely neve álljon benne: <b>Mancs Menhely</b>.</p>", "goals": [{"t": "A <code>&lt;h1&gt;</code> szövege: <b>Mancs Menhely</b>", "tip": "Csak a <code>&lt;h1&gt;</code> és a <code>&lt;/h1&gt;</code> közötti szöveget írd át, a címkéket hagyd meg."}], "cheat": "<h1>Mancs Menhely</h1>", "cheatNote": "A címkék maradnak, csak a köztük lévő szöveg változik. Tipp: a szerkesztő magától lezárja a címkéket, és gépelés közben ajánl. Enterrel választhatsz. A ⌨ Billentyűk gomb a többi trükköt is megmutatja.", "success": "Látod? Ahogy gépelsz, az oldal is változik. Ez lesz a munkád: a kódot írod, a böngésző megmutatja."}, {"short": "Címsorok", "label": "1. fejezet", "title": "Címsorok", "msg": "<p>Négy rész lesz az oldalon: <b>Rólunk</b>, <b>Nyitvatartás</b>, <b>Állataink</b> és <b>Kapcsolat</b>. Mindegyiknek kell egy alcím a főcím alatt, pont ebben a sorrendben.</p><p>A főcím maradjon egyedül: egy oldalon csak egy <code>&lt;h1&gt;</code> van, az alcímek <code>&lt;h2&gt;</code>-k.</p>", "goals": [{"t": "Pontosan egy <code>&lt;h1&gt;</code> van az oldalon", "tip": ""}, {"t": "Négy <code>&lt;h2&gt;</code> alcím: Rólunk, Nyitvatartás, Állataink, Kapcsolat", "tip": "Figyelj a helyesírásra, az ékezeteket nem nézem szigorúan."}, {"t": "A sorrend: főcím, Rólunk, Nyitvatartás, Állataink, Kapcsolat", "tip": ""}], "cheat": "<h1>Mancs Menhely</h1>\n<h2>Rólunk</h2>\n<h2>…</h2>", "cheatNote": "Minden alcím egy külön sor. A címkéket a <code>body</code>-n belül, a főcím alá írd.", "success": "Már látszik az oldal váza! Most töltsük meg tartalommal."}, {"short": "Bekezdések", "label": "2. fejezet", "title": "Bekezdések", "msg": "<p>Most jöjjön a szöveg. A főcím alá egy rövid, kedves bemutatkozó mondat kell. A <b>Rólunk</b> alá pedig ez:</p><span class=\"quote\">A Mancs Menhely 2009 óta ad otthont elhagyott kutyáknak, macskáknak és nyulaknak. Jelenleg 34 állat várja, hogy szerető gazdi vigye haza.</span><p>Nem baj, ha a saját szavaiddal írod.</p>", "goals": [{"t": "Egy bekezdés (<code>&lt;p&gt;</code>) a főcím és az első alcím között", "tip": "Legalább egy rövid mondat legyen benne."}, {"t": "A <b>Rólunk</b> alatt egy legalább két mondatos bekezdés", "tip": "Minden mondat végén pont (vagy ! vagy ?) és utána szóköz."}], "cheat": "<h1>Mancs Menhely</h1>\n<p>Egy rövid bemutatkozás.</p>\n<h2>Rólunk</h2>\n<p>Első mondat. Második mondat.</p>", "cheatNote": "A bekezdés <code>&lt;p&gt;</code>-vel kezdődik és <code>&lt;/p&gt;</code>-vel zárul. Új sor a kódban nem lesz új sor az oldalon.", "success": "Szép! Így már tudják az emberek, kik vagyunk."}, {"short": "Kiemelés", "label": "3. fejezet", "title": "Kiemelés", "msg": "<p>A legfontosabb, hogy mindenki tudja, mikor jöhet! Írd a bemutatkozó bekezdés végére:</p><span class=\"quote\">Örökbefogadási nap: szombaton 10 órától!</span><p>A <b>szombaton 10 órától</b> részt emeld ki erősen. A Rólunk bekezdésben pedig a <b>szerető gazdi</b> legyen hangsúlyos, dőlt betűs.</p>", "goals": [{"t": "Egy <code>&lt;strong&gt;</code> elem, benne a <b>szombat</b> szóval", "tip": ""}, {"t": "A <code>&lt;strong&gt;</code> egy bekezdés belsejében van", "tip": "A <code>&lt;strong&gt;</code> a <code>&lt;p&gt;</code> és a <code>&lt;/p&gt;</code> közé kerüljön."}, {"t": "Egy <code>&lt;em&gt;</code> elem a <b>Rólunk</b> bekezdésében", "tip": ""}], "cheat": "<p>Örökbefogadási nap: <strong>szombaton 10 órától</strong>!</p>\n<p>… hogy <em>szerető gazdi</em> vigye haza.</p>", "cheatNote": "A kiemelés a bekezdésen belül van: előbb a belső címkét zárd le, utána a bekezdést.", "success": "Ezt most már senki sem hagyja ki! Szombaton tele lesz az udvar."}, {"short": "Listák", "label": "4. fejezet", "title": "Listák", "msg": "<p>A <b>Nyitvatartás</b> alá egy felsorolás kell:</p><span class=\"quote\">Hétfő–péntek: 10–17 · Szombat: 9–13 · Vasárnap: zárva</span><p>A <b>Rólunk</b> részbe pedig, a bekezdés alá, írd le számozott listában, hogyan zajlik az örökbefogadás: 1. Nézd meg az állatokat. 2. Beszélgess a gondozókkal. 3. Írd alá a szerződést.</p>", "goals": [{"t": "A <b>Nyitvatartás</b> alatt egy <code>&lt;ul&gt;</code>, legalább 3 <code>&lt;li&gt;</code> elemmel", "tip": ""}, {"t": "A <b>Rólunk</b> részben egy <code>&lt;ol&gt;</code>, legalább 3 <code>&lt;li&gt;</code> elemmel", "tip": "A Rólunk alcím alá, a következő alcím elé kerüljön."}, {"t": "Minden <code>&lt;li&gt;</code> egy <code>&lt;ul&gt;</code> vagy <code>&lt;ol&gt;</code> belsejében van", "tip": ""}], "cheat": "<ul>\n  <li>Hétfő–péntek: 10–17</li>\n  <li>…</li>\n</ul>\n\n<ol>\n  <li>Nézd meg az állatokat.</li>\n  <li>…</li>\n</ol>", "cheatNote": "<code>ul</code>: pontozott felsorolás, <code>ol</code>: számozott lista. Minden sor egy <code>li</code>. Gyorsabban: írd be, hogy <code>ul&gt;li*3</code>, és nyomj Tabot.", "success": "Áttekinthető, rövid, lényeges. Pont, ahogy szeretem."}, {"short": "Képek", "label": "5. fejezet", "title": "Képek", "msg": "<p>Az <b>Állataink</b> rész a legfontosabb: mutassuk meg őket! Lefotóztunk hármat, a képek az <b>img</b> mappában vannak:</p><span class=\"quote\">img/morzsa.svg · img/cirmi.svg · img/pamacs.svg</span><p>Mindegyiknek legyen leírása (<code>alt</code>), és ne legyenek óriásiak: a szélességük legyen 150.</p>", "goals": [{"t": "Három <code>&lt;img&gt;</code> az <b>Állataink</b> alatt", "tip": ""}, {"t": "Mindhárom kép megjelenik (helyes <code>src</code>)", "tip": "A fájlnevek: img/morzsa.svg, img/cirmi.svg, img/pamacs.svg – pontosan így, kisbetűvel."}, {"t": "Minden képnek van <code>alt</code> szövege", "tip": "Írd le, mi van a képen, pl. alt=\"Morzsa, a barna kutya\"."}, {"t": "Minden képnek van <code>width</code> attribútuma (pl. 150)", "tip": ""}, {"t": "Bodri, a menhely őrzője is kerüljön fel: img/bodri.svg", "tip": "", "bonus": true}], "cheat": "<img src=\"img/morzsa.svg\" alt=\"Morzsa, a barna kutya\" width=\"150\">", "cheatNote": "Az <code>img</code> üres elem: nincs záró címkéje. Az attribútumokat szóköz választja el.", "success": "Jaj, de édesek! Morzsa már most a kedvencem."}, {"short": "Linkek", "label": "6. fejezet", "title": "Hivatkozások", "msg": "<p>Ha valaki kérdezne, írjon nekünk: <b>info@mancsmenhely.hu</b>. Ezt tedd a <b>Kapcsolat</b> alá, kattintható e-mail-linkként.</p><p>Tegyünk ki egy linket a térképre is, hogy odataláljanak: <b>https://www.openstreetmap.org</b>. Ez nyíljon új lapon, hogy ne tűnjön el az oldalunk.</p>", "goals": [{"t": "A <b>Kapcsolat</b> alatt egy e-mail-link (<code>mailto:</code>)", "tip": "A <code>href</code> értéke így kezdődik: mailto:"}, {"t": "Egy link egy weboldalra (<code>https://</code>…)", "tip": ""}, {"t": "A weboldalra mutató link új lapon nyílik (<code>target</code>)", "tip": "<code>target=&quot;_blank&quot;</code> a nyitó címkébe."}, {"t": "Minden linknek van szövege, amire kattintani lehet", "tip": "A szöveg a <code>&lt;a …&gt;</code> és a <code>&lt;/a&gt;</code> közé kerül."}], "cheat": "<p>Írj nekünk: <a href=\"mailto:info@mancsmenhely.hu\">info@mancsmenhely.hu</a></p>\n<p><a href=\"https://www.openstreetmap.org\" target=\"_blank\">térkép</a></p>", "cheatNote": "A <code>href</code> mondja meg, hová visz a link, a címkék közötti szöveg az, amire kattintani lehet.", "success": "Kipróbáltam, működik! Az e-mail-link meg is nyitotta a levelezőmet."}, {"short": "Táblázat", "label": "7. fejezet", "title": "Táblázat", "msg": "<p>A képek alá kérek egy táblázatot az állatokról, hogy könnyű legyen összehasonlítani őket. Oszlopok: <b>Név</b>, <b>Faj</b>, <b>Kor</b>.</p><span class=\"quote\">Morzsa – kutya – 3 év · Cirmi – macska – 2 év · Pamacs – nyúl – 1 év</span><p>Legyen kerete is (<code>border=\"1\"</code>), hogy jól lássák a cellákat.</p>", "goals": [{"t": "Egy <code>&lt;table&gt;</code> az <b>Állataink</b> részben", "tip": "A képek alá, a Kapcsolat alcím elé kerüljön."}, {"t": "Az első sor a fejléc: legalább 3 <code>&lt;th&gt;</code> cella", "tip": ""}, {"t": "Legalább 3 adatsor, mindegyikben 3 <code>&lt;td&gt;</code>", "tip": "Minden sor egy <code>&lt;tr&gt;</code>, benne a cellák."}, {"t": "Mindhárom állat neve szerepel a táblázatban", "tip": ""}], "cheat": "<table border=\"1\">\n  <tr><th>Név</th><th>Faj</th><th>Kor</th></tr>\n  <tr><td>Morzsa</td><td>kutya</td><td>3 év</td></tr>\n</table>", "cheatNote": "Soronként: minden <code>tr</code> egy sor, benne balról jobbra a cellák. Fejléc: <code>th</code>, adat: <code>td</code>. Gyorsabban: <code>table&gt;tr*4&gt;td*3</code>, utána Tab.", "success": "Így egy pillantással látszik, ki hány éves. Nagyon profi!"}, {"short": "Fejrész", "label": "8. fejezet", "title": "Az utolsó simítások", "msg": "<p>Majdnem kész! De a böngésző fülén még mindig az áll: <b>Új oldal</b>. Írd át a címet (<code>title</code>) így:</p><span class=\"quote\">Mancs Menhely – Örökbefogadás</span><p>Állítsd be az oldal nyelvét magyarra (<code>lang</code>), és írd a neved egy megjegyzésbe a <code>body</code> elejére, hogy tudjuk, ki készítette.</p>", "goals": [{"t": "A <code>&lt;title&gt;</code> szövegében szerepel: Mancs Menhely", "tip": "A title a head-ben van. Figyeld a fület az előnézet tetején!"}, {"t": "A <code>&lt;html&gt;</code> nyitó címkéjében: <code>lang=&quot;hu&quot;</code>", "tip": ""}, {"t": "Egy megjegyzés (<code>&lt;!-- … --&gt;</code>) a neveddel", "tip": "A megjegyzés nem látszik az oldalon, csak a kódban."}, {"t": "A váz rendben: DOCTYPE az első sorban, megvan a head és a body", "tip": "Ha valamit véletlenül kitöröltél, a ↺ Fejezet eleje gomb visszahozza."}], "cheat": "<html lang=\"hu\">\n  <head>\n    <title>Mancs Menhely – Örökbefogadás</title>\n  …\n  <body>\n    <!-- Készítette: Kovács Anna -->", "cheatNote": "Ami a <code>head</code>-ben van, az nem az oldalon jelenik meg, hanem a fülön vagy a háttérben.", "success": "Köszönöm! Szombaton mindenki ezt fogja látni. Morzsa, Cirmi és Pamacs is köszöni!"}], "ui": {"pick": "Kijelölés", "pickT": "Kattints egy elemre az előnézetben, és a kódban odaugrik. Alt+kattintással mindig működik.", "preview": "Az oldal előnézete", "localTpl": "Ez a link a(z) {h} fájlra vinne, de itt nincs ilyen fájl.", "progress": "{n} / {t} fejezet kész", "doneWord": "kész", "todoWord": "még nincs kész", "bonus": "bónusz", "missing": "Hiányzik: ", "badSrc": "Nem létező kép: ", "winTitle": "Kész!", "nextCh": "Következő fejezet ▸", "startWork": "Indulhat a munka ▸", "toEnd": "Befejezés ▸", "solvedSay": "Kész a fejezet!", "saved": "Mentve.", "solNote": "Ha nagyon elakadtál, megnézheted a mintamegoldást. Előtte azért próbálkozz egy kicsit!", "solWait": "Mintamegoldás ({t} múlva)", "solShow": "Mutasd a mintamegoldást", "solLoadNote": "Így nézhet ki a kód ennek a fejezetnek a végén. Hasonlítsd össze a sajátoddal! Ha betöltöd, a szerkesztőben lévő kódod helyére ez kerül.", "solLoad": "Betöltés a szerkesztőbe", "resetConfirm": "Visszaállítod a kódot arra, ahogy a fejezet elején volt?", "restartConfirm": "Biztosan elölről kezded? Minden eddigi munkád törlődik ebből a böngészőből.", "stChapters": "fejezet", "stMinutes": "perc", "stHelped": "mintamegoldás", "noName": "nevtelen", "zipping": "Csomagolás…", "zipped": "Letöltve ✓", "zipFail": "Csak a HTML-fájl töltődött le", "copied": "Kimásolva ✓", "repTitle": "A Mancs Menhely honlapja – jelentés", "repName": "Név", "repStart": "Kezdés", "repEnd": "Befejezés", "repDone": "Kész fejezetek", "repHelped": "Mintamegoldással", "repMin": "perc", "repCode": "--- A honlap kódja ---"}, "pawSvg": "<svg viewBox=\"0 0 20 20\" aria-hidden=\"true\"><g fill=\"currentColor\"><ellipse cx=\"10\" cy=\"13\" rx=\"4.6\" ry=\"3.8\"/><ellipse cx=\"4.6\" cy=\"8.6\" rx=\"1.8\" ry=\"2.3\"/><ellipse cx=\"8\" cy=\"5.2\" rx=\"1.8\" ry=\"2.4\"/><ellipse cx=\"12\" cy=\"5.2\" rx=\"1.8\" ry=\"2.4\"/><ellipse cx=\"15.4\" cy=\"8.6\" rx=\"1.8\" ry=\"2.3\"/></g></svg>", "solutionDelay": 240};
 const UI = { preview: CFG.ui.preview };
@@ -350,7 +349,8 @@ const ED_TEXT = {
       th: "fejléccella", td: "cella", div: "doboz, részeket csoportosít", span: "szövegrész, csoportosít", "@href": "hová visz a link", "@src": "a képfájl helye",
       "@alt": "a kép leírása", "@width": "szélesség képpontban", "@height": "magasság képpontban", "@target": "_blank: új lapon nyílik", "@lang": "az oldal nyelve, pl. hu",
       "@colspan": "hány oszlopon át ér a cella", "@rowspan": "hány soron át ér a cella", "@border": "keret a cellák körül", "@charset": "karakterkódolás",
-      "@title": "súgó, ha fölé viszed az egeret", "#file": "kép a mappában", "#emmet": "Emmet · Tab" },
+      "@title": "súgó, ha fölé viszed az egeret", "#file": "kép a mappában", "#emmet": "Emmet · Tab",
+      "css:color": "a szöveg színe", "css:background-color": "a háttér színe", "css:background": "háttér (szín, kép) egyszerre", "css:font-family": "a betűtípus, pl. Arial, sans-serif", "css:font-size": "a betűméret, pl. 18px", "css:font-weight": "a betű vastagsága, pl. bold", "css:font-style": "dőlt betű: italic", "css:text-align": "igazítás: left, center, right", "css:text-decoration": "aláhúzás: underline, vagy none: nincs", "css:line-height": "sortávolság, pl. 1.5", "css:letter-spacing": "betűköz", "css:text-transform": "uppercase: csupa nagybetű", "css:margin": "külső margó: távolság a többi elemtől", "css:margin-top": "külső margó fent", "css:margin-bottom": "külső margó lent", "css:margin-left": "külső margó balra", "css:margin-right": "külső margó jobbra", "css:padding": "belső margó: távolság a doboz széle és a tartalom között", "css:padding-top": "belső margó fent", "css:padding-bottom": "belső margó lent", "css:padding-left": "belső margó balra", "css:padding-right": "belső margó jobbra", "css:border": "keret: vastagság, stílus, szín, pl. 2px solid green", "css:border-radius": "lekerekített sarkok, pl. 10px vagy 50%", "css:border-collapse": "collapse: a cellák keretei összeolvadnak", "css:border-bottom": "keret csak alul", "css:width": "szélesség", "css:max-width": "legnagyobb szélesség", "css:height": "magasság", "css:box-shadow": "árnyék a doboz körül, pl. 0 2px 6px gray", "css:display": "megjelenés: block, inline, flex, none", "css:list-style-type": "a lista jele: disc, square, none", "css:opacity": "átlátszatlanság 0 és 1 között", "css:cursor": "az egérmutató alakja, pl. pointer", "css:transform": "elforgatás, nagyítás, pl. scale(1.1)", "css:transition": "áttűnés: a változás ideje, pl. 0.3s", "css:vertical-align": "függőleges igazítás", "css:gap": "rés a rugalmas doboz elemei között" },
     phrases: { "Find": "Keresés", "Replace": "Csere", "next": "következő", "previous": "előző", "all": "mind", "match case": "kis- és nagybetű",
       "regexp": "regex", "by word": "egész szó", "replace": "csere", "replace all": "mindet cseréli", "close": "bezárás", "current match": "aktuális találat",
       "replaced $ matches": "$ találat cserélve", "replaced match on line $": "csere a(z) $. sorban", "on line": "sor", "Go to line": "Ugrás sorra", "go": "ugrás",
@@ -358,7 +358,14 @@ const ED_TEXT = {
       "Fold line": "Összecsukás", "Unfold line": "Kibontás", "Diagnostics": "Figyelmeztetések", "No diagnostics": "Nincs figyelmeztetés" },
     lint: { lintOpen: "{1}. sor: a címke nincs befejezve, hiányzik a > jel: {0}", lintQuote: "{1}. sor: hiányzik egy idézőjel ebben a címkében: {0}",
       lintVoidClose: "{1}. sor: {0} üres elem, nincs záró címkéje. Töröld a {c0} címkét.", lintStray: "{1}. sor: {c0} lezár valamit, amit nem nyitottál meg.",
-      lintCross: "{3}. sor: keresztbe zárt címkék. Előbb {c0}, utána {c1} jön.", lintUnclosed: "{1}. sor: {0} nincs lezárva. Valahová kell egy {c0}." }
+      lintCross: "{3}. sor: keresztbe zárt címkék. Előbb {c0}, utána {c1} jön.", lintUnclosed: "{1}. sor: {0} nincs lezárva. Valahová kell egy {c0}.",
+      cssProp: "{1}. sor: nincs ilyen CSS-tulajdonság: {p0}. Elírtad?", cssVal: "{2}. sor: a(z) {p0} nem érti ezt az értéket: {p1}",
+      cssNoVal: "{1}. sor: a(z) {p0} után hiányzik az érték.", cssNoColon: "{1}. sor: hiányzik a kettőspont ( : ) a(z) {p0} után.",
+      cssSemi: "{1}. sor: a(z) {p0} sora végéről hiányzik a pontosvessző ( ; ).", cssUnclosed: "{1}. sor: a(z) {p0} szabály nincs lezárva: hiányzik a }}.",
+      cssStray: "{0}. sor: ez a }} nem zár le semmit.", cssNoSel: "{0}. sor: a {{ elől hiányzik a kijelölő (pl. h1 vagy .kiemelt).",
+      cssAngle: "{1}. sor: a CSS-ben a címkét kacsacsőrök nélkül írjuk: {p0}", cssBadSel: "{1}. sor: ezt a kijelölőt a böngésző nem érti: {p0}",
+      cssNoBlock: "{1}. sor: a(z) {p0} után hiányzik a {{ … }} rész.",
+      cssHtmlCm: "{0}. sor: ez HTML-megjegyzés, a CSS-ben nem működik. A CSS-ben így írd: /* … */" }
   },
   en: {
     docs: { html: "the whole page", head: "information about the page", body: "everything visible on the page", title: "the title on the browser tab",
@@ -369,18 +376,28 @@ const ED_TEXT = {
       th: "header cell", td: "cell", div: "box that groups parts", span: "piece of text, groups", "@href": "where the link goes", "@src": "where the image file is",
       "@alt": "description of the image", "@width": "width in pixels", "@height": "height in pixels", "@target": "_blank: opens in a new tab", "@lang": "the page's language, e.g. en",
       "@colspan": "how many columns the cell spans", "@rowspan": "how many rows the cell spans", "@border": "border round the cells", "@charset": "character encoding",
-      "@title": "tooltip on mouse hover", "#file": "image in the folder", "#emmet": "Emmet · Tab" },
+      "@title": "tooltip on mouse hover", "#file": "image in the folder", "#emmet": "Emmet · Tab",
+      "css:color": "text colour", "css:background-color": "background colour", "css:background": "background (colour, image) in one go", "css:font-family": "the typeface, e.g. Arial, sans-serif", "css:font-size": "text size, e.g. 18px", "css:font-weight": "how bold, e.g. bold", "css:font-style": "italic text: italic", "css:text-align": "alignment: left, center, right", "css:text-decoration": "underline, or none", "css:line-height": "line spacing, e.g. 1.5", "css:letter-spacing": "space between letters", "css:text-transform": "uppercase: all capitals", "css:margin": "outer space: distance from other elements", "css:margin-top": "outer space at the top", "css:margin-bottom": "outer space at the bottom", "css:margin-left": "outer space on the left", "css:margin-right": "outer space on the right", "css:padding": "inner space: between the box edge and its content", "css:padding-top": "inner space at the top", "css:padding-bottom": "inner space at the bottom", "css:padding-left": "inner space on the left", "css:padding-right": "inner space on the right", "css:border": "border: width, style, colour, e.g. 2px solid green", "css:border-radius": "rounded corners, e.g. 10px or 50%", "css:border-collapse": "collapse: cell borders merge", "css:border-bottom": "border at the bottom only", "css:width": "width", "css:max-width": "largest width", "css:height": "height", "css:box-shadow": "shadow round the box, e.g. 0 2px 6px gray", "css:display": "how it shows: block, inline, flex, none", "css:list-style-type": "the list marker: disc, square, none", "css:opacity": "opacity from 0 to 1", "css:cursor": "mouse pointer shape, e.g. pointer", "css:transform": "rotate, scale, e.g. scale(1.1)", "css:transition": "how long a change takes, e.g. 0.3s", "css:vertical-align": "vertical alignment", "css:gap": "gap between items in a flex box" },
     phrases: {},
     lint: { lintOpen: "Line {1}: this tag isn't finished, the > is missing: {0}", lintQuote: "Line {1}: a quote mark is missing in this tag: {0}",
       lintVoidClose: "Line {1}: {0} is an empty element with no closing tag. Delete the {c0}.", lintStray: "Line {1}: {c0} closes something that was never opened.",
-      lintCross: "Line {3}: tags closed crosswise. First {c0}, then {c1}.", lintUnclosed: "Line {1}: {0} is never closed. Add a {c0} somewhere." }
+      lintCross: "Line {3}: tags closed crosswise. First {c0}, then {c1}.", lintUnclosed: "Line {1}: {0} is never closed. Add a {c0} somewhere.",
+      cssProp: "Line {1}: there's no CSS property called {p0}. A typo?", cssVal: "Line {2}: {p0} doesn't understand this value: {p1}",
+      cssNoVal: "Line {1}: the value after {p0} is missing.", cssNoColon: "Line {1}: the colon ( : ) after {p0} is missing.",
+      cssSemi: "Line {1}: the semicolon ( ; ) at the end of the {p0} line is missing.", cssUnclosed: "Line {1}: the {p0} rule isn't closed: the }} is missing.",
+      cssStray: "Line {0}: this }} doesn't close anything.", cssNoSel: "Line {0}: the selector in front of {{ is missing (e.g. h1 or .highlight).",
+      cssAngle: "Line {1}: in CSS, write the tag without angle brackets: {p0}", cssBadSel: "Line {1}: the browser doesn't understand this selector: {p0}",
+      cssNoBlock: "Line {1}: the {{ … }} part after {p0} is missing.",
+      cssHtmlCm: "Line {0}: this is an HTML comment, and it doesn't work in CSS. In CSS, write: /* … */" }
   }
 };
 const LINT_T = {};
 Object.entries(ED_TEXT[PAGE_LANG].lint).forEach(([k, tpl]) => {
-  LINT_T[k] = (...a) => tpl.replace(/\{(c?)(\d)\}/g, (_, c, i) => {
+  LINT_T[k] = (...a) => tpl.replace(/\{\{|\}\}|\{([cp]?)(\d)\}/g, (all, c, i) => {
+    if (all === "{{") return "<code>{</code>"; if (all === "}}") return "<code>}</code>";
     const v = a[+i];
-    return typeof v === "number" ? String(v) : `<code>&lt;${c ? "/" : ""}${esc(v)}&gt;</code>`;
+    if (typeof v === "number") return String(v);
+    return c === "p" ? `<code>${esc(v)}</code>` : `<code>&lt;${c ? "/" : ""}${esc(v)}&gt;</code>`;
   });
 });
 const IMG_FILES = ["img/morzsa.svg", "img/cirmi.svg", "img/pamacs.svg", "img/bodri.svg", "img/logo.svg"];
@@ -410,17 +427,103 @@ function hl(src){
     if (t.startsWith("<!--")) o += `<span class="cm">${esc(t)}</span>`;
     else if (/^<!doctype/i.test(t)) o += `<span class="dt">${esc(t)}</span>`;
     else if (t[0] === "&") o += `<span class="en">${esc(t)}</span>`;
-    else o += hlTag(t);
+    else {
+      o += hlTag(t);
+      if (/^<style[\s>]/i.test(t)){                          /* the stylesheet inside is CSS */
+        const end = src.toLowerCase().indexOf("</style", TOKEN.lastIndex);
+        const stop = end < 0 ? src.length : end;
+        o += hlCss(src.slice(TOKEN.lastIndex, stop));
+        TOKEN.lastIndex = stop;
+      }
+    }
     last = TOKEN.lastIndex;
   }
   return o + esc(src.slice(last));
 }
 
+/* CSS colouring: selectors, properties, values, comments */
+function hlCss(src){
+  let o = "", i = 0, inBlock = 0;
+  const re = /\/\*[\s\S]*?(?:\*\/|$)|[{}]|[^{}/]+|\//g;
+  let m;
+  while ((m = re.exec(src))){
+    const t = m[0];
+    if (t.startsWith("/*")) o += `<span class="cm">${esc(t)}</span>`;
+    else if (t === "{"){ inBlock++; o += `<span class="pu">{</span>`; }
+    else if (t === "}"){ inBlock = Math.max(0, inBlock - 1); o += `<span class="pu">}</span>`; }
+    else if (!inBlock) o += `<span class="sl">${esc(t)}</span>`;
+    else o += esc(t).replace(/([\w-]+)(\s*:)([^;]*)(;?)/g, (a, p, c, v, sc) => `<span class="cp">${p}</span><span class="pu">${c}</span><span class="cv">${v}</span><span class="pu">${sc}</span>`);
+  }
+  return o;
+}
+
 /* A tolerant check for beginners' mistakes: unclosed, stray and crossed tags, with line numbers. */
+/* CSS inside <style>: the browser quietly ignores what it doesn't understand, so we say it out loud */
+function cssLint(src, T = LINT_T){
+  const out = [], re = /<style[^>]*>([\s\S]*?)(?:<\/style\s*>|$)/gi;
+  const lineOf = i => src.slice(0, i).split("\n").length;
+  const ok = (p, v) => { try { return typeof CSS === "undefined" || !CSS.supports || CSS.supports(p, v); } catch(e){ return true; } };
+  const decls = (css, from, body, at) => {
+    let off = from;
+    for (const part of body.split(";")){
+      const decl = part.trim(), pos = off + (part.length - part.trimStart().length);
+      off += part.length + 1;
+      if (!decl) continue;
+      const c = decl.indexOf(":");
+      if (c < 0){ out.push({ line: at(pos), html: T.cssNoColon(decl.split(/\s+/)[0], at(pos)) }); continue; }
+      const prop = decl.slice(0, c).trim().toLowerCase(), val = decl.slice(c + 1).replace(/!important\s*$/i, "").trim();
+      if (prop.startsWith("--")) continue;
+      if (/\n\s*[a-z-]+\s*:/i.test(val) || (/\s[a-z-]+\s*:/i.test(val) && !ok(prop, val))){ out.push({ line: at(pos), html: T.cssSemi(prop, at(pos)) }); continue; }
+      if (!/^[a-z-]+$/.test(prop) || !ok(prop, "inherit")){ out.push({ line: at(pos), html: T.cssProp(prop, at(pos)) }); continue; }
+      if (!val){ out.push({ line: at(pos), html: T.cssNoVal(prop, at(pos)) }); continue; }
+      if (!ok(prop, val)) out.push({ line: at(pos), html: T.cssVal(prop, val.length > 30 ? val.slice(0, 30) + "…" : val, at(pos)) });
+    }
+  };
+  let m;
+  while ((m = re.exec(src))){
+    const base = m.index + m[0].indexOf(">") + 1;
+    const at = k => lineOf(base + k);
+    const css = m[1].replace(/\/\*[\s\S]*?(\*\/|$)/g, c => c.replace(/[^\n]/g, " "))
+      .replace(/<!--|-->/g, (c, k) => { out.push({ line: at(k), html: T.cssHtmlCm(at(k)) }); return "    ".slice(0, c.length); });
+    let k = 0, depth = 0, selStart = 0;
+    while (k < css.length){
+      const ch = css[k];
+      if (ch === "{"){
+        const sel = css.slice(selStart, k).trim(), sp = selStart + (css.slice(selStart, k).length - css.slice(selStart, k).trimStart().length);
+        if (sel.startsWith("@")){ depth++; k++; selStart = k; continue; }
+        if (!sel) out.push({ line: at(k), html: T.cssNoSel(at(k)) });
+        else if (sel.includes("<")) out.push({ line: at(sp), html: T.cssAngle(sel.replace(/[<>\/]/g, "").trim(), at(sp)) });
+        else { try { document.createDocumentFragment().querySelector(sel); } catch(e){ out.push({ line: at(sp), html: T.cssBadSel(sel, at(sp)) }); } }
+        let e = k + 1;
+        while (e < css.length && css[e] !== "}" && css[e] !== "{") e++;
+        const body = css.slice(k + 1, e);
+        if (e >= css.length || css[e] === "{"){
+          out.push({ line: at(k), html: T.cssUnclosed(sel || "?", at(k)) });
+          if (e >= css.length){ decls(css, k + 1, body, at); selStart = css.length; break; }
+          const cut = body.lastIndexOf(";");                       /* the next rule's selector starts after the last ; */
+          decls(css, k + 1, cut < 0 ? "" : body.slice(0, cut), at);
+          selStart = cut < 0 ? k + 1 : k + 1 + cut + 1; k = e; continue;
+        }
+        decls(css, k + 1, body, at);
+        k = e + 1; selStart = k; continue;
+      }
+      if (ch === "}"){
+        if (depth > 0) depth--; else out.push({ line: at(k), html: T.cssStray(at(k)) });
+        k++; selStart = k; continue;
+      }
+      k++;
+    }
+    const tail = css.slice(selStart), tt = tail.trim();
+    if (tt) out.push({ line: at(selStart + tail.indexOf(tt[0])), html: T.cssNoBlock(tt.split(/\s+/)[0], at(selStart + tail.indexOf(tt[0]))) });
+  }
+  return out;
+}
+
 function lint(src, T = LINT_T){
   const out = [], stack = [];
   const lineOf = i => src.slice(0, i).split("\n").length;
-  const clean = src.replace(/<!--[\s\S]*?-->/g, c => c.replace(/[^\n]/g, " "));
+  const clean = src.replace(/<!--[\s\S]*?-->/g, c => c.replace(/[^\n]/g, " "))
+                   .replace(/(<style[^>]*>)([\s\S]*?)(?=<\/style|$)/gi, (a, t, c) => t + c.replace(/[^\n]/g, " "));
   const re = /<(\/?)([a-zA-Z][\w-]*)([^<>]*?)(\/?)>|<(\/?)([a-zA-Z][\w-]*)[^<>]*$/g;
   const skip = new Set(["html","head","body"]);              /* optional end tags: a forgotten </body> is no drama */
   const lateClose = {};                                        /* closing tags we already explained (crossed pairs) */
@@ -446,6 +549,8 @@ function lint(src, T = LINT_T){
     stack.length = at;
   }
   stack.forEach(s => { if (!skip.has(s.name)) out.push({ line: s.line, html: T.lintUnclosed(s.name, s.line) }); });
+  out.push(...cssLint(src, T));
+  out.sort((a, b) => a.line - b.line);
   const seen = new Set();
   return out.filter(w => !seen.has(w.html) && seen.add(w.html)).slice(0, 6);
 }
@@ -595,6 +700,7 @@ function makeBrowser(host, file, T, opts = {}){
       $$("img", d).forEach(im => im.addEventListener("load", size));
     } catch(e){}
     size();
+    if (opts.onLoad) try { opts.onLoad(fr.contentDocument); } catch(e){}
   });
   const show = src => {
     const t = /<title[^>]*>([\s\S]*?)<\/title>/i.exec(src);
@@ -721,10 +827,12 @@ const CHECKS = [
   }
 ];
 
+
+
 /* ---------- page parts ---------- */
 const ed = $("#code"), editor = makeEditor(ed, { lines: true, fixed: true, fold: true, files: W.allImgs,
   onCursor: () => { try { if (browser.picking) browser.highlightAt(editor.cm.view.state.selection.main.head); } catch(e){} } });
-const browser = makeBrowser($("#browser"), W.file, UI, { pick: { label: CFG.ui.pick, title: CFG.ui.pickT, onPick: (start, open) => {
+const browser = makeBrowser($("#browser"), W.file, UI, { onLoad: () => { if (CFG.live) evaluate(); }, pick: { label: CFG.ui.pick, title: CFG.ui.pickT, onPick: (start, open) => {
   if (editor.cm){ const v = editor.cm.view; v.dispatch({ selection: { anchor: open, head: start }, scrollIntoView: true }); v.focus(); }
   else { ed.focus(); ed.setSelectionRange(start, open); }
 } } });
@@ -749,13 +857,14 @@ function drawChapter(){
   $("#chTitle").textContent = c.title;
   $("#msg").innerHTML = c.msg;
   $("#cheatNote").innerHTML = c.cheatNote;
-  $("#cheat").innerHTML = hl(c.cheat);
+  $("#cheat").innerHTML = /^\s*</.test(c.cheat) ? hl(c.cheat) : hlCss(c.cheat);
   drawSolution();
 }
 
 let lastResults = null;
 function evaluate(){
-  const src = ed.value, d = parse(src), i = state.current, c = CH[i];
+  const src = ed.value, d = CFG.live ? browser.frame.contentDocument : parse(src), i = state.current, c = CH[i];
+  if (!d || !d.body) return;
   const res = CHECKS[i](d, src).map(r => Array.isArray(r) ? r : [r, ""]);
   const req = c.goals.map((g, k) => g.bonus ? true : !!res[k][0]);
   const okN = c.goals.filter((g, k) => !g.bonus && res[k][0]).length, need = c.goals.filter(g => !g.bonus).length;
@@ -768,10 +877,13 @@ function evaluate(){
   $("#count").textContent = `${okN} / ${need}`;
   if (req.every(Boolean) && !state.solved.includes(i)) solve(i);
   drawWin();
-  const warn = lint(src);
+  drawLint();
+  lastResults = res;
+}
+function drawLint(){
+  const warn = lint(ed.value);
   $("#lint").hidden = !warn.length;
   $("#lint").innerHTML = warn.map(w => `<p>${w.html}</p>`).join("");
-  lastResults = res;
 }
 
 function solve(i){
@@ -916,7 +1028,9 @@ ed.value = state.code; editor.refit();
 ed.addEventListener("input", () => {
   state.code = ed.value; saveSoon();
   browser.show(instrument(ed.value));
-  clearTimeout(evalTimer); evalTimer = setTimeout(evaluate, 220);
+  clearTimeout(evalTimer);
+  if (CFG.live) evalTimer = setTimeout(drawLint, 220);       /* the goals are re-checked when the preview has loaded */
+  else evalTimer = setTimeout(evaluate, 220);
 });
 document.addEventListener("keydown", e => {
   if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "s"){ e.preventDefault(); save(); $("#status").textContent = CFG.ui.saved; flashSaved(); }
@@ -980,6 +1094,6 @@ go(hashCh >= 0 && hashCh < CH.length && unlocked(hashCh) ? hashCh : state.curren
 drawEnding();
 
 </script>
-<script src="../../nav.js?v=1cff4815" defer></script>
+<script src="../../nav.js?v=d9bcb2b4" defer></script>
 </body>
 </html>

@@ -1,41 +1,44 @@
-/* digikult HTML + CSS editor: CodeMirror 6 with the comforts students know from VS Code.
+/* digikult HTML editor: CodeMirror 6 with the comforts students know from VS Code.
    Bundled into ../codemirror-html.js with:
-   esbuild entry.js --bundle --minify --format=iife --global-name=CMHTML
-   (npm: @codemirror/view state commands language autocomplete search lint lang-html lang-css,
-    @replit/codemirror-indentation-markers, @lezer/highlight, emmet, esbuild) */
+   esbuild entry.js --bundle --minify --format=iife --global-name=CMHTML */
 import { EditorView, keymap, lineNumbers, highlightActiveLine, highlightActiveLineGutter, drawSelection, dropCursor,
-         highlightSpecialChars, hoverTooltip, rectangularSelection, crosshairCursor,
-         Decoration, ViewPlugin, WidgetType, MatchDecorator, GutterMarker, gutterLineClass } from "@codemirror/view";
-import { EditorState, EditorSelection, StateField, StateEffect, Annotation, Compartment, RangeSet } from "@codemirror/state";
+         highlightSpecialChars, hoverTooltip, rectangularSelection, crosshairCursor } from "@codemirror/view";
+import { EditorState, EditorSelection, StateField, StateEffect, Annotation } from "@codemirror/state";
 import { defaultKeymap, history, historyKeymap, indentWithTab, indentSelection } from "@codemirror/commands";
 import { indentOnInput, bracketMatching, syntaxHighlighting, HighlightStyle, indentUnit, syntaxTree,
          foldGutter, foldKeymap, codeFolding } from "@codemirror/language";
-import { autocompletion, closeBrackets, closeBracketsKeymap, completionKeymap, acceptCompletion, completionStatus } from "@codemirror/autocomplete";
+import { autocompletion, closeBrackets, closeBracketsKeymap, completionKeymap, acceptCompletion, completionStatus, startCompletion } from "@codemirror/autocomplete";
 import { search, searchKeymap, highlightSelectionMatches, openSearchPanel } from "@codemirror/search";
-import { linter, lintGutter, forEachDiagnostic, setDiagnosticsEffect } from "@codemirror/lint";
+import { linter, lintGutter } from "@codemirror/lint";
 import { html, htmlCompletionSource } from "@codemirror/lang-html";
-import { css, cssCompletionSource } from "@codemirror/lang-css";
+import { cssCompletionSource } from "@codemirror/lang-css";
 import { indentationMarkers } from "@replit/codemirror-indentation-markers";
 import { tags as t } from "@lezer/highlight";
 import expandEmmet, { extract as extractEmmet } from "emmet";
 
 /* ---------- looks: colours match the static code blocks on the site ---------- */
 const style = HighlightStyle.define([
-  /* strong, clearly separate colours so each kind of code is easy to spot; punctuation steps back */
-  { tag: t.tagName, color: "#ffd84d", fontWeight: "700" },
-  { tag: t.attributeName, color: "#6ec3ff" },
-  { tag: [t.attributeValue, t.string], color: "#9be57a" },
-  { tag: [t.angleBracket, t.definitionOperator, t.operator, t.punctuation, t.separator, t.brace, t.paren, t.squareBracket], color: "#7f978c" },
-  { tag: t.comment, color: "#7d9489", fontStyle: "italic" },
-  { tag: [t.documentMeta, t.character, t.processingInstruction], color: "#ff9cc6" },
-  { tag: t.invalid, color: "#ff6b6b", textDecoration: "underline wavy" },
-  /* CSS: selectors orange and bold, properties blue, numbers and units pink, values green */
-  { tag: [t.className, t.labelName], color: "#ffa64d", fontWeight: "700" },
-  { tag: t.propertyName, color: "#6ec3ff" },
-  { tag: [t.number, t.unit, t.color], color: "#ff8fb8" },
-  { tag: [t.keyword, t.atom, t.variableName, t.constant(t.name)], color: "#9be57a" },
-  { tag: t.modifier, color: "#ff6b6b", fontWeight: "700" },
+  { tag: t.tagName, color: "#f2d264", fontWeight: "700" },
+  { tag: t.attributeName, color: "#9cc8e8" },
+  { tag: t.attributeValue, color: "#a8dba0" },
+  { tag: [t.angleBracket, t.definitionOperator, t.operator, t.punctuation], color: "#c9d3cc" },
+  { tag: t.comment, color: "#8fa39a", fontStyle: "italic" },
+  { tag: [t.documentMeta, t.character, t.processingInstruction], color: "#f0a3b8" },
+  { tag: t.invalid, color: "#ff8a80" },
+  /* CSS inside <style> */
+  { tag: t.propertyName, color: "#9cc8e8" },
+  { tag: [t.atom, t.color, t.string], color: "#a8dba0" },
+  { tag: [t.number, t.unit], color: "#f0a3b8" },
+  { tag: [t.className, t.labelName, t.constant(t.className)], color: "#f2b84a", fontWeight: "600" },
+  { tag: [t.keyword, t.definitionKeyword, t.modifier], color: "#d6a2f0" },
+  { tag: [t.brace, t.separator, t.paren, t.derefOperator, t.logicOperator, t.definitionOperator], color: "#c9d3cc" },
 ]);
+
+/* is this position inside the CSS of a <style> element? */
+function inCss(state, pos){
+  for (let n = syntaxTree(state).resolveInner(pos, -1); n; n = n.parent) if (n.name === "StyleSheet") return true;
+  return false;
+}
 
 const theme = EditorView.theme({
   "&": { color: "#e9efe9", backgroundColor: "#1f2a26", fontSize: "var(--code-size, 15px)", height: "100%" },
@@ -78,208 +81,8 @@ const theme = EditorView.theme({
   ".cm-diagnostic-warning": { borderLeft: "4px solid #f2b84a" },
   ".cm-diagnostic code": { fontFamily: "'JetBrains Mono', monospace", color: "#f2d264" },
   ".cm-lint-marker-warning": { content: "none" },
-  ".cm-lintRange-info": { backgroundImage: "none", textDecoration: "underline dotted #8cc4ee", textDecorationSkipInk: "none", textUnderlineOffset: "3px" },
-  ".cm-diagnostic-info": { borderLeft: "4px solid #8cc4ee" },
-  ".cm-lint-marker-info": { content: "none" },
-  ".cm-tagPair": { backgroundColor: "rgba(255,216,77,.12)", boxShadow: "0 0 0 1px rgba(255,216,77,.45)", borderRadius: "2px" },
-  ".cm-tagPairName": { textDecoration: "underline 2px rgba(255,216,77,.85)", textUnderlineOffset: "4px" },
-  ".cm-tagLonely": { backgroundColor: "rgba(242,120,74,.12)", boxShadow: "0 0 0 1px rgba(242,120,74,.6)" },
-  ".cm-tagpeek": { position: "absolute", right: "12px", bottom: "8px", zIndex: "6", maxWidth: "calc(100% - 80px)", display: "flex", gap: "8px", alignItems: "baseline",
-                   padding: "3px 9px", border: "1px solid rgba(255,216,77,.4)", borderRadius: "4px", backgroundColor: "rgba(24,36,31,.94)", color: "#c9d6cf",
-                   font: "12.5px/1.5 'JetBrains Mono', monospace", cursor: "pointer", whiteSpace: "nowrap", overflow: "hidden", boxShadow: "0 4px 12px rgba(0,0,0,.35)" },
-  ".cm-tagpeek.above": { bottom: "auto", top: "8px" },
-  ".cm-tagpeek:hover": { borderColor: "#ffd84d", color: "#fff" },
-  ".cm-tagpeek .n": { color: "#ffd84d", fontWeight: "700", flex: "none" },
-  ".cm-tagpeek .t": { overflow: "hidden", textOverflow: "ellipsis" },
-  ".cm-errLine": { backgroundColor: "rgba(242,120,74,.13)", boxShadow: "inset 3px 0 0 #f2784a" },
-  ".cm-tipLine": { backgroundColor: "rgba(140,196,238,.07)", boxShadow: "inset 3px 0 0 rgba(140,196,238,.55)" },
-  ".cm-errLine.cm-activeLine": { backgroundColor: "rgba(242,120,74,.2)" },
-  ".cm-lineNumbers .cm-errLineNo": { color: "#ff9a70", fontWeight: "700" },
-  ".cm-lineNumbers .cm-tipLineNo": { color: "#8cc4ee" },
   ".cm-gutter-lint .cm-gutterElement": { padding: "0 2px" },
-  ".cm-swatch": { display: "inline-block", width: ".8em", height: ".8em", margin: "0 .35em 0 .05em", verticalAlign: "-.06em",
-                  borderRadius: "2px", boxShadow: "0 0 0 1px rgba(255,255,255,.35)", backgroundImage: "linear-gradient(45deg,#888 25%,transparent 25%,transparent 75%,#888 75%),linear-gradient(45deg,#888 25%,transparent 25%,transparent 75%,#888 75%)",
-                  backgroundSize: "6px 6px", backgroundPosition: "0 0,3px 3px", position: "relative", overflow: "hidden" },
-  ".cm-swatch > i": { position: "absolute", inset: "0" },
-  ".cm-flash-line": { backgroundColor: "rgba(224,123,44,.16)", boxShadow: "inset 4px 0 0 #e07b2c", animation: "cm-flash-fade 2s ease-in 2s forwards" },
-  ".cm-flash-line.first": { borderTop: "1px solid rgba(224,123,44,.55)" },
-  ".cm-flash-line.last": { borderBottom: "1px solid rgba(224,123,44,.55)" },
-  ".cm-flash": { backgroundColor: "rgba(224,123,44,.22)", borderRadius: "2px", animation: "cm-flash-fade 2s ease-in 2s forwards" },
-  "@keyframes cm-flash-fade": { to: { backgroundColor: "transparent", boxShadow: "inset 4px 0 0 transparent", borderColor: "transparent" } },
 }, { dark: true });
-
-/* ---------- "this is the element you clicked": a block that lights up, then fades ---------- */
-const setFlash = StateEffect.define();
-const flashField = StateField.define({
-  create: () => Decoration.none,
-  update(v, tr) {
-    v = v.map(tr.changes);
-    for (const e of tr.effects) if (e.is(setFlash)) {
-      if (!e.value) return Decoration.none;
-      const { from, to } = e.value, doc = tr.state.doc, ranges = [];
-      const a = doc.lineAt(from).number, b = doc.lineAt(Math.max(from, to - 1)).number;
-      for (let n = a; n <= b; n++) ranges.push(Decoration.line({ class: "cm-flash-line" + (n === a ? " first" : "") + (n === b ? " last" : "") }).range(doc.line(n).from));
-      if (to > from) ranges.push(Decoration.mark({ class: "cm-flash" }).range(from, to));
-      return Decoration.set(ranges, true);
-    }
-    if (tr.docChanged) return Decoration.none;
-    return v;
-  },
-  provide: f => EditorView.decorations.from(f)
-});
-
-/* ---------- matching tags: the tag under the cursor (or mouse) lights up together with its partner;
-   when the partner is scrolled out of view, a small note at the edge shows it and jumps there on click ---------- */
-const setHoverTag = StateEffect.define();
-const VOID_TAGS = new Set("area base br col embed hr img input link meta source track wbr".split(" "));
-function elementTags(state, pos){
-  if (pos == null) return null;
-  const tree = syntaxTree(state);
-  for (const side of [1, -1]) {
-    let n = tree.resolveInner(pos, side);
-    while (n && !["OpenTag", "CloseTag", "SelfClosingTag"].includes(n.name)) { if (n.name === "Element" || n.name === "Document") { n = null; break; } n = n.parent; }
-    if (!n || n.name === "SelfClosingTag") continue;
-    const el = n.parent;
-    if (!el || el.name !== "Element") continue;
-    const open = el.firstChild && el.firstChild.name === "OpenTag" ? el.firstChild : null;
-    const close = el.lastChild && el.lastChild.name === "CloseTag" ? el.lastChild : null;
-    if (!open) continue;
-    const nameNode = open.getChild("TagName"), name = nameNode ? state.sliceDoc(nameNode.from, nameNode.to).toLowerCase() : "";
-    if (VOID_TAGS.has(name)) return null;                    /* <img>, <br>…: nothing to pair */
-    return { open, close, on: n.name === "OpenTag" ? "open" : "close" };
-  }
-  return null;
-}
-const tagMatchPlugin = ViewPlugin.fromClass(class {
-  constructor(view){
-    this.view = view; this.hover = null; this.pair = null; this.deco = Decoration.none;
-    this.peek = document.createElement("button"); this.peek.type = "button"; this.peek.className = "cm-tagpeek"; this.peek.hidden = true;
-    this.peek.addEventListener("mousedown", e => { e.preventDefault(); const t = this.peekAt; if (t == null) return;
-      view.dispatch({ selection: { anchor: t }, scrollIntoView: true }); view.focus(); });
-    view.dom.appendChild(this.peek);
-    this.onScroll = () => this.measure();
-    view.scrollDOM.addEventListener("scroll", this.onScroll, { passive: true });
-    this.compute();
-  }
-  compute(){
-    const st = this.view.state, pos = this.hover != null ? this.hover : st.selection.main.head;
-    const p = elementTags(st, pos); this.pair = p;
-    if (!p) { this.deco = Decoration.none; this.measure(); return; }
-    const marks = [], tag = (node, cls) => {
-      marks.push(Decoration.mark({ class: cls }).range(node.from, node.to));
-      const nm = node.getChild("TagName"); if (nm) marks.push(Decoration.mark({ class: "cm-tagPairName" }).range(nm.from, nm.to));
-    };
-    tag(p.open, p.close ? "cm-tagPair" : "cm-tagPair cm-tagLonely");
-    if (p.close) tag(p.close, "cm-tagPair");
-    this.deco = Decoration.set(marks, true);
-    this.measure();
-  }
-  measure(){
-    const view = this.view, p = this.pair;
-    const other = p && p.close ? (p.on === "open" ? p.close : p.open) : null;
-    view.requestMeasure({ key: this, read: () => {
-      if (!other) return null;
-      const rect = view.scrollDOM.getBoundingClientRect(), b = view.lineBlockAt(other.from), top = view.documentTop + b.top;
-      if (top >= rect.top - 2 && top + b.height <= rect.bottom + 2) return null;
-      return { above: top < rect.top, line: view.state.doc.lineAt(other.from).number, text: view.state.sliceDoc(other.from, Math.min(other.to, other.from + 70)) };
-    }, write: m => {
-      this.peekAt = m ? other.from : null;
-      this.peek.hidden = !m; if (!m) return;
-      this.peek.classList.toggle("above", m.above);
-      this.peek.textContent = "";
-      const n = document.createElement("span"); n.className = "n"; n.textContent = (m.above ? "↑ " : "↓ ") + m.line;
-      const t = document.createElement("span"); t.className = "t"; t.textContent = m.text.replace(/\s+/g, " ");
-      this.peek.append(n, t);
-    } });
-  }
-  update(u){
-    let h = this.hover;
-    for (const tr of u.transactions) for (const e of tr.effects) if (e.is(setHoverTag)) h = e.value;
-    if (u.docChanged && h != null) h = null;
-    const changed = h !== this.hover; this.hover = h;
-    if (changed || u.docChanged || u.selectionSet || syntaxTree(u.startState) !== syntaxTree(u.state)) this.compute();
-    else if (u.viewportChanged || u.geometryChanged) this.measure();
-  }
-  destroy(){ this.view.scrollDOM.removeEventListener("scroll", this.onScroll); this.peek.remove(); }
-}, {
-  decorations: v => v.deco,
-  eventHandlers: {
-    mousemove(e, view){
-      const pos = view.posAtCoords({ x: e.clientX, y: e.clientY }, false);
-      const p = elementTags(view.state, pos), cur = this.hover != null ? elementTags(view.state, this.hover) : null;
-      if (!p && this.hover == null) return;
-      if (p && cur && p.open.from === cur.open.from) return;
-      view.dispatch({ effects: setHoverTag.of(p ? pos : null) });
-    },
-    mouseleave(e, view){ if (this.hover != null) view.dispatch({ effects: setHoverTag.of(null) }); }
-  }
-});
-
-/* ---------- lines with a mistake get a tinted background and a coloured line number ---------- */
-const errGutter = new class extends GutterMarker { constructor(){ super(); this.elementClass = "cm-errLineNo"; } }();
-const tipGutter = new class extends GutterMarker { constructor(){ super(); this.elementClass = "cm-tipLineNo"; } }();
-function problemLines(state){
-  const worst = new Map();                                   /* line start -> "err" | "tip" */
-  forEachDiagnostic(state, d => {
-    const doc = state.doc, a = doc.lineAt(Math.min(d.from, doc.length)).number, b = doc.lineAt(Math.min(Math.max(d.from, d.to - 1), doc.length)).number;
-    for (let n = a; n <= Math.min(b, a + 30); n++) {
-      const at = doc.line(n).from, k = d.severity === "info" ? "tip" : "err";
-      if (worst.get(at) !== "err") worst.set(at, k);
-    }
-  });
-  const at = [...worst.keys()].sort((x, y) => x - y);
-  return {
-    deco: Decoration.set(at.map(p => Decoration.line({ class: worst.get(p) === "err" ? "cm-errLine" : "cm-tipLine" }).range(p))),
-    gut: RangeSet.of(at.map(p => (worst.get(p) === "err" ? errGutter : tipGutter).range(p)))
-  };
-}
-const problemField = StateField.define({
-  create: () => ({ deco: Decoration.none, gut: RangeSet.empty }),
-  update(v, tr) {
-    if (tr.effects.some(e => e.is(setDiagnosticsEffect))) return problemLines(tr.state);
-    return tr.docChanged ? { deco: v.deco.map(tr.changes), gut: v.gut.map(tr.changes) } : v;
-  },
-  provide: f => [EditorView.decorations.from(f, v => v.deco), gutterLineClass.from(f, v => v.gut)]
-});
-
-/* ---------- CSS: a small colour square in front of every colour value ---------- */
-const NAMED = new Set(("black white red green blue yellow orange purple pink brown gray grey silver gold navy teal olive maroon lime aqua " +
-  "fuchsia cyan magenta coral salmon tomato crimson orchid violet indigo turquoise khaki beige ivory lavender plum tan chocolate " +
-  "darkred darkgreen darkblue darkorange lightblue lightgreen lightgray lightgrey skyblue steelblue royalblue tomato hotpink deeppink " +
-  "forestgreen seagreen limegreen springgreen slategray dimgray whitesmoke snow mintcream honeydew aliceblue transparent").split(" "));
-class Swatch extends WidgetType {
-  constructor(color) { super(); this.color = color; }
-  eq(o) { return o.color === this.color; }
-  toDOM() { const s = document.createElement("span"); s.className = "cm-swatch"; s.setAttribute("aria-hidden", "true");
-            const i = document.createElement("i"); i.style.background = this.color; s.append(i); return s; }
-  ignoreEvent() { return true; }
-}
-const swatchMatcher = new MatchDecorator({
-  regexp: /#(?:[0-9a-fA-F]{8}|[0-9a-fA-F]{6}|[0-9a-fA-F]{3,4})\b|\b(?:rgba?|hsla?)\([^)]*\)|(?<=:\s*|\s)[a-z]+(?=\s*[;}!]|\s*$)/g,
-  decorate: (add, from, to, m) => {
-    const v = m[0];
-    if (/^[a-z]+$/.test(v) && !NAMED.has(v)) return;
-    if (typeof CSS !== "undefined" && CSS.supports && !CSS.supports("color", v)) return;
-    add(from, from, Decoration.widget({ widget: new Swatch(v), side: -1 }));
-  }
-});
-const swatches = ViewPlugin.fromClass(class {
-  constructor(view) { this.deco = swatchMatcher.createDeco(view); }
-  update(u) { this.deco = swatchMatcher.updateDeco(u, this.deco); }
-}, { decorations: v => v.deco });
-
-/* ---------- CSS Emmet: m10 + Tab gives margin: 10px; like VS Code ---------- */
-function cssEmmetAt(state, pos) {
-  const line = state.doc.lineAt(pos), col = pos - line.from;
-  const before = line.text.slice(0, col);
-  if (/[:{]\s*[^;{}]*$/.test(before) && /:/.test(before.split(/[;{]/).pop())) return null;   /* already in a value */
-  const ex = extractEmmet(line.text, col, { type: "stylesheet", lookAhead: false });
-  if (!ex || !ex.abbreviation || !/^[a-z][a-z0-9.:-]*$/i.test(ex.abbreviation)) return null;
-  let out;
-  try { out = expandEmmet(ex.abbreviation, { type: "stylesheet", options: { "output.field": () => "" } }); } catch (e) { return null; }
-  if (!out || out === ex.abbreviation || !/:/.test(out)) return null;
-  return { from: line.from + ex.start, to: pos, text: out };
-}
 
 /* ---------- Emmet: ul>li*3 + Tab, like VS Code ---------- */
 const TAGS = new Set(("a abbr address article aside audio b blockquote body br button caption cite code col colgroup dd del details div dl dt em " +
@@ -387,10 +190,11 @@ const formatAll = view => {
 
 /* ---------- create ---------- */
 export function create({ parent, doc = "", lines = false, onChange = null, onCursor = null, label = "", fit = true, lang = "hu",
-                         docs = {}, phrases = {}, files = [], lint = null, fold = false, mode = "html" }) {
+                         docs = {}, phrases = {}, files = [], lint = null, fold = false }) {
   const tagDoc = name => docs[(name || "").toLowerCase()];
   /* suggestions: tags and attributes explained in the students' language; attributes arrive as name="" */
   const htmlSource = ctx => {
+    if (inCss(ctx.state, ctx.pos)) return null;
     const r = htmlCompletionSource(ctx);
     if (!r || !r.options) return r;
     return { ...r, options: r.options.map(o => {
@@ -428,6 +232,7 @@ export function create({ parent, doc = "", lines = false, onChange = null, onCur
   };
   /* a bare tag name at the start of a line (no "<" yet): offer the whole element */
   const tagWordSource = ctx => {
+    if (inCss(ctx.state, ctx.pos)) return null;
     const line = ctx.state.doc.lineAt(ctx.pos), head = line.text.slice(0, ctx.pos - line.from);
     const m = /^(\s*)([a-z][a-z0-9]*)$/.exec(head);
     if (!m) return null;
@@ -440,8 +245,25 @@ export function create({ parent, doc = "", lines = false, onChange = null, onCur
     return { from, validFor: /^[a-z0-9]*$/, options: names.map(t => ({ label: t, type: "type", detail: (docs[t] ? docs[t] + " · " : "") + "<" + t + ">",
       boost: t === word ? 20 : -t.length, apply: (view, c, f, to) => applyEmmet(view, { from: f, to, abbr: t, indent: m[1] }, lang) })) };
   };
+  const cssSource = ctx => {
+    if (!inCss(ctx.state, ctx.pos)) return null;
+    const r = cssCompletionSource(ctx);
+    if (!r || !r.options) return r;
+    return { ...r, options: r.options.map(o => {
+      if (o.type !== "property") return o;
+      const d = docs["css:" + o.label];
+      return { ...o, detail: d || "", boost: d ? 10 : 0, apply: (view, c, from, to) => {
+        const rest = view.state.sliceDoc(to, view.state.doc.lineAt(to).to);
+        if (/^\s*:/.test(rest)) { view.dispatch({ changes: { from, to, insert: c.label }, selection: { anchor: from + c.label.length }, userEvent: "input.complete" }); return; }
+        const ins = c.label + ": ;";
+        view.dispatch({ changes: { from, to, insert: ins }, selection: { anchor: from + c.label.length + 2 }, userEvent: "input.complete" });
+        setTimeout(() => startCompletion(view), 20);
+      } };
+    }) };
+  };
   /* Emmet shows up in the suggestion list too, so students discover it */
   const emmetSource = ctx => {
+    if (inCss(ctx.state, ctx.pos)) return null;
     const m = emmetAt(ctx.state, ctx.pos);
     if (!m || m.simple || m.abbr.length < 3) return null;
     return { from: m.from, filter: false, options: [{ label: m.abbr, detail: docs["#emmet"] || "Emmet", type: "keyword", boost: 99,
@@ -450,50 +272,15 @@ export function create({ parent, doc = "", lines = false, onChange = null, onCur
   const tabKey = view => {
     if (completionStatus(view.state) === "active") return acceptCompletion(view);
     const pos = view.state.selection.main;
-    if (pos.empty && mode === "css") {
-      const m = cssEmmetAt(view.state, pos.head);
-      if (m) { view.dispatch({ changes: { from: m.from, to: m.to, insert: m.text }, selection: { anchor: m.from + m.text.length }, userEvent: "input.complete" }); return true; }
-      return false;
-    }
-    if (pos.empty) { const m = emmetAt(view.state, pos.head); if (m) return applyEmmet(view, m, lang); }
+    if (pos.empty && !inCss(view.state, pos.head)) { const m = emmetAt(view.state, pos.head); if (m) return applyEmmet(view, m, lang); }
     return false;
   };
-  /* CSS suggestions: property names explained in the students' language, a colon and a space added */
-  const cssSource = ctx => {
-    const r = cssCompletionSource(ctx);
-    if (!r || !r.options) return r;
-    return { ...r, options: r.options.map(o => {
-      if (o.type !== "property") return o;
-      const d = docs["css:" + o.label];
-      return { ...o, detail: d || o.detail, boost: d ? 5 : 0, apply: (view, c, from, to) => {
-        const next = view.state.sliceDoc(to, to + 1), ins = next === ":" ? c.label : c.label + ": ";
-        view.dispatch({ changes: { from, to, insert: ins }, selection: { anchor: from + ins.length }, userEvent: "input.complete" });
-      } };
-    }) };
-  };
-  const cssHover = hoverTooltip((view, pos, side) => {
-    const n = syntaxTree(view.state).resolveInner(pos, side);
-    if (n.name !== "PropertyName") return null;
-    const name = view.state.sliceDoc(n.from, n.to).toLowerCase(), text = docs["css:" + name];
-    if (!text) return null;
-    return { pos: n.from, end: n.to, above: true, create() {
-      const d = document.createElement("div"); d.className = "cm-doc";
-      const b = document.createElement("b"); b.textContent = name; d.append(b, document.createTextNode(" " + text));
-      return { dom: d };
-    } };
-  }, { hoverTime: 350 });
-  const langFor = m => m === "css"
-    ? [css(), autocompletion({ icons: false, override: [cssSource], activateOnTypingDelay: 60 }), cssHover, swatches]
-    : [html({ autoCloseTags: true, matchClosingTags: true }),
-       autocompletion({ icons: false, override: [emmetSource, tagWordSource, fileSource, htmlSource], activateOnTypingDelay: 60 }),
-       hover, linkField, linkedRename, tagMatchPlugin];
-  const langComp = new Compartment();
-  let flashTimer = 0;
   const hover = hoverTooltip((view, pos, side) => {
     const n = syntaxTree(view.state).resolveInner(pos, side);
     let key = null, shown = "";
     if (n.name === "TagName") { shown = view.state.sliceDoc(n.from, n.to).toLowerCase(); key = shown; shown = `<${shown}>`; }
     else if (n.name === "AttributeName") { shown = view.state.sliceDoc(n.from, n.to).toLowerCase(); key = "@" + shown; }
+    else if (n.name === "PropertyName") { shown = view.state.sliceDoc(n.from, n.to).toLowerCase(); key = "css:" + shown; }
     const text = key && docs[key];
     if (!text) return null;
     return { pos: n.from, end: n.to, above: true, create() {
@@ -507,13 +294,15 @@ export function create({ parent, doc = "", lines = false, onChange = null, onCur
     highlightSpecialChars(), history(), drawSelection(), dropCursor(), EditorState.allowMultipleSelections.of(true),
     rectangularSelection(), crosshairCursor(), highlightSelectionMatches(),
     indentUnit.of("  "), EditorState.tabSize.of(2), EditorState.phrases.of(phrases),
-    indentOnInput(), bracketMatching(), closeBrackets(), flashField,
-    langComp.of(langFor(mode)),
-    syntaxHighlighting(style), theme, search({ top: false }),
+    indentOnInput(), bracketMatching(), closeBrackets(),
+    html({ autoCloseTags: true, matchClosingTags: true }),
+    autocompletion({ icons: false, override: [cssSource, emmetSource, tagWordSource, fileSource, htmlSource], activateOnTypingDelay: 60 }),
+    syntaxHighlighting(style), theme, search({ top: false }), hover,
+    linkField, linkedRename,
     indentationMarkers({ thickness: 1, colors: { light: "#33433c", dark: "#33433c", activeLight: "#5b7a6c", activeDark: "#5b7a6c" } }),
     keymap.of([
       { key: "Tab", run: tabKey },
-      { key: "Mod-b", run: v => mode === "html" && wrapWith("strong")(v) }, { key: "Mod-i", run: v => mode === "html" && wrapWith("em")(v) },
+      { key: "Mod-b", run: wrapWith("strong") }, { key: "Mod-i", run: wrapWith("em") },
       { key: "Shift-Alt-f", run: formatAll },
       ...closeBracketsKeymap, ...completionKeymap, ...searchKeymap, ...foldKeymap, ...historyKeymap, indentWithTab, ...defaultKeymap
     ]),
@@ -526,13 +315,10 @@ export function create({ parent, doc = "", lines = false, onChange = null, onCur
   if (lines) ext.push(lineNumbers(), highlightActiveLineGutter(), highlightActiveLine());
   if (fold) ext.push(codeFolding(), foldGutter({ openText: "⌄", closedText: "›" }));
   if (fit) ext.push(EditorView.lineWrapping);
-  if (lint) ext.push(lintGutter(), problemField, linter(view => lint(view.state.doc.toString()).map(w => {
-    const len = view.state.doc.length, L = view.state.doc.line(Math.min(Math.max(1, w.line), view.state.doc.lines));
+  if (lint) ext.push(lintGutter(), linter(view => lint(view.state.doc.toString()).map(w => {
+    const L = view.state.doc.line(Math.min(Math.max(1, w.line), view.state.doc.lines));
     const ind = /^\s*/.exec(L.text)[0].length;
-    /* a checker that knows the exact spot underlines just that; otherwise the whole line. Tips get a calmer mark. */
-    const exact = typeof w.from === "number" && w.from <= len;
-    const from = exact ? w.from : L.from + ind, to = exact ? Math.min(len, Math.max(w.to, w.from + 1)) : Math.max(L.from + ind, L.to);
-    return { from, to, severity: w.tip ? "info" : "warning", message: w.html.replace(/<[^>]+>/g, "").replace(/&lt;/g, "<").replace(/&gt;/g, ">"),
+    return { from: L.from + ind, to: Math.max(L.from + ind, L.to), severity: "warning", message: w.html.replace(/<[^>]+>/g, "").replace(/&lt;/g, "<").replace(/&gt;/g, ">"),
              renderMessage: () => { const s = document.createElement("span"); s.innerHTML = w.html; return s; } };
   }), { delay: 450 }));
   const view = new EditorView({ parent, state: EditorState.create({ doc, extensions: ext }) });
@@ -543,21 +329,5 @@ export function create({ parent, doc = "", lines = false, onChange = null, onCur
     focus: () => view.focus(),
     format: () => { formatAll(view); view.focus(); },
     search: () => { openSearchPanel(view); },
-    /* switch between an HTML page and a CSS file in the same editor; the new text replaces the old */
-    setMode: (m, text) => {
-      mode = m === "css" ? "css" : "html";
-      view.dispatch({ effects: langComp.reconfigure(langFor(mode)),
-                      changes: text == null ? undefined : { from: 0, to: view.state.doc.length, insert: text }, annotations: syncAnn.of(true) });
-    },
-    get mode() { return mode; },
-    /* light up from..to (a whole element), select its opening tag, and bring it to the middle of the editor */
-    flash: (from, to, sel) => {
-      const len = view.state.doc.length; from = Math.min(from, len); to = Math.min(Math.max(to, from), len);
-      view.dispatch({ effects: [setFlash.of(null)] });
-      view.dispatch({ effects: [setFlash.of({ from, to }), EditorView.scrollIntoView(from, { y: "center" })],
-                      selection: sel ? { anchor: Math.min(sel.anchor, len), head: Math.min(sel.head, len) } : undefined });
-      view.focus();
-      clearTimeout(flashTimer); flashTimer = setTimeout(() => view.dispatch({ effects: setFlash.of(null) }), 4200);
-    },
   };
 }

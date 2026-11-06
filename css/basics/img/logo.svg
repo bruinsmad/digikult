@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <title>Paw print</title>
+  <circle cx="100" cy="100" r="96" fill="#2f7a5a"/>
+  <g fill="#fff6e0">
+    <ellipse cx="100" cy="128" rx="38" ry="32"/>
+    <ellipse cx="54" cy="92" rx="14" ry="18" transform="rotate(-20 54 92)"/>
+    <ellipse cx="80" cy="64" rx="14" ry="19" transform="rotate(-8 80 64)"/>
+    <ellipse cx="120" cy="64" rx="14" ry="19" transform="rotate(8 120 64)"/>
+    <ellipse cx="146" cy="92" rx="14" ry="18" transform="rotate(20 146 92)"/>
+  </g>
+</svg>

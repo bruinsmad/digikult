@@ -3,7 +3,6 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<style>/* moving between pages: the old page drifts aside and fades, the new one glides in; the rail holds still */@view-transition{navigation:auto}.rail{view-transition-name:rail}::view-transition-group(root){animation:none}::view-transition-old(root){animation:dk-out .2s cubic-bezier(.4,0,1,1) both}::view-transition-new(root){animation:dk-in .38s cubic-bezier(.16,1,.3,1) .06s both}::view-transition-old(rail),::view-transition-new(rail){animation:none}@keyframes dk-out{to{opacity:0;transform:translateX(-18px)}}@keyframes dk-in{from{opacity:0;transform:translateX(26px)}}@media (prefers-reduced-motion:reduce){::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none!important}}</style>
 <title>HTML alapok – elmélet</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -37,28 +36,18 @@ code,pre,textarea{font-family:var(--f-mono)}
 .rail .in{max-width:980px;margin:0 auto;padding:0 18px;height:54px;display:flex;align-items:center;gap:14px}
 .home{font:700 20px/1 var(--f-chalk);color:#fff6e8;text-decoration:none;white-space:nowrap}
 .crumb{color:#f3dcc4;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
-.crumb a{color:inherit;text-decoration:none}.crumb a:hover{color:#fff6e8;text-decoration:underline;text-decoration-color:var(--yellow);text-underline-offset:3px}
-.langlink{margin-left:auto;flex:none;font:700 14px var(--f-body);color:#fff6e8;border:1.5px solid rgba(255,246,232,.45);border-radius:4px;padding:4px 10px;text-decoration:none}
-.langlink:hover{border-color:#fff6e8;background:rgba(0,0,0,.15)}
+.langlink{margin-left:auto;flex:none;font:700 13px var(--f-body);color:#5d3820;background:#fff6e8;border-radius:999px;padding:5px 12px;text-decoration:none}
 
 /* hero on the board */
 .hero{max-width:980px;margin:0 auto;padding:44px 22px 30px}
-.kicker{font:700 21px/1.2 var(--f-chalk);color:var(--yellow)}
+.kicker{font:700 15px var(--f-body);letter-spacing:.06em;text-transform:uppercase;color:var(--yellow)}
 .hero h1{margin:6px 0 8px;font:700 clamp(38px,6vw,64px)/1.05 var(--f-chalk);text-shadow:0 0 12px rgba(255,255,255,.08)}
 .hero h1 code{font:700 .62em var(--f-mono);color:var(--yellow);background:rgba(0,0,0,.2);padding:0 .25em;border-radius:6px}
 .lead{max-width:62ch;margin:0;font-size:clamp(18px,2.2vw,20px);color:var(--chalk-dim)}
-.meta{display:flex;flex-wrap:wrap;gap:8px 0;margin-top:16px;color:var(--chalk-dim);font-size:15px}
-.meta span{padding-right:14px;margin-right:14px;border-right:2px solid rgba(239,238,230,.18)}
-.meta span:last-child{border-right:0;margin-right:0;padding-right:0}
-@media (max-width:520px){ .meta{flex-direction:column;gap:3px} .meta span{border:0;margin:0;padding:0} }
-/* contents: numbered like the sections below, read down the columns */
-.toc{columns:3 210px;column-gap:28px;margin:24px 0 0;padding:14px 0 0;list-style:none;counter-reset:toc;border-top:2px dashed rgba(239,238,230,.16)}
-.toc li{counter-increment:toc;break-inside:avoid;padding:3px 0}
-.toc a{display:flex;gap:10px;align-items:baseline;text-decoration:none;font-size:15px;font-weight:700;color:var(--chalk);line-height:1.3}
-.toc a::before{content:counter(toc);flex:none;width:1.4em;text-align:right;font:700 17px/1 var(--f-chalk);color:var(--yellow)}
-.toc a:hover{color:var(--yellow)}
-.toc a:hover{text-decoration:underline;text-decoration-color:var(--yellow);text-underline-offset:4px}
-@media (max-width:520px){ .toc{columns:2;column-gap:14px} .toc a{font-size:14px;gap:7px} .toc a::before{width:1.1em} }
+.meta{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:16px;color:var(--chalk-dim);font-size:15px}
+.toc{display:flex;flex-wrap:wrap;gap:8px;margin:22px 0 0;padding:0;list-style:none}
+.toc a{display:inline-block;text-decoration:none;font-size:14.5px;font-weight:700;color:var(--chalk);border:1.5px solid rgba(239,238,230,.35);border-radius:999px;padding:4px 12px}
+.toc a:hover{border-color:var(--yellow);color:var(--yellow)}
 
 /* the sheet */
 .sheet{max-width:980px;margin:0 auto 40px;background:var(--paper);color:var(--ink);border-radius:6px;
@@ -77,35 +66,35 @@ mark{background:linear-gradient(transparent 55%,#f8e08e 55%);color:inherit;paddi
 .big{font-size:19px}
 
 /* callouts */
-.idea{display:flex;gap:14px;align-items:flex-start;background:var(--accent-bg);border-left:5px solid var(--accent);border-radius:4px;padding:12px 16px;margin:14px 0;max-width:76ch}
+.idea{display:flex;gap:14px;align-items:flex-start;background:var(--accent-bg);border-left:5px solid var(--accent);border-radius:8px;padding:12px 16px;margin:14px 0;max-width:76ch}
 .idea .i{flex:none;font-size:22px;line-height:1.3}
 .idea p{margin:0}
-.rule-box{border:2px solid var(--ink);border-radius:4px;padding:12px 16px;margin:14px 0;max-width:76ch;box-shadow:4px 4px 0 var(--ink)}
+.rule-box{border:2px solid var(--ink);border-radius:10px;padding:12px 16px;margin:14px 0;max-width:76ch;box-shadow:4px 4px 0 var(--ink)}
 .rule-box b{font-size:17px}
 
 /* static code */
-pre.code{margin:12px 0;background:var(--code-bg);color:var(--code-ink);border-radius:4px;padding:12px 16px;font-size:15px;line-height:1.55;overflow-x:auto;white-space:pre-wrap;overflow-wrap:anywhere;max-width:76ch}
+pre.code{margin:12px 0;background:var(--code-bg);color:var(--code-ink);border-radius:10px;padding:12px 16px;font-size:15px;line-height:1.55;overflow-x:auto;white-space:pre-wrap;overflow-wrap:anywhere;max-width:76ch}
 :is(.code,.vsql) .k{color:var(--kw);font-weight:700}:is(.code,.vsql) .s{color:var(--str)}:is(.code,.vsql) .d{color:var(--num)}:is(.code,.vsql) .f{color:var(--fn)}.code .c{color:#8fa39a;font-style:italic}
 
 /* anatomy */
-.anat{display:grid;grid-template-columns:max-content 1fr;gap:0;margin:14px 0;max-width:76ch;border:2px solid var(--ink);border-radius:4px;overflow:hidden}
+.anat{display:grid;grid-template-columns:max-content 1fr;gap:0;margin:14px 0;max-width:76ch;border:2px solid var(--ink);border-radius:10px;overflow:hidden}
 .anat>div{display:contents}
-.anat>div>code{display:block;background:var(--code-bg);color:var(--kw);font:700 15px var(--f-mono);padding:9px 14px;border-bottom:1px solid rgba(255,255,255,.08);white-space:pre}
-.anat>div>code .rest{color:var(--code-ink);font-weight:400}
-.anat>div>span{padding:9px 14px;border-bottom:1px solid var(--line);font-size:15.5px}
-.anat>div:last-child>code,.anat>div:last-child>span{border-bottom:0}
-@media (max-width:620px){ .anat{grid-template-columns:1fr} .anat>div>span{padding-top:4px} }
+.anat code{display:block;background:var(--code-bg);color:var(--kw);font:700 15px var(--f-mono);padding:9px 14px;border-bottom:1px solid rgba(255,255,255,.08);white-space:pre}
+.anat code .rest{color:var(--code-ink);font-weight:400}
+.anat span{padding:9px 14px;border-bottom:1px solid var(--line);font-size:15.5px}
+.anat>div:last-child code,.anat>div:last-child span{border-bottom:0}
+@media (max-width:620px){ .anat{grid-template-columns:1fr} .anat span{padding-top:4px} }
 
 /* operator table */
 .ops{border-collapse:collapse;margin:12px 0;font-size:15.5px;max-width:76ch;width:100%}
 .ops th,.ops td{border-bottom:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
-.ops th{font-size:14px;color:var(--muted)}
+.ops th{font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
 .ops td:first-child{font:700 16px var(--f-mono);white-space:nowrap}
 
 /* live example */
-.ex{margin:14px 0 18px;max-width:80ch;border:2px solid var(--ink);border-radius:4px;overflow:hidden;background:#fff}
+.ex{margin:14px 0 18px;max-width:80ch;border:2px solid var(--ink);border-radius:12px;overflow:hidden;background:#fff}
 .ex-tag{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--ink);color:var(--chalk);padding:5px 12px;font-size:13px;font-weight:700;letter-spacing:.04em}
-.ex-tag .t{font-weight:700}
+.ex-tag .t{text-transform:uppercase}
 .ex-tag .kb{font-weight:400;color:var(--chalk-dim);letter-spacing:0}
 .ex textarea{display:block;width:100%;border:0;resize:vertical;min-height:52px;padding:12px 14px;font-size:15px;line-height:1.55;background:var(--code-bg);color:var(--code-ink);caret-color:var(--yellow);tab-size:2}
 .ex textarea:focus{outline:none;box-shadow:inset 0 0 0 3px var(--yellow)}
@@ -116,7 +105,7 @@ pre.code{margin:12px 0;background:var(--code-bg);color:var(--code-ink);border-ra
 .edw textarea{position:relative;background:transparent;color:transparent;-webkit-text-fill-color:transparent;font:15px/1.55 var(--f-mono);white-space:pre-wrap;overflow-wrap:break-word}
 .edw textarea::selection{background:rgba(242,210,100,.35)}
 .ex-bar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:8px 10px;background:#f3f1e7;border-top:1px solid var(--line)}
-.btn{font:700 15px var(--f-body);border:0;border-radius:4px;padding:7px 14px;cursor:pointer;background:var(--ink);color:#fff}
+.btn{font:700 15px var(--f-body);border:0;border-radius:8px;padding:7px 14px;cursor:pointer;background:var(--ink);color:#fff}
 .btn:hover{background:#000}
 .btn.ghost{background:transparent;color:var(--ink);border:1.5px solid #bdb9a9}
 .btn.ghost:hover{border-color:var(--ink)}
@@ -124,30 +113,30 @@ pre.code{margin:12px 0;background:var(--code-bg);color:var(--code-ink);border-ra
 .ex-out{padding:0 10px 10px;background:#f3f1e7}
 .ex-out:empty{display:none}
 .res-meta{font-size:13px;font-weight:700;color:var(--muted);padding:8px 2px 6px}
-.tbox{overflow:auto;max-height:340px;border:1px solid var(--line);border-radius:4px;background:#fff}
+.tbox{overflow:auto;max-height:340px;border:1px solid var(--line);border-radius:8px;background:#fff}
 .tbox table{border-collapse:collapse;font:14px/1.4 var(--f-mono);min-width:100%}
 .tbox th{position:sticky;top:0;background:#ece9dd;text-align:left;padding:6px 10px;font-weight:700;border-bottom:1px solid var(--line);white-space:nowrap}
 .tbox td{padding:5px 10px;border-bottom:1px solid #f0ede3;white-space:nowrap}
 .tbox td.num{text-align:right}
 .tbox td.null{color:#a49f8e;font-style:italic}
-.err{background:var(--bad-bg);color:#6e1f1a;border-radius:4px;padding:10px 12px;font-size:15px;margin-top:10px}
+.err{background:var(--bad-bg);color:#6e1f1a;border-radius:8px;padding:10px 12px;font-size:15px;margin-top:10px}
 .err b{display:block}
 .err code{white-space:normal!important}
 .zero{font-size:15px;color:var(--muted);padding:10px 2px 2px;margin:0}
 
 /* data tables shown at the top */
 .data-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:14px;margin:12px 0}
-.data-card{border:2px solid var(--ink);border-radius:4px;overflow:hidden;background:#fff}
+.data-card{border:2px solid var(--ink);border-radius:10px;overflow:hidden;background:#fff}
 .data-card .h{background:var(--ink);color:var(--yellow);font:700 15px var(--f-mono);padding:6px 12px;display:flex;justify-content:space-between}
 .data-card .h span{color:var(--chalk-dim);font:400 13px var(--f-body)}
 .data-card .tbox{border:0;border-radius:0;max-height:none}
 
 /* mistakes */
 .mist{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0 6px;max-width:86ch}
-.mist .side{border-radius:4px;padding:10px 12px 12px;border:2px solid}
+.mist .side{border-radius:10px;padding:10px 12px 12px;border:2px solid}
 .mist .bad{background:var(--bad-bg);border-color:#e4aaa2}
 .mist .good{background:var(--ok-bg);border-color:#a9d3a0}
-.mist .lbl{font:700 17px var(--f-chalk)}
+.mist .lbl{font:700 13px var(--f-body);text-transform:uppercase;letter-spacing:.05em}
 .mist .bad .lbl{color:var(--bad)}.mist .good .lbl{color:var(--ok)}
 .mist pre.code{margin:6px 0 0;font-size:14px}
 .mist-why{margin:0 0 18px!important;max-width:86ch!important;font-size:15.5px;color:var(--muted)}
@@ -155,12 +144,12 @@ pre.code{margin:12px 0;background:var(--code-bg);color:var(--code-ink);border-ra
 
 /* quiz */
 .quiz{counter-reset:q;max-width:80ch}
-.q{border:2px solid var(--line);border-radius:4px;padding:12px 16px 14px;margin:14px 0;background:#fff}
+.q{border:2px solid var(--line);border-radius:12px;padding:12px 16px 14px;margin:14px 0;background:#fff}
 .q legend{font-weight:700;font-size:17px;padding:0 6px;margin-left:-6px}
 .q legend::before{counter-increment:q;content:counter(q) ". "}
 .q pre.code{margin:8px 0}
 .opts{display:grid;gap:8px;margin-top:8px}
-.opt{display:block;width:100%;text-align:left;font:16px/1.4 var(--f-body);background:#f6f4ec;border:2px solid var(--line);border-radius:4px;padding:8px 12px;cursor:pointer;color:var(--ink)}
+.opt{display:block;width:100%;text-align:left;font:16px/1.4 var(--f-body);background:#f6f4ec;border:2px solid var(--line);border-radius:9px;padding:8px 12px;cursor:pointer;color:var(--ink)}
 .opt:hover{border-color:#bdb9a9}
 .opt code{font-size:.92em}
 .opt.right{background:var(--ok-bg);border-color:var(--ok);font-weight:700}
@@ -168,14 +157,14 @@ pre.code{margin:12px 0;background:var(--code-bg);color:var(--code-ink);border-ra
 .q .fb{margin:10px 0 0;font-size:15.5px;display:none}
 .q.done .fb{display:block}
 .q .fb b{color:var(--ok)}.q.miss .fb b{color:var(--bad)}
-.score{font:700 18px var(--f-body);padding:10px 14px;border-radius:4px;background:var(--accent-bg);display:none;max-width:80ch}
+.score{font:700 18px var(--f-body);padding:10px 14px;border-radius:10px;background:var(--accent-bg);display:none;max-width:80ch}
 .score.show{display:block}
 
 /* practice links */
 .practice{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr));gap:14px;margin:14px 0}
-.pcard{position:relative;display:block;text-decoration:none;border:2px solid var(--ink);border-radius:4px;padding:14px 16px;background:#fff;box-shadow:4px 4px 0 var(--ink);transition:transform .15s,box-shadow .15s}
+.pcard{position:relative;display:block;text-decoration:none;border:2px solid var(--ink);border-radius:12px;padding:14px 16px;background:#fff;box-shadow:4px 4px 0 var(--ink);transition:transform .15s,box-shadow .15s}
 .pcard:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--ink)}
-.pcard .k{display:inline-block;font:700 16px/1.15 var(--f-chalk);border:1.5px solid currentColor;border-radius:3px;padding:1px 7px 0;color:#9a5b00;transform:rotate(-1.5deg)}
+.pcard .k{display:inline-block;font-size:12.5px;font-weight:700;border-radius:999px;padding:1px 9px;background:var(--accent-bg);color:#7a5a00}
 .pcard .k.demo{background:#dcefff;color:#1f5a88}
 .pcard h4{margin:8px 0 4px;font:700 19px/1.25 var(--f-body)}
 .pcard p{margin:0;color:var(--muted);font-size:15px}
@@ -191,7 +180,7 @@ pre.code{margin:12px 0;background:var(--code-bg);color:var(--code-ink);border-ra
   .ops{font-size:14px} .ops th,.ops td{padding:6px 6px} .ops td:first-child{white-space:normal}
   .ops th{font-size:11.5px;letter-spacing:.02em}
   :where(.sec) :where(:not(pre))>code{white-space:normal;overflow-wrap:anywhere}
-  .anat>div>code{white-space:pre-wrap}
+  .anat code{white-space:pre-wrap}
 }
 footer.end{max-width:980px;margin:0 auto;padding:0 22px 60px;color:var(--chalk-dim);font-size:14px}
 
@@ -222,12 +211,12 @@ footer.end{max-width:980px;margin:0 auto;padding:0 22px 60px;color:var(--chalk-d
 .ex-bar .try::before{content:"✎ ";color:var(--accent);font-weight:700}
 
 /* browser window */
-.bw{position:relative;border:2px solid var(--ink);border-radius:4px;overflow:hidden;background:#fff;box-shadow:0 2px 0 rgba(0,0,0,.06)}
+.bw{position:relative;border:2px solid var(--ink);border-radius:10px;overflow:hidden;background:#fff;box-shadow:0 2px 0 rgba(0,0,0,.06)}
 .bw-top{display:flex;align-items:flex-end;gap:10px;background:#dcd8c8;padding:6px 8px 0}
 .bw-top .dots{display:flex;gap:5px;padding-bottom:9px}
 .bw-top .dots i{width:9px;height:9px;border-radius:50%;background:#b3ad99}
 .bw-top .dots i:first-child{background:#e0796b}.bw-top .dots i:nth-child(2){background:#e6c25a}.bw-top .dots i:nth-child(3){background:#7fbf6e}
-.bw-tab{display:flex;align-items:center;gap:6px;background:#fff;border-radius:4px 4px 0 0;padding:6px 12px;font:600 12.5px var(--f-body);color:var(--ink);max-width:70%;min-width:0}
+.bw-tab{display:flex;align-items:center;gap:6px;background:#fff;border-radius:8px 8px 0 0;padding:6px 12px;font:600 12.5px var(--f-body);color:var(--ink);max-width:70%;min-width:0}
 .bw-tab .ttl{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .bw-tab .fav{flex:none;width:12px;height:12px;border-radius:3px;background:var(--accent)}
 .bw-bar{background:#fff;padding:5px 8px;border-bottom:1px solid var(--line)}
@@ -237,7 +226,7 @@ footer.end{max-width:980px;margin:0 auto;padding:0 22px 60px;color:var(--chalk-d
 @keyframes flash{0%{background:#f8e08e}100%{background:#fff}}
 
 /* anatomy of an element */
-.tagdiag{margin:16px 0 8px;max-width:80ch;border:2px solid var(--ink);border-radius:4px;background:#fff;padding:18px 16px 14px;overflow-x:auto}
+.tagdiag{margin:16px 0 8px;max-width:80ch;border:2px solid var(--ink);border-radius:14px;background:#fff;padding:18px 16px 14px;overflow-x:auto}
 .td-row{display:flex;align-items:stretch;width:max-content;margin:0 auto}
 .td-seg{display:flex;flex-direction:column;align-items:stretch}
 .td-code{font:700 clamp(17px,2.6vw,24px)/1 var(--f-mono);padding:12px 2px;white-space:pre;text-align:center;border-radius:6px}
@@ -267,7 +256,7 @@ footer.end{max-width:980px;margin:0 auto;padding:0 22px 60px;color:var(--chalk-d
 .xr-src .xt:hover{background:rgba(255,255,255,.08)}
 .xr-src .xt.sel{background:rgba(242,210,100,.28);box-shadow:0 0 0 2px var(--yellow)}
 .xr-view{padding:10px;background:#f3f1e7}
-.xr-page{background:#fff;border:1px solid var(--line);border-radius:4px;padding:6px 14px 14px;color:#000;font:16px/1.3 "Times New Roman",Times,serif;min-height:100%}
+.xr-page{background:#fff;border:1px solid var(--line);border-radius:8px;padding:6px 14px 14px;color:#000;font:16px/1.3 "Times New Roman",Times,serif;min-height:100%}
 .xr-page *{cursor:pointer}
 .xr-page h1{font-size:2em;margin:.67em 0}.xr-page h2{font-size:1.5em;margin:.83em 0}.xr-page p{margin:1em 0}.xr-page ul{margin:1em 0;padding-left:40px}
 .xr-page a{color:#0000ee}
@@ -290,13 +279,13 @@ footer.end{max-width:980px;margin:0 auto;padding:0 22px 60px;color:var(--chalk-d
 /* skeleton map */
 .skel{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:14px;margin:14px 0;max-width:86ch}
 @media (max-width:700px){ .skel{grid-template-columns:minmax(0,1fr)} }
-.skel pre{margin:0;background:var(--code-bg);color:var(--code-ink);border-radius:4px;padding:12px 0;font:14.5px/1.6 var(--f-mono);overflow-x:auto}
+.skel pre{margin:0;background:var(--code-bg);color:var(--code-ink);border-radius:10px;padding:12px 0;font:14.5px/1.6 var(--f-mono);overflow-x:auto}
 .skel pre span.l{display:block;padding:0 14px;border-left:5px solid transparent}
 .skel pre span.h{background:rgba(59,130,196,.22);border-left-color:#3b82c4}
 .skel pre span.b{background:rgba(79,154,69,.24);border-left-color:#4f9a45}
-.skel .mock{border:2px solid var(--ink);border-radius:4px;overflow:hidden;background:#fff;display:flex;flex-direction:column}
+.skel .mock{border:2px solid var(--ink);border-radius:10px;overflow:hidden;background:#fff;display:flex;flex-direction:column}
 .skel .mock .top{background:#dcd8c8;padding:6px 8px 0;display:flex}
-.skel .mock .tab{background:#dcefff;border:2px dashed #3b82c4;border-bottom:0;border-radius:4px 4px 0 0;padding:4px 10px;font:600 12.5px var(--f-body)}
+.skel .mock .tab{background:#dcefff;border:2px dashed #3b82c4;border-bottom:0;border-radius:8px 8px 0 0;padding:4px 10px;font:600 12.5px var(--f-body)}
 .skel .mock .page{flex:1;margin:8px;border:2px dashed #4f9a45;background:#e3f2df;border-radius:6px;padding:8px 10px;font:15px "Times New Roman",serif;color:#000}
 .skel .mock .page b{font-size:20px}
 .skel .legend{display:flex;flex-wrap:wrap;gap:6px 14px;padding:8px 10px;font-size:13.5px;color:var(--muted)}
@@ -304,9 +293,9 @@ footer.end{max-width:980px;margin:0 auto;padding:0 22px 60px;color:var(--chalk-d
 
 .ops td:first-child code{font:inherit;background:none;border:0;padding:0}
 .ops td code{white-space:normal}
-.bw-note{position:absolute;left:8px;right:8px;bottom:8px;background:var(--ink);color:#fff;font:14px/1.4 var(--f-body);padding:8px 12px;border-radius:4px;opacity:0;transform:translateY(6px);transition:opacity .2s,transform .2s;pointer-events:none}
+.bw-note{position:absolute;left:8px;right:8px;bottom:8px;background:var(--ink);color:#fff;font:14px/1.4 var(--f-body);padding:8px 12px;border-radius:8px;opacity:0;transform:translateY(6px);transition:opacity .2s,transform .2s;pointer-events:none}
 .bw-note.on{opacity:1;transform:none}
-.viz{margin:16px 0 8px;border:2px solid var(--ink);border-radius:4px;background:#fff;overflow:hidden}
+.viz{margin:16px 0 8px;border:2px solid var(--ink);border-radius:14px;background:#fff;overflow:hidden}
 .viz-head{background:var(--ink);color:var(--chalk);padding:8px 14px;font-weight:700;font-size:15px}
 .xr-src .tg{color:var(--tg);font-weight:700}.xr-src .an{color:var(--an)}.xr-src .av{color:var(--av)}.xr-src .pu{color:var(--pu)}
 .xr-page h1,.xr-page h2{font-family:"Times New Roman",Times,serif;font-weight:700;line-height:1.15;display:block}
@@ -344,14 +333,14 @@ footer.end{max-width:980px;margin:0 auto;padding:0 22px 60px;color:var(--chalk-d
 <body>
 <header class="rail"><div class="in">
   <a class="home" href="../../index.html">Digitális kultúra</a>
-  <span class="crumb"><a href="../../index.html#web">Weboldalak</a> › <a href="../../index.html#web-html">1. lecke</a></span>
+  <span class="crumb">Weboldalak › 1. lecke</span>
   <a class="langlink" href="intro.html" lang="en">English</a>
 </div></header>
 <section class="hero">
-  <div class="kicker">Weboldalak, 1. lecke: elmélet</div>
+  <div class="kicker">Weboldalak · 1. lecke · Elmélet</div>
   <h1>HTML alapok</h1>
   <p class="lead">Minden weboldal egy egyszerű szövegfájl. A <b>HTML-címkék</b> mondják meg a böngészőnek, melyik rész a cím, melyik a bekezdés, a lista vagy a kép. Itt megismered a legfontosabb címkéket, és mindegyiket rögtön ki is próbálhatod.</p>
-  <div class="meta"><span>kb. 15 perc</span><span>minden példa szerkeszthető</span><span>a végén 6 kérdés</span></div>
+  <div class="meta"><span>⏱ kb. 15 perc</span><span>✎ minden példa szerkeszthető</span><span>✅ a végén 6 kérdés</span></div>
   <ul class="toc"><li><a href="#mi-az">Mi az a HTML?</a></li><li><a href="#cimke">Címke, elem, attribútum</a></li><li><a href="#vaz">Az oldal váza</a></li><li><a href="#szoveg">Címsorok és bekezdések</a></li><li><a href="#kiemeles">Kiemelés</a></li><li><a href="#listak">Listák</a></li><li><a href="#linkek">Hivatkozások</a></li><li><a href="#kepek">Képek</a></li><li><a href="#tablazat">Táblázatok</a></li><li><a href="#hibak">Gyakori hibák</a></li><li><a href="#kviz">Ellenőrizd magad</a></li><li><a href="#gyakorolj">Gyakorolj</a></li></ul>
 </section>
 
@@ -503,8 +492,8 @@ a sortörés.&lt;/p&gt;
 <a class="pcard" href="../../css/basics/first-steps.html"><span class="k demo">Következő lecke</span><h4>CSS első lépések</h4><p>Ha megvan a HTML, jöhet a kinézet: színek, betűk, keretek, térközök.</p></a>
 </div></section>
 </main>
-<footer class="end">Digitális kultúra. A példák a böngésződben futnak, semmi sem kerül elküldésre.</footer>
-<script src="../../vendor/codemirror-html.js?v=8aa23aa2"></script>
+<footer class="end">Digitális kultúra · A példák a böngésződben futnak, semmi sem kerül elküldésre.</footer>
+<script src="../../vendor/codemirror-html.js?v=6e60cf59"></script>
 <script>
 const CFG = {"editorUrl": "../editor-hu.html", "ui": {"preview": "Előnézet", "qRight": "Helyes!", "qWrong": "Nem ez.", "xrOn": "Röntgen: be", "xrOff": "Röntgen: ki"}, "localTpl": "Ez a hivatkozás a(z) {h} fájlra vinne, de itt nincs ilyen fájl. Egy igazi weboldalon a mappában lenne.", "scoreTpl": ["Eredmény: {r} / {n} helyes válasz. Nézd át újra a pirossal jelölt részt.", "Eredmény: {r} / {n} helyes válasz. Szép munka!"], "xray": {"src": "<h1>Mancs Menhely</h1>\n<p>Szombaton <strong>örökbefogadási nap</strong>!</p>\n<h2>Állataink</h2>\n<ul>\n  <li>Morzsa, a kutya</li>\n  <li>Cirmi, a macska</li>\n</ul>\n<p><img src=\"img/pamacs.svg\" alt=\"Pamacs, a nyúl\" width=\"64\"> <a href=\"#\">Írj nekünk!</a></p>", "desc": {"h1": "főcím, az oldal legfontosabb címsora.", "h2": "alcím, egy szinttel kisebb címsor.", "p": "bekezdés.", "strong": "fontos, kiemelt szöveg (félkövér).", "ul": "felsorolás: pontokkal jelölt lista.", "li": "a lista egy eleme.", "img": "kép. Üres elem: nincs záró címkéje.", "a": "hivatkozás (link): kattintásra máshová visz."}}};
 const UI = CFG.ui;
@@ -526,7 +515,8 @@ const ED_TEXT = {
       th: "fejléccella", td: "cella", div: "doboz, részeket csoportosít", span: "szövegrész, csoportosít", "@href": "hová visz a link", "@src": "a képfájl helye",
       "@alt": "a kép leírása", "@width": "szélesség képpontban", "@height": "magasság képpontban", "@target": "_blank: új lapon nyílik", "@lang": "az oldal nyelve, pl. hu",
       "@colspan": "hány oszlopon át ér a cella", "@rowspan": "hány soron át ér a cella", "@border": "keret a cellák körül", "@charset": "karakterkódolás",
-      "@title": "súgó, ha fölé viszed az egeret", "#file": "kép a mappában", "#emmet": "Emmet · Tab" },
+      "@title": "súgó, ha fölé viszed az egeret", "#file": "kép a mappában", "#emmet": "Emmet · Tab",
+      "css:color": "a szöveg színe", "css:background-color": "a háttér színe", "css:background": "háttér (szín, kép) egyszerre", "css:font-family": "a betűtípus, pl. Arial, sans-serif", "css:font-size": "a betűméret, pl. 18px", "css:font-weight": "a betű vastagsága, pl. bold", "css:font-style": "dőlt betű: italic", "css:text-align": "igazítás: left, center, right", "css:text-decoration": "aláhúzás: underline, vagy none: nincs", "css:line-height": "sortávolság, pl. 1.5", "css:letter-spacing": "betűköz", "css:text-transform": "uppercase: csupa nagybetű", "css:margin": "külső margó: távolság a többi elemtől", "css:margin-top": "külső margó fent", "css:margin-bottom": "külső margó lent", "css:margin-left": "külső margó balra", "css:margin-right": "külső margó jobbra", "css:padding": "belső margó: távolság a doboz széle és a tartalom között", "css:padding-top": "belső margó fent", "css:padding-bottom": "belső margó lent", "css:padding-left": "belső margó balra", "css:padding-right": "belső margó jobbra", "css:border": "keret: vastagság, stílus, szín, pl. 2px solid green", "css:border-radius": "lekerekített sarkok, pl. 10px vagy 50%", "css:border-collapse": "collapse: a cellák keretei összeolvadnak", "css:border-bottom": "keret csak alul", "css:width": "szélesség", "css:max-width": "legnagyobb szélesség", "css:height": "magasság", "css:box-shadow": "árnyék a doboz körül, pl. 0 2px 6px gray", "css:display": "megjelenés: block, inline, flex, none", "css:list-style-type": "a lista jele: disc, square, none", "css:opacity": "átlátszatlanság 0 és 1 között", "css:cursor": "az egérmutató alakja, pl. pointer", "css:transform": "elforgatás, nagyítás, pl. scale(1.1)", "css:transition": "áttűnés: a változás ideje, pl. 0.3s", "css:vertical-align": "függőleges igazítás", "css:gap": "rés a rugalmas doboz elemei között" },
     phrases: { "Find": "Keresés", "Replace": "Csere", "next": "következő", "previous": "előző", "all": "mind", "match case": "kis- és nagybetű",
       "regexp": "regex", "by word": "egész szó", "replace": "csere", "replace all": "mindet cseréli", "close": "bezárás", "current match": "aktuális találat",
       "replaced $ matches": "$ találat cserélve", "replaced match on line $": "csere a(z) $. sorban", "on line": "sor", "Go to line": "Ugrás sorra", "go": "ugrás",
@@ -534,7 +524,14 @@ const ED_TEXT = {
       "Fold line": "Összecsukás", "Unfold line": "Kibontás", "Diagnostics": "Figyelmeztetések", "No diagnostics": "Nincs figyelmeztetés" },
     lint: { lintOpen: "{1}. sor: a címke nincs befejezve, hiányzik a > jel: {0}", lintQuote: "{1}. sor: hiányzik egy idézőjel ebben a címkében: {0}",
       lintVoidClose: "{1}. sor: {0} üres elem, nincs záró címkéje. Töröld a {c0} címkét.", lintStray: "{1}. sor: {c0} lezár valamit, amit nem nyitottál meg.",
-      lintCross: "{3}. sor: keresztbe zárt címkék. Előbb {c0}, utána {c1} jön.", lintUnclosed: "{1}. sor: {0} nincs lezárva. Valahová kell egy {c0}." }
+      lintCross: "{3}. sor: keresztbe zárt címkék. Előbb {c0}, utána {c1} jön.", lintUnclosed: "{1}. sor: {0} nincs lezárva. Valahová kell egy {c0}.",
+      cssProp: "{1}. sor: nincs ilyen CSS-tulajdonság: {p0}. Elírtad?", cssVal: "{2}. sor: a(z) {p0} nem érti ezt az értéket: {p1}",
+      cssNoVal: "{1}. sor: a(z) {p0} után hiányzik az érték.", cssNoColon: "{1}. sor: hiányzik a kettőspont ( : ) a(z) {p0} után.",
+      cssSemi: "{1}. sor: a(z) {p0} sora végéről hiányzik a pontosvessző ( ; ).", cssUnclosed: "{1}. sor: a(z) {p0} szabály nincs lezárva: hiányzik a }}.",
+      cssStray: "{0}. sor: ez a }} nem zár le semmit.", cssNoSel: "{0}. sor: a {{ elől hiányzik a kijelölő (pl. h1 vagy .kiemelt).",
+      cssAngle: "{1}. sor: a CSS-ben a címkét kacsacsőrök nélkül írjuk: {p0}", cssBadSel: "{1}. sor: ezt a kijelölőt a böngésző nem érti: {p0}",
+      cssNoBlock: "{1}. sor: a(z) {p0} után hiányzik a {{ … }} rész.",
+      cssHtmlCm: "{0}. sor: ez HTML-megjegyzés, a CSS-ben nem működik. A CSS-ben így írd: /* … */" }
   },
   en: {
     docs: { html: "the whole page", head: "information about the page", body: "everything visible on the page", title: "the title on the browser tab",
@@ -545,18 +542,28 @@ const ED_TEXT = {
       th: "header cell", td: "cell", div: "box that groups parts", span: "piece of text, groups", "@href": "where the link goes", "@src": "where the image file is",
       "@alt": "description of the image", "@width": "width in pixels", "@height": "height in pixels", "@target": "_blank: opens in a new tab", "@lang": "the page's language, e.g. en",
       "@colspan": "how many columns the cell spans", "@rowspan": "how many rows the cell spans", "@border": "border round the cells", "@charset": "character encoding",
-      "@title": "tooltip on mouse hover", "#file": "image in the folder", "#emmet": "Emmet · Tab" },
+      "@title": "tooltip on mouse hover", "#file": "image in the folder", "#emmet": "Emmet · Tab",
+      "css:color": "text colour", "css:background-color": "background colour", "css:background": "background (colour, image) in one go", "css:font-family": "the typeface, e.g. Arial, sans-serif", "css:font-size": "text size, e.g. 18px", "css:font-weight": "how bold, e.g. bold", "css:font-style": "italic text: italic", "css:text-align": "alignment: left, center, right", "css:text-decoration": "underline, or none", "css:line-height": "line spacing, e.g. 1.5", "css:letter-spacing": "space between letters", "css:text-transform": "uppercase: all capitals", "css:margin": "outer space: distance from other elements", "css:margin-top": "outer space at the top", "css:margin-bottom": "outer space at the bottom", "css:margin-left": "outer space on the left", "css:margin-right": "outer space on the right", "css:padding": "inner space: between the box edge and its content", "css:padding-top": "inner space at the top", "css:padding-bottom": "inner space at the bottom", "css:padding-left": "inner space on the left", "css:padding-right": "inner space on the right", "css:border": "border: width, style, colour, e.g. 2px solid green", "css:border-radius": "rounded corners, e.g. 10px or 50%", "css:border-collapse": "collapse: cell borders merge", "css:border-bottom": "border at the bottom only", "css:width": "width", "css:max-width": "largest width", "css:height": "height", "css:box-shadow": "shadow round the box, e.g. 0 2px 6px gray", "css:display": "how it shows: block, inline, flex, none", "css:list-style-type": "the list marker: disc, square, none", "css:opacity": "opacity from 0 to 1", "css:cursor": "mouse pointer shape, e.g. pointer", "css:transform": "rotate, scale, e.g. scale(1.1)", "css:transition": "how long a change takes, e.g. 0.3s", "css:vertical-align": "vertical alignment", "css:gap": "gap between items in a flex box" },
     phrases: {},
     lint: { lintOpen: "Line {1}: this tag isn't finished, the > is missing: {0}", lintQuote: "Line {1}: a quote mark is missing in this tag: {0}",
       lintVoidClose: "Line {1}: {0} is an empty element with no closing tag. Delete the {c0}.", lintStray: "Line {1}: {c0} closes something that was never opened.",
-      lintCross: "Line {3}: tags closed crosswise. First {c0}, then {c1}.", lintUnclosed: "Line {1}: {0} is never closed. Add a {c0} somewhere." }
+      lintCross: "Line {3}: tags closed crosswise. First {c0}, then {c1}.", lintUnclosed: "Line {1}: {0} is never closed. Add a {c0} somewhere.",
+      cssProp: "Line {1}: there's no CSS property called {p0}. A typo?", cssVal: "Line {2}: {p0} doesn't understand this value: {p1}",
+      cssNoVal: "Line {1}: the value after {p0} is missing.", cssNoColon: "Line {1}: the colon ( : ) after {p0} is missing.",
+      cssSemi: "Line {1}: the semicolon ( ; ) at the end of the {p0} line is missing.", cssUnclosed: "Line {1}: the {p0} rule isn't closed: the }} is missing.",
+      cssStray: "Line {0}: this }} doesn't close anything.", cssNoSel: "Line {0}: the selector in front of {{ is missing (e.g. h1 or .highlight).",
+      cssAngle: "Line {1}: in CSS, write the tag without angle brackets: {p0}", cssBadSel: "Line {1}: the browser doesn't understand this selector: {p0}",
+      cssNoBlock: "Line {1}: the {{ … }} part after {p0} is missing.",
+      cssHtmlCm: "Line {0}: this is an HTML comment, and it doesn't work in CSS. In CSS, write: /* … */" }
   }
 };
 const LINT_T = {};
 Object.entries(ED_TEXT[PAGE_LANG].lint).forEach(([k, tpl]) => {
-  LINT_T[k] = (...a) => tpl.replace(/\{(c?)(\d)\}/g, (_, c, i) => {
+  LINT_T[k] = (...a) => tpl.replace(/\{\{|\}\}|\{([cp]?)(\d)\}/g, (all, c, i) => {
+    if (all === "{{") return "<code>{</code>"; if (all === "}}") return "<code>}</code>";
     const v = a[+i];
-    return typeof v === "number" ? String(v) : `<code>&lt;${c ? "/" : ""}${esc(v)}&gt;</code>`;
+    if (typeof v === "number") return String(v);
+    return c === "p" ? `<code>${esc(v)}</code>` : `<code>&lt;${c ? "/" : ""}${esc(v)}&gt;</code>`;
   });
 });
 const IMG_FILES = ["img/morzsa.svg", "img/cirmi.svg", "img/pamacs.svg", "img/bodri.svg", "img/logo.svg"];
@@ -586,17 +593,103 @@ function hl(src){
     if (t.startsWith("<!--")) o += `<span class="cm">${esc(t)}</span>`;
     else if (/^<!doctype/i.test(t)) o += `<span class="dt">${esc(t)}</span>`;
     else if (t[0] === "&") o += `<span class="en">${esc(t)}</span>`;
-    else o += hlTag(t);
+    else {
+      o += hlTag(t);
+      if (/^<style[\s>]/i.test(t)){                          /* the stylesheet inside is CSS */
+        const end = src.toLowerCase().indexOf("</style", TOKEN.lastIndex);
+        const stop = end < 0 ? src.length : end;
+        o += hlCss(src.slice(TOKEN.lastIndex, stop));
+        TOKEN.lastIndex = stop;
+      }
+    }
     last = TOKEN.lastIndex;
   }
   return o + esc(src.slice(last));
 }
 
+/* CSS colouring: selectors, properties, values, comments */
+function hlCss(src){
+  let o = "", i = 0, inBlock = 0;
+  const re = /\/\*[\s\S]*?(?:\*\/|$)|[{}]|[^{}/]+|\//g;
+  let m;
+  while ((m = re.exec(src))){
+    const t = m[0];
+    if (t.startsWith("/*")) o += `<span class="cm">${esc(t)}</span>`;
+    else if (t === "{"){ inBlock++; o += `<span class="pu">{</span>`; }
+    else if (t === "}"){ inBlock = Math.max(0, inBlock - 1); o += `<span class="pu">}</span>`; }
+    else if (!inBlock) o += `<span class="sl">${esc(t)}</span>`;
+    else o += esc(t).replace(/([\w-]+)(\s*:)([^;]*)(;?)/g, (a, p, c, v, sc) => `<span class="cp">${p}</span><span class="pu">${c}</span><span class="cv">${v}</span><span class="pu">${sc}</span>`);
+  }
+  return o;
+}
+
 /* A tolerant check for beginners' mistakes: unclosed, stray and crossed tags, with line numbers. */
+/* CSS inside <style>: the browser quietly ignores what it doesn't understand, so we say it out loud */
+function cssLint(src, T = LINT_T){
+  const out = [], re = /<style[^>]*>([\s\S]*?)(?:<\/style\s*>|$)/gi;
+  const lineOf = i => src.slice(0, i).split("\n").length;
+  const ok = (p, v) => { try { return typeof CSS === "undefined" || !CSS.supports || CSS.supports(p, v); } catch(e){ return true; } };
+  const decls = (css, from, body, at) => {
+    let off = from;
+    for (const part of body.split(";")){
+      const decl = part.trim(), pos = off + (part.length - part.trimStart().length);
+      off += part.length + 1;
+      if (!decl) continue;
+      const c = decl.indexOf(":");
+      if (c < 0){ out.push({ line: at(pos), html: T.cssNoColon(decl.split(/\s+/)[0], at(pos)) }); continue; }
+      const prop = decl.slice(0, c).trim().toLowerCase(), val = decl.slice(c + 1).replace(/!important\s*$/i, "").trim();
+      if (prop.startsWith("--")) continue;
+      if (/\n\s*[a-z-]+\s*:/i.test(val) || (/\s[a-z-]+\s*:/i.test(val) && !ok(prop, val))){ out.push({ line: at(pos), html: T.cssSemi(prop, at(pos)) }); continue; }
+      if (!/^[a-z-]+$/.test(prop) || !ok(prop, "inherit")){ out.push({ line: at(pos), html: T.cssProp(prop, at(pos)) }); continue; }
+      if (!val){ out.push({ line: at(pos), html: T.cssNoVal(prop, at(pos)) }); continue; }
+      if (!ok(prop, val)) out.push({ line: at(pos), html: T.cssVal(prop, val.length > 30 ? val.slice(0, 30) + "…" : val, at(pos)) });
+    }
+  };
+  let m;
+  while ((m = re.exec(src))){
+    const base = m.index + m[0].indexOf(">") + 1;
+    const at = k => lineOf(base + k);
+    const css = m[1].replace(/\/\*[\s\S]*?(\*\/|$)/g, c => c.replace(/[^\n]/g, " "))
+      .replace(/<!--|-->/g, (c, k) => { out.push({ line: at(k), html: T.cssHtmlCm(at(k)) }); return "    ".slice(0, c.length); });
+    let k = 0, depth = 0, selStart = 0;
+    while (k < css.length){
+      const ch = css[k];
+      if (ch === "{"){
+        const sel = css.slice(selStart, k).trim(), sp = selStart + (css.slice(selStart, k).length - css.slice(selStart, k).trimStart().length);
+        if (sel.startsWith("@")){ depth++; k++; selStart = k; continue; }
+        if (!sel) out.push({ line: at(k), html: T.cssNoSel(at(k)) });
+        else if (sel.includes("<")) out.push({ line: at(sp), html: T.cssAngle(sel.replace(/[<>\/]/g, "").trim(), at(sp)) });
+        else { try { document.createDocumentFragment().querySelector(sel); } catch(e){ out.push({ line: at(sp), html: T.cssBadSel(sel, at(sp)) }); } }
+        let e = k + 1;
+        while (e < css.length && css[e] !== "}" && css[e] !== "{") e++;
+        const body = css.slice(k + 1, e);
+        if (e >= css.length || css[e] === "{"){
+          out.push({ line: at(k), html: T.cssUnclosed(sel || "?", at(k)) });
+          if (e >= css.length){ decls(css, k + 1, body, at); selStart = css.length; break; }
+          const cut = body.lastIndexOf(";");                       /* the next rule's selector starts after the last ; */
+          decls(css, k + 1, cut < 0 ? "" : body.slice(0, cut), at);
+          selStart = cut < 0 ? k + 1 : k + 1 + cut + 1; k = e; continue;
+        }
+        decls(css, k + 1, body, at);
+        k = e + 1; selStart = k; continue;
+      }
+      if (ch === "}"){
+        if (depth > 0) depth--; else out.push({ line: at(k), html: T.cssStray(at(k)) });
+        k++; selStart = k; continue;
+      }
+      k++;
+    }
+    const tail = css.slice(selStart), tt = tail.trim();
+    if (tt) out.push({ line: at(selStart + tail.indexOf(tt[0])), html: T.cssNoBlock(tt.split(/\s+/)[0], at(selStart + tail.indexOf(tt[0]))) });
+  }
+  return out;
+}
+
 function lint(src, T = LINT_T){
   const out = [], stack = [];
   const lineOf = i => src.slice(0, i).split("\n").length;
-  const clean = src.replace(/<!--[\s\S]*?-->/g, c => c.replace(/[^\n]/g, " "));
+  const clean = src.replace(/<!--[\s\S]*?-->/g, c => c.replace(/[^\n]/g, " "))
+                   .replace(/(<style[^>]*>)([\s\S]*?)(?=<\/style|$)/gi, (a, t, c) => t + c.replace(/[^\n]/g, " "));
   const re = /<(\/?)([a-zA-Z][\w-]*)([^<>]*?)(\/?)>|<(\/?)([a-zA-Z][\w-]*)[^<>]*$/g;
   const skip = new Set(["html","head","body"]);              /* optional end tags: a forgotten </body> is no drama */
   const lateClose = {};                                        /* closing tags we already explained (crossed pairs) */
@@ -622,6 +715,8 @@ function lint(src, T = LINT_T){
     stack.length = at;
   }
   stack.forEach(s => { if (!skip.has(s.name)) out.push({ line: s.line, html: T.lintUnclosed(s.name, s.line) }); });
+  out.push(...cssLint(src, T));
+  out.sort((a, b) => a.line - b.line);
   const seen = new Set();
   return out.filter(w => !seen.has(w.html) && seen.add(w.html)).slice(0, 6);
 }
@@ -771,6 +866,7 @@ function makeBrowser(host, file, T, opts = {}){
       $$("img", d).forEach(im => im.addEventListener("load", size));
     } catch(e){}
     size();
+    if (opts.onLoad) try { opts.onLoad(fr.contentDocument); } catch(e){}
   });
   const show = src => {
     const t = /<title[^>]*>([\s\S]*?)<\/title>/i.exec(src);
@@ -884,6 +980,6 @@ $$("pre.code.h").forEach(p => {
 });
 setupExamples(); setupXray(); setupQuiz();
 </script>
-<script src="../../nav.js?v=1cff4815" defer></script>
+<script src="../../nav.js?v=d9bcb2b4" defer></script>
 </body>
 </html>
