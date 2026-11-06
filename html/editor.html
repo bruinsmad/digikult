@@ -3,7 +3,6 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<style>/* moving between pages: the old page drifts aside and fades, the new one glides in; the rail holds still */@view-transition{navigation:auto}.rail{view-transition-name:rail}::view-transition-group(root){animation:none}::view-transition-old(root){animation:dk-out .2s cubic-bezier(.4,0,1,1) both}::view-transition-new(root){animation:dk-in .38s cubic-bezier(.16,1,.3,1) .06s both}::view-transition-old(rail),::view-transition-new(rail){animation:none}@keyframes dk-out{to{opacity:0;transform:translateX(-18px)}}@keyframes dk-in{from{opacity:0;transform:translateX(26px)}}@media (prefers-reduced-motion:reduce){::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none!important}}</style>
 <title>HTML editor</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -32,8 +31,7 @@ code{font-family:var(--f-mono);font-size:.9em}
 .rail .home{font:700 18px/1 var(--f-hand);color:#fff6e8;text-decoration:none;white-space:nowrap}
 .rail .crumb{color:#f3dcc4;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
 .rail .crumb b{color:#fff6e8}
-.rail .langlink{margin-left:auto;flex:none;font:700 14px var(--f-body);color:#fff6e8;border:1.5px solid rgba(255,246,232,.45);border-radius:4px;padding:4px 10px;text-decoration:none}
-.rail .langlink:hover{border-color:#fff6e8;background:rgba(0,0,0,.15)}
+.rail .langlink{margin-left:auto;flex:none;font:700 13px var(--f-body);color:#5d3820;background:#fff6e8;border-radius:999px;padding:4px 12px;text-decoration:none}
 
 /* toolbar */
 .bar{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;padding:8px 12px;background:var(--board-2);border-bottom:1px solid var(--line)}
@@ -47,16 +45,6 @@ code{font-family:var(--f-mono);font-size:.9em}
 .tb.go:hover{background:#c96a20}
 .tb[aria-pressed="true"],.tb[aria-expanded="true"]{background:var(--green);border-color:#4fae86;color:#fff}
 .tb .n{background:rgba(0,0,0,.25);border-radius:999px;padding:0 7px;font-size:12px}
-/* file tabs, like VS Code: <> pages, # stylesheets */
-.tabs{display:flex;gap:4px;overflow-x:auto;max-width:min(560px,52vw);scrollbar-width:thin;padding-bottom:1px}
-.ftab{flex:none;display:inline-flex;align-items:center;gap:7px;background:var(--code-bg);border:1px solid #4a6a5d;border-radius:4px;padding:6px 11px;cursor:pointer;
-  font:600 13.5px var(--f-mono);color:#b9c7bf;white-space:nowrap}
-.ftab i{font:700 12px var(--f-mono);font-style:normal;color:var(--yellow)}
-.ftab.is-css i{color:#f0a3b8}
-.ftab:hover{color:var(--code-ink);border-color:#6b8f80}
-.ftab[aria-selected="true"]{color:var(--code-ink);background:#2a3833;border-color:var(--yellow);box-shadow:inset 0 -2px 0 var(--yellow)}
-.ftab.is-css[aria-selected="true"]{border-color:#f0a3b8;box-shadow:inset 0 -2px 0 #f0a3b8}
-@media (max-width:760px){ .tabs{max-width:100%;flex:1 1 100%} }
 .sel{display:flex;align-items:center;gap:6px;background:var(--code-bg);border:1px solid #4a6a5d;border-radius:8px;padding:0 4px 0 10px}
 .sel svg{width:15px;height:15px;color:var(--yellow);flex:none}
 .sel select{background:transparent;border:0;color:var(--code-ink);font:600 13.5px var(--f-mono);padding:6px 4px;max-width:220px;cursor:pointer}
@@ -82,17 +70,8 @@ code{font-family:var(--f-mono);font-size:.9em}
 .cmw .cm-editor{height:100%}
 .lint{flex:none;max-height:30%;overflow:auto;border-top:1px solid #33433c;background:#2b2a1d;padding:7px 12px;display:grid;gap:3px}
 .lint p{margin:0;font:13.5px/1.4 var(--f-body);color:#f6e7a6}
-.lint code{background:rgba(255,255,255,.1);border-radius:4px;padding:0 4px;color:#fff;white-space:pre-wrap}
-.lrow{display:grid;grid-template-columns:auto minmax(0,1fr);gap:2px 10px;align-items:baseline;width:100%;text-align:left;background:none;border:0;border-radius:4px;padding:4px 6px;margin:0 -6px;cursor:pointer;font:13.5px/1.45 var(--f-body);color:#f6e7a6}
-.lrow:hover,.lrow:focus-visible{background:rgba(255,255,255,.07)}
-.lrow:focus-visible{outline:2px solid var(--yellow);outline-offset:0}
-.lrow .ln{font:600 12px var(--f-mono);color:#f2b84a;white-space:nowrap}
-.lrow .ln::before{content:"⚠ "}
-.lrow.tip{color:#cfe3f3}
-.lrow.tip .ln{color:#8cc4ee}
-.lrow.tip .ln::before{content:none}
-.lrow .tp{display:inline-block;margin-right:6px;padding:0 5px;border:1px solid #8cc4ee;border-radius:3px;font:600 11px/1.5 var(--f-body);color:#8cc4ee;vertical-align:1px}
-.lint .lmore{color:#c9c2a0;font-size:13px}
+.lint p::before{content:"⚠ "}
+.lint code{background:rgba(255,255,255,.1);border-radius:4px;padding:0 4px;color:#fff}
 @media (max-width:760px){
   .work{grid-template-columns:minmax(0,1fr)!important;grid-template-rows:minmax(0,1fr) 8px minmax(0,1fr)}
   .work.m-code{grid-template-rows:minmax(0,1fr) 0 0}.work.m-view{grid-template-rows:0 0 minmax(0,1fr)}
@@ -153,7 +132,7 @@ dialog::backdrop{background:rgba(10,20,16,.55)}
 .asset .acts button{flex:1;font:700 12px var(--f-body);border:1px solid #d3c2a5;background:#fbf6ec;border-radius:7px;padding:5px 4px;cursor:pointer;color:var(--ink)}
 .asset .acts button:hover{border-color:var(--ink)}
 .asset.sample{border-style:dashed}
-.subh{font:700 18px/1.2 var(--f-hand);color:var(--muted);margin:4px 0 -4px}
+.subh{font:700 13px var(--f-body);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:4px 0 -4px}
 .keys{position:fixed;right:14px;top:96px;z-index:30;width:min(460px,calc(100vw - 28px));max-height:calc(100dvh - 120px);overflow:auto;background:#24312c;color:var(--code-ink);border:1px solid #3a4a44;border-radius:12px;box-shadow:0 14px 30px rgba(0,0,0,.45);padding:10px 14px 12px}
 .keys-h{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px}
 .keys-h b{font:700 16px var(--f-body)}
@@ -185,18 +164,13 @@ body{grid-template-columns:minmax(0,1fr)}
 .bw-pick:hover{border-color:#2b2520}
 .bw-pick[aria-pressed="true"]{background:#e07b2c;border-color:#e07b2c;color:#fff}
 .bw.picking iframe{cursor:crosshair}
-.dk-box{position:absolute;pointer-events:none;border:3px solid #e07b2c;background:rgba(224,123,44,.18);border-radius:3px;z-index:3;
-  box-shadow:0 0 0 3px rgba(224,123,44,.25),0 0 0 9999px rgba(20,28,25,.08);transition:left .08s,top .08s,width .08s,height .08s}
-.dk-box.hit{animation:dk-hit .5s ease-out}
-@keyframes dk-hit{0%{box-shadow:0 0 0 0 rgba(224,123,44,.7),0 0 0 9999px rgba(20,28,25,.14)}100%{box-shadow:0 0 0 14px rgba(224,123,44,0),0 0 0 9999px rgba(20,28,25,.08)}}
-@media (prefers-reduced-motion:reduce){.dk-box.hit{animation:none}}
+.dk-box{position:absolute;pointer-events:none;border:2px solid #e07b2c;background:rgba(224,123,44,.12);border-radius:3px;z-index:3;transition:left .08s,top .08s,width .08s,height .08s}
 .dk-tag{position:absolute;left:-2px;top:-21px;background:#e07b2c;color:#fff;font:700 11.5px/1 "JetBrains Mono",ui-monospace,monospace;padding:4px 6px;border-radius:4px 4px 4px 0;white-space:nowrap}
 .dk-box.below .dk-tag{top:auto;bottom:-21px;border-radius:0 4px 4px 4px}
 @media (prefers-reduced-motion:reduce){ .dk-box{transition:none} }
 .cm-line.dk-flash,.cm-dk-flash{background:rgba(224,123,44,.28)!important;transition:background .6s}
 
 </style>
-<link rel="stylesheet" href="style-picker.css?v=5">
 </head>
 <body>
 <header class="rail"><div class="in">
@@ -207,7 +181,7 @@ body{grid-template-columns:minmax(0,1fr)}
 
 <div class="bar" role="toolbar" aria-label="Toolbar">
   <div class="grp files">
-    <div class="tabs" id="tabs" role="tablist" aria-label="Your files"></div>
+    <span class="sel"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 1.5h5l3.5 3.5v9.5h-8.5z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M9 1.5V5h3.5" fill="none" stroke="currentColor" stroke-width="1.5"/></svg><select id="docSel" aria-label="Your pages"></select></span>
     <button type="button" class="tb" id="newDoc" title="Create a new page (file)">＋<span class="lb">New</span></button>
     <button type="button" class="tb" id="renameDoc" title="Rename the page">✎<span class="lb">Rename</span></button>
     <button type="button" class="tb" id="delDoc" title="Delete the page">🗑<span class="lb">Delete</span></button>
@@ -221,7 +195,6 @@ body{grid-template-columns:minmax(0,1fr)}
   <span class="sep" aria-hidden="true"></span>
   <div class="grp">
     <button type="button" class="tb" id="findBtn" title="Find and replace (Ctrl+F)" aria-label="Find and replace (Ctrl+F)"><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="6.8" cy="6.8" r="4.6" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M10.3 10.3l4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
-    <button type="button" class="tb" id="styleBtn" aria-label="Editor themes" title="Choose a theme for the editor"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18h1.5a2.5 2.5 0 0 0 0-5h-.7a1.8 1.8 0 0 1 0-3.6H16a5 5 0 0 0 5-5C21 4.8 16.5 3 12 3Z" fill="none" stroke="currentColor" stroke-width="1.7"/><circle cx="7" cy="10" r="1.3" fill="currentColor"/><circle cx="10" cy="6.5" r="1.3" fill="currentColor"/><circle cx="15" cy="6.5" r="1.3" fill="currentColor"/></svg><span class="lb">Styles</span></button>
     <button type="button" class="tb" id="fmtBtn" title="Fix the indentation (Shift+Alt+F)">⇥<span class="lb">Format</span></button>
     <button type="button" class="tb" id="keysBtn" aria-expanded="false" aria-controls="keys">⌨<span class="lb">Shortcuts</span></button>
     <button type="button" class="tb" id="smaller" title="Smaller code" aria-label="Smaller code">A−</button><button type="button" class="tb" id="bigger" title="Larger code" aria-label="Larger code">A+</button>
@@ -245,40 +218,15 @@ body{grid-template-columns:minmax(0,1fr)}
 <footer class="status"><span id="stPos"></span><button type="button" id="stWarn"></button><span class="sp"></span><span>💾 saves automatically in this browser ·</span><span id="stSave"></span></footer>
 
 <div class="keys" id="keys" hidden><div class="keys-h"><b>Keyboard shortcuts, as in VS Code</b><button type="button" class="x" id="keysClose" aria-label="Close">×</button></div>
-  <dl><dt>ul&gt;li*3 + Tab</dt><dd>Emmet: short codes become full HTML. Try <code>p</code>, <code>img</code>, <code>table&gt;tr*3&gt;td*3</code>, <code>!</code></dd><dt>m10 + Tab (in CSS)</dt><dd>Emmet for CSS: <code>m10</code> → <code>margin: 10px;</code>, <code>c</code> → <code>color</code>, <code>bgc</code> → <code>background-color</code>. Colours get a small swatch.</dd><dt>Tab or Enter</dt><dd>accept the suggested tag or attribute</dd><dt>Ctrl + Space</dt><dd>open suggestions</dd><dt>Ctrl + B / Ctrl + I</dt><dd>wrap the selection in &lt;strong&gt; / &lt;em&gt;</dd><dt>Ctrl + /</dt><dd>comment on/off (&lt;!-- --&gt;)</dd><dt>Alt + ↑ / ↓</dt><dd>move the line up / down</dd><dt>Shift + Alt + ↓</dt><dd>duplicate the line</dd><dt>Ctrl + D</dt><dd>select the next match too: type with several cursors at once</dd><dt>Ctrl + click</dt><dd>add another cursor</dd><dt>Ctrl + F</dt><dd>find and replace</dd><dt>Shift + Alt + F</dt><dd>fix the indentation</dd><dt>Ctrl + Shift + [ / ]</dt><dd>fold / unfold an element</dd><dt>Ctrl + Z / Ctrl + Y</dt><dd>undo / redo</dd><dt>mouse over a tag</dt><dd>shows what the tag is for</dd><dt>Alt + click in the preview</dt><dd>jumps to the element in the code (or the 🎯 Pick button)</dd><dt>Ctrl + S</dt><dd>save (it saves by itself anyway)</dd><dt>drop files here</dt><dd>open an HTML file or image from your computer</dd></dl><p class="keys-n">On a Mac use ⌘ (Cmd) instead of Ctrl and ⌥ (Option) instead of Alt.</p></div>
+  <dl><dt>ul&gt;li*3 + Tab</dt><dd>Emmet: short codes become full HTML. Try <code>p</code>, <code>img</code>, <code>table&gt;tr*3&gt;td*3</code>, <code>!</code></dd><dt>Tab or Enter</dt><dd>accept the suggested tag or attribute</dd><dt>Ctrl + Space</dt><dd>open suggestions</dd><dt>Ctrl + B / Ctrl + I</dt><dd>wrap the selection in &lt;strong&gt; / &lt;em&gt;</dd><dt>Ctrl + /</dt><dd>comment on/off (&lt;!-- --&gt;)</dd><dt>Alt + ↑ / ↓</dt><dd>move the line up / down</dd><dt>Shift + Alt + ↓</dt><dd>duplicate the line</dd><dt>Ctrl + D</dt><dd>select the next match too: type with several cursors at once</dd><dt>Ctrl + click</dt><dd>add another cursor</dd><dt>Ctrl + F</dt><dd>find and replace</dd><dt>Shift + Alt + F</dt><dd>fix the indentation</dd><dt>Ctrl + Shift + [ / ]</dt><dd>fold / unfold an element</dd><dt>Ctrl + Z / Ctrl + Y</dt><dd>undo / redo</dd><dt>mouse over a tag</dt><dd>shows what the tag is for</dd><dt>Alt + click in the preview</dt><dd>jumps to the element in the code (or the 🎯 Pick button)</dd><dt>Ctrl + S</dt><dd>save (it saves by itself anyway)</dd><dt>drop files here</dt><dd>open an HTML file or image from your computer</dd></dl><p class="keys-n">On a Mac use ⌘ (Cmd) instead of Ctrl and ⌥ (Option) instead of Alt.</p></div>
 <dialog id="dlg"></dialog>
 <div class="toast" id="toast" role="status"></div>
 <div class="drop" id="drop" hidden>Drop to open the files</div>
 
-<script src="../vendor/codemirror-html.js?v=8aa23aa2"></script>
-<script src="checks.js?v=2"></script>
-<script src="style-picker.js?v=5"></script>
+<script src="../vendor/codemirror-html.js?v=6e60cf59"></script>
 <script>
 const CFG = {"ui": {"pick": "Pick", "pickT": "Click an element in the preview to jump to its code. Alt+click always works.", "title": "HTML editor", "preview": "Preview", "localTpl": "This link would open {h}, but you have no page or image with that name. Create it with ＋ New!", "switched": "Switched to {n}", "saveFail": "Couldn't save: the browser's storage is full.", "pos": "Line {l}, column {c}", "warns": "⚠ {n} warnings", "noWarn": "✓ no mistakes", "saved": "saved ✓", "saving": "saving…", "savedToast": "Saved. (It saves by itself too.)", "ok": "OK", "cancel": "Cancel", "fileName": "File name", "nameEmpty": "Type a name.", "nameTaken": "You already have a page called {n}", "newTitle": "New page", "create": "Create", "tplSkel": "HTML skeleton", "tplSkelD": "DOCTYPE, head, title and body, as in the lesson", "tplBlank": "Empty", "tplBlankD": "A completely empty file. Tip: type ! and press Tab.", "created": "Created {n}", "renameTitle": "Rename", "rename": "Rename", "delTitle": "Delete the page?", "delText": "<b>{n}</b> will be deleted from this browser for good.", "del": "Delete", "opened": "Opened: {p} page(s), {i} other file(s)", "imgTitle": "Images", "imgText": "Uploaded images stay in this browser. Refer to them by name in your code, e.g. <code>src=\"dog.jpg\"</code>. They go into the downloaded .zip too.", "imgAdd": "＋ Upload an image", "imgMine": "Your images", "imgNone": "No images of your own yet. Upload one, or drop it into the window!", "imgSamples": "Sample images (always available)", "sample": "sample", "insert": "Insert", "close": "Close", "downloaded": "Downloaded {n}", "zipFail": "The .zip couldn't be made; only the page was downloaded.", "imported": "Opened in the editor: {n}"}, "samples": ["img/morzsa.svg", "img/cirmi.svg", "img/pamacs.svg", "img/bodri.svg", "img/logo.svg"], "sampleBase": "basics/img/", "templates": {"skeleton": "<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <title>New page</title>\n  </head>\n  <body>\n    <h1>Hello, world!</h1>\n\n  </body>\n</html>\n"}};
 const UI = { preview: CFG.ui.preview, localNote: h => CFG.ui.localTpl.replace("{h}", h) };
-/* separate CSS files: their strings, and short explanations of the common properties */
-Object.assign(CFG.ui, {
-  tplCss: "CSS file", tplCssD: "Styles in their own file. It gets linked from the page you're on.",
-  cssStarter: "/* Styles for your page. Change a value and watch the preview. */\n\nbody {\n  font-family: sans-serif;\n  line-height: 1.5;\n  margin: 24px;\n}\n\nh1 {\n  color: teal;\n}\n",
-  cssLinked: "Linked: {c} is now used by {p}", previewOf: "preview: {p}",
-  noHost: "No page uses this CSS file yet. Put <code>&lt;link rel=\"stylesheet\" href=\"{n}\"&gt;</code> into a page's <code>&lt;head&gt;</code>.",
-  lintBrace: "The curly brackets don't match: {o} × <code>{</code> but {c} × <code>}</code>.",
-  lintSemi: "Line {l}: a <code>;</code> is missing at the end of this line.",
-  lintColon: "Line {l}: a property needs a <code>:</code> between its name and value.",
-  newPage: "New file", tabsLabel: "Your files", cssKey: "m10 + Tab (in CSS)", cssKeyD: "Emmet for CSS: <code>m10</code> → <code>margin: 10px;</code>, <code>c</code> → <code>color</code>, <code>bgc</code> → <code>background-color</code>"
-});
-const CSS_DOCS = {
-  "css:color": "text colour", "css:background": "background colour or picture", "css:background-color": "background colour",
-  "css:font-family": "typeface, e.g. sans-serif", "css:font-size": "size of the letters, e.g. 20px", "css:font-weight": "boldness: normal, bold, 700",
-  "css:font-style": "italic or normal", "css:text-align": "left, center, right", "css:text-decoration": "underline, line-through, none",
-  "css:line-height": "space between lines, e.g. 1.5", "css:margin": "space outside the box", "css:padding": "space inside the box, around the content",
-  "css:border": "frame: thickness, style, colour, e.g. 2px solid black", "css:border-radius": "rounded corners", "css:width": "width of the box",
-  "css:height": "height of the box", "css:display": "block, inline, flex, grid, none", "css:gap": "space between flex or grid items",
-  "css:justify-content": "where flex items sit along the row", "css:align-items": "where flex items sit across the row", "css:flex-direction": "row or column",
-  "css:box-shadow": "shadow around the box", "css:opacity": "see-through: 0 to 1", "css:max-width": "the box never gets wider than this",
-  "css:list-style": "the dots or numbers of a list", "css:cursor": "mouse pointer, e.g. pointer", "css:transition": "animate changes, e.g. all .3s",
-  "css:transform": "move, turn, scale, e.g. rotate(5deg)", "css:position": "static, relative, absolute, fixed", "css:object-fit": "how a picture fills its box"
-};
 /* ---------- shared by the HTML explainer and the HTML mission ---------- */
 const $ = (s, el=document) => el.querySelector(s), $$ = (s, el=document) => [...el.querySelectorAll(s)];
 const esc = s => String(s).replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
@@ -296,7 +244,8 @@ const ED_TEXT = {
       th: "fejléccella", td: "cella", div: "doboz, részeket csoportosít", span: "szövegrész, csoportosít", "@href": "hová visz a link", "@src": "a képfájl helye",
       "@alt": "a kép leírása", "@width": "szélesség képpontban", "@height": "magasság képpontban", "@target": "_blank: új lapon nyílik", "@lang": "az oldal nyelve, pl. hu",
       "@colspan": "hány oszlopon át ér a cella", "@rowspan": "hány soron át ér a cella", "@border": "keret a cellák körül", "@charset": "karakterkódolás",
-      "@title": "súgó, ha fölé viszed az egeret", "#file": "kép a mappában", "#emmet": "Emmet · Tab" },
+      "@title": "súgó, ha fölé viszed az egeret", "#file": "kép a mappában", "#emmet": "Emmet · Tab",
+      "css:color": "a szöveg színe", "css:background-color": "a háttér színe", "css:background": "háttér (szín, kép) egyszerre", "css:font-family": "a betűtípus, pl. Arial, sans-serif", "css:font-size": "a betűméret, pl. 18px", "css:font-weight": "a betű vastagsága, pl. bold", "css:font-style": "dőlt betű: italic", "css:text-align": "igazítás: left, center, right", "css:text-decoration": "aláhúzás: underline, vagy none: nincs", "css:line-height": "sortávolság, pl. 1.5", "css:letter-spacing": "betűköz", "css:text-transform": "uppercase: csupa nagybetű", "css:margin": "külső margó: távolság a többi elemtől", "css:margin-top": "külső margó fent", "css:margin-bottom": "külső margó lent", "css:margin-left": "külső margó balra", "css:margin-right": "külső margó jobbra", "css:padding": "belső margó: távolság a doboz széle és a tartalom között", "css:padding-top": "belső margó fent", "css:padding-bottom": "belső margó lent", "css:padding-left": "belső margó balra", "css:padding-right": "belső margó jobbra", "css:border": "keret: vastagság, stílus, szín, pl. 2px solid green", "css:border-radius": "lekerekített sarkok, pl. 10px vagy 50%", "css:border-collapse": "collapse: a cellák keretei összeolvadnak", "css:border-bottom": "keret csak alul", "css:width": "szélesség", "css:max-width": "legnagyobb szélesség", "css:height": "magasság", "css:box-shadow": "árnyék a doboz körül, pl. 0 2px 6px gray", "css:display": "megjelenés: block, inline, flex, none", "css:list-style-type": "a lista jele: disc, square, none", "css:opacity": "átlátszatlanság 0 és 1 között", "css:cursor": "az egérmutató alakja, pl. pointer", "css:transform": "elforgatás, nagyítás, pl. scale(1.1)", "css:transition": "áttűnés: a változás ideje, pl. 0.3s", "css:vertical-align": "függőleges igazítás", "css:gap": "rés a rugalmas doboz elemei között" },
     phrases: { "Find": "Keresés", "Replace": "Csere", "next": "következő", "previous": "előző", "all": "mind", "match case": "kis- és nagybetű",
       "regexp": "regex", "by word": "egész szó", "replace": "csere", "replace all": "mindet cseréli", "close": "bezárás", "current match": "aktuális találat",
       "replaced $ matches": "$ találat cserélve", "replaced match on line $": "csere a(z) $. sorban", "on line": "sor", "Go to line": "Ugrás sorra", "go": "ugrás",
@@ -304,7 +253,14 @@ const ED_TEXT = {
       "Fold line": "Összecsukás", "Unfold line": "Kibontás", "Diagnostics": "Figyelmeztetések", "No diagnostics": "Nincs figyelmeztetés" },
     lint: { lintOpen: "{1}. sor: a címke nincs befejezve, hiányzik a > jel: {0}", lintQuote: "{1}. sor: hiányzik egy idézőjel ebben a címkében: {0}",
       lintVoidClose: "{1}. sor: {0} üres elem, nincs záró címkéje. Töröld a {c0} címkét.", lintStray: "{1}. sor: {c0} lezár valamit, amit nem nyitottál meg.",
-      lintCross: "{3}. sor: keresztbe zárt címkék. Előbb {c0}, utána {c1} jön.", lintUnclosed: "{1}. sor: {0} nincs lezárva. Valahová kell egy {c0}." }
+      lintCross: "{3}. sor: keresztbe zárt címkék. Előbb {c0}, utána {c1} jön.", lintUnclosed: "{1}. sor: {0} nincs lezárva. Valahová kell egy {c0}.",
+      cssProp: "{1}. sor: nincs ilyen CSS-tulajdonság: {p0}. Elírtad?", cssVal: "{2}. sor: a(z) {p0} nem érti ezt az értéket: {p1}",
+      cssNoVal: "{1}. sor: a(z) {p0} után hiányzik az érték.", cssNoColon: "{1}. sor: hiányzik a kettőspont ( : ) a(z) {p0} után.",
+      cssSemi: "{1}. sor: a(z) {p0} sora végéről hiányzik a pontosvessző ( ; ).", cssUnclosed: "{1}. sor: a(z) {p0} szabály nincs lezárva: hiányzik a }}.",
+      cssStray: "{0}. sor: ez a }} nem zár le semmit.", cssNoSel: "{0}. sor: a {{ elől hiányzik a kijelölő (pl. h1 vagy .kiemelt).",
+      cssAngle: "{1}. sor: a CSS-ben a címkét kacsacsőrök nélkül írjuk: {p0}", cssBadSel: "{1}. sor: ezt a kijelölőt a böngésző nem érti: {p0}",
+      cssNoBlock: "{1}. sor: a(z) {p0} után hiányzik a {{ … }} rész.",
+      cssHtmlCm: "{0}. sor: ez HTML-megjegyzés, a CSS-ben nem működik. A CSS-ben így írd: /* … */" }
   },
   en: {
     docs: { html: "the whole page", head: "information about the page", body: "everything visible on the page", title: "the title on the browser tab",
@@ -315,18 +271,28 @@ const ED_TEXT = {
       th: "header cell", td: "cell", div: "box that groups parts", span: "piece of text, groups", "@href": "where the link goes", "@src": "where the image file is",
       "@alt": "description of the image", "@width": "width in pixels", "@height": "height in pixels", "@target": "_blank: opens in a new tab", "@lang": "the page's language, e.g. en",
       "@colspan": "how many columns the cell spans", "@rowspan": "how many rows the cell spans", "@border": "border round the cells", "@charset": "character encoding",
-      "@title": "tooltip on mouse hover", "#file": "image in the folder", "#emmet": "Emmet · Tab" },
+      "@title": "tooltip on mouse hover", "#file": "image in the folder", "#emmet": "Emmet · Tab",
+      "css:color": "text colour", "css:background-color": "background colour", "css:background": "background (colour, image) in one go", "css:font-family": "the typeface, e.g. Arial, sans-serif", "css:font-size": "text size, e.g. 18px", "css:font-weight": "how bold, e.g. bold", "css:font-style": "italic text: italic", "css:text-align": "alignment: left, center, right", "css:text-decoration": "underline, or none", "css:line-height": "line spacing, e.g. 1.5", "css:letter-spacing": "space between letters", "css:text-transform": "uppercase: all capitals", "css:margin": "outer space: distance from other elements", "css:margin-top": "outer space at the top", "css:margin-bottom": "outer space at the bottom", "css:margin-left": "outer space on the left", "css:margin-right": "outer space on the right", "css:padding": "inner space: between the box edge and its content", "css:padding-top": "inner space at the top", "css:padding-bottom": "inner space at the bottom", "css:padding-left": "inner space on the left", "css:padding-right": "inner space on the right", "css:border": "border: width, style, colour, e.g. 2px solid green", "css:border-radius": "rounded corners, e.g. 10px or 50%", "css:border-collapse": "collapse: cell borders merge", "css:border-bottom": "border at the bottom only", "css:width": "width", "css:max-width": "largest width", "css:height": "height", "css:box-shadow": "shadow round the box, e.g. 0 2px 6px gray", "css:display": "how it shows: block, inline, flex, none", "css:list-style-type": "the list marker: disc, square, none", "css:opacity": "opacity from 0 to 1", "css:cursor": "mouse pointer shape, e.g. pointer", "css:transform": "rotate, scale, e.g. scale(1.1)", "css:transition": "how long a change takes, e.g. 0.3s", "css:vertical-align": "vertical alignment", "css:gap": "gap between items in a flex box" },
     phrases: {},
     lint: { lintOpen: "Line {1}: this tag isn't finished, the > is missing: {0}", lintQuote: "Line {1}: a quote mark is missing in this tag: {0}",
       lintVoidClose: "Line {1}: {0} is an empty element with no closing tag. Delete the {c0}.", lintStray: "Line {1}: {c0} closes something that was never opened.",
-      lintCross: "Line {3}: tags closed crosswise. First {c0}, then {c1}.", lintUnclosed: "Line {1}: {0} is never closed. Add a {c0} somewhere." }
+      lintCross: "Line {3}: tags closed crosswise. First {c0}, then {c1}.", lintUnclosed: "Line {1}: {0} is never closed. Add a {c0} somewhere.",
+      cssProp: "Line {1}: there's no CSS property called {p0}. A typo?", cssVal: "Line {2}: {p0} doesn't understand this value: {p1}",
+      cssNoVal: "Line {1}: the value after {p0} is missing.", cssNoColon: "Line {1}: the colon ( : ) after {p0} is missing.",
+      cssSemi: "Line {1}: the semicolon ( ; ) at the end of the {p0} line is missing.", cssUnclosed: "Line {1}: the {p0} rule isn't closed: the }} is missing.",
+      cssStray: "Line {0}: this }} doesn't close anything.", cssNoSel: "Line {0}: the selector in front of {{ is missing (e.g. h1 or .highlight).",
+      cssAngle: "Line {1}: in CSS, write the tag without angle brackets: {p0}", cssBadSel: "Line {1}: the browser doesn't understand this selector: {p0}",
+      cssNoBlock: "Line {1}: the {{ … }} part after {p0} is missing.",
+      cssHtmlCm: "Line {0}: this is an HTML comment, and it doesn't work in CSS. In CSS, write: /* … */" }
   }
 };
 const LINT_T = {};
 Object.entries(ED_TEXT[PAGE_LANG].lint).forEach(([k, tpl]) => {
-  LINT_T[k] = (...a) => tpl.replace(/\{(c?)(\d)\}/g, (_, c, i) => {
+  LINT_T[k] = (...a) => tpl.replace(/\{\{|\}\}|\{([cp]?)(\d)\}/g, (all, c, i) => {
+    if (all === "{{") return "<code>{</code>"; if (all === "}}") return "<code>}</code>";
     const v = a[+i];
-    return typeof v === "number" ? String(v) : `<code>&lt;${c ? "/" : ""}${esc(v)}&gt;</code>`;
+    if (typeof v === "number") return String(v);
+    return c === "p" ? `<code>${esc(v)}</code>` : `<code>&lt;${c ? "/" : ""}${esc(v)}&gt;</code>`;
   });
 });
 const IMG_FILES = ["img/morzsa.svg", "img/cirmi.svg", "img/pamacs.svg", "img/bodri.svg", "img/logo.svg"];
@@ -356,17 +322,103 @@ function hl(src){
     if (t.startsWith("<!--")) o += `<span class="cm">${esc(t)}</span>`;
     else if (/^<!doctype/i.test(t)) o += `<span class="dt">${esc(t)}</span>`;
     else if (t[0] === "&") o += `<span class="en">${esc(t)}</span>`;
-    else o += hlTag(t);
+    else {
+      o += hlTag(t);
+      if (/^<style[\s>]/i.test(t)){                          /* the stylesheet inside is CSS */
+        const end = src.toLowerCase().indexOf("</style", TOKEN.lastIndex);
+        const stop = end < 0 ? src.length : end;
+        o += hlCss(src.slice(TOKEN.lastIndex, stop));
+        TOKEN.lastIndex = stop;
+      }
+    }
     last = TOKEN.lastIndex;
   }
   return o + esc(src.slice(last));
 }
 
+/* CSS colouring: selectors, properties, values, comments */
+function hlCss(src){
+  let o = "", i = 0, inBlock = 0;
+  const re = /\/\*[\s\S]*?(?:\*\/|$)|[{}]|[^{}/]+|\//g;
+  let m;
+  while ((m = re.exec(src))){
+    const t = m[0];
+    if (t.startsWith("/*")) o += `<span class="cm">${esc(t)}</span>`;
+    else if (t === "{"){ inBlock++; o += `<span class="pu">{</span>`; }
+    else if (t === "}"){ inBlock = Math.max(0, inBlock - 1); o += `<span class="pu">}</span>`; }
+    else if (!inBlock) o += `<span class="sl">${esc(t)}</span>`;
+    else o += esc(t).replace(/([\w-]+)(\s*:)([^;]*)(;?)/g, (a, p, c, v, sc) => `<span class="cp">${p}</span><span class="pu">${c}</span><span class="cv">${v}</span><span class="pu">${sc}</span>`);
+  }
+  return o;
+}
+
 /* A tolerant check for beginners' mistakes: unclosed, stray and crossed tags, with line numbers. */
+/* CSS inside <style>: the browser quietly ignores what it doesn't understand, so we say it out loud */
+function cssLint(src, T = LINT_T){
+  const out = [], re = /<style[^>]*>([\s\S]*?)(?:<\/style\s*>|$)/gi;
+  const lineOf = i => src.slice(0, i).split("\n").length;
+  const ok = (p, v) => { try { return typeof CSS === "undefined" || !CSS.supports || CSS.supports(p, v); } catch(e){ return true; } };
+  const decls = (css, from, body, at) => {
+    let off = from;
+    for (const part of body.split(";")){
+      const decl = part.trim(), pos = off + (part.length - part.trimStart().length);
+      off += part.length + 1;
+      if (!decl) continue;
+      const c = decl.indexOf(":");
+      if (c < 0){ out.push({ line: at(pos), html: T.cssNoColon(decl.split(/\s+/)[0], at(pos)) }); continue; }
+      const prop = decl.slice(0, c).trim().toLowerCase(), val = decl.slice(c + 1).replace(/!important\s*$/i, "").trim();
+      if (prop.startsWith("--")) continue;
+      if (/\n\s*[a-z-]+\s*:/i.test(val) || (/\s[a-z-]+\s*:/i.test(val) && !ok(prop, val))){ out.push({ line: at(pos), html: T.cssSemi(prop, at(pos)) }); continue; }
+      if (!/^[a-z-]+$/.test(prop) || !ok(prop, "inherit")){ out.push({ line: at(pos), html: T.cssProp(prop, at(pos)) }); continue; }
+      if (!val){ out.push({ line: at(pos), html: T.cssNoVal(prop, at(pos)) }); continue; }
+      if (!ok(prop, val)) out.push({ line: at(pos), html: T.cssVal(prop, val.length > 30 ? val.slice(0, 30) + "…" : val, at(pos)) });
+    }
+  };
+  let m;
+  while ((m = re.exec(src))){
+    const base = m.index + m[0].indexOf(">") + 1;
+    const at = k => lineOf(base + k);
+    const css = m[1].replace(/\/\*[\s\S]*?(\*\/|$)/g, c => c.replace(/[^\n]/g, " "))
+      .replace(/<!--|-->/g, (c, k) => { out.push({ line: at(k), html: T.cssHtmlCm(at(k)) }); return "    ".slice(0, c.length); });
+    let k = 0, depth = 0, selStart = 0;
+    while (k < css.length){
+      const ch = css[k];
+      if (ch === "{"){
+        const sel = css.slice(selStart, k).trim(), sp = selStart + (css.slice(selStart, k).length - css.slice(selStart, k).trimStart().length);
+        if (sel.startsWith("@")){ depth++; k++; selStart = k; continue; }
+        if (!sel) out.push({ line: at(k), html: T.cssNoSel(at(k)) });
+        else if (sel.includes("<")) out.push({ line: at(sp), html: T.cssAngle(sel.replace(/[<>\/]/g, "").trim(), at(sp)) });
+        else { try { document.createDocumentFragment().querySelector(sel); } catch(e){ out.push({ line: at(sp), html: T.cssBadSel(sel, at(sp)) }); } }
+        let e = k + 1;
+        while (e < css.length && css[e] !== "}" && css[e] !== "{") e++;
+        const body = css.slice(k + 1, e);
+        if (e >= css.length || css[e] === "{"){
+          out.push({ line: at(k), html: T.cssUnclosed(sel || "?", at(k)) });
+          if (e >= css.length){ decls(css, k + 1, body, at); selStart = css.length; break; }
+          const cut = body.lastIndexOf(";");                       /* the next rule's selector starts after the last ; */
+          decls(css, k + 1, cut < 0 ? "" : body.slice(0, cut), at);
+          selStart = cut < 0 ? k + 1 : k + 1 + cut + 1; k = e; continue;
+        }
+        decls(css, k + 1, body, at);
+        k = e + 1; selStart = k; continue;
+      }
+      if (ch === "}"){
+        if (depth > 0) depth--; else out.push({ line: at(k), html: T.cssStray(at(k)) });
+        k++; selStart = k; continue;
+      }
+      k++;
+    }
+    const tail = css.slice(selStart), tt = tail.trim();
+    if (tt) out.push({ line: at(selStart + tail.indexOf(tt[0])), html: T.cssNoBlock(tt.split(/\s+/)[0], at(selStart + tail.indexOf(tt[0]))) });
+  }
+  return out;
+}
+
 function lint(src, T = LINT_T){
   const out = [], stack = [];
   const lineOf = i => src.slice(0, i).split("\n").length;
-  const clean = src.replace(/<!--[\s\S]*?-->/g, c => c.replace(/[^\n]/g, " "));
+  const clean = src.replace(/<!--[\s\S]*?-->/g, c => c.replace(/[^\n]/g, " "))
+                   .replace(/(<style[^>]*>)([\s\S]*?)(?=<\/style|$)/gi, (a, t, c) => t + c.replace(/[^\n]/g, " "));
   const re = /<(\/?)([a-zA-Z][\w-]*)([^<>]*?)(\/?)>|<(\/?)([a-zA-Z][\w-]*)[^<>]*$/g;
   const skip = new Set(["html","head","body"]);              /* optional end tags: a forgotten </body> is no drama */
   const lateClose = {};                                        /* closing tags we already explained (crossed pairs) */
@@ -392,6 +444,8 @@ function lint(src, T = LINT_T){
     stack.length = at;
   }
   stack.forEach(s => { if (!skip.has(s.name)) out.push({ line: s.line, html: T.lintUnclosed(s.name, s.line) }); });
+  out.push(...cssLint(src, T));
+  out.sort((a, b) => a.line - b.line);
   const seen = new Set();
   return out.filter(w => !seen.has(w.html) && seen.add(w.html)).slice(0, 6);
 }
@@ -404,12 +458,11 @@ function makeEditor(ta, opts={}){
     const T = ED_TEXT[PAGE_LANG];
     const cm = CMHTML.create({ parent: w, doc: ta.value, lines: !!opts.lines, fit: true, label: ta.getAttribute("aria-label") || "",
       lang: PAGE_LANG, docs: T.docs, phrases: T.phrases, files: opts.files || IMG_FILES, fold: !!opts.fold,
-      lint: opts.lint === false ? null : (opts.lintFn || (src => lint(src))), mode: opts.mode || "html",
+      lint: opts.lint === false ? null : (src => lint(src)),
       onCursor: opts.onCursor || null,
       onChange: v => { if (quiet) return; ta.value = v; ta.dispatchEvent(new Event("input")); } });
     w.addEventListener("mousedown", e => { if (e.target === w){ e.preventDefault(); cm.focus(); } });
-    return { refit: () => { quiet = true; cm.set(ta.value); quiet = false; cm.view.requestMeasure(); }, cm, el: w,
-             setMode: m => { quiet = true; cm.setMode(m, ta.value); quiet = false; cm.view.requestMeasure(); } };
+    return { refit: () => { quiet = true; cm.set(ta.value); quiet = false; cm.view.requestMeasure(); }, cm, el: w };
   }
   const w = document.createElement("div"); w.className = "edw" + (opts.lines ? " numbered" : ""); ta.before(w);
   const gut = document.createElement("pre"); gut.className = "gut"; gut.setAttribute("aria-hidden", "true");
@@ -523,7 +576,7 @@ function makeBrowser(host, file, T, opts = {}){
       d.addEventListener("click", e => {
         if (opts.pick && (picking || e.altKey)){                  /* jump to the code */
           const mk = markOf(e.target);
-          if (mk){ e.preventDefault(); e.stopPropagation(); showBox(mk.el, 3200); box.classList.remove("hit"); void box.offsetWidth; box.classList.add("hit"); opts.pick.onPick(mk.start, mk.open, mk.end); }
+          if (mk){ e.preventDefault(); e.stopPropagation(); showBox(mk.el, 1600); opts.pick.onPick(mk.start, mk.open, mk.end); }
           return;
         }
         const a = e.target.closest && e.target.closest("a[href]"); if (!a) return;   /* links open in a new tab; #anchors scroll inside */
@@ -542,6 +595,7 @@ function makeBrowser(host, file, T, opts = {}){
       $$("img", d).forEach(im => im.addEventListener("load", size));
     } catch(e){}
     size();
+    if (opts.onLoad) try { opts.onLoad(fr.contentDocument); } catch(e){}
   });
   const show = src => {
     const t = /<title[^>]*>([\s\S]*?)<\/title>/i.exec(src);
@@ -586,16 +640,6 @@ const save = () => { try { localStorage.setItem(LS, JSON.stringify(store)); } ca
 let saveTimer = 0;
 const saveSoon = () => { clearTimeout(saveTimer); setStatusSaved(false); saveTimer = setTimeout(() => { save(); setStatusSaved(true); }, 450); };
 const doc = () => store.docs.find(d => d.name === store.current);
-const isCss = n => /\.css$/i.test(n || "");
-const pages = () => store.docs.filter(d => !isCss(d.name));
-/* the HTML page that shows a CSS file: the one last open that links it, else any page that links it */
-const linksTo = (page, css) => [...page.code.matchAll(/<link\b[^>]*>/gi)].some(m => /rel\s*=\s*["']?stylesheet/i.test(m[0]) &&
-  new RegExp(`href\\s*=\\s*["']?(?:\\./)?${css.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}["'\\s>]`, "i").test(m[0]));
-function hostFor(css){
-  const last = store.docs.find(d => d.name === store.lastPage);
-  if (last && !isCss(last.name) && linksTo(last, css)) return last;
-  return pages().find(p => linksTo(p, css)) || null;
-}
 const uniqueName = base => {
   base = cleanName(base) || "oldal.html";
   if (!store.docs.some(d => d.name === base)) return base;
@@ -660,134 +704,61 @@ function resolve(code){
     if (SAMPLES.includes(k) && !assets.has(k)) return SAMPLE_URL(k);
     return null;
   };
-  const files = u => u.replace(/url\(\s*(["']?)([^"')]+)\1\s*\)/gi, (all, q, v) => { const x = map(v); return x ? `url(${q}${x}${q})` : all; });
-  code = code.replace(/<link\b[^>]*>/gi, tag => {                 /* <link rel="stylesheet" href="style.css">: the CSS you are writing */
-    if (!/rel\s*=\s*["']?stylesheet/i.test(tag)) return tag;
-    const h = /href\s*=\s*(["']?)([^"'\s>]+)\1/i.exec(tag); if (!h) return tag;
-    const d = store.docs.find(x => isCss(x.name) && x.name === h[2].replace(/^\.\//, ""));
-    return d ? `<style data-file="${esc(d.name)}">\n${files(d.code).replace(/<\/style/gi, "<\\/style")}\n</style>` : tag;
-  });
   return code
     .replace(/(\s(?:src|href|poster)\s*=\s*)(["'])([^"']*)\2/gi, (all, a, q, v) => { const u = map(v); return u ? a + q + u + q : all; })
     .replace(/url\(\s*(["']?)([^"')]+)\1\s*\)/gi, (all, q, v) => { const u = map(v); return u ? `url(${q}${u}${q})` : all; });
 }
 
-/* ---------- a few plain checks for CSS files ---------- */
-function lintCss(src){
-  const out = [], plain = src.replace(/\/\*[\s\S]*?(\*\/|$)/g, m => m.replace(/[^\n]/g, " ")).replace(/(["'])(?:\\.|(?!\1).)*\1/g, m => " ".repeat(m.length));
-  const o = (plain.match(/\{/g) || []).length, c = (plain.match(/\}/g) || []).length;
-  if (o !== c) out.push({ line: 1, html: tpl("lintBrace", { o, c }) });
-  let depth = 0;
-  plain.split("\n").forEach((L, i) => {
-    const t = L.trim(), was = depth;
-    depth += (L.match(/\{/g) || []).length - (L.match(/\}/g) || []).length;
-    if (!t || was < 1 || /[{}]$/.test(t) || t.startsWith("@") || /^[}]/.test(t)) return;
-    if (!/:/.test(t) && /^[a-z-]+\s+\S/i.test(t)) { out.push({ line: i + 1, html: tpl("lintColon", { l: i + 1 }) }); return; }
-    if (/:/.test(t) && !/[;,]$/.test(t)) {
-      const next = plain.split("\n").slice(i + 1).find(x => x.trim());
-      if (next !== undefined && !/^\s*\}/.test(next)) out.push({ line: i + 1, html: tpl("lintSemi", { l: i + 1 }) });
-    }
-  });
-  return out.slice(0, 6);
-}
-/* mistakes are explained by checks.js (all the common slips, in plain words); the older checks stay as a fallback */
-const checkFiles = () => [...new Set([...store.docs.map(d => d.name), ...assets.keys(), ...SAMPLES])];
-const lintNow = src => {
-  if (!window.DKCheck) return isCss(store.current) ? lintCss(src) : lint(src);
-  if (isCss(store.current)) { const h = hostFor(store.current); return DKCheck.css(src, { lang: PAGE_LANG, page: h ? h.code : undefined }); }
-  return DKCheck.html(src, { lang: PAGE_LANG, files: checkFiles() });
-};
-Object.assign(ED_TEXT[PAGE_LANG].docs, CSS_DOCS);
-
 /* ---------- editor + preview ---------- */
 const ta = $("#code");
 ta.value = doc().code;
-const editor = makeEditor(ta, { lines: true, fixed: true, fold: true, files: FILES, mode: isCss(store.current) ? "css" : "html", lintFn: lintNow, onCursor: (l, c) => { try { cur = [l, c]; drawStatus(); if (browser.picking) browser.highlightAt(editor.cm.view.state.selection.main.head); } catch(e){} } });
-let cur = [1, 1], warnN = 0, tipN = 0, savedOk = true, lintList = [], lintTimer = 0;
+const editor = makeEditor(ta, { lines: true, fixed: true, fold: true, files: FILES, onCursor: (l, c) => { try { cur = [l, c]; drawStatus(); if (browser.picking) browser.highlightAt(editor.cm.view.state.selection.main.head); } catch(e){} } });
+let cur = [1, 1], warnN = 0, savedOk = true;
 UI.localLink = h => {                                          /* a link to one of your pages opens it */
   const n = h.split(/[?#]/)[0].replace(/^\.\//, "");
   if (store.docs.some(d => d.name === n)) { openDoc(n); toast(tpl("switched", { n })); return true; }
   if (assets.has(n)) { window.open(assets.get(n).url, "_blank"); return true; }
   return false;
 };
-const browser = makeBrowser($("#browser"), doc().name, UI, { pick: { label: T.pick, title: T.pickT, onPick: (start, open, end) => {
-  if (isCss(store.current)) { const h = hostFor(store.current); if (h) openDoc(h.name); }   /* picking while on a CSS file jumps into its page */
-  jumpTo(start, open, end);
-} } });
-function jumpTo(start, open, end){
+const browser = makeBrowser($("#browser"), doc().name, UI, { pick: { label: T.pick, title: T.pickT, onPick: (start, open) => jumpTo(start, open) } });
+function jumpTo(start, open){
   if (mode === "view") setMode(innerWidth < 760 ? "code" : "both");
-  /* the whole element lights up in the code and fades; its opening tag stays selected */
-  if (editor.cm && editor.cm.flash){ editor.cm.flash(start, end || open, { anchor: open, head: start }); }
-  else if (editor.cm){ const v = editor.cm.view; v.dispatch({ selection: { anchor: open, head: start }, scrollIntoView: true }); v.focus(); }
+  if (editor.cm){ const v = editor.cm.view; v.dispatch({ selection: { anchor: open, head: start }, scrollIntoView: true }); v.focus(); }
   else { ta.focus(); ta.setSelectionRange(start, open); }
 }
 function render(now){
-  const d = doc(), css = isCss(d.name), host = css ? hostFor(d.name) : d;
-  $(".bw-bar .addr", $("#browser")).lastChild.textContent = " " + (host ? host.name : d.name);
-  $("#work").classList.toggle("css", css);
-  if (host) browser.show(resolve(instrument(host.code)), now);
-  else browser.show(`<!doctype html><meta charset="utf-8"><style>body{font:16px/1.5 system-ui,sans-serif;color:#2b3a33;margin:28px;max-width:46ch}code{font:14px ui-monospace,monospace;background:#eef1ec;padding:1px 4px;border-radius:3px}</style><p>${tpl("noHost", { n: esc(d.name) })}</p>`, now);
-  /* while typing, wait for a pause: half-written tags aren't mistakes yet */
-  clearTimeout(lintTimer);
-  if (now) drawLint(); else lintTimer = setTimeout(drawLint, 600);
+  const d = doc();
+  $(".bw-bar .addr", $("#browser")).lastChild.textContent = " " + d.name;
+  browser.show(resolve(instrument(ta.value)), now);
+  const w = lint(ta.value); warnN = w.length;
+  $("#lint").hidden = !w.length; $("#lint").innerHTML = w.map(x => `<p>${x.html}</p>`).join("");
   drawStatus();
 }
-const LINT_MAX = 8;
-function drawLint(){
-  const w = lintNow(ta.value), M = window.DKCheck ? DKCheck.text(PAGE_LANG) : null;
-  lintList = w; tipN = w.filter(x => x.tip).length; warnN = w.length - tipN;
-  const box = $("#lint");
-  box.hidden = !w.length;
-  box.innerHTML = !M ? w.map(x => `<p>⚠ ${x.html}</p>`).join("") :
-    w.slice(0, LINT_MAX).map((x, i) => `<button type="button" class="lrow${x.tip ? " tip" : ""}" data-i="${i}"><span class="ln">${M.line(x.line)}</span><span class="lm">${x.tip ? `<span class="tp">${M.tip}</span>` : ""}${x.html}</span></button>`).join("") +
-    (w.length > LINT_MAX ? `<p class="lmore">${M.more(w.length - LINT_MAX)}</p>` : "");
-  drawStatus();
-}
-/* clicking a mistake selects the exact spot in the code */
-$("#lint").addEventListener("click", e => {
-  const b = e.target.closest(".lrow"); if (!b) return;
-  const x = lintList[+b.dataset.i]; if (!x) return;
-  const from = typeof x.from === "number" ? x.from : 0, to = typeof x.to === "number" ? x.to : from;
-  if (mode === "view") setMode(innerWidth < 760 ? "code" : "both");
-  if (editor.cm){ const v = editor.cm.view, n = v.state.doc.length; v.dispatch({ selection: { anchor: Math.min(from, n), head: Math.min(to, n) }, scrollIntoView: true }); v.focus(); }
-  else { ta.focus(); ta.setSelectionRange(from, to); }
-});
 ta.addEventListener("input", () => { doc().code = ta.value; doc().updated = Date.now(); saveSoon(); render(false); });
 function setStatusSaved(ok){ savedOk = ok; drawStatus(); }
 function drawStatus(){
-  $("#stPos").textContent = (isCss(store.current) ? "CSS · " : "HTML · ") + tpl("pos", { l: cur[0], c: cur[1] });
-  const w = $("#stWarn");
-  w.textContent = window.DKCheck ? DKCheck.text(PAGE_LANG).status(warnN, tipN) : (warnN ? tpl("warns", { n: warnN }) : T.noWarn);
-  w.className = warnN ? "warn" : "ok";
+  $("#stPos").textContent = tpl("pos", { l: cur[0], c: cur[1] });
+  const w = $("#stWarn"); w.textContent = warnN ? tpl("warns", { n: warnN }) : T.noWarn; w.className = warnN ? "warn" : "ok";
   $("#stSave").textContent = savedOk ? T.saved : T.saving;
 }
 
 /* ---------- pages menu ---------- */
 function drawDocs(){
-  /* pages first, then their CSS files; each tab says what kind of file it is */
-  const list = [...pages(), ...store.docs.filter(d => isCss(d.name))];
-  $("#tabs").innerHTML = list.map(d => `<button type="button" role="tab" class="ftab ${isCss(d.name) ? "is-css" : "is-html"}" data-n="${esc(d.name)}" aria-selected="${d.name === store.current}"><i aria-hidden="true">${isCss(d.name) ? "#" : "&lt;&gt;"}</i>${esc(d.name)}</button>`).join("");
-  const on = $("#tabs .ftab[aria-selected=true]"); if (on) on.scrollIntoView({ block: "nearest", inline: "nearest" });
+  const s = $("#docSel");
+  s.innerHTML = store.docs.map(d => `<option value="${esc(d.name)}"${d.name === store.current ? " selected" : ""}>${esc(d.name)}</option>`).join("");
   $("#delDoc").disabled = store.docs.length < 2;
   document.title = `${store.current} · ${T.title}`;
 }
 function openDoc(name){
   if (!store.docs.some(d => d.name === name)) return;
-  store.current = name; if (!isCss(name)) store.lastPage = name; save(); drawDocs();
-  ta.value = doc().code;
-  if (editor.setMode) editor.setMode(isCss(name) ? "css" : "html"); else editor.refit();
-  render(true);
+  store.current = name; save(); drawDocs();
+  ta.value = doc().code; editor.refit(); render(true);
   if (editor.cm) editor.cm.focus();
 }
-$("#tabs").onclick = e => { const b = e.target.closest(".ftab"); if (b) openDoc(b.dataset.n); };
-$("#tabs").onkeydown = e => {                                   /* arrow keys move between the tabs */
-  if (!/^Arrow(Left|Right)$/.test(e.key)) return;
-  const t = $$("#tabs .ftab"), i = t.indexOf(document.activeElement); if (i < 0) return;
-  e.preventDefault(); const n = t[(i + (e.key === "ArrowRight" ? 1 : -1) + t.length) % t.length]; n.focus(); openDoc(n.dataset.n);
-};
+$("#docSel").onchange = e => openDoc(e.target.value);
 
 /* small promise dialogs instead of prompt/confirm */
-function ask({ title, text = "", input = null, choices = null, ok = T.ok, danger = false, validate = null, onChoice = null }){
+function ask({ title, text = "", input = null, choices = null, ok = T.ok, danger = false, validate = null }){
   return new Promise(res => {
     const dl = $("#dlg");
     dl.innerHTML = `<form method="dialog" class="dlg"><h2>${esc(title)}</h2>${text ? `<p>${text}</p>` : ""}
@@ -796,7 +767,6 @@ function ask({ title, text = "", input = null, choices = null, ok = T.ok, danger
       <p class="err" hidden></p>
       <div class="row"><button type="button" class="btn ghost" value="cancel">${esc(T.cancel)}</button><button type="submit" class="btn${danger ? " danger" : ""}" value="ok">${esc(ok)}</button></div></form>`;
     const f = $("form", dl), inp = $("input[name=v]", dl), err = $(".err", dl);
-    if (onChoice && inp) $$("input[name=ch]", dl).forEach(c => c.onchange = () => { onChoice(c.value, inp); const dot = inp.value.lastIndexOf("."); inp.focus(); inp.setSelectionRange(0, dot > 0 ? dot : inp.value.length); });
     $("button[value=cancel]", dl).onclick = () => { dl.close(); res(null); };
     f.onsubmit = e => {
       e.preventDefault();
@@ -813,25 +783,11 @@ function ask({ title, text = "", input = null, choices = null, ok = T.ok, danger
 const nameTaken = (v, except) => { const n = cleanName(v); if (!n) return T.nameEmpty; if (n !== except && store.docs.some(d => d.name === n)) return tpl("nameTaken", { n }); return null; };
 
 $("#newDoc").onclick = async () => {
-  const r = await ask({ title: T.newPage, input: uniqueName("oldal.html"), ok: T.create,
-    validate: v => nameTaken(v),
-    choices: [{ v: "skeleton", t: T.tplSkel, d: T.tplSkelD }, { v: "css", t: T.tplCss, d: T.tplCssD }, { v: "blank", t: T.tplBlank, d: T.tplBlankD }],
-    onChoice: (v, inp) => {                                       /* the suggested name follows the kind of file */
-      const base = inp.value.replace(/\.[a-z0-9]+$/i, "");
-      if (v === "css" && !isCss(inp.value)) inp.value = uniqueName((/^oldal\d*$/.test(base) || !base ? "style" : base) + ".css");
-      if (v !== "css" && isCss(inp.value)) inp.value = uniqueName((base === "style" ? "oldal" : base) + ".html");
-    } });
+  const r = await ask({ title: T.newTitle, input: uniqueName("oldal.html"), ok: T.create, validate: v => nameTaken(v),
+    choices: [{ v: "skeleton", t: T.tplSkel, d: T.tplSkelD }, { v: "blank", t: T.tplBlank, d: T.tplBlankD }] });
   if (!r) return;
-  let name = cleanName(r.v);
-  if (r.ch === "css" && !isCss(name)) name = uniqueName(name.replace(/\.[a-z0-9]+$/i, "") + ".css");
-  const page = isCss(store.current) ? (hostFor(store.current) || pages()[0]) : doc();
-  store.docs.push({ name, code: r.ch === "blank" ? "" : r.ch === "css" ? T.cssStarter : CFG.templates.skeleton, updated: Date.now() });
-  if (r.ch === "css" && page && !linksTo(page, name)) {            /* hook it into the page so it shows at once */
-    const tag = `<link rel="stylesheet" href="${name}">`;
-    page.code = /<\/head>/i.test(page.code) ? page.code.replace(/([ \t]*)<\/head>/i, (m, ind) => `${ind}  ${tag}\n${ind}</head>`) : tag + "\n" + page.code;
-    page.updated = Date.now(); store.lastPage = page.name;
-    openDoc(name); toast(tpl("cssLinked", { c: name, p: page.name })); return;
-  }
+  const name = cleanName(r.v);
+  store.docs.push({ name, code: r.ch === "blank" ? "" : CFG.templates.skeleton, updated: Date.now() });
   openDoc(name); toast(tpl("created", { n: name }));
 };
 $("#renameDoc").onclick = async () => {
@@ -857,7 +813,7 @@ async function takeFiles(list){
   for (const f of list){
     if (/\.(html?|css|txt|js)$/i.test(f.name) || /^text\//.test(f.type)){
       const text = await f.text();
-      if (/\.(html?|css)$/i.test(f.name)){
+      if (/\.html?$/i.test(f.name)){
         const existing = store.docs.find(d => d.name === f.name);
         if (existing){ existing.code = text; existing.updated = Date.now(); }
         else store.docs.push({ name: cleanName(f.name), code: text, updated: Date.now() });
@@ -934,8 +890,7 @@ $("#dlBtn").onclick = async () => {
   } catch(e){ saveBlob(new Blob([doc().code], { type: "text/html" }), doc().name); toast(T.zipFail); }
 };
 $("#fullBtn").onclick = () => {
-  const host = isCss(store.current) ? hostFor(store.current) : doc(); if (!host) return;
-  let src = resolve(host.code);
+  let src = resolve(doc().code);
   const base = `<base href="${new URL(".", location.href).href}">`;
   src = /<head[^>]*>/i.test(src) ? src.replace(/<head[^>]*>/i, m => m + base) : base + src;
   const u = URL.createObjectURL(new Blob([src], { type: "text/html" })); window.open(u, "_blank"); setTimeout(() => URL.revokeObjectURL(u), 60000);
@@ -985,7 +940,7 @@ document.addEventListener("keydown", e => {
   if (e.key === "Escape" && !keys.hidden) showKeys(false);
   if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "s"){ e.preventDefault(); save(); setStatusSaved(true); toast(T.savedToast); }
 });
-$("#stWarn").onclick = () => { if (warnN || tipN) { const r = $("#lint .lrow"); if (r) r.focus(); else $("#lint").scrollIntoView({ block: "nearest" }); } };
+$("#stWarn").onclick = () => { if (warnN) $("#lint").scrollIntoView({ block: "nearest" }); };
 if (!editor.cm) ["#findBtn", "#fmtBtn", "#keysBtn"].forEach(s => $(s).hidden = true);
 
 let toastT = 0;
@@ -1004,11 +959,9 @@ try {
   }
 } catch(e){}
 
-DKStylePicker.mount({ button: $("#styleBtn"), lang: PAGE_LANG });
-
 drawDocs(); editor.refit(); render(true); loadAssets();
 
 </script>
-<script src="../nav.js?v=1cff4815" defer></script>
+<script src="../nav.js?v=d9bcb2b4" defer></script>
 </body>
 </html>

@@ -1,0 +1,1129 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Paw Shelter Makeover</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Kalam:wght@700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* The shelter office: warm paper, a green awning header, Teri's note beside the to-do list,
+   then the code editor beside a browser window. Committed daytime look. */
+:root{
+  --bg:#f4ecdd; --panel:#fffaf2; --ink:#2b2520; --muted:#6c6157; --line:#e2d4bd; --line-2:#d3c2a5;
+  --green:#2f7a5a; --green-d:#225c43; --green-soft:#dcefe3; --orange:#e07b2c; --orange-d:#b85f17; --orange-soft:#fde5cc;
+  --yellow:#f2d264; --bad:#b3362f; --bad-soft:#fbe3df;
+  --code-bg:#1f2a26; --code-ink:#e9efe9; --gut:#6f857c;
+  --tg:#f2d264; --an:#9cc8e8; --av:#a8dba0; --cm:#8fa39a; --en:#f0a3b8; --pu:#c9d3cc;
+  --f-display:"Fredoka","Atkinson Hyperlegible","Segoe UI",system-ui,sans-serif;
+  --f-body:"Atkinson Hyperlegible","Segoe UI",system-ui,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  --f-hand:"Kalam","Segoe Print","Comic Sans MS",cursive;
+  --code-size:15px;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+*,*::before,*::after{font-feature-settings:"calt" 0,"liga" 0}
+[hidden]{display:none!important}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.5 var(--f-body);
+  background-image:radial-gradient(circle at 12px 12px,rgba(120,90,50,.07) 2px,transparent 2.5px);background-size:28px 28px}
+a{color:var(--green-d)}
+:focus-visible{outline:3px solid var(--orange);outline-offset:2px;border-radius:6px}
+code{font-family:var(--f-mono);font-size:.9em;background:#f1e7d6;border:1px solid var(--line);border-radius:5px;padding:0 4px}
+button{font:inherit;color:inherit}
+
+/* top rail, same as the other pages */
+.rail{background:linear-gradient(#b07448,#8a5532 45%,#5d3820);box-shadow:0 3px 0 rgba(0,0,0,.2)}
+.rail .in{max-width:1500px;margin:0 auto;padding:0 18px;height:50px;display:flex;align-items:center;gap:14px}
+.rail .home{font:700 19px/1 var(--f-hand);color:#fff6e8;text-decoration:none;white-space:nowrap}
+.rail .crumb{color:#f3dcc4;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.rail .langlink{margin-left:auto;flex:none;font:700 13px var(--f-body);color:#5d3820;background:#fff6e8;border-radius:999px;padding:5px 12px;text-decoration:none}
+
+/* awning header */
+.sign{position:relative;background:var(--green);color:#fff8ea;padding:18px 0 18px}
+.sign::after{content:"";position:absolute;left:0;right:0;bottom:-18px;height:18px;
+  background:radial-gradient(circle at 18px 0,var(--green) 17px,transparent 18px) 0 0/36px 18px repeat-x;}
+.sign .in{max-width:1500px;margin:0 auto;padding:0 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.sign img{width:58px;height:58px;flex:none;border-radius:50%;box-shadow:0 0 0 4px rgba(255,248,234,.25)}
+.sign .tt{min-width:0;flex:1}
+.sign .kick{font:700 13px var(--f-body);letter-spacing:.08em;text-transform:uppercase;color:#bfe6cf}
+.sign h1{margin:2px 0 0;font:600 clamp(26px,3.6vw,40px)/1.1 var(--f-display);letter-spacing:.01em}
+.sign .meta{display:flex;gap:10px 18px;flex-wrap:wrap;font-size:14.5px;color:#d8efe1}
+.sign .meta b{color:#fff}
+
+/* chapter path: paw prints */
+.path{max-width:1500px;margin:30px auto 0;padding:0 20px;display:flex;gap:6px;flex-wrap:wrap;list-style:none}
+.path li{display:flex;align-items:center;gap:6px}
+.path li+li::before{content:"";width:14px;height:3px;border-radius:2px;background:var(--line-2)}
+.paw{display:inline-flex;align-items:center;gap:7px;border:2px solid var(--line-2);background:var(--panel);border-radius:999px;padding:4px 12px 4px 5px;cursor:pointer;font:700 14px var(--f-body);color:var(--ink)}
+.paw .ic{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:#efe4d0;color:var(--muted);font:700 13px var(--f-body)}
+.paw .ic svg{width:16px;height:16px}
+.paw .nm{white-space:nowrap}
+.paw.done{border-color:var(--green)}
+.paw.done .ic{background:var(--green);color:#fff}
+.paw[aria-current="step"]{border-color:var(--orange);box-shadow:0 0 0 3px var(--orange-soft);background:#fff}
+.paw[aria-current="step"] .ic{background:var(--orange);color:#fff}
+.paw:disabled{cursor:not-allowed;opacity:.55}
+@media (max-width:900px){ .paw .nm{display:none} .paw{padding:4px} .path li+li::before{width:8px} }
+
+/* layout */
+.wrap{max-width:1500px;margin:0 auto;padding:16px 20px 60px}
+.band{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:16px;align-items:start}
+.work{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;margin-top:16px;align-items:stretch}
+.work>*{height:min(74vh,720px);min-height:380px}
+@media (max-width:980px){ .work>*{height:62vh} }
+.extra{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;margin-top:16px;align-items:start}
+@media (max-width:980px){ .band,.work,.extra{grid-template-columns:minmax(0,1fr)} }
+.card{background:var(--panel);border:2px solid var(--line-2);border-radius:14px;box-shadow:0 2px 0 rgba(90,60,30,.08)}
+.card-h{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px;border-bottom:2px solid var(--line);font:700 13px var(--f-body);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+
+/* Teri's note */
+.note{display:flex;gap:14px;padding:16px}
+.note .av{flex:none;width:72px;height:72px}
+.note .who{font:700 14px var(--f-body);color:var(--muted)}
+.note .who b{color:var(--ink)}
+.note .ch{font:600 clamp(22px,2.6vw,28px)/1.15 var(--f-display);margin:2px 0 8px}
+.note .msg{position:relative;background:#fff;border:2px solid var(--line);border-radius:4px 14px 14px 14px;padding:12px 14px;font-size:16.5px;line-height:1.55}
+.note .msg p{margin:0 0 8px}.note .msg p:last-child{margin:0}
+.note .msg q{quotes:"„" "”" "‘" "’";font-style:italic}
+.note .msg .quote{display:block;margin:8px 0;padding:8px 12px;background:#fbf4e6;border-left:4px solid var(--orange);border-radius:6px;font-style:italic}
+
+/* to-do list */
+.todo ul{list-style:none;margin:0;padding:10px 12px 12px;display:grid;gap:6px}
+.goal{display:grid;grid-template-columns:28px minmax(0,1fr);gap:4px 10px;align-items:start;padding:8px 10px;border-radius:10px;background:#fff;border:2px solid var(--line)}
+.goal .bx{width:24px;height:24px;border-radius:50%;border:2.5px solid var(--line-2);display:grid;place-items:center;font:700 14px/1 var(--f-body);color:#fff;transition:background .2s,border-color .2s,transform .2s}
+.goal.ok{border-color:#a9d3b6;background:#f3faf5}
+.goal.ok .bx{background:var(--green);border-color:var(--green);transform:scale(1.06)}
+.goal .gt{font-size:15.5px;line-height:1.4;padding-top:1px}
+.goal .gt code{font-size:.88em}
+.goal .tip{grid-column:2;font-size:14px;color:var(--orange-d)}
+.goal.ok .tip{display:none}
+.goal .bonus{display:inline-block;font:700 11px var(--f-body);letter-spacing:.06em;text-transform:uppercase;background:var(--orange-soft);color:var(--orange-d);border-radius:999px;padding:1px 8px;margin-right:6px;vertical-align:1px}
+.todo .count{font:700 13px var(--f-body);color:var(--muted);text-transform:none;letter-spacing:0}
+.win{margin:0 12px 12px;padding:12px 14px;border-radius:12px;background:var(--green);color:#fff;display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;animation:pop .3s ease-out}
+.win .wt{flex:1;min-width:200px}
+.win .wt b{display:block;font:600 20px var(--f-display)}
+.win .wt span{font-size:15px;color:#e1f3e8}
+@keyframes pop{from{transform:scale(.96);opacity:0}to{transform:none;opacity:1}}
+
+.btn{font:700 15px var(--f-body);border:0;border-radius:10px;padding:9px 16px;cursor:pointer;background:var(--ink);color:#fff;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+.btn:hover{background:#000}
+.btn.go{background:var(--orange);color:#fff}
+.btn.go:hover{background:var(--orange-d)}
+.btn.light{background:#fff;color:var(--green-d)}
+.btn.light:hover{background:#eefaf2}
+.btn.ghost{background:transparent;color:var(--ink);border:2px solid var(--line-2);padding:7px 12px}
+.btn.ghost:hover{border-color:var(--ink)}
+.btn:disabled{opacity:.5;cursor:default}
+.mini{font:600 12.5px/1 var(--f-mono);color:var(--code-ink);background:transparent;border:1px solid #3a4a44;border-radius:6px;padding:6px 9px;cursor:pointer}
+.mini:hover{background:rgba(255,255,255,.08)}
+
+/* editor */
+.editor{background:var(--code-bg);border-radius:14px;overflow:hidden;border:2px solid #14201b;display:flex;flex-direction:column}
+.ed-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:7px 8px 7px 0;border-bottom:1px solid #33433c}
+.ed-bar .file{font:600 13px var(--f-mono);color:var(--code-ink);background:#2a3833;border-radius:8px 8px 0 0;padding:7px 12px;margin:-7px 0 -8px;align-self:stretch;display:flex;align-items:center;gap:7px}
+.ed-bar .file::before{content:"";width:10px;height:10px;border-radius:3px;background:var(--orange)}
+.ed-bar .sp{flex:1}
+.edw{position:relative;display:flex;background:var(--code-bg);flex:1;min-height:0;cursor:text}
+.edw .gut{margin:0;flex:none;padding:12px 8px 12px 10px;min-width:44px;text-align:right;font:400 var(--code-size)/1.6 var(--f-mono);color:var(--gut);background:#1a2420;overflow:hidden;user-select:none;border-right:1px solid #2c3a34}
+.edbox{position:relative;flex:1;min-width:0}
+.edw .ov,.edw textarea{position:absolute;inset:0;margin:0;border:0;padding:12px 14px;font:400 var(--code-size)/1.6 var(--f-mono);white-space:pre;tab-size:2;letter-spacing:0;font-variant-ligatures:none}
+.edw .ov{color:var(--code-ink);overflow:hidden;pointer-events:none}
+.edw textarea{width:100%;height:100%;background:transparent;color:transparent;-webkit-text-fill-color:transparent;caret-color:var(--yellow);resize:none;outline:none;overflow:auto}
+.edw textarea:focus{box-shadow:inset 0 0 0 2px rgba(242,210,100,.5)}
+.edw textarea::selection{background:rgba(242,210,100,.35)}
+.ov .tg{color:var(--tg);font-weight:700}.ov .an{color:var(--an)}.ov .av{color:var(--av)}.ov .pu{color:var(--pu)}.ov .cm{color:var(--cm);font-style:italic}.ov .dt{color:var(--en)}.ov .en{color:var(--en)}
+.lint{flex:none;max-height:40%;overflow:auto;border-top:1px solid #33433c;background:#2b2a1d;padding:8px 12px;display:grid;gap:4px}
+.lint p{margin:0;font:14px/1.4 var(--f-body);color:#f6e7a6}
+.lint p::before{content:"⚠ ";}
+.lint code{background:rgba(255,255,255,.1);border-color:transparent;color:#fff}
+
+/* browser */
+.bw{position:relative;border:2px solid var(--ink);border-radius:14px;overflow:hidden;background:#fff;display:flex;flex-direction:column}
+.bw-top{display:flex;align-items:flex-end;gap:10px;background:#dcd3c0;padding:7px 9px 0}
+.bw-top .dots{display:flex;gap:5px;padding-bottom:10px}
+.bw-top .dots i{width:10px;height:10px;border-radius:50%;background:#b3ad99}
+.bw-top .dots i:first-child{background:#e0796b}.bw-top .dots i:nth-child(2){background:#e6c25a}.bw-top .dots i:nth-child(3){background:#7fbf6e}
+.bw-tab{display:flex;align-items:center;gap:7px;background:#fff;border-radius:9px 9px 0 0;padding:7px 14px;font:600 13px var(--f-body);color:var(--ink);max-width:75%;min-width:0}
+.bw-tab .ttl{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bw-tab .fav{flex:none;width:13px;height:13px;border-radius:3px;background:var(--green)}
+.bw-bar{background:#fff;padding:6px 9px;border-bottom:1px solid var(--line)}
+.bw-bar .addr{display:block;background:#f3ede1;border-radius:999px;padding:4px 12px;font:12.5px var(--f-mono);color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bw iframe{display:block;width:100%;border:0;background:#fff;flex:1;min-height:0}
+.bw.flash .bw-tab{animation:flash .9s ease-out}
+@keyframes flash{0%{background:#f8e08e}100%{background:#fff}}
+.bw-note{position:absolute;left:10px;right:10px;bottom:10px;background:var(--ink);color:#fff;font:14px/1.4 var(--f-body);padding:9px 12px;border-radius:9px;opacity:0;transform:translateY(6px);transition:opacity .2s,transform .2s;pointer-events:none}
+.bw-note.on{opacity:1;transform:none}
+
+/* cheat sheet + solution */
+.cheat{padding:12px 14px 14px}
+.cheat p{margin:0 0 8px;font-size:15px;color:var(--muted)}
+pre.code{margin:0;background:var(--code-bg);color:var(--code-ink);border-radius:10px;padding:10px 14px;font:14.5px/1.55 var(--f-mono);white-space:pre-wrap;overflow-wrap:anywhere}
+pre.code .tg{color:var(--tg);font-weight:700}pre.code .an{color:var(--an)}pre.code .av{color:var(--av)}pre.code .pu{color:var(--pu)}pre.code .cm{color:var(--cm);font-style:italic}pre.code .dt{color:var(--en)}pre.code .sl{color:var(--tg);font-weight:700}pre.code .cp{color:var(--an)}pre.code .cv{color:var(--av)}
+.sol{padding:12px 14px 14px;display:grid;gap:10px}
+.sol p{margin:0;font-size:15px;color:var(--muted)}
+.sol pre.code{max-height:340px;overflow:auto;white-space:pre}
+
+/* ending */
+.ending{margin:16px 0;padding:20px;background:var(--green);color:#fff;border-radius:16px;display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:20px;align-items:start;border:0}
+@media (max-width:980px){ .ending{grid-template-columns:minmax(0,1fr)} }
+.ending h2{margin:0 0 6px;font:600 clamp(26px,3.2vw,36px)/1.1 var(--f-display)}
+.ending p{margin:0 0 10px;color:#e1f3e8;font-size:16.5px}
+.ending .stats{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0}
+.ending .stat{background:rgba(255,255,255,.12);border-radius:12px;padding:8px 14px}
+.ending .stat b{display:block;font:600 24px var(--f-display);color:#fff}
+.ending .stat span{font-size:13px;color:#cfe9da}
+.ending .box{background:#fff;color:var(--ink);border-radius:14px;padding:14px;display:grid;gap:10px}
+.ending label{font:700 14px var(--f-body)}
+.ending input{width:100%;font:16px var(--f-body);padding:9px 12px;border:2px solid var(--line-2);border-radius:10px}
+.ending .row{display:flex;flex-wrap:wrap;gap:8px}
+.ending .small{font-size:13.5px;color:var(--muted);margin:0}
+
+/* confetti */
+.confetti{position:fixed;inset:0;pointer-events:none;z-index:50;overflow:hidden}
+.confetti i{position:absolute;top:-20px;width:10px;height:14px;border-radius:2px;animation:fall 1.6s ease-in forwards}
+@keyframes fall{to{transform:translate(var(--dx),110vh) rotate(var(--r));opacity:.9}}
+@media (prefers-reduced-motion:reduce){ .confetti{display:none} .win{animation:none} .goal .bx{transition:none} }
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+footer.end{max-width:1500px;margin:0 auto;padding:0 20px 40px;color:var(--muted);font-size:14px}
+.note .nb{min-width:0;flex:1}
+.kick2{margin:0;font:700 12.5px var(--f-body);letter-spacing:.08em;text-transform:uppercase;color:var(--orange-d)}
+.note .sig{margin:8px 0 0;font:700 17px var(--f-hand);color:var(--green-d)}
+.saved{font:600 12.5px var(--f-body);color:#a8dba0}
+@media (max-width:560px){ .note{flex-direction:column;gap:8px} .note .av{width:56px;height:56px} }
+.cmw{flex:1;min-height:0;position:relative;background:var(--code-bg)}
+.cmw .cm-editor{height:100%}
+.cmw .cm-scroller{overflow:auto}
+
+/* shortcut sheet */
+.editor{position:relative}
+.keys{position:absolute;right:10px;top:46px;z-index:30;width:min(440px,calc(100% - 20px));max-height:calc(100% - 60px);overflow:auto;background:#24312c;color:var(--code-ink);border:1px solid #3a4a44;border-radius:12px;box-shadow:0 14px 30px rgba(0,0,0,.4);padding:10px 14px 12px}
+.keys-h{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px}
+.keys-h b{font:600 16px var(--f-display)}
+.keys dl{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:6px 14px;margin:0;font-size:14px}
+.keys dt{font:600 12.5px/1.6 var(--f-mono);color:var(--yellow);white-space:nowrap}
+.keys dd{margin:0;line-height:1.45;color:#d6e0da}
+.keys code{background:rgba(255,255,255,.08);border-color:transparent;color:#a8dba0}
+.keys-n{margin:10px 0 0;font-size:13px;color:#9fb3aa}
+.mini[aria-pressed="true"],.mini[aria-expanded="true"]{background:#2f7a5a;border-color:#2f7a5a;color:#fff}
+/* focus mode: just the editor and the preview */
+body.focus{overflow:hidden}
+body.focus .work{position:fixed;inset:0;z-index:40;margin:0;padding:10px;gap:10px;background:var(--bg)}
+body.focus .work>*{height:auto;min-height:0}
+@media (max-width:980px){ body.focus .work{grid-template-rows:1fr 1fr} }
+body.focus #digikult-nav{display:none}
+
+.ed-bar{flex-wrap:wrap;row-gap:6px}
+.ed-bar .tools{margin-left:auto;display:flex;flex-wrap:wrap;justify-content:flex-end;gap:5px}
+.ed-bar .mini{padding:6px 8px;font-size:12px}
+.ed-bar .mini.ic{display:inline-grid;place-items:center;padding:4px 7px}
+.ed-bar .mini.ic svg{width:15px;height:15px}
+/* preview: element picking */
+.bw-view{position:relative;min-height:0}
+.bw[data-fixed] .bw-view{flex:1;display:flex;flex-direction:column}
+.bw-bar{display:flex;align-items:center;gap:8px}
+.bw-bar .addr{flex:1;min-width:0}
+.bw-pick{flex:none;display:inline-flex;align-items:center;gap:5px;font:700 12.5px/1 "Atkinson Hyperlegible",system-ui,sans-serif;color:#2b2520;background:#f3ede1;border:1.5px solid #d8ccb4;border-radius:999px;padding:4px 10px 4px 7px;cursor:pointer}
+.bw-pick svg{width:14px;height:14px}
+.bw-pick:hover{border-color:#2b2520}
+.bw-pick[aria-pressed="true"]{background:#e07b2c;border-color:#e07b2c;color:#fff}
+.bw.picking iframe{cursor:crosshair}
+.dk-box{position:absolute;pointer-events:none;border:2px solid #e07b2c;background:rgba(224,123,44,.12);border-radius:3px;z-index:3;transition:left .08s,top .08s,width .08s,height .08s}
+.dk-tag{position:absolute;left:-2px;top:-21px;background:#e07b2c;color:#fff;font:700 11.5px/1 "JetBrains Mono",ui-monospace,monospace;padding:4px 6px;border-radius:4px 4px 4px 0;white-space:nowrap}
+.dk-box.below .dk-tag{top:auto;bottom:-21px;border-radius:0 4px 4px 4px}
+@media (prefers-reduced-motion:reduce){ .dk-box{transition:none} }
+.cm-line.dk-flash,.cm-dk-flash{background:rgba(224,123,44,.28)!important;transition:background .6s}
+
+.sign{--green:#2f5d7a}.sign .kick{color:#cfe3f2}.sign .meta{color:#dde9f3}
+</style>
+</head>
+<body>
+<header class="rail"><div class="in">
+  <a class="home" href="../../index.html">Digital Culture</a>
+  <span class="crumb">Web pages › CSS › Mission</span>
+  <a class="langlink" href="makeover-hu.html" lang="hu">Magyar</a>
+</div></header>
+<section class="sign"><div class="in">
+  <img src="img/logo.svg" alt="">
+  <div class="tt"><div class="kick">Mission · CSS in the head</div><h1>The Paw Shelter Makeover</h1></div>
+  <div class="meta"><span id="progress"></span><span>⏱ about 40 min</span><span>💾 saves automatically</span></div>
+</div></section>
+<nav aria-label="Chapters"><ol class="path" id="path"></ol></nav>
+
+<div class="wrap">
+  <section class="ending" id="ending" hidden aria-labelledby="endH">
+    <div>
+      <h2 id="endH">The makeover is done! 🎉</h2>
+      <p>The page looks good and consistent, and all the CSS is in one place, in the head. Download your work, or open it full size.</p>
+      <div class="stats" id="endStats"></div>
+    </div>
+    <div class="box">
+      <label for="who">Your name (surname first)</label>
+      <input id="who" type="text" autocomplete="name" spellcheck="false">
+      <div class="row">
+        <button type="button" class="btn go" id="dl">Download (.zip)</button>
+        <button type="button" class="btn ghost" id="openFull">Open in a new tab</button>
+        <button type="button" class="btn ghost" id="copyRep">Copy report</button>
+        <button type="button" class="btn ghost" id="toEditor">Carry on in the editor ↗</button>
+      </div>
+      <p class="small">File name: <b id="zipName"></b>. It holds the HTML file (with its CSS) and the <code>img</code> folder with the pictures.</p>
+      <p class="small"><button type="button" class="btn ghost" id="restart">Start again from the beginning</button></p>
+    </div>
+  </section>
+
+  <div class="band">
+    <section class="card" aria-labelledby="chTitle">
+      <div class="note">
+        <div class="av" id="teri"><svg viewBox="0 0 72 72" aria-hidden="true"><circle cx="36" cy="36" r="36" fill="#fde5cc"/>
+<path d="M8 72c2-13 13-20 28-20s26 7 28 20z" fill="#2f7a5a"/><path d="M28 52l8 9 8-9" fill="none" stroke="#225c43" stroke-width="2.5" stroke-linejoin="round"/>
+<path d="M31 47h10v6a5 5 0 0 1-10 0z" fill="#efc29c"/>
+<circle cx="36" cy="12" r="7.5" fill="#a9a29a"/>
+<ellipse cx="36" cy="32" rx="14.5" ry="16.5" fill="#f2c9a6"/>
+<path d="M21 31c-1-12 6-19 15-19s16 7 15 19c-3-7-8-10-15-10s-12 3-15 10z" fill="#bdb6ad"/>
+<circle cx="26" cy="39" r="2.6" fill="#f4a3a3" opacity=".65"/><circle cx="46" cy="39" r="2.6" fill="#f4a3a3" opacity=".65"/>
+<g fill="none" stroke="#5a3b22" stroke-width="1.8"><circle cx="30.5" cy="33" r="4.6"/><circle cx="41.5" cy="33" r="4.6"/><path d="M35 33h2"/></g>
+<circle cx="30.5" cy="33" r="1.5" fill="#2b2520"/><circle cx="41.5" cy="33" r="1.5" fill="#2b2520"/>
+<path d="M31.5 41q4.5 3.6 9 0" stroke="#a0522d" stroke-width="1.9" fill="none" stroke-linecap="round"/>
+<g fill="#fff6e0" transform="translate(48 62) scale(.5)"><ellipse cx="0" cy="3" rx="5" ry="4"/><circle cx="-5" cy="-3" r="2"/><circle cx="-1.8" cy="-6" r="2"/><circle cx="1.8" cy="-6" r="2"/><circle cx="5" cy="-3" r="2"/></g></svg></div>
+        <div class="nb">
+          <p class="kick2" id="chk"></p>
+          <h2 class="ch" id="chTitle"></h2>
+          <div class="msg" id="msg"></div>
+          <p class="sig">– Teri, shelter manager</p>
+        </div>
+      </div>
+    </section>
+    <section class="card todo" aria-labelledby="todoH">
+      <div class="card-h"><span id="todoH">To do</span><span class="count" id="count"></span></div>
+      <ul id="goals"></ul>
+      <div class="win" id="win" hidden><div class="wt" id="winText"></div><button type="button" class="btn light" id="nextBtn"></button></div>
+    </section>
+  </div>
+
+  <div class="work">
+    <section class="editor" aria-label="Code editor">
+      <div class="ed-bar"><span class="file">shelter.html</span><span class="saved" id="savedTag" hidden>Saved ✓</span>
+        <div class="tools">
+          <button type="button" class="mini" id="smaller" title="Smaller code" aria-label="Smaller code">A−</button><button type="button" class="mini" id="bigger" title="Larger code" aria-label="Larger code">A+</button>
+          <button type="button" class="mini ic" id="findBtn" title="Find and replace (Ctrl+F)" aria-label="Find and replace (Ctrl+F)"><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="6.8" cy="6.8" r="4.6" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M10.3 10.3l4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+          <button type="button" class="mini" id="fmtBtn" title="Fix the indentation (Shift+Alt+F)">⇥ Format</button>
+          <button type="button" class="mini" id="keysBtn" aria-expanded="false" aria-controls="keys">⌨ Shortcuts</button>
+          <button type="button" class="mini" id="focusBtn" aria-pressed="false" title="Just the code and the preview (Esc: back)">⛶ Focus</button>
+          <button type="button" class="mini" id="resetCh">↺ Chapter start</button>
+        </div></div>
+      <div class="keys" id="keys" hidden><div class="keys-h"><b>Keyboard shortcuts, as in VS Code</b><button type="button" class="mini" id="keysClose" aria-label="Close">×</button></div>
+        <dl><dt>ul&gt;li*3 + Tab</dt><dd>Emmet: short codes become full HTML. Try <code>p</code>, <code>img</code>, <code>table&gt;tr*3&gt;td*3</code>, <code>!</code></dd><dt>Tab or Enter</dt><dd>accept the suggested tag or attribute</dd><dt>Ctrl + Space</dt><dd>open suggestions</dd><dt>Ctrl + B / Ctrl + I</dt><dd>wrap the selection in &lt;strong&gt; / &lt;em&gt;</dd><dt>Ctrl + /</dt><dd>comment on/off (&lt;!-- --&gt;)</dd><dt>Alt + ↑ / ↓</dt><dd>move the line up / down</dd><dt>Shift + Alt + ↓</dt><dd>duplicate the line</dd><dt>Ctrl + D</dt><dd>select the next match too: type with several cursors at once</dd><dt>Ctrl + click</dt><dd>add another cursor</dd><dt>Ctrl + F</dt><dd>find and replace</dd><dt>Shift + Alt + F</dt><dd>fix the indentation</dd><dt>Ctrl + Shift + [ / ]</dt><dd>fold / unfold an element</dd><dt>Ctrl + Z / Ctrl + Y</dt><dd>undo / redo</dd><dt>mouse over a tag</dt><dd>shows what the tag is for</dd><dt>Alt + click in the preview</dt><dd>jumps to the element in the code (or the 🎯 Pick button)</dd></dl><p class="keys-n">On a Mac use ⌘ (Cmd) instead of Ctrl and ⌥ (Option) instead of Alt.</p></div>
+      <textarea id="code" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" aria-label="The website's HTML code"></textarea>
+      <div class="lint" id="lint" hidden aria-live="polite"></div>
+    </section>
+    <div id="browser" data-fixed="1"></div>
+  </div>
+
+  <div class="extra">
+    <section class="card"><div class="card-h"><span>Cheat sheet</span></div><div class="cheat"><p id="cheatNote"></p><pre class="code" id="cheat"></pre></div></section>
+    <section class="card"><div class="card-h"><span>Stuck?</span></div><div class="sol" id="sol"></div></section>
+  </div>
+</div>
+<footer class="end">Digital Culture · Everything stays in your browser; nothing is sent anywhere.</footer>
+<span class="sr" role="status" id="status"></span>
+<script src="../../vendor/codemirror-html.js?v=6e60cf59"></script>
+<script>
+const CFG = {"editorUrl": "../../html/editor.html", "key": "makeover-en-v1", "words": {"cls": "highlight", "file": "shelter.html", "fileBase": "shelter-css", "allImgs": ["img/morzsa.svg", "img/cirmi.svg", "img/pamacs.svg", "img/bodri.svg", "img/logo.svg"], "lang": "en"}, "start": "<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <title>Paw Shelter – Adoption</title>\n  </head>\n  <body>\n    <!-- Made by: Sample Student -->\n    <h1>Paw Shelter</h1>\n    <p>Dogs, cats and bunnies are looking for a loving home. Adoption day: <strong>Saturday from 10 am</strong>!</p>\n    <h2>About us</h2>\n    <p>The Paw Shelter has looked after abandoned dogs, cats and rabbits since 2009. Right now 34 animals are waiting for a <em>loving owner</em> to take them home.</p>\n    <ol>\n      <li>Meet the animals.</li>\n      <li>Talk to the keepers.</li>\n      <li>Sign the agreement.</li>\n    </ol>\n    <h2>Opening hours</h2>\n    <ul>\n      <li>Monday–Friday: 10–17</li>\n      <li>Saturday: 9–13</li>\n      <li>Sunday: closed</li>\n    </ul>\n    <h2>Our animals</h2>\n    <img src=\"img/morzsa.svg\" alt=\"Morzsa, a brown dog\" width=\"150\">\n    <img src=\"img/cirmi.svg\" alt=\"Cirmi, a ginger cat\" width=\"150\">\n    <img src=\"img/pamacs.svg\" alt=\"Pamacs, a grey bunny\" width=\"150\">\n    <table border=\"1\">\n      <tr><th>Name</th><th>Species</th><th>Age</th></tr>\n      <tr><td>Morzsa</td><td>dog</td><td>3 years</td></tr>\n      <tr><td>Cirmi</td><td>cat</td><td>2 years</td></tr>\n      <tr><td>Pamacs</td><td>rabbit</td><td>1 year</td></tr>\n    </table>\n    <h2>Contact</h2>\n    <p>Write to us: <a href=\"mailto:info@pawshelter.org\">info@pawshelter.org</a></p>\n    <p>How to find us: <a href=\"https://www.openstreetmap.org\" target=\"_blank\">map</a></p>\n  </body>\n</html>\n", "models": ["<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <title>Paw Shelter – Adoption</title>\n    <style>\n      body {\n        background-color: #fff6e0;\n      }\n    </style>\n  </head>\n  <body>\n    <!-- Made by: Sample Student -->\n    <h1>Paw Shelter</h1>\n    <p>Dogs, cats and bunnies are looking for a loving home. Adoption day: <strong>Saturday from 10 am</strong>!</p>\n    <h2>About us</h2>\n    <p>The Paw Shelter has looked after abandoned dogs, cats and rabbits since 2009. Right now 34 animals are waiting for a <em>loving owner</em> to take them home.</p>\n    <ol>\n      <li>Meet the animals.</li>\n      <li>Talk to the keepers.</li>\n      <li>Sign the agreement.</li>\n    </ol>\n    <h2>Opening hours</h2>\n    <ul>\n      <li>Monday–Friday: 10–17</li>\n      <li>Saturday: 9–13</li>\n      <li>Sunday: closed</li>\n    </ul>\n    <h2>Our animals</h2>\n    <img src=\"img/morzsa.svg\" alt=\"Morzsa, a brown dog\" width=\"150\">\n    <img src=\"img/cirmi.svg\" alt=\"Cirmi, a ginger cat\" width=\"150\">\n    <img src=\"img/pamacs.svg\" alt=\"Pamacs, a grey bunny\" width=\"150\">\n    <table border=\"1\">\n      <tr><th>Name</th><th>Species</th><th>Age</th></tr>\n      <tr><td>Morzsa</td><td>dog</td><td>3 years</td></tr>\n      <tr><td>Cirmi</td><td>cat</td><td>2 years</td></tr>\n      <tr><td>Pamacs</td><td>rabbit</td><td>1 year</td></tr>\n    </table>\n    <h2>Contact</h2>\n    <p>Write to us: <a href=\"mailto:info@pawshelter.org\">info@pawshelter.org</a></p>\n    <p>How to find us: <a href=\"https://www.openstreetmap.org\" target=\"_blank\">map</a></p>\n  </body>\n</html>\n", "<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <title>Paw Shelter – Adoption</title>\n    <style>\n      body {\n        background-color: #fff6e0;\n        font-family: Arial, sans-serif;\n        color: #333333;\n        line-height: 1.5;\n      }\n    </style>\n  </head>\n  <body>\n    <!-- Made by: Sample Student -->\n    <h1>Paw Shelter</h1>\n    <p>Dogs, cats and bunnies are looking for a loving home. Adoption day: <strong>Saturday from 10 am</strong>!</p>\n    <h2>About us</h2>\n    <p>The Paw Shelter has looked after abandoned dogs, cats and rabbits since 2009. Right now 34 animals are waiting for a <em>loving owner</em> to take them home.</p>\n    <ol>\n      <li>Meet the animals.</li>\n      <li>Talk to the keepers.</li>\n      <li>Sign the agreement.</li>\n    </ol>\n    <h2>Opening hours</h2>\n    <ul>\n      <li>Monday–Friday: 10–17</li>\n      <li>Saturday: 9–13</li>\n      <li>Sunday: closed</li>\n    </ul>\n    <h2>Our animals</h2>\n    <img src=\"img/morzsa.svg\" alt=\"Morzsa, a brown dog\" width=\"150\">\n    <img src=\"img/cirmi.svg\" alt=\"Cirmi, a ginger cat\" width=\"150\">\n    <img src=\"img/pamacs.svg\" alt=\"Pamacs, a grey bunny\" width=\"150\">\n    <table border=\"1\">\n      <tr><th>Name</th><th>Species</th><th>Age</th></tr>\n      <tr><td>Morzsa</td><td>dog</td><td>3 years</td></tr>\n      <tr><td>Cirmi</td><td>cat</td><td>2 years</td></tr>\n      <tr><td>Pamacs</td><td>rabbit</td><td>1 year</td></tr>\n    </table>\n    <h2>Contact</h2>\n    <p>Write to us: <a href=\"mailto:info@pawshelter.org\">info@pawshelter.org</a></p>\n    <p>How to find us: <a href=\"https://www.openstreetmap.org\" target=\"_blank\">map</a></p>\n  </body>\n</html>\n", "<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <title>Paw Shelter – Adoption</title>\n    <style>\n      body {\n        background-color: #fff6e0;\n        font-family: Arial, sans-serif;\n        color: #333333;\n        line-height: 1.5;\n      }\n\n      h1 {\n        color: #2f7a5a;\n        text-align: center;\n      }\n\n      h2 {\n        color: #e07b2c;\n        border-bottom: 2px solid #e07b2c;\n      }\n    </style>\n  </head>\n  <body>\n    <!-- Made by: Sample Student -->\n    <h1>Paw Shelter</h1>\n    <p>Dogs, cats and bunnies are looking for a loving home. Adoption day: <strong>Saturday from 10 am</strong>!</p>\n    <h2>About us</h2>\n    <p>The Paw Shelter has looked after abandoned dogs, cats and rabbits since 2009. Right now 34 animals are waiting for a <em>loving owner</em> to take them home.</p>\n    <ol>\n      <li>Meet the animals.</li>\n      <li>Talk to the keepers.</li>\n      <li>Sign the agreement.</li>\n    </ol>\n    <h2>Opening hours</h2>\n    <ul>\n      <li>Monday–Friday: 10–17</li>\n      <li>Saturday: 9–13</li>\n      <li>Sunday: closed</li>\n    </ul>\n    <h2>Our animals</h2>\n    <img src=\"img/morzsa.svg\" alt=\"Morzsa, a brown dog\" width=\"150\">\n    <img src=\"img/cirmi.svg\" alt=\"Cirmi, a ginger cat\" width=\"150\">\n    <img src=\"img/pamacs.svg\" alt=\"Pamacs, a grey bunny\" width=\"150\">\n    <table border=\"1\">\n      <tr><th>Name</th><th>Species</th><th>Age</th></tr>\n      <tr><td>Morzsa</td><td>dog</td><td>3 years</td></tr>\n      <tr><td>Cirmi</td><td>cat</td><td>2 years</td></tr>\n      <tr><td>Pamacs</td><td>rabbit</td><td>1 year</td></tr>\n    </table>\n    <h2>Contact</h2>\n    <p>Write to us: <a href=\"mailto:info@pawshelter.org\">info@pawshelter.org</a></p>\n    <p>How to find us: <a href=\"https://www.openstreetmap.org\" target=\"_blank\">map</a></p>\n  </body>\n</html>\n", "<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <title>Paw Shelter – Adoption</title>\n    <style>\n      body {\n        background-color: #fff6e0;\n        font-family: Arial, sans-serif;\n        color: #333333;\n        line-height: 1.5;\n        max-width: 600px;\n        margin: 0 auto;\n        padding: 20px;\n      }\n\n      h1 {\n        color: #2f7a5a;\n        text-align: center;\n      }\n\n      h2 {\n        color: #e07b2c;\n        border-bottom: 2px solid #e07b2c;\n      }\n    </style>\n  </head>\n  <body>\n    <!-- Made by: Sample Student -->\n    <h1>Paw Shelter</h1>\n    <p>Dogs, cats and bunnies are looking for a loving home. Adoption day: <strong>Saturday from 10 am</strong>!</p>\n    <h2>About us</h2>\n    <p>The Paw Shelter has looked after abandoned dogs, cats and rabbits since 2009. Right now 34 animals are waiting for a <em>loving owner</em> to take them home.</p>\n    <ol>\n      <li>Meet the animals.</li>\n      <li>Talk to the keepers.</li>\n      <li>Sign the agreement.</li>\n    </ol>\n    <h2>Opening hours</h2>\n    <ul>\n      <li>Monday–Friday: 10–17</li>\n      <li>Saturday: 9–13</li>\n      <li>Sunday: closed</li>\n    </ul>\n    <h2>Our animals</h2>\n    <img src=\"img/morzsa.svg\" alt=\"Morzsa, a brown dog\" width=\"150\">\n    <img src=\"img/cirmi.svg\" alt=\"Cirmi, a ginger cat\" width=\"150\">\n    <img src=\"img/pamacs.svg\" alt=\"Pamacs, a grey bunny\" width=\"150\">\n    <table border=\"1\">\n      <tr><th>Name</th><th>Species</th><th>Age</th></tr>\n      <tr><td>Morzsa</td><td>dog</td><td>3 years</td></tr>\n      <tr><td>Cirmi</td><td>cat</td><td>2 years</td></tr>\n      <tr><td>Pamacs</td><td>rabbit</td><td>1 year</td></tr>\n    </table>\n    <h2>Contact</h2>\n    <p>Write to us: <a href=\"mailto:info@pawshelter.org\">info@pawshelter.org</a></p>\n    <p>How to find us: <a href=\"https://www.openstreetmap.org\" target=\"_blank\">map</a></p>\n  </body>\n</html>\n", "<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <title>Paw Shelter – Adoption</title>\n    <style>\n      body {\n        background-color: #fff6e0;\n        font-family: Arial, sans-serif;\n        color: #333333;\n        line-height: 1.5;\n        max-width: 600px;\n        margin: 0 auto;\n        padding: 20px;\n      }\n\n      h1 {\n        color: #2f7a5a;\n        text-align: center;\n      }\n\n      h2 {\n        color: #e07b2c;\n        border-bottom: 2px solid #e07b2c;\n      }\n\n      img {\n        border-radius: 50%;\n        border: 4px solid #2f7a5a;\n        box-shadow: 0 4px 10px #c9b89a;\n      }\n    </style>\n  </head>\n  <body>\n    <!-- Made by: Sample Student -->\n    <h1>Paw Shelter</h1>\n    <p>Dogs, cats and bunnies are looking for a loving home. Adoption day: <strong>Saturday from 10 am</strong>!</p>\n    <h2>About us</h2>\n    <p>The Paw Shelter has looked after abandoned dogs, cats and rabbits since 2009. Right now 34 animals are waiting for a <em>loving owner</em> to take them home.</p>\n    <ol>\n      <li>Meet the animals.</li>\n      <li>Talk to the keepers.</li>\n      <li>Sign the agreement.</li>\n    </ol>\n    <h2>Opening hours</h2>\n    <ul>\n      <li>Monday–Friday: 10–17</li>\n      <li>Saturday: 9–13</li>\n      <li>Sunday: closed</li>\n    </ul>\n    <h2>Our animals</h2>\n    <img src=\"img/morzsa.svg\" alt=\"Morzsa, a brown dog\" width=\"150\">\n    <img src=\"img/cirmi.svg\" alt=\"Cirmi, a ginger cat\" width=\"150\">\n    <img src=\"img/pamacs.svg\" alt=\"Pamacs, a grey bunny\" width=\"150\">\n    <table border=\"1\">\n      <tr><th>Name</th><th>Species</th><th>Age</th></tr>\n      <tr><td>Morzsa</td><td>dog</td><td>3 years</td></tr>\n      <tr><td>Cirmi</td><td>cat</td><td>2 years</td></tr>\n      <tr><td>Pamacs</td><td>rabbit</td><td>1 year</td></tr>\n    </table>\n    <h2>Contact</h2>\n    <p>Write to us: <a href=\"mailto:info@pawshelter.org\">info@pawshelter.org</a></p>\n    <p>How to find us: <a href=\"https://www.openstreetmap.org\" target=\"_blank\">map</a></p>\n  </body>\n</html>\n", "<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <title>Paw Shelter – Adoption</title>\n    <style>\n      body {\n        background-color: #fff6e0;\n        font-family: Arial, sans-serif;\n        color: #333333;\n        line-height: 1.5;\n        max-width: 600px;\n        margin: 0 auto;\n        padding: 20px;\n      }\n\n      h1 {\n        color: #2f7a5a;\n        text-align: center;\n      }\n\n      h2 {\n        color: #e07b2c;\n        border-bottom: 2px solid #e07b2c;\n      }\n\n      img {\n        border-radius: 50%;\n        border: 4px solid #2f7a5a;\n        box-shadow: 0 4px 10px #c9b89a;\n      }\n\n      table {\n        border-collapse: collapse;\n      }\n\n      th, td {\n        border: 1px solid #2f7a5a;\n        padding: 8px 12px;\n      }\n\n      th {\n        background-color: #2f7a5a;\n        color: white;\n      }\n\n      tr:nth-child(even) {\n        background-color: #fde5cc;\n      }\n    </style>\n  </head>\n  <body>\n    <!-- Made by: Sample Student -->\n    <h1>Paw Shelter</h1>\n    <p>Dogs, cats and bunnies are looking for a loving home. Adoption day: <strong>Saturday from 10 am</strong>!</p>\n    <h2>About us</h2>\n    <p>The Paw Shelter has looked after abandoned dogs, cats and rabbits since 2009. Right now 34 animals are waiting for a <em>loving owner</em> to take them home.</p>\n    <ol>\n      <li>Meet the animals.</li>\n      <li>Talk to the keepers.</li>\n      <li>Sign the agreement.</li>\n    </ol>\n    <h2>Opening hours</h2>\n    <ul>\n      <li>Monday–Friday: 10–17</li>\n      <li>Saturday: 9–13</li>\n      <li>Sunday: closed</li>\n    </ul>\n    <h2>Our animals</h2>\n    <img src=\"img/morzsa.svg\" alt=\"Morzsa, a brown dog\" width=\"150\">\n    <img src=\"img/cirmi.svg\" alt=\"Cirmi, a ginger cat\" width=\"150\">\n    <img src=\"img/pamacs.svg\" alt=\"Pamacs, a grey bunny\" width=\"150\">\n    <table>\n      <tr><th>Name</th><th>Species</th><th>Age</th></tr>\n      <tr><td>Morzsa</td><td>dog</td><td>3 years</td></tr>\n      <tr><td>Cirmi</td><td>cat</td><td>2 years</td></tr>\n      <tr><td>Pamacs</td><td>rabbit</td><td>1 year</td></tr>\n    </table>\n    <h2>Contact</h2>\n    <p>Write to us: <a href=\"mailto:info@pawshelter.org\">info@pawshelter.org</a></p>\n    <p>How to find us: <a href=\"https://www.openstreetmap.org\" target=\"_blank\">map</a></p>\n  </body>\n</html>\n", "<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <title>Paw Shelter – Adoption</title>\n    <style>\n      body {\n        background-color: #fff6e0;\n        font-family: Arial, sans-serif;\n        color: #333333;\n        line-height: 1.5;\n        max-width: 600px;\n        margin: 0 auto;\n        padding: 20px;\n      }\n\n      h1 {\n        color: #2f7a5a;\n        text-align: center;\n      }\n\n      h2 {\n        color: #e07b2c;\n        border-bottom: 2px solid #e07b2c;\n      }\n\n      img {\n        border-radius: 50%;\n        border: 4px solid #2f7a5a;\n        box-shadow: 0 4px 10px #c9b89a;\n      }\n\n      table {\n        border-collapse: collapse;\n      }\n\n      th, td {\n        border: 1px solid #2f7a5a;\n        padding: 8px 12px;\n      }\n\n      th {\n        background-color: #2f7a5a;\n        color: white;\n      }\n\n      tr:nth-child(even) {\n        background-color: #fde5cc;\n      }\n\n      a {\n        color: #e07b2c;\n        text-decoration: none;\n      }\n\n      a:hover {\n        text-decoration: underline;\n      }\n    </style>\n  </head>\n  <body>\n    <!-- Made by: Sample Student -->\n    <h1>Paw Shelter</h1>\n    <p>Dogs, cats and bunnies are looking for a loving home. Adoption day: <strong>Saturday from 10 am</strong>!</p>\n    <h2>About us</h2>\n    <p>The Paw Shelter has looked after abandoned dogs, cats and rabbits since 2009. Right now 34 animals are waiting for a <em>loving owner</em> to take them home.</p>\n    <ol>\n      <li>Meet the animals.</li>\n      <li>Talk to the keepers.</li>\n      <li>Sign the agreement.</li>\n    </ol>\n    <h2>Opening hours</h2>\n    <ul>\n      <li>Monday–Friday: 10–17</li>\n      <li>Saturday: 9–13</li>\n      <li>Sunday: closed</li>\n    </ul>\n    <h2>Our animals</h2>\n    <img src=\"img/morzsa.svg\" alt=\"Morzsa, a brown dog\" width=\"150\">\n    <img src=\"img/cirmi.svg\" alt=\"Cirmi, a ginger cat\" width=\"150\">\n    <img src=\"img/pamacs.svg\" alt=\"Pamacs, a grey bunny\" width=\"150\">\n    <table>\n      <tr><th>Name</th><th>Species</th><th>Age</th></tr>\n      <tr><td>Morzsa</td><td>dog</td><td>3 years</td></tr>\n      <tr><td>Cirmi</td><td>cat</td><td>2 years</td></tr>\n      <tr><td>Pamacs</td><td>rabbit</td><td>1 year</td></tr>\n    </table>\n    <h2>Contact</h2>\n    <p>Write to us: <a href=\"mailto:info@pawshelter.org\">info@pawshelter.org</a></p>\n    <p>How to find us: <a href=\"https://www.openstreetmap.org\" target=\"_blank\">map</a></p>\n  </body>\n</html>\n", "<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <title>Paw Shelter – Adoption</title>\n    <style>\n      body {\n        background-color: #fff6e0;\n        font-family: Arial, sans-serif;\n        color: #333333;\n        line-height: 1.5;\n        max-width: 600px;\n        margin: 0 auto;\n        padding: 20px;\n      }\n\n      h1 {\n        color: #2f7a5a;\n        text-align: center;\n      }\n\n      h2 {\n        color: #e07b2c;\n        border-bottom: 2px solid #e07b2c;\n      }\n\n      img {\n        border-radius: 50%;\n        border: 4px solid #2f7a5a;\n        box-shadow: 0 4px 10px #c9b89a;\n      }\n\n      table {\n        border-collapse: collapse;\n      }\n\n      th, td {\n        border: 1px solid #2f7a5a;\n        padding: 8px 12px;\n      }\n\n      th {\n        background-color: #2f7a5a;\n        color: white;\n      }\n\n      tr:nth-child(even) {\n        background-color: #fde5cc;\n      }\n\n      a {\n        color: #e07b2c;\n        text-decoration: none;\n      }\n\n      a:hover {\n        text-decoration: underline;\n      }\n\n      .highlight {\n        background-color: #fde5cc;\n        padding: 12px;\n        border-radius: 8px;\n      }\n    </style>\n  </head>\n  <body>\n    <!-- Made by: Sample Student -->\n    <h1>Paw Shelter</h1>\n    <p class=\"highlight\">Dogs, cats and bunnies are looking for a loving home. Adoption day: <strong>Saturday from 10 am</strong>!</p>\n    <h2>About us</h2>\n    <p>The Paw Shelter has looked after abandoned dogs, cats and rabbits since 2009. Right now 34 animals are waiting for a <em>loving owner</em> to take them home.</p>\n    <ol>\n      <li>Meet the animals.</li>\n      <li>Talk to the keepers.</li>\n      <li>Sign the agreement.</li>\n    </ol>\n    <h2>Opening hours</h2>\n    <ul>\n      <li>Monday–Friday: 10–17</li>\n      <li>Saturday: 9–13</li>\n      <li>Sunday: closed</li>\n    </ul>\n    <h2>Our animals</h2>\n    <img src=\"img/morzsa.svg\" alt=\"Morzsa, a brown dog\" width=\"150\">\n    <img src=\"img/cirmi.svg\" alt=\"Cirmi, a ginger cat\" width=\"150\">\n    <img src=\"img/pamacs.svg\" alt=\"Pamacs, a grey bunny\" width=\"150\">\n    <table>\n      <tr><th>Name</th><th>Species</th><th>Age</th></tr>\n      <tr><td>Morzsa</td><td>dog</td><td>3 years</td></tr>\n      <tr><td>Cirmi</td><td>cat</td><td>2 years</td></tr>\n      <tr><td>Pamacs</td><td>rabbit</td><td>1 year</td></tr>\n    </table>\n    <h2>Contact</h2>\n    <p>Write to us: <a href=\"mailto:info@pawshelter.org\">info@pawshelter.org</a></p>\n    <p>How to find us: <a href=\"https://www.openstreetmap.org\" target=\"_blank\">map</a></p>\n  </body>\n</html>\n", "<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"utf-8\">\n    <title>Paw Shelter – Adoption</title>\n    <style>\n      /* Made by: Sample Student */\n      body {\n        background-color: #fff6e0;\n        font-family: Arial, sans-serif;\n        color: #333333;\n        line-height: 1.5;\n        max-width: 600px;\n        margin: 0 auto;\n        padding: 20px;\n      }\n\n      h1 {\n        color: #2f7a5a;\n        text-align: center;\n      }\n\n      h2 {\n        color: #e07b2c;\n        border-bottom: 2px solid #e07b2c;\n      }\n\n      img {\n        border-radius: 50%;\n        border: 4px solid #2f7a5a;\n        box-shadow: 0 4px 10px #c9b89a;\n      }\n\n      table {\n        border-collapse: collapse;\n      }\n\n      th, td {\n        border: 1px solid #2f7a5a;\n        padding: 8px 12px;\n      }\n\n      th {\n        background-color: #2f7a5a;\n        color: white;\n      }\n\n      tr:nth-child(even) {\n        background-color: #fde5cc;\n      }\n\n      a {\n        color: #e07b2c;\n        text-decoration: none;\n      }\n\n      a:hover {\n        text-decoration: underline;\n      }\n\n      .highlight {\n        background-color: #fde5cc;\n        padding: 12px;\n        border-radius: 8px;\n      }\n    </style>\n  </head>\n  <body>\n    <!-- Made by: Sample Student -->\n    <h1>Paw Shelter</h1>\n    <p class=\"highlight\">Dogs, cats and bunnies are looking for a loving home. Adoption day: <strong>Saturday from 10 am</strong>!</p>\n    <h2>About us</h2>\n    <p>The Paw Shelter has looked after abandoned dogs, cats and rabbits since 2009. Right now 34 animals are waiting for a <em>loving owner</em> to take them home.</p>\n    <ol>\n      <li>Meet the animals.</li>\n      <li>Talk to the keepers.</li>\n      <li>Sign the agreement.</li>\n    </ol>\n    <h2>Opening hours</h2>\n    <ul>\n      <li>Monday–Friday: 10–17</li>\n      <li>Saturday: 9–13</li>\n      <li>Sunday: closed</li>\n    </ul>\n    <h2>Our animals</h2>\n    <img src=\"img/morzsa.svg\" alt=\"Morzsa, a brown dog\" width=\"150\">\n    <img src=\"img/cirmi.svg\" alt=\"Cirmi, a ginger cat\" width=\"150\">\n    <img src=\"img/pamacs.svg\" alt=\"Pamacs, a grey bunny\" width=\"150\">\n    <table>\n      <tr><th>Name</th><th>Species</th><th>Age</th></tr>\n      <tr><td>Morzsa</td><td>dog</td><td>3 years</td></tr>\n      <tr><td>Cirmi</td><td>cat</td><td>2 years</td></tr>\n      <tr><td>Pamacs</td><td>rabbit</td><td>1 year</td></tr>\n    </table>\n    <h2>Contact</h2>\n    <p>Write to us: <a href=\"mailto:info@pawshelter.org\">info@pawshelter.org</a></p>\n    <p>How to find us: <a href=\"https://www.openstreetmap.org\" target=\"_blank\">map</a></p>\n  </body>\n</html>\n"], "chapters": [{"short": "Start", "label": "Warm-up", "title": "The <style> element", "msg": "<p>Hi, it's Teri again! The website works and everyone likes it… but it looks like it came from 1995. Pamacs says it's boring. Let's give it a makeover by Saturday!</p><p>The looks come from <b>CSS</b>. This time we write it in the <code>head</code>, in a <code>&lt;style&gt;</code> element. A CSS rule looks like this:</p><span class=\"quote\">selector { property: value; }</span><p>Let's start with the background: make the page cream-coloured, <b>#fff6e0</b>.</p>", "goals": [{"t": "There's a <code>&lt;style&gt;</code> element in the <code>head</code>", "tip": "Write it under the <code>&lt;/title&gt;</code> line: <code>&lt;style&gt;</code> … <code>&lt;/style&gt;</code>"}, {"t": "The <code>body</code> background isn't white (<code>background-color</code>)", "tip": "<code>body { background-color: #fff6e0; }</code>"}], "cheat": "<head>\n  …\n  <style>\n    body {\n      background-color: #fff6e0;\n    }\n  </style>\n</head>", "cheatNote": "The selector (<code>body</code>) says what the rule applies to. The properties go between the curly brackets, each ending with a semicolon. The editor makes suggestions as you type!", "success": "Friendlier already! See? One rule, and the whole page changed."}, {"short": "Fonts", "label": "Chapter 1", "title": "Fonts and colours", "msg": "<p>This Times New Roman looks like an official letter. I'd like a more modern font for the whole page: <b>Arial</b>, or if that's missing, any sans-serif font (<b>sans-serif</b>).</p><p>The text shouldn't be pitch black either, but dark grey: <b>#333333</b>. Put these in the <code>body</code> rule too!</p>", "goals": [{"t": "The <code>body</code> font is set (<code>font-family</code>)", "tip": ""}, {"t": "The text colour isn't black (<code>color</code>)", "tip": ""}, {"t": "More space between lines: <code>line-height: 1.5;</code>", "tip": "", "bonus": true}], "cheat": "body {\n  background-color: #fff6e0;\n  font-family: Arial, sans-serif;\n  color: #333333;\n}", "cheatNote": "One rule can hold several properties. With <code>font-family</code> you can list fallback fonts, separated by commas.", "success": "Much easier to read. Now it's a modern website!"}, {"short": "Headings", "label": "Chapter 2", "title": "Headings", "msg": "<p>The main heading should be the shelter's green, <b>#2f7a5a</b>, and centred. The subheadings should be orange, <b>#e07b2c</b>, so they stand out from the text.</p>", "goals": [{"t": "The <code>h1</code> colour differs from the text colour", "tip": ""}, {"t": "The <code>h1</code> is centred (<code>text-align: center;</code>)", "tip": ""}, {"t": "Every <code>h2</code> has a colour", "tip": ""}, {"t": "A line under the subheadings: <code>border-bottom</code>", "tip": "", "bonus": true}], "cheat": "h1 {\n  color: #2f7a5a;\n  text-align: center;\n}\n\nh2 {\n  color: #e07b2c;\n}", "cheatNote": "The selector is the tag name without angle brackets: <code>h1</code>, not <code>&lt;h1&gt;</code>. The rule applies to every such element.", "success": "Now those are our colours! Morzsa is proud."}, {"short": "Layout", "label": "Chapter 3", "title": "The middle of the page", "msg": "<p>In the office I use a big monitor, and the lines run from one edge of the screen to the other. Let's pull it together: the page should be at most <b>600 pixels</b> wide, sit in the <b>middle</b>, and have a little inner space at its edges, <b>20 pixels</b>.</p>", "goals": [{"t": "The page's largest width is set (<code>max-width</code>)", "tip": ""}, {"t": "The page is centred (<code>margin: 0 auto;</code>)", "tip": "It goes in the body rule."}, {"t": "Inner space at the edges (<code>padding</code>)", "tip": ""}], "cheat": "body {\n  …\n  max-width: 600px;\n  margin: 0 auto;\n  padding: 20px;\n}", "cheatNote": "<code>margin: 0 auto</code>: 0 at the top and bottom, automatic left and right, which centres it. It shows better in ⛶ Focus view!", "success": "Like a newspaper column. Comfortable to read."}, {"short": "Images", "label": "Chapter 4", "title": "Images", "msg": "<p>The animals' pictures are square. Make them <b>round</b>, and give them a <b>4-pixel green border</b>.</p>", "goals": [{"t": "Every image has rounded corners (<code>border-radius</code>)", "tip": "50% makes a round picture."}, {"t": "Every image has a border (<code>border</code>)", "tip": "<code>border: 4px solid #2f7a5a;</code>"}, {"t": "A shadow under the images: <code>box-shadow</code>", "tip": "", "bonus": true}], "cheat": "img {\n  border-radius: 50%;\n  border: 4px solid #2f7a5a;\n}", "cheatNote": "<code>border</code> is three values in one: width, style (<code>solid</code> = unbroken), colour.", "success": "Like a photo album! Cirmi looks very smart."}, {"short": "Table", "label": "Chapter 5", "title": "Table", "msg": "<p>The table's border still comes from the HTML <code>border=\"1\"</code> attribute. The looks are CSS's job, so <b>delete</b> the <code>border</code> from the <code>table</code> tag and add borders with CSS!</p><p>The cell borders should merge, the cells need some room, and the header should be green with white text.</p>", "goals": [{"t": "The <code>table</code> tag has no <code>border</code> attribute any more", "tip": ""}, {"t": "The cells have CSS borders that merge (<code>border-collapse: collapse;</code>)", "tip": "border-collapse goes in the <code>table</code> rule, the border in the <code>th, td</code> rule."}, {"t": "The cells have room inside (<code>padding</code>)", "tip": ""}, {"t": "The header cells (<code>th</code>) have a background colour", "tip": ""}, {"t": "Striped rows: <code>tr:nth-child(even)</code>", "tip": "", "bonus": true}], "cheat": "table {\n  border-collapse: collapse;\n}\n\nth, td {\n  border: 1px solid #2f7a5a;\n  padding: 8px 12px;\n}\n\nth {\n  background-color: #2f7a5a;\n  color: white;\n}", "cheatNote": "<code>th, td</code>: with a comma you can give several selectors one rule.", "success": "Now it's a real table, not a cage. 😄"}, {"short": "Links", "label": "Chapter 6", "title": "Links", "msg": "<p>The links are blue and underlined, which doesn't suit the page. Make them <b>orange</b>, with <b>no underline</b>.</p><p>But when the mouse is over them, the underline should appear. That's what <code>a:hover</code> is for.</p>", "goals": [{"t": "The link colour is set (<code>a</code> rule, <code>color</code>)", "tip": ""}, {"t": "The links aren't underlined (<code>text-decoration: none;</code>)", "tip": ""}, {"t": "There's an <code>a:hover</code> rule", "tip": ""}], "cheat": "a {\n  color: #e07b2c;\n  text-decoration: none;\n}\n\na:hover {\n  text-decoration: underline;\n}", "cheatNote": "<code>:hover</code> is a state: it applies while the mouse is over the element. Move the mouse onto a link in the preview!", "success": "Lovely! The page feels alive."}, {"short": "Class", "label": "Chapter 7", "title": "A class", "msg": "<p>Adoption day is the most important news. The paragraph under the main heading should stand out in a pale orange box, but <b>only that one paragraph</b>!</p><p>That needs a class. Add this to the paragraph's opening tag: <code>class=\"highlight\"</code>. In the CSS you refer to it with a dot: <code>.highlight</code></p>", "goals": [{"t": "An element has the class <code>class=&quot;highlight&quot;</code>", "tip": ""}, {"t": "The <code>.highlight</code> rule gives it a background colour", "tip": ""}, {"t": "Inner space in the box (<code>padding</code>)", "tip": ""}, {"t": "Rounded corners: <code>border-radius</code>", "tip": "", "bonus": true}], "cheat": ".highlight {\n  background-color: #fde5cc;\n  padding: 12px;\n  border-radius: 8px;\n}", "cheatNote": "In the HTML: <code>&lt;p class=\"highlight\"&gt;</code>. In the CSS, the dot means a class: only elements with that class get the style.", "success": "Nobody will miss that! The yard will be packed on Saturday."}, {"short": "Finish", "label": "Chapter 8", "title": "The finishing touches", "msg": "<p>Nearly done! Put your name in a CSS comment at the start of the <code>&lt;style&gt;</code>, so we know who dressed up the page.</p><p>And let's check: if you used a <code>style=\"…\"</code> attribute anywhere, move that CSS into the <code>&lt;style&gt;</code>, so it's all in one place.</p>", "goals": [{"t": "A CSS comment (<code>/* … */</code>) with your name", "tip": "The comment goes inside the <code>&lt;style&gt;</code>."}, {"t": "No <code>style=&quot;…&quot;</code> attribute anywhere", "tip": ""}, {"t": "Every <code>&lt;style&gt;</code> is in the <code>head</code>", "tip": ""}], "cheat": "<style>\n  /* Made by: Anna Kovács */\n  body {\n    …\n  }\n</style>", "cheatNote": "A CSS comment goes between <code>/*</code> and <code>*/</code>. An HTML comment (<code>&lt;!-- --&gt;</code>) doesn't work in CSS!", "success": "Thank you! The new look is beautiful. Morzsa, Cirmi and Pamacs dressed up for Saturday too."}], "ui": {"pick": "Pick", "pickT": "Click an element in the preview to jump to its code. Alt+click always works.", "preview": "Page preview", "localTpl": "This link would open the file {h}, but there's no such file here.", "progress": "{n} / {t} chapters done", "doneWord": "done", "todoWord": "not done yet", "bonus": "bonus", "missing": "Missing: ", "badSrc": "No such image: ", "winTitle": "Done!", "nextCh": "Next chapter ▸", "startWork": "Let's get to work ▸", "toEnd": "Finish ▸", "solvedSay": "Chapter done!", "saved": "Saved.", "solNote": "If you're really stuck, you can look at a model solution. Have a go on your own first, though!", "solWait": "Model solution (in {t})", "solShow": "Show the model solution", "solLoadNote": "This is how the code could look at the end of this chapter. Compare it with yours! If you load it, it replaces the code in the editor.", "solLoad": "Load into the editor", "resetConfirm": "Put the code back the way it was at the start of this chapter?", "restartConfirm": "Start again from the beginning? All your work so far will be deleted from this browser.", "stChapters": "chapters", "stMinutes": "minutes", "stHelped": "model solutions", "noName": "noname", "zipping": "Packing…", "zipped": "Downloaded ✓", "zipFail": "Only the HTML file was downloaded", "copied": "Copied ✓", "repTitle": "The Paw Shelter Makeover – report", "repName": "Name", "repStart": "Started", "repEnd": "Finished", "repDone": "Chapters done", "repHelped": "With model solution", "repMin": "min", "repCode": "--- The page's code ---"}, "pawSvg": "<svg viewBox=\"0 0 20 20\" aria-hidden=\"true\"><g fill=\"currentColor\"><ellipse cx=\"10\" cy=\"13\" rx=\"4.6\" ry=\"3.8\"/><ellipse cx=\"4.6\" cy=\"8.6\" rx=\"1.8\" ry=\"2.3\"/><ellipse cx=\"8\" cy=\"5.2\" rx=\"1.8\" ry=\"2.4\"/><ellipse cx=\"12\" cy=\"5.2\" rx=\"1.8\" ry=\"2.4\"/><ellipse cx=\"15.4\" cy=\"8.6\" rx=\"1.8\" ry=\"2.3\"/></g></svg>", "solutionDelay": 240, "live": true};
+const UI = { preview: CFG.ui.preview };
+/* ---------- shared by the HTML explainer and the HTML mission ---------- */
+const $ = (s, el=document) => el.querySelector(s), $$ = (s, el=document) => [...el.querySelectorAll(s)];
+const esc = s => String(s).replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const VOID = new Set(["area","base","br","col","embed","hr","img","input","link","meta","source","track","wbr"]);
+
+/* ---------- editor texts: suggestions, hover help, search panel, mistake messages ---------- */
+const PAGE_LANG = document.documentElement.lang === "en" ? "en" : "hu";
+const ED_TEXT = {
+  hu: {
+    docs: { html: "az egész oldal", head: "fejrész: adatok az oldalról", body: "törzs: ami az oldalon látszik", title: "a böngésző fülén látszó cím",
+      meta: "adat az oldalról (pl. kódolás)", h1: "főcím, a legfontosabb címsor", h2: "alcím", h3: "harmadszintű címsor", h4: "kisebb címsor", h5: "kisebb címsor", h6: "a legkisebb címsor",
+      p: "bekezdés", br: "sortörés (üres elem)", hr: "vízszintes vonal (üres elem)", strong: "fontos szöveg, félkövér", em: "hangsúlyos szöveg, dőlt",
+      b: "félkövér betű", i: "dőlt betű", u: "aláhúzott szöveg", sub: "alsó index, pl. H₂O", sup: "felső index, pl. m²", ul: "felsorolás pontokkal",
+      ol: "számozott lista", li: "a lista egy eleme", a: "hivatkozás (link)", img: "kép (üres elem)", table: "táblázat", tr: "a táblázat egy sora",
+      th: "fejléccella", td: "cella", div: "doboz, részeket csoportosít", span: "szövegrész, csoportosít", "@href": "hová visz a link", "@src": "a képfájl helye",
+      "@alt": "a kép leírása", "@width": "szélesség képpontban", "@height": "magasság képpontban", "@target": "_blank: új lapon nyílik", "@lang": "az oldal nyelve, pl. hu",
+      "@colspan": "hány oszlopon át ér a cella", "@rowspan": "hány soron át ér a cella", "@border": "keret a cellák körül", "@charset": "karakterkódolás",
+      "@title": "súgó, ha fölé viszed az egeret", "#file": "kép a mappában", "#emmet": "Emmet · Tab",
+      "css:color": "a szöveg színe", "css:background-color": "a háttér színe", "css:background": "háttér (szín, kép) egyszerre", "css:font-family": "a betűtípus, pl. Arial, sans-serif", "css:font-size": "a betűméret, pl. 18px", "css:font-weight": "a betű vastagsága, pl. bold", "css:font-style": "dőlt betű: italic", "css:text-align": "igazítás: left, center, right", "css:text-decoration": "aláhúzás: underline, vagy none: nincs", "css:line-height": "sortávolság, pl. 1.5", "css:letter-spacing": "betűköz", "css:text-transform": "uppercase: csupa nagybetű", "css:margin": "külső margó: távolság a többi elemtől", "css:margin-top": "külső margó fent", "css:margin-bottom": "külső margó lent", "css:margin-left": "külső margó balra", "css:margin-right": "külső margó jobbra", "css:padding": "belső margó: távolság a doboz széle és a tartalom között", "css:padding-top": "belső margó fent", "css:padding-bottom": "belső margó lent", "css:padding-left": "belső margó balra", "css:padding-right": "belső margó jobbra", "css:border": "keret: vastagság, stílus, szín, pl. 2px solid green", "css:border-radius": "lekerekített sarkok, pl. 10px vagy 50%", "css:border-collapse": "collapse: a cellák keretei összeolvadnak", "css:border-bottom": "keret csak alul", "css:width": "szélesség", "css:max-width": "legnagyobb szélesség", "css:height": "magasság", "css:box-shadow": "árnyék a doboz körül, pl. 0 2px 6px gray", "css:display": "megjelenés: block, inline, flex, none", "css:list-style-type": "a lista jele: disc, square, none", "css:opacity": "átlátszatlanság 0 és 1 között", "css:cursor": "az egérmutató alakja, pl. pointer", "css:transform": "elforgatás, nagyítás, pl. scale(1.1)", "css:transition": "áttűnés: a változás ideje, pl. 0.3s", "css:vertical-align": "függőleges igazítás", "css:gap": "rés a rugalmas doboz elemei között" },
+    phrases: { "Find": "Keresés", "Replace": "Csere", "next": "következő", "previous": "előző", "all": "mind", "match case": "kis- és nagybetű",
+      "regexp": "regex", "by word": "egész szó", "replace": "csere", "replace all": "mindet cseréli", "close": "bezárás", "current match": "aktuális találat",
+      "replaced $ matches": "$ találat cserélve", "replaced match on line $": "csere a(z) $. sorban", "on line": "sor", "Go to line": "Ugrás sorra", "go": "ugrás",
+      "Folded lines": "Összecsukott sorok", "Unfolded lines": "Kibontott sorok", "to": "–", "folded code": "összecsukott kód", "unfold": "kibontás",
+      "Fold line": "Összecsukás", "Unfold line": "Kibontás", "Diagnostics": "Figyelmeztetések", "No diagnostics": "Nincs figyelmeztetés" },
+    lint: { lintOpen: "{1}. sor: a címke nincs befejezve, hiányzik a > jel: {0}", lintQuote: "{1}. sor: hiányzik egy idézőjel ebben a címkében: {0}",
+      lintVoidClose: "{1}. sor: {0} üres elem, nincs záró címkéje. Töröld a {c0} címkét.", lintStray: "{1}. sor: {c0} lezár valamit, amit nem nyitottál meg.",
+      lintCross: "{3}. sor: keresztbe zárt címkék. Előbb {c0}, utána {c1} jön.", lintUnclosed: "{1}. sor: {0} nincs lezárva. Valahová kell egy {c0}.",
+      cssProp: "{1}. sor: nincs ilyen CSS-tulajdonság: {p0}. Elírtad?", cssVal: "{2}. sor: a(z) {p0} nem érti ezt az értéket: {p1}",
+      cssNoVal: "{1}. sor: a(z) {p0} után hiányzik az érték.", cssNoColon: "{1}. sor: hiányzik a kettőspont ( : ) a(z) {p0} után.",
+      cssSemi: "{1}. sor: a(z) {p0} sora végéről hiányzik a pontosvessző ( ; ).", cssUnclosed: "{1}. sor: a(z) {p0} szabály nincs lezárva: hiányzik a }}.",
+      cssStray: "{0}. sor: ez a }} nem zár le semmit.", cssNoSel: "{0}. sor: a {{ elől hiányzik a kijelölő (pl. h1 vagy .kiemelt).",
+      cssAngle: "{1}. sor: a CSS-ben a címkét kacsacsőrök nélkül írjuk: {p0}", cssBadSel: "{1}. sor: ezt a kijelölőt a böngésző nem érti: {p0}",
+      cssNoBlock: "{1}. sor: a(z) {p0} után hiányzik a {{ … }} rész.",
+      cssHtmlCm: "{0}. sor: ez HTML-megjegyzés, a CSS-ben nem működik. A CSS-ben így írd: /* … */" }
+  },
+  en: {
+    docs: { html: "the whole page", head: "information about the page", body: "everything visible on the page", title: "the title on the browser tab",
+      meta: "page information (e.g. encoding)", h1: "main heading, the most important", h2: "subheading", h3: "third-level heading", h4: "smaller heading", h5: "smaller heading", h6: "the smallest heading",
+      p: "paragraph", br: "line break (empty element)", hr: "horizontal line (empty element)", strong: "important text, bold", em: "stressed text, italic",
+      b: "bold text", i: "italic text", u: "underlined text", sub: "subscript, e.g. H₂O", sup: "superscript, e.g. m²", ul: "bulleted list",
+      ol: "numbered list", li: "one item of a list", a: "link", img: "image (empty element)", table: "table", tr: "one row of a table",
+      th: "header cell", td: "cell", div: "box that groups parts", span: "piece of text, groups", "@href": "where the link goes", "@src": "where the image file is",
+      "@alt": "description of the image", "@width": "width in pixels", "@height": "height in pixels", "@target": "_blank: opens in a new tab", "@lang": "the page's language, e.g. en",
+      "@colspan": "how many columns the cell spans", "@rowspan": "how many rows the cell spans", "@border": "border round the cells", "@charset": "character encoding",
+      "@title": "tooltip on mouse hover", "#file": "image in the folder", "#emmet": "Emmet · Tab",
+      "css:color": "text colour", "css:background-color": "background colour", "css:background": "background (colour, image) in one go", "css:font-family": "the typeface, e.g. Arial, sans-serif", "css:font-size": "text size, e.g. 18px", "css:font-weight": "how bold, e.g. bold", "css:font-style": "italic text: italic", "css:text-align": "alignment: left, center, right", "css:text-decoration": "underline, or none", "css:line-height": "line spacing, e.g. 1.5", "css:letter-spacing": "space between letters", "css:text-transform": "uppercase: all capitals", "css:margin": "outer space: distance from other elements", "css:margin-top": "outer space at the top", "css:margin-bottom": "outer space at the bottom", "css:margin-left": "outer space on the left", "css:margin-right": "outer space on the right", "css:padding": "inner space: between the box edge and its content", "css:padding-top": "inner space at the top", "css:padding-bottom": "inner space at the bottom", "css:padding-left": "inner space on the left", "css:padding-right": "inner space on the right", "css:border": "border: width, style, colour, e.g. 2px solid green", "css:border-radius": "rounded corners, e.g. 10px or 50%", "css:border-collapse": "collapse: cell borders merge", "css:border-bottom": "border at the bottom only", "css:width": "width", "css:max-width": "largest width", "css:height": "height", "css:box-shadow": "shadow round the box, e.g. 0 2px 6px gray", "css:display": "how it shows: block, inline, flex, none", "css:list-style-type": "the list marker: disc, square, none", "css:opacity": "opacity from 0 to 1", "css:cursor": "mouse pointer shape, e.g. pointer", "css:transform": "rotate, scale, e.g. scale(1.1)", "css:transition": "how long a change takes, e.g. 0.3s", "css:vertical-align": "vertical alignment", "css:gap": "gap between items in a flex box" },
+    phrases: {},
+    lint: { lintOpen: "Line {1}: this tag isn't finished, the > is missing: {0}", lintQuote: "Line {1}: a quote mark is missing in this tag: {0}",
+      lintVoidClose: "Line {1}: {0} is an empty element with no closing tag. Delete the {c0}.", lintStray: "Line {1}: {c0} closes something that was never opened.",
+      lintCross: "Line {3}: tags closed crosswise. First {c0}, then {c1}.", lintUnclosed: "Line {1}: {0} is never closed. Add a {c0} somewhere.",
+      cssProp: "Line {1}: there's no CSS property called {p0}. A typo?", cssVal: "Line {2}: {p0} doesn't understand this value: {p1}",
+      cssNoVal: "Line {1}: the value after {p0} is missing.", cssNoColon: "Line {1}: the colon ( : ) after {p0} is missing.",
+      cssSemi: "Line {1}: the semicolon ( ; ) at the end of the {p0} line is missing.", cssUnclosed: "Line {1}: the {p0} rule isn't closed: the }} is missing.",
+      cssStray: "Line {0}: this }} doesn't close anything.", cssNoSel: "Line {0}: the selector in front of {{ is missing (e.g. h1 or .highlight).",
+      cssAngle: "Line {1}: in CSS, write the tag without angle brackets: {p0}", cssBadSel: "Line {1}: the browser doesn't understand this selector: {p0}",
+      cssNoBlock: "Line {1}: the {{ … }} part after {p0} is missing.",
+      cssHtmlCm: "Line {0}: this is an HTML comment, and it doesn't work in CSS. In CSS, write: /* … */" }
+  }
+};
+const LINT_T = {};
+Object.entries(ED_TEXT[PAGE_LANG].lint).forEach(([k, tpl]) => {
+  LINT_T[k] = (...a) => tpl.replace(/\{\{|\}\}|\{([cp]?)(\d)\}/g, (all, c, i) => {
+    if (all === "{{") return "<code>{</code>"; if (all === "}}") return "<code>}</code>";
+    const v = a[+i];
+    if (typeof v === "number") return String(v);
+    return c === "p" ? `<code>${esc(v)}</code>` : `<code>&lt;${c ? "/" : ""}${esc(v)}&gt;</code>`;
+  });
+});
+const IMG_FILES = ["img/morzsa.svg", "img/cirmi.svg", "img/pamacs.svg", "img/bodri.svg", "img/logo.svg"];
+
+/* HTML syntax colouring: tags, attribute names, values, comments, entities */
+function hlTag(t){
+  const m = /^(<\/?)([a-zA-Z][\w-]*)?([\s\S]*?)(\/?>)?$/.exec(t);
+  if (!m) return esc(t);
+  let attrs = "", rest = m[3] || "", last = 0, a;
+  const re = /([^\s=\/>"']+)(\s*=\s*)?("[^"]*"?|'[^']*'?|[^\s>"']+)?/g;
+  while ((a = re.exec(rest))){
+    attrs += esc(rest.slice(last, a.index)) + `<span class="an">${esc(a[1])}</span>`;
+    if (a[2]) attrs += `<span class="pu">${esc(a[2])}</span>`;
+    if (a[3]) attrs += `<span class="av">${esc(a[3])}</span>`;
+    last = re.lastIndex;
+  }
+  attrs += esc(rest.slice(last));
+  return `<span class="pu">${esc(m[1])}</span><span class="tg">${esc(m[2]||"")}</span>${attrs}<span class="pu">${esc(m[4]||"")}</span>`;
+}
+const TOKEN = /<!--[\s\S]*?(?:-->|$)|<!doctype[^>]*>?|<\/?[a-zA-Z][^<>]*>?|&#?[a-zA-Z0-9]+;/gi;
+function hl(src){
+  let o = "", last = 0, m;
+  TOKEN.lastIndex = 0;
+  while ((m = TOKEN.exec(src))){
+    o += esc(src.slice(last, m.index));
+    const t = m[0];
+    if (t.startsWith("<!--")) o += `<span class="cm">${esc(t)}</span>`;
+    else if (/^<!doctype/i.test(t)) o += `<span class="dt">${esc(t)}</span>`;
+    else if (t[0] === "&") o += `<span class="en">${esc(t)}</span>`;
+    else {
+      o += hlTag(t);
+      if (/^<style[\s>]/i.test(t)){                          /* the stylesheet inside is CSS */
+        const end = src.toLowerCase().indexOf("</style", TOKEN.lastIndex);
+        const stop = end < 0 ? src.length : end;
+        o += hlCss(src.slice(TOKEN.lastIndex, stop));
+        TOKEN.lastIndex = stop;
+      }
+    }
+    last = TOKEN.lastIndex;
+  }
+  return o + esc(src.slice(last));
+}
+
+/* CSS colouring: selectors, properties, values, comments */
+function hlCss(src){
+  let o = "", i = 0, inBlock = 0;
+  const re = /\/\*[\s\S]*?(?:\*\/|$)|[{}]|[^{}/]+|\//g;
+  let m;
+  while ((m = re.exec(src))){
+    const t = m[0];
+    if (t.startsWith("/*")) o += `<span class="cm">${esc(t)}</span>`;
+    else if (t === "{"){ inBlock++; o += `<span class="pu">{</span>`; }
+    else if (t === "}"){ inBlock = Math.max(0, inBlock - 1); o += `<span class="pu">}</span>`; }
+    else if (!inBlock) o += `<span class="sl">${esc(t)}</span>`;
+    else o += esc(t).replace(/([\w-]+)(\s*:)([^;]*)(;?)/g, (a, p, c, v, sc) => `<span class="cp">${p}</span><span class="pu">${c}</span><span class="cv">${v}</span><span class="pu">${sc}</span>`);
+  }
+  return o;
+}
+
+/* A tolerant check for beginners' mistakes: unclosed, stray and crossed tags, with line numbers. */
+/* CSS inside <style>: the browser quietly ignores what it doesn't understand, so we say it out loud */
+function cssLint(src, T = LINT_T){
+  const out = [], re = /<style[^>]*>([\s\S]*?)(?:<\/style\s*>|$)/gi;
+  const lineOf = i => src.slice(0, i).split("\n").length;
+  const ok = (p, v) => { try { return typeof CSS === "undefined" || !CSS.supports || CSS.supports(p, v); } catch(e){ return true; } };
+  const decls = (css, from, body, at) => {
+    let off = from;
+    for (const part of body.split(";")){
+      const decl = part.trim(), pos = off + (part.length - part.trimStart().length);
+      off += part.length + 1;
+      if (!decl) continue;
+      const c = decl.indexOf(":");
+      if (c < 0){ out.push({ line: at(pos), html: T.cssNoColon(decl.split(/\s+/)[0], at(pos)) }); continue; }
+      const prop = decl.slice(0, c).trim().toLowerCase(), val = decl.slice(c + 1).replace(/!important\s*$/i, "").trim();
+      if (prop.startsWith("--")) continue;
+      if (/\n\s*[a-z-]+\s*:/i.test(val) || (/\s[a-z-]+\s*:/i.test(val) && !ok(prop, val))){ out.push({ line: at(pos), html: T.cssSemi(prop, at(pos)) }); continue; }
+      if (!/^[a-z-]+$/.test(prop) || !ok(prop, "inherit")){ out.push({ line: at(pos), html: T.cssProp(prop, at(pos)) }); continue; }
+      if (!val){ out.push({ line: at(pos), html: T.cssNoVal(prop, at(pos)) }); continue; }
+      if (!ok(prop, val)) out.push({ line: at(pos), html: T.cssVal(prop, val.length > 30 ? val.slice(0, 30) + "…" : val, at(pos)) });
+    }
+  };
+  let m;
+  while ((m = re.exec(src))){
+    const base = m.index + m[0].indexOf(">") + 1;
+    const at = k => lineOf(base + k);
+    const css = m[1].replace(/\/\*[\s\S]*?(\*\/|$)/g, c => c.replace(/[^\n]/g, " "))
+      .replace(/<!--|-->/g, (c, k) => { out.push({ line: at(k), html: T.cssHtmlCm(at(k)) }); return "    ".slice(0, c.length); });
+    let k = 0, depth = 0, selStart = 0;
+    while (k < css.length){
+      const ch = css[k];
+      if (ch === "{"){
+        const sel = css.slice(selStart, k).trim(), sp = selStart + (css.slice(selStart, k).length - css.slice(selStart, k).trimStart().length);
+        if (sel.startsWith("@")){ depth++; k++; selStart = k; continue; }
+        if (!sel) out.push({ line: at(k), html: T.cssNoSel(at(k)) });
+        else if (sel.includes("<")) out.push({ line: at(sp), html: T.cssAngle(sel.replace(/[<>\/]/g, "").trim(), at(sp)) });
+        else { try { document.createDocumentFragment().querySelector(sel); } catch(e){ out.push({ line: at(sp), html: T.cssBadSel(sel, at(sp)) }); } }
+        let e = k + 1;
+        while (e < css.length && css[e] !== "}" && css[e] !== "{") e++;
+        const body = css.slice(k + 1, e);
+        if (e >= css.length || css[e] === "{"){
+          out.push({ line: at(k), html: T.cssUnclosed(sel || "?", at(k)) });
+          if (e >= css.length){ decls(css, k + 1, body, at); selStart = css.length; break; }
+          const cut = body.lastIndexOf(";");                       /* the next rule's selector starts after the last ; */
+          decls(css, k + 1, cut < 0 ? "" : body.slice(0, cut), at);
+          selStart = cut < 0 ? k + 1 : k + 1 + cut + 1; k = e; continue;
+        }
+        decls(css, k + 1, body, at);
+        k = e + 1; selStart = k; continue;
+      }
+      if (ch === "}"){
+        if (depth > 0) depth--; else out.push({ line: at(k), html: T.cssStray(at(k)) });
+        k++; selStart = k; continue;
+      }
+      k++;
+    }
+    const tail = css.slice(selStart), tt = tail.trim();
+    if (tt) out.push({ line: at(selStart + tail.indexOf(tt[0])), html: T.cssNoBlock(tt.split(/\s+/)[0], at(selStart + tail.indexOf(tt[0]))) });
+  }
+  return out;
+}
+
+function lint(src, T = LINT_T){
+  const out = [], stack = [];
+  const lineOf = i => src.slice(0, i).split("\n").length;
+  const clean = src.replace(/<!--[\s\S]*?-->/g, c => c.replace(/[^\n]/g, " "))
+                   .replace(/(<style[^>]*>)([\s\S]*?)(?=<\/style|$)/gi, (a, t, c) => t + c.replace(/[^\n]/g, " "));
+  const re = /<(\/?)([a-zA-Z][\w-]*)([^<>]*?)(\/?)>|<(\/?)([a-zA-Z][\w-]*)[^<>]*$/g;
+  const skip = new Set(["html","head","body"]);              /* optional end tags: a forgotten </body> is no drama */
+  const lateClose = {};                                        /* closing tags we already explained (crossed pairs) */
+  let m;
+  while ((m = re.exec(clean))){
+    if (m[6] !== undefined && m[2] === undefined){ out.push({ line: lineOf(m.index), html: T.lintOpen(m[6].toLowerCase(), lineOf(m.index)) }); continue; }
+    const close = !!m[1], name = m[2].toLowerCase(), line = lineOf(m.index), attrs = m[3] || "";
+    if ((attrs.split('"').length - 1) % 2) out.push({ line, html: T.lintQuote(name, line) });
+    if (VOID.has(name)){ if (close) out.push({ line, html: T.lintVoidClose(name, line) }); continue; }
+    if (!close){ stack.push({ name, line }); continue; }
+    const at = stack.map(s => s.name).lastIndexOf(name);
+    if (at < 0){
+      if (lateClose[name]) lateClose[name]--; else out.push({ line, html: T.lintStray(name, line) });
+      continue;
+    }
+    const rest = clean.slice(re.lastIndex).toLowerCase();
+    stack.slice(at + 1).reverse().forEach(inner => {
+      if (skip.has(inner.name)) return;
+      const crossed = new RegExp("^\\s*</" + inner.name + "\\s*>").test(rest);
+      if (crossed){ out.push({ line, html: T.lintCross(inner.name, name, inner.line, line) }); lateClose[inner.name] = (lateClose[inner.name] || 0) + 1; }
+      else out.push({ line: inner.line, html: T.lintUnclosed(inner.name, inner.line) });
+    });
+    stack.length = at;
+  }
+  stack.forEach(s => { if (!skip.has(s.name)) out.push({ line: s.line, html: T.lintUnclosed(s.name, s.line) }); });
+  out.push(...cssLint(src, T));
+  out.sort((a, b) => a.line - b.line);
+  const seen = new Set();
+  return out.filter(w => !seen.has(w.html) && seen.add(w.html)).slice(0, 6);
+}
+
+/* Highlighted editor: a coloured copy underneath, a see-through textarea on top, line numbers on the left. */
+function makeEditor(ta, opts={}){
+  if (window.CMHTML){                                     /* CodeMirror: VS Code-style comforts */
+    const w = document.createElement("div"); w.className = "cmw" + (opts.fixed ? " fixed" : ""); ta.before(w); ta.hidden = true;
+    let quiet = false;
+    const T = ED_TEXT[PAGE_LANG];
+    const cm = CMHTML.create({ parent: w, doc: ta.value, lines: !!opts.lines, fit: true, label: ta.getAttribute("aria-label") || "",
+      lang: PAGE_LANG, docs: T.docs, phrases: T.phrases, files: opts.files || IMG_FILES, fold: !!opts.fold,
+      lint: opts.lint === false ? null : (src => lint(src)),
+      onCursor: opts.onCursor || null,
+      onChange: v => { if (quiet) return; ta.value = v; ta.dispatchEvent(new Event("input")); } });
+    w.addEventListener("mousedown", e => { if (e.target === w){ e.preventDefault(); cm.focus(); } });
+    return { refit: () => { quiet = true; cm.set(ta.value); quiet = false; cm.view.requestMeasure(); }, cm, el: w };
+  }
+  const w = document.createElement("div"); w.className = "edw" + (opts.lines ? " numbered" : ""); ta.before(w);
+  const gut = document.createElement("pre"); gut.className = "gut"; gut.setAttribute("aria-hidden", "true");
+  const ov = document.createElement("pre"); ov.className = "ov"; ov.setAttribute("aria-hidden", "true");
+  if (opts.lines) w.append(gut);
+  const box = document.createElement("div"); box.className = "edbox"; box.append(ov, ta); w.append(box);
+  const paint = () => {
+    ov.innerHTML = hl(ta.value) + "\n";
+    if (opts.lines){ const n = ta.value.split("\n").length; gut.textContent = Array.from({length:n}, (_, i) => i + 1).join("\n") + "\n"; }
+  };
+  const fit = () => {
+    if (opts.fixed){ paint(); ov.scrollTop = ta.scrollTop; gut.scrollTop = ta.scrollTop; return; }
+    ta.style.height = "auto"; ta.style.height = (ta.scrollHeight + 2) + "px"; paint();
+  };
+  ta.addEventListener("scroll", () => { ov.scrollTop = ta.scrollTop; ov.scrollLeft = ta.scrollLeft; gut.scrollTop = ta.scrollTop; });
+  ta.addEventListener("input", fit);
+  w.addEventListener("mousedown", e => { if (e.target === w || e.target === box || e.target === gut){ e.preventDefault(); ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length); } });
+  ta.addEventListener("keydown", e => {
+    if (e.key === "Tab" && !e.shiftKey && !e.ctrlKey && !e.metaKey && !e.altKey){
+      e.preventDefault();
+      const s = ta.selectionStart;
+      ta.setRangeText("  ", s, ta.selectionEnd, "end");
+      ta.dispatchEvent(new Event("input"));
+    }
+    if (e.key === "Enter" && !e.shiftKey && !e.ctrlKey && !e.metaKey){       /* keep the indentation of the line above */
+      const s = ta.selectionStart, ls = ta.value.lastIndexOf("\n", s - 1) + 1, ind = /^[ \t]*/.exec(ta.value.slice(ls, s))[0];
+      if (ind){ e.preventDefault(); ta.setRangeText("\n" + ind, s, ta.selectionEnd, "end"); ta.dispatchEvent(new Event("input")); }
+    }
+  });
+  fit();
+  return { refit: fit };
+}
+
+/* A small browser window: the tab shows the page's <title>, the address bar its file name. */
+/* Mark every element with where it sits in the code: data-dk="start,endOfOpeningTag,end".
+   The preview gets these attributes; downloads and "open in a new tab" use the clean code. */
+function instrument(src){
+  const out = [], stack = [], marks = [];
+  const re = /<!--[\s\S]*?(?:-->|$)|<!doctype[^>]*>|<(\/?)([a-zA-Z][\w-]*)((?:[^>"']|"[^"]*"|'[^']*')*)>/gi;
+  let m;
+  while ((m = re.exec(src))){
+    if (m[2] === undefined) continue;
+    const name = m[2].toLowerCase(), at = m.index, endOpen = re.lastIndex;
+    if (m[1]){                                              /* closing tag */
+      const k = stack.map(e => e.name).lastIndexOf(name);
+      if (k >= 0){ for (let j = stack.length - 1; j >= k; j--) stack[j].mark.end = j === k ? endOpen : at; stack.length = k; }
+      continue;
+    }
+    const mark = { pos: at + 1 + m[2].length, start: at, open: endOpen, end: endOpen };
+    marks.push(mark);
+    if (!VOID.has(name) && !/\/\s*$/.test(m[3])) stack.push({ name, mark });
+    if (name === "script" || name === "style"){              /* skip their contents */
+      const close = new RegExp("</" + name + "\\s*>", "i"); close.lastIndex = 0;
+      const rest = src.slice(endOpen), c = close.exec(rest);
+      if (c){ re.lastIndex = endOpen + c.index; }
+    }
+  }
+  stack.forEach(e => e.mark.end = src.length);
+  let last = 0;
+  for (const mk of marks){ out.push(src.slice(last, mk.pos), ` data-dk="${mk.start},${mk.open},${mk.end}"`); last = mk.pos; }
+  out.push(src.slice(last));
+  return out.join("");
+}
+
+/* A small browser window: the tab shows the page's <title>, the address bar its file name.
+   With opts.pick, a target button turns on "pick" mode: hover shows the element, click jumps to its code. */
+function makeBrowser(host, file, T, opts = {}){
+  host.classList.add("bw");
+  const pickBtn = opts.pick ? `<button type="button" class="bw-pick" aria-pressed="false" title="${esc(opts.pick.title)}"><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="5.2" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="8" cy="8" r="1.8" fill="currentColor"/><path d="M8 0.8v3M8 12.2v3M0.8 8h3M12.2 8h3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><span>${esc(opts.pick.label)}</span></button>` : "";
+  host.innerHTML = `<div class="bw-top"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
+    <span class="bw-tab"><span class="fav" aria-hidden="true"></span><span class="ttl"></span></span></div>
+    <div class="bw-bar"><span class="addr"><span aria-hidden="true">📄</span> ${esc(file)}</span>${pickBtn}</div>
+    <div class="bw-view"><iframe title="${esc(T.preview)}" sandbox="allow-same-origin allow-popups allow-popups-to-escape-sandbox"></iframe>
+    <div class="dk-box" hidden><span class="dk-tag"></span></div></div>`;
+  const fr = $("iframe", host), ttl = $(".ttl", host), box = $(".dk-box", host), boxTag = $(".dk-tag", host);
+  const nt = document.createElement("div"); nt.className = "bw-note"; nt.setAttribute("role", "status"); host.append(nt);
+  let ntTimer = 0;
+  const note = msg => { nt.textContent = msg; nt.classList.add("on"); clearTimeout(ntTimer); ntTimer = setTimeout(() => nt.classList.remove("on"), 3200); };
+  let timer = 0, pendingScroll = 0, picking = false, boxTimer = 0;
+  const size = () => {
+    if (host.dataset.fixed) return;
+    try {
+      const d = fr.contentDocument; if (!d || !d.documentElement) return;
+      const h = Math.max(d.documentElement.scrollHeight, d.body ? d.body.scrollHeight : 0);
+      fr.style.height = Math.min(host.dataset.max ? +host.dataset.max : 560, Math.max(+host.dataset.min || 110, h + 4)) + "px";
+    } catch(e){}
+  };
+  /* the highlight box lives outside the page, so the student's page is never changed */
+  const showBox = (el, stay) => {
+    if (!el || !el.getBoundingClientRect){ box.hidden = true; return; }
+    const r = el.getBoundingClientRect();
+    if (!r.width && !r.height){ box.hidden = true; return; }
+    box.hidden = false;
+    Object.assign(box.style, { left: r.left + "px", top: r.top + "px", width: r.width + "px", height: r.height + "px" });
+    boxTag.textContent = "<" + el.tagName.toLowerCase() + ">";
+    box.classList.toggle("below", r.top < 22);
+    clearTimeout(boxTimer);
+    if (stay) boxTimer = setTimeout(() => { if (!picking) box.hidden = true; }, stay);
+  };
+  const markOf = el => { const e = el && el.closest && el.closest("[data-dk]"); if (!e) return null; const [a, b, c] = e.dataset.dk.split(",").map(Number); return { el: e, start: a, open: b, end: c }; };
+  const setPick = on => {
+    picking = on; host.classList.toggle("picking", on);
+    const b = $(".bw-pick", host); if (b) b.setAttribute("aria-pressed", String(on));
+    if (!on) box.hidden = true;
+  };
+  if (opts.pick) $(".bw-pick", host).onclick = () => setPick(!picking);
+  fr.addEventListener("load", () => {
+    try {
+      const d = fr.contentDocument;
+      d.documentElement.scrollTop = pendingScroll;
+      d.addEventListener("click", e => {
+        if (opts.pick && (picking || e.altKey)){                  /* jump to the code */
+          const mk = markOf(e.target);
+          if (mk){ e.preventDefault(); e.stopPropagation(); showBox(mk.el, 1600); opts.pick.onPick(mk.start, mk.open, mk.end); }
+          return;
+        }
+        const a = e.target.closest && e.target.closest("a[href]"); if (!a) return;   /* links open in a new tab; #anchors scroll inside */
+        e.preventDefault();
+        const h = a.getAttribute("href") || "";
+        if (h.startsWith("#")){ const t = d.getElementById(h.slice(1)); if (t) t.scrollIntoView({ behavior:"smooth" }); return; }
+        if (/^(https?:|mailto:|tel:)/i.test(h)) window.open(a.href, "_blank", "noopener");
+        else if (!(T.localLink && T.localLink(h))) note(T.localNote(h));
+      }, true);
+      if (opts.pick){
+        d.addEventListener("mousemove", e => { if (picking || e.altKey) showBox(markOf(e.target) && markOf(e.target).el); else if (!boxTimer) box.hidden = true; });
+        d.addEventListener("mouseleave", () => { if (picking) box.hidden = true; });
+        d.addEventListener("scroll", () => { box.hidden = true; }, true);
+        d.addEventListener("keydown", e => { if (e.key === "Escape") setPick(false); });
+      }
+      $$("img", d).forEach(im => im.addEventListener("load", size));
+    } catch(e){}
+    size();
+    if (opts.onLoad) try { opts.onLoad(fr.contentDocument); } catch(e){}
+  });
+  const show = src => {
+    const t = /<title[^>]*>([\s\S]*?)<\/title>/i.exec(src);
+    ttl.textContent = t && t[1].trim() ? t[1].replace(/\s+/g, " ").trim() : file;
+    try { pendingScroll = fr.contentDocument ? fr.contentDocument.documentElement.scrollTop : 0; } catch(e){ pendingScroll = 0; }
+    box.hidden = true;
+    fr.srcdoc = src;
+  };
+  /* the other way round: the element that contains a position in the code */
+  const highlightAt = pos => {
+    if (!picking) return;
+    try {
+      let best = null, size = Infinity;
+      for (const el of fr.contentDocument.querySelectorAll("[data-dk]")){
+        const [a, , c] = el.dataset.dk.split(",").map(Number);
+        if (a <= pos && pos <= c && c - a < size){ best = el; size = c - a; }
+      }
+      if (best && best.tagName !== "HTML" && best.tagName !== "BODY" && best.tagName !== "HEAD"){
+        if (best.scrollIntoView) best.scrollIntoView({ block: "nearest" });
+        showBox(best);
+      } else box.hidden = true;
+    } catch(e){}
+  };
+  return {
+    show: (src, now) => { clearTimeout(timer); if (now) show(src); else timer = setTimeout(() => show(src), 160); },
+    frame: fr, resize: size, note, highlightAt, setPick, get picking(){ return picking; }
+  };
+}
+
+/* ---------- the mission ---------- */
+const W = CFG.words, CH = CFG.chapters, NCH = CH.length - 1;      /* chapter 0 is the warm-up */
+const KEY = CFG.key;
+UI.localNote = h => CFG.ui.localTpl.replace("{h}", h);
+
+let state = { solved: [], current: 0, start: Date.now(), end: null, code: CFG.start, chStart: {}, chOpen: {}, helped: [], doneAt: {}, name: "" };
+try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && Array.isArray(s.solved) && typeof s.code === "string") state = Object.assign(state, s); } catch(e){}
+if (!(state.current >= 0 && state.current < CH.length)) state.current = 0;
+let saveTimer = 0;
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(state)); } catch(e){} }
+const saveSoon = () => { clearTimeout(saveTimer); saveTimer = setTimeout(save, 400); };
+
+/* ---------- reading the student's page ---------- */
+const norm = s => String(s || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[–—]/g, "-").replace(/\s+/g, " ").trim().replace(/[.!?:]+$/, "");
+const parse = src => new DOMParser().parseFromString(src, "text/html");
+const h2named = (d, name) => [...d.querySelectorAll("h2")].find(h => norm(h.textContent) === norm(name));
+function section(d, name){
+  const h = h2named(d, name); if (!h) return null;
+  const out = []; let n = h.nextElementSibling;
+  while (n && !/^H[12]$/.test(n.tagName)){ out.push(n); n = n.nextElementSibling; }
+  return out;
+}
+function afterH1(d){
+  const h = d.querySelector("h1"); if (!h) return [];
+  const out = []; let n = h.nextElementSibling;
+  while (n && !/^H[12]$/.test(n.tagName)){ out.push(n); n = n.nextElementSibling; }
+  return out;
+}
+const within = (sec, sel) => sec ? sec.flatMap(e => [...(e.matches(sel) ? [e] : []), ...e.querySelectorAll(sel)]) : [];
+const sentences = t => (String(t).match(/[.!?…](\s|$)/g) || []).length;
+const before = (a, b) => !!(a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING);
+function comments(d){
+  const out = [], tw = d.createTreeWalker(d, NodeFilter.SHOW_COMMENT); let n;
+  while ((n = tw.nextNode())) out.push(n.nodeValue.trim());
+  return out;
+}
+const nameComment = d => comments(d).find(c => /\p{L}{3,}/u.test(c)) || "";
+const cellCount = r => [...r.children].filter(c => /^T[DH]$/.test(c.tagName)).reduce((s, c) => s + (parseInt(c.getAttribute("colspan"), 10) || 1), 0);
+
+/* Each check returns one entry per goal: true/false, or [ok, extra tip text]. */
+/* The makeover checks read the rendered preview: the styles the browser really applied,
+   and the rules written in the page's <style> elements. */
+const CS = el => el.ownerDocument.defaultView.getComputedStyle(el);
+function rulesOf(d){
+  const out = [];
+  const walk = list => { for (const r of list){ if (r.selectorText !== undefined) out.push(r); else if (r.cssRules) walk(r.cssRules); } };
+  for (const sh of d.styleSheets){ try { walk(sh.cssRules); } catch(e){} }
+  return out;
+}
+/* the value a stylesheet rule gives this element (inline style="" does not count) */
+function declared(el, prop){
+  if (!el) return "";
+  let v = "";
+  for (const r of rulesOf(el.ownerDocument)){
+    let hit = false;
+    try { hit = el.matches(r.selectorText); } catch(e){}
+    if (hit){ const x = r.style.getPropertyValue(prop); if (x) v = x; }
+  }
+  return v;
+}
+const anyRule = (d, re) => rulesOf(d).some(r => re.test(r.selectorText));
+const px = v => parseFloat(v) || 0;
+const plainBg = c => /^rgba\(0, 0, 0, 0\)$|^transparent$|^rgb\(255, 255, 255\)$/.test(c);
+const every = (list, f) => list.length > 0 && [...list].every(f);
+const styleText = d => [...d.querySelectorAll("style")].map(s => s.textContent).join("\n");
+
+const CHECKS = [
+  d => {
+    const b = d.body, h = d.documentElement;
+    const set = declared(b, "background-color") || declared(h, "background-color");
+    return [!!d.head && !!d.head.querySelector("style"), !!set && (!plainBg(CS(b).backgroundColor) || !plainBg(CS(h).backgroundColor))];
+  },
+  d => {
+    const b = d.body;
+    return [!!(declared(b, "font-family") || declared(d.documentElement, "font-family")),
+            !!declared(b, "color") && CS(b).color !== "rgb(0, 0, 0)",
+            !!declared(b, "line-height")];
+  },
+  d => {
+    const h1 = d.querySelector("h1"), h2s = d.querySelectorAll("h2");
+    return [!!h1 && !!declared(h1, "color") && CS(h1).color !== CS(d.body).color,
+            !!h1 && CS(h1).textAlign === "center",
+            every(h2s, h => !!declared(h, "color")),
+            every(h2s, h => CS(h).borderBottomStyle !== "none" && px(CS(h).borderBottomWidth) > 0)];
+  },
+  d => {
+    const b = d.body;
+    return [!!(declared(b, "max-width") || declared(b, "width")),
+            declared(b, "margin-left") === "auto" && declared(b, "margin-right") === "auto",
+            px(CS(b).paddingLeft) > 0 && px(CS(b).paddingTop) > 0];
+  },
+  d => {
+    const imgs = d.querySelectorAll("img");
+    return [every(imgs, i => px(CS(i).borderTopLeftRadius) > 0),
+            every(imgs, i => CS(i).borderTopStyle !== "none" && px(CS(i).borderTopWidth) > 0 && !!declared(i, "border-top-style")),
+            every(imgs, i => CS(i).boxShadow !== "none")];
+  },
+  d => {
+    const t = d.querySelector("table"), cells = d.querySelectorAll("th, td"), ths = d.querySelectorAll("th");
+    const css = c => { const v = declared(c, "border-top-style"); return !!v && v !== "none"; };
+    return [!!t && !t.hasAttribute("border"),
+            !!t && CS(t).borderCollapse === "collapse" && every(cells, css),
+            every(cells, c => px(CS(c).paddingLeft) >= 4 && px(CS(c).paddingTop) >= 2),
+            every(ths, c => !!declared(c, "background-color")),
+            anyRule(d, /nth-(child|of-type)/)];
+  },
+  d => {
+    const as = d.querySelectorAll("a");
+    return [every(as, a => !!declared(a, "color")),
+            every(as, a => CS(a).textDecorationLine === "none"),
+            anyRule(d, /(^|[\s,>+~(])a:hover/)];
+  },
+  d => {
+    const k = d.querySelector("." + W.cls), cls = new RegExp("\\." + W.cls + "(?![\\w-])");
+    return [!!k,
+            !!k && anyRule(d, cls) && !!declared(k, "background-color"),
+            !!k && px(CS(k).paddingTop) > 0 && px(CS(k).paddingLeft) > 0,
+            !!k && px(CS(k).borderTopLeftRadius) > 0];
+  },
+  d => {
+    const styles = [...d.querySelectorAll("style")];
+    return [/\/\*[\s\S]*?\p{L}{3,}[\s\S]*?\*\//u.test(styleText(d)),
+            !d.documentElement.querySelector("[style]") && !d.documentElement.hasAttribute("style"),
+            styles.length > 0 && styles.every(s => !!s.closest("head"))];
+  }
+];
+
+
+
+/* ---------- page parts ---------- */
+const ed = $("#code"), editor = makeEditor(ed, { lines: true, fixed: true, fold: true, files: W.allImgs,
+  onCursor: () => { try { if (browser.picking) browser.highlightAt(editor.cm.view.state.selection.main.head); } catch(e){} } });
+const browser = makeBrowser($("#browser"), W.file, UI, { onLoad: () => { if (CFG.live) evaluate(); }, pick: { label: CFG.ui.pick, title: CFG.ui.pickT, onPick: (start, open) => {
+  if (editor.cm){ const v = editor.cm.view; v.dispatch({ selection: { anchor: open, head: start }, scrollIntoView: true }); v.focus(); }
+  else { ed.focus(); ed.setSelectionRange(start, open); }
+} } });
+const TERI = $("#teri").innerHTML;
+
+const unlocked = i => i === 0 || state.solved.includes(i - 1);
+const solvedN = () => state.solved.filter(i => i > 0).length;
+
+function drawPath(){
+  $("#path").innerHTML = CH.map((c, i) => {
+    const done = state.solved.includes(i), cur = i === state.current, ok = unlocked(i);
+    const ic = done ? "✓" : (i === 0 ? CFG.pawSvg : String(i));
+    return `<li><button type="button" class="paw${done ? " done" : ""}" data-i="${i}"${cur ? ' aria-current="step"' : ""}${ok ? "" : " disabled"}
+      aria-label="${esc(c.label)}${done ? " – " + esc(CFG.ui.doneWord) : ""}"><span class="ic">${ic}</span><span class="nm">${esc(c.short)}</span></button></li>`;
+  }).join("");
+  $("#progress").innerHTML = CFG.ui.progress.replace("{n}", `<b>${solvedN()}</b>`).replace("{t}", NCH);
+}
+
+function drawChapter(){
+  const i = state.current, c = CH[i];
+  $("#chk").textContent = c.label;
+  $("#chTitle").textContent = c.title;
+  $("#msg").innerHTML = c.msg;
+  $("#cheatNote").innerHTML = c.cheatNote;
+  $("#cheat").innerHTML = /^\s*</.test(c.cheat) ? hl(c.cheat) : hlCss(c.cheat);
+  drawSolution();
+}
+
+let lastResults = null;
+function evaluate(){
+  const src = ed.value, d = CFG.live ? browser.frame.contentDocument : parse(src), i = state.current, c = CH[i];
+  if (!d || !d.body) return;
+  const res = CHECKS[i](d, src).map(r => Array.isArray(r) ? r : [r, ""]);
+  const req = c.goals.map((g, k) => g.bonus ? true : !!res[k][0]);
+  const okN = c.goals.filter((g, k) => !g.bonus && res[k][0]).length, need = c.goals.filter(g => !g.bonus).length;
+  $("#goals").innerHTML = c.goals.map((g, k) => {
+    const ok = !!res[k][0], tip = [g.tip, res[k][1]].filter(Boolean).join(" ");
+    return `<li class="goal${ok ? " ok" : ""}"><span class="bx" aria-hidden="true">${ok ? "✓" : ""}</span>
+      <span class="gt">${g.bonus ? `<span class="bonus">${esc(CFG.ui.bonus)}</span>` : ""}${g.t}<span class="sr"> – ${ok ? esc(CFG.ui.doneWord) : esc(CFG.ui.todoWord)}</span></span>
+      ${tip && !ok ? `<span class="tip">${tip}</span>` : ""}</li>`;
+  }).join("");
+  $("#count").textContent = `${okN} / ${need}`;
+  if (req.every(Boolean) && !state.solved.includes(i)) solve(i);
+  drawWin();
+  drawLint();
+  lastResults = res;
+}
+function drawLint(){
+  const warn = lint(ed.value);
+  $("#lint").hidden = !warn.length;
+  $("#lint").innerHTML = warn.map(w => `<p>${w.html}</p>`).join("");
+}
+
+function solve(i){
+  state.solved.push(i);
+  state.doneAt[i] = Date.now();
+  if (state.solved.filter(k => k > 0).length === NCH && !state.end) state.end = Date.now();
+  save(); drawPath(); confetti();
+  $("#status").textContent = CFG.ui.solvedSay;
+  if (state.end && i === NCH) drawEnding();
+}
+
+function drawWin(){
+  const i = state.current, w = $("#win");
+  if (!state.solved.includes(i)){ w.hidden = true; return; }
+  w.hidden = false;
+  const last = i === NCH;
+  $("#winText").innerHTML = `<b>${esc(CFG.ui.winTitle)}</b><span>${CH[i].success}</span>`;
+  const nb = $("#nextBtn");
+  nb.hidden = last && !state.end;
+  nb.textContent = last ? CFG.ui.toEnd : (i === 0 ? CFG.ui.startWork : CFG.ui.nextCh);
+}
+
+/* ---------- the model solution, after a few minutes ---------- */
+let solTimer = 0;
+function drawSolution(){
+  clearInterval(solTimer);
+  const i = state.current, box = $("#sol");
+  const opened = state.chOpen[i] || Date.now();
+  const tick = () => {
+    const left = Math.ceil((opened + CFG.solutionDelay * 1000 - Date.now()) / 1000);
+    const free = left <= 0 || state.solved.includes(i);
+    const b = $("#solShow");
+    if (!b) return;
+    b.disabled = !free;
+    b.textContent = free ? CFG.ui.solShow : CFG.ui.solWait.replace("{t}", `${Math.floor(left / 60)}:${String(left % 60).padStart(2, "0")}`);
+    if (free) clearInterval(solTimer);
+  };
+  box.innerHTML = `<p>${CFG.ui.solNote}</p><div><button type="button" class="btn ghost" id="solShow"></button></div>`;
+  $("#solShow").onclick = () => {
+    box.innerHTML = `<p>${CFG.ui.solLoadNote}</p><pre class="code">${hl(CFG.models[i])}</pre><div><button type="button" class="btn" id="solLoad">${esc(CFG.ui.solLoad)}</button></div>`;
+    $("#solLoad").onclick = () => {
+      if (!state.solved.includes(i) && !state.helped.includes(i)) state.helped.push(i);
+      setCode(CFG.models[i]); save();
+    };
+  };
+  tick(); solTimer = setInterval(tick, 1000);
+}
+
+function setCode(v){
+  ed.value = v; editor.refit(); ed.scrollTop = 0;
+  state.code = v; saveSoon();
+  browser.show(instrument(v), true); evaluate();
+}
+
+function go(i){
+  if (!unlocked(i)) return;
+  state.current = i;
+  if (!state.chOpen[i]) state.chOpen[i] = Date.now();
+  if (!(i in state.chStart)) state.chStart[i] = state.code;
+  save(); drawPath(); drawChapter(); evaluate();
+  try { history.replaceState(null, "", "#" + i); } catch(e){}
+}
+
+/* ---------- ending ---------- */
+const slug = s => norm(s).split(/\s+/)[0].replace(/[^a-z0-9]/g, "") || CFG.ui.noName;
+function guessName(){
+  if (state.name) return state.name;
+  const c = nameComment(parse(state.code));
+  return c.includes(":") ? c.split(":").slice(1).join(":").trim() : c;
+}
+function drawEnding(){
+  const box = $("#ending");
+  if (!state.end){ box.hidden = true; return; }
+  box.hidden = false;
+  const mins = Math.max(1, Math.round((state.end - state.start) / 60000));
+  $("#endStats").innerHTML = `<span class="stat"><b>${NCH} / ${NCH}</b><span>${esc(CFG.ui.stChapters)}</span></span>
+    <span class="stat"><b>${mins}</b><span>${esc(CFG.ui.stMinutes)}</span></span>
+    <span class="stat"><b>${state.helped.length}</b><span>${esc(CFG.ui.stHelped)}</span></span>`;
+  const nm = $("#who"); if (!nm.value) nm.value = guessName();
+  $("#zipName").textContent = slug(nm.value) + "_" + W.fileBase + ".zip";
+}
+
+function withBase(src){
+  const base = `<base href="${new URL(".", location.href).href}">`;
+  return /<head[^>]*>/i.test(src) ? src.replace(/<head[^>]*>/i, m => m + base) : base + src;
+}
+
+function loadZip(){
+  return window.JSZip ? Promise.resolve(window.JSZip) : new Promise((ok, no) => {
+    const s = document.createElement("script");
+    s.src = "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js";
+    s.onload = () => ok(window.JSZip); s.onerror = no; document.head.append(s);
+  });
+}
+async function download(){
+  const b = $("#dl"), name = slug($("#who").value), base = name + "_" + W.fileBase;
+  b.disabled = true; const old = b.textContent; b.textContent = CFG.ui.zipping;
+  try {
+    const Z = await loadZip(), zip = new Z();
+    zip.file(base + ".html", state.code);
+    for (const f of W.allImgs) zip.file(f, await (await fetch(f)).blob());
+    const blob = await zip.generateAsync({ type: "blob" });
+    const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = base + ".zip";
+    document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+    b.textContent = CFG.ui.zipped;
+  } catch(e){
+    const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([state.code], { type: "text/html" })); a.download = base + ".html";
+    document.body.append(a); a.click(); a.remove();
+    b.textContent = CFG.ui.zipFail;
+  }
+  setTimeout(() => { b.disabled = false; b.textContent = old; }, 2500);
+}
+
+function report(){
+  const pad = n => String(n).padStart(2, "0"), dt = t => { const d = new Date(t); return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`; };
+  const L = [CFG.ui.repTitle, `${CFG.ui.repName}: ${$("#who").value || guessName() || "?"}`, `${CFG.ui.repStart}: ${dt(state.start)}`];
+  if (state.end) L.push(`${CFG.ui.repEnd}: ${dt(state.end)} (${Math.max(1, Math.round((state.end - state.start) / 60000))} ${CFG.ui.repMin})`);
+  L.push(`${CFG.ui.repDone}: ${solvedN()} / ${NCH}`);
+  if (state.helped.length) L.push(`${CFG.ui.repHelped}: ${state.helped.filter(i => i > 0).sort((a, b) => a - b).join(", ")}`);
+  L.push("", CFG.ui.repCode, state.code);
+  return L.join("\n");
+}
+
+/* ---------- small joys ---------- */
+function confetti(){
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const c = document.createElement("div"); c.className = "confetti"; c.setAttribute("aria-hidden", "true");
+  const cols = ["#2f7a5a", "#e07b2c", "#f2d264", "#9cc8e8", "#f0a3b8"];
+  for (let k = 0; k < 46; k++){
+    const i = document.createElement("i");
+    i.style.left = (Math.random() * 100) + "vw"; i.style.background = cols[k % cols.length];
+    i.style.setProperty("--dx", (Math.random() * 160 - 80) + "px"); i.style.setProperty("--r", (Math.random() * 720 - 360) + "deg");
+    i.style.animationDelay = (Math.random() * .35) + "s";
+    c.append(i);
+  }
+  document.body.append(c); setTimeout(() => c.remove(), 2400);
+}
+
+/* ---------- wiring ---------- */
+let evalTimer = 0;
+ed.value = state.code; editor.refit();
+ed.addEventListener("input", () => {
+  state.code = ed.value; saveSoon();
+  browser.show(instrument(ed.value));
+  clearTimeout(evalTimer);
+  if (CFG.live) evalTimer = setTimeout(drawLint, 220);       /* the goals are re-checked when the preview has loaded */
+  else evalTimer = setTimeout(evaluate, 220);
+});
+document.addEventListener("keydown", e => {
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "s"){ e.preventDefault(); save(); $("#status").textContent = CFG.ui.saved; flashSaved(); }
+});
+function flashSaved(){ const s = $("#savedTag"); s.hidden = false; clearTimeout(s._t); s._t = setTimeout(() => s.hidden = true, 1400); }
+$("#path").addEventListener("click", e => { const b = e.target.closest(".paw"); if (b && !b.disabled) go(+b.dataset.i); });
+$("#nextBtn").onclick = () => {
+  if (state.current < NCH) go(state.current + 1);
+  else { drawEnding(); $("#ending").scrollIntoView({ behavior: "smooth", block: "start" }); }
+};
+/* editor toolbar: search, format, shortcuts, focus mode */
+const cmApi = editor.cm;
+$("#findBtn").onclick = () => cmApi ? cmApi.search() : ed.focus();
+$("#fmtBtn").onclick = () => { if (cmApi) cmApi.format(); };
+if (!cmApi) { $("#findBtn").hidden = true; $("#fmtBtn").hidden = true; $("#keysBtn").hidden = true; }
+const keys = $("#keys"), keysBtn = $("#keysBtn");
+const showKeys = on => { keys.hidden = !on; keysBtn.setAttribute("aria-expanded", String(on)); };
+keysBtn.onclick = () => showKeys(keys.hidden);
+$("#keysClose").onclick = () => { showKeys(false); keysBtn.focus(); };
+const focusBtn = $("#focusBtn");
+const setFocus = on => {
+  document.body.classList.toggle("focus", on); focusBtn.setAttribute("aria-pressed", String(on));
+  if (cmApi) { cmApi.view.requestMeasure(); cmApi.focus(); }
+};
+focusBtn.onclick = () => setFocus(!document.body.classList.contains("focus"));
+document.addEventListener("keydown", e => {
+  if (e.key !== "Escape") return;
+  if (!keys.hidden) { showKeys(false); return; }
+  if (document.body.classList.contains("focus") && !document.querySelector(".cm-panel, .cm-tooltip-autocomplete")) setFocus(false);
+});
+$("#resetCh").onclick = () => { if (confirm(CFG.ui.resetConfirm)) setCode(state.chStart[state.current] ?? CFG.start); };
+let size = 15;
+try { const s = parseInt(localStorage.getItem("html-mission-size"), 10); if (s >= 12 && s <= 28) size = s; } catch(e){}
+const setSize = n => { size = Math.max(12, Math.min(28, n)); document.documentElement.style.setProperty("--code-size", size + "px"); editor.refit(); try { localStorage.setItem("html-mission-size", String(size)); } catch(e){} };
+setSize(size);
+$("#smaller").onclick = () => setSize(size - 1);
+$("#bigger").onclick = () => setSize(size + 1);
+$("#who").addEventListener("input", () => { state.name = $("#who").value; saveSoon(); $("#zipName").textContent = slug($("#who").value) + "_" + W.fileBase + ".zip"; });
+$("#dl").onclick = download;
+$("#toEditor").onclick = () => {
+  try { localStorage.setItem("digikult-editor-import", JSON.stringify({ code: state.code, name: W.file, at: Date.now() })); } catch(e){}
+  window.open(CFG.editorUrl, "_blank");
+};
+$("#openFull").onclick = () => { const u = URL.createObjectURL(new Blob([withBase(state.code)], { type: "text/html" })); window.open(u, "_blank"); setTimeout(() => URL.revokeObjectURL(u), 60000); };
+$("#copyRep").onclick = async () => {
+  const b = $("#copyRep"), old = b.textContent, txt = report();
+  try { await navigator.clipboard.writeText(txt); b.textContent = CFG.ui.copied; }
+  catch(e){ const t = document.createElement("textarea"); t.value = txt; document.body.append(t); t.select(); document.execCommand("copy"); t.remove(); b.textContent = CFG.ui.copied; }
+  setTimeout(() => b.textContent = old, 1600);
+};
+$("#restart").onclick = () => {
+  if (!confirm(CFG.ui.restartConfirm)) return;
+  state = { solved: [], current: 0, start: Date.now(), end: null, code: CFG.start, chStart: {}, chOpen: {}, helped: [], doneAt: {}, name: "" };
+  save(); ed.value = state.code; editor.refit(); browser.show(instrument(state.code), true); go(0); drawEnding();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+};
+
+const hashCh = parseInt(location.hash.slice(1), 10);
+browser.show(instrument(state.code), true);
+go(hashCh >= 0 && hashCh < CH.length && unlocked(hashCh) ? hashCh : state.current);
+drawEnding();
+
+</script>
+<script src="../../nav.js?v=d9bcb2b4" defer></script>
+</body>
+</html>

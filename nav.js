@@ -225,6 +225,18 @@
                   en: "Step by step: colours, fonts and boxes, with the result shown instantly."
                 },
                 files: { en: "css/basics/first-steps.html" }
+              },
+              {
+                id: "makeover",
+                kind: "story",
+                minutes: 40,
+                title: { hu: "A Mancs Menhely új ruhája", en: "The Paw Shelter Makeover" },
+                desc: {
+                  hu: "A kész menhelyes honlap úgy néz ki, mintha 1995-ből jött volna. Egy <style> elemmel a head-ben 8 fejezetben új ruhát adsz neki.",
+                  en: "The finished shelter website looks like it came from 1995. With a <style> element in the head, give it a makeover in 8 chapters."
+                },
+                files: { en: "css/basics/makeover.html", hu: "css/basics/makeover-hu.html" },
+                progress: { chapters: 8, keys: { en: "makeover-en-v1", hu: "makeover-hu-v1" } }
               }
             ]
           }
