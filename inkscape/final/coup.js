@@ -982,6 +982,8 @@ function tallyMarks(n){
     <span><svg viewBox="0 0 40 28" aria-hidden="true"><rect x="3" y="15" width="12" height="9" fill="none" stroke="#1d2622" stroke-dasharray="3 2"/><path d="M12 17L24 9" stroke="#1d2622" stroke-width="2"/><polygon points="27,7 21,8 24,12" fill="#1d2622"/><rect x="25" y="3" width="12" height="9" fill="#c9c6b8"/></svg>${t("dashed outline + arrow = moved / aligned from here", "szaggatott körvonal + nyíl = innen mozdult / igazodott")}</span></div>`;
   function renderWork() {
     const box = $("#work");
+    const dots = document.querySelector(".dots");
+    if (dots) dots.style.display = S.revealed ? "" : "none";   /* the step links only once the steps exist */
     if (!S.revealed) { box.innerHTML = ""; paint(); return; }
     const m = build(A());
     const tilt = i => ["-.3deg", ".25deg", "-.15deg", ".35deg"][i % 4];

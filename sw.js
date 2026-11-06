@@ -6,7 +6,7 @@
    The file list below is written by tools/build-sw.py: run it before pushing. */
 
 /* FILES:BEGIN (written by tools/build-sw.py, don't edit by hand) */
-const VERSION = "a9bc64a16f";
+const VERSION = "412860468e";
 const CORE = [
 "./",
 "css/basics/first-steps.html",
@@ -53,14 +53,12 @@ const CORE = [
 "inkscape/explainer.css",
 "inkscape/explainer.js",
 "inkscape/final/coup-hu.html",
-"inkscape/final/coup-hu.js",
 "inkscape/final/coup.css",
 "inkscape/final/coup.html",
 "inkscape/final/coup.js",
 "inkscape/img/common/hu/inkscape-map.png",
 "inkscape/img/common/hu/tools.png",
 "inkscape/img/common/inkscape-map.png",
-"inkscape/img/common/rules.png",
 "inkscape/img/common/tools.png",
 "inkscape/img/common/tools/al-bottom.png",
 "inkscape/img/common/tools/al-ch.png",
@@ -105,8 +103,6 @@ const CORE = [
 "sql/joins/backstage.html",
 "sql/joins/intro-hu.html",
 "sql/joins/intro.html",
-"sql/joins/matchmaker-classic-hu.html",
-"sql/joins/matchmaker-classic.html",
 "sql/joins/matchmaker-hu.html",
 "sql/joins/matchmaker.html",
 "sql/joins/pact-hu.html",
