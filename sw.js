@@ -6,10 +6,17 @@
    The file list below is written by tools/build-sw.py: run it before pushing. */
 
 /* FILES:BEGIN (written by tools/build-sw.py, don't edit by hand) */
-const VERSION = "c150d3643b";
+const VERSION = "a9bc64a16f";
 const CORE = [
 "./",
 "css/basics/first-steps.html",
+"css/basics/img/bodri.svg",
+"css/basics/img/cirmi.svg",
+"css/basics/img/logo.svg",
+"css/basics/img/morzsa.svg",
+"css/basics/img/pamacs.svg",
+"css/basics/makeover-hu.html",
+"css/basics/makeover.html",
 "css/index.html",
 "favicon.svg",
 "heist-hu.html",
