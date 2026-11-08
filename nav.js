@@ -358,8 +358,8 @@
         accent: "#5cc98a",
         title: { hu: "Táblázatkezelés – Excel", en: "Spreadsheets – Excel" },
         blurb: {
-          hu: "Képletek, kitöltőjel, függvények és döntések: igazi munkalap a böngészőben, magyar Excel-függvényekkel.",
-          en: "Formulas, the fill handle, functions and decisions: a real worksheet in the browser, with Hungarian Excel functions."
+          hu: "Képletek, kitöltőjel, függvények és döntések: munkalap a böngészőben, magyar Excel-függvényekkel, és egy küldetés az igazi Excelben.",
+          en: "Formulas, the fill handle, functions and decisions: a worksheet in the browser with Hungarian Excel functions, plus a mission in real Excel."
         },
         lessons: [
           {

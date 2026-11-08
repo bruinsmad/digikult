@@ -67,7 +67,7 @@ window.MISSION = {
   },
   chapters: [
     { refresher: true, title: "Ki mennyivel tartozik?", select: "E2",
-      story: `<p>A sütivásár bevételéből kifizették a buszt. Már csak a szállás és az étkezés díját, a <b>részvételi díjat</b> kell befizetnie mindenkinek: fejenként 12 000 Ft. <span class="who">Kati néni</span> táblázatában ott van, ki mennyit fizetett eddig, ki milyen menüt kér, és ki melyik túrára megy.</p>
+      story: `<p>A sütivásár bevételéből kifizették a buszt. Már csak a <b>részvételi díjat</b> (a szállás és az étkezés árát) kell befizetnie mindenkinek: fejenként 12 000 Ft-ot. <span class="who">Kati néni</span> táblázatában ott van, ki mennyit fizetett eddig, ki milyen menüt kér, és ki melyik túrára megy.</p>
         <p>„Te kezeled a táblázatot – mondja Kati néni. – Először azt szeretném látni, kinek mennyi van még hátra.”</p>`,
       learn: `<ul><li>Hátralék = részvételi díj − amit már befizetett.</li><li>A díj mindenkinek ugyanannyi, 12 000 Ft, ezért most beírhatod a képletbe: <code>=12000-B2</code>.</li><li>Egy képletet írsz, a többit a kitöltőjellel lehúzod.</li></ul>`,
       goals: [{ text: "<b>E2–E17</b>: mindenkinél a hátralék: 12 000 Ft-ból vond ki, amit befizetett (B oszlop).", range: "E2:E17", ref: "=12000-B2" }],
@@ -89,7 +89,7 @@ window.MISSION = {
                 traps: [raw => /hosszu/i.test(raw) && !/hosszú/i.test(raw) ? "A táblázatban „hosszú” áll, ékezettel. A feltételben is pontosan így kell írni." : null] },
               { text: "<b>G18</b>: mennyit fizetünk összesen a libegőért? (SZUM)", range: "G18", ref: "=SZUM(G2:G17)", use: ["SZUM"] }],
       hints: ['G2: <code>=HA(D2="hosszú";1500;0)</code>, aztán húzd le a G17-ig.', "G18: <code>=SZUM(G2:G17)</code>"],
-      success: "10 jegy, összesen 15 000 Ft. A rövid túrázóknál 0 Ft áll: a HA nem csak szöveget, számot is tud adni." },
+      success: "10 jegy, összesen 15 000 Ft. A rövid túrázóknál 0 Ft áll: a HA nemcsak szöveget, hanem számot is tud adni." },
     { title: "Vega vagy normál?", select: "E19",
       story: `<p>A szállás konyhája tudni szeretné, <b>hány vega és hány normál menüt</b> főzzön. Megszámolhatnád fejben is, de mi van, ha valaki meggondolja magát?</p>`,
       learn: `<p>A <b>DARABTELI</b> megszámolja, hány cella felel meg egy feltételnek. Két része van: <i>hol számoljon</i> (tartomány), és <i>mit</i> (kritérium, idézőjelben):</p><pre>=<span class="fn">DARABTELI</span>(<span class="rf">C2:C17</span>;<span class="st">&quot;vega&quot;</span>)</pre>
@@ -121,12 +121,12 @@ window.MISSION = {
   ending: {
     title: "Indulhat a szervezés!",
     text: `<p>A táblázat most már magától tudja, ki tartozik, hány menü kell, mennyibe kerül a libegő, és mehet-e a foglalás. Ha valaki befizet, elég egyetlen számot átírni: minden más magától változik.</p>
-      <p>Megtanultál két döntő függvényt: a <b>HA</b> két lehetőség közül választ, a <b>DARABTELI</b> pedig megszámolja, mi felel meg egy feltételnek. Jó utat a Mátrába!</p>`,
+      <p>Megtanultál két új függvényt: a <b>HA</b> két lehetőség közül választ, a <b>DARABTELI</b> pedig megszámolja, mi felel meg egy feltételnek. Jó utat a Mátrába!</p>`,
     rank: (min, hints) => hints === 0 ? "Rang: Főszervező. Egyetlen segítség nélkül!" : hints <= 3 ? "Rang: Profi szervező" : "Rang: Ügyes segítő. Legközelebb kevesebb segítséggel is menni fog!"
   }
 };
 </script>
 <script src="../mission.js"></script>
-<script src="../../nav.js?v=e9a89f4b" defer></script>
+<script src="../../nav.js?v=2b949d3f" defer></script>
 </body>
 </html>

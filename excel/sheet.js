@@ -146,7 +146,7 @@
     if (typeof v === "boolean") return v;
     if (typeof v === "number") return v !== 0;
     const u = String(v).toUpperCase(); if (u === "IGAZ") return true; if (u === "HAMIS") return false;
-    return E.value(`A HA feltétele itt szöveg („${v}”), nem összehasonlítás. Így kellene: B2="${v}"`);
+    return E.value(`A HA feltétele itt szöveg („${v}”), nem összehasonlítás. Helyesen például: B2="${v}"`);
   }
   const low = s => String(s).toLocaleLowerCase("hu");
   const rank = v => typeof v === "number" ? 0 : typeof v === "string" ? 1 : 2;
@@ -302,7 +302,7 @@
       case "name": {
         const w = node.v, up = w.toLocaleUpperCase("hu");
         if (FN[up] || ALIAS[up]) return E.name(`Hiányzik a zárójel ${az(up)} ${ALIAS[up] || up} után: ${ALIAS[up] || up}(…)`);
-        return E.name(`Az Excel nem tudja, mi az, hogy „${w}”. Ha szöveget akartál írni, tedd idézőjelbe: "${w}"`);
+        return E.name(`Az Excel nem ismeri ezt a szót: „${w}”. Ha szöveget akartál írni, tedd idézőjelbe: "${w}"`);
       }
       case "un": { const x = toNum(evaluate(node.x, ctx)); return isErr(x) ? x : node.op === "-" ? -x : x; }
       case "pct": { const x = toNum(evaluate(node.x, ctx)); return isErr(x) ? x : x / 100; }
@@ -332,7 +332,7 @@
           const al = ALIAS[up] || ALIAS[up.normalize("NFD").replace(/[̀-ͯ]/g, "")];
           return E.name(al ? `${Az(up)} ${up} függvényt a magyar Excel így hívja: ${al}` : `Nincs ${up} nevű függvény. Nézd meg, jól írtad-e (ékezetekkel együtt).`);
         }
-        if (node.args.length < f.min) return E.value(`${Az(up)} ${up} függvénynek ${f.min === 2 ? "két" : f.min} része kell: ${up}(${f.args})`);
+        if (node.args.length < f.min) return E.value(`${Az(up)} ${up} függvény ${f.min === 2 ? "két" : f.min} részből áll: ${up}(${f.args})`);
         if (node.args.length > f.max) return E.value(`${Az(up)} ${up} függvénynek legfeljebb ${f.max === 2 ? "két" : f.max === 3 ? "három" : f.max} része lehet: ${up}(${f.args})`);
         if (f.lazy) return f.fn(node.args, n => evaluate(n, ctx));
         const args = node.args.map(n => evaluate(n, ctx));
@@ -429,7 +429,7 @@
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
   const ERR_HELP = {
     "#NÉV?": "Az Excel egy szót nem ismer fel: elírt függvénynév, angol név (SUM helyett SZUM), vagy idézőjel nélküli szöveg.",
-    "#ÉRTÉK!": "Rossz fajta adattal számol a képlet, például szöveggel szoroz.",
+    "#ÉRTÉK!": "Rossz típusú adattal számol a képlet, például szöveget szoroz.",
     "#ZÉRÓOSZTÓ!": "Nullával (vagy egy üres cellával) oszt a képlet.",
     "#HIV!": "A képlet olyan cellára hivatkozik, ami nincs, vagy saját magára.",
     "#SZÁM!": "Túl nagy vagy lehetetlen szám jött ki."
@@ -553,7 +553,7 @@
       Object.entries(step).forEach(([a, v]) => sheet.set(a, v));
       paint(); o.onChange && o.onChange(api, redo ? "redo" : "undo", Object.keys(step));
     }
-    const lockedMsg = () => say(o.lockedText || "Ez a cella adat, ezt nem kell átírni. A kiemelt cellákba dolgozz!");
+    const lockedMsg = () => say(o.lockedText || "Ebben a cellában adat van, ezt nem kell átírni. A kiemelt cellákba dolgozz!");
 
     /* ----- selection ----- */
     function select(c, r, extend) {
@@ -758,11 +758,11 @@
       const g = selRange(), data = [];
       for (let r = g.r1; r <= g.r2; r++) { const row = []; for (let c = g.c1; c <= g.c2; c++) row.push(sheet.rawOf(A(c, r))); data.push(row); }
       clip = { g, data }; copyBox.hidden = false; place(copyBox, g);
-      say("Másolva. Kattints oda, ahová be akarod illeszteni, és nyomd meg: Ctrl+V.", 3000);
+      say("Másolva. Kattints oda, ahová be akarod illeszteni, és nyomd meg a Ctrl+V-t.", 3000);
       try { navigator.clipboard && navigator.clipboard.writeText(data.map(r => r.map(v => v === null ? "" : textOf(v)).join("\t")).join("\n")); } catch (err) {}
     }
     function pasteAt() {
-      if (!clip) { say("Előbb másolj ki valamit: jelöld ki, és nyomd meg: Ctrl+C."); return; }
+      if (!clip) { say("Előbb másolj ki valamit: jelöld ki, és nyomd meg a Ctrl+C-t."); return; }
       const g = selRange(), h = clip.data.length, w = clip.data[0].length;
       const tr = Math.max(h, g.r2 - g.r1 + 1), tc = Math.max(w, g.c2 - g.c1 + 1), ch = {};
       let blocked = 0;
@@ -924,7 +924,7 @@
       if (!msg && spec.use) for (const f of spec.use) if (!u.fns.has(f)) { msg = same(val, exp) ? `${Az(a)} ${a} cellában jó az eredmény, de most ${az(f)} ${f} függvényt gyakoroljuk: használd!` : `${Az(a)} ${a} cellában használd ${az(f)} ${f} függvényt.`; break; }
       if (!msg && spec.noConst) {
         const bad = u.nums.filter(n => !(spec.allow || []).includes(n));
-        if (bad.length) msg = `${Az(a)} ${a} képletében ott egy beírt szám (${fmtGeneral(bad[0])}). Ne a számot írd be, hanem hivatkozz arra a cellára, ahol az adat van!`;
+        if (bad.length) msg = `${Az(a)} ${a} képletében van egy beírt szám (${fmtGeneral(bad[0])}). Ne a számot írd be, hanem hivatkozz arra a cellára, ahol az adat van!`;
       }
       if (!msg && spec.abs && a !== cells[0]) for (const t of spec.abs) {
         const q = parseA(t); if (!u.refs.some(r => r.c === q.c && r.r === q.r)) { msg = `${Az(a)} ${a} képlete már nem ${az(t)} ${t} cellára mutat: másoláskor elcsúszott. Rögzítsd $ jellel: $${t.replace(/(\d)/, "$$$1")}`; break; }

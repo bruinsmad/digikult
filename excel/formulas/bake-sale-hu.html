@@ -61,7 +61,7 @@ window.MISSION = {
       A8: "Brownie", B8: 500, C8: 6, E8: 9,
       A9: "Almás pite", B9: 350, C9: 10, D9: 8, E9: 13,
       A10: "Összesen",
-      A12: "Legtöbb eladott darab egy sütiből", A13: "Legkevesebb eladott darab", A14: "Átlagosan ennyi süti fogyott egy nap",
+      A12: "Legtöbb eladott darab egy sütiből", A13: "Legkevesebb eladott darab", A14: "Naponta átlagosan ennyi süti fogyott",
       A15: "Ugyanez egészre kerekítve", A16: "Hányféle süti volt szerdán?", A17: "Hány napon volt brownie?"
     },
     formats: { "B2:B9": "ft", "G2:G10": "ft" },
@@ -74,7 +74,7 @@ window.MISSION = {
       story: `<p>Május végén a 8.B osztálykirándulásra megy a Mátrába, de a buszra még nincs elég pénz. Ezért az osztály három napig sütit árult a nagyszünetben. <span class="who">Zsófi</span>, az osztálypénztáros, mindent beírt egy táblázatba: melyik süti mennyibe került, és melyik nap hány darab fogyott belőle.</p>
         <p>„Számolni már nem volt időm – mondja Zsófi. – Segítesz? De úgy, hogy az Excel számoljon, ne mi fejben!”</p>`,
       learn: `<ul><li>Minden képlet <b>egyenlőségjellel</b> kezdődik: <code>=</code></li>
-        <li>A képletbe a <b>cella címét</b> írd, ne a benne lévő számot: <code>=C2+D2</code>. Így ha az adat változik, az eredmény is változik.</li>
+        <li>A képletbe a <b>cella címét</b> írd, ne a benne lévő számot: <code>=C2+D2</code>. Így ha az adat megváltozik, az eredmény is vele változik.</li>
         <li>Műveleti jelek: <code>+</code> <code>-</code> <code>*</code> (szorzás) <code>/</code> (osztás). A végén <kbd>Enter</kbd>.</li></ul>
         <p>Tipp: a címet nem kell begépelni. Írd be, hogy <code>=</code>, aztán kattints a cellára!</p>`,
       goals: [{ text: "Az <b>F2</b> cellába: hány kakaós csiga fogyott a három nap alatt? Add össze a <b>C2</b>, <b>D2</b> és <b>E2</b> cellát!", range: "F2", ref: "=C2+D2+E2", noConst: true }],
@@ -82,13 +82,13 @@ window.MISSION = {
       success: "41 kakaós csiga! És ha Zsófi átírná valamelyik napot, az F2 magától újraszámolna. Ez a képlet ereje." },
     { title: "Mennyi fogyott?", select: "F2",
       story: `<p>„Szuper! De nyolcféle sütink volt – sóhajt Zsófi. – Mind a nyolcat egyenként kell?”</p><p>Nem kell. Egy képletet megírsz, a többit az Excel lemásolja.</p>`,
-      learn: `<p>Hosszú összeadás helyett ott a <b>SZUM</b> függvény. A <code>C2:E2</code> azt jelenti: <i>C2-től E2-ig minden cella</i>. Ez egy <b>tartomány</b>.</p><pre>=<span class="fn">SZUM</span>(<span class="rf">C2:E2</span>)</pre>
+      learn: `<p>A hosszú összeadás helyett használd a <b>SZUM</b> függvényt. A <code>C2:E2</code> azt jelenti: <i>C2-től E2-ig minden cella</i>. Ez egy <b>tartomány</b>.</p><pre>=<span class="fn">SZUM</span>(<span class="rf">C2:E2</span>)</pre>
         <p><b>Kitöltőjel:</b> a kijelölt cella jobb alsó sarkában van egy kis négyzet. Fogd meg, és húzd le! Az Excel minden sorba lemásolja a képletet, és közben <b>átírja a sorszámot</b>: a 3. sorban már <code>=SZUM(C3:E3)</code> áll.</p>`,
       goals: [{ text: "<b>F2–F9</b>: minden sütinél a három nap összege, a <b>SZUM</b> függvénnyel. Az F2-ben lévő képletet is cseréld le!", range: "F2:F9", ref: "=SZUM(C2:E2)", use: ["SZUM"] }],
-      hints: ["Írd be az F2-be: <code>=SZUM(</code>, aztán húzd végig az egeret C2-től E2-ig, és nyomj <kbd>Enter</kbd>-t. Utána kattints vissza az F2-re, és húzd le a sarkában lévő négyzetet az F9-ig.", "F2: <code>=SZUM(C2:E2)</code>, aztán a kitöltőjellel le az F9-ig."],
+      hints: ["Írd be az F2-be: <code>=SZUM(</code>, aztán húzd végig az egeret C2-től E2-ig, és nyomd meg az <kbd>Enter</kbd> billentyűt. Utána kattints vissza az F2-re, és húzd le a sarkában lévő négyzetet az F9-ig.", "F2: <code>=SZUM(C2:E2)</code>, aztán a kitöltőjellel le az F9-ig."],
       success: "Nézd meg a zserbót és a brownie-t: náluk egy nap üres, a SZUM mégis jól számol, mert az üres cellát egyszerűen kihagyja." },
     { title: "Mennyi pénz jött?", select: "G2", isNew: false,
-      story: `<p>Most jön a lényeg: <b>mennyi pénzt hozott</b> az egyes sütik árulása? Ehhez az árat meg kell szorozni azzal, hogy összesen hány darab fogyott.</p>`,
+      story: `<p>Most jön a lényeg: <b>mennyi pénzt hozott</b> az egyes sütik eladása? Ehhez az árat meg kell szorozni azzal, hogy összesen hány darab fogyott.</p>`,
       learn: `<p>Szorozni a <code>*</code> jellel kell. A kakaós csiga bevétele: <code>=B2*F2</code>.</p>
         <p>Miért nem <code>=350*41</code>? Mert ha jövőre 400 Ft lesz a csiga, a beírt 350 nem változik, a <code>B2</code> viszont igen. <mark>Mindig a cellára hivatkozz, ne a számot írd be!</mark></p>`,
       goals: [{ text: "<b>G2–G9</b>: az egyes sütik bevétele (ár × összes eladott darab), lehúzással.", range: "G2:G9", ref: "=B2*F2", noConst: true,
@@ -99,7 +99,7 @@ window.MISSION = {
       story: `<p><span class="who">Kati néni</span>, az osztályfőnök, két dolgot kérdez: <i>melyik nap ment a legjobban</i>, és <i>mennyi pénz gyűlt össze összesen</i>? Erre való a 10. sor.</p>`,
       learn: `<p>A kitöltőjelet <b>jobbra</b> is húzhatod! Ilyenkor az Excel a <b>betűket</b> írja át: a C oszlop <code>=SZUM(C2:C9)</code> képletéből a D oszlopban <code>=SZUM(D2:D9)</code> lesz.</p>`,
       goals: [{ text: "<b>C10</b>: a hétfői eladások összege (<code>C2:C9</code>), SZUM-mal.", range: "C10", ref: "=SZUM(C2:C9)", use: ["SZUM"] },
-              { text: "<b>D10–G10</b>: ugyanez a többi oszlopra: húzd a C10 kitöltőjelét jobbra a G10-ig.", range: "D10:G10", ref: "=SZUM(D2:D9)", use: ["SZUM"] }],
+              { text: "<b>D10–G10</b>: ugyanez a többi oszlopban: húzd a C10 kitöltőjelét jobbra a G10-ig.", range: "D10:G10", ref: "=SZUM(D2:D9)", use: ["SZUM"] }],
       hints: ["C10: <code>=SZUM(C2:C9)</code>. Aztán fogd meg a C10 sarkát, és húzd jobbra a G10-ig.", "A végén a G10-ben ez lesz: <code>=SZUM(G2:G9)</code>."],
       success: "Összesen 96 050 Ft! A hétfő volt a legjobb nap (92 süti), a kedd a leggyengébb (85)." },
     { title: "A legjobb és a leggyengébb", select: "F12", isNew: false,
@@ -111,7 +111,7 @@ window.MISSION = {
       success: "53 pizzás csiga a csúcs, és 15 brownie a sereghajtó. (Igaz, a brownie csak két napig volt kapható…)" },
     { title: "Átlag és kerekítés", select: "F14",
       story: `<p>Jövőre is lesz sütivásár, és a szülők megkérdezték: <i>naponta átlagosan hány sütit kell sütni</i>? Az átlagot a <b>napi</b> összegekből kell számolni: C10, D10, E10.</p>`,
-      learn: `<p>Az ÁTLAG eredménye most csúnya lesz: <code>89,33333333</code>. Sütit nem lehet harmadrészt sütni! A <b>KEREKÍTÉS</b> függvénynek két része van:</p><pre>=<span class="fn">KEREKÍTÉS</span>(<span class="rf">F14</span>;0)</pre>
+      learn: `<p>Az ÁTLAG eredménye most csúnya lesz: <code>89,33333333</code>. Harmad sütit nem lehet sütni! A <b>KEREKÍTÉS</b> függvénynek két része van:</p><pre>=<span class="fn">KEREKÍTÉS</span>(<span class="rf">F14</span>;0)</pre>
         <p>Az első: <i>mit</i> kerekítsen. A második: <i>hány tizedesjegyre</i> (0 = egészre). A részeket <b>pontosvessző</b> <code>;</code> választja el, mert a vessző a tizedesjel.</p>`,
       goals: [{ text: "<b>F14</b>: a napi átlag: a C10, D10, E10 átlaga (<b>ÁTLAG</b>).", range: "F14", ref: "=ÁTLAG(C10:E10)", use: ["ÁTLAG"],
                 traps: [raw => /F2|F9/i.test(raw) ? "Itt nem a sütik átlaga kell, hanem a napi összegeké: C10, D10, E10." : null] },
@@ -126,17 +126,17 @@ window.MISSION = {
                 traps: [raw => /A\d/i.test(raw) ? "Az A oszlopban nevek vannak, azokat a DARAB nem számolja. A szerdai számok az E oszlopban vannak." : null] },
               { text: "<b>F17</b>: hány napon volt brownie? (Hány szám van a 8. sorban, C-től E-ig?)", range: "F17", ref: "=DARAB(C8:E8)", use: ["DARAB"] }],
       hints: ["F16: <code>=DARAB(E2:E9)</code>", "F17: <code>=DARAB(C8:E8)</code>"],
-      success: "Szerdán 7-féle süti volt, brownie pedig 2 napon. Az üres cella nem nulla: egyszerűen nincs ott semmi." }
+      success: "Szerdán hétféle süti volt, brownie pedig 2 napon. Az üres cella nem nulla: egyszerűen nincs ott semmi." }
   ],
   ending: {
     title: "96 050 Ft a kirándulásra!",
     text: `<p>Zsófi táblázata kész, és minden szám képlet: ha bármi változik, minden magától újraszámolódik. Kati néni elégedett: a busz 90 000 Ft-ba kerül, ezt a sütivásár bevétele fedezi, és még marad is.</p>
-      <p>De van még dolog: be kell gyűjteni a részvételi díjakat, és meg kell számolni, ki kér vega menüt. Előbb azonban jön a <b>Sportnap</b>: ugyanezek a függvények, de már az igazi Excelben.</p>`,
+      <p>De van még teendő: be kell gyűjteni a részvételi díjakat, és meg kell számolni, ki kér vega menüt. Előbb azonban jön a <b>Sportnap</b>: ugyanezek a függvények, de már az igazi Excelben.</p>`,
     rank: (min, hints) => hints === 0 ? "Rang: Excel-mester. Egyetlen segítség nélkül!" : hints <= 4 ? "Rang: Profi pénztáros" : "Rang: Ügyes tanonc. Legközelebb kevesebb segítséggel is menni fog!"
   }
 };
 </script>
 <script src="../mission.js"></script>
-<script src="../../nav.js?v=e9a89f4b" defer></script>
+<script src="../../nav.js?v=2b949d3f" defer></script>
 </body>
 </html>

@@ -28,7 +28,7 @@
 <main class="sheet">
 <section class="sec" id="cimek"><h2><span class="n">1</span>Cellák és címek</h2>
 
-<p>Egy táblázat <b>oszlopokból</b> és <b>sorokból</b> áll. Az oszlopok betűt kapnak (A, B, C…), a sorok számot (1, 2, 3…). Ahol egy oszlop és egy sor találkozik, ott van egy <b>cella</b>. A cella <b>címe</b> az oszlop betűje és a sor száma: a <code>C4</code> a C oszlop 4. sora.</p>
+<p>Egy táblázat <b>oszlopokból</b> és <b>sorokból</b> áll. Az oszlopok betűt kapnak (A, B, C…), a sorok számot (1, 2, 3…). Ahol egy oszlop és egy sor találkozik, ott van egy <b>cella</b>. A cella <b>címe</b> az oszlop betűje és a sor száma: a <code>C4</code> a C oszlop 4. sorában lévő cella.</p>
 <div class="idea"><span class="i">💡</span><p>Mindig előbb a betű, aztán a szám: <code>C4</code>, és nem <code>4C</code>. A kijelölt cella címét a táblázat bal felső sarkában, a <b>névmezőben</b> látod.</p></div>
 <div data-try="cimek"></div>
 </section>
@@ -40,32 +40,32 @@
 <tr><td>-</td><td>kivonás</td><td><code>=B2-C2</code></td></tr>
 <tr><td>*</td><td>szorzás</td><td><code>=B2*C2</code></td></tr>
 <tr><td>/</td><td>osztás</td><td><code>=B2/4</code></td></tr>
-<tr><td>( )</td><td>ami zárójelben van, az előbb</td><td><code>=(C2+D2)*B2</code></td></tr></table>
+<tr><td>( )</td><td>a zárójeles részt számolja ki először</td><td><code>=(C2+D2)*B2</code></td></tr></table>
 <p>A cellacímet nem kell begépelned: írd be az <code>=</code> jelet, aztán <b>kattints a cellára</b>. Az Excel beírja a címét, és színes kerettel meg is mutatja, melyik cellára gondolsz.</p>
 <div data-try="keplet"></div>
-<div class="rule-box"><b>Miért nem írjuk be egyszerűen a számot?</b> A <code>=60*25</code> is 1500-at ad. De ha holnap drágább lesz a kifli, a beírt 60 nem változik, a <code>=B2*C2</code> viszont magától újraszámol. <mark>Mindig a cellára hivatkozz, ne a számot írd be!</mark></div>
+<div class="rule-box"><b>Miért nem írjuk be egyszerűen a számot?</b> A <code>=60*25</code> is 1500-at ad. De ha holnap drágább lesz a kifli, a beírt 60 nem változik, a <code>=B2*C2</code> eredménye viszont magától frissül. <mark>Mindig a cellára hivatkozz, ne a számot írd be!</mark></div>
 </section>
 <section class="sec" id="masolas"><h2><span class="n">3</span>Másolás a kitöltőjellel</h2>
 
 <p>Ha minden sorban ugyanazt kell kiszámolni, elég <b>egyszer</b> megírni a képletet. A kijelölt cella jobb alsó sarkában van egy kis zöld négyzet: a <b>kitöltőjel</b>. Fogd meg az egérrel, és húzd le: az Excel minden sorba lemásolja a képletet.</p>
-<p>A legjobb benne: másolás közben <b>átírja a címeket</b>. Ha egy sorral lejjebb másolod, minden sorszám eggyel nő:</p>
-<div class="side-by-side"><figure><table class="mini"><tr><th></th><th>A</th><th>B</th><th>C</th></tr><tr><th>1</th><td class="">Ár</td><td class="">Darab</td><td class="">Bevétel</td></tr><tr><th>2</th><td class="n">60</td><td class="n">25</td><td class="f hl">=A2*B2</td></tr><tr><th>3</th><td class="n">450</td><td class="n">12</td><td class="f">=A3*B3</td></tr><tr><th>4</th><td class="n">250</td><td class="n">18</td><td class="f">=A4*B4</td></tr></table><figcaption>Az első képletet írtad be, a többit a kitöltőjel írta. Ezt <b>relatív hivatkozásnak</b> hívjuk: a cím ahhoz képest változik, hová másolod.</figcaption></figure></div>
+<p>A legjobb az egészben, hogy másolás közben <b>átírja a címeket</b>. Ha egy sorral lejjebb másolod, minden sorszám eggyel nő:</p>
+<div class="side-by-side"><figure><table class="mini"><tr><th></th><th>A</th><th>B</th><th>C</th></tr><tr><th>1</th><td class="">Ár</td><td class="">Darab</td><td class="">Bevétel</td></tr><tr><th>2</th><td class="n">60</td><td class="n">25</td><td class="f hl">=A2*B2</td></tr><tr><th>3</th><td class="n">450</td><td class="n">12</td><td class="f">=A3*B3</td></tr><tr><th>4</th><td class="n">250</td><td class="n">18</td><td class="f">=A4*B4</td></tr></table><figcaption>Az első képletet írtad be, a többit a kitöltőjel írta. Ezt <b>relatív hivatkozásnak</b> hívjuk: a cím aszerint változik, hová másolod.</figcaption></figure></div>
 <p>Jobbra húzva ugyanígy: ott a <b>betűk</b> lépnek tovább (<code>C2</code> → <code>D2</code> → <code>E2</code>).</p>
 <div data-try="masolas"></div>
 <div class="idea"><span class="i">👀</span><p>A <b>Képletek</b> gombbal (vagy <kbd>Ctrl</kbd>+<kbd>ö</kbd>) a táblázat az eredmények helyett a képleteket mutatja. Így látod, mit csinált a kitöltőjel. Az igazi Excelben: <i>Képletek</i> lap › <i>Képletek megjelenítése</i>.</p></div>
 </section>
 <section class="sec" id="fuggvenyek"><h2><span class="n">4</span>Ismétlés: SZUM, ÁTLAG, MIN, MAX</h2>
 
-<p>A <b>függvény</b> egy kész számolási módszer, amit a neve alapján hívunk meg. Ezt a négyet már ismered:</p>
+<p>A <b>függvény</b> egy előre elkészített számítás: a nevével hívod meg, a zárójelben pedig megadod, mivel számoljon. Ezt a négyet már ismered:</p>
 <div class="fparts" aria-hidden="true"><span class="p5"><b>=</b><i>egyenlőség&shy;jel</i></span><span class="p1"><b>SZUM</b><i>a függvény neve</i></span><span class="p5"><b>(</b><i></i></span><span class="p2"><b>B2:B6</b><i>a tartomány: B2-től B6-ig</i></span><span class="p5"><b>)</b><i></i></span></div>
 <table class="ops"><tr><th>függvény</th><th>mit ad</th><th>példa</th></tr>
 <tr><td>SZUM</td><td>a számok összegét</td><td><code>=SZUM(B2:B6)</code></td></tr>
 <tr><td>ÁTLAG</td><td>a számok átlagát</td><td><code>=ÁTLAG(B2:B6)</code></td></tr>
 <tr><td>MAX</td><td>a legnagyobb számot</td><td><code>=MAX(B2:B6)</code></td></tr>
 <tr><td>MIN</td><td>a legkisebb számot</td><td><code>=MIN(B2:B6)</code></td></tr></table>
-<p>A <code>B2:B6</code> egy <b>tartomány</b>: a kettőspont azt jelenti, hogy „-tól -ig”. Begépelni sem kell: írd be, hogy <code>=SZUM(</code>, aztán <b>húzd végig az egeret</b> a cellákon.</p>
+<p>A <code>B2:B6</code> egy <b>tartomány</b>: a kettőspont azt jelenti, hogy „-tól -ig”. A tartományt be sem kell gépelned: írd be, hogy <code>=SZUM(</code>, aztán <b>húzd végig az egeret</b> a cellákon.</p>
 <div data-try="fuggvenyek"></div>
-<div class="idea"><span class="i">⌨️</span><p>Ha elkezded gépelni egy függvény nevét, az Excel felajánlja a lehetőségeket: a <kbd>Tab</kbd> beírja. Közben egy kis sárga sor mutatja, milyen részek kellenek a zárójelbe.</p></div>
+<div class="idea"><span class="i">⌨️</span><p>Ha elkezded gépelni egy függvény nevét, az Excel felajánlja a lehetőségeket, és a <kbd>Tab</kbd> billentyű beírja a kiválasztottat. Gépelés közben egy kis súgósor mutatja, milyen részek kellenek a zárójelbe.</p></div>
 </section>
 <section class="sec" id="darab"><h2><span class="n">5</span>Új: DARAB – hány szám van?</h2>
 
@@ -74,31 +74,31 @@
 <p>A példában a kakaógép kedden és csütörtökön elromlott, ezért azok a cellák üresek. Hány napon volt kakaó?</p>
 <div data-try="darab"></div>
 <div class="rule-box"><b>Az üres cella nem nulla.</b> Az ÁTLAG is csak a számokat nézi: a 3 nap átlagát számolja, nem az 5 napét. Ha a hiányzó napokra 0-t írnál, az átlag sokkal kisebb lenne.</div>
-<p>Rokona a <b>DARAB2</b>: az minden <i>nem üres</i> cellát megszámol, a szövegeseket is. Nevek megszámolására jó.</p>
+<p>Rokona a <b>DARAB2</b>: az minden <i>nem üres</i> cellát megszámol, a szöveget tartalmazókat is. Például nevek megszámolására jó.</p>
 </section>
 <section class="sec" id="kerekites"><h2><span class="n">6</span>Új: KEREKÍTÉS</h2>
 
-<p>Az átlag gyakran csúnya szám: <code>4,333333333</code>. A <b>KEREKÍTÉS</b> függvénynek <b>két része</b> van, pontosvesszővel (<code>;</code>) elválasztva:</p>
+<p>Az átlag gyakran hosszú, csúnya szám: <code>4,333333333</code>. A <b>KEREKÍTÉS</b> függvénynek <b>két része</b> van, pontosvesszővel (<code>;</code>) elválasztva:</p>
 <div class="fparts" aria-hidden="true"><span class="p1"><b>=KEREKÍTÉS(</b><i></i></span><span class="p2"><b>E2</b><i>mit kerekítsen</i></span><span class="p5"><b>;</b><i>pontos&shy;vessző</i></span><span class="p3"><b>1</b><i>hány tizedesre</i></span><span class="p5"><b>)</b><i></i></span></div>
 <table class="ops"><tr><th>képlet</th><th>eredmény</th><th>mit csinált</th></tr>
 <tr><td>=KEREKÍTÉS(4,666;1)</td><td>4,7</td><td>egy tizedesre</td></tr>
 <tr><td>=KEREKÍTÉS(4,666;0)</td><td>5</td><td>egészre</td></tr>
-<tr><td>=KEREKÍTÉS(4,25;1)</td><td>4,3</td><td>az 5-ös felfelé kerekít</td></tr>
+<tr><td>=KEREKÍTÉS(4,25;1)</td><td>4,3</td><td>5-től felfelé kerekít</td></tr>
 <tr><td>=KEREKÍTÉS(1234;-2)</td><td>1200</td><td>százasokra</td></tr></table>
 <div class="rule-box"><b>Vessző vagy pontosvessző?</b> A magyar Excelben a <b>vessző</b> a tizedesjel (4,7), ezért a függvény részeit <b>pontosvessző</b> választja el: <code>=KEREKÍTÉS(E2;1)</code>.</div>
 <div data-try="kerekites"></div>
 <p><b>Függvény a függvényben.</b> A két lépést egybe is írhatod: a KEREKÍTÉS első része maga az ÁTLAG lesz. Az Excel belülről kifelé számol: előbb az átlag, aztán a kerekítés.</p>
 <pre class="code">=<span class="fn">KEREKÍTÉS</span>(<span class="fn">ÁTLAG</span>(<span class="rf">B2:D2</span>);1)</pre>
-<div class="idea"><span class="i">🎨</span><p>Az Excel <i>Tizedesjegyek csökkentése</i> gombja csak a <b>kinézetet</b> változtatja: a cellában ott marad a 4,333333. A KEREKÍTÉS tényleg <b>átírja</b> a számot 4,3-ra, és azzal számol tovább.</p></div>
+<div class="idea"><span class="i">🎨</span><p>Az Excel <i>Tizedeshelyek csökkentése</i> gombja csak a <b>kinézetet</b> változtatja: a cellában ott marad a 4,333333. A KEREKÍTÉS tényleg <b>átírja</b> a számot 4,3-ra, és azzal számol tovább.</p></div>
 </section>
 <section class="sec" id="hibak"><h2><span class="n">7</span>Hibaüzenetek és gyakori hibák</h2>
 
 <p>Ha valami nem stimmel, az Excel egy <b>hibaüzenetet</b> ír a cellába. Ne ijedj meg tőle, inkább olvasd el: elárulja, mi a baj.</p>
 <table class="ops"><tr><th>üzenet</th><th>mit jelent</th><th>tipikus ok</th></tr>
 <tr><td>#NÉV?</td><td>ismeretlen szó a képletben</td><td><code>=SUM(…)</code> a <code>SZUM</code> helyett, elírt név, hiányzó ékezet</td></tr>
-<tr><td>#ÉRTÉK!</td><td>rossz fajta adattal számol</td><td>szöveget szoroz: <code>=A2*2</code>, ha az A2-ben név van</td></tr>
+<tr><td>#ÉRTÉK!</td><td>rossz típusú adattal számol</td><td>szöveget szoroz: <code>=A2*2</code>, ha az A2-ben név van</td></tr>
 <tr><td>#ZÉRÓOSZTÓ!</td><td>nullával oszt</td><td>üres cellával vagy nullával osztasz</td></tr>
-<tr><td>#HIV!</td><td>nem létező cellára mutat</td><td>a képlet saját magára hivatkozik</td></tr>
+<tr><td>#HIV!</td><td>nem létező cellára mutat</td><td>törölted azt a sort vagy oszlopot, amelyre a képlet hivatkozott</td></tr>
 <tr><td>#######</td><td>nem fér ki a szám</td><td>szélesebb oszlop kell (ez nem igazi hiba)</td></tr></table>
 <div class="mist"><div class="side bad"><span class="lbl">Így nem</span><pre class="code">SZUM(B2:B6)</pre></div><div class="side good"><span class="lbl">Így igen</span><pre class="code">=<span class="fn">SZUM</span>(<span class="rf">B2:B6</span>)</pre></div></div>
 <p class="mist-why">Egyenlőségjel nélkül az Excel sima szövegnek veszi.</p>
@@ -141,7 +141,7 @@ window.TRY = {
             { text: "Kapcsold be a <b>Képletek</b> gombot, és nézd meg a D oszlopot.", test: g => ({ ok: g.el.querySelector(".xl-toggle").getAttribute("aria-pressed") === "true" }) }] },
   fuggvenyek: { title: "Próbáld ki", sub: "a kifli eladásai egy héten", cols: 4, rows: 6, widths: [100, 90, 150, 80], select: "D2",
     cells: { A1: "Nap", B1: "Kifli (db)", A2: "Hétfő", B2: 25, A3: "Kedd", B3: 30, A4: "Szerda", B4: 28, A5: "Csütörtök", B5: 19, A6: "Péntek", B6: 33,
-      C2: "Összesen", C3: "Átlagosan", C4: "Legtöbb egy nap", C5: "Legkevesebb egy nap" },
+      C2: "Összesen", C3: "Átlagosan", C4: "Legtöbb egy napon", C5: "Legkevesebb egy napon" },
     styles: { "A1:D1": "head", "C2:C5": "label" }, locked: ["A1:C6"], targets: ["D2:D5"],
     goals: [{ text: "<b>D2</b>: a heti összeg (SZUM)", range: "D2", ref: "=SZUM(B2:B6)", use: ["SZUM"] }, { text: "<b>D3</b>: az átlag (ÁTLAG)", range: "D3", ref: "=ÁTLAG(B2:B6)", use: ["ÁTLAG"] },
             { text: "<b>D4</b>: a legtöbb (MAX)", range: "D4", ref: "=MAX(B2:B6)", use: ["MAX"] }, { text: "<b>D5</b>: a legkevesebb (MIN)", range: "D5", ref: "=MIN(B2:B6)", use: ["MIN"] }] },
@@ -160,20 +160,20 @@ window.TRY = {
 
 window.QUIZ = [
   { q: "Melyik képlet működik a magyar Excelben?", opts: ["<code>=SZUM(B2:B9)</code>", "<code>SZUM(B2:B9)</code>", "<code>=SUM(B2:B9)</code>", "<code>=SZUM(B2…B9)</code>"], right: 0,
-    fb: "Kell az egyenlőségjel, a magyar név (SZUM) és a kettőspont a tartományban. A SUM az angol Excel neve: a magyarban #NÉV? lesz belőle." },
-  { q: "A D2-ben ez a képlet van: <code>=B2*C2</code>. Mi lesz a D5-ben, ha a kitöltőjellel lehúzod?", opts: ["<code>=B5*C5</code>", "<code>=B2*C2</code>", "<code>=B3*C3</code>", "<code>=E5*F5</code>"], right: 0,
+    fb: "Kell az egyenlőségjel, a magyar név (SZUM) és a kettőspont a tartományban. A SUM a függvény angol neve: a magyar Excelben #NÉV? lesz belőle." },
+  { q: "A D2-ben ez a képlet van: <code>=B2*C2</code>. Mi lesz a D5-ben, ha a kitöltőjellel lehúzod a D5-ig?", opts: ["<code>=B5*C5</code>", "<code>=B2*C2</code>", "<code>=B3*C3</code>", "<code>=E5*F5</code>"], right: 0,
     fb: "Három sorral lejjebb minden sorszám hárommal nő: B2 → B5, C2 → C5. A betűk maradnak, mert lefelé másoltunk." },
   { q: "A B2:B6 cellákban ez van: 12, (üres), alma, 7, 0. Mennyi lesz <code>=DARAB(B2:B6)</code>?", opts: ["2", "3", "4", "5"], right: 1,
     fb: "A DARAB a számokat számolja: 12, 7 és 0. A 0 is szám! Az üres cella és az „alma” nem számít." },
   { q: "Mennyi <code>=KEREKÍTÉS(4,666;1)</code>?", opts: ["4,7", "4,6", "5", "4,67"], right: 0,
-    fb: "Egy tizedesre kerekít. A második tizedes 6, ezért felfelé: 4,7." },
-  { q: "A G2-ben már jó a képlet. Hogyan kerül a G3–G9 cellákba is a leggyorsabban?", opts: ["Lehúzom a G2 kitöltőjelét a G9-ig", "Mindegyikbe begépelem újra", "Kijelölöm a G2-t, és megnyomom az Entert", "Beírom a G3–G9-be a G2 eredményét"], right: 0,
-    fb: "A kitöltőjel lemásolja a képletet, és közben átírja a sorszámokat. Az igazi Excelben a kitöltőjelre duplán kattintva is lemásolja az oszlop aljáig." },
+    fb: "Egy tizedesre kerekít. A második tizedesjegy 6, ezért felfelé kerekít: 4,7." },
+  { q: "A G2-ben már jó a képlet. Hogyan másolod át a leggyorsabban a G3–G9 cellákba?", opts: ["Lehúzom a G2 kitöltőjelét a G9-ig", "Mindegyikbe begépelem újra", "Kijelölöm a G2-t, és megnyomom az Entert", "Beírom a G3–G9-be a G2 eredményét"], right: 0,
+    fb: "A kitöltőjel lemásolja a képletet, és közben átírja a sorszámokat. Az igazi Excelben a kitöltőjelre duplán is kattinthatsz: akkor magától lemásolja a táblázat aljáig." },
   { q: "Egy cellában ez látszik: <code>#NÉV?</code>. Mi lehet a baj?", opts: ["Elírtad egy függvény nevét, például <code>=ATLAG(…)</code>", "Nullával osztottál", "Túl keskeny az oszlop", "Üres cellát adtál össze"], right: 0,
-    fb: "A #NÉV? azt jelenti, hogy az Excel egy szót nem ismer fel. Az ÁTLAG ékezettel helyes. Nullával osztásnál #ZÉRÓOSZTÓ!, keskeny oszlopnál ##### a jel." }
+    fb: "A #NÉV? azt jelenti, hogy az Excel egy szót nem ismer fel. Az ÁTLAG ékezettel helyes. Nullával osztásnál #ZÉRÓOSZTÓ! jelenik meg, túl keskeny oszlopnál pedig #####." }
 ];
 </script>
 <script src="../explainer.js"></script>
-<script src="../../nav.js?v=e9a89f4b" defer></script>
+<script src="../../nav.js?v=2b949d3f" defer></script>
 </body>
 </html>

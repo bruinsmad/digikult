@@ -28,7 +28,7 @@
 <main class="sheet">
 <section class="sec" id="feltetel"><h2><span class="n">1</span>Igaz vagy hamis?</h2>
 
-<p>Az eddigi képletek mindig <b>számoltak</b>. Most megtanítjuk az Excelt <b>dönteni</b>. Minden döntés egy kérdéssel kezdődik, amire a válasz <b>IGAZ</b> vagy <b>HAMIS</b>. Ezt hívjuk <b>feltételnek</b>.</p>
+<p>Az eddigi képletek mindig <b>számoltak</b>. Most megtanítjuk az Excelt <b>dönteni</b>. Minden döntés egy kérdéssel kezdődik, amelyre a válasz <b>IGAZ</b> vagy <b>HAMIS</b>. Ezt hívjuk <b>feltételnek</b>.</p>
 <table class="ops"><tr><th>jel</th><th>jelentése</th><th>példa</th><th>ha B2 = 72</th></tr>
 <tr><td>=</td><td>egyenlő</td><td><code>=B2=72</code></td><td>IGAZ</td></tr>
 <tr><td>&lt;&gt;</td><td>nem egyenlő</td><td><code>=B2&lt;&gt;72</code></td><td>HAMIS</td></tr>
@@ -36,13 +36,13 @@
 <tr><td>&lt;</td><td>kisebb</td><td><code>=B2&lt;80</code></td><td>IGAZ</td></tr>
 <tr><td>&gt;=</td><td>nagyobb vagy egyenlő (legalább)</td><td><code>=B2&gt;=50</code></td><td>IGAZ</td></tr>
 <tr><td>&lt;=</td><td>kisebb vagy egyenlő (legfeljebb)</td><td><code>=B2&lt;=50</code></td><td>HAMIS</td></tr></table>
-<p>Egy témazáróban 50 ponttól lehet átmenni. Kérdezzük meg az Excelt mindenkiről!</p>
+<p>Egy témazáróban 50 ponttól lehet átmenni. Kérdezzük meg az Excelt minden diákról!</p>
 <div data-try="feltetel"></div>
 <div class="idea"><span class="i">💡</span><p>Az első <code>=</code> azt jelzi, hogy képlet jön. A második <code>=</code> már az összehasonlítás: <code>=B2=72</code> azt kérdezi, hogy „a B2 egyenlő 72-vel?”</p></div>
 </section>
 <section class="sec" id="ha"><h2><span class="n">2</span>A HA függvény</h2>
 
-<p>Az IGAZ és a HAMIS még nem túl barátságos. A <b>HA</b> függvény a feltétel alapján <b>választ</b>: ha igaz, az egyik dolgot írja ki, ha hamis, a másikat.</p>
+<p>Az IGAZ és a HAMIS még nem sokat mond. A <b>HA</b> függvény a feltétel alapján <b>választ</b>: ha igaz, az egyik dolgot írja ki, ha hamis, a másikat.</p>
 <div class="fparts" aria-hidden="true"><span class="p1"><b>=HA(</b><i></i></span><span class="p2"><b>B2&gt;=50</b><i>feltétel</i></span><span class="p5"><b>;</b><i></i></span><span class="p3"><b>&quot;átment&quot;</b><i>ha igaz</i></span><span class="p5"><b>;</b><i></i></span><span class="p4"><b>&quot;javítás&quot;</b><i>ha hamis</i></span><span class="p5"><b>)</b><i></i></span></div>
 <svg class="flow" viewBox="0 0 620 200" role="img" aria-label="A HA döntése: ha a feltétel igaz, az első érték, ha hamis, a második">
 <g font-family="Atkinson Hyperlegible, sans-serif" font-size="16" text-anchor="middle">
@@ -57,16 +57,16 @@
 </g><defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0l10 5-10 5z" fill="#1d2622"/></marker>
 <marker id="ag" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0l10 5-10 5z" fill="#2f7a3a"/></marker>
 <marker id="ab" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0l10 5-10 5z" fill="#b3362f"/></marker></defs></svg>
-<p>Három része van, pontosvesszővel elválasztva: a <b>feltétel</b>, az érték, ha <b>igaz</b>, és az érték, ha <b>hamis</b>.</p>
+<p>Három része van, pontosvesszővel elválasztva: a <b>feltétel</b>, amit akkor ír ki, ha <b>igaz</b>, és amit akkor, ha <b>hamis</b>.</p>
 <div data-try="ha"></div>
-<div class="rule-box"><b>A szöveg idézőjelbe kerül.</b> <code>"átment"</code> – így az Excel tudja, hogy ezt szó szerint kell kiírnia. Idézőjel nélkül azt hiszi, hogy egy függvény vagy cella neve, és <code>#NÉV?</code> hibát ad.</div>
+<div class="rule-box"><b>A szöveg idézőjelbe kerül.</b> <code>"átment"</code> – így az Excel tudja, hogy ezt szó szerint kell kiírnia. Idézőjel nélkül az Excel valamilyen névnek hiszi, és <code>#NÉV?</code> hibát ad.</div>
 </section>
 <section class="sec" id="szoveg"><h2><span class="n">3</span>Szöveg a feltételben, szám az eredményben</h2>
 
 <p>A feltételben <b>szöveget</b> is összehasonlíthatsz. Ilyenkor az is idézőjelbe kerül: <code>C2="igen"</code>. A kis- és nagybetű mindegy: az „Igen” és az „igen” ugyanaz.</p>
 <p>Az eredmény nem csak szöveg lehet, hanem <b>szám</b> vagy akár egy <b>képlet</b> is. Aki megcsinálta a házit, 5 plusz pontot kap:</p>
 <pre class="code">=<span class="fn">HA</span>(<span class="rf">C2</span>=<span class="st">&quot;igen&quot;</span>;<span class="rf">B2</span>+5;<span class="rf">B2</span>)</pre>
-<p>Ha a C2-ben „igen” áll, az eredmény <code>B2+5</code>, különben marad a <code>B2</code>. A számokat nem kell idézőjelbe tenni.</p>
+<p>Ha a C2-ben „igen” áll, az eredmény <code>B2+5</code>, különben a <code>B2</code> marad. A számokat nem kell idézőjelbe tenni.</p>
 <div data-try="szoveg"></div>
 
 </section>
@@ -77,14 +77,14 @@
 <table class="ops"><tr><th>kritérium</th><th>mit számol</th></tr>
 <tr><td>"igen"</td><td>az „igen” szövegű cellákat</td></tr>
 <tr><td>5</td><td>az 5-öt tartalmazó cellákat</td></tr>
-<tr><td>"&gt;=50"</td><td>a legalább 50-es számokat</td></tr>
+<tr><td>"&gt;=50"</td><td>az 50-et és az annál nagyobb számokat</td></tr>
 <tr><td>"&lt;&gt;igen"</td><td>mindent, ami nem „igen”</td></tr></table>
 <p>Figyeld meg: ha a kritériumban összehasonlító jel van, <b>a jel és a szám együtt</b> kerül idézőjelbe: <code>"&gt;=50"</code>.</p>
 <div data-try="darabteli"></div>
 </section>
 <section class="sec" id="szumha"><h2><span class="n">5</span>Kitekintés: SZUMHA</h2>
 
-<p>Ha már tudsz feltétel szerint számolni, összeadni is tudsz. A <b>SZUMHA</b> csak azokat a számokat adja össze, amelyeknek a sora megfelel a feltételnek. Három része van: <i>hol nézze a feltételt</i>, <i>mi a feltétel</i>, és <i>mit adjon össze</i>.</p>
+<p>Feltétel szerint nemcsak számolni, hanem összeadni is lehet. A <b>SZUMHA</b> csak azokat a számokat adja össze, amelyeknek a sora megfelel a feltételnek. Három része van: <i>hol nézze a feltételt</i>, <i>mi a feltétel</i>, és <i>mit adjon össze</i>.</p>
 <pre class="code">=<span class="fn">SZUMHA</span>(<span class="rf">B2:B7</span>;<span class="st">&quot;ital&quot;</span>;<span class="rf">C2:C7</span>)</pre>
 <div data-try="szumha"></div>
 <p class="mist-why">Ez a rész nem kötelező, de jól jöhet, ha valaha a saját költéseidet vezeted.</p>
@@ -105,7 +105,7 @@
 </section>
 <section class="sec" id="gyakorolj"><h2><span class="n">8</span>Gyakorolj</h2>
 
-<p>A 8.B kirándulása közeleg, és a szervezés táblázata csupa döntés: ki fizetett, ki melyik túrára megy, hány vega menü kell.</p>
+<p>A 8.B kirándulása közeleg, és a szervezéshez sok döntés kell: ki fizetett, ki melyik túrára megy, hány vega menü kell.</p>
 <div class="practice"><a class="pcard" href="class-trip-hu.html"><span class="k">Küldetés</span><h4>Irány a Mátra!</h4><p>16 diák, egy osztálykirándulás. HA szöveggel és számmal, DARABTELI szövegre és összehasonlításra, a végén egy döntés: mehet-e a foglalás?</p></a></div>
 <p class="mist-why">Még nem csináltad meg az első leckét? Kezdd a <a href="../formulas/bake-sale-hu.html">sütivásárral</a>!</p>
 </section>
@@ -119,8 +119,8 @@ const PONT = { A1: "Név", B1: "Pont", A2: "Ádám", B2: 72, A3: "Bea", B3: 48, 
 window.TRY = {
   feltetel: { title: "Próbáld ki", cols: 3, rows: 6, widths: [100, 70, 120], select: "C2", cells: Object.assign({ C1: "Átment?" }, PONT),
     styles: { "A1:C1": "head" }, locked: ["A1:C1", "A2:B6"], targets: ["C2:C6"],
-    goals: [{ text: "<b>C2</b>: legalább 50 pontos? <code>=B2>=50</code>, aztán húzd le a <b>C6</b>-ig.", range: "C2:C6", ref: "=B2>=50", noConst: true, allow: [50] }],
-    note: "Csaba pont 50 pontos. Nála IGAZ jön ki, mert a >= azt jelenti: „legalább”." },
+    goals: [{ text: "<b>C2</b>: legalább 50 pontot ért el? <code>=B2>=50</code>, aztán húzd le a <b>C6</b>-ig.", range: "C2:C6", ref: "=B2>=50", noConst: true, allow: [50] }],
+    note: "Csabának pont 50 pontja van. Nála IGAZ jön ki, mert a >= azt jelenti: „legalább”." },
   ha: { title: "Próbáld ki", cols: 3, rows: 6, widths: [100, 70, 120], select: "C2", cells: Object.assign({ C1: "Eredmény" }, PONT),
     styles: { "A1:C1": "head" }, locked: ["A1:C1", "A2:B6"], targets: ["C2:C6"],
     goals: [{ text: '<b>C2–C6</b>: <code>=HA(B2>=50;"átment";"javítás")</code>, lehúzva.', range: "C2:C6", ref: '=HA(B2>=50;"átment";"javítás")', use: ["HA"] }] },
@@ -128,7 +128,7 @@ window.TRY = {
     cells: { A1: "Név", B1: "Pont", C1: "Házi kész?", D1: "Végső pont", A2: "Ádám", B2: 72, C2: "igen", A3: "Bea", B3: 48, C3: "igen", A4: "Csaba", B4: 50, C4: "nem", A5: "Dóra", B5: 91, C5: "igen", A6: "Ervin", B6: 35, C6: "nem" },
     styles: { "A1:D1": "head" }, locked: ["A1:D1", "A2:A6"], targets: ["D2:D6"],
     goals: [{ text: '<b>D2–D6</b>: 5 plusz pont, ha kész a házi: <code>=HA(C2="igen";B2+5;B2)</code>', range: "D2:D6", ref: '=HA(C2="igen";B2+5;B2)', use: ["HA"] },
-            { text: "Írd át Csabánál a <b>C4</b>-et „igen”-re, és figyeld a D4-et!", test: g => ({ ok: String(g.value("C4")).toLowerCase() === "igen" && String(g.raw("D4") || "").startsWith("=") && g.value("D4") === 55 }) }],
+            { text: "Írd át a <b>C4</b>-et (Csaba sorát) „igen”-re, és figyeld a D4-et!", test: g => ({ ok: String(g.value("C4")).toLowerCase() === "igen" && String(g.raw("D4") || "").startsWith("=") && g.value("D4") === 55 }) }],
     note: "Ebben a táblázatban a B és a C oszlopot is átírhatod. Próbáld ki!" },
   darabteli: { title: "Próbáld ki", cols: 6, rows: 9, widths: [90, 64, 84, 20, 230, 64], select: "F2",
     cells: { A1: "Név", B1: "Pont", C1: "Házi kész?", A2: "Ádám", B2: 72, C2: "igen", A3: "Bea", B3: 48, C3: "igen", A4: "Csaba", B4: 50, C4: "nem", A5: "Dóra", B5: 91, C5: "igen",
@@ -140,7 +140,7 @@ window.TRY = {
             { text: "<b>F4</b>: hány pontszám nagyobb 90-nél?", range: "F4", ref: '=DARABTELI(B2:B9;">90")', use: ["DARABTELI"] }] },
   szumha: { title: "Próbáld ki", sub: "nem kötelező", cols: 6, rows: 7, widths: [110, 70, 80, 20, 170, 80], select: "F2",
     cells: { A1: "Mit vettem?", B1: "Fajta", C1: "Ár (Ft)", A2: "Ásványvíz", B2: "ital", C2: 250, A3: "Szendvics", B3: "étel", C3: 690, A4: "Kakaó", B4: "ital", C4: 320,
-      A5: "Pogácsa", B5: "étel", C5: 180, A6: "Üdítő", B6: "ital", C6: 450, A7: "Kifli", B7: "étel", C7: 60, E2: "Italokra költve", E3: "Ételekre költve" },
+      A5: "Pogácsa", B5: "étel", C5: 180, A6: "Üdítő", B6: "ital", C6: 450, A7: "Kifli", B7: "étel", C7: 60, E2: "Italokra költöttem", E3: "Ételekre költöttem" },
     formats: { "C2:C7": "ft", "F2:F3": "ft" }, styles: { "A1:C1": "head", "E2:E3": "label" }, locked: ["A1:E7"], targets: ["F2:F3"],
     goals: [{ text: '<b>F2</b>: <code>=SZUMHA(B2:B7;"ital";C2:C7)</code>', range: "F2", ref: '=SZUMHA(B2:B7;"ital";C2:C7)', use: ["SZUMHA"] },
             { text: "<b>F3</b>: ugyanez az ételekre.", range: "F3", ref: '=SZUMHA(B2:B7;"étel";C2:C7)', use: ["SZUMHA"] }] }
@@ -154,7 +154,7 @@ window.QUIZ = [
   { q: "Mit ad <code>=B2>10</code>, ha a B2-ben 7 van?", opts: ["HAMIS", "IGAZ", "7", "0"], right: 0,
     fb: "A 7 nem nagyobb 10-nél, ezért a feltétel hamis. Egy összehasonlítás mindig IGAZ-at vagy HAMIS-at ad." },
   { q: '<code>=DARABTELI(C2:C20;"vega")</code> – mit csinál?', opts: ["Megszámolja, hány cellában áll a „vega” szó", "Összeadja a vega sorok számait", "Megmondja, hányadik sorban van az első vega", "IGAZ-at ad, ha van legalább egy vega"], right: 0,
-    fb: "A DARABTELI számol: hány cella felel meg a kritériumnak." },
+    fb: "A DARABTELI megszámolja, hány cella felel meg a kritériumnak." },
   { q: "Hogyan számolod meg, hány pontszám nagyobb 80-nál a B2:B30 tartományban?", opts: ['<code>=DARABTELI(B2:B30;">80")</code>', "<code>=DARABTELI(B2:B30;>80)</code>", "<code>=HA(B2:B30>80)</code>", "<code>=DARAB(B2:B30>80)</code>"], right: 0,
     fb: "A jel és a szám együtt kerül idézőjelbe: \">80\"." },
   { q: 'Mit ír ki <code>=HA(B2>5;"sok")</code>, ha a B2-ben 3 van?', opts: ["HAMIS", "semmit (üres marad)", "0", "#ÉRTÉK!"], right: 0,
@@ -162,6 +162,6 @@ window.QUIZ = [
 ];
 </script>
 <script src="../explainer.js"></script>
-<script src="../../nav.js?v=e9a89f4b" defer></script>
+<script src="../../nav.js?v=2b949d3f" defer></script>
 </body>
 </html>
