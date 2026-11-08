@@ -31,6 +31,7 @@
 .xl-grid td.f{font:13.5px "JetBrains Mono",ui-monospace,Consolas,monospace;color:#1f5a88;text-align:left}
 /* looks the pages can ask for */
 .xl-grid td.head{font-weight:700;background:#f3f6f0;white-space:normal;line-height:1.15;font-size:14px}
+.xl-grid td.headsm{font-size:12px;padding:3px 4px}
 .xl-grid td.total{font-weight:700;border-top:2px solid var(--xl-ink)}
 .xl-grid td.label{font-weight:700;color:#38433e}
 .xl-grid td.sum{background:#fbf4dc}

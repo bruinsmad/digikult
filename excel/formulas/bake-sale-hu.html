@@ -35,7 +35,7 @@
   <section class="work" aria-label="Munkalap"><div class="card">
     <div class="work-head"><h2>sutivasar.xlsx</h2><p>Kattints egy cellára, és kezdj el gépelni.</p></div>
     <div id="sheet"></div>
-    <p class="keys"><kbd>Enter</kbd> kész · <kbd>Esc</kbd> mégse · <kbd>F2</kbd> javítás · <kbd>F4</kbd> $ jel · <kbd>Ctrl</kbd>+<kbd>Z</kbd> visszavonás · <kbd>Ctrl</kbd>+<kbd>C</kbd> / <kbd>V</kbd> másolás · a cella sarkában lévő ▪ a <b>kitöltőjel</b>: húzd le vagy jobbra</p>
+    <p class="keys"><kbd>Enter</kbd> kész · <kbd>Esc</kbd> mégse · <kbd>F2</kbd> javítás · <kbd>Ctrl</kbd>+<kbd>Z</kbd> visszavonás · <kbd>Ctrl</kbd>+<kbd>C</kbd> / <kbd>V</kbd> másolás · a cella sarkában lévő ▪ a <b>kitöltőjel</b>: húzd le vagy jobbra</p>
   </div></section>
 </main></div>
 <section id="endPanel" hidden></section>
@@ -45,13 +45,13 @@
 <script>
 
 window.MISSION = {
-  key: "bake-sale-hu-v1", file: "sutivasar", title: "A 8.B sütivására", sheetName: "Sütivásár",
+  key: "bake-sale-hu-v2", file: "sutivasar", title: "A 8.B sütivására", sheetName: "Sütivásár",
   confetti: ["#c2477a", "#f2d264", "#f0a3b8", "#e9a25a", "#7fa7ff", "#a8dba0"],
-  next: { href: "../if/intro-hu.html", text: "Tovább: HA és DARABTELI" },
+  next: { href: "sports-day-hu.html", text: "Tovább: Sportnap, az igazi Excelben" },
   sheet: {
-    cols: 8, rows: 17, widths: [150, 74, 66, 66, 66, 84, 104, 84], select: "F2",
+    cols: 7, rows: 17, widths: [150, 74, 66, 66, 66, 84, 104], select: "F2",
     cells: {
-      A1: "Süti", B1: "Ár (Ft)", C1: "Hétfő (db)", D1: "Kedd (db)", E1: "Szerda (db)", F1: "Összesen (db)", G1: "Bevétel (Ft)", H1: "Arány",
+      A1: "Süti", B1: "Ár (Ft)", C1: "Hétfő (db)", D1: "Kedd (db)", E1: "Szerda (db)", F1: "Összesen (db)", G1: "Bevétel (Ft)",
       A2: "Kakaós csiga", B2: 350, C2: 14, D2: 11, E2: 16,
       A3: "Túrós batyu", B3: 400, C3: 9, D3: 12, E3: 8,
       A4: "Pizzás csiga", B4: 450, C4: 18, D4: 15, E4: 20,
@@ -64,9 +64,9 @@ window.MISSION = {
       A12: "Legtöbb eladott darab egy sütiből", A13: "Legkevesebb eladott darab", A14: "Átlagosan ennyi süti fogyott egy nap",
       A15: "Ugyanez egészre kerekítve", A16: "Hányféle süti volt szerdán?", A17: "Hány napon volt brownie?"
     },
-    formats: { "B2:B9": "ft", "G2:G10": "ft", "H2:H10": "pct" },
-    styles: { "A1:H1": "head", "A10:H10": "total", "A12:A17": "label", "F12:F17": "sum" },
-    locked: ["A1:H1", "A2:E9", "A10", "A12:A17"],
+    formats: { "B2:B9": "ft", "G2:G10": "ft" },
+    styles: { "A1:G1": "head", "A10:G10": "total", "A12:A17": "label", "F12:F17": "sum" },
+    locked: ["A1:G1", "A2:E9", "A10", "A12:A17"],
     lockedText: "Ezek Zsófi adatai, ezeket nem kell átírni. A sárgával kiemelt cellákba dolgozz!"
   },
   chapters: [
@@ -126,25 +126,17 @@ window.MISSION = {
                 traps: [raw => /A\d/i.test(raw) ? "Az A oszlopban nevek vannak, azokat a DARAB nem számolja. A szerdai számok az E oszlopban vannak." : null] },
               { text: "<b>F17</b>: hány napon volt brownie? (Hány szám van a 8. sorban, C-től E-ig?)", range: "F17", ref: "=DARAB(C8:E8)", use: ["DARAB"] }],
       hints: ["F16: <code>=DARAB(E2:E9)</code>", "F17: <code>=DARAB(C8:E8)</code>"],
-      success: "Szerdán 7-féle süti volt, brownie pedig 2 napon. Az üres cella nem nulla: egyszerűen nincs ott semmi." },
-    { title: "Ki hozta a legtöbbet?", select: "H2",
-      story: `<p>Utolsó kérés: Zsófi azt szeretné tudni, hogy <b>az összes bevétel hány százalékát</b> hozta az egyes süti. Ehhez minden sütinél a bevételt el kell osztani az összes bevétellel, ami a G10-ben van.</p>`,
-      learn: `<p>Ha a H2-be ezt írod: <code>=G2/G10</code>, és lehúzod, a H3-ban már <code>=G3/G11</code> lesz. A <code>G10</code> is lecsúszott, pedig a G11 üres: <code>#ZÉRÓOSZTÓ!</code></p>
-        <p>A megoldás a <b>rögzítés</b>: a <code>$</code> jel megakadályozza, hogy másoláskor a cím elcsússzon.</p><pre>=<span class="rf">G2</span>/<span class="rf">$G$10</span></pre>
-        <p>Nem kell kézzel beírni: a képletben állj a <code>G10</code>-re, és nyomd meg az <kbd>F4</kbd>-et.</p>`,
-      goals: [{ text: "<b>H2–H9</b>: az egyes sütik bevétele osztva az összes bevétellel (G10, rögzítve). A H oszlop magától százalékként mutatja.", range: "H2:H9", ref: "=G2/$G$10", abs: ["G10"], noConst: true }],
-      hints: ["H2: <code>=G2/G10</code>, de a G10 elé tegyél $ jeleket (vagy állj rá, és nyomd meg az F4-et).", "<code>=G2/$G$10</code>, aztán húzd le a H9-ig."],
-      success: "A pizzás csiga hozta a bevétel negyedét (25%), a brownie csak 8%-ot. Ha összeadnád a H oszlopot, pontosan 100% jönne ki." }
+      success: "Szerdán 7-féle süti volt, brownie pedig 2 napon. Az üres cella nem nulla: egyszerűen nincs ott semmi." }
   ],
   ending: {
     title: "96 050 Ft a kirándulásra!",
     text: `<p>Zsófi táblázata kész, és minden szám képlet: ha bármi változik, minden magától újraszámolódik. Kati néni elégedett: a busz 90 000 Ft-ba kerül, ezt a sütivásár bevétele fedezi, és még marad is.</p>
-      <p>De van még dolog: be kell gyűjteni a részvételi díjakat, és meg kell számolni, ki kér vega menüt. A következő leckében a táblázat már <b>dönteni</b> is fog: a <b>HA</b> függvénnyel.</p>`,
+      <p>De van még dolog: be kell gyűjteni a részvételi díjakat, és meg kell számolni, ki kér vega menüt. Előbb azonban jön a <b>Sportnap</b>: ugyanezek a függvények, de már az igazi Excelben.</p>`,
     rank: (min, hints) => hints === 0 ? "Rang: Excel-mester. Egyetlen segítség nélkül!" : hints <= 4 ? "Rang: Profi pénztáros" : "Rang: Ügyes tanonc. Legközelebb kevesebb segítséggel is menni fog!"
   }
 };
 </script>
 <script src="../mission.js"></script>
-<script src="../../nav.js?v=61ed1528" defer></script>
+<script src="../../nav.js?v=e9a89f4b" defer></script>
 </body>
 </html>

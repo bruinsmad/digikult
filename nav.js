@@ -364,7 +364,7 @@
         lessons: [
           {
             id: "formulas",
-            title: { hu: "Képletek és alapfüggvények: SZUM, ÁTLAG, MIN, MAX, DARAB, KEREKÍTÉS, $", en: "Formulas and basic functions: SZUM, ÁTLAG, MIN, MAX, DARAB, KEREKÍTÉS, $" },
+            title: { hu: "Képletek és alapfüggvények: SZUM, ÁTLAG, MIN, MAX, DARAB, KEREKÍTÉS", en: "Formulas and basic functions: SZUM, ÁTLAG, MIN, MAX, DARAB, KEREKÍTÉS" },
             pages: [
               {
                 id: "formulas-intro",
@@ -372,8 +372,8 @@
                 minutes: 15,
                 title: { hu: "Képletek – elmélet", en: "Formulas – explainer" },
                 desc: {
-                  hu: "Cellák és címek, képletek, a kitöltőjel, SZUM, ÁTLAG, MIN, MAX ismétlése, és újak: DARAB, KEREKÍTÉS, rögzítés a $ jellel. Minden táblázat kipróbálható.",
-                  en: "Cells and addresses, formulas, the fill handle, a SZUM/ÁTLAG/MIN/MAX refresher, then DARAB, KEREKÍTÉS and the $ sign. Every worksheet is live."
+                  hu: "Cellák és címek, képletek, a kitöltőjel, SZUM, ÁTLAG, MIN, MAX ismétlése, és két új függvény: DARAB és KEREKÍTÉS. Minden táblázat kipróbálható.",
+                  en: "Cells and addresses, formulas, the fill handle, a SZUM/ÁTLAG/MIN/MAX refresher, then DARAB and KEREKÍTÉS. Every worksheet is live."
                 },
                 files: { hu: "excel/formulas/intro-hu.html" }
               },
@@ -383,11 +383,23 @@
                 minutes: 40,
                 title: { hu: "A 8.B sütivására", en: "The Class 8B Bake Sale" },
                 desc: {
-                  hu: "Nyolcféle süti, három nap, egy osztálykirándulás. Zsófi táblázatát kell működésre bírnod: a végén letöltheted igazi Excel-fájlként.",
-                  en: "Eight cakes, three days, one class trip. Make Zsófi's worksheet calculate, then download it as a real Excel file."
+                  hu: "Nyolcféle süti, három nap, egy osztálykirándulás. Zsófi táblázatát kell működésre bírnod, itt a böngészőben.",
+                  en: "Eight cakes, three days, one class trip. Make Zsófi's worksheet calculate, right in the browser."
                 },
                 files: { hu: "excel/formulas/bake-sale-hu.html" },
-                progress: { chapters: 7, keys: { hu: "bake-sale-hu-v1" } }
+                progress: { chapters: 6, keys: { hu: "bake-sale-hu-v2" } }
+              },
+              {
+                id: "sports-day",
+                kind: "story",
+                minutes: 45,
+                title: { hu: "Sportnap – az igazi Excelben", en: "Sports Day – in real Excel" },
+                desc: {
+                  hu: "Letöltöd a fájlt, és az igazi Excelben számolod ki a sportnap eredményét: SZUM, MAX, MIN, ÁTLAG, KEREKÍTÉS, DARAB. A végén az oldal ellenőrzi a mentett fájlodat.",
+                  en: "Download the file and work out the sports day results in real Excel: SZUM, MAX, MIN, ÁTLAG, KEREKÍTÉS, DARAB. At the end the page checks your saved file."
+                },
+                files: { hu: "excel/formulas/sports-day-hu.html" },
+                progress: { chapters: 7, keys: { hu: "sports-day-hu-v1" } }
               }
             ]
           },
@@ -416,7 +428,7 @@
                   en: "16 students, one trip: who has paid, who takes which hike, how many veggie meals, and can we book? HA and DARABTELI."
                 },
                 files: { hu: "excel/if/class-trip-hu.html" },
-                progress: { chapters: 5, keys: { hu: "class-trip-hu-v1" } }
+                progress: { chapters: 5, keys: { hu: "class-trip-hu-v2" } }
               }
             ]
           }

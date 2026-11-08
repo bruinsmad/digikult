@@ -14,6 +14,7 @@
 
   let state = { solved: [], current: 0, start: Date.now(), end: null, cells: {}, hints: {}, student: "" };
   try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && Array.isArray(s.solved)) state = Object.assign(state, s); } catch (e) {}
+  state.solved = state.solved.filter(i => i >= 0 && i < CH.length);
   const save = () => { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} };
   const isUnlocked = i => i === 0 || state.solved.includes(i - 1) || state.solved.includes(i);
   const chapNo = i => CH.slice(0, i + 1).filter(c => !c.refresher).length;

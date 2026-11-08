@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>/* moving between pages: the old page drifts aside and fades, the new one glides in; the rail holds still */@view-transition{navigation:auto}.rail{view-transition-name:rail}::view-transition-group(root){animation:none}::view-transition-old(root){animation:dk-out .2s cubic-bezier(.4,0,1,1) both}::view-transition-new(root){animation:dk-in .38s cubic-bezier(.16,1,.3,1) .06s both}::view-transition-old(rail),::view-transition-new(rail){animation:none}@keyframes dk-out{to{opacity:0;transform:translateX(-18px)}}@keyframes dk-in{from{opacity:0;transform:translateX(26px)}}@media (prefers-reduced-motion:reduce){::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none!important}}</style>
+<title>Sportnap – Excel-küldetés</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600;700&display=swap">
+<link rel="stylesheet" href="../sheet.css">
+<link rel="stylesheet" href="../mission.css">
+<style>:root{--m:#c4620f;--m-soft:#fdf0e3;--m-ink:#8a4106}</style>
+</head>
+<body>
+<header class="rail"><div class="in">
+  <a class="home" href="../../index.html">Digitális kultúra</a>
+  <span class="crumb"><a href="../../index.html#excel">Táblázatkezelés – Excel</a> › <a href="../../index.html#excel-formulas">1. lecke</a></span>
+</div></header>
+<div class="top">
+  <span class="art" aria-hidden="true"><svg viewBox="0 0 96 96"><ellipse cx="48" cy="88" rx="30" ry="5" fill="#000" opacity=".25"/>
+<path d="M30 14h36v14c0 14-8 24-18 24S30 42 30 28z" fill="#f2c230"/><path d="M30 20H18c0 12 6 18 14 18M66 20h12c0 12-6 18-14 18" fill="none" stroke="#f2c230" stroke-width="5"/>
+<path d="M44 52h8v14h-8z" fill="#d9a51c"/><rect x="32" y="66" width="32" height="8" rx="2" fill="#8a5532"/><rect x="26" y="74" width="44" height="10" rx="2" fill="#5d3820"/>
+<path d="M40 22l4 6 6-10" fill="none" stroke="#fff6d8" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="48" y="82" text-anchor="middle" font-family="Kalam,cursive" font-weight="700" font-size="9" fill="#f2d264">8.B</text></svg></span>
+  <div><div class="kicker">Excel, 1. lecke: küldetés az igazi Excelben</div><h1>Sportnap</h1></div>
+  <div class="meta"><span>Haladás <b id="solvedCount">–</b></span><span>Idő <b id="timer">0:00</b></span><button type="button" class="mbtn" id="soundBtn">Hang: be</button><button type="button" class="mbtn" id="resetBtn">Elölről</button></div>
+</div>
+<nav class="steps" id="steps" aria-label="Fejezetek"></nav>
+<div id="game"><main>
+  <article class="card" id="case" aria-live="polite"></article>
+  <section class="work" aria-label="Munkalap"><div class="card">
+    <div class="dlcard"><svg class="ic" viewBox="0 0 40 46" aria-hidden="true"><path d="M4 2h22l10 10v32H4z" fill="#fff" stroke="#107c41" stroke-width="2"/><path d="M26 2v10h10" fill="#d9efe2" stroke="#107c41" stroke-width="2"/><rect x="0" y="18" width="24" height="20" rx="2" fill="#107c41"/><path d="M6 23l12 10M18 23L6 33" stroke="#fff" stroke-width="3" stroke-linecap="round"/></svg><p><b>sportnap.xlsx</b><br>Ebben a fájlban dolgozol, az igazi Excelben.</p><a class="btn primary" href="sportnap.xlsx" download>Letöltés</a></div>
+    <div class="work-head"><h2>Előnézet</h2><p>Így kell kinéznie a fájlodnak. A sárga cellák a mostani feladat.</p></div>
+    <div id="sheet"></div>
+    <p class="preview-note">Ez csak előnézet, ide nem lehet írni. Ahogy haladsz, itt is megjelennek a jó képletek: a <b>Képletek</b> gombbal megnézheted őket.</p>
+  </div></section>
+</main></div>
+<section id="endPanel" hidden></section>
+<footer class="end">Digitális kultúra. A haladásod a böngésződben marad: ha bezárod az oldalt, legközelebb innen folytathatod. A feltöltött fájlt az oldal csak megnézi, nem küldi el sehová.</footer>
+<canvas id="fx" aria-hidden="true"></canvas>
+<script src="../sheet.js"></script>
+<script>
+
+window.MISSION = {
+  key: "sports-day-hu-v1", title: "Sportnap", sheetName: "Sportnap", saveAs: "sportnap-Kovacs-Anna.xlsx",
+  confetti: ["#c4620f", "#f2c230", "#107c41", "#7fa7ff", "#f0a3b8", "#a8dba0"],
+  next: { href: "../if/intro-hu.html", text: "Tovább: HA és DARABTELI" },
+  sheet: {
+    cols: 10, rows: 15, widths: [116, 52, 78, 62, 78, 76, 68, 54, 70, 60], select: "A1",
+    cells: {
+      A1: "Osztály", B1: "Futás", C1: "Távolugrás", D1: "Kislabda", E1: "Kötélhúzás", F1: "Váltófutás", G1: "Összpont", H1: "Átlag", I1: "Kerekítve", J1: "Hány számban",
+      A2: "5.A", B2: 4, C2: 3, D2: 5, F2: 2,          A3: "5.B", B3: 3, C3: 4, D3: 2, E3: 5, F3: 3,
+      A4: "6.A", B4: 5, C4: 6, D4: 4, E4: 6, F4: 5,   A5: "6.B", B5: 9, D5: 10, F5: 7,
+      A6: "7.A", B6: 6, C6: 7, D6: 7, E6: 8, F6: 6,   A7: "7.B", B7: 7, C7: 5, D7: 6, E7: 7,
+      A8: "8.A", B8: 8, C8: 9, D8: 6, E8: 9, F8: 7,   A9: "8.B", B9: 7, C9: 8, D9: 9, E9: 10, F9: 8,
+      A10: "Indulók száma", A12: "A legtöbb összpont", A13: "A legkevesebb összpont", A14: "Átlagos összpont", A15: "Ugyanez egy tizedesre"
+    },
+    styles: { "A1:J1": "head headsm", "A2:A10": "label", "A12:A15": "label", "G12:G15": "sum" }
+  },
+  chapters: [
+    { refresher: true, title: "Nyisd meg az Excelt", select: "E6",
+      story: `<p>Pénteken volt az iskolai <b>sportnap</b>. Nyolc osztály versenyzett öt versenyszámban, és minden számban 1-től 10-ig kaptak pontot. <span class="who">Gábor bácsi</span>, a testnevelő tanár, beírta a pontokat egy Excel-táblázatba, de számolni már nem maradt ideje. Hétfőn ki kell hirdetni a győztest. Te leszel a pontozóbíró!</p>
+        <p>Ezt a küldetést az <b>igazi Excelben</b> csinálod. Ez az oldal mondja meg, mit csinálj, és ellenőrzi, jó-e, amit az Excel kiszámolt.</p>`,
+      learn: `<ul><li>A cella címe: előbb az oszlop betűje, aztán a sor száma, pl. <code>E6</code>.</li><li>Minden képlet <code>=</code> jellel kezdődik, és a végén <kbd>Enter</kbd>.</li><li>A képletbe cellacímet írj, ne számot.</li></ul>`,
+      steps: [
+        `Töltsd le a fájlt: <br><a class="btn primary" href="sportnap.xlsx" download>sportnap.xlsx letöltése</a>`,
+        `Nyisd meg a letöltött fájlt az Excelben. Ha felül egy sárga sávban azt látod, hogy <span class=ui>Védett nézet</span>, kattints a <span class=ui>Szerkesztés engedélyezése</span> gombra.`,
+        `Mentsd el a saját neveddel: <span class=ui>Fájl</span> › <span class=ui>Mentés másként</span> (vagy <kbd>F12</kbd>). A fájl neve legyen például <code>sportnap-Kovacs-Anna</code>.`,
+        `Nézd meg a táblázatot: a sorokban az osztályok, az oszlopokban a versenyszámok. Ahol üres a cella, ott az osztály nem indult. A <b>sárga</b> cellákba fogsz dolgozni.`
+      ],
+      asks: [{ q: "Hány pontot kapott a <b>7.A</b> kötélhúzásban? (Melyik cellában van? Mi a benne lévő szám?)", cell: "E6",
+               traps: { "7": "A 7.A sora jó, de nézd meg az oszlopot: a kötélhúzás az E oszlop.", "6": "Nézd meg újra: a 7.A a 6. sorban van, a kötélhúzás az E oszlopban." } }],
+      hints: ["A 7.A a 6. sorban van, a kötélhúzás az E oszlopban. A keresett cella tehát az <b>E6</b>."],
+      success: "Úgy van, az E6 cellában 8 áll. Mehet a számolás!" },
+
+    { title: "Összpontszám", select: "G2",
+      story: `<p>Először azt kell tudni, melyik osztály hány pontot gyűjtött összesen. Nyolc osztály van, de elég egyetlen képletet megírnod.</p>`,
+      learn: `<p>A <b>SZUM</b> összeadja a tartomány számait. A <code>B2:F2</code> azt jelenti: B2-től F2-ig.</p><pre>=<span class="fn">SZUM</span>(<span class="rf">B2:F2</span>)</pre>
+        <p>A <b>kitöltőjel</b> a kijelölt cella jobb alsó sarkában lévő kis zöld négyzet. Ha lehúzod, az Excel minden sorba lemásolja a képletet, és közben átírja a sorszámot.</p>`,
+      steps: [
+        `Kattints a <b>G2</b> cellára.`,
+        `Írd be: <code>=SZUM(</code>, aztán az egérrel húzd végig a <b>B2</b>-től az <b>F2</b>-ig. Írd be a <code>)</code> jelet, és nyomj <kbd>Enter</kbd>-t.`,
+        `Kattints vissza a G2-re. Fogd meg a jobb alsó sarkában a kitöltőjelet, és húzd le a <b>G9</b>-ig. (Ha duplán kattintasz a kitöltőjelre, az Excel magától lemásolja a táblázat aljáig.)`,
+        `Kattints a <b>G5</b>-re, és nézd meg fent a <b>szerkesztőlécen</b> (az <i>fx</i> mellett), mi lett a képlet. Ha minden jó, ezt látod: <code>=SZUM(B5:F5)</code>.`
+      ],
+      goals: [{ label: "G2–G9: összpont (SZUM)", range: "G2:G9", ref: "=SZUM(B2:F2)", fn: "SZUM" }],
+      asks: [{ q: "Hány összpontja lett a <b>8.B</b>-nek? (G9)", cell: "G9" }],
+      hints: ["Tipp: a <span class=ui>Kezdőlap</span> lap jobb szélén lévő <b>Σ AutoSzum</b> gomb is beírja a SZUM-ot.", "G2: <code>=SZUM(B2:F2)</code>, aztán a kitöltőjellel le a G9-ig. A 8.B a 9. sor."],
+      success: "42 pont. A kitöltőjel minden sorban átírta a sorszámot, így minden osztály a saját pontjait kapta." },
+
+    { title: "Ki nyert?", select: "G12", isNew: false,
+      story: `<p>Gábor bácsi azt kéri, hogy a táblázat magától írja ki a <b>legtöbb</b> és a <b>legkevesebb</b> összpontot. Így ha valamit javítani kell, a győztes is magától frissül.</p>`,
+      learn: `<p>A <b>MAX</b> a legnagyobb, a <b>MIN</b> a legkisebb számot adja egy tartományból.</p><pre>=<span class="fn">MAX</span>(<span class="rf">G2:G9</span>)</pre>`,
+      steps: [
+        `Kattints a <b>G12</b> cellára, írd be: <code>=MAX(</code>, jelöld ki a <b>G2:G9</b> tartományt, zárd be a zárójelet, <kbd>Enter</kbd>.`,
+        `A <b>G13</b>-ba ugyanígy a <b>MIN</b> kerül.`,
+        `Keresd meg a G oszlopban, melyik osztály sorában van a legtöbb pont.`
+      ],
+      goals: [{ label: "G12: legtöbb összpont (MAX)", range: "G12", ref: "=MAX(G2:G9)", fn: "MAX" }, { label: "G13: legkevesebb összpont (MIN)", range: "G13", ref: "=MIN(G2:G9)", fn: "MIN" }],
+      asks: [{ q: "Mennyi a legkisebb összpont? (G13)", cell: "G13" },
+             { q: "Melyik osztály nyerte a sportnapot összpontszám alapján?", text: ["8.B", "8b", "8.b osztály"], traps: { "42": "Ez a pontszám. Azt írd be, melyik osztályé: nézd meg, melyik sorban van a 42.", "6.B": "A 6.B nagyon jól szerepelt, de most az összpont számít (G oszlop)." }, wrong: "Nézd meg, melyik sorban van a G12-ben lévő szám a G oszlopban, és melyik osztály áll annak a sornak az elején." }],
+      hints: ["G12: <code>=MAX(G2:G9)</code>, G13: <code>=MIN(G2:G9)</code>", "A legtöbb pont 42. Keresd meg a G oszlopban, és nézd meg, melyik osztály sora."],
+      success: "A 8.B nyert 42 ponttal, az 5.A-nak lett a legkevesebb, 14. De várjunk csak…" },
+
+    { title: "Igazságos ez?", select: "H2",
+      story: `<p>A 6.B osztályfőnöke reklamál: „A 6.B csak <b>három</b> számban indult, mert a többiek egy versenyen voltak. Mégis majdnem minden számot megnyertek! Az összpont így nem igazságos.”</p>
+        <p>Gábor bácsi szerint igaza van. Számoljuk ki az <b>átlagot</b> is: az nem azt mutatja, mennyit gyűjtöttek, hanem hogy egy versenyszámban átlagosan milyen jók voltak.</p>`,
+      learn: `<p>Az <b>ÁTLAG</b> a számok összegét elosztja a darabszámukkal. Az üres cellát <b>kihagyja</b>: a 6.B-nél 3 számmal oszt, nem 5-tel.</p><pre>=<span class="fn">ÁTLAG</span>(<span class="rf">B2:F2</span>)</pre>`,
+      isNew: false,
+      steps: [
+        `Kattints a <b>H2</b>-re, és írd be: <code>=ÁTLAG(B2:F2)</code>. Az Á betű a billentyűzeten van; ha elkezded gépelni, az Excel fel is ajánlja a függvényt.`,
+        `Vigyázz: a tartomány most is <b>B2:F2</b>. A G2 (az összpont) ne legyen benne!`,
+        `Húzd le a kitöltőjelet a <b>H9</b>-ig.`
+      ],
+      goals: [{ label: "H2–H9: átlag (ÁTLAG)", range: "H2:H9", ref: "=ÁTLAG(B2:F2)", fn: "ÁTLAG" }],
+      asks: [{ q: "Mennyi a <b>7.B</b> átlaga? (H7)", cell: "H7",
+               traps: { "5": "Ez 25 osztva 5-tel. De a 7.B csak 4 számban indult: az ÁTLAG az üres cellát kihagyja. Biztos ÁTLAG-ot használtál, és a tartomány B7:F7?", "10": "Úgy tűnik, a G oszlop (az összpont) is belekerült a tartományba. Az átlag csak a B–F oszlopból számoljon!" } }],
+      hints: ["H2: <code>=ÁTLAG(B2:F2)</code>, aztán le a H9-ig.", "A 7.B a 7. sorban van. Pontjai: 7, 5, 6, 7, ez 25 pont 4 számból."],
+      success: "6,25. Most nézd meg a 6.B átlagát: 8,666666… Ez a legjobb az egész iskolában! Csak hát ez a sok tizedes…" },
+
+    { title: "Kerekítés", select: "I2",
+      story: `<p>Az eredményhirdetésen senki sem akarja hallani, hogy „nyolc egész hatszázhatvanhat ezred”. Az átlagokat <b>egy tizedesjegyre</b> kerekítjük.</p>`,
+      learn: `<p>A <b>KEREKÍTÉS</b> függvénynek két része van: <i>mit</i> kerekítsen, és <i>hány tizedesjegyre</i>. A kettő közé <b>pontosvessző</b> kell, mert a vessző a tizedesjel.</p><pre>=<span class="fn">KEREKÍTÉS</span>(<span class="rf">H2</span>;1)</pre>
+        <p>Az Excel <span class="ui">Tizedesjegyek csökkentése</span> gombja csak a kinézetet változtatja. A KEREKÍTÉS tényleg átírja a számot.</p>`,
+      steps: [
+        `Kattints az <b>I2</b>-re, és írd be: <code>=KEREKÍTÉS(H2;1)</code>, <kbd>Enter</kbd>.`,
+        `Húzd le a kitöltőjelet az <b>I9</b>-ig.`,
+        `Nézd meg a 6.B sorát: mennyi lett a kerekített átlaga? És van-e osztály, amelyiknek ennél jobb az átlaga?`
+      ],
+      goals: [{ label: "I2–I9: kerekített átlag (KEREKÍTÉS)", range: "I2:I9", ref: "=KEREKÍTÉS(H2;1)", fn: "KEREKÍTÉS" }],
+      asks: [{ q: "Mennyi a <b>6.B</b> kerekített átlaga? (I5)", cell: "I5",
+               traps: { "8.666666667": "Ez a kerekítetlen átlag. Az I5-ben a KEREKÍTÉS eredménye kell, egy tizedesjegyre.", "8.67": "Ez két tizedesjegy. A KEREKÍTÉS második része 1 legyen.", "9": "Ez egészre kerekítve. A KEREKÍTÉS második része 1 legyen, nem 0." } },
+             { q: "Melyik osztálynak a legjobb az átlaga?", text: ["6.B", "6b"], traps: { "8.B": "A 8.B-nek a legtöbb az összpontja. De az átlagát (8,4) valaki megelőzi: nézd meg az I oszlopot!" }, wrong: "Nézd meg az I oszlopban, hol a legnagyobb szám, és melyik osztály sora az." }],
+      hints: ["I2: <code>=KEREKÍTÉS(H2;1)</code>. Vessző helyett pontosvessző!", "A 6.B az 5. sorban van, az átlaga 8,666…, egy tizedesre kerekítve ebből 8,7 lesz."],
+      success: "8,7 a 6.B-nél: övék a legjobb átlag! Gábor bácsi úgy dönt, hogy a 8.B kapja a kupát, a 6.B pedig különdíjat kap a legjobb átlagért." },
+
+    { title: "Hányban indultak?", select: "J2",
+      story: `<p>Jövőre Gábor bácsi szeretné, ha minden osztály minden számban indulna. Ehhez tudnia kell, <b>melyik osztály hány számban indult</b>, és <b>melyik számban hány osztály</b>.</p>`,
+      learn: `<p>A <b>DARAB</b> megszámolja, hány cellában van <b>szám</b>. Az üres cellákat kihagyja.</p><pre>=<span class="fn">DARAB</span>(<span class="rf">B2:F2</span>)</pre>
+        <p>A kitöltőjelet <b>jobbra</b> is húzhatod. Ilyenkor nem a sorszám, hanem az oszlop betűje változik: <code>B2:B9</code> → <code>C2:C9</code>.</p>`,
+      steps: [
+        `<b>J2</b>: <code>=DARAB(B2:F2)</code>, aztán húzd le a <b>J9</b>-ig. Ez megmutatja, hány számban indult az osztály.`,
+        `<b>B10</b>: <code>=DARAB(B2:B9)</code>. Ez azt mutatja, hány osztály indult futásban.`,
+        `Kattints vissza a B10-re, és a kitöltőjelet most húzd <b>jobbra</b>, az <b>F10</b>-ig.`
+      ],
+      goals: [{ label: "J2–J9: hány számban indult (DARAB)", range: "J2:J9", ref: "=DARAB(B2:F2)", fn: "DARAB" }, { label: "B10–F10: hány osztály indult (DARAB)", range: "B10:F10", ref: "=DARAB(B2:B9)", fn: "DARAB" }],
+      asks: [{ q: "Hány osztály indult <b>kötélhúzásban</b>? (E10)", cell: "E10", traps: { "8": "8 osztály van összesen, de kötélhúzásban nem mindenki indult. Biztos DARAB-ot használtál? (A DARAB az üres cellát nem számolja.)" } },
+             { q: "Hány számban indult a <b>6.B</b>? (J5)", cell: "J5" }],
+      hints: ["J2: <code>=DARAB(B2:F2)</code>, le a J9-ig. B10: <code>=DARAB(B2:B9)</code>, jobbra az F10-ig.", "A kötélhúzás az E oszlop: ott két üres cella van."],
+      success: "Kötélhúzásban csak 6 osztály indult, a 6.B pedig csak 3 számban. Gábor bácsi jövőre ezen javít." },
+
+    { title: "Az átlagos osztály", select: "G14",
+      story: `<p>Utolsó számolás: mennyi volt az <b>átlagos összpont</b>? Ebből látszik, melyik osztály teljesített az átlag felett.</p>`,
+      learn: `<p>A függvényeket egymásba is írhatod: a KEREKÍTÉS első része maga is lehet egy függvény. Az Excel belülről kifelé számol: előbb az átlag, aztán a kerekítés.</p><pre>=<span class="fn">KEREKÍTÉS</span>(<span class="fn">ÁTLAG</span>(<span class="rf">G2:G9</span>);1)</pre>`,
+      isNew: false,
+      steps: [
+        `<b>G14</b>: az összpontok átlaga: <code>=ÁTLAG(G2:G9)</code>.`,
+        `<b>G15</b>: ugyanez egy tizedesjegyre kerekítve: <code>=KEREKÍTÉS(G14;1)</code>. (Ha ügyes vagy, egyben is megy: <code>=KEREKÍTÉS(ÁTLAG(G2:G9);1)</code>.)`
+      ],
+      goals: [{ label: "G14: átlagos összpont (ÁTLAG)", range: "G14", ref: "=ÁTLAG(G2:G9)", fn: "ÁTLAG" }, { label: "G15: kerekítve (KEREKÍTÉS)", range: "G15", ref: "=KEREKÍTÉS(G14;1)", fn: "KEREKÍTÉS" }],
+      asks: [{ q: "Mennyi az átlagos összpont egy tizedesre kerekítve? (G15)", cell: "G15", traps: { "27.875": "Ez a kerekítetlen átlag (G14). A G15-ben egy tizedesjegyre kerekíts!", "28": "Ez egészre kerekítve. A KEREKÍTÉS második része 1 legyen." } }],
+      hints: ["G14: <code>=ÁTLAG(G2:G9)</code>", "G15: <code>=KEREKÍTÉS(G14;1)</code>"],
+      success: "27,9 pont az átlag. Három osztály van felette: a 7.A, a 8.A és a 8.B. A 6.B a kihagyott számok miatt maradt alatta, pedig neki a legjobb az átlaga." },
+
+    { title: "Beadás", upload: true,
+      story: `<p>Kész a táblázat! Mielőtt beadod, az oldal <b>megnézi a fájlodat</b>: mindenhol képlet van-e, jó függvényt használtál-e, és jó-e az eredmény.</p>`,
+      steps: [
+        `Mentsd el a fájlt az Excelben: <kbd>Ctrl</kbd>+<kbd>S</kbd>.`,
+        `Húzd a fájlt az alábbi mezőbe (vagy kattints rá, és válaszd ki). A fájlt az oldal csak itt a böngészőben nézi meg, nem küldi el sehová.`,
+        `Ha valami piros, javítsd ki az Excelben, mentsd el, és húzd ide újra.`
+      ],
+      success: "Minden képlet a helyén, minden eredmény stimmel. Gábor bácsi hétfőn ebből a táblázatból hirdet eredményt!" }
+  ],
+  ending: {
+    title: "Kihirdethető az eredmény!",
+    text: `<p>A 8.B nyerte a kupát a legtöbb összponttal, a 6.B pedig különdíjat kapott a legjobb átlagért. Te pedig az igazi Excelben megírtad az összes képletet: SZUM, MAX, MIN, ÁTLAG, KEREKÍTÉS és DARAB.</p>
+      <p>Ha jövőre változik egy pontszám, elég átírni: minden összeg, átlag és győztes magától frissül.</p>`,
+    rank: (min, hints) => hints === 0 ? "Rang: Főbíró. Egyetlen segítség nélkül!" : hints <= 3 ? "Rang: Profi pontozó" : "Rang: Ügyes segítő. Legközelebb kevesebb segítséggel is menni fog!"
+  }
+};
+</script>
+<script src="../real.js"></script>
+<script src="../../nav.js?v=e9a89f4b" defer></script>
+</body>
+</html>
