@@ -6,7 +6,7 @@
    The file list below is written by tools/build-sw.py: run it before pushing. */
 
 /* FILES:BEGIN (written by tools/build-sw.py, don't edit by hand) */
-const VERSION = "412860468e";
+const VERSION = "c904f5c032";
 const CORE = [
 "./",
 "css/basics/first-steps.html",
@@ -18,6 +18,17 @@ const CORE = [
 "css/basics/makeover-hu.html",
 "css/basics/makeover.html",
 "css/index.html",
+"excel/explainer.css",
+"excel/explainer.js",
+"excel/formulas/bake-sale-hu.html",
+"excel/formulas/intro-hu.html",
+"excel/if/class-trip-hu.html",
+"excel/if/intro-hu.html",
+"excel/index.html",
+"excel/mission.css",
+"excel/mission.js",
+"excel/sheet.css",
+"excel/sheet.js",
 "favicon.svg",
 "heist-hu.html",
 "heist.html",
@@ -114,6 +125,7 @@ const CORE = [
 "vendor/codemirror-html.js"
 ];
 const EXTERNAL = [
+"https://cdn.jsdelivr.net/npm/",
 "https://cdn.jsdelivr.net/npm/sql.js@1.10.3/dist/sql-asm.js",
 "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js",
 "https://fonts.googleapis.com/css2?family=Bree+Serif&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap",

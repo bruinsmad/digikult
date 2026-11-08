@@ -352,6 +352,75 @@
             ]
           }
         ]
+      },
+      {
+        id: "excel",
+        accent: "#5cc98a",
+        title: { hu: "Táblázatkezelés – Excel", en: "Spreadsheets – Excel" },
+        blurb: {
+          hu: "Képletek, kitöltőjel, függvények és döntések: igazi munkalap a böngészőben, magyar Excel-függvényekkel.",
+          en: "Formulas, the fill handle, functions and decisions: a real worksheet in the browser, with Hungarian Excel functions."
+        },
+        lessons: [
+          {
+            id: "formulas",
+            title: { hu: "Képletek és alapfüggvények: SZUM, ÁTLAG, MIN, MAX, DARAB, KEREKÍTÉS, $", en: "Formulas and basic functions: SZUM, ÁTLAG, MIN, MAX, DARAB, KEREKÍTÉS, $" },
+            pages: [
+              {
+                id: "formulas-intro",
+                kind: "theory",
+                minutes: 15,
+                title: { hu: "Képletek – elmélet", en: "Formulas – explainer" },
+                desc: {
+                  hu: "Cellák és címek, képletek, a kitöltőjel, SZUM, ÁTLAG, MIN, MAX ismétlése, és újak: DARAB, KEREKÍTÉS, rögzítés a $ jellel. Minden táblázat kipróbálható.",
+                  en: "Cells and addresses, formulas, the fill handle, a SZUM/ÁTLAG/MIN/MAX refresher, then DARAB, KEREKÍTÉS and the $ sign. Every worksheet is live."
+                },
+                files: { hu: "excel/formulas/intro-hu.html" }
+              },
+              {
+                id: "bake-sale",
+                kind: "story",
+                minutes: 40,
+                title: { hu: "A 8.B sütivására", en: "The Class 8B Bake Sale" },
+                desc: {
+                  hu: "Nyolcféle süti, három nap, egy osztálykirándulás. Zsófi táblázatát kell működésre bírnod: a végén letöltheted igazi Excel-fájlként.",
+                  en: "Eight cakes, three days, one class trip. Make Zsófi's worksheet calculate, then download it as a real Excel file."
+                },
+                files: { hu: "excel/formulas/bake-sale-hu.html" },
+                progress: { chapters: 7, keys: { hu: "bake-sale-hu-v1" } }
+              }
+            ]
+          },
+          {
+            id: "if",
+            title: { hu: "Döntések: HA és DARABTELI", en: "Decisions: HA and DARABTELI" },
+            pages: [
+              {
+                id: "if-intro",
+                kind: "theory",
+                minutes: 15,
+                title: { hu: "HA és DARABTELI – elmélet", en: "HA and DARABTELI – explainer" },
+                desc: {
+                  hu: "Feltételek (IGAZ vagy HAMIS), a HA szöveggel és számmal, a DARABTELI kritériumai, és kitekintésként a SZUMHA.",
+                  en: "Conditions (IGAZ or HAMIS), HA with text and numbers, DARABTELI criteria, and a look at SZUMHA."
+                },
+                files: { hu: "excel/if/intro-hu.html" }
+              },
+              {
+                id: "class-trip",
+                kind: "story",
+                minutes: 35,
+                title: { hu: "Irány a Mátra!", en: "Off to the Mátra!" },
+                desc: {
+                  hu: "16 diák, egy kirándulás: ki fizetett, ki melyik túrára megy, hány vega menü kell, és mehet-e a foglalás? HA és DARABTELI.",
+                  en: "16 students, one trip: who has paid, who takes which hike, how many veggie meals, and can we book? HA and DARABTELI."
+                },
+                files: { hu: "excel/if/class-trip-hu.html" },
+                progress: { chapters: 5, keys: { hu: "class-trip-hu-v1" } }
+              }
+            ]
+          }
+        ]
       }
     ]
   };

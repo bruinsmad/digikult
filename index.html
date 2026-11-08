@@ -299,6 +299,22 @@ main:focus{outline:none}
   filter:drop-shadow(0 4px 3px rgba(0,0,0,.3))}
 .slate--inkscape .curl{position:absolute;right:0;bottom:0;width:26px;height:26px;
   background:linear-gradient(315deg,var(--board) 0 50%,#e4dcc8 50%,#f6f1e4 72%);box-shadow:-2px -2px 3px rgba(0,0,0,.08)}
+/* Excel: a printed worksheet on a clipboard, the selected cell still showing its fill handle */
+.slate--excel{padding:16px 12px 12px;border-radius:10px;background:linear-gradient(135deg,#a8774a,#86592f 50%,#65411f);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 3px 0 rgba(0,0,0,.25),0 18px 30px rgba(0,0,0,.35)}
+.slate--excel::before{top:-14px;width:96px;height:30px;opacity:1;border-radius:6px 6px 10px 10px;z-index:3;
+  background:linear-gradient(#e9ecef,#aab1b7 55%,#7f878d);box-shadow:inset 0 -3px 0 rgba(0,0,0,.18),0 3px 4px rgba(0,0,0,.35)}
+.slate--excel::after{top:-6px;width:40px;height:10px;margin-left:-20px;border-radius:5px;background:#5e666c;box-shadow:inset 0 2px 2px rgba(0,0,0,.4);z-index:4}
+.slate--excel .slate-in{--chalk:#1f2b26;--chalk-dim:#56625c;--chalk-faint:rgba(31,43,38,.18);--board-deep:#fff;--c:#107c41;
+  color:var(--chalk);border-radius:3px;background-color:#fff;padding-top:30px;
+  background-image:linear-gradient(#eef3ee,#eef3ee),linear-gradient(rgba(16,124,65,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(16,124,65,.08) 1px,transparent 1px);
+  background-size:100% 18px,100% 26px,72px 100%;background-repeat:no-repeat,repeat,repeat;background-position:0 0,0 18px,22px 0;
+  box-shadow:0 1px 2px rgba(0,0,0,.2)}
+.slate--excel h2 small{color:var(--chalk-dim)}
+.slate--excel .cellsel{position:absolute;z-index:-1;top:70px;right:22px;width:72px;height:26px;border:2.5px solid #107c41;background:rgba(16,124,65,.06)}
+.slate--excel .cellsel::after{content:"";position:absolute;right:-6px;bottom:-6px;width:8px;height:8px;background:#107c41;border:1.5px solid #fff}
+.slate--excel .fxghost{position:absolute;z-index:-1;top:2px;left:12px;font:600 11.5px ui-monospace,"SF Mono",Menlo,Consolas,monospace;color:#6b7d73;letter-spacing:.02em}
+.slate--excel .slate-in{isolation:isolate}
 @media (prefers-reduced-motion:reduce){ .slate--web h2 .caret{animation:none} }
 
 /* ---------- one subject open ---------- */
@@ -400,7 +416,7 @@ body.subject .hero{display:none}
   </div>
 </footer>
 
-<script src="nav.js?v=57ac8eae"></script>
+<script src="nav.js?v=61ed1528"></script>
 <script>
 (function(){
   const D = window.DIGIKULT;
@@ -409,7 +425,7 @@ body.subject .hero{display:none}
 
   const TXT = {
     hu:{
-      tagline:"Nyomozz, terelj, építs weboldalt, rajzolj: minden küldetés egy történet, amit SQL-lel, HTML-lel és CSS-sel vagy Inkscape-pel oldasz meg.",
+      tagline:"Nyomozz, terelj, építs weboldalt, rajzolj, számolj: minden küldetés egy történet, amit SQL-lel, HTML-lel és CSS-sel, Inkscape-pel vagy Excellel oldasz meg.",
       left:"Itt tartasz", start:"Kezdd itt", allDone:"Mindet megoldottad!",
       chapters:(d,n)=>`${d} / ${n} fejezet kész`, chaptersTotal:n=>`${n} fejezet`, min:n=>`kb. ${n} perc`,
       cont:"Folytatás", go:"Indítás", solved:"Megoldva ✓",
@@ -423,7 +439,7 @@ body.subject .hero{display:none}
       sticky:"Ctrl+S, ne felejtsd!"
     },
     en:{
-      tagline:"Solve a heist, herd a flock, build a web page, draw a poster: every mission is a story you crack with SQL, HTML and CSS, or Inkscape.",
+      tagline:"Solve a heist, herd a flock, build a web page, draw a poster, run the numbers: every mission is a story you crack with SQL, HTML and CSS, Inkscape or Excel.",
       left:"Where you left off", start:"Start here", allDone:"You've solved them all!",
       chapters:(d,n)=>`${d} of ${n} chapters done`, chaptersTotal:n=>`${n} chapters`, min:n=>`about ${n} min`,
       cont:"Continue", go:"Start", solved:"Solved ✓",
@@ -666,6 +682,31 @@ function puliSvg(){
       </g>
       <path d="M222 100h14" stroke="#f2d264" stroke-width="3" stroke-dasharray="4 4"/>
     </svg>`,
+    "bake-sale":`<svg viewBox="0 0 400 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <rect width="400" height="200" fill="#f6d7e2"/><path d="M0 0h400v34H0z" fill="#c2477a"/>
+      <path d="M0 34q25 18 50 0t50 0 50 0 50 0 50 0 50 0 50 0 50 0v-6H0z" fill="#c2477a"/><text x="200" y="24" text-anchor="middle" font-family="Kalam,cursive" font-weight="700" font-size="22" fill="#fff6e8" letter-spacing="2">SÜTIVÁSÁR</text>
+      <rect x="20" y="150" width="360" height="14" rx="3" fill="#a8693a"/><rect x="34" y="164" width="12" height="36" fill="#7d4a26"/><rect x="354" y="164" width="12" height="36" fill="#7d4a26"/>
+      <g transform="translate(70 92)"><path d="M-22 18h44l-6 40h-32z" fill="#e9a25a"/><path d="M-26 20c-4-14 8-26 18-22 2-12 18-14 22-2 12-2 18 12 12 24z" fill="#fbe3ef"/><circle cy="-12" r="6" fill="#d6313a"/></g>
+      <g transform="translate(150 98)"><path d="M-20 16h40l-5 36h-30z" fill="#8a5532"/><path d="M-24 18c-3-12 8-22 16-18 3-10 17-10 20 0 10-2 14 10 10 20z" fill="#5a3418"/><g fill="#f2d264"><rect x="-10" y="-2" width="5" height="2" rx="1"/><rect x="4" y="2" width="5" height="2" rx="1"/></g></g>
+      <g transform="translate(232 104)"><rect x="-30" y="10" width="60" height="36" rx="4" fill="#f2c56a"/><path d="M-30 22h60M-30 34h60" stroke="#d99a3a" stroke-width="3"/><rect x="-30" y="4" width="60" height="8" rx="3" fill="#fff6e8"/></g>
+      <g transform="translate(318 92)"><path d="M-22 18h44l-6 40h-32z" fill="#e9a25a"/><path d="M-26 20c-4-14 8-26 18-22 2-12 18-14 22-2 12-2 18 12 12 24z" fill="#d6f0dc"/><circle cy="-12" r="6" fill="#d6313a"/></g>
+      <g font-family="Atkinson Hyperlegible,sans-serif" font-weight="700" font-size="12" text-anchor="middle">
+        <g transform="translate(96 140) rotate(-8)"><rect x="-24" y="-11" width="48" height="20" rx="3" fill="#fff"/><text y="4" fill="#1d2622">350 Ft</text></g>
+        <g transform="translate(262 140) rotate(6)"><rect x="-24" y="-11" width="48" height="20" rx="3" fill="#fff"/><text y="4" fill="#1d2622">300 Ft</text></g></g>
+      <g transform="translate(330 44) rotate(8)"><rect width="56" height="40" rx="3" fill="#fff" stroke="#107c41" stroke-width="2"/><path d="M0 13h56M0 26h56M19 0v40M38 0v40" stroke="#cfe3d6" stroke-width="1.5"/><rect x="19" y="13" width="19" height="13" fill="none" stroke="#107c41" stroke-width="2.5"/></g>
+    </svg>`,
+    "class-trip":`<svg viewBox="0 0 400 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <defs><linearGradient id="ctSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8cc4ea"/><stop offset="1" stop-color="#d9eef8"/></linearGradient></defs>
+      <rect width="400" height="200" fill="url(#ctSky)"/><circle cx="330" cy="44" r="20" fill="#f2d264"/>
+      <path d="M0 150L70 70l40 40 60-78 70 86 40-36 70 60 50-30v88H0z" fill="#7aa58a"/><path d="M170 32l18 22-9-3-9 9-7-8-9 3z" fill="#fff"/>
+      <path d="M0 160l80-46 50 30 70-50 90 60 60-30 50 26v50H0z" fill="#4f8564"/>
+      <path d="M40 66L262 18" stroke="#1d2622" stroke-width="1.6"/><g fill="#d6313a"><path d="M118 49h12v10h-12z"/><path d="M196 32h12v10h-12z"/></g><path d="M124 49v-4M202 32v-4" stroke="#1d2622" stroke-width="1.4"/>
+      <path d="M0 176h400v24H0z" fill="#5d6a66"/><path d="M0 188h400" stroke="#f2efe4" stroke-width="2.4" stroke-dasharray="18 14"/>
+      <g transform="translate(110 140)"><rect width="150" height="44" rx="8" fill="#f2c230"/><rect y="30" width="150" height="6" fill="#d9a51c"/>
+        <g fill="#cfe6f5"><rect x="12" y="8" width="22" height="16" rx="2"/><rect x="40" y="8" width="22" height="16" rx="2"/><rect x="68" y="8" width="22" height="16" rx="2"/><rect x="96" y="8" width="22" height="16" rx="2"/><rect x="124" y="8" width="18" height="26" rx="2"/></g>
+        <circle cx="34" cy="46" r="9" fill="#1d2622"/><circle cx="34" cy="46" r="3.5" fill="#b9b9b9"/><circle cx="118" cy="46" r="9" fill="#1d2622"/><circle cx="118" cy="46" r="3.5" fill="#b9b9b9"/>
+        <text x="66" y="-6" text-anchor="middle" font-family="Kalam,cursive" font-weight="700" font-size="16" fill="#1d4f78">8.B</text></g>
+    </svg>`,
     makeover:`<svg viewBox="0 0 400 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
       <rect width="400" height="200" fill="#e8eef4"/>
       <g transform="translate(26 40) rotate(-4)">
@@ -739,6 +780,11 @@ function puliSvg(){
       <circle cx="16" cy="16" r="2.4" fill="var(--chalk)" stroke="none"/><circle cx="25" cy="16" r="2.4" fill="var(--chalk)" stroke="none"/>
       <path d="M20 40h50M20 52h70M20 64h40" stroke="var(--chalk)" stroke-width="2.4" opacity=".8"/><rect x="74" y="56" width="30" height="20" rx="2" stroke="var(--c)" stroke-width="2.6"/>
       <path d="M134 30l-12 18 12 18M154 30l12 18-12 18" stroke="var(--c)" stroke-width="3.4"/><path d="M148 26l-8 44" stroke="var(--chalk)" stroke-width="2.4"/></svg>`;
+  EMBLEMS.excel = `<svg viewBox="0 0 170 96" aria-hidden="true" fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <g stroke="var(--chalk)" stroke-width="2.2" opacity=".85"><rect x="4" y="6" width="112" height="84" rx="3"/><path d="M4 26h112M4 46h112M4 66h112M32 6v84M60 6v84M88 6v84"/></g>
+      <rect x="60" y="26" width="28" height="20" stroke="var(--c)" stroke-width="3.4"/><rect x="60" y="46" width="28" height="40" stroke="var(--c)" stroke-width="2.4" stroke-dasharray="5 4"/>
+      <rect x="84" y="42" width="8" height="8" fill="var(--c)" stroke="var(--board-deep)" stroke-width="1.6"/>
+      <path d="M162 24h-28l16 24-16 24h28" stroke="var(--c)" stroke-width="3.4"/></svg>`;
   const embGen = `<svg viewBox="0 0 170 96" aria-hidden="true" fill="none"><path d="M8 70q40-60 80 0t76-10" stroke="var(--c)" stroke-width="3.4" stroke-linecap="round"/></svg>`;
   const splitName = n => { const [field, tool] = n.split(" – "); return tool ? `<small>${esc(field)}</small>${esc(tool)}` : esc(n); };
   const lessonTitle = t => {
@@ -762,6 +808,7 @@ function puliSvg(){
       ${tp.id === "web" ? `<span class="titlebar" aria-hidden="true"><i></i><i></i><i></i><span>index.html</span></span>` : ""}
       ${tp.id === "sql" ? `<span class="deco ghost" aria-hidden="true">SELECT *<br>FROM&nbsp;…</span>` : ""}
       ${tp.id === "inkscape" ? `<span class="deco guides" aria-hidden="true"></span><span class="deco curl" aria-hidden="true"></span>` : ""}
+      ${tp.id === "excel" ? `<span class="deco fxghost" aria-hidden="true">fx&nbsp;&nbsp;=SZUM(B2:B9)</span>` : ""}
       <span class="emb">${EMBLEMS[tp.id] || embGen}</span>
       <h2><a href="#${tp.id}" aria-label="${esc(T.open(name))}">${splitName(name)}${tp.id === "web" ? `<span class="caret" aria-hidden="true"></span>` : ""}</a></h2>
       <p class="bl">${esc(D.t(tp.blurb))}</p>

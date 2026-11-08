@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>/* moving between pages: the old page drifts aside and fades, the new one glides in; the rail holds still */@view-transition{navigation:auto}.rail{view-transition-name:rail}::view-transition-group(root){animation:none}::view-transition-old(root){animation:dk-out .2s cubic-bezier(.4,0,1,1) both}::view-transition-new(root){animation:dk-in .38s cubic-bezier(.16,1,.3,1) .06s both}::view-transition-old(rail),::view-transition-new(rail){animation:none}@keyframes dk-out{to{opacity:0;transform:translateX(-18px)}}@keyframes dk-in{from{opacity:0;transform:translateX(26px)}}@media (prefers-reduced-motion:reduce){::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none!important}}</style>
+<title>A 8.B sütivására – Excel-küldetés</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600;700&display=swap">
+<link rel="stylesheet" href="../sheet.css">
+<link rel="stylesheet" href="../mission.css">
+<style>:root{--m:#c2477a;--m-soft:#fbe9f0;--m-ink:#8f2453}</style>
+</head>
+<body>
+<header class="rail"><div class="in">
+  <a class="home" href="../../index.html">Digitális kultúra</a>
+  <span class="crumb"><a href="../../index.html#excel">Táblázatkezelés – Excel</a> › <a href="../../index.html#excel-formulas">1. lecke</a></span>
+</div></header>
+<div class="top">
+  <span class="art" aria-hidden="true"><svg viewBox="0 0 96 96"><ellipse cx="48" cy="86" rx="30" ry="5" fill="#000" opacity=".25"/>
+<path d="M22 50h52l-7 34H29z" fill="#e9a25a"/><path d="M30 50l3 34M40 50l1.5 34M50 50v34M60 50l-1.5 34M68 50l-2 34" stroke="#c97c35" stroke-width="2.4"/>
+<path d="M18 52c-4-12 6-22 14-20 0-12 14-18 22-12 8-6 22 0 20 12 10-2 16 10 10 20z" fill="#fbe3ef"/>
+<path d="M18 52c4 3 10 3 14 0 4 3 10 3 14 0 4 3 10 3 14 0 4 3 10 3 14 0" fill="none" stroke="#f0a3b8" stroke-width="3" stroke-linecap="round"/>
+<circle cx="48" cy="17" r="7" fill="#d6313a"/><path d="M48 10c2-6 7-8 10-7" stroke="#2f7a3a" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+<g fill="#7fa7ff"><rect x="30" y="34" width="5" height="2.4" rx="1" transform="rotate(30 32 35)"/><rect x="60" y="30" width="5" height="2.4" rx="1" transform="rotate(-25 62 31)"/></g>
+<g fill="#f2d264"><rect x="44" y="38" width="5" height="2.4" rx="1" transform="rotate(-40 46 39)"/><rect x="66" y="42" width="5" height="2.4" rx="1"/></g>
+<g fill="#a8dba0"><rect x="24" y="44" width="5" height="2.4" rx="1" transform="rotate(15 26 45)"/><rect x="53" y="44" width="5" height="2.4" rx="1" transform="rotate(50 55 45)"/></g></svg></span>
+  <div><div class="kicker">Excel, 1. lecke: küldetés</div><h1>A 8.B sütivására</h1></div>
+  <div class="meta"><span>Haladás <b id="solvedCount">–</b></span><span>Idő <b id="timer">0:00</b></span><button type="button" class="mbtn" id="soundBtn">Hang: be</button><button type="button" class="mbtn" id="resetBtn">Elölről</button></div>
+</div>
+<nav class="steps" id="steps" aria-label="Fejezetek"></nav>
+<div id="game"><main>
+  <article class="card" id="case" aria-live="polite"></article>
+  <section class="work" aria-label="Munkalap"><div class="card">
+    <div class="work-head"><h2>sutivasar.xlsx</h2><p>Kattints egy cellára, és kezdj el gépelni.</p></div>
+    <div id="sheet"></div>
+    <p class="keys"><kbd>Enter</kbd> kész · <kbd>Esc</kbd> mégse · <kbd>F2</kbd> javítás · <kbd>F4</kbd> $ jel · <kbd>Ctrl</kbd>+<kbd>Z</kbd> visszavonás · <kbd>Ctrl</kbd>+<kbd>C</kbd> / <kbd>V</kbd> másolás · a cella sarkában lévő ▪ a <b>kitöltőjel</b>: húzd le vagy jobbra</p>
+  </div></section>
+</main></div>
+<section id="endPanel" hidden></section>
+<footer class="end">Digitális kultúra. A táblázat a böngésződben számol, és ott is marad: ha bezárod az oldalt, legközelebb innen folytathatod.</footer>
+<canvas id="fx" aria-hidden="true"></canvas>
+<script src="../sheet.js"></script>
+<script>
+
+window.MISSION = {
+  key: "bake-sale-hu-v1", file: "sutivasar", title: "A 8.B sütivására", sheetName: "Sütivásár",
+  confetti: ["#c2477a", "#f2d264", "#f0a3b8", "#e9a25a", "#7fa7ff", "#a8dba0"],
+  next: { href: "../if/intro-hu.html", text: "Tovább: HA és DARABTELI" },
+  sheet: {
+    cols: 8, rows: 17, widths: [150, 74, 66, 66, 66, 84, 104, 84], select: "F2",
+    cells: {
+      A1: "Süti", B1: "Ár (Ft)", C1: "Hétfő (db)", D1: "Kedd (db)", E1: "Szerda (db)", F1: "Összesen (db)", G1: "Bevétel (Ft)", H1: "Arány",
+      A2: "Kakaós csiga", B2: 350, C2: 14, D2: 11, E2: 16,
+      A3: "Túrós batyu", B3: 400, C3: 9, D3: 12, E3: 8,
+      A4: "Pizzás csiga", B4: 450, C4: 18, D4: 15, E4: 20,
+      A5: "Zserbó", B5: 300, C5: 7, D5: 10,
+      A6: "Muffin", B6: 400, C6: 12, D6: 9, E6: 11,
+      A7: "Linzer", B7: 200, C7: 16, D7: 20, E7: 14,
+      A8: "Brownie", B8: 500, C8: 6, E8: 9,
+      A9: "Almás pite", B9: 350, C9: 10, D9: 8, E9: 13,
+      A10: "Összesen",
+      A12: "Legtöbb eladott darab egy sütiből", A13: "Legkevesebb eladott darab", A14: "Átlagosan ennyi süti fogyott egy nap",
+      A15: "Ugyanez egészre kerekítve", A16: "Hányféle süti volt szerdán?", A17: "Hány napon volt brownie?"
+    },
+    formats: { "B2:B9": "ft", "G2:G10": "ft", "H2:H10": "pct" },
+    styles: { "A1:H1": "head", "A10:H10": "total", "A12:A17": "label", "F12:F17": "sum" },
+    locked: ["A1:H1", "A2:E9", "A10", "A12:A17"],
+    lockedText: "Ezek Zsófi adatai, ezeket nem kell átírni. A sárgával kiemelt cellákba dolgozz!"
+  },
+  chapters: [
+    { refresher: true, title: "Bemelegítés", select: "F2",
+      story: `<p>Május végén a 8.B osztálykirándulásra megy a Mátrába, de a buszra még nincs elég pénz. Ezért az osztály három napig sütit árult a nagyszünetben. <span class="who">Zsófi</span>, az osztálypénztáros, mindent beírt egy táblázatba: melyik süti mennyibe került, és melyik nap hány darab fogyott belőle.</p>
+        <p>„Számolni már nem volt időm – mondja Zsófi. – Segítesz? De úgy, hogy az Excel számoljon, ne mi fejben!”</p>`,
+      learn: `<ul><li>Minden képlet <b>egyenlőségjellel</b> kezdődik: <code>=</code></li>
+        <li>A képletbe a <b>cella címét</b> írd, ne a benne lévő számot: <code>=C2+D2</code>. Így ha az adat változik, az eredmény is változik.</li>
+        <li>Műveleti jelek: <code>+</code> <code>-</code> <code>*</code> (szorzás) <code>/</code> (osztás). A végén <kbd>Enter</kbd>.</li></ul>
+        <p>Tipp: a címet nem kell begépelni. Írd be, hogy <code>=</code>, aztán kattints a cellára!</p>`,
+      goals: [{ text: "Az <b>F2</b> cellába: hány kakaós csiga fogyott a három nap alatt? Add össze a <b>C2</b>, <b>D2</b> és <b>E2</b> cellát!", range: "F2", ref: "=C2+D2+E2", noConst: true }],
+      hints: ["Kattints az F2-re, írd be: <code>=</code>, kattints a C2-re, írj <code>+</code> jelet, kattints a D2-re, és így tovább.", "A teljes képlet: <code>=C2+D2+E2</code>, a végén <kbd>Enter</kbd>."],
+      success: "41 kakaós csiga! És ha Zsófi átírná valamelyik napot, az F2 magától újraszámolna. Ez a képlet ereje." },
+    { title: "Mennyi fogyott?", select: "F2",
+      story: `<p>„Szuper! De nyolcféle sütink volt – sóhajt Zsófi. – Mind a nyolcat egyenként kell?”</p><p>Nem kell. Egy képletet megírsz, a többit az Excel lemásolja.</p>`,
+      learn: `<p>Hosszú összeadás helyett ott a <b>SZUM</b> függvény. A <code>C2:E2</code> azt jelenti: <i>C2-től E2-ig minden cella</i>. Ez egy <b>tartomány</b>.</p><pre>=<span class="fn">SZUM</span>(<span class="rf">C2:E2</span>)</pre>
+        <p><b>Kitöltőjel:</b> a kijelölt cella jobb alsó sarkában van egy kis négyzet. Fogd meg, és húzd le! Az Excel minden sorba lemásolja a képletet, és közben <b>átírja a sorszámot</b>: a 3. sorban már <code>=SZUM(C3:E3)</code> áll.</p>`,
+      goals: [{ text: "<b>F2–F9</b>: minden sütinél a három nap összege, a <b>SZUM</b> függvénnyel. Az F2-ben lévő képletet is cseréld le!", range: "F2:F9", ref: "=SZUM(C2:E2)", use: ["SZUM"] }],
+      hints: ["Írd be az F2-be: <code>=SZUM(</code>, aztán húzd végig az egeret C2-től E2-ig, és nyomj <kbd>Enter</kbd>-t. Utána kattints vissza az F2-re, és húzd le a sarkában lévő négyzetet az F9-ig.", "F2: <code>=SZUM(C2:E2)</code>, aztán a kitöltőjellel le az F9-ig."],
+      success: "Nézd meg a zserbót és a brownie-t: náluk egy nap üres, a SZUM mégis jól számol, mert az üres cellát egyszerűen kihagyja." },
+    { title: "Mennyi pénz jött?", select: "G2", isNew: false,
+      story: `<p>Most jön a lényeg: <b>mennyi pénzt hozott</b> az egyes sütik árulása? Ehhez az árat meg kell szorozni azzal, hogy összesen hány darab fogyott.</p>`,
+      learn: `<p>Szorozni a <code>*</code> jellel kell. A kakaós csiga bevétele: <code>=B2*F2</code>.</p>
+        <p>Miért nem <code>=350*41</code>? Mert ha jövőre 400 Ft lesz a csiga, a beírt 350 nem változik, a <code>B2</code> viszont igen. <mark>Mindig a cellára hivatkozz, ne a számot írd be!</mark></p>`,
+      goals: [{ text: "<b>G2–G9</b>: az egyes sütik bevétele (ár × összes eladott darab), lehúzással.", range: "G2:G9", ref: "=B2*F2", noConst: true,
+        wrong: (raw, val, exp, a) => `${XL.Az(a)} ${a} értéke nem stimmel. A bevételhez az ár (B oszlop) és az összes eladott darab (F oszlop) kell.` }],
+      hints: ["G2: írd be: <code>=</code>, kattints a B2-re, írj <code>*</code> jelet, kattints az F2-re, <kbd>Enter</kbd>. Aztán húzd le.", "<code>=B2*F2</code>, majd a kitöltőjellel le a G9-ig."],
+      success: "A pizzás csiga hozta a legtöbbet: 23 850 Ft! Pedig nem is ez a legdrágább süti." },
+    { title: "Mindent összeadva", select: "C10",
+      story: `<p><span class="who">Kati néni</span>, az osztályfőnök, két dolgot kérdez: <i>melyik nap ment a legjobban</i>, és <i>mennyi pénz gyűlt össze összesen</i>? Erre való a 10. sor.</p>`,
+      learn: `<p>A kitöltőjelet <b>jobbra</b> is húzhatod! Ilyenkor az Excel a <b>betűket</b> írja át: a C oszlop <code>=SZUM(C2:C9)</code> képletéből a D oszlopban <code>=SZUM(D2:D9)</code> lesz.</p>`,
+      goals: [{ text: "<b>C10</b>: a hétfői eladások összege (<code>C2:C9</code>), SZUM-mal.", range: "C10", ref: "=SZUM(C2:C9)", use: ["SZUM"] },
+              { text: "<b>D10–G10</b>: ugyanez a többi oszlopra: húzd a C10 kitöltőjelét jobbra a G10-ig.", range: "D10:G10", ref: "=SZUM(D2:D9)", use: ["SZUM"] }],
+      hints: ["C10: <code>=SZUM(C2:C9)</code>. Aztán fogd meg a C10 sarkát, és húzd jobbra a G10-ig.", "A végén a G10-ben ez lesz: <code>=SZUM(G2:G9)</code>."],
+      success: "Összesen 96 050 Ft! A hétfő volt a legjobb nap (92 süti), a kedd a leggyengébb (85)." },
+    { title: "A legjobb és a leggyengébb", select: "F12", isNew: false,
+      story: `<p>Zsófi plakátot készít a folyosóra: <i>„A legnépszerűbb süti”</i> és <i>„Ezt legközelebb kihagyjuk”</i>. Ehhez kell a legtöbb és a legkevesebb eladott darab.</p>`,
+      learn: `<p>A <b>MAX</b> a tartomány legnagyobb, a <b>MIN</b> a legkisebb számát adja.</p><pre>=<span class="fn">MAX</span>(<span class="rf">F2:F9</span>)</pre><p>Vigyázz, a 10. sor (az összesen) ne legyen a tartományban!</p>`,
+      goals: [{ text: "<b>F12</b>: a legtöbb eladott darab egy sütiből (<b>MAX</b> az F2:F9 tartományból).", range: "F12", ref: "=MAX(F2:F9)", use: ["MAX"], traps: [raw => /F10/i.test(raw) ? "Az F10 az összesen, az nem egy süti. A tartomány F2-től F9-ig tart." : null] },
+              { text: "<b>F13</b>: a legkevesebb eladott darab (<b>MIN</b>).", range: "F13", ref: "=MIN(F2:F9)", use: ["MIN"], traps: [raw => /F10/i.test(raw) ? "Az F10 az összesen, az nem egy süti. A tartomány F2-től F9-ig tart." : null] }],
+      hints: ["F12: <code>=MAX(F2:F9)</code>", "F13: <code>=MIN(F2:F9)</code>"],
+      success: "53 pizzás csiga a csúcs, és 15 brownie a sereghajtó. (Igaz, a brownie csak két napig volt kapható…)" },
+    { title: "Átlag és kerekítés", select: "F14",
+      story: `<p>Jövőre is lesz sütivásár, és a szülők megkérdezték: <i>naponta átlagosan hány sütit kell sütni</i>? Az átlagot a <b>napi</b> összegekből kell számolni: C10, D10, E10.</p>`,
+      learn: `<p>Az ÁTLAG eredménye most csúnya lesz: <code>89,33333333</code>. Sütit nem lehet harmadrészt sütni! A <b>KEREKÍTÉS</b> függvénynek két része van:</p><pre>=<span class="fn">KEREKÍTÉS</span>(<span class="rf">F14</span>;0)</pre>
+        <p>Az első: <i>mit</i> kerekítsen. A második: <i>hány tizedesjegyre</i> (0 = egészre). A részeket <b>pontosvessző</b> <code>;</code> választja el, mert a vessző a tizedesjel.</p>`,
+      goals: [{ text: "<b>F14</b>: a napi átlag: a C10, D10, E10 átlaga (<b>ÁTLAG</b>).", range: "F14", ref: "=ÁTLAG(C10:E10)", use: ["ÁTLAG"],
+                traps: [raw => /F2|F9/i.test(raw) ? "Itt nem a sütik átlaga kell, hanem a napi összegeké: C10, D10, E10." : null] },
+              { text: "<b>F15</b>: ugyanez <b>egészre</b> kerekítve (<b>KEREKÍTÉS</b>, 0 tizedesjegy).", range: "F15", ref: "=KEREKÍTÉS(F14;0)", use: ["KEREKÍTÉS"] }],
+      hints: ["F14: <code>=ÁTLAG(C10:E10)</code>", "F15: <code>=KEREKÍTÉS(F14;0)</code>. Egyben is megy: <code>=KEREKÍTÉS(ÁTLAG(C10:E10);0)</code>"],
+      success: "Naponta kb. 89 sütit kell sütni. A KEREKÍTÉS tényleg átírja a számot: ha az F15-tel számolsz tovább, az pontosan 89." },
+    { title: "Hányféle süti?", select: "F16",
+      story: `<p>Szerdán Bence beteg volt, ezért nem hozott zserbót, kedden pedig elfogyott a csoki a brownie-hoz. Ezek a cellák <b>üresen</b> maradtak. Kati néni azt kérdezi: <i>hányféle süti volt szerdán</i>, és <i>hány napon volt brownie</i>?</p>`,
+      learn: `<p>A <b>DARAB</b> függvény megszámolja, <b>hány cellában van szám</b>. Az üres cellákat és a szövegeket kihagyja.</p><pre>=<span class="fn">DARAB</span>(<span class="rf">E2:E9</span>)</pre>
+        <p>Miért nem számolod meg fejben? Mert ha Zsófi utólag beírja, hogy mégis volt zserbó, a DARAB magától frissül.</p>`,
+      goals: [{ text: "<b>F16</b>: hányféle sütit árultunk szerdán? (Hány szám van az E2:E9 tartományban?)", range: "F16", ref: "=DARAB(E2:E9)", use: ["DARAB"],
+                traps: [raw => /A\d/i.test(raw) ? "Az A oszlopban nevek vannak, azokat a DARAB nem számolja. A szerdai számok az E oszlopban vannak." : null] },
+              { text: "<b>F17</b>: hány napon volt brownie? (Hány szám van a 8. sorban, C-től E-ig?)", range: "F17", ref: "=DARAB(C8:E8)", use: ["DARAB"] }],
+      hints: ["F16: <code>=DARAB(E2:E9)</code>", "F17: <code>=DARAB(C8:E8)</code>"],
+      success: "Szerdán 7-féle süti volt, brownie pedig 2 napon. Az üres cella nem nulla: egyszerűen nincs ott semmi." },
+    { title: "Ki hozta a legtöbbet?", select: "H2",
+      story: `<p>Utolsó kérés: Zsófi azt szeretné tudni, hogy <b>az összes bevétel hány százalékát</b> hozta az egyes süti. Ehhez minden sütinél a bevételt el kell osztani az összes bevétellel, ami a G10-ben van.</p>`,
+      learn: `<p>Ha a H2-be ezt írod: <code>=G2/G10</code>, és lehúzod, a H3-ban már <code>=G3/G11</code> lesz. A <code>G10</code> is lecsúszott, pedig a G11 üres: <code>#ZÉRÓOSZTÓ!</code></p>
+        <p>A megoldás a <b>rögzítés</b>: a <code>$</code> jel megakadályozza, hogy másoláskor a cím elcsússzon.</p><pre>=<span class="rf">G2</span>/<span class="rf">$G$10</span></pre>
+        <p>Nem kell kézzel beírni: a képletben állj a <code>G10</code>-re, és nyomd meg az <kbd>F4</kbd>-et.</p>`,
+      goals: [{ text: "<b>H2–H9</b>: az egyes sütik bevétele osztva az összes bevétellel (G10, rögzítve). A H oszlop magától százalékként mutatja.", range: "H2:H9", ref: "=G2/$G$10", abs: ["G10"], noConst: true }],
+      hints: ["H2: <code>=G2/G10</code>, de a G10 elé tegyél $ jeleket (vagy állj rá, és nyomd meg az F4-et).", "<code>=G2/$G$10</code>, aztán húzd le a H9-ig."],
+      success: "A pizzás csiga hozta a bevétel negyedét (25%), a brownie csak 8%-ot. Ha összeadnád a H oszlopot, pontosan 100% jönne ki." }
+  ],
+  ending: {
+    title: "96 050 Ft a kirándulásra!",
+    text: `<p>Zsófi táblázata kész, és minden szám képlet: ha bármi változik, minden magától újraszámolódik. Kati néni elégedett: a busz 90 000 Ft-ba kerül, ezt a sütivásár bevétele fedezi, és még marad is.</p>
+      <p>De van még dolog: be kell gyűjteni a részvételi díjakat, és meg kell számolni, ki kér vega menüt. A következő leckében a táblázat már <b>dönteni</b> is fog: a <b>HA</b> függvénnyel.</p>`,
+    rank: (min, hints) => hints === 0 ? "Rang: Excel-mester. Egyetlen segítség nélkül!" : hints <= 4 ? "Rang: Profi pénztáros" : "Rang: Ügyes tanonc. Legközelebb kevesebb segítséggel is menni fog!"
+  }
+};
+</script>
+<script src="../mission.js"></script>
+<script src="../../nav.js?v=61ed1528" defer></script>
+</body>
+</html>
