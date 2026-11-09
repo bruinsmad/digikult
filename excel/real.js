@@ -34,7 +34,7 @@
 
   /* ---------- the preview on the right: Zsófi's file as it should look so far ---------- */
   const preview = XL.grid($("sheet"), Object.assign({}, M.sheet, {
-    label: M.title + " – előnézet", locked: [`A1:${XL.A(M.sheet.cols - 1, M.sheet.rows - 1)}`],
+    label: M.title + " – előnézet", noCopy: true, locked: [`A1:${XL.A(M.sheet.cols - 1, M.sheet.rows - 1)}`],
     lockedText: "Ez csak előnézet. A feladatot az Excelben csináld!"
   }));
   function fillPreview() {
@@ -288,5 +288,7 @@
   const buzz = () => tone(180, .18, "sawtooth", .03);
   const fanfare = () => { [523, 659, 784, 1047, 784, 1047].forEach((f, k) => tone(f, k === 5 ? .9 : .2, "triangle", .09, k * .13)); };
 
+  $("sheet").classList.add("xl-preview");
+  XL.guardFormulas();
   goTo(Math.min(state.current, CH.length - 1), true);
 })();

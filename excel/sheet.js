@@ -755,6 +755,7 @@
 
     /* ----- copy and paste (references move along, $ ones stay) ----- */
     function copySel() {
+      if (o.noCopy) { say(o.lockedText || "Innen nem lehet másolni."); return; }
       const g = selRange(), data = [];
       for (let r = g.r1; r <= g.r2; r++) { const row = []; for (let c = g.c1; c <= g.c2; c++) row.push(sheet.rawOf(A(c, r))); data.push(row); }
       clip = { g, data }; copyBox.hidden = false; place(copyBox, g);
@@ -935,5 +936,22 @@
     return res;
   }
 
-  window.XL = { grid, Sheet, parse, tokenize, evaluate, shiftFormula, tidy, check, rangeOf, cellsOf, parseA, A, colName, FN, FORMATS, fmtGeneral, textOf, isErr, az, Az, ERR_HELP };
+  /* the formulas printed on the page can't be copied: anything that looks like one is left out of the clipboard */
+  const FORMULA_TEXT = /=\s*(?=[A-Za-zÁÉÍÓÖŐÚÜŰáéíóöőúüű$(])(?:"[^"\n]*"|[^\s"])+/g;
+  const hideFormulas = t => t.replace(FORMULA_TEXT, m => "[képlet]" + ((/[.,!?:]+$/.exec(m) || [""])[0]));
+  function guardFormulas() {
+    document.addEventListener("copy", e => {
+      const t = e.target && e.target.closest ? e.target : document.activeElement;
+      if (t && t.closest && t.closest("input:not([readonly]), textarea") && !t.closest(".xl-preview")) return;
+      const sel = String(getSelection() || "");
+      if (!sel) return;
+      const clean = hideFormulas(sel);
+      if (clean === sel) return;
+      e.preventDefault();
+      e.clipboardData && e.clipboardData.setData("text/plain", clean);
+    });
+    document.addEventListener("dragstart", e => { const sel = String(getSelection() || ""); if (sel && hideFormulas(sel) !== sel) e.preventDefault(); });
+  }
+
+  window.XL = { guardFormulas, hideFormulas, grid, Sheet, parse, tokenize, evaluate, shiftFormula, tidy, check, rangeOf, cellsOf, parseA, A, colName, FN, FORMATS, fmtGeneral, textOf, isErr, az, Az, ERR_HELP };
 })();

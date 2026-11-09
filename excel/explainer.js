@@ -5,6 +5,7 @@
   "use strict";
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
   const TRY = window.TRY || {}, QUIZ = window.QUIZ || [];
+  XL.guardFormulas();
 
   document.querySelectorAll("[data-try]").forEach(box => {
     const cfg = TRY[box.dataset.try]; if (!cfg) return;

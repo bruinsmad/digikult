@@ -180,3 +180,6 @@ kbd{display:inline-block;font:700 13px var(--f-body);padding:1px 7px;border:1.5p
 /* the decision picture for HA */
 .flow{display:block;width:100%;max-width:620px;height:auto;margin:12px 0}
 .scroll-x{overflow-x:auto}
+
+/* formulas are for reading, not copying: students type them themselves */
+code,pre,.fparts,.mini,.xl-tip,.goals .sol{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}

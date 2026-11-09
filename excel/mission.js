@@ -300,5 +300,6 @@
   const fanfare = () => { [523, 659, 784, 1047, 784, 1047].forEach((f, k) => tone(f, k === 5 ? .9 : .2, "triangle", .09, k * .13)); };
 
   /* ---------- start ---------- */
+  XL.guardFormulas();
   goTo(Math.min(state.current, CH.length - 1), true);
 })();

@@ -155,3 +155,6 @@ footer.end{max-width:1320px;margin:0 auto;padding:0 18px 60px;color:var(--chalk-
 .dlcard p{flex:1;min-width:180px;margin:0;font-size:14.5px;color:var(--muted)}
 .dlcard p b{color:var(--ink)}
 .preview-note{margin:8px 2px 0;font-size:13.5px;color:var(--muted)}
+
+/* formulas are for reading, not copying: students type them themselves */
+code,pre,.fparts,.mini,.xl-tip,.goals .sol{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
