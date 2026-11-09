@@ -125,8 +125,9 @@
   }
 
   /* ---------- typed answers (the starting chapter) ---------- */
-  const normText = s => String(s).toLowerCase().replace(/[\s.\-–!]/g, "");
-  const normNum = s => { const t = String(s).replace(/[\s  ]/g, "").replace(/(db|darab|cm|pt|oldal)$/i, "").replace(",", "."); return /^-?\d+(\.\d+)?$/.test(t) ? parseFloat(t) : null; };
+  const normText = s => String(s).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[\s.,\-–!?„”"']/g, "");
+  const WORDS = { nulla: 0, egy: 1, ketto: 2, ket: 2, harom: 3, negy: 4, ot: 5, hat: 6, het: 7, nyolc: 8, kilenc: 9, tiz: 10 };
+  const normNum = s => { const w = String(s).trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s*(db|darab)$/, ""); if (w in WORDS) return WORDS[w]; const t = String(s).replace(/[\s  ]/g, "").replace(/(db|darab|cm|pt|oldal)$/i, "").replace(",", "."); return /^-?\d+(\.\d+)?$/.test(t) ? parseFloat(t) : null; };
   function judge(q, raw) {
     if (!raw.trim()) return { ok: false, msg: "Még nem írtál be semmit." };
     if (q.num !== undefined) {
@@ -139,6 +140,10 @@
     const n = normText(raw);
     if (q.text.some(t => normText(t) === n)) return { ok: true };
     for (const [k, m] of Object.entries(q.traps || {})) if (normText(k) === n) return { ok: false, msg: m };
+    /* a longer answer is fine if it names the right thing and none of the traps ("szóközök vannak előtte") */
+    const hit = q.text.some(t => n.includes(normText(t))), trap = Object.entries(q.traps || {}).find(([k]) => normText(k).length > 2 && n.includes(normText(k)));
+    if (hit && !trap) return { ok: true };
+    if (trap) return { ok: false, msg: trap[1] };
     return { ok: false, msg: q.wrong || "Ez nem stimmel. Nézd meg újra a Wordben!" };
   }
   $("case").addEventListener("submit", e => {
@@ -184,7 +189,7 @@
     const solved = state.solved.includes(state.current);
     if (handle) {
       box.innerHTML = `<div class="linked"><svg class="ic" viewBox="0 0 40 46" aria-hidden="true"><path d="M4 2h22l10 10v32H4z" fill="#fff" stroke="#185abd" stroke-width="2"/><path d="M26 2v10h10" fill="#dbe7fb" stroke="#185abd" stroke-width="2"/><rect x="0" y="18" width="24" height="20" rx="2" fill="#185abd"/><path d="M5 23l3 10 4-8 4 8 3-10" fill="none" stroke="#fff" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/></svg>
-        <p><b>${esc(handle.name)}</b><br>Mentsd el a Wordben (<kbd>Ctrl</kbd>+<kbd>S</kbd>), aztán kattints az Ellenőrzésre.</p>
+        <p><b>${esc(handle.name)}</b><br>Mentsd el a Wordben (<span class='nw'><kbd>Ctrl</kbd>+<kbd>S</kbd></span>), aztán kattints az Ellenőrzésre.</p>
         <button type="button" class="btn primary" id="recheck"${solved ? " hidden" : ""}>Ellenőrzés</button><button type="button" class="linkbtn" id="otherFile">másik fájl</button></div>`;
     } else {
       box.innerHTML = `<div class="drop" id="drop" tabindex="0" role="button" aria-label="Fájl kiválasztása">
@@ -201,7 +206,9 @@
   async function checkHandle() {
     try {
       if (handle.queryPermission && (await handle.queryPermission({ mode: "read" })) !== "granted" && (await handle.requestPermission({ mode: "read" })) !== "granted") throw new Error("perm");
-      checkFile(await handle.getFile());
+      let f;
+      try { f = await handle.getFile(); } catch (e1) { await new Promise(r => setTimeout(r, 600)); f = await handle.getFile(); }
+      checkFile(f);
     } catch (e) {
       handle = null; IDB("readwrite", st => st.delete(KEY)); paintFileBox();
       $("report").innerHTML = `<div class="verdict no"><b>Nem érem el a fájlt.</b><p>Húzd ide újra a mentett fájlt.</p></div>`;
@@ -236,7 +243,7 @@
     }
     $("report").innerHTML = `<p class="rep-head"><b>${esc(rep.name)}</b>: ${good} / ${rep.rows.length} rész rendben</p>
       <ul class="goals report">${rep.rows.map(r => `<li class="${r.ok ? "ok" : "no"}"><span class="gt">${r.label}${r.ok ? "" : `<small>${esc(r.msg)}</small>`}</span><span class="cnt">${r.total > 1 ? `${r.done} / ${r.total}` : ""}</span></li>`).join("")}</ul>
-      ${good < rep.rows.length ? `<p class="export-note">Javítsd ki a Wordben, mentsd el (<kbd>Ctrl</kbd>+<kbd>S</kbd>), és ellenőrizd újra.</p>` : ""}`;
+      ${good < rep.rows.length ? `<p class="export-note">Javítsd ki a Wordben, mentsd el (<span class='nw'><kbd>Ctrl</kbd>+<kbd>S</kbd></span>), és ellenőrizd újra.</p>` : ""}`;
   }
   $("case").addEventListener("click", e => {
     if (e.target.id === "recheck") checkHandle();

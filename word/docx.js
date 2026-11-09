@@ -129,6 +129,8 @@
       const bdr = pel("pBdr"), shd = pel("shd");
       const box = !!(bdr && Array.from(bdr.children).some(c => !/^(nil|none)$/.test(val(c) || ""))) || !!(shd && realFill(attr(shd, "fill")));
       const pb = pel("pageBreakBefore");
+      const sp = kid(pPr, "sectPr"), stype = sp && val(kid(sp, "type"));
+      const sectBreak = !!sp && stype !== "continuous";
 
       /* runs (skip those inside text boxes / nested paragraphs) */
       const runs = []; let text = "", drawings = 0, pageBreak = false, pageBreakAt = -1;
@@ -136,7 +138,7 @@
       desc(p, "r").forEach(r => {
         let a = r.parentNode; while (a && !(a.namespaceURI === W && a.localName === "p")) a = a.parentNode;
         if (a !== p) return;
-        if (r.parentNode && r.parentNode.localName === "del") return;
+        if (r.parentNode && /^(del|moveFrom)$/.test(r.parentNode.localName)) return;
         const rPr = kid(r, "rPr");
         const rs = val(kid(rPr, "rStyle"));
         const src = [rPr, ...chain(rs).map(s => s.rPr), ...rSrcBase].filter(Boolean);
@@ -159,9 +161,10 @@
         }
       });
       desc(p, "drawing").forEach(imageInfo);
+      drawings = Math.max(drawings, desc(p, "drawing").length + desc(p, "pict").length);
       return { text, norm: normText(text), style: sid, align: jc, ind: { left: cm(left), right: cm(right), firstLine: cm(fl - hg) },
         before: before / 20, after: after / 20, line: rule === "auto" ? (lineRaw || 240) / 240 : (lineRaw || 240) / 20, lineRule: rule,
-        list, runs, box, drawings, pageBreak, pageBreakEnd: pageBreak && pageBreakAt >= text.trimEnd().length, pageBreakBefore: !!on(pb),
+        list, runs, box, drawings, pageBreak, sectBreak, pageBreakEnd: pageBreak && pageBreakAt >= text.trimEnd().length, pageBreakBefore: !!on(pb),
         inTable: !!ctx.inTable, table: ctx.table, row: ctx.row };
     }
     function imageInfo(d) {
@@ -218,10 +221,15 @@
     /* page setup, header, footer (all sections) */
     const sects = desc(body, "sectPr"), sect = sects[sects.length - 1];
     const pgMar = kid(sect, "pgMar"), pgSz = kid(sect, "pgSz");
-    const g = (el, a, d) => { const x = num(attr(el, a)); return x === undefined ? d : x; };
-    const page = { top: cm(g(pgMar, "top", 1418)), bottom: cm(g(pgMar, "bottom", 1418)), left: cm(g(pgMar, "left", 1418)), right: cm(g(pgMar, "right", 1418)),
-      width: cm(g(pgSz, "w", 11906)), height: cm(g(pgSz, "h", 16838)) };
-    page.landscape = attr(pgSz, "orient") === "landscape" || page.width > page.height;
+    const g = (el, a, d) => { const x = num(attr(el, a)); return x === undefined || isNaN(x) ? d : x; };
+    const pageOf = sp => {
+      const mar = kid(sp, "pgMar"), sz = kid(sp, "pgSz");
+      const pg = { top: cm(g(mar, "top", 1418)), bottom: cm(g(mar, "bottom", 1418)), left: cm(g(mar, "left", 1418)), right: cm(g(mar, "right", 1418)),
+        width: cm(g(sz, "w", 11906)), height: cm(g(sz, "h", 16838)) };
+      pg.landscape = attr(sz, "orient") === "landscape" || pg.width > pg.height;
+      return pg;
+    };
+    const page = pageOf(sect), sections = sects.map(pageOf);
     const hf = async kind => {
       const out = { text: "", page: false };
       const ids = new Set(); sects.forEach(s => kids(s, kind + "Reference").forEach(r => ids.add(r.getAttributeNS(R, "id") || r.getAttribute("r:id"))));
@@ -235,7 +243,7 @@
       out.text = out.text.trim();
       return out;
     };
-    return { paras, tables, images, page, header: await hf("header"), footer: await hf("footer") };
+    return { paras, tables, images, page, sections, header: await hf("header"), footer: await hf("footer") };
   }
 
   /* ---------- checking ---------- */
@@ -265,7 +273,7 @@
     if (w.firstLine !== undefined && !near(p.ind.firstLine, w.firstLine, 0.06)) return p.ind.firstLine < -0.01 ? `{P} függő behúzást kapott (${fmtNum(-p.ind.firstLine)} cm). Első sor behúzása kell, ${fmtNum(w.firstLine)} cm.` : `{P} első sorának behúzása most ${fmtNum(p.ind.firstLine)} cm, de ${fmtNum(w.firstLine)} cm kell.`;
     if (w.left !== undefined && !near(p.ind.left, w.left, 0.06)) return `{P} bal behúzása most ${fmtNum(p.ind.left)} cm, de ${fmtNum(w.left)} cm kell.`;
     if (w.right !== undefined && !near(p.ind.right, w.right, 0.06)) return `{P} jobb behúzása most ${fmtNum(p.ind.right)} cm, de ${fmtNum(w.right)} cm kell.`;
-    if (w.line !== undefined && (p.lineRule !== "auto" || !near(p.line, w.line, 0.02))) return p.lineRule !== "auto" ? `{P} sorköze „Pontosan” vagy „Legalább” értékre van állítva. Válaszd a ${fmtNum(w.line)}-es sorközt!` : `{P} sorköze most ${fmtNum(p.line)}, de ${fmtNum(w.line)} kell.`;
+    if (w.line !== undefined && (p.lineRule !== "auto" || !near(p.line, w.line, 0.02))) return p.lineRule !== "auto" ? `{P} sorköze „Pontosan” vagy „Legalább” értékre van állítva. Válaszd ${az(fmtNum(w.line))} ${fmtNum(w.line)} sor beállítást!` : `{P} sorköze most ${fmtNum(p.line)}, de ${fmtNum(w.line)} kell.`;
     if (w.before !== undefined && !near(p.before, w.before, 0.6)) return `{P} előtt most ${fmtNum(p.before, 1)} pt a térköz, de ${fmtNum(w.before, 1)} pt kell.`;
     if (w.after !== undefined && !near(p.after, w.after, 0.6)) return `{P} után most ${fmtNum(p.after, 1)} pt a térköz, de ${fmtNum(w.after, 1)} pt kell.`;
     if (w.box && !p.box && !(runs.length && runs.every(r => r.box))) return "{P} körül még nincs szegély vagy árnyékolás.";
@@ -298,11 +306,14 @@
     }
     const one = (ok, msg) => ({ ok, done: ok ? 1 : 0, total: 1, msg: ok ? null : msg });
     if (T === "noEmpty") {
-      const empty = doc.paras.filter((p, k) => !p.inTable && !p.last && !p.text.trim() && !p.drawings && !p.pageBreak && !(doc.paras[k + 1] && doc.paras[k + 1].inTable) && !(doc.paras[k - 1] && doc.paras[k - 1].inTable));
+      const empty = doc.paras.filter((p, k) => !p.inTable && !p.last && !p.text.trim() && !p.drawings && !p.pageBreak && !p.sectBreak && !(doc.paras[k + 1] && doc.paras[k + 1].inTable) && !(doc.paras[k - 1] && doc.paras[k - 1].inTable));
       const allow = goal.allow || 0;
       return one(empty.length <= allow, `Még ${empty.length} üres bekezdés van a szövegben (egy ¶ jel egymagában egy sorban). Töröld ki őket: a hely a térközből jöjjön, ne üres sorokból!`);
     }
     if (T === "margins") {
+      const HUs = { top: "felső", bottom: "alsó", left: "bal", right: "jobb" };
+      const odd = (doc.sections || []).find(sc => ["top", "bottom", "left", "right"].some(k => !near(sc[k], goal.cm, 0.06)));
+      if (odd && odd !== doc.sections[doc.sections.length - 1]) return one(false, `A dokumentum egyik részében (szakaszában) még más a margó. Az Egyéni margók ablakban az Alkalmaz legyen „Teljes dokumentum”, és állítsd be újra.`);
       const bad = ["top", "bottom", "left", "right"].filter(k => !near(doc.page[k], goal.cm, 0.06));
       const HU = { top: "felső", bottom: "alsó", left: "bal", right: "jobb" };
       return one(!bad.length, bad.length ? `${Az(HU[bad[0]])} ${HU[bad[0]]} margó most ${fmtNum(doc.page[bad[0]])} cm, de ${fmtNum(goal.cm)} cm kell.${bad.length === 4 ? " Mind a négyet át kell állítani." : bad.length > 1 ? ` Még ${bad.length} margó nem jó.` : ""}` : "");
@@ -345,7 +356,7 @@
       let enters = 0;
       for (let j = k - 1; j >= 0 && !ok; j--) {
         const q = ps[j];
-        if (q.pageBreak && (q.pageBreakEnd || !q.text.trim())) { ok = true; break; }
+        if ((q.pageBreak && (q.pageBreakEnd || !q.text.trim())) || q.sectBreak) { ok = true; break; }
         if (q.text.trim() || q.drawings) break;
         enters++;
       }

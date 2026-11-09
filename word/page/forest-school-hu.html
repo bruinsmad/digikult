@@ -92,7 +92,7 @@ window.MISSION = {
         `<span class=ui>Elrendezés</span> lap › <span class=ui>Margók</span> › <span class=ui>Egyéni margók…</span>`,
         `A <span class=ui>Margók</span> fülön a <span class=ui>Felső</span>, <span class=ui>Alsó</span>, <span class=ui>Bal</span> és <span class=ui>Jobb</span> mezőbe is írd be: <b>2 cm</b>.`,
         `Lent az <span class=ui>Alkalmaz</span> legyen <b>Teljes dokumentum</b>. Kattints az <span class=ui>OK</span> gombra.`,
-        `Mentsd el (<kbd>Ctrl</kbd>+<kbd>S</kbd>), és ellenőrizd.`
+        `Mentsd el (<span class='nw'><kbd>Ctrl</kbd>+<kbd>S</kbd></span>), és ellenőrizd.`
       ],
       goals: [{ label: "Mind a négy margó 2 cm", type: "margins", cm: 2,
         apply: m => { m.page = Object.assign({}, m.page, { top: 2, bottom: 2, left: 2, right: 2 }); }, target: m => { m.pageTarget = true; m.showMargins = true; } }],
@@ -157,10 +157,10 @@ window.MISSION = {
 
     { title: "Új oldal",
       story: `<p>Kapcsold be a ¶ gombot, és nézd meg a <b>Fontos tudnivalók</b> utáni részt! Kati néni <b>hat üres bekezdéssel</b> tolta át a Csomaglistát a második oldalra. Ez addig jó, amíg nem változik semmi. De most, hogy bekerült a táblázat és a kép, a Csomaglista elcsúszott, és az üres sorok rossz helyre kerültek.</p>`,
-      learn: `<p>Az <b>oldaltörés</b> azt mondja a Wordnek: <i>innen új oldal kezdődik.</i> Bármit írsz fölé, a Csomaglista mindig a következő oldal tetején marad.</p><p><b>Oldaltörés:</b> <kbd>Ctrl</kbd>+<kbd>Enter</kbd>, vagy <span class="ui">Beszúrás</span> › <span class="ui">Oldaltörés</span>. A ¶ jelekkel így látszik: <code>·····Oldaltörés·····</code></p>`,
+      learn: `<p>Az <b>oldaltörés</b> azt mondja a Wordnek: <i>innen új oldal kezdődik.</i> Bármit írsz fölé, a Csomaglista mindig a következő oldal tetején marad.</p><p><b>Oldaltörés:</b> <span class='nw'><kbd>Ctrl</kbd>+<kbd>Enter</kbd></span>, vagy <span class="ui">Beszúrás</span> › <span class="ui">Oldaltörés</span>. A ¶ jelekkel így látszik: <code>·····Oldaltörés·····</code></p>`,
       steps: [
         `Kapcsold be a <span class=ui>¶</span> gombot. Töröld ki a hat üres bekezdést a <i>Kísérő tanárok…</i> sor és a <b>Csomaglista</b> között.`,
-        `Kattints a <b>Csomaglista</b> szó elé, és nyomd meg: <kbd>Ctrl</kbd>+<kbd>Enter</kbd>. A Csomaglista átugrik a 2. oldal tetejére.`,
+        `Kattints a <b>Csomaglista</b> szó elé, és nyomd meg: <span class='nw'><kbd>Ctrl</kbd>+<kbd>Enter</kbd></span>. A Csomaglista átugrik a 2. oldal tetejére.`,
         `Jelöld ki a csomaglista kilenc tételét (a <i>túracipő</i> sortól a <i>TAJ-kártya</i> sorig), és legyen <span class=ui>Felsorolás</span>.`,
         `Mentsd el, és ellenőrizd.`
       ],
@@ -175,7 +175,7 @@ window.MISSION = {
     { title: "Beadás", upload: true,
       story: `<p>Kész a tájékoztató! Mielőtt Kati néni kinyomtatja a szülőknek, az oldal <b>még egyszer átnézi az egész fájlt</b>.</p>`,
       steps: [
-        `Mentsd el a fájlt a Wordben: <kbd>Ctrl</kbd>+<kbd>S</kbd>.`,
+        `Mentsd el a fájlt a Wordben: <span class='nw'><kbd>Ctrl</kbd>+<kbd>S</kbd></span>.`,
         `Kattints az Ellenőrzés gombra (vagy húzd ide újra a fájlt).`,
         `Ha valami piros, javítsd ki a Wordben, mentsd el, és ellenőrizd újra.`
       ],
