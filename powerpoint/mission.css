@@ -183,3 +183,9 @@ footer.end{max-width:1320px;margin:0 auto;padding:0 18px 60px;color:var(--chalk-
 .ap-bar{position:relative;height:9px;background:#f3f2f1;border-radius:2px}
 .ap-bar i{position:absolute;top:0;bottom:0;border-radius:2px;opacity:.85}
 .howto .star{display:inline-block;width:16px;height:16px;vertical-align:-3px}
+
+/* the restart button: easy to find, and red while it waits for the second click */
+#resetBtn,.btn.reset{display:inline-flex;align-items:center;gap:6px;font:700 14.5px var(--f-body);background:#f2d264;color:#3a2e00;border:2px solid #f2d264;border-radius:4px;padding:6px 13px;cursor:pointer}
+#resetBtn::before,.btn.reset::before{content:"↺";font-size:17px;line-height:1}
+#resetBtn:hover,.btn.reset:hover{background:#ffe48a;border-color:#ffe48a}
+#resetBtn.armed,.btn.reset.armed{background:#d9483b;border-color:#d9483b;color:#fff}

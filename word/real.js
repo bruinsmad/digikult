@@ -298,8 +298,8 @@
   paintSound();
   let resetArmed = 0;
   $("resetBtn").addEventListener("click", () => {
-    if (Date.now() - resetArmed > 4000) { resetArmed = Date.now(); $("resetBtn").textContent = "Biztos? Kattints újra"; setTimeout(() => { $("resetBtn").textContent = "Elölről"; }, 4000); return; }
-    resetArmed = 0; $("resetBtn").textContent = "Elölről";
+    if (Date.now() - resetArmed > 4000) { resetArmed = Date.now(); $("resetBtn").textContent = "Biztos? Kattints újra"; $("resetBtn").classList.add("armed"); setTimeout(() => { $("resetBtn").textContent = "Újrakezdés"; $("resetBtn").classList.remove("armed"); }, 4000); return; }
+    resetArmed = 0; $("resetBtn").textContent = "Újrakezdés"; $("resetBtn").classList.remove("armed");
     state = { solved: [], current: 0, start: Date.now(), end: null, hints: {}, answers: {}, reports: {}, marks: false };
     handle = null; IDB("readwrite", st => st.delete(KEY));
     save(); $("endPanel").hidden = true; $("game").hidden = false; goTo(0);

@@ -241,7 +241,7 @@
           <h3>Add be a munkádat</h3>
           <ol class="export-steps"><li>Nyisd meg a feladatot a <b>Google Classroomban</b>.</li><li>Töltsd fel az elmentett Excel-fájlodat (${esc(latestFile())}).</li><li>Kattints a <b>Beadás</b> gombra.</li></ol>
         </div>
-        <div class="end-btns"><button type="button" class="btn" id="backToSheet">← Vissza a fejezetekhez</button>${M.next ? `<a class="btn primary" href="${M.next.href}">${esc(M.next.text)} →</a>` : ""}</div>
+        <div class="end-btns"><button type="button" class="btn" id="backToSheet">← Vissza a fejezetekhez</button><button type="button" class="btn reset" id="endReset">Újrakezdés</button>${M.next ? `<a class="btn primary" href="${M.next.href}">${esc(M.next.text)} →</a>` : ""}</div>
       </div>`;
     if (window.DancingCats) DancingCats.mount($("reward"), { sound: () => soundOn, burst: (x, y, n) => celebrate(x, y, n) });
     const r = $("endPanel").getBoundingClientRect();
@@ -259,6 +259,7 @@
   }
   $("endPanel").addEventListener("click", e => {
     if (e.target.id === "backToSheet") { $("endPanel").hidden = true; $("game").hidden = false; goTo(LAST_MAIN); }
+    if (e.target.closest("#endReset")) { if (armOrReset(e.target.closest("#endReset"))) doReset(); }
     if (e.target.id === "toBonus") { $("endPanel").hidden = true; $("game").hidden = false; goTo(+e.target.dataset.i); }
   });
 
@@ -270,13 +271,21 @@
   const paintSound = () => { $("soundBtn").textContent = soundOn ? "Hang: be" : "Hang: ki"; $("soundBtn").setAttribute("aria-pressed", soundOn); };
   $("soundBtn").addEventListener("click", () => { soundOn = !soundOn; paintSound(); try { localStorage.setItem("digikult-excel-sound", soundOn ? "on" : "off"); } catch (e) {} });
   paintSound();
-  let resetArmed = 0;
-  $("resetBtn").addEventListener("click", () => {
-    if (Date.now() - resetArmed > 4000) { resetArmed = Date.now(); $("resetBtn").textContent = "Biztos? Kattints újra"; setTimeout(() => { $("resetBtn").textContent = "Elölről"; }, 4000); return; }
-    resetArmed = 0; $("resetBtn").textContent = "Elölről";
+  /* restart: two clicks instead of a browser dialog; works for the header button and the one on the end page */
+  let resetArmed = null;
+  function disarm(btn) { clearTimeout(btn._t); btn.textContent = btn.dataset.label || "Újrakezdés"; btn.classList.remove("armed"); if (resetArmed === btn) resetArmed = null; }
+  function armOrReset(btn) {
+    if (resetArmed === btn) { disarm(btn); return true; }
+    if (resetArmed) disarm(resetArmed);
+    resetArmed = btn; btn.dataset.label = btn.textContent; btn.textContent = "Biztos? Kattints újra"; btn.classList.add("armed");
+    btn._t = setTimeout(() => disarm(btn), 4000);
+    return false;
+  }
+  function doReset() {
     state = { solved: [], bonus: [], current: 0, start: Date.now(), end: null, hints: {}, answers: {}, student: "" };
-    save(); $("endPanel").hidden = true; $("game").hidden = false; goTo(0);
-  });
+    save(); $("endPanel").hidden = true; $("game").hidden = false; goTo(0); scrollTo({ top: 0, behavior: "smooth" });
+  }
+  $("resetBtn").addEventListener("click", e => { if (armOrReset(e.currentTarget)) doReset(); });
 
   /* teacher shortcut: type the code anywhere and every chapter opens, with the model file in the preview */
   let buf = "";
