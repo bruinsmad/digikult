@@ -358,7 +358,7 @@
         accent: "#5cc98a",
         title: { hu: "Táblázatkezelés – Excel", en: "Spreadsheets – Excel" },
         blurb: {
-          hu: "Képletek, kitöltőjel, függvények és döntések: munkalap a böngészőben, magyar Excel-függvényekkel, és egy küldetés az igazi Excelben.",
+          hu: "Képletek, kitöltőjel, függvények és döntések: munkalap a böngészőben, magyar Excel-függvényekkel, és egy küldetés az Excelben.",
           en: "Formulas, the fill handle, functions and decisions: a worksheet in the browser with Hungarian Excel functions, plus a mission in real Excel."
         },
         lessons: [
@@ -393,9 +393,9 @@
                 id: "sports-day",
                 kind: "story",
                 minutes: 45,
-                title: { hu: "Sportnap – az igazi Excelben", en: "Sports Day – in real Excel" },
+                title: { hu: "Sportnap – az Excelben", en: "Sports Day – in real Excel" },
                 desc: {
-                  hu: "Letöltöd a fájlt, és az igazi Excelben számolod ki a sportnap eredményét: SZUM, MAX, MIN, ÁTLAG, KEREKÍTÉS, DARAB. A végén az oldal ellenőrzi a mentett fájlodat.",
+                  hu: "Letöltöd a fájlt, és az Excelben számolod ki a sportnap eredményét: SZUM, MAX, MIN, ÁTLAG, KEREKÍTÉS, DARAB. A végén az oldal ellenőrzi a mentett fájlodat.",
                   en: "Download the file and work out the sports day results in real Excel: SZUM, MAX, MIN, ÁTLAG, KEREKÍTÉS, DARAB. At the end the page checks your saved file."
                 },
                 files: { hu: "excel/formulas/sports-day-hu.html" },
@@ -439,7 +439,7 @@
         accent: "#4f8fe8",
         title: { hu: "Szövegszerkesztés – Word", en: "Word processing – Word" },
         blurb: {
-          hu: "Bekezdések, igazítás, behúzás, felsorolás, táblázat, kép és élőfej. Kipróbálod a böngészőben, aztán az igazi Wordben dolgozol, és az oldal ellenőrzi a mentett fájlodat.",
+          hu: "Bekezdések, igazítás, behúzás, felsorolás, táblázat, kép és élőfej. Kipróbálod a böngészőben, aztán a Wordben dolgozol, és az oldal ellenőrzi a mentett fájlodat.",
           en: "Paragraphs, alignment, indents, lists, tables, pictures and headers. Try it in the browser, then work in real Word while the page checks your saved file."
         },
         lessons: [
@@ -462,9 +462,9 @@
                 id: "recipe",
                 kind: "story",
                 minutes: 45,
-                title: { hu: "Mamó mézeskalácsa – az igazi Wordben", en: "Grandma's Gingerbread – in real Word" },
+                title: { hu: "Mamó mézeskalácsa – a Wordben", en: "Grandma's Gingerbread – in real Word" },
                 desc: {
-                  hu: "A 7.B receptkönyve nyomdába megy, de Bori receptje szóközökkel és üres sorokkal van „formázva”. Rendbe teszed az igazi Wordben, és az oldal fejezetenként ellenőrzi a fájlodat.",
+                  hu: "A 7.B receptkönyve nyomdába megy, de Bori receptje szóközökkel és üres sorokkal van „formázva”. Rendbe teszed a Wordben, és az oldal fejezetenként ellenőrzi a fájlodat.",
                   en: "Class 7B's cookbook goes to print, but Bori's recipe is formatted with spaces and empty lines. Fix it in real Word; the page checks your file chapter by chapter."
                 },
                 files: { hu: "word/paragraphs/recipe-hu.html" },
@@ -492,9 +492,9 @@
                 id: "forest-school",
                 kind: "story",
                 minutes: 45,
-                title: { hu: "Erdei iskola a Bükkben – az igazi Wordben", en: "Forest School in the Bükk – in real Word" },
+                title: { hu: "Erdei iskola a Bükkben – a Wordben", en: "Forest School in the Bükk – in real Word" },
                 desc: {
-                  hu: "Kati néni tájékoztatója a szülőknek: margók, napi program táblázatban, körbefuttatott kép, élőfej, oldalszám és oldaltörés, az igazi Wordben.",
+                  hu: "Kati néni tájékoztatója a szülőknek: margók, napi program táblázatban, körbefuttatott kép, élőfej, oldalszám és oldaltörés, a Wordben.",
                   en: "The class teacher's letter to parents: margins, a timetable, a wrapped picture, a header, page numbers and a page break, in real Word."
                 },
                 files: { hu: "word/page/forest-school-hu.html" },

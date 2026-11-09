@@ -23,14 +23,14 @@
 <path d="M44 52h8v14h-8z" fill="#d9a51c"/><rect x="32" y="66" width="32" height="8" rx="2" fill="#8a5532"/><rect x="26" y="74" width="44" height="10" rx="2" fill="#5d3820"/>
 <path d="M40 22l4 6 6-10" fill="none" stroke="#fff6d8" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
 <text x="48" y="82" text-anchor="middle" font-family="Kalam,cursive" font-weight="700" font-size="9" fill="#f2d264">8.B</text></svg></span>
-  <div><div class="kicker">Excel, 1. lecke: küldetés az igazi Excelben</div><h1>Sportnap</h1></div>
+  <div><div class="kicker">Excel, 1. lecke: küldetés az Excelben</div><h1>Sportnap</h1></div>
   <div class="meta"><span>Haladás <b id="solvedCount">–</b></span><span>Idő <b id="timer">0:00</b></span><button type="button" class="mbtn" id="soundBtn">Hang: be</button><button type="button" class="mbtn" id="resetBtn">Elölről</button></div>
 </div>
 <nav class="steps" id="steps" aria-label="Fejezetek"></nav>
 <div id="game"><main>
   <article class="card" id="case" aria-live="polite"></article>
   <section class="work" aria-label="Munkalap"><div class="card">
-    <div class="dlcard"><svg class="ic" viewBox="0 0 40 46" aria-hidden="true"><path d="M4 2h22l10 10v32H4z" fill="#fff" stroke="#107c41" stroke-width="2"/><path d="M26 2v10h10" fill="#d9efe2" stroke="#107c41" stroke-width="2"/><rect x="0" y="18" width="24" height="20" rx="2" fill="#107c41"/><path d="M6 23l12 10M18 23L6 33" stroke="#fff" stroke-width="3" stroke-linecap="round"/></svg><p><b>sportnap.xlsx</b><br>Ebben a fájlban dolgozol, az igazi Excelben.</p><a class="btn primary" href="sportnap.xlsx" download>Letöltés</a></div>
+    <div class="dlcard"><svg class="ic" viewBox="0 0 40 46" aria-hidden="true"><path d="M4 2h22l10 10v32H4z" fill="#fff" stroke="#107c41" stroke-width="2"/><path d="M26 2v10h10" fill="#d9efe2" stroke="#107c41" stroke-width="2"/><rect x="0" y="18" width="24" height="20" rx="2" fill="#107c41"/><path d="M6 23l12 10M18 23L6 33" stroke="#fff" stroke-width="3" stroke-linecap="round"/></svg><p><b>sportnap.xlsx</b><br>Ebben a fájlban dolgozol, az Excelben.</p><a class="btn primary" href="sportnap.xlsx" download>Letöltés</a></div>
     <div class="work-head"><h2>Előnézet</h2><p>Így kell kinéznie a fájlodnak. A sárga cellák tartoznak a mostani feladathoz.</p></div>
     <div id="sheet"></div>
     <p class="preview-note">Ez csak előnézet, ide nem lehet írni. Ahogy haladsz, itt is megjelennek a jó képletek: a <b>Képletek</b> gombbal megnézheted őket.</p>
@@ -61,7 +61,7 @@ window.MISSION = {
   chapters: [
     { refresher: true, title: "Nyisd meg az Excelt", select: "E6",
       story: `<p>Pénteken volt az iskolai <b>sportnap</b>. Nyolc osztály versenyzett öt versenyszámban, és minden versenyszámban 1–10 pontot kaphattak. <span class="who">Gábor bácsi</span>, a testnevelő tanár, beírta a pontokat egy Excel-táblázatba, de számolni már nem maradt ideje. Hétfőn ki kell hirdetni a győztest. Te leszel a pontozóbíró!</p>
-        <p>Ezt a küldetést az <b>igazi Excelben</b> oldod meg. Ez az oldal megmutatja, mit csinálj, és ellenőrzi az eredményeidet.</p>`,
+        <p>Ezt a küldetést az <b>Excelben</b> oldod meg. Ez az oldal megmutatja, mit csinálj, és ellenőrzi az eredményeidet.</p>`,
       learn: `<ul><li>A cella címe: előbb az oszlop betűje, aztán a sor száma, pl. <code>E6</code>.</li><li>Minden képlet <code>=</code> jellel kezdődik, és a végén <kbd>Enter</kbd>.</li><li>A képletbe cellacímet írj, ne számot.</li></ul>`,
       steps: [
         `Töltsd le a fájlt: <br><a class="btn primary" href="sportnap.xlsx" download>sportnap.xlsx letöltése</a>`,
@@ -174,13 +174,13 @@ window.MISSION = {
   ],
   ending: {
     title: "Kihirdethető az eredmény!",
-    text: `<p>A 8.B nyerte a kupát a legtöbb összponttal, a 6.B pedig különdíjat kapott a legjobb átlagért. Te pedig az igazi Excelben megírtad az összes képletet: SZUM, MAX, MIN, ÁTLAG, KEREKÍTÉS és DARAB.</p>
+    text: `<p>A 8.B nyerte a kupát a legtöbb összponttal, a 6.B pedig különdíjat kapott a legjobb átlagért. Te pedig az Excelben megírtad az összes képletet: SZUM, MAX, MIN, ÁTLAG, KEREKÍTÉS és DARAB.</p>
       <p>Ha jövőre változik egy pontszám, elég átírni: minden összeg, átlag és győztes magától frissül.</p>`,
     rank: (min, hints) => hints === 0 ? "Rang: Főbíró. Egyetlen segítség nélkül!" : hints <= 3 ? "Rang: Profi pontozó" : "Rang: Ügyes segítő. Legközelebb kevesebb segítséggel is menni fog!"
   }
 };
 </script>
 <script src="../real.js"></script>
-<script src="../../nav.js?v=09b240ae" defer></script>
+<script src="../../nav.js?v=e5968e8a" defer></script>
 </body>
 </html>

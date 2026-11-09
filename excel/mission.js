@@ -136,7 +136,7 @@
         ${M.ending.rank ? `<p class="rank">${M.ending.rank(mins, hints)}</p>` : ""}
         <div class="export">
           <h3>Add be a munkádat</h3>
-          <ol class="export-steps"><li>Írd be a neved.</li><li>Kattints a <b>Táblázat letöltése (.xlsx)</b> gombra. Ez egy igazi Excel-fájl a képleteiddel; a Letöltések mappába kerül.</li><li>Nyisd meg a feladatot a <b>Google Classroomban</b>, töltsd fel a fájlt, és kattints a <b>Beadás</b> gombra.</li></ol>
+          <ol class="export-steps"><li>Írd be a neved.</li><li>Kattints a <b>Táblázat letöltése (.xlsx)</b> gombra. Ez egy Excel-fájl a képleteiddel; a Letöltések mappába kerül.</li><li>Nyisd meg a feladatot a <b>Google Classroomban</b>, töltsd fel a fájlt, és kattints a <b>Beadás</b> gombra.</li></ol>
           <label for="studentName">A neved</label>
           <input id="studentName" type="text" autocomplete="name" value="${esc(state.student || "")}" placeholder="pl. Kovács Anna">
           <div class="export-btns"><button class="btn primary" type="button" id="saveXlsx">Táblázat letöltése (.xlsx)</button><button class="btn" type="button" id="saveTxt">Képletek mentése (.txt)</button></div>
