@@ -433,8 +433,8 @@
             ]
           }
         ]
-      }
-      ,{
+      },
+      {
         id: "word",
         accent: "#4f8fe8",
         title: { hu: "Szövegszerkesztés – Word", en: "Word processing – Word" },
@@ -500,6 +500,75 @@
                 files: { hu: "word/page/forest-school-hu.html" },
                 cover: "word/page/szalajka.png",
                 progress: { chapters: 6, keys: { hu: "forest-school-hu-v1" } }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        id: "powerpoint",
+        accent: "#ff9e6b",
+        title: { hu: "Bemutatókészítés – PowerPoint", en: "Presentations – PowerPoint" },
+        blurb: {
+          hu: "Rajzolás alakzatokból, aztán animációk: Robi, a robot megszületik, és a Holdra repül – az igazi PowerPointban.",
+          en: "Drawing with shapes, then animations: Robi the robot is built and flies to the Moon – in real PowerPoint."
+        },
+        lessons: [
+          {
+            id: "shapes",
+            title: { hu: "Alakzatok: rajzolás, színek, sorrend, csoportosítás", en: "Shapes: drawing, colours, order, grouping" },
+            pages: [
+              {
+                id: "shapes-intro",
+                kind: "theory",
+                minutes: 15,
+                title: { hu: "Alakzatok – elmélet", en: "Shapes – explainer" },
+                desc: {
+                  hu: "Alakzat beszúrása, Shift a szabályos körhöz, méretezés és forgatás, kitöltés és körvonal, szöveg, előre-hátra, csoportosítás. Kis PowerPoint-gyakorlókkal.",
+                  en: "Inserting shapes, Shift for a perfect circle, resizing and rotating, fill and outline, text, order, grouping. With little PowerPoint practice windows."
+                },
+                files: { hu: "powerpoint/shapes/intro-hu.html" }
+              },
+              {
+                id: "robi",
+                kind: "story",
+                minutes: 40,
+                title: { hu: "Robi, a robot", en: "Robi the Robot" },
+                desc: {
+                  hu: "Az informatikateremnek kabala kell! Csupa alakzatból rajzolod meg Robit az igazi PowerPointban, a végén az oldal megnézi a mentett fájlodat.",
+                  en: "The computer room needs a mascot! Draw Robi from shapes in real PowerPoint; at the end the page checks your saved file."
+                },
+                files: { hu: "powerpoint/shapes/robot-hu.html" },
+                progress: { chapters: 8, keys: { hu: "robi-hu-v1" } }
+              }
+            ]
+          },
+          {
+            id: "animation",
+            title: { hu: "Animációk: megjelenés, kiemelés, eltűnés, mozgásvonal", en: "Animations: entrance, emphasis, exit, motion path" },
+            pages: [
+              {
+                id: "animation-intro",
+                kind: "theory",
+                minutes: 15,
+                title: { hu: "Animációk – elmélet", en: "Animations – explainer" },
+                desc: {
+                  hu: "A négy fajta animáció, irány és második animáció, indítás, időtartam, késleltetés és az Animációs munkaablak. Lejátszható gyakorlókkal.",
+                  en: "The four kinds of animation, direction and a second effect, start, duration, delay and the Animation Pane. With playable practice windows."
+                },
+                files: { hu: "powerpoint/animation/intro-hu.html" }
+              },
+              {
+                id: "moon-trip",
+                kind: "story",
+                minutes: 40,
+                title: { hu: "Robi a Holdra repül", en: "Robi Flies to the Moon" },
+                desc: {
+                  hu: "Letöltöd a kész rajzot, és animációkkal életre kelted: beúszik a cím, megfordul a Hold, felszáll a rakéta, kitűzik a zászlót. A végén az oldal ellenőrzi a fájlt.",
+                  en: "Download the finished drawing and bring it to life: the title flies in, the Moon turns, the rocket lifts off, the flag goes up. The page checks your file at the end."
+                },
+                files: { hu: "powerpoint/animation/moon-hu.html" },
+                progress: { chapters: 7, keys: { hu: "moon-trip-hu-v1" } }
               }
             ]
           }

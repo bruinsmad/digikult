@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>/* moving between pages: the old page drifts aside and fades, the new one glides in; the rail holds still */@view-transition{navigation:auto}.rail{view-transition-name:rail}::view-transition-group(root){animation:none}::view-transition-old(root){animation:dk-out .2s cubic-bezier(.4,0,1,1) both}::view-transition-new(root){animation:dk-in .38s cubic-bezier(.16,1,.3,1) .06s both}::view-transition-old(rail),::view-transition-new(rail){animation:none}@keyframes dk-out{to{opacity:0;transform:translateX(-18px)}}@keyframes dk-in{from{opacity:0;transform:translateX(26px)}}@media (prefers-reduced-motion:reduce){::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none!important}}</style>
+<title>Animációk – elmélet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600;700&display=swap">
+<link rel="stylesheet" href="../explainer.css">
+</head>
+<body>
+<header class="rail"><div class="in">
+  <a class="home" href="../../index.html">Digitális kultúra</a>
+  <span class="crumb"><a href="../../index.html#powerpoint">Bemutatókészítés – PowerPoint</a> › <a href="../../index.html#powerpoint-animation">2. lecke</a></span>
+</div></header>
+
+<section class="hero">
+  <div class="kicker">PowerPoint, 2. lecke: elmélet</div>
+  <h1>Mozduljon meg! Animációk</h1>
+  <p class="lead">Az <b>animációval</b> a dián lévő dolgok életre kelnek: beúsznak, megfordulnak, elrepülnek, eltűnnek. Megtanulod, hogyan adj animációt egy alakzatnak, mikor induljon, és milyen sorrendben jöjjenek.</p>
+  <div class="meta"><span>kb. 15 perc</span><span>minden gyakorló lejátszható</span><span>a végén 6 kérdés</span></div>
+  <ul class="toc"><li><a href="#mi">Mi az animáció?</a></li><li><a href="#fajtak">A négy fajta</a></li><li><a href="#beallitas">Irány és második animáció</a></li><li><a href="#inditas">Mikor induljon?</a></li><li><a href="#sorrend">Az Animációs munkaablak</a></li><li><a href="#lejatszas">Lejátszás és jó tanácsok</a></li><li><a href="#kviz">Ellenőrizd magad</a></li><li><a href="#gyakorolj">Gyakorolj</a></li></ul>
+</section>
+
+<main class="sheet">
+<section class="sec" id="mi"><h2><span class="n">1</span>Mi az animáció?</h2>
+<p>Az <b>animáció</b> egy mozgás vagy változás, amit egy dolog kap a dián: egy alakzat, egy kép vagy egy szöveg. Diavetítéskor ez játszódik le, például kattintásra.</p>
+<p>Minden animáció az <span class="ui">Animációk</span> lapon van. A lépések mindig ugyanazok:</p>
+<ol><li><b>Jelöld ki</b>, mit akarsz animálni.</li><li>Válassz egy <b>effektust</b> az <span class="ui">Animációk</span> lapon.</li><li>Állítsd be, <b>mikor induljon</b> és <b>mennyi ideig tartson</b>.</li></ol>
+<div class="idea"><span class="i">💡</span><p>Ne keverd össze az <b>áttűnéssel</b>! Az áttűnés (<span class="ui">Áttűnések</span> lap) az, ahogyan az egyik diáról a <b>következő diára</b> váltasz. Az animáció egy dián <b>belül</b> mozgat valamit.</p></div>
+</section>
+
+<section class="sec" id="fajtak"><h2><span class="n">2</span>A négy fajta</h2>
+<p>Az effektusok listája négy részből áll. Mindegyiknek saját jele van, ezt a munkaablakban is látod majd:</p>
+<div class="cats">
+<div class="cat"><h4><svg viewBox="0 0 16 16"><path d="M8 1l2.1 4.6 5 .5-3.8 3.4 1.1 4.9L8 11.9 3.6 14.4l1.1-4.9L.9 6.1l5-.5z" fill="#2f9e44"/></svg>Megjelenés</h4><p>A dolog <b>belép</b> a diára. Előtte nem látszik.</p><span class="ex">pl. Fokozatos megjelenés, Beúszás, Kitakarás, Nagyítás</span></div>
+<div class="cat"><h4><svg viewBox="0 0 16 16"><path d="M8 1l2.1 4.6 5 .5-3.8 3.4 1.1 4.9L8 11.9 3.6 14.4l1.1-4.9L.9 6.1l5-.5z" fill="#e0a800"/></svg>Kiemelés</h4><p>Már ott van, és <b>felhívja magára a figyelmet</b>.</p><span class="ex">pl. Forgás, Növekedés/kicsinyítés, Áttetszőség</span></div>
+<div class="cat"><h4><svg viewBox="0 0 16 16"><path d="M8 1l2.1 4.6 5 .5-3.8 3.4 1.1 4.9L8 11.9 3.6 14.4l1.1-4.9L.9 6.1l5-.5z" fill="#d6336c"/></svg>Eltűnés</h4><p>A dolog <b>elhagyja</b> a diát. Utána nem látszik.</p><span class="ex">pl. Elhalványulás, Kiúszás, Kicsinyítés</span></div>
+<div class="cat"><h4><svg viewBox="0 0 16 16"><path d="M2 13C5 3 11 13 14 3" fill="none" stroke="#5b6660" stroke-width="1.6" stroke-dasharray="2 2"/><circle cx="2" cy="13" r="2" fill="#2f9e44"/><circle cx="14" cy="3" r="2" fill="#d6336c"/></svg>Mozgásvonal</h4><p>Egy <b>útvonalon</b> végigmegy: a zöld jeltől a pirosig.</p><span class="ex">pl. Vonalak, Ívek, Hurkok, Egyéni mozgásvonal</span></div>
+</div>
+<div data-alab="kinds"></div>
+</section>
+
+<section class="sec" id="beallitas"><h2><span class="n">3</span>Irány és második animáció</h2>
+<p>Sok effektusnál beállíthatod az <b>irányt</b> is: a Beúszás jöhet alulról, felülről, balról vagy jobbról. Erre való az <span class="ui">Effektus beállításai</span> gomb.</p>
+<div class="rule-box"><b>Egy dolognak több animációja is lehet</b>, például előbb beúszik, aztán megpördül. De vigyázz: ha a nagy listából választasz, az <b>lecseréli</b> a régi animációt! A másodikat az <span class="ui">Animáció hozzáadása</span> gombbal add hozzá.</div>
+<div data-alab="more"></div>
+</section>
+
+<section class="sec" id="inditas"><h2><span class="n">4</span>Mikor induljon?</h2>
+<p>Az <span class="ui">Animációk</span> lap jobb oldalán, az <i>Időzítés</i> csoportban állítod be, mikor és milyen gyorsan menjen az animáció.</p>
+<table class="starts"><tr><th>Indítás</th><th>mit jelent?</th><th>jele a munkaablakban</th></tr>
+<tr><td>Kattintásra</td><td>Megvárja, hogy kattints (vagy megnyomd a szóközt).</td><td>egér és egy szám</td></tr>
+<tr><td>Együtt az előzővel</td><td>Ugyanakkor indul, mint az előtte lévő.</td><td>semmi</td></tr>
+<tr><td>Az előző után</td><td>Megvárja, hogy az előtte lévő befejeződjön, aztán magától indul.</td><td>óra</td></tr></table>
+<ul><li><b>Időtartam</b>: hány másodpercig tartson. A nagyobb szám lassabb mozgást jelent.</li>
+<li><b>Késleltetés</b>: hány másodpercet várjon még, mielőtt elindul. A 0,5 fél másodperc.</li></ul>
+<div data-alab="race"></div>
+</section>
+
+<section class="sec" id="sorrend"><h2><span class="n">5</span>Az Animációs munkaablak</h2>
+<p>Ha sok animációd van, könnyű elveszni. Az <span class="ui">Animációk</span> lapon az <span class="ui">Animációs munkaablak</span> gomb megnyit a dia mellett egy listát: ebben <b>sorrendben</b> látod az összes animációt.</p>
+<ul><li>Felülről lefelé játszódnak le.</li>
+<li>A <b>szám</b> megmutatja, hányadik kattintásra indul. A dián is ott van a kis szám a dolog mellett.</li>
+<li>Ha a legelső sor nem kattintásra indul, <b>0</b> áll előtte: ez rögtön indul, amikor a dia megjelenik.</li>
+<li>A sorrendet megváltoztathatod: jelöld ki a sort, és az <span class="ui">Animációk</span> lapon <span class="ui">Áthelyezés korábbra</span> vagy <span class="ui">Áthelyezés későbbre</span>. (A munkaablakban egérrel is húzhatod.)</li>
+<li>Animációt törölni: jelöld ki a sort, és nyomd meg a <kbd>Delete</kbd> billentyűt.</li></ul>
+<div data-alab="sandwich"></div>
+</section>
+
+<section class="sec" id="lejatszas"><h2><span class="n">6</span>Lejátszás és jó tanácsok</h2>
+<ul><li><span class="ui">Megtekintés</span> (az <span class="ui">Animációk</span> lap bal szélén): lejátssza a dia animációit, kattintás nélkül.</li>
+<li><kbd>F5</kbd>: diavetítés az elejétől. <kbd>Shift</kbd>+<kbd>F5</kbd>: diavetítés attól a diától, amelyiken állsz. Kilépés: <kbd>Esc</kbd>.</li></ul>
+<div class="idea"><span class="i">💡</span><p>Kevesebb néha több! Ha minden pörög és repül, senki sem figyel arra, amit mondasz. Animálj csak annyit, ami segít elmesélni a történetet, és ne használj minden dián más effektust.</p></div>
+</section>
+
+<section class="sec" id="kviz"><h2><span class="n">7</span>Ellenőrizd magad</h2>
+<div class="quiz" id="quiz"></div>
+</section>
+
+<section class="sec" id="gyakorolj"><h2><span class="n">8</span>Gyakorolj</h2>
+<p>Robi, a robot kabala nagy útra indul. A rajz már kész, neked kell életre keltened az igazi PowerPointban.</p>
+<div class="practice"><a class="pcard" href="moon-hu.html"><span class="k">Küldetés</span><h4>Robi a Holdra repül</h4><p>Megjelenés, kiemelés, eltűnés és mozgásvonal; indítás, időtartam, késleltetés és sorrend. Az oldal megnézi a mentett fájlodat.</p></a></div>
+<p class="try-note">Még nem rajzoltad meg Robit? Kezdd az <a href="../shapes/robot-hu.html">alakzatos küldetéssel</a>!</p>
+</section>
+</main>
+<footer class="end">Digitális kultúra. A gyakorlók a böngésződben működnek, semmi sem kerül elküldésre.</footer>
+
+<script>
+const STAR = `<path d="M0-9l2.6 5.6 6.1.6-4.6 4.1 1.3 6L0 4.3-5.4 7.3l1.3-6-4.6-4.1 6.1-.6z"/>`;
+window.ALAB = {
+  kinds: { title: "Próbáld ki", objects: { "#k-sun": { name: "Nap" }, "#k-cloud": { name: "Felhő" }, "#k-bird": { name: "Madár", path: { dx: 560, dy: -40 } }, "#k-title": { name: "Cím" } },
+    slide: `<svg viewBox="0 0 960 540" role="img" aria-label="Tavaszi dia: nap, felhő, madár és a Tavasz cím">
+      <rect width="960" height="540" fill="#cfeaff"/><path d="M0 430q240-60 480 0t480 0v110H0z" fill="#8fd16a"/><path d="M0 470q240-40 480 0t480 0v70H0z" fill="#6bb84a"/>
+      <g id="k-sun"><circle cx="800" cy="120" r="62" fill="#ffd21f" stroke="#f0a500" stroke-width="5"/></g>
+      <g id="k-cloud" fill="#fff" stroke="#b9c7d3" stroke-width="4"><path d="M520 210c-40 0-50-50-10-60 0-40 60-50 80-20 20-30 80-20 80 20 40 0 50 60 0 60z"/></g>
+      <g id="k-bird"><rect x="100" y="270" width="110" height="44" fill="transparent"/><path d="M110 300q20-24 44 0q20-24 44 0" fill="none" stroke="#1d2622" stroke-width="7" stroke-linecap="round"/></g>
+      <g id="k-title"><text x="60" y="110" font-family="Aptos, Calibri, 'Atkinson Hyperlegible', sans-serif" font-size="72" font-weight="700" fill="#2f7a3a">Tavasz</text></g></svg>`,
+    goals: [
+      { text: "Kattints a napra, és adj neki egy zöld csillagos (<b>megjelenési</b>) effektust.", test: s => s.some(x => x.el === "#k-sun" && x.cls === "entr") },
+      { text: "A cím kapjon sárga csillagos (<b>kiemelési</b>) effektust.", test: s => s.some(x => x.el === "#k-title" && x.cls === "emph") },
+      { text: "A felhő tűnjön el: piros csillagos (<b>eltűnési</b>) effektus.", test: s => s.some(x => x.el === "#k-cloud" && x.cls === "exit") },
+      { text: "A madár repüljön át a dián: <b>Mozgásvonalak › Vonalak</b>.", test: s => s.some(x => x.el === "#k-bird" && x.cls === "path") },
+      { text: "Játszd le (<b>Megtekintés</b> vagy <b>▶ Lejátszás</b>), és kattintgass a diára.", test: (s, f) => f.played && s.length >= 2 }
+    ],
+    note: "Ez egy kis gyakorló, nem az igazi PowerPoint. A ▾ gomb a lista szélén az összes effektust megmutatja." },
+  more: { title: "Próbáld ki", objects: { "#b-balloon": { name: "Léggömb" } },
+    slide: `<svg viewBox="0 0 960 540" role="img" aria-label="Egy piros léggömb a dia közepén"><rect width="960" height="540" fill="#fff8e7"/>
+      <g id="b-balloon"><path d="M480 330q-10 60 20 120" fill="none" stroke="#5b6660" stroke-width="3"/><ellipse cx="480" cy="250" rx="78" ry="96" fill="#ff4d4d" stroke="#c00000" stroke-width="5"/><path d="M470 344h20l-10-14z" fill="#c00000"/><ellipse cx="452" cy="212" rx="16" ry="26" fill="#fff" opacity=".45"/></g></svg>`,
+    goals: [
+      { text: "Adj a léggömbnek <b>Beúszás</b> effektust, és az <b>Effektus beállításai</b> gombbal állítsd <b>Balról</b> irányra.", test: s => s.some(x => x.el === "#b-balloon" && x.fx === "fly" && x.dir === "left") },
+      { text: "Adj hozzá egy második animációt is: <b>Animáció hozzáadása</b> › Kiemelés › <b>Forgás</b>. A munkaablakban két sor lesz.", test: s => s.some(x => x.fx === "fly" && x.dir === "left") && s.some(x => x.el === "#b-balloon" && x.fx === "spin") },
+      { text: "Játszd le!", test: (s, f) => f.played && s.length >= 2 }
+    ],
+    note: "Ha a nagy listából választod a Forgást, lecseréli a Beúszást. Próbáld ki, és figyeld a munkaablakot!" },
+  race: { title: "Próbáld ki: autóverseny", objects: { "#r-red": { name: "Piros autó", path: { dx: 700, dy: 0 } }, "#r-blue": { name: "Kék autó", path: { dx: 700, dy: 0 } }, "#r-green": { name: "Zöld autó", path: { dx: 700, dy: 0 } } },
+    slide: `<svg viewBox="0 0 960 540" role="img" aria-label="Autóverseny: három autó a rajtvonalon, jobbra a cél"><rect width="960" height="540" fill="#e9eef2"/>
+      <g fill="#5b6670"><rect y="80" width="960" height="120"/><rect y="230" width="960" height="120"/><rect y="380" width="960" height="120"/></g>
+      <g stroke="#fff" stroke-width="4" stroke-dasharray="26 22"><path d="M0 140h960M0 290h960M0 440h960"/></g>
+      <g transform="translate(860 70)">${Array.from({ length: 22 }, (_, k) => `<rect x="${(k % 2) * 20}" y="${Math.floor(k / 2) * 40 + (k % 2) * 20}" width="20" height="20" fill="#1d2622"/>`).join("")}</g>
+      <rect x="860" y="70" width="40" height="440" fill="none" stroke="#1d2622" stroke-width="2"/>
+      ${[["r-red", 140, "#e03131"], ["r-blue", 290, "#1c7ed6"], ["r-green", 440, "#2f9e44"]].map(([id, y, c]) => `<g id="${id}"><rect x="40" y="${y - 30}" width="110" height="44" rx="14" fill="${c}"/><path d="M66 ${y - 30}l14-22h44l16 22z" fill="${c}"/><path d="M84 ${y - 30}l8-14h28l8 14z" fill="#cfeaff"/><circle cx="70" cy="${y + 16}" r="14" fill="#1d2622"/><circle cx="124" cy="${y + 16}" r="14" fill="#1d2622"/></g>`).join("")}</svg>`,
+    steps: [
+      { el: "#r-red", name: "Piros autó", cls: "path", fx: "path", label: "Vonalak", start: "click", dur: 2000, delay: 0, dx: 700, dy: 0 },
+      { el: "#r-blue", name: "Kék autó", cls: "path", fx: "path", label: "Vonalak", start: "click", dur: 2000, delay: 0, dx: 700, dy: 0 },
+      { el: "#r-green", name: "Zöld autó", cls: "path", fx: "path", label: "Vonalak", start: "click", dur: 2000, delay: 0, dx: 700, dy: 0 }
+    ],
+    goals: [
+      { text: "Most mindhárom autóhoz külön kattintás kell. Játszd le, és nézd meg!", test: (s, f) => f.played },
+      { text: "Egyetlen kattintásra rajtoljon mind a három: a munkaablakban jelöld ki a kék, aztán a zöld autó sorát, és <b>Indítás › Együtt az előzővel</b>.", test: s => { const b = s.find(x => x.el === "#r-blue"), g = s.find(x => x.el === "#r-green"); return b && g && b.start === "with" && g.start === "with"; } },
+      { text: "A kék autó legyen lassabb: <b>Időtartam: 3</b> mp.", test: s => { const b = s.find(x => x.el === "#r-blue"); return b && b.dur === 3000; } },
+      { text: "A zöld autó rajtoljon fél másodperccel később: <b>Késleltetés: 0,5</b> mp.", test: s => { const g = s.find(x => x.el === "#r-green"); return g && g.delay === 500; } }
+    ],
+    note: "Ki nyer? Az, akinek a legrövidebb az időtartama és a késleltetése együtt." },
+  sandwich: { title: "Próbáld ki: szendvicsgyár", objects: { "#w-bottom": { name: "Alsó kenyér" }, "#w-salad": { name: "Saláta" }, "#w-cheese": { name: "Sajt" }, "#w-tomato": { name: "Paradicsom" }, "#w-top": { name: "Felső kenyér" } },
+    slide: `<svg viewBox="0 0 960 540" role="img" aria-label="Egy tányéron egy szendvics öt rétege"><rect width="960" height="540" fill="#fff4e6"/><ellipse cx="480" cy="470" rx="260" ry="36" fill="#fff" stroke="#c9c2b4" stroke-width="4"/>
+      <g id="w-bottom"><rect x="300" y="400" width="360" height="56" rx="16" fill="#e8b46c" stroke="#a8742c" stroke-width="4"/></g>
+      <g id="w-salad"><path d="M290 396q20-22 45 0t45 0 45 0 45 0 45 0 45 0 45 0 45 0 45 0v12H290z" fill="#69c34a" stroke="#3c8a23" stroke-width="3"/></g>
+      <g id="w-cheese"><path d="M300 352h360l-20 40H320z" fill="#ffd43b" stroke="#e0a800" stroke-width="3"/><circle cx="400" cy="372" r="7" fill="#e0a800"/><circle cx="560" cy="368" r="9" fill="#e0a800"/></g>
+      <g id="w-tomato" fill="#fa5252" stroke="#c92a2a" stroke-width="3"><ellipse cx="380" cy="336" rx="66" ry="16"/><ellipse cx="580" cy="336" rx="66" ry="16"/></g>
+      <g id="w-top"><path d="M300 320q0-110 180-110t180 110z" fill="#e8b46c" stroke="#a8742c" stroke-width="4"/><g fill="#fff3d6"><ellipse cx="420" cy="262" rx="8" ry="4"/><ellipse cx="500" cy="244" rx="8" ry="4"/><ellipse cx="560" cy="272" rx="8" ry="4"/></g></g></svg>`,
+    steps: [
+      { el: "#w-top", name: "Felső kenyér", cls: "entr", fx: "fly", dir: "top", label: "Beúszás", start: "click", dur: 500, delay: 0 },
+      { el: "#w-cheese", name: "Sajt", cls: "entr", fx: "fly", dir: "top", label: "Beúszás", start: "after", dur: 500, delay: 0 },
+      { el: "#w-bottom", name: "Alsó kenyér", cls: "entr", fx: "fly", dir: "top", label: "Beúszás", start: "after", dur: 500, delay: 0 },
+      { el: "#w-tomato", name: "Paradicsom", cls: "entr", fx: "fly", dir: "top", label: "Beúszás", start: "after", dur: 500, delay: 0 },
+      { el: "#w-salad", name: "Saláta", cls: "entr", fx: "fly", dir: "top", label: "Beúszás", start: "after", dur: 500, delay: 0 }
+    ],
+    goals: [
+      { text: "Játszd le: hát ez nem egy szendvics…", test: (s, f) => f.played },
+      { text: "Rendezd át a munkaablakban (<b>Áthelyezés korábbra / későbbre</b>) alulról felfelé: alsó kenyér, saláta, sajt, paradicsom, felső kenyér.", test: s => s.map(x => x.el).join() === "#w-bottom,#w-salad,#w-cheese,#w-tomato,#w-top" },
+      { text: "Az első (alsó kenyér) induljon kattintásra, a többi <b>Az előző után</b>.", test: s => s.length === 5 && s[0].start === "click" && s.slice(1).every(x => x.start === "after") }
+    ],
+    note: "A sorhoz tartozó animációt úgy jelölöd ki, hogy a munkaablakban rákattintasz a sorára." }
+};
+window.QUIZ = [
+  { q: "Melyik lapon vannak az animációs effektusok?", opts: ["Animációk", "Áttűnések", "Beszúrás", "Diavetítés"], right: 0,
+    fb: "Az Animációk lapon. Az Áttűnések lap a diák közötti váltásra való." },
+  { q: "Milyen fajta effektus kell, hogy egy dolog <b>belépjen</b> a diára?", opts: ["Megjelenés (zöld csillag)", "Kiemelés (sárga csillag)", "Eltűnés (piros csillag)", "Áttűnés"], right: 0,
+    fb: "A zöld csillagos megjelenési effektusok hozzák be a dolgokat a diára." },
+  { q: "Egy autónak már van Beúszás animációja. Hogyan adsz neki <b>még egy</b> animációt úgy, hogy a Beúszás is megmaradjon?", opts: ["Az Animáció hozzáadása gombbal", "A nagy effektuslistából választok még egyet", "Lemásolom az autót", "Az Effektus beállításai gombbal"], right: 0,
+    fb: "A nagy listából választva lecseréled a régit. Az Animáció hozzáadása új sort tesz a munkaablakba." },
+  { q: "Melyik indítást válaszd, ha a madárnak <b>ugyanakkor</b> kell elindulnia, mint az előtte lévő felhőnek?", opts: ["Együtt az előzővel", "Az előző után", "Kattintásra", "Késleltetés: 0"], right: 0,
+    fb: "Együtt az előzővel: egyszerre indul az előtte lévővel." },
+  { q: "Mit állít be az <b>Időtartam</b>?", opts: ["Hány másodpercig tartson az animáció", "Hány másodperc múlva induljon", "Hányszor ismétlődjön", "Hányadik kattintásra induljon"], right: 0,
+    fb: "Az időtartam az animáció hossza. Hogy mennyit várjon indulás előtt, azt a Késleltetés mondja meg." },
+  { q: "A munkaablakban a legelső animáció előtt <b>0</b> áll. Mit jelent ez?", opts: ["Kattintás nélkül indul, amikor a dia megjelenik", "Nem fog lejátszódni", "0 másodpercig tart", "Ez az utolsó animáció"], right: 0,
+    fb: "A 0 azt jelenti: nem kell rá kattintani, rögtön indul a dia elején." }
+];
+</script>
+<script src="../anim.js"></script>
+<script src="../anim-lab.js"></script>
+<script src="../explainer.js"></script>
+<script src="../../nav.js?v=898a04a6" defer></script>
+</body>
+</html>

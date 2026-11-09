@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>/* moving between pages: the old page drifts aside and fades, the new one glides in; the rail holds still */@view-transition{navigation:auto}.rail{view-transition-name:rail}::view-transition-group(root){animation:none}::view-transition-old(root){animation:dk-out .2s cubic-bezier(.4,0,1,1) both}::view-transition-new(root){animation:dk-in .38s cubic-bezier(.16,1,.3,1) .06s both}::view-transition-old(rail),::view-transition-new(rail){animation:none}@keyframes dk-out{to{opacity:0;transform:translateX(-18px)}}@keyframes dk-in{from{opacity:0;transform:translateX(26px)}}@media (prefers-reduced-motion:reduce){::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none!important}}</style>
+<title>Robi a Holdra repül – PowerPoint-küldetés</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600;700&display=swap">
+<link rel="stylesheet" href="../mission.css">
+</head>
+<body>
+<header class="rail"><div class="in">
+  <a class="home" href="../../index.html">Digitális kultúra</a>
+  <span class="crumb"><a href="../../index.html#powerpoint">Bemutatókészítés – PowerPoint</a> › <a href="../../index.html#powerpoint-animation">2. lecke</a></span>
+</div></header>
+<div class="top">
+  <span class="art" aria-hidden="true"><svg viewBox="0 0 96 96"><circle cx="48" cy="48" r="46" fill="#0b1638"/><circle cx="70" cy="28" r="16" fill="#e8e3c9"/><circle cx="65" cy="24" r="4" fill="#cfc59d"/><circle cx="75" cy="33" r="5" fill="#cfc59d"/>
+<path d="M26 74C34 60 44 48 58 40" fill="none" stroke="#f2d264" stroke-width="2.4" stroke-dasharray="4 4"/><circle cx="26" cy="74" r="3.5" fill="#2f9e44"/><path d="M58 40l-2-7 7 2z" fill="#d6336c"/>
+<g transform="rotate(45 30 62)"><rect x="24" y="52" width="12" height="26" rx="3" fill="#e9ecef"/><path d="M24 53l6-10 6 10z" fill="#ff0000"/><circle cx="30" cy="62" r="3.6" fill="#00b0f0" stroke="#002060"/><path d="M24 70l-5 8h5zM36 70l5 8h-5z" fill="#ff0000"/></g>
+<g fill="#fff"><circle cx="18" cy="30" r="1.6"/><circle cx="40" cy="18" r="1.4"/><circle cx="84" cy="62" r="1.4"/><circle cx="56" cy="80" r="1.2"/></g></svg></span>
+  <div><div class="kicker">PowerPoint, 2. lecke: küldetés az igazi PowerPointban</div><h1>Robi a Holdra repül</h1></div>
+  <div class="meta"><span>Haladás <b id="solvedCount">–</b></span><span>Idő <b id="timer">0:00</b></span><button type="button" class="mbtn" id="soundBtn">Hang: be</button><button type="button" class="mbtn" id="resetBtn">Elölről</button></div>
+</div>
+<nav class="steps" id="steps" aria-label="Fejezetek"></nav>
+<div id="game"><main>
+  <article class="card" id="case" aria-live="polite"></article>
+  <section class="work" aria-label="A dia"><div class="card">
+    <div class="dlcard"><svg class="ic" viewBox="0 0 40 46" aria-hidden="true"><path d="M4 2h22l10 10v32H4z" fill="#fff" stroke="#c43e1c" stroke-width="2"/><path d="M26 2v10h10" fill="#fbebe5" stroke="#c43e1c" stroke-width="2"/><rect x="0" y="18" width="24" height="20" rx="2" fill="#c43e1c"/><path d="M8 33V23h5a3.2 3.2 0 0 1 0 6.4H8" fill="none" stroke="#fff" stroke-width="2.6" stroke-linejoin="round"/></svg><p><b>holdutazas.pptx</b><br>Ebben a fájlban dolgozol, az igazi PowerPointban.</p><a class="btn primary" href="holdutazas.pptx" download>Letöltés</a></div>
+    <div class="work-head"><h2>Így működjön a diád</h2><p>A <b>Lejátszás</b> gombbal megnézheted, mit kell tudnia eddig.</p></div>
+    <div class="slidebox" id="slide" tabindex="0"></div>
+    <div class="playrow"><button type="button" class="btn primary" id="playBtn">▶ Lejátszás</button><p>Lejátszás közben ott, ahol egér van a listában, kattints a diára, mint diavetítéskor.</p></div>
+    <div class="mission-pane"><h3>Animációs munkaablak (minta)</h3><div class="ap-list" id="pane"></div></div>
+    <div class="ap-hint" id="clickHint" hidden>🖱 Kattints a diára!</div>
+  </div></section>
+</main></div>
+<section id="endPanel" hidden></section>
+<footer class="end">Digitális kultúra. A haladásod a böngésződben marad: ha bezárod az oldalt, legközelebb innen folytathatod. A feltöltött fájlt az oldal csak megnézi, nem küldi el sehová.</footer>
+<canvas id="fx" aria-hidden="true"></canvas>
+<script src="../pptx.js"></script>
+<script src="../anim.js"></script>
+<script>
+const star = c => `<svg class="star" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1l2.1 4.6 5 .5-3.8 3.4 1.1 4.9L8 11.9 3.6 14.4l1.1-4.9L.9 6.1l5-.5z" fill="${c}"/></svg>`;
+const GREEN = star("#2f9e44"), YELLOW = star("#e0a800"), RED = star("#d6336c");
+/* the slide with the most animations is the one to check */
+const sceneOf = d => d.slides.slice().sort((a, b) => b.anims.length - a.anims.length)[0] || { shapes: [], anims: [] };
+const START = { click: "Kattintásra", with: "Együtt az előzővel", after: "Az előző után" };
+function animOf(d, name, cls) {
+  const sl = sceneOf(d), sh = PPTX.byName(sl, name);
+  if (!sh) return { err: `Nem találom a dián ezt: <b>${name}</b>. Az eredeti, letöltött fájlban dolgozz, és ne töröld ki a részeit!` };
+  const list = PPTX.animsOf(sl, sh);
+  const a = list.find(x => x.cls === cls);
+  return { a, list, sl, err: null };
+}
+const CLS = { entr: "megjelenési (zöld) effektus", emph: "kiemelési (sárga) effektus", exit: "eltűnési (piros) effektus", path: "mozgásvonal" };
+const CLS_ACC = { entr: "megjelenési (zöld) effektust", emph: "kiemelési (sárga) effektust", exit: "eltűnési (piros) effektust", path: "mozgásvonalat" };
+function need(d, name, cls, start, extra) {
+  const r = animOf(d, name, cls); if (r.err) return r.err;
+  if (!r.a) return r.list.length ? `${name}: van animációja, de nem ${CLS[cls]}. Jelöld ki, és cseréld le.` : `${name}: még nincs animációja. Jelöld ki, és adj neki egy ${CLS_ACC[cls]}.`;
+  if (start && r.a.start !== start) return `${name}: az <i>Indítás</i> most „${START[r.a.start]}”, de „${START[start]}” kellene.`;
+  return extra ? extra(r.a) : true;
+}
+
+window.MISSION = {
+  key: "moon-trip-hu-v1", title: "Robi a Holdra repül", saveAs: "holdutazas-Kovacs-Anna.pptx",
+  confetti: ["#f2d264", "#e8e3c9", "#00b0f0", "#ff0000", "#ffc000", "#ffffff"],
+  next: { href: "../../index.html#powerpoint", text: "Vissza a PowerPoint-leckékhez" },
+  names: { "#m-stars": "Csillagok", "#m-title": "Cím", "#m-moon": "Hold", "#m-rocket": "Rakéta", "#m-smoke": "Füst", "#m-flag": "Zászló" },
+  slide: `<svg viewBox="0 0 960 540" role="img" aria-label="A mintadia: éjszakai égbolt, balra lent egy rakéta füstfelhőben, jobbra fent a Hold egy zászlóval, fent a cím: Robi a Holdra repül">
+    <rect width="960" height="540" fill="#0b1638"/><rect y="475" width="960" height="65" fill="#3a3f4b"/>
+    <g id="m-stars">${[[1.0,1.8,"#ffff00"],[3.2,1.3,"#fff"],[5.0,2.3,"#ffff00"],[6.6,1.2,"#fff"],[7.8,2.8,"#ffff00"],[4.2,3.6,"#fff"],[8.6,4.4,"#ffff00"],[12.4,4.0,"#fff"],[6.2,4.8,"#fff"],[11.6,5.4,"#ffff00"]]
+      .map(([x, y, c]) => `<path transform="translate(${x * 72 + 8.6} ${y * 72 + 9})" d="M0-9l2.6 5.6 6.1.6-4.6 4.1 1.3 6L0 4.3-5.4 7.3l1.3-6-4.6-4.1 6.1-.6z" fill="${c}"/>`).join("")}</g>
+    <g id="m-moon" data-hl="2"><circle cx="770.4" cy="144" r="100.8" fill="#e8e3c9" stroke="#bfb48a" stroke-width="2.5"/>
+      <g fill="#cfc59d"><circle cx="734.4" cy="115.2" r="21.6"/><circle cx="806.4" cy="172.8" r="28.8"/><circle cx="784.8" cy="90" r="13"/><circle cx="720" cy="187.2" r="15.8"/></g></g>
+    <g id="m-flag" data-hl="5"><rect x="700" y="10.8" width="4.3" height="68.4" fill="#fff"/><rect x="704" y="10.8" width="50.4" height="30.2" fill="#ffc000"/>
+      <path d="M729 32c-7-6-11-1-8 3l8 6 8-6c3-4-1-9-8-3z" fill="#ff0000"/></g>
+    <g id="m-rocket" data-hl="3"><path d="M90 432H115.2V374.4zM172.8 374.4V432H198z" fill="#ff0000" stroke="#7f1d1d" stroke-width="2"/>
+      <rect x="115.2" y="277.2" width="57.6" height="154.8" rx="10" fill="#e9ecef" stroke="#5b6670" stroke-width="2"/><path d="M115.2 280.8H172.8L144 226.8z" fill="#ff0000" stroke="#7f1d1d" stroke-width="2"/>
+      <circle cx="144" cy="331.2" r="20" fill="#00b0f0" stroke="#002060" stroke-width="3.5"/><circle cx="137.5" cy="327.6" r="3.6" fill="#fff"/><circle cx="150.5" cy="327.6" r="3.6" fill="#fff"/></g>
+    <g id="m-smoke" data-hl="4" fill="#d9d9d9" stroke="#a6a6a6" stroke-width="2"><circle cx="95" cy="462" r="26"/><circle cx="196" cy="462" r="26"/><circle cx="125" cy="440" r="30"/><circle cx="168" cy="440" r="30"/><circle cx="146" cy="470" r="30"/>
+      <g stroke="none"><circle cx="125" cy="452" r="26"/><circle cx="168" cy="452" r="26"/><circle cx="146" cy="458" r="24"/></g></g>
+    <g id="m-title" data-hl="1"><text x="43" y="76" font-family="Aptos, Calibri, 'Atkinson Hyperlegible', sans-serif" font-size="40" font-weight="700" fill="#fff">Robi a Holdra repül</text></g>
+  </svg>`,
+  play: [
+    { ch: 6, el: "#m-stars", cls: "entr", fx: "fade", start: "with", dur: 500, label: "Fokozatos megjelenés" },
+    { ch: 1, el: "#m-title", cls: "entr", fx: "fly", dir: "top", start: "click", dur: 500, label: "Beúszás" },
+    { ch: 2, el: "#m-moon", cls: "emph", fx: "spin", start: "after", dur: 2000, label: "Forgás" },
+    { ch: 3, el: "#m-rocket", cls: "path", fx: "path", dx: 520, dy: -215, start: "click", dur: 3000, label: "Vonalak" },
+    { ch: 4, el: "#m-smoke", cls: "exit", fx: "fadeout", start: "with", dur: 500, label: "Elhalványulás" },
+    { ch: 5, el: "#m-flag", cls: "entr", fx: "wipe", dir: "bottom", start: "after", delay: 500, dur: 500, label: "Kitakarás" }
+  ],
+  chapters: [
+    { refresher: true, title: "Nyisd meg a fájlt",
+      story: `<p>Robi, a robot kabala nagy útra készül: <b>a Holdra repül</b>! A rajz már kész: ott a rakéta, a Hold, a csillagok és a füst. De a dia még mozdulatlan, mint egy fénykép.</p>
+        <p>A feladatod: <b>animációkkal</b> életre kelteni. A végén, diavetítésben, a cím beúszik, a Hold megfordul, a rakéta felszáll, a füst eloszlik, és a Holdon kitűzik a zászlót.</p>`,
+      learn: `<ul><li>Az animációk az <span class="ui">Animációk</span> lapon vannak.</li><li>Előbb mindig <b>jelöld ki</b>, mit akarsz animálni, csak utána válassz effektust.</li><li>Az elméletet <a href="intro-hu.html">itt</a> olvashatod el újra.</li></ul>`,
+      steps: [
+        `Töltsd le a fájlt: <br><a class="btn primary" href="holdutazas.pptx" download>holdutazas.pptx letöltése</a>`,
+        `Nyisd meg a PowerPointban. Ha felül sárga sávban azt látod: <span class="ui">Védett nézet</span>, kattints a <span class="ui">Szerkesztés engedélyezése</span> gombra.`,
+        `Mentsd el a neveddel: <span class="ui">Fájl</span> › <span class="ui">Mentés másként</span>, például <code>holdutazas-Kovacs-Anna</code>.`,
+        `Kattints az <span class="ui">Animációk</span> lapra, aztán jobbra az <span class="ui">Animációs munkaablak</span> gombra. A dia mellett megnyílik egy lista: ebben látod majd az összes animációt, sorrendben.`
+      ],
+      asks: [{ q: "Hány animáció van most a munkaablak listájában?", num: 0, traps: { "6": "Ennyi rész van a dián, de animációjuk még nincs. Mi áll a listában?" } }],
+      hints: ["A dia még mozdulatlan: a lista üres. Írd be: 0."],
+      success: "Üres a lista: ezt most megtöltjük. Kezdjük a címmel!" },
+
+    { title: "Beúszik a cím",
+      story: `<p>Az előadás elején a cím ne legyen ott rögtön: kattintásra <b>ússzon be felülről</b>.</p>`,
+      learn: `<p>Az animációknak négy fajtája van, mindegyiknek saját színű csillaga:</p><ul><li>${GREEN} <b>Megjelenés</b>: a dolog belép a diára,</li><li>${YELLOW} <b>Kiemelés</b>: már ott van, és felhívja magára a figyelmet,</li><li>${RED} <b>Eltűnés</b>: elhagyja a diát,</li><li><b>Mozgásvonal</b>: egy útvonalon végigmegy.</li></ul>`,
+      steps: [
+        `Kattints a címre (<i>Robi a Holdra repül</i>), hogy ki legyen jelölve.`,
+        `Az <span class="ui">Animációk</span> lapon a nagy listából válaszd a <span class="ui">Beúszás</span> effektust. (Ha nem látod, kattints a lista jobb szélén a kis nyílra: ott van az összes.) A PowerPoint egyszer lejátssza, hogy lásd.`,
+        `<span class="ui">Effektus beállításai</span> › <span class="ui">Felülről</span>.`,
+        `Nézd meg: a cím mellett megjelent egy kis <b>1</b>-es szám. Ez azt jelenti: az első kattintásra indul.`
+      ],
+      asks: [{ q: "Milyen színű csillag van a <b>Beúszás</b> és a többi megjelenési effektus előtt?", text: ["zöld", "zöldszínű", "zöld színű"], traps: { "sárga": "A sárga a kiemelés színe. A megjelenési effektusoké más.", "piros": "A piros az eltűnés színe. A megjelenési effektusoké más." } }],
+      hints: ["Nézd meg az Animációs munkaablakban a Cím sora elején a kis csillagot."],
+      success: "Zöld: a zöld csillag mindig azt jelenti, hogy valami megjelenik." },
+
+    { title: "Megfordul a Hold",
+      story: `<p>Amikor a cím beúszott, a Hold <b>forduljon meg</b> egyszer, magától, kattintás nélkül.</p>`,
+      learn: `<p>Az <span class="ui">Indítás</span> mondja meg, <b>mikor</b> induljon az animáció:</p><ul><li><b>Kattintásra</b>: megvárja, hogy kattints,</li><li><b>Együtt az előzővel</b>: ugyanakkor indul, mint az előző,</li><li><b>Az előző után</b>: megvárja, hogy az előző befejeződjön, aztán magától indul.</li></ul>`,
+      steps: [
+        `Kattints a Holdra.`,
+        `Az effektusok listájában a ${YELLOW} sárga csillagosok közül válaszd a <span class="ui">Forgás</span> effektust.`,
+        `Jobbra az <i>Időzítés</i> csoportban: <span class="ui">Indítás</span> › <span class="ui">Az előző után</span>.`,
+        `Nézd meg a munkaablakban: a Hold sora előtt egy kis <b>óra</b> van, szám nincs. Az óra jelenti, hogy magától, az előző után indul.`
+      ],
+      asks: [{ q: "Milyen színű csillag jelöli a <b>kiemelési</b> effektusokat?", text: ["sárga", "sárga színű", "narancs", "narancssárga"], traps: { "zöld": "A zöld a megjelenésé. A kiemelésé más.", "piros": "A piros az eltűnésé. A kiemelésé más." } }],
+      hints: ["A Forgás a kiemelések között van. Nézd meg a munkaablakban a Hold sorát."],
+      success: "Sárga: a Hold már ott volt, csak felhívja magára a figyelmet." },
+
+    { title: "Kilövés!",
+      story: `<p>Jöhet a nagy pillanat: kattintásra a rakéta <b>felszáll, és a Holdig repül</b>. Ehhez mozgásvonal kell, azon megy végig a rakéta.</p>`,
+      learn: `<p>A mozgásvonal egy szaggatott vonal a dián. Az elején egy <b>zöld</b>, a végén egy <b>piros</b> jel van: a rakéta a zöldtől a pirosig megy. A piros jelet egérrel arrébb húzhatod: oda megy majd a rakéta.</p><p>Az <span class="ui">Időtartam</span> azt mondja meg, hány másodpercig tartson az animáció.</p>`,
+      steps: [
+        `Kattints a rakétára. (Ha csak egy darabja jelölődik ki, kattints a dián egy üres helyre, aztán egyszer újra a rakétára.)`,
+        `Görgess le az effektusok listájában a <i>Mozgásvonalak</i> csoportig, és válaszd a <span class="ui">Vonalak</span> effektust.`,
+        `<span class="ui">Effektus beállításai</span> › válaszd azt az irányt, amelyik <b>felfelé</b> mutat.`,
+        `Most fogd meg a szaggatott vonal végén a <b>piros</b> jelet, és húzd a Hold mellé.`,
+        `<span class="ui">Időtartam</span>: írd be, hogy <b>3</b>, és nyomd meg az <kbd>Enter</kbd> billentyűt (így 03,00 lesz). Az <span class="ui">Indítás</span> maradjon <span class="ui">Kattintásra</span>.`
+      ],
+      asks: [{ q: "Milyen színű a mozgásvonal <b>elején</b> lévő jel, ahonnan a rakéta indul?", text: ["zöld", "zöld színű"], traps: { "piros": "A piros a vonal végén van: ott áll meg a rakéta. Az elején lévő más színű." } }],
+      hints: ["Zöld: indulj! Piros: állj meg! Mint a közlekedési lámpa."],
+      success: "Zöldtől a pirosig: a rakéta a Holdig repül, 3 másodperc alatt." },
+
+    { title: "Eloszlik a füst",
+      story: `<p>Amikor a rakéta felszáll, a füstfelhő maradjon lent, és <b>tűnjön el</b> – de ne később, hanem <b>a kilövéssel egy időben</b>.</p>`,
+      isNew: false,
+      learn: `<p>Az ${RED} <b>eltűnési</b> effektusok piros csillagosak. Az <span class="ui">Együtt az előzővel</span> indítás azt jelenti: az előzővel (itt a rakétával) egyszerre indul, nem kell hozzá külön kattintani.</p>`,
+      steps: [
+        `Kattints a füstfelhőre.`,
+        `Az effektusok listájában a ${RED} piros csillagosok közül válaszd az <span class="ui">Elhalványulás</span> effektust.`,
+        `<span class="ui">Indítás</span> › <span class="ui">Együtt az előzővel</span>.`,
+        `Kattints a munkaablak tetején a <span class="ui">Lejátszás</span> gombra, és nézd meg: egyszerre indul a rakéta és tűnik el a füst?`
+      ],
+      asks: [{ q: "A munkaablakban milyen jel áll a Füst sora előtt? (Írd be: <i>szám</i>, <i>óra</i> vagy <i>semmi</i>.)", text: ["semmi", "nincs", "nincs semmi", "semmilyen", "üres"], traps: { "óra": "Az óra az <i>Az előző után</i> jele. A Füstnél az <i>Együtt az előzővel</i> van beállítva?", "szám": "Szám csak a kattintásra induló animációk előtt áll. A Füstnél az <i>Együtt az előzővel</i> van beállítva?" } }],
+      hints: ["Az <i>Együtt az előzővel</i> animáció előtt se szám, se óra nincs: csak egy üres hely."],
+      success: "Semmi: ami együtt indul az előzővel, annak nem kell se kattintás, se várakozás." },
+
+    { title: "Zászló a Holdon",
+      story: `<p>Robi megérkezett! Fél másodperccel a landolás után a Holdon <b>megjelenik a zászló</b>, alulról felfelé, mintha most tűznék ki.</p>`,
+      learn: `<p>A <span class="ui">Késleltetés</span> azt mondja meg, hány másodpercet várjon még az animáció, mielőtt elindul. A 0,5 fél másodpercet jelent.</p>`,
+      steps: [
+        `Kattints a zászlóra.`,
+        `${GREEN} Megjelenés: <span class="ui">Kitakarás</span>. Aztán <span class="ui">Effektus beállításai</span> › <span class="ui">Alulról</span>.`,
+        `<span class="ui">Indítás</span> › <span class="ui">Az előző után</span>.`,
+        `<span class="ui">Késleltetés</span>: írd be, hogy <b>0,5</b>, és nyomd meg az <kbd>Enter</kbd> billentyűt.`,
+        `Próbáld ki az egészet diavetítésben: nyomd meg az <kbd>F5</kbd> billentyűt, és kattintgass. Kilépés: <kbd>Esc</kbd>.`
+      ],
+      asks: [{ q: "Diavetítésben hányszor kell kattintanod, hogy minden animáció lejátszódjon?", num: 2,
+        traps: { "5": "Nem mindegyik indul kattintásra! Számold meg a munkaablakban az egér jeleket (vagy a számokat).", "6": "Nem mindegyik indul kattintásra! Számold meg a munkaablakban a számokat.", "1": "A cím is és a rakéta is kattintásra indul. Próbáld ki F5-tel!", "3": "Nézd meg a munkaablakban: hány sor előtt van szám?" } }],
+      hints: ["A cím (1) és a rakéta (2) indul kattintásra, a többi magától."],
+      success: "Kétszer: egyszer a címért, egyszer a kilövésért. Minden más magától megy." },
+
+    { title: "Csillagok legelőször",
+      story: `<p>Már majdnem tökéletes. Egy ötlet még: a dia elején a csillagok ne legyenek ott, hanem <b>magától, rögtön tűnjenek fel</b>, még mielőtt bárki kattintana.</p>`,
+      learn: `<p>Az új animáció mindig a lista <b>végére</b> kerül. A sorrenden a munkaablakban változtathatsz: jelöld ki az animációt, és az <span class="ui">Animációk</span> lapon kattints az <span class="ui">Áthelyezés korábbra</span> gombra (vagy a munkaablakban húzd feljebb).</p><p>Ha a <b>legelső</b> animáció nem kattintásra indul, akkor rögtön elindul, amikor a dia megjelenik. Az ilyen sor előtt <b>0</b> áll.</p>`,
+      steps: [
+        `Kattints az egyik csillagra. Mivel a csillagok egy csoportba vannak foglalva, az egész csoport kijelölődik.`,
+        `${GREEN} Megjelenés: <span class="ui">Fokozatos megjelenés</span>. Az új animáció a munkaablak aljára került.`,
+        `Kattints az <span class="ui">Áthelyezés korábbra</span> gombra annyiszor, hogy a Csillagok a lista <b>legtetejére</b> kerüljenek.`,
+        `<span class="ui">Indítás</span> › <span class="ui">Együtt az előzővel</span>.`,
+        `Nézd meg F5-tel. Mentsd el: <kbd>Ctrl</kbd>+<kbd>S</kbd>.`
+      ],
+      asks: [{ q: "Milyen szám áll most a munkaablakban a Csillagok előtt?", num: 0, traps: { "1": "Akkor a Csillagok még kattintásra indulnak. Állítsd az Indítást Együtt az előzővel értékre!", "6": "A Csillagok még a lista alján vannak. Hozd fel őket legfelülre!" } }],
+      hints: ["Ha a legelső animáció nem kattintásra indul, a PowerPoint 0-t ír elé: ez a „nulladik” kattintás, vagyis kattintás nélkül indul."],
+      success: "0: a csillagok kattintás nélkül, rögtön a dia elején feltűnnek." },
+
+    { title: "Beadás", upload: true,
+      story: `<p>Kész az űrutazás! Mielőtt beadod, az oldal <b>megnézi a fájlodat</b>: megvan-e minden animáció, jó-e az indításuk, és jó-e a sorrendjük.</p>`,
+      steps: [
+        `Mentsd el a fájlt a PowerPointban: <kbd>Ctrl</kbd>+<kbd>S</kbd>.`,
+        `Húzd a fájlt az alábbi mezőbe (vagy kattints rá, és válaszd ki). A fájlt az oldal csak itt a böngészőben nézi meg, nem küldi el sehová.`,
+        `Ha valami piros, javítsd ki a PowerPointban, mentsd el, és húzd ide újra.`
+      ],
+      success: "Minden animáció a helyén van. Robi sikeresen landolt a Holdon!" }
+  ],
+  checks: [
+    { label: "Cím: megjelenési effektus, kattintásra", test: d => need(d, "Cím", "entr", "click") },
+    { label: "Hold: kiemelési effektus, az előző után", test: d => need(d, "Hold", "emph", "after") },
+    { label: "Rakéta: mozgásvonal, kattintásra, 3 másodperc", test: d => need(d, "Rakéta", "path", "click", a => Math.abs(a.dur - 3000) <= 60 || `Rakéta: az időtartam most ${(a.dur / 1000).toLocaleString("hu-HU")} mp, de 3 mp kellene. <i>Időtartam: 03,00</i>.`) },
+    { label: "Rakéta: felfelé repül, a Hold felé", test: d => need(d, "Rakéta", "path", null, a => { const e = PPTX.pathEnd(a.motion); return (e && e[1] < -0.15) || "Rakéta: a mozgásvonal nem vezet elég magasra. Húzd a piros jelet a Hold mellé!"; }) },
+    { label: "Füst: eltűnési effektus, együtt az előzővel", test: d => need(d, "Füst", "exit", "with") },
+    { label: "Zászló: megjelenés, az előző után, 0,5 mp késleltetéssel", test: d => need(d, "Zászló", "entr", "after", a => Math.abs(a.delay - 500) <= 30 || `Zászló: a késleltetés most ${(a.delay / 1000).toLocaleString("hu-HU")} mp, de 0,5 mp kellene.`) },
+    { label: "Csillagok: legelöl, kattintás nélkül", test: d => {
+        const r = need(d, "Csillagok", "entr"); if (r !== true) return r;
+        const sl = sceneOf(d), first = sl.anims[0], cs = PPTX.byName(sl, "Csillagok");
+        if (!first || !PPTX.inside(first.shape, cs)) return "A Csillagok még nincsenek a lista legtetején. Jelöld ki az animációjukat, és <i>Áthelyezés korábbra</i>.";
+        return first.start !== "click" || "A Csillagok legelöl vannak, de kattintásra indulnak. <i>Indítás: Együtt az előzővel</i>.";
+      } },
+    { label: "Jó sorrend: Cím → Hold → Rakéta → Füst → Zászló", test: d => {
+        const sl = sceneOf(d), names = ["Cím", "Hold", "Rakéta", "Füst", "Zászló"];
+        const pos = names.map(n => { const sh = PPTX.byName(sl, n); return sh ? sl.anims.findIndex(a => a.shape && PPTX.inside(a.shape, sh)) : -1; });
+        if (pos.some(p => p < 0)) return "Még nincs meg mind az öt animáció.";
+        for (let k = 1; k < pos.length; k++) if (pos[k] < pos[k - 1]) return `A ${names[k]} animációja a ${names[k - 1]} előtt van. Rendezd át a munkaablakban!`;
+        return true;
+      } }
+  ],
+  ending: {
+    title: "Landolás a Holdon!",
+    text: `<p>A dia most már egy kis film: a csillagok feltűnnek, a cím beúszik, a Hold megfordul, a rakéta a Holdig repül, a füst eloszlik, és kitűzik a zászlót.</p>
+      <p>Használtál megjelenési, kiemelési, eltűnési effektust és mozgásvonalat; beállítottad, mikor induljanak, mennyi ideig tartsanak, és milyen sorrendben jöjjenek.</p>`,
+    rank: (min, hints) => hints === 0 ? "Rang: Űrparancsnok. Egyetlen segítség nélkül!" : hints <= 3 ? "Rang: Pilóta" : "Rang: Űrkadét. Legközelebb kevesebb segítséggel is menni fog!"
+  }
+};
+</script>
+<script src="../real.js"></script>
+<script src="../../nav.js?v=898a04a6" defer></script>
+</body>
+</html>

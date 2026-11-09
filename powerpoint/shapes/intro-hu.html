@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>/* moving between pages: the old page drifts aside and fades, the new one glides in; the rail holds still */@view-transition{navigation:auto}.rail{view-transition-name:rail}::view-transition-group(root){animation:none}::view-transition-old(root){animation:dk-out .2s cubic-bezier(.4,0,1,1) both}::view-transition-new(root){animation:dk-in .38s cubic-bezier(.16,1,.3,1) .06s both}::view-transition-old(rail),::view-transition-new(rail){animation:none}@keyframes dk-out{to{opacity:0;transform:translateX(-18px)}}@keyframes dk-in{from{opacity:0;transform:translateX(26px)}}@media (prefers-reduced-motion:reduce){::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none!important}}</style>
+<title>Alakzatok – elmélet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600;700&display=swap">
+<link rel="stylesheet" href="../explainer.css">
+</head>
+<body>
+<header class="rail"><div class="in">
+  <a class="home" href="../../index.html">Digitális kultúra</a>
+  <span class="crumb"><a href="../../index.html#powerpoint">Bemutatókészítés – PowerPoint</a> › <a href="../../index.html#powerpoint-shapes">1. lecke</a></span>
+</div></header>
+
+<section class="hero">
+  <div class="kicker">PowerPoint, 1. lecke: elmélet</div>
+  <h1>Rajzolj alakzatokkal!</h1>
+  <p class="lead">A PowerPointban nemcsak írni lehet. Kész <b>alakzatokból</b> – téglalapból, körből, csillagból, nyílból – bármit megrajzolhatsz: egy házat, egy állatot vagy egy robotot. Ebben a leckében megtanulod, hogyan.</p>
+  <div class="meta"><span>kb. 15 perc</span><span>minden gyakorló kipróbálható</span><span>a végén 6 kérdés</span></div>
+  <ul class="toc"><li><a href="#mi">Mi az alakzat?</a></li><li><a href="#beszuras">Alakzat beszúrása</a></li><li><a href="#kijeloles">Mozgatás, méretezés, forgatás</a></li><li><a href="#szinek">Kitöltés és körvonal</a></li><li><a href="#szoveg">Szöveg az alakzatban</a></li><li><a href="#sorrend">Előre és hátra</a></li><li><a href="#csoport">Csoportosítás</a></li><li><a href="#tippek">Ha valami nem megy</a></li><li><a href="#kviz">Ellenőrizd magad</a></li><li><a href="#gyakorolj">Gyakorolj</a></li></ul>
+</section>
+
+<main class="sheet">
+<section class="sec" id="mi"><h2><span class="n">1</span>Mi az alakzat?</h2>
+<p>Az <b>alakzat</b> egy kész forma, amit a PowerPoint ad: téglalap, kör, háromszög, csillag, szív, nyíl, szövegbuborék és még sok más. Egy alakzatot bármikor átméretezhetsz, elforgathatsz és átszínezhetsz, és írhatsz is bele.</p>
+<p>Ha több alakzatot egymás mellé és egymásra teszel, <b>rajz</b> lesz belőlük. Ezt a házat is öt alakzatból raktuk össze:</p>
+<figure class="pic"><svg viewBox="0 0 760 300" role="img" aria-label="Egy ház alakzatokból: téglalap fal, háromszög tető, két négyzet ablak, téglalap ajtó és egy kör nap">
+<rect width="760" height="300" fill="#fff"/>
+<g stroke="#2f528f" stroke-width="3" stroke-linejoin="round">
+<path d="M150 120L260 40L370 120Z" fill="#c00000"/><rect x="170" y="120" width="180" height="140" fill="#ffc000"/>
+<rect x="190" y="145" width="44" height="44" fill="#00b0f0"/><rect x="286" y="145" width="44" height="44" fill="#00b0f0"/><rect x="238" y="198" width="44" height="62" fill="#8b5a2b"/>
+<circle cx="80" cy="66" r="34" fill="#ffff00"/></g>
+<g font-family="Atkinson Hyperlegible, sans-serif" font-size="17" fill="#1d2622">
+<path d="M370 80h60M352 190h78M330 167h100M282 240h148M114 66h-6" stroke="#5b6660" stroke-width="1.5" stroke-dasharray="4 4" fill="none"/>
+<text x="438" y="85">tető: <tspan font-weight="700">Egyenlő szárú háromszög</tspan></text>
+<text x="438" y="172">ablakok: <tspan font-weight="700">Téglalap</tspan> (Shift-tel négyzet)</text>
+<text x="438" y="196">fal: <tspan font-weight="700">Téglalap</tspan></text>
+<text x="438" y="245">ajtó: <tspan font-weight="700">Téglalap</tspan>, barna</text>
+<text x="30" y="128">nap: <tspan font-weight="700">Ellipszis</tspan></text><text x="30" y="148">(Shift-tel kör)</text></g></svg>
+<figcaption>Öt alakzat, öt szín. A tető, az ablakok és az ajtó a fal <b>előtt</b> vannak.</figcaption></figure>
+</section>
+
+<section class="sec" id="beszuras"><h2><span class="n">2</span>Alakzat beszúrása</h2>
+<ol>
+<li>Kattints fent a <span class="ui">Beszúrás</span> lapra.</li>
+<li>Kattints az <span class="ui">Alakzatok</span> gombra. Lenyílik a lista, csoportokba rendezve: <i>Téglalapok</i>, <i>Alapalakzatok</i>, <i>Széles nyilak</i>, <i>Csillagok és szalagok</i>, <i>Feliratok</i>…</li>
+<li>Válassz egy alakzatot. Az egérmutató kis <b>kereszt</b> lesz.</li>
+<li>Kattints a dián, vagy <b>húzd</b> az egeret: akkora lesz az alakzat, amekkorát húzol.</li>
+</ol>
+<div class="idea"><span class="i">💡</span><p>Ha húzás közben nyomva tartod a <kbd>Shift</kbd> billentyűt, az alakzat <b>szabályos</b> lesz: az ellipszisből <b>kör</b>, a téglalapból <b>négyzet</b>. Előbb engedd el az egeret, utána a Shiftet!</p></div>
+<div data-lab="draw"></div>
+</section>
+
+<section class="sec" id="kijeloles"><h2><span class="n">3</span>Mozgatás, méretezés, forgatás</h2>
+<p>Ha egy alakzatra rákattintasz, <b>kijelölöd</b>. Ilyenkor keret jelenik meg körülötte:</p>
+<figure class="pic"><svg viewBox="0 0 760 260" role="img" aria-label="Egy kijelölt alakzat: körülötte 8 fehér karika a méretezéshez, fölötte egy kerek nyíl a forgatáshoz">
+<rect width="760" height="260" fill="#fff"/>
+<rect x="250" y="90" width="220" height="130" rx="22" fill="#4472c4" stroke="#2f528f" stroke-width="1.5"/>
+<rect x="250" y="90" width="220" height="130" fill="none" stroke="#7a8696" stroke-width="1.2"/>
+<path d="M360 90V60" stroke="#7a8696" stroke-width="1.2"/><circle cx="360" cy="45" r="14" fill="#fff" stroke="#7a8696" stroke-width="1.2"/>
+<path d="M353.5 43a6.5 6.5 0 1 1 1.5 6.8" fill="none" stroke="#3b4652" stroke-width="2" stroke-linecap="round"/><path d="M350 40.5l3.5 3.2 1.6-4.6z" fill="#3b4652"/>
+<g fill="#fff" stroke="#5b6670" stroke-width="1.6"><circle cx="250" cy="90" r="8"/><circle cx="360" cy="90" r="8"/><circle cx="470" cy="90" r="8"/><circle cx="470" cy="155" r="8"/><circle cx="470" cy="220" r="8"/><circle cx="360" cy="220" r="8"/><circle cx="250" cy="220" r="8"/><circle cx="250" cy="155" r="8"/></g>
+<circle cx="272" cy="90" r="6" fill="#ffd200" stroke="#5b6670" stroke-width="1.2"/>
+<g font-family="Atkinson Hyperlegible, sans-serif" font-size="16" fill="#1d2622">
+<path d="M378 42h102" stroke="#5b6660" stroke-width="1.4" stroke-dasharray="4 4"/><text x="488" y="47"><tspan font-weight="700">forgatás</tspan>: fogd meg és körbe húzd</text>
+<path d="M478 220h40" stroke="#5b6660" stroke-width="1.4" stroke-dasharray="4 4"/><text x="526" y="215"><tspan font-weight="700">8 fehér karika</tspan>: méretezés</text><text x="526" y="235">(sarok: két irányba, oldal: egy irányba)</text>
+<path d="M266 84L200 46" stroke="#5b6660" stroke-width="1.4" stroke-dasharray="4 4"/><text x="20" y="34"><tspan font-weight="700">sárga pötty</tspan>: az alakzat formája</text><text x="20" y="54">(itt: mennyire kerek a sarok)</text>
+<text x="300" y="161" fill="#fff" font-weight="700">közepe: mozgatás</text></g></svg>
+<figcaption>Nem minden alakzatnak van sárga pöttye. A szövegbuboréknál például ezzel húzhatod a „csücskét”.</figcaption></figure>
+<ul>
+<li><b>Mozgatás:</b> fogd meg az alakzatot a közepénél (nem a karikáknál), és húzd el. Kicsit a nyílbillentyűkkel is mozgathatod.</li>
+<li><b>Méretezés:</b> húzd valamelyik fehér karikát. A sarokban lévő karikánál a <kbd>Shift</kbd> megtartja az arányokat.</li>
+<li><b>Forgatás:</b> fogd meg a kerek nyilat, és húzd körbe. <kbd>Shift</kbd>-tel 15 fokonként ugrik.</li>
+<li><b>Másolás:</b> jelöld ki, <kbd>Ctrl</kbd>+<kbd>C</kbd>, aztán <kbd>Ctrl</kbd>+<kbd>V</kbd>. A másolat kicsit odébb jelenik meg.</li>
+<li><b>Törlés:</b> jelöld ki, és nyomd meg a <kbd>Delete</kbd> billentyűt.</li>
+</ul>
+<div data-lab="move"></div>
+</section>
+
+<section class="sec" id="szinek"><h2><span class="n">4</span>Kitöltés és körvonal</h2>
+<p>Minden alakzatnak két színe van: a <b>kitöltés</b> (a belseje) és a <b>körvonal</b> (a széle). Ha kijelölsz egy alakzatot, fent megjelenik egy új lap: az <span class="ui">Alakzat formátuma</span>. Csak addig látszik, amíg ki van jelölve valami!</p>
+<table class="starts"><tr><th>gomb</th><th>mire jó?</th></tr>
+<tr><td>Alakzat kitöltése</td><td>a belseje színe. <i>Nincs kitöltés</i>: átlátszó lesz, csak a széle látszik.</td></tr>
+<tr><td>Alakzat körvonala</td><td>a széle színe. Itt van a <i>Vastagság</i> is (pl. 3 pt), és a <i>Nincs körvonal</i>.</td></tr>
+</table>
+<div data-lab="format"></div>
+<div class="idea"><span class="i">💡</span><p>Az <b>pt</b> a „pont”: a vonalvastagság mértékegysége. Az 1 pt vékony, a 6 pt már jó vastag.</p></div>
+</section>
+
+<section class="sec" id="szoveg"><h2><span class="n">5</span>Szöveg az alakzatban</h2>
+<p>Szinte minden alakzatba írhatsz: jelöld ki, és <b>kezdj el gépelni</b>. A szöveg az alakzat közepére kerül, és vele együtt mozog. Beszédhez a <span class="ui">Feliratok</span> csoport szövegbuborékai valók.</p>
+<div class="rule-box"><b>Figyelem: a szöveg alapból fehér.</b> Ha fehér vagy sárga az alakzat, nem fogod látni, amit írsz. Jelöld ki az alakzatot, és a <span class="ui">Kezdőlap</span> lapon a <span class="ui">Betűszín</span> gombbal (a piros vonalas <b>A</b> betű) adj neki sötét színt.</div>
+<div data-lab="text"></div>
+</section>
+
+<section class="sec" id="sorrend"><h2><span class="n">6</span>Előre és hátra</h2>
+<p>A dián az alakzatok úgy vannak egymáson, mint az asztalon a papírlapok: amit <b>később</b> szúrtál be, az van <b>felül</b>. Ha valami rossz helyre került, kijelölöd, és az <span class="ui">Alakzat formátuma</span> lapon:</p>
+<ul><li><span class="ui">Előrehozás</span>: egy szinttel feljebb kerül (a kis nyíllal: <i>Legelőre hozás</i> – mindennek a tetejére).</li>
+<li><span class="ui">Hátraküldés</span>: egy szinttel lejjebb kerül (<i>Leghátra küldés</i> – mindennek az aljára).</li></ul>
+<div data-lab="order"></div>
+</section>
+
+<section class="sec" id="csoport"><h2><span class="n">7</span>Csoportosítás</h2>
+<p>Ha kész a rajzod, sok kis darabból áll. Ha el akarod mozgatni, darabonként szétesne. A <b>csoportosítás</b> egyetlen dologgá köti össze őket.</p>
+<ol><li>Jelöld ki az összes darabot: kattints az elsőre, a többire pedig a <kbd>Shift</kbd> (vagy a <kbd>Ctrl</kbd>) nyomva tartása mellett. Vagy húzz egy téglalapot körülöttük az üres részből indulva.</li>
+<li><span class="ui">Alakzat formátuma</span> › <span class="ui">Csoportosítás</span> › <span class="ui">Csoportosítás</span>.</li>
+<li>Most a 8 fehér karika az egész rajz körül van: egyben mozgathatod, méretezheted.</li></ol>
+<p>Ha mégis egy darabot kell javítanod: <span class="ui">Csoportosítás</span> › <span class="ui">Csoportbontás</span>. (Vagy kattints a csoportra, aztán még egyszer a darabra: így a csoporton belül jelölöd ki.)</p>
+<div data-lab="group"></div>
+</section>
+
+<section class="sec" id="tippek"><h2><span class="n">8</span>Ha valami nem megy</h2>
+<table class="starts"><tr><th>baj</th><th>megoldás</th></tr>
+<tr><td>Nem találom az Alakzat formátuma lapot.</td><td>Előbb jelölj ki egy alakzatot. A lap csak akkor látszik.</td></tr>
+<tr><td>Kör helyett tojás lett.</td><td>Húzás közben tartsd nyomva a <kbd>Shift</kbd>-et, és előbb az egeret engedd el.</td></tr>
+<tr><td>A dián ott van, hogy „Kattintson ide a cím beírásához”.</td><td>Ez egy üres címdoboz. <span class="ui">Kezdőlap</span> › <span class="ui">Elrendezés</span> › <span class="ui">Üres</span>, és eltűnik.</td></tr>
+<tr><td>Beírtam a szöveget, de nem látszik.</td><td>Fehér betű fehér alapon. <span class="ui">Kezdőlap</span> › <span class="ui">Betűszín</span>.</td></tr>
+<tr><td>Mozgatni akartam, de átméreteztem.</td><td>Az alakzat közepét fogd meg, ne a karikákat. Ha elrontottad: <kbd>Ctrl</kbd>+<kbd>Z</kbd> (visszavonás).</td></tr>
+<tr><td>Eltűnt az alakzatom!</td><td>Lehet, hogy egy másik mögé került. Kattints a nagyobbra, és küldd hátra.</td></tr>
+</table>
+</section>
+
+<section class="sec" id="kviz"><h2><span class="n">9</span>Ellenőrizd magad</h2>
+<div class="quiz" id="quiz"></div>
+</section>
+
+<section class="sec" id="gyakorolj"><h2><span class="n">10</span>Gyakorolj</h2>
+<p>Az informatikateremnek kabala kell, és az osztály egy robotra szavazott. Most az igazi PowerPointban rajzolod meg, csupa alakzatból.</p>
+<div class="practice"><a class="pcard" href="robot-hu.html"><span class="k">Küldetés</span><h4>Robi, a robot</h4><p>Lekerekített téglalap, körök, színek, vastag körvonal, elforgatott kar, szövegbuborék, a végén csoportosítás. Az oldal megnézi a mentett fájlodat.</p></a></div>
+</section>
+</main>
+<footer class="end">Digitális kultúra. A gyakorlók a böngésződben működnek, semmi sem kerül elküldésre.</footer>
+
+<script>
+window.LAB = {
+  draw: { title: "Próbáld ki", goals: ["insert", "ellipse", "circle"], note: "Ez egy kis gyakorló, nem az igazi PowerPoint, de ugyanígy működik. A <kbd>Delete</kbd> törli a kijelölt alakzatot." },
+  move: { title: "Próbáld ki", startTab: "format",
+    shapes: [{ type: "roundRect", cx: 300, cy: 300, w: 220, h: 140 }, { type: "star5", cx: 690, cy: 250, w: 150, h: 150, fill: "#ffc000", line: "#bf9000" }],
+    goals: ["move", "resize", "rotate"] },
+  format: { title: "Próbáld ki", startTab: "format",
+    shapes: [{ type: "heart", cx: 250, cy: 270, w: 200, h: 180 }, { type: "rightArrow", cx: 640, cy: 270, w: 300, h: 140 }],
+    goals: ["fill", "line", "nofill", "noline"], note: "Először kattints az alakzatra, csak utána a gombokra." },
+  text: { title: "Próbáld ki", startTab: "format",
+    shapes: [{ type: "callout", cx: 480, cy: 250, w: 340, h: 180, fill: "#ffffff", line: "#1d2622", lw: 3, textColor: "#1d2622" }],
+    goals: ["text"], note: "Ebben a gyakorlóban a buborék szövege már fekete. Kattints a buborékra, és gépelj!" },
+  order: { title: "Próbáld ki", startTab: "format",
+    shapes: [{ type: "ellipse", cx: 420, cy: 230, w: 220, h: 220, fill: "#ffff00", line: "#bf9000", lw: 3 }, { type: "cloud", cx: 520, cy: 320, w: 360, h: 200, fill: "#ffffff", line: "#7f7f7f", lw: 3 }],
+    goals: ["front", "back"], note: "A nap a felhő mögött van. Hozd előre a napot (Előrehozás), aztán küldd vissza a felhő mögé (Hátraküldés)!" },
+  group: { title: "Próbáld ki", startTab: "format",
+    shapes: [{ type: "ellipse", cx: 480, cy: 410, w: 170, h: 170, fill: "#ffffff", line: "#7f7f7f", lw: 3 }, { type: "ellipse", cx: 480, cy: 270, w: 125, h: 125, fill: "#ffffff", line: "#7f7f7f", lw: 3 },
+      { type: "ellipse", cx: 480, cy: 160, w: 90, h: 90, fill: "#ffffff", line: "#7f7f7f", lw: 3 }, { type: "triangle", cx: 505, cy: 165, w: 50, h: 22, rot: 90, fill: "#ffc000", line: "#bf9000" },
+      { type: "rect", cx: 480, cy: 102, w: 80, h: 34, fill: "#000000", line: "#000000" }],
+    goals: ["group", "groupmove"], note: "A hóember öt alakzatból áll. Kattints az egyikre, aztán <kbd>Shift</kbd>-tel a többire, és foglald csoportba." }
+};
+window.QUIZ = [
+  { q: "Melyik lapon van az <b>Alakzatok</b> gomb, amivel új alakzatot rajzolsz?", opts: ["Beszúrás", "Animációk", "Tervezés", "Diavetítés"], right: 0,
+    fb: "Beszúrás › Alakzatok. (Ha már ki van jelölve egy alakzat, az Alakzat formátuma lap bal szélén is ott van.)" },
+  { q: "Hogyan lesz <b>kör</b> az ellipszisből?", opts: ["Húzás közben nyomva tartom a Shift billentyűt", "Húzás közben nyomva tartom az Alt billentyűt", "Kétszer kattintok rá", "Az Alakzat kitöltése gombbal"], right: 0,
+    fb: "A Shift szabályossá teszi az alakzatot: kör, négyzet, egyenlő oldalú csillag." },
+  { q: "Mire valók a kijelölt alakzat körüli <b>fehér karikák</b>?", opts: ["A méretezésre", "A forgatásra", "A színezésre", "A törlésre"], right: 0,
+    fb: "A fehér karikákkal méretezel. Forgatni a fölötte lévő kerek nyíllal lehet." },
+  { q: "Nem látod az <b>Alakzat formátuma</b> lapot. Mi lehet a baj?", opts: ["Nincs kijelölve alakzat", "Nincs elmentve a fájl", "Túl kicsi az ablak", "Ki kell kapcsolni a diavetítést"], right: 0,
+    fb: "Ez a lap csak akkor jelenik meg, ha egy alakzat ki van jelölve." },
+  { q: "A napot rajzoltad meg előbb, aztán a felhőt, és a felhő eltakarja a napot. Mit tegyél, hogy a nap legyen elöl?", opts: ["Jelöld ki a napot, és Előrehozás", "Jelöld ki a napot, és Hátraküldés", "Rajzold meg újra a felhőt", "Jelöld ki a felhőt, és Előrehozás"], right: 0,
+    fb: "Amit később rajzolsz, az felül van. Az Előrehozás egy szinttel feljebb hozza a kijelölt alakzatot." },
+  { q: "Kész a robotod tíz alakzatból. Mit érdemes tenni, mielőtt elmozgatod?", opts: ["Csoportba foglalni a részeit", "Minden részét külön elmozgatni", "Elmenteni képként", "Kitörölni a körvonalakat"], right: 0,
+    fb: "Csoportosítás után a darabok egy egészként mozognak, és nem esnek szét." }
+];
+</script>
+<script src="../shape-lab.js"></script>
+<script src="../explainer.js"></script>
+<script src="../../nav.js?v=898a04a6" defer></script>
+</body>
+</html>
