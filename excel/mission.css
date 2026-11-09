@@ -162,3 +162,11 @@ code,pre,.fparts,.mini,.xl-tip,.goals .sol{-webkit-user-select:none;user-select:
 /* reward on the last page: the dancing cats */
 .reward{margin-top:16px;padding:14px 16px;border-radius:6px;background:#f4efff;border:2px solid #b9a6e6}
 .reward h3{margin:0 0 8px;font:700 20px var(--f-chalk);color:#4b2f8a}
+
+/* bonus chapters for students who finish early */
+.step.bonus{border-style:dashed;border-color:rgba(242,210,100,.45)}
+.step.bonus .n{color:var(--yellow)}
+.step.bonus.done::before{background:var(--yellow)}
+.bonusbox{margin-top:16px;padding:14px 16px;border-radius:6px;background:#fff8dc;border:2px dashed #e0b93a}
+.bonusbox h3{margin:0 0 4px;font:700 20px var(--f-chalk);color:#7a5a00}
+.bonusbox p{margin:0 0 10px}

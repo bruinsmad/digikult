@@ -49,9 +49,9 @@ window.MISSION = {
   confetti: ["#c2477a", "#f2d264", "#f0a3b8", "#e9a25a", "#7fa7ff", "#a8dba0"],
   next: { href: "sports-day-hu.html", text: "Tovább: Sportnap, az Excelben" },
   sheet: {
-    cols: 7, rows: 17, widths: [150, 74, 66, 66, 66, 84, 104], select: "F2",
+    cols: 8, rows: 22, widths: [150, 74, 66, 66, 66, 84, 104, 86], select: "F2",
     cells: {
-      A1: "Süti", B1: "Ár (Ft)", C1: "Hétfő (db)", D1: "Kedd (db)", E1: "Szerda (db)", F1: "Összesen (db)", G1: "Bevétel (Ft)",
+      A1: "Süti", B1: "Ár (Ft)", C1: "Hétfő (db)", D1: "Kedd (db)", E1: "Szerda (db)", F1: "Összesen (db)", G1: "Bevétel (Ft)", H1: "Napi átlag (db)",
       A2: "Kakaós csiga", B2: 350, C2: 14, D2: 11, E2: 16,
       A3: "Túrós batyu", B3: 400, C3: 9, D3: 12, E3: 8,
       A4: "Pizzás csiga", B4: 450, C4: 18, D4: 15, E4: 20,
@@ -62,11 +62,12 @@ window.MISSION = {
       A9: "Almás pite", B9: 350, C9: 10, D9: 8, E9: 13,
       A10: "Összesen",
       A12: "Legtöbb eladott darab egy sütiből", A13: "Legkevesebb eladott darab", A14: "Naponta átlagosan ennyi süti fogyott",
-      A15: "Ugyanez egészre kerekítve", A16: "Hányféle süti volt szerdán?", A17: "Hány napon volt brownie?"
+      A15: "Ugyanez egészre kerekítve", A16: "Hányféle süti volt szerdán?", A17: "Hány napon volt brownie?",
+      A18: "Bónusz (nem kötelező)", A19: "A legdrágább süti ára", A20: "A legolcsóbb süti ára", A21: "Átlagos ár", A22: "Átlagosan ennyi pénz jött be egy nap"
     },
-    formats: { "B2:B9": "ft", "G2:G10": "ft" },
-    styles: { "A1:G1": "head", "A10:G10": "total", "A12:A17": "label", "F12:F17": "sum" },
-    locked: ["A1:G1", "A2:E9", "A10", "A12:A17"],
+    formats: { "B2:B9": "ft", "G2:G10": "ft", "F19:F22": "ft" },
+    styles: { "A1:H1": "head", "A10:G10": "total", "A12:A17": "label", "F12:F17": "sum", "A18": "label", "A19:A22": "label", "F19:F22": "sum" },
+    locked: ["A1:H1", "A2:E9", "A10", "A12:A22"],
     lockedText: "Ezek Zsófi adatai, ezeket nem kell átírni. A sárgával kiemelt cellákba dolgozz!"
   },
   chapters: [
@@ -126,7 +127,24 @@ window.MISSION = {
                 traps: [raw => /A\d/i.test(raw) ? "Az A oszlopban nevek vannak, azokat a DARAB nem számolja. A szerdai számok az E oszlopban vannak." : null] },
               { text: "<b>F17</b>: hány napon volt brownie? (Hány szám van a 8. sorban, C-től E-ig?)", range: "F17", ref: "=DARAB(C8:E8)", use: ["DARAB"] }],
       hints: ["F16: <code>=DARAB(E2:E9)</code>", "F17: <code>=DARAB(C8:E8)</code>"],
-      success: "Szerdán hétféle süti volt, brownie pedig 2 napon. Az üres cella nem nulla: egyszerűen nincs ott semmi." }
+      success: "Szerdán hétféle süti volt, brownie pedig 2 napon. Az üres cella nem nulla: egyszerűen nincs ott semmi." },
+    { bonus: true, title: "Átlag sütinként", select: "H2",
+      story: `<p>Jövőre Zsófi azt is tudni szeretné, <b>melyik sütiből átlagosan hány darab fogy egy nap</b>, hogy tudja, mennyit süssenek belőle.</p>`,
+      learn: `<p>Függvényt függvénybe is írhatsz. Ez egy lépésben kiszámolja az átlagot, és egy tizedesjegyre kerekíti:</p><pre>=<span class="fn">KEREKÍTÉS</span>(<span class="fn">ÁTLAG</span>(<span class="rf">C2:E2</span>);1)</pre>
+        <p>Az Excel belülről kifelé számol: előbb az ÁTLAG, aztán a KEREKÍTÉS.</p>`,
+      goals: [{ text: "<b>H2–H9</b>: az egyes sütik napi átlaga egy tizedesjegyre, egyetlen képlettel (KEREKÍTÉS és ÁTLAG).", range: "H2:H9", ref: "=KEREKÍTÉS(ÁTLAG(C2:E2);1)", use: ["KEREKÍTÉS", "ÁTLAG"] }],
+      hints: ["H2: <code>=KEREKÍTÉS(ÁTLAG(C2:E2);1)</code>", "Aztán húzd le a kitöltőjelet a H9-ig."],
+      success: "A kakaós csigából naponta 13,7 fogyott. A zserbónál nézd meg: az ÁTLAG csak a két napot számolta (8,5), mert az üres szerdát kihagyta." },
+    { bonus: true, title: "Árak és napi bevétel", select: "F19",
+      story: `<p>Kati néni még néhány számot kér a szülői értekezletre: mennyibe került a <b>legdrágább</b> és a <b>legolcsóbb</b> süti, mennyi volt az <b>átlagos ár</b>, és <b>átlagosan mennyi pénz jött be egy nap</b>.</p>`,
+      learn: `<p>Egy cella eredményét el is oszthatod. A három nap alatti teljes bevétel a G10-ben van, ezért egy napra jutó bevétel: <code>G10/3</code>. Ezt is be lehet tenni a KEREKÍTÉS-be:</p><pre>=<span class="fn">KEREKÍTÉS</span>(<span class="rf">G10</span>/3;0)</pre>`,
+      isNew: false,
+      goals: [{ text: "<b>F19</b>: a legdrágább süti ára (MAX a B oszlopból).", range: "F19", ref: "=MAX(B2:B9)", use: ["MAX"] },
+              { text: "<b>F20</b>: a legolcsóbb süti ára (MIN).", range: "F20", ref: "=MIN(B2:B9)", use: ["MIN"] },
+              { text: "<b>F21</b>: az átlagos ár, egészre kerekítve (KEREKÍTÉS és ÁTLAG).", range: "F21", ref: "=KEREKÍTÉS(ÁTLAG(B2:B9);0)", use: ["KEREKÍTÉS", "ÁTLAG"] },
+              { text: "<b>F22</b>: az egy napra jutó bevétel, egészre kerekítve: a G10 osztva 3-mal.", range: "F22", ref: "=KEREKÍTÉS(G10/3;0)", use: ["KEREKÍTÉS"] }],
+      hints: ["F19: <code>=MAX(B2:B9)</code>, F20: <code>=MIN(B2:B9)</code>, F21: <code>=KEREKÍTÉS(ÁTLAG(B2:B9);0)</code>", "F22: <code>=KEREKÍTÉS(G10/3;0)</code>"],
+      success: "A legdrágább süti 500 Ft, a legolcsóbb 200 Ft, az átlagos ár 369 Ft, és naponta átlagosan 32 017 Ft jött be. Kati néni elégedett!" }
   ],
   ending: {
     title: "96 050 Ft a kirándulásra!",

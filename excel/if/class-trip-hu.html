@@ -45,7 +45,7 @@ window.MISSION = {
   key: "class-trip-hu-v2", file: "kirandulas", title: "Irány a Mátra!", sheetName: "Kirándulás",
   confetti: ["#2f6fa0", "#f2d264", "#5f8f6e", "#a8dba0", "#7fa7ff", "#ff9e7a"],
   sheet: {
-    cols: 7, rows: 24, widths: [118, 100, 80, 76, 100, 104, 96], select: "E2",
+    cols: 7, rows: 28, widths: [118, 100, 80, 76, 100, 104, 96], select: "E2",
     cells: {
       A1: "Név", B1: "Befizetett (Ft)", C1: "Menü", D1: "Túra", E1: "Hátralék (Ft)", F1: "Állapot", G1: "Libegő (Ft)",
       A2: "Ádám", B2: 12000, C2: "normál", D2: "hosszú",   A3: "Bori", B3: 12000, C3: "vega", D3: "rövid",
@@ -58,11 +58,12 @@ window.MISSION = {
       A16: "Olivér", B16: 3000, C16: "normál", D16: "rövid", A17: "Panna", B17: 12000, C17: "vega", D17: "hosszú",
       F18: "Összesen",
       A19: "Vega menü (fő)", A20: "Normál menü (fő)", A21: "Még tartozik (fő)", A22: "5000 Ft-nál többel tartozik (fő)",
-      A23: "Összes hátralék (Ft)", A24: "Mehet a foglalás?"
+      A23: "Összes hátralék (Ft)", A24: "Mehet a foglalás?",
+      A25: "Bónusz: rövid túrára megy (fő)", A26: "Bónusz: nem vega menü (fő)", A27: "Bónusz: a vegák befizetése (Ft)", A28: "Bónusz: hosszú túrázók hátraléka (Ft)"
     },
-    formats: { "B2:B17": "ft", "E2:E17": "ft", "G2:G18": "ft", E23: "ft" },
-    styles: { "A1:G1": "head", F18: "label", G18: "total", "A19:A24": "label", "E19:E24": "sum" },
-    locked: ["A1:G1", "A2:D17", "F18", "A19:A24"],
+    formats: { "B2:B17": "ft", "E2:E17": "ft", "G2:G18": "ft", E23: "ft", "E27:E28": "ft" },
+    styles: { "A1:G1": "head", F18: "label", G18: "total", "A19:A28": "label", "E19:E28": "sum" },
+    locked: ["A1:G1", "A2:D17", "F18", "A19:A28"],
     lockedText: "Ezek Kati néni adatai, ezeket nem kell átírni. A sárgával kiemelt cellákba dolgozz!"
   },
   chapters: [
@@ -116,7 +117,23 @@ window.MISSION = {
               { text: "<b>E24</b>: <code>Mehet!</code>, ha az összes hátralék 0, különben <code>Még várunk</code> (HA).", range: "E24", ref: '=HA(E23=0;"Mehet!";"Még várunk")', use: ["HA"],
                 traps: [raw => !/mehet!/i.test(raw) || !/még várunk/i.test(raw) ? "A HA-ba mindkét szöveg kell, pontosan így: \"Mehet!\" (ha igaz) és \"Még várunk\" (ha hamis)." : null] }],
       hints: ["E23: <code>=SZUM(E2:E17)</code>", 'E24: <code>=HA(E23=0;"Mehet!";"Még várunk")</code>'],
-      success: "Még 32 000 Ft hiányzik, ezért „Még várunk”. Amint beérkezik az utolsó befizetés, és Kati néni beírja, a cella magától átvált „Mehet!”-re." }
+      success: "Még 32 000 Ft hiányzik, ezért „Még várunk”. Amint beérkezik az utolsó befizetés, és Kati néni beírja, a cella magától átvált „Mehet!”-re." },
+    { bonus: true, title: "Még több számolás", select: "E25",
+      story: `<p>A túravezető is kérdez: <b>hányan jönnek a rövid túrára</b>? A konyha pedig azt szeretné tudni, <b>hány nem vega</b> menü kell.</p>`,
+      learn: `<p>A <code>&lt;&gt;</code> jel azt jelenti: <b>nem egyenlő</b>. Így a DARABTELI mindent megszámol, ami nem „vega”:</p><pre>=<span class="fn">DARABTELI</span>(<span class="rf">C2:C17</span>;<span class="st">&quot;&lt;&gt;vega&quot;</span>)</pre>`,
+      goals: [{ text: "<b>E25</b>: hányan mennek a rövid túrára? (D oszlop)", range: "E25", ref: '=DARABTELI(D2:D17;"rövid")', use: ["DARABTELI"],
+                traps: [raw => /rovid/i.test(raw) && !/rövid/i.test(raw) ? "A táblázatban „rövid” áll, ékezettel. A kritériumban is pontosan így kell írni." : null] },
+              { text: "<b>E26</b>: hány nem vega menü kell? Használd a <code>&lt;&gt;</code> jelet!", range: "E26", ref: '=DARABTELI(C2:C17;"<>vega")', use: ["DARABTELI"],
+                traps: [raw => !/<>/.test(raw) ? "Most a <> jelet gyakoroljuk: \"<>vega\" azt jelenti, hogy nem vega." : null] }],
+      hints: ['E25: <code>=DARABTELI(D2:D17;"rövid")</code>', 'E26: <code>=DARABTELI(C2:C17;"&lt;&gt;vega")</code>'],
+      success: "Hatan mennek a rövid túrára, és 11 nem vega menü kell. Ugyanannyi, mint a normál menü: hiszen ami nem vega, az normál." },
+    { bonus: true, title: "Összeadás feltétellel", select: "E27",
+      story: `<p>Kati néni két összeget kér: mennyit fizettek be eddig <b>a vega menüt kérők</b>, és mennyi <b>a hosszú túrázók hátraléka</b>?</p>`,
+      learn: `<p>A <b>SZUMHA</b> csak azokat a számokat adja össze, amelyeknek a sora megfelel a feltételnek. Három része van: <i>hol nézze a feltételt</i>, <i>mi a feltétel</i>, és <i>mit adjon össze</i>:</p><pre>=<span class="fn">SZUMHA</span>(<span class="rf">C2:C17</span>;<span class="st">&quot;vega&quot;</span>;<span class="rf">B2:B17</span>)</pre>`,
+      goals: [{ text: "<b>E27</b>: a vega menüt kérők befizetései összesen (SZUMHA: C oszlop, \"vega\", B oszlop).", range: "E27", ref: '=SZUMHA(C2:C17;"vega";B2:B17)', use: ["SZUMHA"] },
+              { text: "<b>E28</b>: a hosszú túrázók hátraléka összesen (D oszlop, \"hosszú\", E oszlop).", range: "E28", ref: '=SZUMHA(D2:D17;"hosszú";E2:E17)', use: ["SZUMHA"] }],
+      hints: ['E27: <code>=SZUMHA(C2:C17;"vega";B2:B17)</code>', 'E28: <code>=SZUMHA(D2:D17;"hosszú";E2:E17)</code>'],
+      success: "A vegák eddig 51 000 Ft-ot fizettek be, a hosszú túrázók hátraléka pedig 12 000 Ft. Kati néni most már mindent tud!" }
   ],
   ending: {
     title: "Indulhat a szervezés!",

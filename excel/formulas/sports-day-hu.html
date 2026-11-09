@@ -47,16 +47,17 @@ window.MISSION = {
   confetti: ["#c4620f", "#f2c230", "#107c41", "#7fa7ff", "#f0a3b8", "#a8dba0"],
   next: { href: "../if/intro-hu.html", text: "Tovább: HA és DARABTELI" },
   sheet: {
-    cols: 10, rows: 15, widths: [116, 52, 78, 62, 78, 76, 68, 54, 70, 60], select: "A1",
+    cols: 12, rows: 19, widths: [116, 52, 78, 62, 78, 76, 68, 54, 70, 60, 70, 80], select: "A1",
     cells: {
-      A1: "Osztály", B1: "Futás", C1: "Távolugrás", D1: "Kislabda", E1: "Kötélhúzás", F1: "Váltófutás", G1: "Összpont", H1: "Átlag", I1: "Kerekítve", J1: "Hány számban",
+      A1: "Osztály", B1: "Futás", C1: "Távolugrás", D1: "Kislabda", E1: "Kötélhúzás", F1: "Váltófutás", G1: "Összpont", H1: "Átlag", I1: "Kerekítve", J1: "Hány számban", K1: "Kihagyott", L1: "Becsült összpont",
       A2: "5.A", B2: 4, C2: 3, D2: 5, F2: 2,          A3: "5.B", B3: 3, C3: 4, D3: 2, E3: 5, F3: 3,
       A4: "6.A", B4: 5, C4: 6, D4: 4, E4: 6, F4: 5,   A5: "6.B", B5: 9, D5: 10, F5: 7,
       A6: "7.A", B6: 6, C6: 7, D6: 7, E6: 8, F6: 6,   A7: "7.B", B7: 7, C7: 5, D7: 6, E7: 7,
       A8: "8.A", B8: 8, C8: 9, D8: 6, E8: 9, F8: 7,   A9: "8.B", B9: 7, C9: 8, D9: 9, E9: 10, F9: 8,
-      A10: "Indulók száma", A12: "A legtöbb összpont", A13: "A legkevesebb összpont", A14: "Átlagos összpont", A15: "Ugyanez kerekítve"
+      A10: "Indulók száma", A12: "A legtöbb összpont", A13: "A legkevesebb összpont", A14: "Átlagos összpont", A15: "Ugyanez kerekítve",
+      A16: "Bónusz (nem kötelező)", A17: "Legjobb pont a számban", A18: "Átlagpont a számban", A19: "Legjobb − leggyengébb"
     },
-    styles: { "A1:J1": "head headsm", "A2:A10": "label", "A12:A15": "label", "G12:G15": "sum" }
+    styles: { "A1:L1": "head headsm", "A2:A10": "label", "A12:A15": "label", "G12:G15": "sum", "A17:A19": "label" }
   },
   chapters: [
     { refresher: true, title: "Nyisd meg az Excelt", select: "E6",
@@ -170,7 +171,51 @@ window.MISSION = {
         `Húzd a fájlt az alábbi mezőbe (vagy kattints rá, és válaszd ki). A fájlt az oldal csak itt a böngészőben nézi meg, nem küldi el sehová.`,
         `Ha valami piros, javítsd ki az Excelben, mentsd el, és húzd ide újra.`
       ],
-      success: "Minden képlet a helyén, minden eredmény stimmel. Gábor bácsi hétfőn ebből a táblázatból hirdet eredményt!" }
+      success: "Minden képlet a helyén, minden eredmény stimmel. Gábor bácsi hétfőn ebből a táblázatból hirdet eredményt!" },
+    { bonus: true, title: "A versenyszámok mérlege", select: "B17",
+      story: `<p>Gábor bácsi a versenyszámokat is értékelni szeretné: <b>melyik számban volt a legnagyobb a különbség</b> a legjobb és a leggyengébb osztály között, és <b>hol volt a legmagasabb az átlagpont</b>?</p>
+        <p>Ehhez a 17–19. sorban dolgozol. Ha a te fájlodban még nincsenek ott a feliratok, írd be őket az A oszlopba.</p>`,
+      learn: `<p>Két függvény eredményével számolni is lehet: <code>=MAX(B2:B9)-MIN(B2:B9)</code> a legjobb és a leggyengébb pont különbsége.</p>
+        <p>Függvényt függvénybe is írhatsz. Ez egy lépésben számolja ki az átlagot, és kerekíti is:</p><pre>=<span class="fn">KEREKÍTÉS</span>(<span class="fn">ÁTLAG</span>(<span class="rf">B2:B9</span>);1)</pre>`,
+      steps: [
+        `<b>B17</b>: a legjobb pont a futásban: <code>=MAX(B2:B9)</code>. Húzd a kitöltőjelet jobbra az <b>F17</b>-ig.`,
+        `<b>B18</b>: az átlagpont egy tizedesjegyre, egyetlen képlettel: <code>=KEREKÍTÉS(ÁTLAG(B2:B9);1)</code>. Jobbra az <b>F18</b>-ig.`,
+        `<b>B19</b>: a legjobb és a leggyengébb pont különbsége: <code>=MAX(B2:B9)-MIN(B2:B9)</code>. Jobbra az <b>F19</b>-ig.`
+      ],
+      goals: [{ label: "B17–F17: legjobb pont a számban (MAX)", range: "B17:F17", ref: "=MAX(B2:B9)", fn: "MAX" },
+              { label: "B18–F18: kerekített átlagpont (KEREKÍTÉS és ÁTLAG)", range: "B18:F18", ref: "=KEREKÍTÉS(ÁTLAG(B2:B9);1)", fn: "KEREKÍTÉS" },
+              { label: "B19–F19: legjobb − leggyengébb (MAX és MIN)", range: "B19:F19", ref: "=MAX(B2:B9)-MIN(B2:B9)", fn: "MIN" }],
+      asks: [{ q: "Mennyi a <b>kötélhúzás</b> átlagpontja? (E18)", cell: "E18", traps: { "7": "Ez egészre kerekítve. A KEREKÍTÉS második része 1 legyen." } },
+             { q: "Melyik versenyszámban volt a legnagyobb a különbség?", text: ["kislabda", "kislabdahajítás", "D"], traps: { "8": "Ez a különbség. Azt írd be, melyik versenyszámé: nézd meg, melyik oszlopban van a 8 a 19. sorban." }, wrong: "Keresd meg a 19. sorban a legnagyobb számot, és nézd meg, melyik versenyszám van az oszlop tetején." }],
+      hints: ["B17: <code>=MAX(B2:B9)</code>, B18: <code>=KEREKÍTÉS(ÁTLAG(B2:B9);1)</code>, B19: <code>=MAX(B2:B9)-MIN(B2:B9)</code>. Mindegyiket húzd jobbra az F oszlopig.", "A kötélhúzás az E oszlop. A 19. sorban a legnagyobb szám a 8."],
+      success: "Kislabdában 8 pont volt a különbség (10 és 2 között), a legmagasabb átlagpont pedig kötélhúzásban jött ki: 7,5." },
+
+    { bonus: true, title: "Mi lett volna, ha…?", select: "K2",
+      story: `<p>A 6.B szurkolói szerint ha mind az öt számban indultak volna, ők nyernek. Becsüljük meg! Ha egy osztály minden számban az <b>átlagát</b> hozta volna, az összpontja körülbelül <b>átlag × 5</b> lett volna.</p>`,
+      learn: `<p>Egy függvény vagy egy másik cella eredményével is számolhatsz, akár a KEREKÍTÉS-en belül:</p><pre>=<span class="fn">KEREKÍTÉS</span>(<span class="rf">H2</span>*5;0)</pre>
+        <p>Előbb a <code>H2*5</code> számolódik ki, aztán ezt kerekíti egészre.</p>`,
+      isNew: false,
+      steps: [
+        `<b>K2</b>: hány számból maradt ki az osztály? Az 5 számból vond ki, ahányban indult: <code>=5-J2</code>. Húzd le a <b>K9</b>-ig.`,
+        `<b>L2</b>: a becsült összpont: <code>=KEREKÍTÉS(H2*5;0)</code>. Húzd le az <b>L9</b>-ig.`,
+        `Hasonlítsd össze az L oszlopot a G oszloppal (az igazi összponttal). Kinél lett nagyobb a különbség?`
+      ],
+      goals: [{ label: "K2–K9: kihagyott számok (5 − J)", range: "K2:K9", ref: "=5-J2" },
+              { label: "L2–L9: becsült összpont (KEREKÍTÉS)", range: "L2:L9", ref: "=KEREKÍTÉS(H2*5;0)", fn: "KEREKÍTÉS" }],
+      asks: [{ q: "Hány számból maradt ki az <b>5.A</b>? (K2)", cell: "K2" },
+             { q: "Mennyi lett volna a <b>6.B</b> becsült összpontja? (L5)", cell: "L5", traps: { "43.33333333": "Ez kerekítés nélkül. A KEREKÍTÉS második része 0 legyen: egészre kerekíts.", "43.3": "Ez egy tizedesjegy. Egészre kerekíts: a második rész 0." } },
+             { q: "Melyik osztály nyert volna így?", text: ["6.B", "6b"], traps: { "8.B": "A 8.B becsült összpontja 42. Nézd meg az L oszlopot: valakinek több jött ki." }, wrong: "Keresd meg az L oszlopban a legnagyobb számot, és nézd meg, melyik osztály sora." }],
+      hints: ["K2: <code>=5-J2</code>, L2: <code>=KEREKÍTÉS(H2*5;0)</code>, mindkettőt húzd le a 9. sorig.", "A 6.B az 5. sorban van: 8,666… × 5 = 43,33…, egészre kerekítve 43."],
+      success: "43 pont: a becslés szerint a 6.B megelőzte volna a 8.B-t (42)! Persze ez csak becslés: senki sem tudja, hogyan ment volna nekik a kötélhúzás." },
+
+    { bonus: true, title: "Bónusz beadás", upload: true,
+      story: `<p>Ha a bónuszt is megcsináltad, az oldal ellenőrzi a <b>bónusz cellákat</b> is (K és L oszlop, 17–19. sor).</p>`,
+      steps: [
+        `Mentsd el a fájlt az Excelben: <kbd>Ctrl</kbd>+<kbd>S</kbd>.`,
+        `Húzd a fájlt az alábbi mezőbe, vagy kattints rá, és válaszd ki.`,
+        `Ha a Classroomban már beadtad a fájlt, vond vissza a beadást, töltsd fel az újat, és add be újra.`
+      ],
+      success: "A bónusz is kész, minden képlet stimmel. Igazi Excel-bajnok vagy!" }
   ],
   ending: {
     title: "Kihirdethető az eredmény!",

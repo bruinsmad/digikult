@@ -12,14 +12,22 @@
   const M = window.MISSION, CH = M.chapters, KEY = M.key;
   const $ = id => document.getElementById(id);
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-  const NCH = CH.filter(c => !c.refresher).length;
-  const chapNo = i => CH.slice(0, i + 1).filter(c => !c.refresher).length;
+  const NCH = CH.filter(c => !c.refresher && !c.bonus).length;
+  /* bonus chapters come after the last regular one, for students who finish early; they don't count in the progress */
+  const LAST_MAIN = CH.map((c, i) => c.bonus ? -1 : i).filter(i => i >= 0).pop(), FIRST_BONUS = CH.findIndex(c => c.bonus);
+  const NBONUS = CH.filter(c => c.bonus).length;
+  const chapNo = i => CH.slice(0, i + 1).filter(c => !c.refresher && !c.bonus).length;
+  const bonusNo = i => CH.slice(0, i + 1).filter(c => c.bonus).length;
+  const label = i => CH[i].refresher ? "Kezdés" : CH[i].bonus ? `Bónusz ${bonusNo(i)}` : chapNo(i) + ". fejezet";
 
   let state = { solved: [], current: 0, start: Date.now(), end: null, hints: {}, answers: {}, student: "" };
   try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && Array.isArray(s.solved)) state = Object.assign(state, s); } catch (e) {}
-  state.solved = state.solved.filter(i => i >= 0 && i < CH.length);
+  state.solved = state.solved.filter(i => i >= 0 && i < CH.length && !CH[i].bonus);
+  state.bonus = (state.bonus || []).filter(i => i >= 0 && i < CH.length && CH[i].bonus);
   const save = () => { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} };
-  const isUnlocked = i => i === 0 || state.solved.includes(i - 1) || state.solved.includes(i);
+  const isDone = i => CH[i].bonus ? state.bonus.includes(i) : state.solved.includes(i);
+  const isUnlocked = i => CH[i].bonus ? state.solved.includes(LAST_MAIN) && (i === FIRST_BONUS || isDone(i - 1) || isDone(i))
+                                      : i === 0 || isDone(i - 1) || isDone(i);
 
   /* ---------- the model solution: what the finished file should contain ---------- */
   const model = new XL.Sheet(M.sheet.cols, M.sheet.rows);
@@ -39,16 +47,16 @@
   }));
   function fillPreview() {
     const map = {};
-    state.solved.forEach(i => (CH[i].goals || []).forEach(g => Object.assign(map, modelCells(g))));
+    state.solved.concat(state.bonus).forEach(i => (CH[i].goals || []).forEach(g => Object.assign(map, modelCells(g))));
     preview.load(map);
   }
 
   /* ---------- chapter strip ---------- */
   function renderSteps() {
     $("steps").innerHTML = CH.map((c, i) => {
-      const cls = ["step"]; if (state.solved.includes(i)) cls.push("done"); if (i === state.current) cls.push("current"); if (!isUnlocked(i)) cls.push("locked");
+      const cls = ["step"]; if (c.bonus) cls.push("bonus"); if (isDone(i)) cls.push("done"); if (i === state.current) cls.push("current"); if (!isUnlocked(i)) cls.push("locked");
       return `<button type="button" class="${cls.join(" ")}" data-i="${i}" ${isUnlocked(i) ? "" : 'aria-disabled="true"'} ${i === state.current ? 'aria-current="step"' : ""}>
-        <span class="n">${c.refresher ? "Kezdés" : chapNo(i) + ". fejezet"}</span><span class="t">${esc(c.title)}</span></button>`;
+        <span class="n">${label(i)}</span><span class="t">${esc(c.title)}</span></button>`;
     }).join("");
     $("solvedCount").textContent = `${state.solved.filter(i => !CH[i].refresher).length} / ${NCH}`;
   }
@@ -61,14 +69,14 @@
 
   /* ---------- one chapter ---------- */
   function renderCase() {
-    const i = state.current, c = CH[i], solved = state.solved.includes(i), shown = state.hints[i] || 0;
+    const i = state.current, c = CH[i], solved = isDone(i), shown = state.hints[i] || 0;
     const asks = (c.asks || []).map((q, k) => {
       const prev = (state.answers[i] || {})[k] || "";
       return `<div class="ask" data-k="${k}"><label for="ans${k}">${q.q}</label>
         <div class="ask-row"><input id="ans${k}" type="text" inputmode="${q.text ? "text" : "decimal"}" autocomplete="off" spellcheck="false" value="${esc(prev)}" ${solved ? "disabled" : ""} placeholder="${q.text ? "a válaszod" : "a szám, amit az Excel mutat"}"><span class="mark" aria-hidden="true"></span></div></div>`;
     }).join("");
     $("case").innerHTML = `
-      <p class="chap">${c.refresher ? "Kezdés · mielőtt nekiállsz" : `${chapNo(i)}. fejezet a ${NCH}-ből`}</p>
+      <p class="chap">${c.refresher ? "Kezdés · mielőtt nekiállsz" : c.bonus ? `Bónusz feladat · ${bonusNo(i)}. a ${NBONUS}-ből · nem kötelező` : `${chapNo(i)}. fejezet a ${NCH}-ből`}</p>
       <h2>${esc(c.title)}</h2>
       <div class="story">${c.story}</div>
       ${c.learn ? `<div class="learn"><h3>${c.refresher ? "Emlékeztető" : c.isNew === false ? "Jó tudni" : "Új tudás"}</h3>${c.learn}</div>` : ""}
@@ -80,12 +88,13 @@
         <div id="verdict" aria-live="polite"></div>
       </div>
       <div id="won">${solved ? wonHtml(i) : ""}</div>`;
-    if (c.upload && state.report) showReport(state.report);
+    const rep = (state.reports || {})[i] || (!c.bonus && state.report);
+    if (c.upload && rep) showReport(rep);
   }
   function wonHtml(i) {
-    const c = CH[i], last = i === CH.length - 1;
-    return `<div class="verdict ok"><b>${c.refresher ? "Rendben, mehetünk!" : "Stimmel!"}</b><p>${c.success}</p></div>
-      ${last ? `<button type="button" class="btn primary big" id="toEnd">Tovább a befejezéshez</button>` : `<button type="button" class="btn primary big" id="next">${c.refresher ? "Kezdjük!" : "Következő fejezet"} →</button>`}`;
+    const c = CH[i], toEnd = i === LAST_MAIN || (c.bonus && !(CH[i + 1] && CH[i + 1].bonus));
+    return `<div class="verdict ok"><b>${c.refresher ? "Rendben, mehetünk!" : c.bonus ? "Bónusz kész!" : "Stimmel!"}</b><p>${c.success}</p></div>
+      ${toEnd ? `<button type="button" class="btn primary big" id="toEnd">${c.bonus ? "Vissza a befejezéshez" : "Tovább a befejezéshez"}</button>` : c.bonus ? `<button type="button" class="btn primary big" id="next">Következő bónusz →</button>` : `<button type="button" class="btn primary big" id="next">${c.refresher ? "Kezdjük!" : "Következő fejezet"} →</button>`}`;
   }
   function goTo(i, quiet) {
     state.current = i; save();
@@ -96,8 +105,8 @@
     if (!quiet && innerWidth < 1000) $("case").scrollIntoView({ behavior: "smooth", block: "start" });
   }
   function solve(i) {
-    if (!state.solved.includes(i)) state.solved.push(i);
-    if (i === CH.length - 1 && !state.end) state.end = Date.now();
+    if (!isDone(i)) (CH[i].bonus ? state.bonus : state.solved).push(i);
+    if (i === LAST_MAIN && !state.end) state.end = Date.now();
     save(); renderSteps(); fillPreview();
     $("verdict").innerHTML = "";
     const cb = $("checkBtn"), hb = $("hintBtn"); if (cb) cb.hidden = true; if (hb) hb.hidden = true;
@@ -181,7 +190,8 @@
     for (let r = 0; r < M.sheet.rows; r++) for (let c = 0; c < M.sheet.cols; c++) { const a = XL.A(c, r), x = ws[a]; if (x && x.v !== undefined && x.v !== "") theirs.set(a, x.v); }
     const expect = (goal, a) => { const rg = XL.rangeOf(goal.range), p = XL.parseA(a); return theirs.calc(XL.shiftFormula(goal.ref, p.r - rg.r1, p.c - rg.c1), a); };
     const rows = [];
-    CH.forEach(c => (c.goals || []).forEach(goal => {
+    const bonusScope = !!CH[state.current].bonus;      /* the bonus upload checks only the bonus cells */
+    CH.filter(c => !!c.bonus === bonusScope).forEach(c => (c.goals || []).forEach(goal => {
       const cells = XL.cellsOf(XL.rangeOf(goal.range)); let msg = null, ok = 0;
       for (const a of cells) {
         const cell = ws[a], exp = expect(goal, a), f = cell && cell.f ? String(cell.f) : "";
@@ -195,7 +205,9 @@
       rows.push({ label: goal.label, ok: ok === cells.length, done: ok, total: cells.length, msg });
     }));
     const report = { name: file.name, at: Date.now(), rows };
-    state.report = report; save(); showReport(report);
+    state.reports = state.reports || {}; state.reports[state.current] = report;
+    if (!bonusScope) state.report = report;
+    save(); showReport(report);
     if (rows.every(r => r.ok)) solve(state.current); else buzz();
   }
   function showReport(rep) {
@@ -221,12 +233,13 @@
         <p class="chap">Küldetés teljesítve</p>
         <h2>${esc(M.ending.title)}</h2>
         <div class="story">${M.ending.text}</div>
-        <ul class="stats"><li><b>${NCH}</b> fejezet</li><li><b>${mins}</b> perc</li><li><b>${hints}</b> segítség</li></ul>
+        <ul class="stats"><li><b>${NCH}</b> fejezet</li><li><b>${mins}</b> perc</li><li><b>${hints}</b> segítség</li>${NBONUS ? `<li><b>${state.bonus.length} / ${NBONUS}</b> bónusz</li>` : ""}</ul>
+        ${NBONUS ? bonusBox() : ""}
         ${M.ending.rank ? `<p class="rank">${M.ending.rank(mins, hints)}</p>` : ""}
         <div class="reward"><h3>Jutalom</h3><div id="reward"></div></div>
         <div class="export">
           <h3>Add be a munkádat</h3>
-          <ol class="export-steps"><li>Nyisd meg a feladatot a <b>Google Classroomban</b>.</li><li>Töltsd fel az elmentett Excel-fájlodat (${esc(state.report ? state.report.name : M.saveAs)}).</li><li>Kattints a <b>Beadás</b> gombra.</li></ol>
+          <ol class="export-steps"><li>Nyisd meg a feladatot a <b>Google Classroomban</b>.</li><li>Töltsd fel az elmentett Excel-fájlodat (${esc(latestFile())}).</li><li>Kattints a <b>Beadás</b> gombra.</li></ol>
         </div>
         <div class="end-btns"><button type="button" class="btn" id="backToSheet">← Vissza a fejezetekhez</button>${M.next ? `<a class="btn primary" href="${M.next.href}">${esc(M.next.text)} →</a>` : ""}</div>
       </div>`;
@@ -236,7 +249,18 @@
     setTimeout(() => { for (let k = 0; k < 5; k++) setTimeout(() => celebrate(innerWidth * (0.15 + Math.random() * 0.7), innerHeight * (0.15 + Math.random() * 0.3), 70), k * 350); }, 200);
     fanfare();
   }
-  $("endPanel").addEventListener("click", e => { if (e.target.id === "backToSheet") { $("endPanel").hidden = true; $("game").hidden = false; goTo(CH.length - 1); } });
+  /* the newest checked file is the one to hand in (with the bonus, if it was done) */
+  const latestFile = () => { const all = Object.values(state.reports || {}).concat(state.report ? [state.report] : []).filter(r => r && r.rows.every(x => x.ok)); all.sort((a, b) => b.at - a.at); return all[0] ? all[0].name : M.saveAs; };
+  function bonusBox() {
+    const left = CH.findIndex((c, k) => c.bonus && !isDone(k));
+    return `<div class="bonusbox">${left < 0
+      ? `<h3>Minden bónusz kész!</h3><p>Ügyes vagy: a bónusz feladatokat is mind megoldottad.</p>`
+      : `<h3>Gyorsabb voltál? Itt egy kis plusz!</h3><p>${NBONUS} bónusz feladat vár rád, ugyanabban a fájlban. Nem kötelező, de jó gyakorlás.</p><button type="button" class="btn primary" id="toBonus" data-i="${left}">Bónusz feladatok →</button>`}</div>`;
+  }
+  $("endPanel").addEventListener("click", e => {
+    if (e.target.id === "backToSheet") { $("endPanel").hidden = true; $("game").hidden = false; goTo(LAST_MAIN); }
+    if (e.target.id === "toBonus") { $("endPanel").hidden = true; $("game").hidden = false; goTo(+e.target.dataset.i); }
+  });
 
   /* ---------- header: timer, sound, start again ---------- */
   const fmtTime = ms => { const m = Math.floor(ms / 60000), s = Math.floor(ms / 1000) % 60; return `${m}:${String(s).padStart(2, "0")}`; };
@@ -250,7 +274,7 @@
   $("resetBtn").addEventListener("click", () => {
     if (Date.now() - resetArmed > 4000) { resetArmed = Date.now(); $("resetBtn").textContent = "Biztos? Kattints újra"; setTimeout(() => { $("resetBtn").textContent = "Elölről"; }, 4000); return; }
     resetArmed = 0; $("resetBtn").textContent = "Elölről";
-    state = { solved: [], current: 0, start: Date.now(), end: null, hints: {}, answers: {}, student: "" };
+    state = { solved: [], bonus: [], current: 0, start: Date.now(), end: null, hints: {}, answers: {}, student: "" };
     save(); $("endPanel").hidden = true; $("game").hidden = false; goTo(0);
   });
 
@@ -259,7 +283,7 @@
   document.addEventListener("keydown", e => {
     if (e.key.length !== 1) return;
     buf = (buf + e.key.toLowerCase()).slice(-8);
-    if (buf === "bruinsma") { buf = ""; state.solved = CH.map((_, k) => k); state.dev = true; if (!state.end) state.end = Date.now(); save(); goTo(CH.length - 1); }
+    if (buf === "bruinsma") { buf = ""; state.solved = CH.map((c, k) => c.bonus ? -1 : k).filter(k => k >= 0); state.bonus = CH.map((c, k) => c.bonus ? k : -1).filter(k => k >= 0); state.dev = true; if (!state.end) state.end = Date.now(); save(); goTo(LAST_MAIN); }
   }, true);
 
   /* ---------- confetti and a chime ---------- */
