@@ -80,7 +80,7 @@ window.MISSION = {
         `Mentsd el a saját neveddel: <span class=ui>Fájl</span> › <span class=ui>Mentés másként</span> (vagy <kbd>F12</kbd>), például <code>erdei-iskola-Kovacs-Anna</code>.`,
         `Nézd meg a margókat: <span class=ui>Elrendezés</span> lap › <span class=ui>Margók</span> › legalul <span class=ui>Egyéni margók…</span> Most még ne változtass semmit, csak nézd meg, aztán <span class=ui>Mégse</span>.`
       ],
-      asks: [{ q: "Hány centiméteres most a <b>bal</b> margó?", num: 2.5, traps: { "2": "A 2 cm lesz majd a cél. Most még mennyi van beállítva?", "2.54": "Majdnem: a Word így írja ki: 2,5 cm. Írd be pontosan, amit látsz!" }, wrong: "Elrendezés › Margók › Egyéni margók… A Margók fülön a Bal mezőben látod." },
+      asks: [{ q: "Mekkora most a <b>bal</b> margó (cm-ben)?", num: 2.5, traps: { "2": "A 2 cm lesz majd a cél. Most mekkora margó van beállítva?", "2.54": "Majdnem: a Word így írja ki: 2,5 cm. Írd be pontosan, amit látsz!" }, wrong: "Elrendezés › Margók › Egyéni margók… A Margók fülön a Bal mezőben látod." },
              { q: "Milyen a lap tájolása: <b>álló</b> vagy <b>fekvő</b>?", text: ["álló", "allo", "állo"], traps: { "fekvő": "Nézd meg újra: a lap magasabb, mint amilyen széles. Az ilyen tájolás neve…" } }],
       hints: ["Az Egyéni margók ablakot úgy is megnyithatod, hogy duplán kattintasz a vonalzó szürke részére.", "A bal margó 2,5 cm. A lap álló."],
       success: "2,5 cm-es margók, álló lap. Most átszabjuk a lapot, hogy több minden elférjen rajta!" },
