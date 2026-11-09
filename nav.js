@@ -510,7 +510,7 @@
         accent: "#ff9e6b",
         title: { hu: "Bemutatókészítés – PowerPoint", en: "Presentations – PowerPoint" },
         blurb: {
-          hu: "Rajzolás alakzatokból, aztán animációk: Robi, a robot megszületik, és a Holdra repül – az igazi PowerPointban.",
+          hu: "Rajzolás alakzatokból, aztán animációk: Robi, a robot megszületik, és a Holdra repül – a PowerPointban.",
           en: "Drawing with shapes, then animations: Robi the robot is built and flies to the Moon – in real PowerPoint."
         },
         lessons: [
@@ -535,7 +535,7 @@
                 minutes: 40,
                 title: { hu: "Robi, a robot", en: "Robi the Robot" },
                 desc: {
-                  hu: "Az informatikateremnek kabala kell! Csupa alakzatból rajzolod meg Robit az igazi PowerPointban, a végén az oldal megnézi a mentett fájlodat.",
+                  hu: "Az informatikateremnek kabala kell! Csupa alakzatból rajzolod meg Robit a PowerPointban, a végén az oldal megnézi a mentett fájlodat.",
                   en: "The computer room needs a mascot! Draw Robi from shapes in real PowerPoint; at the end the page checks your saved file."
                 },
                 files: { hu: "powerpoint/shapes/robot-hu.html" },
