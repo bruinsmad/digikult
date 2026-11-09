@@ -122,7 +122,10 @@
     const n = normNum(raw), exp = want(q.cell);
     if (n === null) return { ok: false, msg: "Csak a számot írd be, ahogy az Excel mutatja (pl. 6,25)." };
     if (Math.abs(n - exp) < 0.0006 * Math.max(1, Math.abs(exp))) return { ok: true };
-    for (const [k, m] of Object.entries(q.traps || {})) { const t = normNum(k); if (t !== null && Math.abs(n - t) < 0.0006 * Math.max(1, Math.abs(t))) return { ok: false, msg: m }; }
+    /* the closest typical wrong answer wins (8,67 is "two decimals", not "unrounded") */
+    let best = null;
+    for (const [k, m] of Object.entries(q.traps || {})) { const t = normNum(k); if (t === null) continue; const d = Math.abs(n - t); if (d < 0.0006 * Math.max(1, Math.abs(t)) && (!best || d < best.d)) best = { d, m }; }
+    if (best) return { ok: false, msg: best.m };
     return { ok: false, msg: q.wrong || `Ez nem stimmel. Kattints az Excelben ${XL.az(q.cell)} ${q.cell} cellára, és nézd meg a szerkesztőlécen, jó-e a képlet.` };
   }
   $("case").addEventListener("submit", e => {
@@ -172,16 +175,21 @@
       const wb = XLSX.read(await file.arrayBuffer(), { type: "array", cellFormula: true });
       ws = wb.Sheets[M.sheetName] || wb.Sheets[wb.SheetNames[0]];
     } catch (e) { $("report").innerHTML = `<div class="verdict no"><b>Ezt a fájlt nem tudom megnyitni.</b><p>Mentsd el újra az Excelben (Fájl › Mentés), és próbáld újra.</p></div>`; return; }
+    /* expected values are worked out from the student's own cells, so one wrong cell is reported once,
+       not again in every cell that builds on it */
+    const theirs = new XL.Sheet(M.sheet.cols, M.sheet.rows);
+    for (let r = 0; r < M.sheet.rows; r++) for (let c = 0; c < M.sheet.cols; c++) { const a = XL.A(c, r), x = ws[a]; if (x && x.v !== undefined && x.v !== "") theirs.set(a, x.v); }
+    const expect = (goal, a) => { const rg = XL.rangeOf(goal.range), p = XL.parseA(a); return theirs.calc(XL.shiftFormula(goal.ref, p.r - rg.r1, p.c - rg.c1), a); };
     const rows = [];
     CH.forEach(c => (c.goals || []).forEach(goal => {
       const cells = XL.cellsOf(XL.rangeOf(goal.range)); let msg = null, ok = 0;
       for (const a of cells) {
-        const cell = ws[a], exp = want(a), f = cell && cell.f ? String(cell.f) : "";
+        const cell = ws[a], exp = expect(goal, a), f = cell && cell.f ? String(cell.f) : "";
         let m = null;
         if (!cell || cell.v === undefined || cell.v === "") m = `${XL.Az(a)} ${a} cella üres.`;
         else if (!f) m = `${XL.Az(a)} ${a} cellában nincs képlet, csak egy beírt érték. Írj képletet = jellel!`;
         else if (goal.fn && !new RegExp("\\b" + EN[goal.fn] + "\\(").test(f.toUpperCase())) m = `${XL.Az(a)} ${a} képlete (${toHu(f)}) nem ${XL.az(goal.fn)} ${goal.fn} függvényt használja.`;
-        else if (typeof cell.v !== "number" || Math.abs(cell.v - exp) > 1e-6 * Math.max(1, Math.abs(exp))) m = `${XL.Az(a)} ${a} értéke ${cell.w || cell.v}, de ${XL.fmtGeneral(exp).replace(/(,\d{2})\d+$/, "$1…")} kellene. A képleted: ${toHu(f)}`;
+        else if (typeof exp !== "number" || typeof cell.v !== "number" || Math.abs(cell.v - exp) > 1e-6 * Math.max(1, Math.abs(exp))) m = `${XL.Az(a)} ${a} értéke ${cell.w || cell.v}, de ${(typeof exp === "number" ? XL.fmtGeneral(exp) : XL.textOf(exp)).replace(/(,\d{2})\d+$/, "$1…")} kellene. A képleted: ${toHu(f)}`;
         if (m) { if (!msg) msg = m; } else ok++;
       }
       rows.push({ label: goal.label, ok: ok === cells.length, done: ok, total: cells.length, msg });

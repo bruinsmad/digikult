@@ -780,9 +780,18 @@
 
     /* ----- mouse / touch: select, point at cells while typing a formula, drag the fill handle ----- */
     let dragging = null, pointing = false;
+    /* the cell really under the pointer: text running on from the cell to the left must not catch the click */
+    const tdAt = (x, y) => {
+      for (const el of document.elementsFromPoint(x, y)) {
+        if (!el.matches || !el.matches("td[data-a]") || !table.contains(el)) continue;
+        const r = el.getBoundingClientRect();
+        if (x >= r.left && x < r.right && y >= r.top && y < r.bottom) return el;
+      }
+      return null;
+    };
     const cellAt = (x, y) => {
-      const el = document.elementFromPoint(x, y), t = el && el.closest && el.closest("td[data-a]");
-      if (t && table.contains(t)) return parseA(t.dataset.a);
+      const t = tdAt(x, y);
+      if (t) return parseA(t.dataset.a);
       const r = table.getBoundingClientRect(); if (!r.width) return null;
       /* outside the table: clamp to the nearest cell along the drag */
       const tds = table.tBodies[0].rows; let best = null;
@@ -793,7 +802,8 @@
     stage.addEventListener("pointerdown", e => {
       if (e.button !== 0) return;
       if (e.target.classList.contains("xl-handle")) { e.preventDefault(); startFill(e); return; }
-      const t = e.target.closest("td[data-a]"); if (!t) return;
+      if (!e.target.closest("td[data-a]")) return;
+      const t = tdAt(e.clientX, e.clientY); if (!t) return;
       const p = parseA(t.dataset.a);
       if (edit && wantsRef()) {
         e.preventDefault(); pointing = true;
@@ -822,7 +832,7 @@
     };
     stage.addEventListener("pointerup", endDrag);
     stage.addEventListener("pointercancel", endDrag);
-    stage.addEventListener("dblclick", e => { const t = e.target.closest("td[data-a]"); if (t && !edit) { const p = parseA(t.dataset.a); select(p.c, p.r); startEdit(); } });
+    stage.addEventListener("dblclick", e => { const t = e.target.closest("td[data-a]") && tdAt(e.clientX, e.clientY); if (t && !edit) { const p = parseA(t.dataset.a); select(p.c, p.r); startEdit(); } });
 
     /* fill handle: drag down or right, formulas are copied with their references moved */
     function startFill(e) {

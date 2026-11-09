@@ -130,7 +130,7 @@ window.TRY = {
     goals: [{ text: '<b>D2–D6</b>: 5 plusz pont, ha kész a házi: <code>=HA(C2="igen";B2+5;B2)</code>', range: "D2:D6", ref: '=HA(C2="igen";B2+5;B2)', use: ["HA"] },
             { text: "Írd át a <b>C4</b>-et (Csaba sorát) „igen”-re, és figyeld a D4-et!", test: g => ({ ok: String(g.value("C4")).toLowerCase() === "igen" && String(g.raw("D4") || "").startsWith("=") && g.value("D4") === 55 }) }],
     note: "Ebben a táblázatban a B és a C oszlopot is átírhatod. Próbáld ki!" },
-  darabteli: { title: "Próbáld ki", cols: 6, rows: 9, widths: [90, 64, 84, 20, 230, 64], select: "F2",
+  darabteli: { title: "Próbáld ki", cols: 6, rows: 9, widths: [90, 64, 84, 20, 262, 64], select: "F2",
     cells: { A1: "Név", B1: "Pont", C1: "Házi kész?", A2: "Ádám", B2: 72, C2: "igen", A3: "Bea", B3: 48, C3: "igen", A4: "Csaba", B4: 50, C4: "nem", A5: "Dóra", B5: 91, C5: "igen",
       A6: "Ervin", B6: 35, C6: "nem", A7: "Flóra", B7: 66, C7: "igen", A8: "Gábor", B8: 95, C8: "nem", A9: "Hédi", B9: 58, C9: "igen",
       E2: "Hányan mentek át (legalább 50)?", E3: "Hányan csinálták meg a házit?", E4: "Hányan kaptak 90-nél több pontot?" },
@@ -162,6 +162,6 @@ window.QUIZ = [
 ];
 </script>
 <script src="../explainer.js"></script>
-<script src="../../nav.js?v=2b949d3f" defer></script>
+<script src="../../nav.js?v=e5968e8a" defer></script>
 </body>
 </html>
