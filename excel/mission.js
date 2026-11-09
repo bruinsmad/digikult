@@ -134,6 +134,7 @@
         <div class="story">${M.ending.text}</div>
         <ul class="stats"><li><b>${NCH}</b> fejezet</li><li><b>${mins}</b> perc</li><li><b>${hints}</b> segítség</li></ul>
         ${M.ending.rank ? `<p class="rank">${M.ending.rank(mins, hints)}</p>` : ""}
+        <div class="reward"><h3>Jutalom</h3><div id="reward"></div></div>
         <div class="export">
           <h3>Add be a munkádat</h3>
           <ol class="export-steps"><li>Írd be a neved.</li><li>Kattints a <b>Táblázat letöltése (.xlsx)</b> gombra. Ez egy Excel-fájl a képleteiddel; a Letöltések mappába kerül.</li><li>Nyisd meg a feladatot a <b>Google Classroomban</b>, töltsd fel a fájlt, és kattints a <b>Beadás</b> gombra.</li></ol>
@@ -144,6 +145,7 @@
         </div>
         <div class="end-btns"><button type="button" class="btn" id="backToSheet">← Vissza a táblázathoz</button>${M.next ? `<a class="btn primary" href="${M.next.href}">${esc(M.next.text)} →</a>` : ""}</div>
       </div>`;
+    if (window.DancingCats) DancingCats.mount($("reward"), { sound: () => soundOn, burst: (x, y, n) => celebrate(x, y, n) });
     const r = $("endPanel").getBoundingClientRect();
     scrollTo({ top: scrollY + r.top - 70, behavior: "smooth" });
     setTimeout(() => { for (let k = 0; k < 5; k++) setTimeout(() => celebrate(innerWidth * (0.15 + Math.random() * 0.7), innerHeight * (0.15 + Math.random() * 0.3), 70), k * 350); }, 200);
