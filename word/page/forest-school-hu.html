@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>/* moving between pages: the old page drifts aside and fades, the new one glides in; the rail holds still */@view-transition{navigation:auto}.rail{view-transition-name:rail}::view-transition-group(root){animation:none}::view-transition-old(root){animation:dk-out .2s cubic-bezier(.4,0,1,1) both}::view-transition-new(root){animation:dk-in .38s cubic-bezier(.16,1,.3,1) .06s both}::view-transition-old(rail),::view-transition-new(rail){animation:none}@keyframes dk-out{to{opacity:0;transform:translateX(-18px)}}@keyframes dk-in{from{opacity:0;transform:translateX(26px)}}@media (prefers-reduced-motion:reduce){::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none!important}}</style>
+<title>Erdei iskola a Bükkben – Word-küldetés</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600;700&display=swap">
+<link rel="stylesheet" href="../doc.css">
+<link rel="stylesheet" href="../mission.css">
+<style>:root{--m:#2e6b30;--m-soft:#e7f2e3;--m-ink:#1d4a1f}
+.ptable{border-collapse:collapse;margin:8px 0;font-size:14.5px;background:#fff}
+.ptable td{border:1px solid #b9c7b4;padding:3px 8px}
+.ptable tr:first-child td{font-weight:700;background:#c5e0b3}</style>
+</head>
+<body>
+<header class="rail"><div class="in">
+  <a class="home" href="../../index.html">Digitális kultúra</a>
+  <span class="crumb"><a href="../../index.html#word">Szövegszerkesztés – Word</a> › <a href="../../index.html#word-page">2. lecke</a></span>
+</div></header>
+<div class="top">
+  <span class="art" aria-hidden="true"><svg viewBox="0 0 96 96"><ellipse cx="48" cy="88" rx="30" ry="5" fill="#000" opacity=".25"/>
+<path d="M48 10L18 52h12L14 74h68L66 52h12z" fill="#3f7a37"/><path d="M48 22L28 50h10L24 68h48L58 50h10z" fill="#5c9a4f"/>
+<rect x="43" y="74" width="10" height="12" fill="#6b5440"/>
+<path d="M70 30h14v22H70z" fill="#fffdf6" stroke="#2e6b30" stroke-width="2"/><path d="M73 36h8M73 41h8M73 46h5" stroke="#2e6b30" stroke-width="1.6"/>
+<text x="30" y="26" font-family="Kalam,cursive" font-weight="700" font-size="11" fill="#f2d264">7.B</text></svg></span>
+  <div><div class="kicker">Word, 2. lecke: küldetés az igazi Wordben</div><h1>Erdei iskola a Bükkben</h1></div>
+  <div class="meta"><span>Haladás <b id="solvedCount">–</b></span><span>Idő <b id="timer">0:00</b></span><button type="button" class="mbtn" id="soundBtn">Hang: be</button><button type="button" class="mbtn" id="resetBtn">Elölről</button></div>
+</div>
+<nav class="steps" id="steps" aria-label="Fejezetek"></nav>
+<div id="game"><main>
+  <article class="card" id="case" aria-live="polite"></article>
+  <section class="work" aria-label="Előnézet"><div class="card">
+    <div class="dlcard"><svg class="ic" viewBox="0 0 40 46" aria-hidden="true"><path d="M4 2h22l10 10v32H4z" fill="#fff" stroke="#185abd" stroke-width="2"/><path d="M26 2v10h10" fill="#dbe7fb" stroke="#185abd" stroke-width="2"/><rect x="0" y="18" width="24" height="20" rx="2" fill="#185abd"/><path d="M5 23l3 10 4-8 4 8 3-10" fill="none" stroke="#fff" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/></svg><p><b>erdei-iskola.docx</b> és <b>szalajka.png</b><br>Ezekkel dolgozol, az igazi Wordben.</p><div class="btns"><a class="btn primary" href="erdei-iskola.docx" download>Dokumentum</a><a class="btn" href="szalajka.png" download>Kép</a></div></div>
+    <div class="work-head"><h2>Előnézet</h2><button type="button" class="tog" id="marksBtn" title="Mindent mutat" aria-pressed="false">¶<span>jelek</span></button></div>
+    <div class="doc-wrap"><div id="doc"></div></div>
+    <p class="legend"><span><i></i>A sárga részek tartoznak a mostani feladathoz.</span><span>Ahogy haladsz, itt is elkészül a tájékoztató.</span></p>
+  </div></section>
+</main></div>
+<section id="endPanel" hidden></section>
+<footer class="end">Digitális kultúra. A haladásod a böngésződben marad: ha bezárod az oldalt, legközelebb innen folytathatod. A Word-fájlodat az oldal csak itt, a böngészőben nézi meg, nem küldi el sehová.</footer>
+<canvas id="fx" aria-hidden="true"></canvas>
+<script src="../docx.js"></script>
+<script src="../doc.js"></script>
+<script>
+const P = (text, x) => Object.assign({ text }, x || {});
+const GREEN = "#2e6b30";
+const H = t => P(t, { b: true, size: 14, color: GREEN, before: 12, after: 6 });
+const INFO = ["Indulás hétfőn reggel 7:30-kor az iskola elől, busszal. Hazaérkezés pénteken kb. 17 órakor.",
+  "Az erdei iskola ára 62 000 Ft. Ez tartalmazza a szállást, a napi négyszeri étkezést és a belépőjegyeket.",
+  "Mobiltelefont a gyerekek csak esténként, 19 és 20 óra között használhatnak.",
+  "Kísérő tanárok: Kovács Katalin (osztályfőnök) és Nagy Péter."];
+const PACK = ["bejáratott túracipő", "esőkabát", "2 hosszú nadrág és 1 rövid", "pulóver vagy polár", "kulacs", "zseblámpa", "hálózsák", "tisztálkodószerek, törölköző", "diákigazolvány és TAJ-kártya"];
+const TABLE = [["Nap", "Délelőtt", "Délután"], ["Hétfő", "Utazás", "Szalajka-völgy"], ["Kedd", "Fátyol-vízesés", "Lipicai ménes"],
+  ["Szerda", "Bükki-fennsík", "Erdei olimpia"], ["Csütörtök", "Istállós-kői-barlang", "Tábortűz"], ["Péntek", "Pakolás", "Hazautazás"]];
+const at = (m, start) => m.blocks.findIndex(b => !b.type && WD.textOf(b).startsWith(start));
+const blk = (m, start) => m.blocks[at(m, start)];
+const tbl = m => m.blocks.find(b => b.type === "table");
+
+window.MISSION = {
+  key: "forest-school-hu-v1", title: "Erdei iskola a Bükkben", file: "erdei-iskola.docx", saveAs: "erdei-iskola-Kovacs-Anna.docx", fingerprint: "Erdei iskola a Bükkben",
+  confetti: ["#2e6b30", "#8fbf7a", "#7fc2df", "#f2d264", "#c5e0b3", "#185abd"],
+  doc: { header: null, blocks: [
+    P("Erdei iskola a Bükkben", { align: "center", b: true, size: 24, color: GREEN }), P("7.B · 2027. május 10–14. · Szilvásvárad", { align: "center", i: true, after: 12 }),
+    P("Kedves Szülők! Májusban öt napra a Bükkbe utazunk, Szilvásváradra. A szállásunk egy turistaház a Szalajka-völgy bejáratánál. Minden nap túrázunk, megismerjük a bükki erdők élővilágát, esténként pedig közös programok várják a gyerekeket. Alább összefoglaltuk a legfontosabb tudnivalókat.", { align: "both", line: 1.15 }),
+    H("Napi program"), P("Hétfőtől péntekig ezek a programok várnak ránk:", { after: 6 }),
+    H("Fontos tudnivalók"), ...INFO.map(x => P(x, { after: 4 })), P(""), P(""), P(""), P(""), P(""), P(""),
+    H("Csomaglista"), ...PACK.map(x => P(x)), P("Jó készülődést! Kati néni", { align: "right", i: true, before: 12 })
+  ] },
+  chapters: [
+    { refresher: true, title: "Nyisd meg a Wordöt",
+      story: `<p>A 7.B májusban <b>erdei iskolába</b> megy a Bükkbe. <span class="who">Kati néni</span>, az osztályfőnök, megírta a tájékoztatót a szülőknek, de elfogyott az ideje. A szöveg kész, a címek is szépek, de hiányzik a napi program táblázata, egy kép, az oldalszámok, és a csomaglista sincs rendesen a második oldalon.</p>
+        <p>Te teszed rendbe, az <b>igazi Wordben</b>. Ez az oldal megmutatja, mit csinálj, és minden fejezet végén ellenőrzi a mentett fájlodat.</p>`,
+      learn: `<ul><li>Az <b>oldal beállításai</b> (margók, tájolás, méret) az <span class="ui">Elrendezés</span> lapon vannak.</li><li>A <b>margó</b> az üres sáv a lap szélén, ahová nem kerül szöveg.</li><li>A <b>tájolás</b> lehet <b>álló</b> vagy <b>fekvő</b>.</li></ul>`,
+      steps: [
+        `Töltsd le a dokumentumot és a képet:<br><a class="btn primary" href="erdei-iskola.docx" download>erdei-iskola.docx</a> <a class="btn" href="szalajka.png" download>szalajka.png</a>`,
+        `Nyisd meg a dokumentumot a Wordben. Ha felül azt látod, hogy <span class=ui>Védett nézet</span>, kattints a <span class=ui>Szerkesztés engedélyezése</span> gombra.`,
+        `Mentsd el a saját neveddel: <span class=ui>Fájl</span> › <span class=ui>Mentés másként</span> (vagy <kbd>F12</kbd>), például <code>erdei-iskola-Kovacs-Anna</code>.`,
+        `Nézd meg a margókat: <span class=ui>Elrendezés</span> lap › <span class=ui>Margók</span> › legalul <span class=ui>Egyéni margók…</span> Most még ne változtass semmit, csak nézd meg, aztán <span class=ui>Mégse</span>.`
+      ],
+      asks: [{ q: "Hány centiméteres most a <b>bal</b> margó?", num: 2.5, traps: { "2": "A 2 cm lesz majd a cél. Most még mennyi van beállítva?", "2.54": "Majdnem: a Word így írja ki: 2,5 cm. Írd be pontosan, amit látsz!" }, wrong: "Elrendezés › Margók › Egyéni margók… A Margók fülön a Bal mezőben látod." },
+             { q: "Milyen a lap tájolása: <b>álló</b> vagy <b>fekvő</b>?", text: ["álló", "allo", "állo"], traps: { "fekvő": "Nézd meg újra: a lap magasabb, mint amilyen széles. Az ilyen tájolás neve…" } }],
+      hints: ["Az Egyéni margók ablakot úgy is megnyithatod, hogy duplán kattintasz a vonalzó szürke részére.", "A bal margó 2,5 cm. A lap álló."],
+      success: "2,5 cm-es margók, álló lap. Most átszabjuk a lapot, hogy több minden elférjen rajta!" },
+
+    { title: "Margók",
+      story: `<p>A tájékoztatóra sok minden kerül: szöveg, táblázat, kép. Kati néni azt kéri, hogy a margók legyenek kicsit keskenyebbek, mindenhol <b>2 cm</b>. Így több hely marad a tartalomnak.</p>`,
+      learn: `<p>Az <span class="ui">Elrendezés</span> › <span class="ui">Margók</span> menüben van néhány kész beállítás (Normál, Keskeny, Széles…). Ha egyik sem jó, az <span class="ui">Egyéni margók…</span> ablakban centiméterre pontosan megadhatod mind a négyet.</p>`,
+      steps: [
+        `<span class=ui>Elrendezés</span> lap › <span class=ui>Margók</span> › <span class=ui>Egyéni margók…</span>`,
+        `A <span class=ui>Margók</span> fülön a <span class=ui>Felső</span>, <span class=ui>Alsó</span>, <span class=ui>Bal</span> és <span class=ui>Jobb</span> mezőbe is írd be: <b>2 cm</b>.`,
+        `Lent az <span class=ui>Alkalmaz</span> legyen <b>Teljes dokumentum</b>. Kattints az <span class=ui>OK</span> gombra.`,
+        `Mentsd el (<kbd>Ctrl</kbd>+<kbd>S</kbd>), és ellenőrizd.`
+      ],
+      goals: [{ label: "Mind a négy margó 2 cm", type: "margins", cm: 2,
+        apply: m => { m.page = Object.assign({}, m.page, { top: 2, bottom: 2, left: 2, right: 2 }); }, target: m => { m.pageTarget = true; m.showMargins = true; } }],
+      hints: ["Elég beírni, hogy 2, a Word hozzáteszi a cm-t. A mezők között a Tab billentyűvel is lépkedhetsz."],
+      success: "2 cm minden oldalon. A szöveg most szélesebb sávban fut." },
+
+    { title: "A napi program táblázata",
+      story: `<p>A napi programot Kati néni csak felsorolta egy füzetben. A szülők egy pillantással át akarják látni, ezért <b>táblázatba</b> tesszük: soronként egy nap, oszloponként a délelőtt és a délután.</p>`,
+      learn: `<p>Ezt kell beírnod (az első sor a <b>fejléc</b>):</p>
+        <table class="ptable">${TABLE.map(r => `<tr>${r.map(c => `<td>${c}</td>`).join("")}</tr>`).join("")}</table>
+        <p>A <kbd>Tab</kbd> billentyűvel a következő cellába lépsz. Ha az utolsó cellában nyomod meg, a Word új sort ad a táblázathoz.</p>`,
+      steps: [
+        `Kattints a <i>Hétfőtől péntekig ezek a programok várnak ránk:</i> bekezdés végére, és nyomj <span class="nw"><kbd>Enter</kbd>t</span>.`,
+        `<span class=ui>Beszúrás</span> lap › <span class=ui>Táblázat</span>. Vidd az egeret a négyzetrács fölé: <b>3 oszlop</b> és <b>6 sor</b> kell (felül kiírja: <i>3x6-os táblázat</i>). Kattints.`,
+        `Írd be a táblázatot a fenti minta szerint. A <kbd>Tab</kbd> billentyűvel lépj cellából cellába.`,
+        `Jelöld ki az <b>első sort</b> (vidd az egeret az első sor bal széle elé, és ha ferde nyíl lesz belőle, kattints). Legyen <span class=ui>Félkövér</span>.`,
+        `Amíg ki van jelölve, adj neki háttérszínt: <span class=ui>Táblázattervezés</span> lap › <span class=ui>Mintázat</span> (festékesvödör) › válassz egy világos színt.`,
+        `Mentsd el, és ellenőrizd.`
+      ],
+      goals: [
+        { label: "Táblázat: 3 oszlop, 6 sor, benne a napok", type: "table", first: "Nap", cols: 3, rows: 6, contains: ["Délelőtt", "Délután", "Hétfő", "Kedd", "Szerda", "Csütörtök", "Péntek"],
+          apply: m => { const k = at(m, "Hétfőtől"); m.blocks.splice(k + 1, 0, { type: "table", rows: TABLE }); }, target: m => { blk(m, "Hétfőtől").target = true; } },
+        { label: "Fejléc: félkövér, háttérszínnel", type: "table", first: "Nap", headBold: true, headShaded: true,
+          apply: m => { const t = tbl(m); if (t) { t.headBold = true; t.headShade = "#c5e0b3"; } }, target: m => { blk(m, "Hétfőtől").target = true; } }
+      ],
+      hints: ["Ha elrontottad a sorok számát: kattints a táblázatba, és Elrendezés lap (a Táblázattervezés mellett) › Beszúrás alulra, vagy Törlés › Sorok törlése.", "Ha a táblázat rossz helyre került: kattints bele, Elrendezés › Törlés › Táblázat törlése, és kezdd újra."],
+      success: "Öt nap egy pillantással. A fejléc kiemelve, mint egy igazi órarendben." },
+
+    { title: "Kép a szövegben",
+      story: `<p>Egy kép a <b>Fátyol-vízesésről</b> kedvet csinál a kiránduláshoz. De ha csak beszúrod, a Word a szöveg közé teszi, mint egy óriási betűt, és szétnyomja a bekezdést. A szövegnek <b>körbe kell folynia</b> a képet.</p>`,
+      learn: `<p>A beszúrt kép alapból <b>Szöveggel egy sorban</b> áll. A <b>körbefuttatás</b> mondja meg, hogyan viszonyuljon a szöveghez: <b>Négyzetes</b> beállításnál a szöveg téglalap alakban körbefolyja.</p><p>A képet mindig a <b>sarkánál</b> fogva méretezd: így nem torzul el.</p>`,
+      steps: [
+        `Kattints a bevezető bekezdés (<i>Kedves Szülők!…</i>) legelejére.`,
+        `<span class=ui>Beszúrás</span> lap › <span class=ui>Képek</span> › <span class=ui>Ez az eszköz…</span> Válaszd ki a letöltött <b>szalajka.png</b> képet.`,
+        `Kattints a képre. A jobb felső sarka mellett megjelenik egy kis gomb (<span class=ui>Elrendezési beállítások</span>). Kattints rá, és válaszd a <b>Négyzetes</b> körbefuttatást.`,
+        `Kicsinyítsd le: fogd meg a kép egyik <b>sarkát</b>, és húzd befelé, amíg kb. <b>6 cm</b> széles nem lesz. A pontos méretet a <span class=ui>Képformátum</span> lap jobb szélén látod (<span class=ui>Szélesség</span>), ott be is írhatod.`,
+        `Húzd a képet a bekezdés jobb oldalára. Mentsd el, és ellenőrizd.`
+      ],
+      goals: [
+        { label: "Kép: Négyzetes körbefuttatás", type: "image", wrap: ["square", "tight"], apply: m => { blk(m, "Kedves Szülők").img = { src: "szalajka.png", w: 6, h: 4.5, wrap: "square" }; }, target: m => { blk(m, "Kedves Szülők").target = true; } },
+        { label: "Kép: 4 és 7 cm közötti szélesség", type: "image", minWidth: 4, maxWidth: 7, apply: () => {}, target: m => { blk(m, "Kedves Szülők").target = true; } }
+      ],
+      hints: ["Ha nem látod az Elrendezési beállítások gombot: kattints a képre jobb gombbal › Szöveg körbefuttatása › Négyzetes.", "A Képformátum lapon a Szélesség mezőbe beírhatod, hogy 6 cm. Ha be van pipálva a „Méretarány rögzítése”, a magasság magától igazodik."],
+      success: "A szöveg szépen körbefolyja a vízesést. Már látszik, hogy ez egy kirándulás!" },
+
+    { title: "Élőfej és élőláb",
+      story: `<p>A tájékoztató két oldalas lesz. Ha a szülők kinyomtatják, jó, ha <b>minden oldal tetején</b> ott van, miről szól, és <b>alul</b> az oldalszám. Ezt nem kell oldalanként beírni: az <b>élőfej</b> és az <b>élőláb</b> minden oldalon magától megjelenik.</p>`,
+      learn: `<ul><li>Az <b>élőfej</b> a felső margóban, az <b>élőláb</b> az alsó margóban van. Amit egyszer beírsz, az minden oldalon ott lesz.</li><li>Az <b>oldalszám</b> nem beírt szám, hanem egy <b>mező</b>: minden oldalon magától a helyes számot mutatja.</li><li>Az élőfejbe a lap tetején dupla kattintással jutsz be, a szövegbe vissza szintén dupla kattintással.</li></ul>`,
+      steps: [
+        `Kattints <b>duplán</b> a lap legtetejére, a felső margóba. (Vagy: <span class=ui>Beszúrás</span> › <span class=ui>Élőfej</span> › <span class=ui>Üres</span>.)`,
+        `Írd be: <b>7.B erdei iskola</b>, és tedd középre.`,
+        `<span class=ui>Beszúrás</span> lap › <span class=ui>Oldalszám</span> › <span class=ui>Lap alja</span> › <span class=ui>Egyszerű szám 2</span> (ez középre teszi).`,
+        `Lépj vissza a szövegbe: kattints duplán a szövegre, vagy nyomd meg az <span class=ui>Élőfej és élőláb bezárása</span> gombot.`,
+        `Mentsd el, és ellenőrizd.`
+      ],
+      goals: [
+        { label: "Élőfej: 7.B erdei iskola", type: "header", contains: "7.B erdei iskola", apply: m => { m.header = "7.B erdei iskola"; }, target: m => { if (m.header == null) m.header = ""; m.headerTarget = true; } },
+        { label: "Élőláb: oldalszám (mező, nem beírt szám)", type: "footerPage", apply: m => { m.footerPage = true; }, target: m => { if (!m.footerPage) m.footer = ""; m.footerTarget = true; } }
+      ],
+      hints: ["Ha az élőlábba kézzel írtad be, hogy 1, minden oldalon 1 lesz. Töröld ki, és a Beszúrás › Oldalszám menüből szúrd be.", "Ha az ellenőrzés nem találja az élőfejet: nézd meg, hogy tényleg a lap tetején, a szürkén elválasztott részbe írtál-e, nem a szöveg első sorába."],
+      success: "Minden oldal tetején ott a cím, alján az oldalszám. És ha jövőre három oldalas lesz, a Word akkor is jól számoz." },
+
+    { title: "Új oldal",
+      story: `<p>Kapcsold be a ¶ gombot, és nézd meg a <b>Fontos tudnivalók</b> utáni részt! Kati néni <b>hat üres bekezdéssel</b> tolta át a Csomaglistát a második oldalra. Ez addig jó, amíg nem változik semmi. De most, hogy bekerült a táblázat és a kép, a Csomaglista elcsúszott, és az üres sorok rossz helyre kerültek.</p>`,
+      learn: `<p>Az <b>oldaltörés</b> azt mondja a Wordnek: <i>innen új oldal kezdődik.</i> Bármit írsz fölé, a Csomaglista mindig a következő oldal tetején marad.</p><p><b>Oldaltörés:</b> <kbd>Ctrl</kbd>+<kbd>Enter</kbd>, vagy <span class="ui">Beszúrás</span> › <span class="ui">Oldaltörés</span>. A ¶ jelekkel így látszik: <code>·····Oldaltörés·····</code></p>`,
+      steps: [
+        `Kapcsold be a <span class=ui>¶</span> gombot. Töröld ki a hat üres bekezdést a <i>Kísérő tanárok…</i> sor és a <b>Csomaglista</b> között.`,
+        `Kattints a <b>Csomaglista</b> szó elé, és nyomd meg: <kbd>Ctrl</kbd>+<kbd>Enter</kbd>. A Csomaglista átugrik a 2. oldal tetejére.`,
+        `Jelöld ki a csomaglista kilenc tételét (a <i>túracipő</i> sortól a <i>TAJ-kártya</i> sorig), és legyen <span class=ui>Felsorolás</span>.`,
+        `Mentsd el, és ellenőrizd.`
+      ],
+      goals: [
+        { label: "Nincs üres bekezdés a szövegben", type: "noEmpty", target: m => m.blocks.forEach(b => { if (!b.type && !WD.textOf(b).trim()) b.target = true; }) },
+        { label: "Oldaltörés a Csomaglista előtt", type: "pageBreakBefore", find: "Csomaglista", apply: m => { m.blocks.splice(at(m, "Csomaglista"), 0, { type: "break" }); }, target: m => { blk(m, "Csomaglista").target = true; } },
+        { label: "A 9 tétel felsorolás", find: PACK, want: { list: "bullet" } }
+      ],
+      hints: ["Az üres bekezdést úgy törlöd, hogy belekattintasz (ahol csak egy ¶ van), és megnyomod a Backspace billentyűt.", "Ha a Ctrl+Enter után egy üres sor maradt az oldaltörés mellett, az nem baj, ha a sorban ott az Oldaltörés felirat. Ha egy teljesen üres ¶ is maradt, töröld."],
+      success: "A Csomaglista a 2. oldal tetején van, és ott is marad, akármit írsz elé." },
+
+    { title: "Beadás", upload: true,
+      story: `<p>Kész a tájékoztató! Mielőtt Kati néni kinyomtatja a szülőknek, az oldal <b>még egyszer átnézi az egész fájlt</b>.</p>`,
+      steps: [
+        `Mentsd el a fájlt a Wordben: <kbd>Ctrl</kbd>+<kbd>S</kbd>.`,
+        `Kattints az Ellenőrzés gombra (vagy húzd ide újra a fájlt).`,
+        `Ha valami piros, javítsd ki a Wordben, mentsd el, és ellenőrizd újra.`
+      ],
+      success: "Minden a helyén! Mehet a tájékoztató a szülőknek." }
+  ],
+  ending: {
+    title: "Indulhat az erdei iskola!",
+    text: `<p>Kati néni tájékoztatója kész: 2 cm-es margók, áttekinthető napi program táblázatban, körbefuttatott kép, élőfej, oldalszám, és a csomaglista a második oldal tetején, oldaltöréssel.</p>
+      <p>Ugyanez a recept minden hosszabb dokumentumnál működik: a beszámolódnál, a kiselőadásodnál vagy a meghívóknál.</p>`,
+    rank: (min, hints) => hints === 0 ? "Rang: Főszerkesztő. Egyetlen segítség nélkül!" : hints <= 3 ? "Rang: Profi tördelő" : "Rang: Ügyes szerkesztő. Legközelebb kevesebb segítséggel is menni fog!"
+  }
+};
+</script>
+<script src="../real.js"></script>
+<script src="../../nav.js?v=2b949d3f" defer></script>
+</body>
+</html>

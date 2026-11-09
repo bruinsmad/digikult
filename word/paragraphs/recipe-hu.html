@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>/* moving between pages: the old page drifts aside and fades, the new one glides in; the rail holds still */@view-transition{navigation:auto}.rail{view-transition-name:rail}::view-transition-group(root){animation:none}::view-transition-old(root){animation:dk-out .2s cubic-bezier(.4,0,1,1) both}::view-transition-new(root){animation:dk-in .38s cubic-bezier(.16,1,.3,1) .06s both}::view-transition-old(rail),::view-transition-new(rail){animation:none}@keyframes dk-out{to{opacity:0;transform:translateX(-18px)}}@keyframes dk-in{from{opacity:0;transform:translateX(26px)}}@media (prefers-reduced-motion:reduce){::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none!important}}</style>
+<title>Mamó mézeskalácsa – Word-küldetés</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600;700&display=swap">
+<link rel="stylesheet" href="../doc.css">
+<link rel="stylesheet" href="../mission.css">
+<style>:root{--m:#9c4a1a;--m-soft:#fbefe4;--m-ink:#6e2f0c}</style>
+</head>
+<body>
+<header class="rail"><div class="in">
+  <a class="home" href="../../index.html">Digitális kultúra</a>
+  <span class="crumb"><a href="../../index.html#word">Szövegszerkesztés – Word</a> › <a href="../../index.html#word-paragraphs">1. lecke</a></span>
+</div></header>
+<div class="top">
+  <span class="art" aria-hidden="true"><svg viewBox="0 0 96 96"><ellipse cx="48" cy="88" rx="30" ry="5" fill="#000" opacity=".25"/>
+<path d="M48 84C20 64 10 48 12 32c2-12 12-20 22-18 7 1 11 5 14 11 3-6 7-10 14-11 10-2 20 6 22 18 2 16-8 32-36 52z" fill="#b8692e"/>
+<path d="M48 76C26 60 18 47 20 34c1.5-8 8-13 14-12 6 1 10 6 14 13 4-7 8-12 14-13 6-1 12.5 4 14 12 2 13-6 26-28 42z" fill="none" stroke="#fff6e8" stroke-width="2.6" stroke-dasharray="4 4" stroke-linecap="round"/>
+<circle cx="38" cy="40" r="3" fill="#e2463a"/><circle cx="58" cy="40" r="3" fill="#e2463a"/><circle cx="48" cy="52" r="3" fill="#3f8f4a"/>
+<text x="48" y="68" text-anchor="middle" font-family="Kalam,cursive" font-weight="700" font-size="11" fill="#fff6e8">7.B</text></svg></span>
+  <div><div class="kicker">Word, 1. lecke: küldetés az igazi Wordben</div><h1>Mamó mézeskalácsa</h1></div>
+  <div class="meta"><span>Haladás <b id="solvedCount">–</b></span><span>Idő <b id="timer">0:00</b></span><button type="button" class="mbtn" id="soundBtn">Hang: be</button><button type="button" class="mbtn" id="resetBtn">Elölről</button></div>
+</div>
+<nav class="steps" id="steps" aria-label="Fejezetek"></nav>
+<div id="game"><main>
+  <article class="card" id="case" aria-live="polite"></article>
+  <section class="work" aria-label="Előnézet"><div class="card">
+    <div class="dlcard"><svg class="ic" viewBox="0 0 40 46" aria-hidden="true"><path d="M4 2h22l10 10v32H4z" fill="#fff" stroke="#185abd" stroke-width="2"/><path d="M26 2v10h10" fill="#dbe7fb" stroke="#185abd" stroke-width="2"/><rect x="0" y="18" width="24" height="20" rx="2" fill="#185abd"/><path d="M5 23l3 10 4-8 4 8 3-10" fill="none" stroke="#fff" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/></svg><p><b>recept.docx</b><br>Ebben a fájlban dolgozol, az igazi Wordben.</p><a class="btn primary" href="recept.docx" download>Letöltés</a></div>
+    <div class="work-head"><h2>Előnézet</h2><button type="button" class="tog" id="marksBtn" title="Mindent mutat" aria-pressed="false">¶<span>jelek</span></button></div>
+    <div class="doc-wrap"><div id="doc"></div></div>
+    <p class="legend"><span><i></i>A sárga részek tartoznak a mostani feladathoz.</span><span>Ahogy haladsz, itt is szépül a recept.</span></p>
+  </div></section>
+</main></div>
+<section id="endPanel" hidden></section>
+<footer class="end">Digitális kultúra. A haladásod a böngésződben marad: ha bezárod az oldalt, legközelebb innen folytathatod. A Word-fájlodat az oldal csak itt, a böngészőben nézi meg, nem küldi el sehová.</footer>
+<canvas id="fx" aria-hidden="true"></canvas>
+<script src="../docx.js"></script>
+<script src="../doc.js"></script>
+<script>
+const P = (text, x) => Object.assign({ text }, x || {});
+const ING = ["50 dkg liszt", "15 dkg porcukor", "10 dkg vaj", "2 tojás", "3 evőkanál méz", "1 teáskanál szódabikarbóna", "2 teáskanál mézeskalács-fűszerkeverék"];
+const STEPS = ["A vajat a mézzel együtt kis lángon olvaszd fel, aztán hagyd kihűlni.",
+  "Egy nagy tálban keverd össze a lisztet, a porcukrot, a szódabikarbónát és a fűszerkeveréket.",
+  "Add hozzá a tojásokat és a mézes vajat, és gyúrj belőle sima tésztát.",
+  "Csomagold folpackba, és tedd egy éjszakára a hűtőbe.",
+  "Nyújtsd ki fél centi vastagra, és szaggass ki belőle formákat.",
+  "180 fokon süsd 8–10 percig, amíg a széle aranybarna lesz."];
+const empties = m => m.blocks.forEach(b => { if (!b.type && !WD.textOf(b).trim()) b.target = true; });
+
+window.MISSION = {
+  key: "recipe-hu-v1", title: "Mamó mézeskalácsa", file: "recept.docx", saveAs: "recept-Kovacs-Anna.docx", fingerprint: "Mamó mézeskalácsa",
+  confetti: ["#b8692e", "#e2463a", "#3f8f4a", "#f2d264", "#185abd", "#fff6e8"],
+  next: { href: "../page/intro-hu.html", text: "Tovább: oldal, táblázat, kép" },
+  doc: { blocks: [
+    P(" ".repeat(20) + "Mamó mézeskalácsa"), P("Bori nagymamájának receptje a 7.B karácsonyi receptkönyvébe"), P(""),
+    P("Nálunk karácsony előtt az egész lakás mézeskalácsillatú. Mamó ezt a receptet még az ő nagymamájától tanulta, és azóta minden decemberben ebből sütünk. A tésztát előző este kell bekeverni, mert egy éjszakát pihennie kell a hűtőben. Másnap jöhet a legjobb rész: a szaggatás és a díszítés!"),
+    P(""), P("Hozzávalók (kb. 40 darabhoz)"), ...ING.map(x => P("- " + x)), P(""),
+    P("Elkészítés"), ...STEPS.map((x, k) => P(`${k + 1}. ${x}`)), P(""),
+    P("Mamó tippje: a kész mézeskalácsot tedd egy fémdobozba egy szelet almával. Két nap múlva puha lesz, mint a felhő!"),
+    P(" ".repeat(72) + "– Mamó")
+  ] },
+  chapters: [
+    { refresher: true, title: "Nyisd meg a Wordöt",
+      story: `<p>A 7.B <b>receptkönyvet</b> készít a karácsonyi vásárra: mindenki hoz egy családi receptet, és a könyv bevételéből osztálykirándulásra mennek. <span class="who">Bori</span> be is gépelte a nagymamája, <b>Mamó</b> híres mézeskalácsát. A szöveg megvan, de nagyon csúnya: a cím szóközökkel van „középre tolva”, a sorokat üres sorok választják el, a számokat kézzel írta be.</p>
+        <p>Holnap nyomdába megy a könyv. Te leszel a szerkesztő! Ezt a küldetést az <b>igazi Wordben</b> oldod meg. Ez az oldal megmutatja, mit csinálj, és minden fejezet végén ellenőrzi a mentett fájlodat.</p>`,
+      learn: `<ul><li>A <b>¶ gomb</b> (Kezdőlap lap, Bekezdés csoport, a neve: <span class="ui">Mindent mutat</span>) megmutatja a rejtett jeleket.</li><li>A <b>·</b> egy szóköz, a <b>¶</b> egy bekezdés vége: ott nyomtak <span class="nw"><kbd>Enter</kbd>t</span>.</li><li>A ¶ jelek nem kerülnek bele a nyomtatásba, csak neked segítenek.</li></ul>`,
+      steps: [
+        `Töltsd le a fájlt: <br><a class="btn primary" href="recept.docx" download>recept.docx letöltése</a>`,
+        `Nyisd meg a letöltött fájlt a Wordben. Ha felül egy sárga sávban azt látod, hogy <span class=ui>Védett nézet</span>, kattints a <span class=ui>Szerkesztés engedélyezése</span> gombra.`,
+        `Mentsd el úgy, hogy a fájl nevében benne legyen a neved: <span class=ui>Fájl</span> › <span class=ui>Mentés másként</span> (vagy <kbd>F12</kbd>). A fájl neve legyen például <code>recept-Kovacs-Anna</code>.`,
+        `Kapcsold be a rejtett jeleket: <span class=ui>Kezdőlap</span> lap › <span class=ui>¶</span> gomb. Ugyanezt a jobb oldali előnézetben is megnézheted a <b>¶ jelek</b> gombbal.`
+      ],
+      asks: [{ q: "Hány <b>üres bekezdés</b> van a szövegben? (Olyan sor, amelyben semmi sincs, csak egy ¶ jel.)", num: 4,
+               traps: { "24": "Ez az összes bekezdés. Csak azokat számold, amelyekben nincs szöveg, csak egy ¶ áll.", "0": "Bekapcsoltad a ¶ gombot? Kezdőlap lap › Bekezdés csoport › ¶.", "3": "Majdnem! Nézd meg a recept legalját is." , "5": "Eggyel kevesebb van. A legutolsó ¶ az aláírás sorának végén áll, és az a sor nem üres." } },
+             { q: "Mi van a cím előtt? Mit jelentenek a kis pöttyök (·)?", text: ["szóköz", "szóközök", "szóközt", "szóközöket", "space", "spacek", "üres hely"],
+               traps: { "pont": "Ezek nem igazi pontok: a ¶ gomb így mutatja a … mit? Mit nyomott Bori a billentyűzeten?", "pontok": "Ezek nem igazi pontok: a ¶ gomb így mutatja a … mit? Mit nyomott Bori a billentyűzeten?", "tabulátor": "A tabulátort nyíl (→) jelzi. A pöttyök mást jelentenek.", "tab": "A tabulátort nyíl (→) jelzi. A pöttyök mást jelentenek.", "enter": "Az Entert a ¶ jelzi. A pöttyök mást jelentenek." },
+               wrong: "Nézd meg az Emlékeztetőt: mit jelent a · jel?" }],
+      hints: ["A ¶ gomb a Kezdőlap lapon van, a Bekezdés csoportban (a felsorolás és az igazítás gombok közelében).", "Az üres bekezdések: a cím után, a bevezető után, a hozzávalók után és a lépések után. A pötty (·) egy szóköz."],
+      success: "4 üres sor, és 20 szóköz a cím előtt. Bori ezekkel próbálta szépíteni a receptet. Most megmutatjuk, hogyan kell ezt rendesen!" },
+
+    { title: "A cím", isNew: false,
+      story: `<p>A címet Bori úgy tette középre, hogy 20 szóközt ütött elé. Ez csak a képernyőjén néz ki jól: ha valaki megváltoztatja a betűméretet, a cím elcsúszik. Az igazítás a <b>bekezdés</b> dolga!</p>`,
+      learn: `<p>Az <b>igazítás</b> (balra, középre, jobbra, sorkizárt) bekezdésformázás: elég, ha a kurzor a bekezdésben áll, nem kell kijelölni.</p><p>A <b>betűformázás</b> (félkövér, méret, szín) viszont csak a <b>kijelölt</b> szövegre hat. Ezt tavaly tanultátok.</p>`,
+      steps: [
+        `Kattints a cím elejére, közvetlenül a <b>M</b> betű elé. Nyomd a <kbd>Backspace</kbd> billentyűt, amíg az összes · el nem tűnik.`,
+        `Kattints a cím sorába, és nyomd meg a <span class=ui>Középre igazítás</span> gombot (Kezdőlap › Bekezdés).`,
+        `Jelöld ki a címet (kattints háromszor a sorra). Legyen <span class=ui>Félkövér</span>, a betűmérete legalább <b>20</b>, és válassz egy szép <span class=ui>Betűszín</span>t (például sötétpirosat).`,
+        `Az alcím (<i>Bori nagymamájának…</i>) legyen szintén <b>középre igazított</b> és <span class=ui>Dőlt</span>.`,
+        `Mentsd el: <kbd>Ctrl</kbd>+<kbd>S</kbd>. Aztán húzd ide a fájlt, és ellenőrizd.`
+      ],
+      goals: [
+        { label: "Cím: nincsenek előtte szóközök, középre igazított", find: "Mamó mézeskalácsa", want: { noLeading: true, align: "center" } },
+        { label: "Cím: félkövér, legalább 20-as, színes", find: "Mamó mézeskalácsa", want: { bold: true, sizeMin: 20, colored: true }, showSize: 24 },
+        { label: "Alcím: középre igazított, dőlt", find: "Bori nagymamájának", want: { align: "center", italic: true } }
+      ],
+      hints: ["A sor háromszori kattintással kijelölhető. A Betűszín gomb egy „A” betű színes csíkkal alatta; a mellette lévő kis nyíllal választhatsz színt.", "Ha az ellenőrzés szerint még vannak szóközök: kapcsold be a ¶ gombot, és nézd meg, maradt-e · a cím előtt."],
+      success: "Középen van, és akkor is ott marad, ha valaki átírja a címet vagy a betűméretet." },
+
+    { title: "A bevezető",
+      story: `<p>A bevezető bekezdés most egy szürke tömb: a jobb széle cakkos, és a sorok túl közel vannak egymáshoz. A könyvekben a bekezdések másképp néznek ki: mindkét szélük egyenes, és az első sor beljebb kezdődik.</p>`,
+      learn: `<ul><li><b>Sorkizárt</b> igazítás: a Word úgy tágítja a szóközöket, hogy a sorok mindkét oldalon egyenesek legyenek.</li><li><b>Első sor behúzása</b>: csak a bekezdés első sora kezdődik beljebb. Ezt sose szóközzel vagy Tabbal csináld!</li><li><b>Sorköz</b>: mekkora hely van a sorok között egy bekezdésen belül (1; 1,15; 1,5; 2).</li></ul>`,
+      steps: [
+        `Kattints a bevezető bekezdésbe (<i>Nálunk karácsony előtt…</i>). Nem kell kijelölni!`,
+        `Nyomd meg a <span class=ui>Sorkizárt</span> gombot (az igazítás gombok közül a negyedik).`,
+        `Nyisd meg a <b>Bekezdés</b> ablakot: a Kezdőlap lap Bekezdés csoportjának jobb alsó sarkában lévő kis nyíllal.`,
+        `A <span class=ui>Behúzás</span> részben a <span class=ui>Speciális</span> legyen <b>Első sor</b>, a <span class=ui>Mérték</span> <b>1 cm</b>.`,
+        `A <span class=ui>Sorköz</span> legyen <b>1,5 sor</b>. Kattints az <span class=ui>OK</span> gombra, aztán mentsd el (<kbd>Ctrl</kbd>+<kbd>S</kbd>), és ellenőrizd.`
+      ],
+      goals: [
+        { label: "Bevezető: sorkizárt", find: "Nálunk karácsony", want: { align: "both" } },
+        { label: "Bevezető: első sor behúzása 1 cm", find: "Nálunk karácsony", want: { firstLine: 1 } },
+        { label: "Bevezető: 1,5-es sorköz", find: "Nálunk karácsony", want: { line: 1.5 } }
+      ],
+      hints: ["A Bekezdés ablakot jobb gombbal is megnyithatod: kattints jobb gombbal a bekezdésre › Bekezdés…", "Ha 1,25 cm-t ír az ellenőrzés: valószínűleg Tabbal húztad be az első sort, és a Word ezt alakította át. Írd át a Bekezdés ablakban 1 cm-re."],
+      success: "Mint egy igazi könyvben: egyenes szélek, beljebb kezdődő első sor, levegős sorok." },
+
+    { title: "Hozzávalók",
+      story: `<p>Bori a hozzávalók elé kötőjelet gépelt. A Word ennél sokkal szebbet tud: a <b>felsorolást</b>. Ott a pöttyöt a Word teszi oda, és ha a sor két sorosra nő, a második sor is szépen a szöveg alá kerül, nem a pötty alá.</p>`,
+      learn: `<p>A <b>Felsorolás</b> gomb (Kezdőlap › Bekezdés, a bal felső gomb) minden kijelölt bekezdés elé pöttyöt tesz. A gomb melletti kis nyíllal másféle jelet is választhatsz.</p><p>Ha a felsorolás végén kétszer <span class="nw"><kbd>Enter</kbd>t</span> nyomsz, a felsorolás véget ér.</p>`,
+      steps: [
+        `Jelöld ki mind a <b>hét</b> hozzávalót (az <i>50 dkg liszt</i> sortól a <i>fűszerkeverék</i> sorig).`,
+        `Kattints a <span class=ui>Felsorolás</span> gombra.`,
+        `Most töröld ki minden sor elejéről a kézzel írt kötőjelet és az utána lévő szóközt. (Kattints a sor szövege elé, például az <i>50</i> elé, és nyomd meg kétszer a <kbd>Backspace</kbd> billentyűt.)`,
+        `Mentsd el, és ellenőrizd.`
+      ],
+      goals: [{ label: "Mind a 7 hozzávaló felsorolás, kézzel írt kötőjel nélkül", find: ING, want: { list: "bullet", noPrefix: "^[-–—]\\s*", noPrefixMsg: "elején még ott van a kézzel írt kötőjel. Töröld ki: a pöttyöt a Word teszi oda." } }],
+      hints: ["Ha a Backspace a pöttyöt törli a kötőjel helyett: a kurzort a kötőjel <b>után</b> tedd, ne elé.", "Ha a felsorolás helyett számok jelentek meg, a Számozás gombot nyomtad. Nyomd meg a Felsorolás gombot."],
+      success: "Hét szép pötty, és mindegyiket a Word teszi oda." },
+
+    { title: "Elkészítés",
+      story: `<p>A lépéseket Bori kézzel számozta: <i>1., 2., 3.</i> Mi történik, ha Mamó később beszúr egy új lépést a második után? Minden számot kézzel kéne átírni. A <b>számozott lista</b> magától számol.</p>`,
+      learn: `<p>A <b>Számozás</b> gomb (a Felsorolás mellett) sorszámot tesz a kijelölt bekezdések elé. Ha beszúrsz vagy törölsz egy lépést, a Word magától újraszámozza a listát.</p>`,
+      steps: [
+        `Jelöld ki mind a <b>hat</b> lépést (<i>A vajat…</i> sortól a <i>180 fokon…</i> sorig).`,
+        `Kattints a <span class=ui>Számozás</span> gombra. Most minden lépés előtt két szám áll: a Word-é és Borié.`,
+        `Töröld ki a kézzel írt számokat és az utánuk álló pontot és szóközt (pl. <code>1. </code>). A Word-é marad!`,
+        `Mentsd el, és ellenőrizd.`
+      ],
+      goals: [{ label: "Mind a 6 lépés számozott lista, kézzel írt számok nélkül", find: STEPS.map(s => s.split(" ").slice(0, 3).join(" ")), want: { list: "number", noPrefix: "^\\d+[.)]\\s*", noPrefixMsg: "elején még ott van a kézzel írt szám. Töröld ki: a számot a Word írja oda." } }],
+      hints: ["Próbáld ki: kattints a 2. lépés végére, és nyomj Entert. Látod? Az új sor 3. lett, a többi pedig magától eggyel nőtt. (Utána nyomd meg a Ctrl+Z-t, hogy visszavond.)"],
+      success: "Hat lépés, a Word számolja. Ha Mamó beír egy új lépést, minden szám magától frissül." },
+
+    { title: "Térközök",
+      story: `<p>Bori üres sorokkal választotta el a részeket. A gond: ha a recept átcsúszik a következő oldalra, az üres sor az oldal tetejére kerülhet, és ott furcsán néz ki. A profik a <b>térközzel</b> dolgoznak: azt mondják meg, mekkora hely legyen egy bekezdés <b>előtt</b> és <b>után</b>.</p>`,
+      learn: `<p>A <b>térköz</b> a bekezdések közötti hely, <b>pontban</b> (pt) mérve. <b>Előtte</b>: a bekezdés fölött, <b>utána</b>: a bekezdés alatt.</p><p>Az <span class=ui>Elrendezés</span> lapon a <span class=ui>Térköz</span> részben az <span class=ui>Előtte</span> és <span class=ui>Utána</span> mezőben gyorsan beállíthatod. A Bekezdés ablakban is megtalálod.</p>`,
+      steps: [
+        `Töröld ki mind a négy üres bekezdést. Kattints az üres sorba (ahol csak egy ¶ van), és nyomd meg a <kbd>Backspace</kbd> billentyűt.`,
+        `Kattints a <b>Hozzávalók</b> alcímbe. Jelöld ki, és legyen <span class=ui>Félkövér</span>, a betűmérete <b>14</b>.`,
+        `<span class=ui>Elrendezés</span> lap › <span class=ui>Térköz</span>: az <span class=ui>Előtte</span> legyen <b>12 pt</b>, az <span class=ui>Utána</span> <b>6 pt</b>.`,
+        `Csináld meg ugyanezt az <b>Elkészítés</b> alcímmel is. (Gyorsabb: a Hozzávalók sorában kattints a Kezdőlap <span class=ui>Formátummásoló</span> ecsetjére, aztán kattints az Elkészítés sorára.)`,
+        `Mentsd el, és ellenőrizd.`
+      ],
+      goals: [
+        { label: "Nincs üres bekezdés a szövegben", type: "noEmpty", target: empties },
+        { label: "Alcímek: félkövér, 14-es", find: ["Hozzávalók (kb.", "Elkészítés"], exact: false, want: { bold: true, size: 14 } },
+        { label: "Alcímek: térköz előtte 12 pt, utána 6 pt", find: ["Hozzávalók (kb.", "Elkészítés"], want: { before: 12, after: 6 } }
+      ],
+      hints: ["Ha a Backspace után a felsorolás utolsó eleme „összeolvadt” valamivel, nyomd meg a Ctrl+Z-t, és próbáld a Delete billentyűvel.", "Az Elrendezés lapon az Előtte/Utána mezőbe beírhatod a számot is: írd be, hogy 12, és nyomj Entert."],
+      success: "Nincs több üres sor, mégis szellős a recept. A hely most a térközből jön." },
+
+    { title: "Mamó tippje",
+      story: `<p>Mamó tippje olyan fontos, hogy keretet kap, mint egy matrica a recept alján. Az aláírás pedig a jobb szélre kerül, de most már rendesen, nem 72 szóközzel.</p>`,
+      learn: `<ul><li>A <b>bal és jobb behúzás</b> beljebb hozza az egész bekezdést mindkét oldalon. (Az első sor behúzása csak az első sort.)</li><li>A <span class=ui>Szegélyek</span> gomb (Kezdőlap › Bekezdés, az alsó sorban jobbra) keretet tesz a bekezdés köré. Mellette az <span class=ui>Árnyékolás</span> (festékesvödör) háttérszínt ad.</li></ul>`,
+      steps: [
+        `Kattints a tipp bekezdésébe (<i>Mamó tippje: …</i>).`,
+        `<span class=ui>Elrendezés</span> lap › <span class=ui>Behúzás</span>: a <span class=ui>Bal</span> és a <span class=ui>Jobb</span> legyen <b>1 cm</b>.`,
+        `<span class=ui>Kezdőlap</span> › a <span class=ui>Szegélyek</span> gomb melletti nyíl › <span class=ui>Külső szegélyek</span>. Ha szeretnéd, adj neki halvány hátteret is az <span class=ui>Árnyékolás</span> gombbal.`,
+        `Az aláírás (<i>– Mamó</i>): töröld ki előle a szóközöket, és legyen <span class=ui>Jobbra igazítás</span> és <span class=ui>Dőlt</span>.`,
+        `Mentsd el, és ellenőrizd.`
+      ],
+      goals: [
+        { label: "Tipp: bal és jobb behúzás 1 cm", find: "Mamó tippje", want: { left: 1, right: 1 } },
+        { label: "Tipp: szegély vagy árnyékolás", find: "Mamó tippje", want: { box: true } },
+        { label: "Aláírás: szóközök nélkül, jobbra igazított, dőlt", find: "– Mamó", exact: true, want: { noLeading: true, align: "right", italic: true } }
+      ],
+      hints: ["A szegélyt úgy tedd fel, hogy a kurzor a bekezdésben álljon, de ne jelölj ki semmit. Így az egész bekezdés kap keretet, nem csak a szavak.", "Ha nem látod az Elrendezés lapon a Behúzás mezőket, nyisd meg a Bekezdés ablakot (Kezdőlap › Bekezdés csoport sarkában a kis nyíl): ott is megvan a Bal és a Jobb."],
+      success: "Keretben a tipp, jobb oldalt az aláírás. Kész a receptoldal!" },
+
+    { title: "Beadás", upload: true,
+      story: `<p>Kész a recept! Mielőtt elküldöd a nyomdába, az oldal <b>még egyszer átnézi az egész fájlt</b>: megvan-e minden, amit eddig beállítottál.</p>`,
+      steps: [
+        `Mentsd el a fájlt a Wordben: <kbd>Ctrl</kbd>+<kbd>S</kbd>.`,
+        `Kattints az Ellenőrzés gombra (vagy húzd ide újra a fájlt).`,
+        `Ha valami piros, javítsd ki a Wordben, mentsd el, és ellenőrizd újra.`
+      ],
+      success: "Minden a helyén! Mamó mézeskalácsa mehet a 7.B receptkönyvébe." }
+  ],
+  ending: {
+    title: "Nyomdába mehet!",
+    text: `<p>Bori receptjéből igazi receptkönyv-oldal lett: középre igazított cím, sorkizárt bevezető, felsorolás, számozott lépések, térközök és egy keretes tipp. És sehol egyetlen felesleges szóköz vagy üres sor!</p>
+      <p>Ugyanez a többi receptnél is így megy: a formázás a bekezdésé, nem a szóközöké.</p>`,
+    rank: (min, hints) => hints === 0 ? "Rang: Főszerkesztő. Egyetlen segítség nélkül!" : hints <= 3 ? "Rang: Profi tördelő" : "Rang: Ügyes szerkesztő. Legközelebb kevesebb segítséggel is menni fog!"
+  }
+};
+</script>
+<script src="../real.js"></script>
+<script src="../../nav.js?v=2b949d3f" defer></script>
+</body>
+</html>

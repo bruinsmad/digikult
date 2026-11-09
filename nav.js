@@ -434,6 +434,77 @@
           }
         ]
       }
+      ,{
+        id: "word",
+        accent: "#4f8fe8",
+        title: { hu: "Szövegszerkesztés – Word", en: "Word processing – Word" },
+        blurb: {
+          hu: "Bekezdések, igazítás, behúzás, felsorolás, táblázat, kép és élőfej. Kipróbálod a böngészőben, aztán az igazi Wordben dolgozol, és az oldal ellenőrzi a mentett fájlodat.",
+          en: "Paragraphs, alignment, indents, lists, tables, pictures and headers. Try it in the browser, then work in real Word while the page checks your saved file."
+        },
+        lessons: [
+          {
+            id: "paragraphs",
+            title: { hu: "Bekezdések: igazítás, behúzás, térköz, felsorolás", en: "Paragraphs: alignment, indents, spacing, lists" },
+            pages: [
+              {
+                id: "paragraphs-intro",
+                kind: "theory",
+                minutes: 15,
+                title: { hu: "Bekezdések – elmélet", en: "Paragraphs – explainer" },
+                desc: {
+                  hu: "Karakter- és bekezdésformázás, a ¶ jelek, igazítás, behúzás, térköz, sorköz, felsorolás és számozás. Minden példa kipróbálható egy kis Wordben.",
+                  en: "Character vs. paragraph formatting, the ¶ marks, alignment, indents, spacing, line spacing and lists. Every example is a little Word you can try."
+                },
+                files: { hu: "word/paragraphs/intro-hu.html" }
+              },
+              {
+                id: "recipe",
+                kind: "story",
+                minutes: 45,
+                title: { hu: "Mamó mézeskalácsa – az igazi Wordben", en: "Grandma's Gingerbread – in real Word" },
+                desc: {
+                  hu: "A 7.B receptkönyve nyomdába megy, de Bori receptje szóközökkel és üres sorokkal van „formázva”. Rendbe teszed az igazi Wordben, és az oldal fejezetenként ellenőrzi a fájlodat.",
+                  en: "Class 7B's cookbook goes to print, but Bori's recipe is formatted with spaces and empty lines. Fix it in real Word; the page checks your file chapter by chapter."
+                },
+                files: { hu: "word/paragraphs/recipe-hu.html" },
+                cover: "word/paragraphs/cover.svg",
+                progress: { chapters: 7, keys: { hu: "recipe-hu-v1" } }
+              }
+            ]
+          },
+          {
+            id: "page",
+            title: { hu: "Oldal, táblázat, kép: margó, táblázat, körbefuttatás, élőfej, oldaltörés", en: "Page, table, picture: margins, tables, wrapping, headers, page breaks" },
+            pages: [
+              {
+                id: "page-intro",
+                kind: "theory",
+                minutes: 15,
+                title: { hu: "Oldal, táblázat, kép – elmélet", en: "Page, table, picture – explainer" },
+                desc: {
+                  hu: "Margó és tájolás, táblázat beszúrása és formázása, kép körbefuttatása, élőfej, élőláb, oldalszám és oldaltörés.",
+                  en: "Margins and orientation, inserting and formatting a table, wrapping text around a picture, headers, footers, page numbers and page breaks."
+                },
+                files: { hu: "word/page/intro-hu.html" }
+              },
+              {
+                id: "forest-school",
+                kind: "story",
+                minutes: 45,
+                title: { hu: "Erdei iskola a Bükkben – az igazi Wordben", en: "Forest School in the Bükk – in real Word" },
+                desc: {
+                  hu: "Kati néni tájékoztatója a szülőknek: margók, napi program táblázatban, körbefuttatott kép, élőfej, oldalszám és oldaltörés, az igazi Wordben.",
+                  en: "The class teacher's letter to parents: margins, a timetable, a wrapped picture, a header, page numbers and a page break, in real Word."
+                },
+                files: { hu: "word/page/forest-school-hu.html" },
+                cover: "word/page/szalajka.png",
+                progress: { chapters: 6, keys: { hu: "forest-school-hu-v1" } }
+              }
+            ]
+          }
+        ]
+      }
     ]
   };
 

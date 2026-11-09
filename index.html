@@ -315,6 +315,17 @@ main:focus{outline:none}
 .slate--excel .cellsel::after{content:"";position:absolute;right:-6px;bottom:-6px;width:8px;height:8px;background:#107c41;border:1.5px solid #fff}
 .slate--excel .fxghost{position:absolute;z-index:-1;top:2px;left:12px;font:600 11.5px ui-monospace,"SF Mono",Menlo,Consolas,monospace;color:#6b7d73;letter-spacing:.02em}
 .slate--excel .slate-in{isolation:isolate}
+/* Word: a printed page with a blue title bar, the ¶ mark showing faintly, and its corner folded down */
+.slate--word{padding:0;background:none;box-shadow:none;transform:rotate(-.6deg)}
+.slate--word::before,.slate--word::after{display:none}
+.slate--word .slate-in{--chalk:#1d2633;--chalk-dim:#55606e;--chalk-faint:rgba(29,38,51,.18);--board-deep:#fff;--c:#185abd;
+  isolation:isolate;color:var(--chalk);border-radius:2px;background-color:#fff;padding-top:34px;
+  background-image:linear-gradient(#185abd,#185abd),repeating-linear-gradient(transparent 0 25px,rgba(24,90,189,.07) 25px 26px);
+  background-size:100% 12px,100% 100%;background-repeat:no-repeat;
+  box-shadow:0 2px 0 rgba(0,0,0,.12),0 18px 30px rgba(0,0,0,.35);clip-path:polygon(0 0,100% 0,100% calc(100% - 26px),calc(100% - 26px) 100%,0 100%)}
+.slate--word h2 small{color:var(--chalk-dim)}
+.slate--word .pil{position:absolute;z-index:-1;top:24px;right:20px;font:700 64px/1 Georgia,"Times New Roman",serif;color:rgba(24,90,189,.12)}
+.slate--word .fold{position:absolute;right:0;bottom:0;width:26px;height:26px;background:linear-gradient(315deg,transparent 0 50%,#cfd8e6 50%,#eef2f8 75%);box-shadow:-2px -2px 3px rgba(0,0,0,.08)}
 @media (prefers-reduced-motion:reduce){ .slate--web h2 .caret{animation:none} }
 
 /* ---------- one subject open ---------- */
@@ -425,7 +436,7 @@ body.subject .hero{display:none}
 
   const TXT = {
     hu:{
-      tagline:"Nyomozz, terelj, építs weboldalt, rajzolj, számolj: minden küldetés egy történet, amit SQL-lel, HTML-lel és CSS-sel, Inkscape-pel vagy Excellel oldasz meg.",
+      tagline:"Nyomozz, terelj, építs weboldalt, rajzolj, számolj, szerkessz: minden küldetés egy történet, amit SQL-lel, HTML-lel és CSS-sel, Inkscape-pel, Excellel vagy Worddel oldasz meg.",
       left:"Itt tartasz", start:"Kezdd itt", allDone:"Mindet megoldottad!",
       chapters:(d,n)=>`${d} / ${n} fejezet kész`, chaptersTotal:n=>`${n} fejezet`, min:n=>`kb. ${n} perc`,
       cont:"Folytatás", go:"Indítás", solved:"Megoldva ✓",
@@ -439,7 +450,7 @@ body.subject .hero{display:none}
       sticky:"Ctrl+S, ne felejtsd!"
     },
     en:{
-      tagline:"Solve a heist, herd a flock, build a web page, draw a poster, run the numbers: every mission is a story you crack with SQL, HTML and CSS, Inkscape or Excel.",
+      tagline:"Solve a heist, herd a flock, build a web page, draw a poster, run the numbers, lay out a page: every mission is a story you crack with SQL, HTML and CSS, Inkscape, Excel or Word.",
       left:"Where you left off", start:"Start here", allDone:"You've solved them all!",
       chapters:(d,n)=>`${d} of ${n} chapters done`, chaptersTotal:n=>`${n} chapters`, min:n=>`about ${n} min`,
       cont:"Continue", go:"Start", solved:"Solved ✓",
@@ -798,6 +809,12 @@ function puliSvg(){
       <rect x="60" y="26" width="28" height="20" stroke="var(--c)" stroke-width="3.4"/><rect x="60" y="46" width="28" height="40" stroke="var(--c)" stroke-width="2.4" stroke-dasharray="5 4"/>
       <rect x="84" y="42" width="8" height="8" fill="var(--c)" stroke="var(--board-deep)" stroke-width="1.6"/>
       <path d="M162 24h-28l16 24-16 24h28" stroke="var(--c)" stroke-width="3.4"/></svg>`;
+  EMBLEMS.word = `<svg viewBox="0 0 170 96" aria-hidden="true" fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M8 6h66l16 16v68H8z" stroke="var(--chalk)" stroke-width="2.2" opacity=".85"/><path d="M74 6v16h16" stroke="var(--chalk)" stroke-width="2.2" opacity=".85"/>
+      <path d="M24 28h34M18 40h56M18 50h56M18 60h56M18 70h40" stroke="var(--chalk)" stroke-width="2.4" opacity=".7"/>
+      <path d="M30 28h22" stroke="var(--c)" stroke-width="4"/>
+      <path d="M104 22h48M112 36h32M104 50h48M112 64h32" stroke="var(--c)" stroke-width="3.4"/>
+      <path d="M140 72a8 8 0 0 0 0 16z" fill="var(--chalk)" stroke="none"/><path d="M140 72h12M140 72v20M148 72v20" stroke="var(--chalk)" stroke-width="2.4"/></svg>`;
   const embGen = `<svg viewBox="0 0 170 96" aria-hidden="true" fill="none"><path d="M8 70q40-60 80 0t76-10" stroke="var(--c)" stroke-width="3.4" stroke-linecap="round"/></svg>`;
   const splitName = n => { const [field, tool] = n.split(" – "); return tool ? `<small>${esc(field)}</small>${esc(tool)}` : esc(n); };
   const lessonTitle = t => {
@@ -822,6 +839,7 @@ function puliSvg(){
       ${tp.id === "sql" ? `<span class="deco ghost" aria-hidden="true">SELECT *<br>FROM&nbsp;…</span>` : ""}
       ${tp.id === "inkscape" ? `<span class="deco guides" aria-hidden="true"></span><span class="deco curl" aria-hidden="true"></span>` : ""}
       ${tp.id === "excel" ? `<span class="deco fxghost" aria-hidden="true">fx&nbsp;&nbsp;=SZUM(B2:B9)</span>` : ""}
+      ${tp.id === "word" ? `<span class="deco pil" aria-hidden="true">¶</span><span class="deco fold" aria-hidden="true"></span>` : ""}
       <span class="emb">${EMBLEMS[tp.id] || embGen}</span>
       <h2><a href="#${tp.id}" aria-label="${esc(T.open(name))}">${splitName(name)}${tp.id === "web" ? `<span class="caret" aria-hidden="true"></span>` : ""}</a></h2>
       <p class="bl">${esc(D.t(tp.blurb))}</p>

@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>/* moving between pages: the old page drifts aside and fades, the new one glides in; the rail holds still */@view-transition{navigation:auto}.rail{view-transition-name:rail}::view-transition-group(root){animation:none}::view-transition-old(root){animation:dk-out .2s cubic-bezier(.4,0,1,1) both}::view-transition-new(root){animation:dk-in .38s cubic-bezier(.16,1,.3,1) .06s both}::view-transition-old(rail),::view-transition-new(rail){animation:none}@keyframes dk-out{to{opacity:0;transform:translateX(-18px)}}@keyframes dk-in{from{opacity:0;transform:translateX(26px)}}@media (prefers-reduced-motion:reduce){::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none!important}}</style>
+<title>Oldal, táblázat, kép – elmélet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600;700&display=swap">
+<link rel="stylesheet" href="../doc.css">
+<link rel="stylesheet" href="../explainer.css">
+<style>
+.tbl-demo .wd-pg{padding:16px 20px}
+.tbl-demo td[contenteditable]{outline:none;cursor:text;min-width:3em}
+.tbl-demo td.focus{box-shadow:inset 0 0 0 2px #185abd}
+.hf-ctl{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;margin:0 0 8px;font-size:15px}
+.hf-ctl input{font:15px var(--f-body);padding:5px 9px;border:2px solid #cfd2c8;border-radius:4px;min-width:0;width:220px}
+.hf-ctl input:focus{outline:none;border-color:var(--accent)}
+.pages3 .wd-pages{grid-auto-flow:column;gap:14px}
+</style>
+</head>
+<body>
+<header class="rail"><div class="in">
+  <a class="home" href="../../index.html">Digitális kultúra</a>
+  <span class="crumb"><a href="../../index.html#word">Szövegszerkesztés – Word</a> › <a href="../../index.html#word-page">2. lecke</a></span>
+</div></header>
+
+<section class="hero">
+  <div class="kicker">Word, 2. lecke: elmélet</div>
+  <h1>Oldal, táblázat, kép</h1>
+  <p class="lead">Egy hosszabb dokumentum több, mint bekezdések sora. Beállítjuk az <b>oldalt</b>, adatokat teszünk <b>táblázatba</b>, <b>képet</b> futtatunk körbe szöveggel, és megtanuljuk, mi az <b>élőfej</b>, az <b>élőláb</b> és az <b>oldaltörés</b>.</p>
+  <div class="meta"><span>kb. 15 perc</span><span>minden dokumentum kipróbálható</span><span>a végén 6 kérdés</span></div>
+  <ul class="toc"><li><a href="#oldal">Az oldal: margó és tájolás</a></li><li><a href="#tablazat">Táblázat</a></li><li><a href="#kep">Kép és körbefuttatás</a></li><li><a href="#elofej">Élőfej, élőláb, oldalszám</a></li><li><a href="#oldaltores">Oldaltörés</a></li><li><a href="#kviz">Ellenőrizd magad</a></li><li><a href="#gyakorolj">Gyakorolj</a></li></ul>
+</section>
+
+<main class="sheet">
+<section class="sec" id="oldal"><h2><span class="n">1</span>Az oldal: margó és tájolás</h2>
+<p>Mielőtt formázod a szöveget, érdemes eldönteni, milyen <b>lapra</b> kerül. Ezek a beállítások az egész dokumentumra hatnak, és az <span class="ui">Elrendezés</span> lapon vannak.</p>
+<ul><li><b>Méret:</b> nálunk szinte mindig <b>A4</b> (21 × 29,7 cm).</li><li><b>Tájolás:</b> <b>álló</b> (magasabb, mint széles) vagy <b>fekvő</b> (szélesebb, mint magas). Egy oklevél vagy egy széles táblázat fekvő lapon fér el jól.</li><li><b>Margó:</b> az üres sáv a lap szélein. Ide nem kerül szöveg, csak az élőfej és az élőláb.</li></ul>
+<div data-try="oldal"></div>
+<p class="where">A Wordben: <span class="ui">Elrendezés</span> › <span class="ui">Margók</span> (kész beállítások, vagy legalul <span class="ui">Egyéni margók…</span>) és <span class="ui">Elrendezés</span> › <span class="ui">Tájolás</span>.</p>
+</section>
+
+<section class="sec" id="tablazat"><h2><span class="n">2</span>Táblázat</h2>
+<p>Ha az adataidnak <b>sorai és oszlopai</b> vannak (órarend, program, eredmények), tedd táblázatba. A táblázat <b>cellákból</b> áll: ahol egy sor és egy oszlop találkozik.</p>
+<ul><li><b>Beszúrás:</b> <span class="ui">Beszúrás</span> › <span class="ui">Táblázat</span>, és az egérrel kijelölöd, hány oszlop és sor kell.</li><li><b>Mozgás:</b> a <kbd>Tab</kbd> a következő cellába visz, a <kbd>Shift</kbd>+<kbd>Tab</kbd> az előzőbe. Az <b>utolsó</b> cellában a <kbd>Tab</kbd> új sort ad a táblázathoz.</li><li><b>Fejléc:</b> az első sor mondja meg, mi van az oszlopokban. Emeld ki: félkövér betű és háttérszín (<span class="ui">Táblázattervezés</span> › <span class="ui">Mintázat</span>).</li><li><b>Sorok, oszlopok:</b> a táblázatba kattintva megjelenik az <span class="ui">Elrendezés</span> lap: itt szúrhatsz be új sort felül vagy alul, és törölhetsz.</li></ul>
+<div data-try="tablazat"></div>
+</section>
+
+<section class="sec" id="kep"><h2><span class="n">3</span>Kép és körbefuttatás</h2>
+<p>Képet a <span class="ui">Beszúrás</span> › <span class="ui">Képek</span> menüből teszel a dokumentumba. A beszúrt kép alapból úgy viselkedik, mint egy nagy betű a szövegben (<b>Szöveggel egy sorban</b>). A <b>körbefuttatás</b> mondja meg, hogyan helyezkedjen el a kép és a szöveg egymáshoz képest.</p>
+<table class="ops plain"><tr><th>körbefuttatás</th><th>mit csinál</th></tr>
+<tr><td>Szöveggel egy sorban</td><td>a kép a sorban áll, mint egy betű</td></tr>
+<tr><td>Négyzetes</td><td>a szöveg téglalap alakban körbefolyja</td></tr>
+<tr><td>Szoros</td><td>a szöveg a kép körvonalát követi</td></tr>
+<tr><td>Felül és alul</td><td>a kép külön sorban van, mellette nincs szöveg</td></tr>
+<tr><td>Szöveg mögött</td><td>a kép háttér, a szöveg rajta van</td></tr>
+<tr><td>Szöveg előtt</td><td>a kép eltakarja a szöveget</td></tr></table>
+<div data-try="kep"></div>
+<div class="idea"><span class="i">📐</span><p>A képet mindig a <b>sarkánál</b> fogva méretezd! Ha az oldalánál húzod, megnyúlik vagy összenyomódik. A pontos méretet a <span class="ui">Képformátum</span> lap jobb szélén írhatod be.</p></div>
+</section>
+
+<section class="sec" id="elofej"><h2><span class="n">4</span>Élőfej, élőláb, oldalszám</h2>
+<p>Az <b>élőfej</b> a felső margóban, az <b>élőláb</b> az alsó margóban van. Amit ide írsz, az <b>minden oldalon</b> megjelenik: a dokumentum címe, a neved, a dátum, az oldalszám.</p>
+<p>Az <b>oldalszám</b> nem egy beírt szám, hanem egy <b>mező</b>: a Word minden oldalon kiszámolja. Ha beszúrsz vagy törölsz egy oldalt, a számok maguktól frissülnek.</p>
+<div data-try="elofej"></div>
+<p class="where">A Wordben: kattints duplán a lap tetejére vagy aljára, vagy <span class="ui">Beszúrás</span> › <span class="ui">Élőfej</span>, <span class="ui">Élőláb</span>, <span class="ui">Oldalszám</span>. A szövegbe dupla kattintással jutsz vissza.</p>
+</section>
+
+<section class="sec" id="oldaltores"><h2><span class="n">5</span>Oldaltörés</h2>
+<p>Ha azt akarod, hogy egy rész (például egy új fejezet) <b>új oldalon</b> kezdődjön, ne nyomj sok <span class="nw"><kbd>Enter</kbd>t</span>! Szúrj be <b>oldaltörést</b>: <kbd>Ctrl</kbd>+<kbd>Enter</kbd>, vagy <span class="ui">Beszúrás</span> › <span class="ui">Oldaltörés</span>.</p>
+<div class="mist"><div class="side bad"><span class="lbl">Így nem</span><div data-try="enterek"></div></div><div class="side good"><span class="lbl">Így igen</span><div data-try="tores"></div></div></div>
+<p class="mist-why">Az üres sorok csak addig tolják a címet a következő oldalra, amíg semmi nem változik fölötte. Ha beírsz még két sort, a cím lecsúszik a 2. oldal közepére. Az oldaltörés után viszont mindig új oldal kezdődik.</p>
+</section>
+
+<section class="sec" id="kviz"><h2><span class="n">6</span>Ellenőrizd magad</h2>
+<div class="quiz" id="quiz"></div>
+</section>
+
+<section class="sec" id="gyakorolj"><h2><span class="n">7</span>Gyakorolj</h2>
+<p>Most jöhet az igazi Word! Kati néni tájékoztatóját te teszed rendbe: margók, táblázat, kép, élőfej, oldalszám és oldaltörés. Minden fejezet végén az oldal ellenőrzi a mentett fájlodat.</p>
+<div class="practice"><a class="pcard" href="forest-school-hu.html"><span class="k">Küldetés · Wordben</span><h4>Erdei iskola a Bükkben</h4><p>A 7.B tájékoztatója a szülőknek. Margók, táblázat, körbefuttatott kép, élőfej, oldalszám és oldaltörés, az igazi Wordben.</p></a></div>
+</section>
+</main>
+<footer class="end">Digitális kultúra. A kis dokumentumok itt a böngészőben működnek, semmi sem kerül elküldésre.</footer>
+
+<script src="../doc.js"></script>
+<script>
+const P = (text, x) => Object.assign({ text }, x || {});
+const near = (a, b) => Math.abs((a || 0) - b) < 0.02;
+const TXT = "Májusban öt napra a Bükkbe utazunk, Szilvásváradra. A szállásunk egy turistaház a Szalajka-völgy bejáratánál. Minden nap túrázunk, megismerjük a bükki erdők élővilágát, esténként pedig közös programok várnak ránk.";
+const MARG = { normal: [2.5, 2.5], keskeny: [1.27, 1.27], szeles: [2.54, 5.08] };
+/* the little page is half an A4, so every margin is drawn at half size too */
+const setMarg = (m, k) => { const [tb, lr] = MARG[k].map(x => x / 2); Object.assign(m.page, { top: tb, bottom: tb, left: lr, right: lr }); };
+
+window.TRY = {
+  oldal: { title: "Próbáld ki!", sub: "egy A4-es lap, kicsiben",
+    model: { page: { w: 10.5, h: 14.85, top: 1.25, bottom: 1.25, left: 1.25, right: 1.25 }, showMargins: true,
+      blocks: [P("Erdei iskola", { b: true, size: 12, align: "center", after: 4 }), P(TXT + " " + TXT, { align: "both", size: 7.5 }), P("Jó készülődést!", { i: true, align: "right", before: 4, size: 7.5 })] },
+    editor: false,
+    buttons: [
+      { label: "Álló", group: "or", on: m => { if (m.page.w > m.page.h) [m.page.w, m.page.h] = [m.page.h, m.page.w]; } },
+      { label: "Fekvő", group: "or", on: m => { if (m.page.w < m.page.h) [m.page.w, m.page.h] = [m.page.h, m.page.w]; } },
+      { label: "Margó: Normál (2,5 cm)", group: "mg", on: m => setMarg(m, "normal") },
+      { label: "Keskeny (1,27 cm)", group: "mg", on: m => setMarg(m, "keskeny") },
+      { label: "Széles (5,08 cm oldalt)", group: "mg", on: m => setMarg(m, "szeles") }
+    ],
+    goals: [
+      { text: "Fordítsd a lapot <b>fekvőre</b>.", test: m => m.page.w > m.page.h },
+      { text: "Állítsd <b>keskeny</b> margóra. Mi történt a szöveggel?", test: m => near(m.page.left, 0.635) }
+    ],
+    note: "A szaggatott vonal a margó határa. Kisebb margónál a sorok hosszabbak, és több fér el egy oldalon." },
+
+  tablazat: { title: "Próbáld ki!", sub: "kattints egy cellába, és írj; a Tab a következő cellába visz",
+    model: { rows: [["Nap", "Program"], ["Hétfő", "Szalajka-völgy"], ["Kedd", "Fátyol-vízesés"]], headBold: false, headShade: null },
+    mount(host, changed) {
+      const m = this.model;
+      host.innerHTML = `<div class="try-btns"><button type="button" data-a="row">Sor beszúrása alá</button><button type="button" data-a="bold">Fejléc félkövér</button><button type="button" data-a="shade">Fejléc: Mintázat</button></div>
+        <div class="wd tbl-demo" style="margin-top:8px"><div class="wd-pg" style="width:100%;max-width:520px"></div></div>`;
+      const pg = host.querySelector(".wd-pg");
+      let focus = [1, 1];
+      const draw = () => {
+        pg.innerHTML = `<table class="wd-tbl">${m.rows.map((r, ri) => `<tr>${r.map((c, ci) => `<td contenteditable="true" spellcheck="false" data-r="${ri}" data-c="${ci}" style="${ri === 0 && m.headShade ? `background:${m.headShade};` : ""}${ri === 0 && m.headBold ? "font-weight:700;" : ""}">${c.replace(/[&<>]/g, x => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[x]))}</td>`).join("")}</tr>`).join("")}</table>`;
+      };
+      const put = (r, c) => { const td = pg.querySelector(`td[data-r="${r}"][data-c="${c}"]`); if (!td) return; td.focus(); const s = getSelection(), rg = document.createRange(); rg.selectNodeContents(td); rg.collapse(false); s.removeAllRanges(); s.addRange(rg); };
+      draw();
+      pg.addEventListener("input", e => { const td = e.target.closest("td"); if (!td) return; m.rows[+td.dataset.r][+td.dataset.c] = td.textContent; changed(); });
+      pg.addEventListener("focusin", e => { const td = e.target.closest("td"); if (td) { focus = [+td.dataset.r, +td.dataset.c]; pg.querySelectorAll("td.focus").forEach(x => x.classList.remove("focus")); td.classList.add("focus"); } });
+      pg.addEventListener("keydown", e => {
+        const td = e.target.closest("td"); if (!td) return;
+        const r = +td.dataset.r, c = +td.dataset.c, nc = m.rows[0].length;
+        if (e.key === "Enter") { e.preventDefault(); return; }
+        if (e.key !== "Tab") return;
+        e.preventDefault();
+        let k = r * nc + c + (e.shiftKey ? -1 : 1);
+        if (k < 0) return;
+        if (k >= m.rows.length * nc) { m.rows.push(Array(nc).fill("")); draw(); changed(); }
+        put(Math.floor(k / nc), k % nc);
+      });
+      host.querySelector(".try-btns").addEventListener("click", e => {
+        const a = e.target.dataset && e.target.dataset.a; if (!a) return;
+        if (a === "row") m.rows.splice(focus[0] + 1, 0, Array(m.rows[0].length).fill(""));
+        if (a === "bold") m.headBold = !m.headBold;
+        if (a === "shade") m.headShade = m.headShade ? null : "#c5e0b3";
+        draw(); changed(); put(a === "row" ? focus[0] + 1 : focus[0], a === "row" ? 0 : focus[1]);
+      });
+      return {};
+    },
+    goals: [
+      { text: "Kattints a <b>Fátyol-vízesés</b> cellába, és nyomj <span class='nw'><kbd>Tab</kbd>ot</span>: új sor jön. Írd be: <b>Szerda</b>, <kbd>Tab</kbd>, <b>Erdei olimpia</b>.", test: m => m.rows.some(r => /szerda/i.test(r[0]) && /olimpia/i.test(r[1])) },
+      { text: "A fejléc (az első sor) legyen <b>félkövér</b>.", test: m => m.headBold },
+      { text: "A fejléc kapjon <b>háttérszínt</b> (Mintázat).", test: m => !!m.headShade }
+    ] },
+
+  kep: { title: "Próbáld ki!", sub: "válassz körbefuttatást, és méretezd a képet",
+    model: { page: { w: 15, h: 7.2, top: 1, bottom: 1, left: 1.2, right: 1.2 }, _seen: {},
+      blocks: [P(TXT + " " + TXT, { align: "both", img: { src: "szalajka.png", w: 6.5, h: 4.9, wrap: "inline" } })] },
+    editor: false,
+    buttons: [
+      ...[["inline", "Szöveggel egy sorban"], ["square", "Négyzetes"], ["tight", "Szoros"], ["topAndBottom", "Felül és alul"], ["behind", "Szöveg mögött"], ["front", "Szöveg előtt"]]
+        .map(([w, label]) => ({ label, group: "wrap", on: m => { m.blocks[0].img.wrap = w; m._seen[w] = true; } })),
+      { label: "Kisebb", on: m => { const i = m.blocks[0].img; if (i.w > 2.5) { i.w = Math.round((i.w - 1) * 10) / 10; i.h = Math.round(i.w * 0.75 * 10) / 10; } } },
+      { label: "Nagyobb", on: m => { const i = m.blocks[0].img; if (i.w < 9) { i.w = Math.round((i.w + 1) * 10) / 10; i.h = Math.round(i.w * 0.75 * 10) / 10; } } }
+    ],
+    goals: [
+      { text: "Próbáld ki a <b>Szöveg mögött</b> és a <b>Felül és alul</b> beállítást is.", test: m => m._seen.behind && m._seen.topAndBottom },
+      { text: "Végül legyen <b>Négyzetes</b>, és a kép legfeljebb <b>4,5 cm</b> széles.", test: m => m.blocks[0].img.wrap === "square" && m.blocks[0].img.w <= 4.5 }
+    ],
+    note: "Melyik a legjobb egy tájékoztatóba? A Négyzetes vagy a Szoros: a kép a szöveg mellett áll, és nem takar el semmit." },
+
+  elofej: { title: "Próbáld ki!", sub: "három oldal, egyetlen élőfej",
+    model: { page: { w: 7, h: 6.5, top: 1.4, bottom: 1.4, left: 0.9, right: 0.9 }, header: "", footer: "",
+      blocks: [P("Erdei iskola", { b: true, size: 13 }), P("Kedves Szülők! Májusban öt napra a Bükkbe utazunk.", { size: 9 }), { type: "break" },
+               P("Napi program", { b: true, size: 13 }), P("Hétfő: utazás, Kedd: Fátyol-vízesés…", { size: 9 }), { type: "break" },
+               P("Csomaglista", { b: true, size: 13 }), P("túracipő, esőkabát, kulacs…", { size: 9 })] },
+    mount(host, changed) {
+      const m = this.model;
+      host.innerHTML = `<div class="hf-ctl"><label>Élőfej: <input type="text" maxlength="30" placeholder="írj ide valamit"></label>
+        <span class="try-btns" style="margin:0"><button type="button" data-a="num">Oldalszám beszúrása</button><button type="button" data-a="page">Új oldal</button></span></div><div class="pages3"></div>`;
+      const api = WD.page(host.querySelector(".pages3"), m);
+      host.querySelector("input").addEventListener("input", e => { m.header = e.target.value; api.render(m); changed(); });
+      host.querySelector(".hf-ctl").addEventListener("click", e => {
+        const a = e.target.dataset && e.target.dataset.a; if (!a) return;
+        if (a === "num") { m.footerPage = !m.footerPage; e.target.classList.toggle("on", m.footerPage); }
+        if (a === "page" && m.blocks.filter(b => b.type === "break").length < 3) m.blocks.splice(3, 0, P("Tudnivalók", { b: true, size: 13 }), P("Indulás hétfőn 7:30-kor.", { size: 9 }), { type: "break" });
+        api.render(m); changed();
+      });
+      return api;
+    },
+    goals: [
+      { text: "Írj valamit az <b>élőfejbe</b>. Figyeld meg: mind a három oldalon megjelenik.", test: m => !!(m.header || "").trim() },
+      { text: "Szúrj be <b>oldalszámot</b>.", test: m => !!m.footerPage },
+      { text: "Adj hozzá egy <b>új oldalt</b> a második helyre. Mi lett a Csomaglista oldalszáma?", test: m => m.footerPage && m.blocks.filter(b => b.type === "break").length === 3 }
+    ] },
+
+  enterek: { editor: false, model: { marks: true, page: { w: 7.5, h: 6.2, top: 0.8, bottom: 0.8, left: 0.8, right: 0.8 },
+    blocks: [P("Kísérő tanárok: Kovács Katalin és Nagy Péter.", { size: 9 }), P("", { size: 9 }), P("", { size: 9 }), P("", { size: 9 }), P("", { size: 9 }), P("", { size: 9 }), P("Csomaglista", { b: true, size: 12 })] } },
+  tores: { editor: false, model: { marks: true, page: { w: 7.5, h: 3.1, top: 0.8, bottom: 0.8, left: 0.8, right: 0.8 },
+    blocks: [P("Kísérő tanárok: Kovács Katalin és Nagy Péter.", { size: 9 }), { type: "break" }, P("Csomaglista", { b: true, size: 12 })] } }
+};
+
+window.QUIZ = [
+  { q: "Hol állítod be a margókat?", opts: ["Elrendezés › Margók", "Kezdőlap › Bekezdés", "Beszúrás › Táblázat", "Nézet › Vonalzó"], right: 0,
+    fb: "Az oldal beállításai (margók, tájolás, méret) az Elrendezés lapon vannak." },
+  { q: "A táblázat utolsó cellájában állsz, és megnyomod a <kbd>Tab</kbd> billentyűt. Mi történik?", opts: ["A táblázat kap egy új sort", "A kurzor kilép a táblázatból", "Beíródik egy tabulátor a cellába", "Törlődik az utolsó sor"], right: 0,
+    fb: "A Tab a következő cellába visz. Az utolsó cellában nincs következő, ezért a Word új sort ad a táblázathoz." },
+  { q: "Melyik körbefuttatásnál folyja körbe a szöveg a képet téglalap alakban?", opts: ["Négyzetes", "Szöveggel egy sorban", "Szöveg mögött", "Felül és alul"], right: 0,
+    fb: "Négyzetesnél a szöveg a kép köré képzelt téglalap mentén fut. A Felül és alul beállításnál a kép mellett nincs szöveg." },
+  { q: "Miért ne írd be kézzel az oldalszámot az élőlábba?", opts: ["Mert akkor minden oldalon ugyanaz a szám lesz", "Mert az élőlábba nem lehet írni", "Mert a kézzel írt szám nem nyomtatódik ki", "Nyugodtan beírhatod, nincs különbség"], right: 0,
+    fb: "Amit az élőlábba írsz, az minden oldalon megjelenik: egy beírt 1-es minden oldalon 1 lesz. Az Oldalszám mezőt a Word oldalanként kiszámolja." },
+  { q: "Egy fejezetnek új oldalon kell kezdődnie. Mit csinálsz?", opts: ["Elé teszek egy oldaltörést (Ctrl+Enter)", "Annyi Entert nyomok, amíg át nem csúszik", "Elé írok sok szóközt", "Kisebb margót állítok be"], right: 0,
+    fb: "Az oldaltörés után mindig új oldal kezdődik. Az üres sorokkal tolt cím elcsúszik, amint fölötte változik valami." },
+  { q: "Hogyan méretezed át a képet úgy, hogy ne torzuljon el?", opts: ["A sarkánál fogva húzom", "Az oldala közepénél fogva húzom", "Kijelölöm, és nagyobb betűméretet adok neki", "Átállítom a margót"], right: 0,
+    fb: "A sarkánál fogva a Word megtartja a kép arányait. Az oldalánál fogva csak az egyik irányban nyújtod, és a kép eltorzul." }
+];
+</script>
+<script src="../explainer.js"></script>
+<script src="../../nav.js?v=2b949d3f" defer></script>
+</body>
+</html>

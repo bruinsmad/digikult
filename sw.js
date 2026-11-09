@@ -6,7 +6,7 @@
    The file list below is written by tools/build-sw.py: run it before pushing. */
 
 /* FILES:BEGIN (written by tools/build-sw.py, don't edit by hand) */
-const VERSION = "9046e865e6";
+const VERSION = "f7ef055484";
 const CORE = [
 "./",
 "css/basics/first-steps.html",
@@ -125,7 +125,22 @@ const CORE = [
 "sql/where/heist.html",
 "sql/where/intro-hu.html",
 "sql/where/intro.html",
-"vendor/codemirror-html.js"
+"vendor/codemirror-html.js",
+"word/doc.css",
+"word/doc.js",
+"word/docx.js",
+"word/explainer.css",
+"word/explainer.js",
+"word/index.html",
+"word/mission.css",
+"word/page/erdei-iskola.docx",
+"word/page/forest-school-hu.html",
+"word/page/intro-hu.html",
+"word/paragraphs/cover.svg",
+"word/paragraphs/intro-hu.html",
+"word/paragraphs/recept.docx",
+"word/paragraphs/recipe-hu.html",
+"word/real.js"
 ];
 const EXTERNAL = [
 "https://cdn.jsdelivr.net/npm/",
@@ -235,6 +250,12 @@ const PAGE_IMAGES = {
 "inkscape/img/slice-shop/step4.png",
 "inkscape/img/slice-shop/step5.png",
 "inkscape/img/slice-shop/step6.png"
+],
+"word/page/forest-school-hu.html": [
+"word/page/szalajka.png"
+],
+"word/page/intro-hu.html": [
+"word/page/szalajka.png"
 ]
 };
 /* FILES:END */

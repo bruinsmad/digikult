@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>/* moving between pages: the old page drifts aside and fades, the new one glides in; the rail holds still */@view-transition{navigation:auto}.rail{view-transition-name:rail}::view-transition-group(root){animation:none}::view-transition-old(root){animation:dk-out .2s cubic-bezier(.4,0,1,1) both}::view-transition-new(root){animation:dk-in .38s cubic-bezier(.16,1,.3,1) .06s both}::view-transition-old(rail),::view-transition-new(rail){animation:none}@keyframes dk-out{to{opacity:0;transform:translateX(-18px)}}@keyframes dk-in{from{opacity:0;transform:translateX(26px)}}@media (prefers-reduced-motion:reduce){::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none!important}}</style>
+<title>Bekezdések formázása – elmélet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600;700&display=swap">
+<link rel="stylesheet" href="../doc.css">
+<link rel="stylesheet" href="../explainer.css">
+</head>
+<body>
+<header class="rail"><div class="in">
+  <a class="home" href="../../index.html">Digitális kultúra</a>
+  <span class="crumb"><a href="../../index.html#word">Szövegszerkesztés – Word</a> › <a href="../../index.html#word-paragraphs">1. lecke</a></span>
+</div></header>
+
+<section class="hero">
+  <div class="kicker">Word, 1. lecke: elmélet</div>
+  <h1>Bekezdések formázása</h1>
+  <p class="lead">Tavaly megtanultad, hogyan lesz egy szó félkövér vagy piros. Most a <b>bekezdéseké</b> a főszerep: igazítás, behúzás, térköz, sorköz, felsorolás és számozás. És megtanulod, miért nem szabad soha szóközzel „középre tolni” egy címet.</p>
+  <div class="meta"><span>kb. 15 perc</span><span>minden dokumentum kipróbálható</span><span>a végén 6 kérdés</span></div>
+  <ul class="toc"><li><a href="#ketfele">Karakter vagy bekezdés?</a></li><li><a href="#jelek">Mi az a bekezdés? A ¶ jelek</a></li><li><a href="#igazitas">Igazítás</a></li><li><a href="#behuzas">Behúzás</a></li><li><a href="#terkoz">Térköz és sorköz</a></li><li><a href="#listak">Felsorolás és számozás</a></li><li><a href="#hibak">Gyakori hibák</a></li><li><a href="#kviz">Ellenőrizd magad</a></li><li><a href="#gyakorolj">Gyakorolj</a></li></ul>
+</section>
+
+<main class="sheet">
+<section class="sec" id="ketfele"><h2><span class="n">1</span>Karakter vagy bekezdés?</h2>
+<p>A Wordben kétféle formázás van. Az egyik a <b>betűkre</b> (karakterekre) hat, a másik az egész <b>bekezdésre</b>.</p>
+<div class="kinds">
+  <div><h4>Karakterformázás</h4><ul><li>betűtípus, betűméret</li><li>félkövér, dőlt, aláhúzott</li><li>betűszín</li></ul><p class="where"><b>Csak a kijelölt szövegre hat.</b> Előbb jelöld ki, aztán formázd!</p></div>
+  <div><h4>Bekezdésformázás</h4><ul><li>igazítás (balra, középre…)</li><li>behúzás, térköz, sorköz</li><li>felsorolás, számozás, szegély</li></ul><p class="where"><b>Az egész bekezdésre hat</b>, amelyikben a kurzor áll. Nem kell kijelölni!</p></div>
+</div>
+<div data-try="ketfele"></div>
+<p class="where">A Wordben: <span class="ui">Kezdőlap</span> lap, a <span class="ui">Betűtípus</span> és a <span class="ui">Bekezdés</span> csoport. A Bekezdés csoport jobb alsó sarkában lévő kis nyíllal nyílik a <b>Bekezdés</b> ablak, ott minden beállítás egy helyen van.</p>
+</section>
+
+<section class="sec" id="jelek"><h2><span class="n">2</span>Mi az a bekezdés? A ¶ jelek</h2>
+<p>Bekezdés az, amit egy <kbd>Enter</kbd> zár le. A Word a sor végén magától új sort kezd: a bekezdés közepén <b>soha ne nyomj Entert</b>, csak ott, ahol új gondolat kezdődik.</p>
+<p>A <span class="ui">¶</span> gomb (neve: <span class="ui">Mindent mutat</span>) megmutatja a rejtett jeleket. Ezek nem nyomtatódnak ki, de rögtön látszik belőlük, ha valaki szóközökkel vagy üres sorokkal „formázott”.</p>
+<table class="ops"><tr><th>jel</th><th>mit jelent</th><th>melyik billentyű</th></tr>
+<tr><td>¶</td><td>bekezdés vége</td><td><kbd>Enter</kbd></td></tr>
+<tr><td>·</td><td>szóköz</td><td><kbd>Szóköz</kbd></td></tr>
+<tr><td>→</td><td>tabulátor</td><td><kbd>Tab</kbd></td></tr>
+<tr><td>↵</td><td>sortörés: új sor, de ugyanaz a bekezdés</td><td><kbd>Shift</kbd>+<kbd>Enter</kbd></td></tr></table>
+<div data-try="jelek"></div>
+</section>
+
+<section class="sec" id="igazitas"><h2><span class="n">3</span>Igazítás</h2>
+<p>Az igazítás megmondja, hogy a bekezdés sorai hová kerüljenek a bal és a jobb margó között.</p>
+<table class="ops plain"><tr><th>gomb</th><th>mire jó</th></tr>
+<tr><td>Balra igazítás</td><td>a legtöbb szöveg: levél, fogalmazás, jegyzet</td></tr>
+<tr><td>Középre igazítás</td><td>címek, meghívók, versek</td></tr>
+<tr><td>Jobbra igazítás</td><td>aláírás, dátum, keltezés</td></tr>
+<tr><td>Sorkizárt</td><td>könyvek, újságok: a sorok mindkét széle egyenes</td></tr></table>
+<div data-try="igazitas"></div>
+<div class="idea"><span class="i">💡</span><p>Sorkizártnál a Word a szóközöket tágítja, hogy a sor kitöltse a helyet. A bekezdés <b>utolsó</b> sora ilyenkor is balra marad.</p></div>
+</section>
+
+<section class="sec" id="behuzas"><h2><span class="n">4</span>Behúzás</h2>
+<p>A <b>behúzás</b> azt mondja meg, mennyivel kezdődjön beljebb a bekezdés a margóhoz képest. Négyféle van:</p>
+<ul><li><b>Bal behúzás:</b> az egész bekezdés beljebb kezdődik bal oldalt.</li><li><b>Jobb behúzás:</b> az egész bekezdés hamarabb véget ér jobb oldalt.</li><li><b>Első sor behúzása:</b> csak az első sor kezdődik beljebb. Könyvekben így jelölik az új bekezdést.</li><li><b>Függő behúzás:</b> az első sor marad, a többi sor beljebb kerül. A felsorolások így működnek.</li></ul>
+<p>A <b>vonalzón</b> (Nézet › Vonalzó) a kis háromszögekkel húzhatod: a <b>felső</b> az első sort, az <b>alsó</b> a többi sort, a <b>jobb oldali</b> a jobb behúzást állítja. Pontosabb, ha a <b>Bekezdés</b> ablakba beírod a számot centiméterben.</p>
+<div data-try="behuzas"></div>
+<div class="rule-box"><b>Sose szóközzel!</b> Ha az első sort szóközökkel vagy Tabbal húzod be, az egyik bekezdésben 5, a másikban 6 szóköz lesz, és a sorok elcsúsznak. Az első sor behúzása minden bekezdésben pontosan ugyanannyi.</div>
+</section>
+
+<section class="sec" id="terkoz"><h2><span class="n">5</span>Térköz és sorköz</h2>
+<p>Két dolgot könnyű összekeverni:</p>
+<ul><li>A <b>térköz</b> a <b>bekezdések között</b> van: mekkora hely legyen egy bekezdés <b>előtt</b> és <b>után</b>. Pontban (pt) mérjük.</li><li>A <b>sorköz</b> a <b>bekezdésen belül</b>, a sorok között van: 1-es, 1,15-ös, 1,5-es, 2-es.</li></ul>
+<div data-try="terkoz"></div>
+<p class="where">A Wordben: <span class="ui">Elrendezés</span> lap › <span class="ui">Térköz</span> › Előtte, Utána. A sorköz a Kezdőlap <span class="ui">Sor- és bekezdéstávolság</span> gombjában van, vagy a Bekezdés ablakban.</p>
+<div class="idea"><span class="i">📏</span><p>Egy pont (pt) nagyjából egyharmad milliméter. A szokásos, 11-es betű kb. 11 pont magas. Így a 12 pt térköz körülbelül egy üres sornyi hely.</p></div>
+</section>
+
+<section class="sec" id="listak"><h2><span class="n">6</span>Felsorolás és számozás</h2>
+<p>Ha több egyforma dolgot sorolsz fel, használd a <span class="ui">Felsorolás</span> (pöttyök) vagy a <span class="ui">Számozás</span> (1., 2., 3.) gombot. A jelet és a számot a <b>Word teszi oda</b>, ne gépeld be!</p>
+<ul><li>Ha a lista közepére beszúrsz egy új elemet, a Word <b>magától újraszámoz</b>.</li><li>Ha egy elem két sorosra nő, a második sor szépen a szöveg alá kerül, nem a pötty alá.</li><li>A lista végén nyomj kétszer <span class="nw"><kbd>Enter</kbd>t</span>: a lista véget ér.</li></ul>
+<div data-try="listak"></div>
+<p class="where">A Wordben: <span class="ui">Kezdőlap</span> › Bekezdés csoport, a bal felső két gomb. A gomb melletti kis nyíllal másféle pöttyöt vagy számozást is választhatsz (pl. a), b), c)).</p>
+</section>
+
+<section class="sec" id="hibak"><h2><span class="n">7</span>Gyakori hibák</h2>
+<p>Ezek a hibák a képernyőn nem látszanak, de amint valaki módosít a szövegen, szétesik az egész. A ¶ gombbal mind kiderül!</p>
+<div class="mist"><div class="side bad"><span class="lbl">Így nem</span><div data-try="rossz"></div></div><div class="side good"><span class="lbl">Így igen</span><div data-try="jo"></div></div></div>
+<p class="mist-why">Balra: szóközökkel tolt cím, üres sorok és kézzel írt kötőjelek. Jobbra: ugyanaz igazítással, térközzel és felsorolással.</p>
+<table class="ops plain"><tr><th>hiba</th><th>helyette</th></tr>
+<tr><td>szóközök a cím előtt</td><td>Középre igazítás</td></tr>
+<tr><td>üres sorok a bekezdések között</td><td>térköz előtte, utána</td></tr>
+<tr><td>Tab vagy szóközök a bekezdés elején</td><td>első sor behúzása</td></tr>
+<tr><td>kézzel írt kötőjel, 1., 2.</td><td>Felsorolás, Számozás</td></tr>
+<tr><td>Enter minden sor végén</td><td>a Word magától új sort kezd</td></tr></table>
+</section>
+
+<section class="sec" id="kviz"><h2><span class="n">8</span>Ellenőrizd magad</h2>
+<div class="quiz" id="quiz"></div>
+</section>
+
+<section class="sec" id="gyakorolj"><h2><span class="n">9</span>Gyakorolj</h2>
+<p>Most jöhet az igazi Word! Letöltöd Bori csúnyán begépelt receptjét, és fejezetről fejezetre rendbe teszed. Minden fejezet végén az oldal ellenőrzi a mentett fájlodat.</p>
+<div class="practice"><a class="pcard" href="recipe-hu.html"><span class="k">Küldetés · Wordben</span><h4>Mamó mézeskalácsa</h4><p>A 7.B receptkönyve nyomdába megy. Igazítás, behúzás, sorköz, felsorolás, számozás, térköz és keret, az igazi Wordben.</p></a></div>
+</section>
+</main>
+<footer class="end">Digitális kultúra. A kis dokumentumok itt a böngészőben működnek, semmi sem kerül elküldésre.</footer>
+
+<script src="../doc.js"></script>
+<script>
+const P = (text, x) => Object.assign({ text }, x || {});
+const small = (h, x) => Object.assign({ page: { w: 15, h: h, top: 1.2, bottom: 1.2, left: 1.5, right: 1.5 } }, x || {});
+const tiny = (h, x) => Object.assign({ page: { w: 9.5, h: h, top: 0.8, bottom: 0.8, left: 0.8, right: 0.8 } }, x || {});
+const words = (m, i) => m.blocks[i].runs.filter(r => r.t.trim());
+const near = (a, b) => Math.abs((a || 0) - b) < 0.06;
+const LONG = "Nálunk karácsony előtt az egész lakás mézeskalácsillatú. Mamó ezt a receptet még az ő nagymamájától tanulta, és azóta minden decemberben ebből sütünk. A tésztát előző este kell bekeverni, mert egy éjszakát pihennie kell a hűtőben.";
+
+window.TRY = {
+  ketfele: { title: "Próbáld ki!", sub: "kattints egy szóra, vagy jelölj ki egeret húzva",
+    model: small(2.6, { blocks: [P("Mamó mézeskalácsa a legfinomabb sütemény az egész utcában.")] }), tools: ["font", "align"],
+    goals: [
+      { text: "Csak a <b>mézeskalácsa</b> szó legyen félkövér, a többi ne.", test: m => words(m, 0).every(r => !!r.b === /^mézeskalácsa/.test(r.t)) },
+      { text: "Az egész bekezdés legyen <b>középre igazítva</b>. (Elég belekattintani!)", test: m => m.blocks[0].align === "center" }
+    ],
+    note: "Figyeld meg: a félkövérhez ki kellett jelölni a szót (vagy beleállni), a középre igazítás viszont az egész bekezdést vitte." },
+  jelek: { title: "Próbáld ki!", sub: "Bori receptjének eleje",
+    model: small(4.2, { blocks: [P(" ".repeat(18) + "Mamó mézeskalácsa"), P(""), P("Hozzávalók:"), P("- 50 dkg liszt"), P("- 15 dkg porcukor"), P("")] }), tools: ["marks"],
+    goals: [
+      { text: "Kapcsold be a <b>¶</b> gombot.", test: m => m.marks },
+      { text: "Kattints egy <b>üres bekezdésbe</b> (ahol csak egy ¶ áll).", test: (m, s) => m.marks && s && s.paras.length === 1 && !WD.textOf(m.blocks[s.paras[0]]).trim() }
+    ],
+    note: "A cím előtti pöttyök szóközök: Bori ezekkel tolta „középre” a címet. Hány bekezdés van összesen? Számold meg a ¶ jeleket!" },
+  igazitas: { title: "Próbáld ki!", sub: "kattints a bekezdésbe, aztán egy igazítás gombra",
+    model: small(5.2, { blocks: [P("Mamó mézeskalácsa", { size: 18, b: true }), P(LONG), P("– Mamó", { i: true })] }), tools: ["align"],
+    goals: [
+      { text: "A cím legyen <b>középre</b> igazítva.", test: m => m.blocks[0].align === "center" },
+      { text: "A hosszú bekezdés legyen <b>sorkizárt</b>.", test: m => m.blocks[1].align === "both" },
+      { text: "Az aláírás kerüljön <b>jobbra</b>.", test: m => m.blocks[2].align === "right" }
+    ] },
+  behuzas: { title: "Próbáld ki!", sub: "húzd a vonalzó háromszögeit, vagy írd be a számot",
+    model: small(5.4, { blocks: [P(LONG, { align: "both", after: 6 }), P("Mamó tippje: a kész mézeskalácsot tedd egy fémdobozba egy szelet almával. Két nap múlva puha lesz, mint a felhő!", { box: true })] }),
+    tools: ["dialog"], ruler: true,
+    goals: [
+      { text: "Az első bekezdés <b>első sora</b> kezdődjön 1 cm-rel beljebb.", test: m => near(m.blocks[0].firstLine, 1) && near(m.blocks[0].left, 0) },
+      { text: "A keretes tipp kapjon <b>bal és jobb</b> behúzást: mindkettő 1 cm.", test: m => near(m.blocks[1].left, 1) && near(m.blocks[1].right, 1) && near(m.blocks[1].firstLine, 0) }
+    ],
+    note: "A vonalzón a felső háromszög az első sor, az alsó a bal behúzás, a jobb oldali a jobb behúzás. Negatív első sor = függő behúzás." },
+  terkoz: { title: "Próbáld ki!", sub: "kattints a bekezdésbe, és állítsd be",
+    model: small(6.4, { blocks: [P("Hozzávalók", { b: true, size: 14 }), P("Ide jön a hozzávalók listája."), P("Elkészítés", { b: true, size: 14 }), P(LONG)] }), tools: ["spacing"],
+    goals: [
+      { text: "Az <b>Elkészítés</b> alcím előtt legyen 12 pt, utána 6 pt térköz.", test: m => m.blocks[2].before === 12 && m.blocks[2].after === 6 },
+      { text: "A hosszú bekezdés sorköze legyen <b>1,5</b>.", test: m => m.blocks[3].line === 1.5 }
+    ],
+    note: "A térköz a bekezdések közé tesz helyet, a sorköz a bekezdés sorai közé." },
+  listak: { title: "Próbáld ki!", sub: "jelöld ki a sorokat egeret húzva, aztán kattints a gombra",
+    model: small(6.6, { blocks: [P("Hozzávalók:", { b: true }), P("50 dkg liszt"), P("15 dkg porcukor"), P("10 dkg vaj"), P("Elkészítés:", { b: true, before: 6 }), P("A vajat a mézzel együtt olvaszd fel."), P("Keverd össze a száraz hozzávalókat."), P("Gyúrd össze a tésztát, és pihentesd egy éjszakát.")] }), tools: ["list", "indent"],
+    goals: [
+      { text: "A három hozzávaló legyen <b>felsorolás</b>.", test: m => [1, 2, 3].every(i => m.blocks[i].list === "bullet") },
+      { text: "A három lépés legyen <b>számozott</b>.", test: m => [5, 6, 7].every(i => m.blocks[i].list === "number") },
+      { text: "Az alcímek ne legyenek a listában.", test: m => !m.blocks[0].list && !m.blocks[4].list }
+    ] },
+  rossz: { editor: false, model: tiny(3.6, { marks: true, blocks: [P(" ".repeat(10) + "Mamó mézeskalácsa", { b: true, size: 14 }), P(""), P("Hozzávalók:"), P("- 50 dkg liszt"), P("- 15 dkg porcukor")] }) },
+  jo: { editor: false, model: tiny(3.6, { marks: true, blocks: [P("Mamó mézeskalácsa", { b: true, size: 14, align: "center", after: 12 }), P("Hozzávalók:"), P("50 dkg liszt", { list: "bullet", left: 0.63 }), P("15 dkg porcukor", { list: "bullet", left: 0.63 })] }) }
+};
+
+window.QUIZ = [
+  { q: "Melyik <b>bekezdésformázás</b>?", opts: ["Sorkizárt igazítás", "Félkövér", "Betűszín", "14-es betűméret"], right: 0,
+    fb: "Az igazítás az egész bekezdésre hat. A félkövér, a betűszín és a betűméret karakterformázás: csak a kijelölt szövegre hat." },
+  { q: "A címet középre akarod tenni. Mit csinálsz?", opts: ["Belekattintok, és megnyomom a Középre igazítás gombot", "Szóközöket ütök elé, amíg középre nem ér", "Tabot nyomok elé kétszer", "Kijelölöm, és nagyobb betűméretet adok neki"], right: 0,
+    fb: "Az igazítás bekezdésformázás: elég, ha a kurzor a bekezdésben áll. A szóközös megoldás elcsúszik, amint valaki átírja a címet." },
+  { q: "Mit jelent a ¶ jel?", opts: ["Itt ér véget egy bekezdés: itt nyomtak Entert", "Itt egy szóköz van", "Itt új oldal kezdődik", "Ez a jel kinyomtatva is látszik"], right: 0,
+    fb: "A ¶ a bekezdés vége. A szóközt · jelzi. A rejtett jelek nem nyomtatódnak ki." },
+  { q: "Mi a különbség a térköz és a sorköz között?", opts: ["A térköz a bekezdések között van, a sorköz egy bekezdés sorai között", "A kettő ugyanaz", "A sorköz a bekezdések között van, a térköz a szavak között", "A térközt centiben, a sorközt pontban mérjük"], right: 0,
+    fb: "A térköz (előtte, utána) a bekezdések közé tesz helyet, pontban mérve. A sorköz (1; 1,15; 1,5; 2) a bekezdésen belüli sorok távolsága." },
+  { q: "Melyik az <b>első sor behúzása</b>?", opts: ["Csak a bekezdés első sora kezdődik beljebb", "Az egész bekezdés beljebb kezdődik", "Az első sor a helyén marad, a többi beljebb kerül", "Az első sor nagyobb betűvel kezdődik"], right: 0,
+    fb: "Az első sor behúzásánál csak az első sor kezdődik beljebb. Ha a többi sor kerül beljebb, az a függő behúzás." },
+  { q: "Bori beírta a lépések elé, hogy 1., 2., 3. Miért jobb a Számozás gomb?", opts: ["Mert ha beszúr egy új lépést, a Word magától újraszámoz", "Mert a Számozás gomb színes számokat ír", "Mert a kézzel írt számokat a nyomtató nem nyomtatja ki", "Nincs különbség"], right: 0,
+    fb: "A számozott listát a Word kezeli: ha beszúrsz, törölsz vagy átrendezel egy lépést, minden szám magától frissül." }
+];
+</script>
+<script src="../explainer.js"></script>
+<script src="../../nav.js?v=2b949d3f" defer></script>
+</body>
+</html>
