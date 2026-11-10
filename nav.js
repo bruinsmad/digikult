@@ -241,14 +241,14 @@
               {
                 id: "galaxy",
                 kind: "story",
-                minutes: 35,
+                minutes: 30,
                 title: { hu: "Birodalmi toborzó: CSS a sötét oldalon", en: "Imperial Recruitment: CSS on the Dark Side" },
                 desc: {
-                  hu: "A Birodalom toborzóhirdetése még fehér és unalmas, senki sem jelentkezik. Sötét háttér, piros cím, állás-kártyák, veszélyes állások és kerek bolygók, egyszerű CSS-sel, 8 fejezetben.",
-                  en: "The Empire's recruitment advert is still white and dull, and nobody signs up. Dark background, a red title, job cards, dangerous jobs and round planets, with simple CSS, in 8 chapters."
+                  hu: "A Birodalom toborzóhirdetése még fehér és unalmas, senki sem jelentkezik. Sötét háttér, piros cím, kiemelt állásnevek, kerek bolygók és rendes táblázat, egyszerű CSS-sel, 7 fejezetben.",
+                  en: "The Empire's recruitment advert is still white and dull, and nobody signs up. Dark background, a red title, highlighted job names, round planets and a proper table, with simple CSS, in 7 chapters."
                 },
                 files: { en: "css/basics/galaxy.html", hu: "css/basics/galaxy-hu.html" },
-                progress: { chapters: 8, keys: { en: "galaxy-en-v2", hu: "galaxy-hu-v2" } }
+                progress: { chapters: 7, keys: { en: "galaxy-en-v3", hu: "galaxy-hu-v3" } }
               }
             ]
           }
