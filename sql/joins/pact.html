@@ -284,7 +284,7 @@ tr:last-child td{border-bottom:none}
       <div><span>Queries run</span><b id="fQueries">–</b></div>
       <div><span>Rank</span><b id="fRank">–</b></div>
     </div>
-    <div class="caught">S. Bálint Máté the Polite · caught at the stables, black wax on his fingers</div>
+    <div class="caught">Bálint Máté the Polite · caught at the stables, black wax on his fingers</div>
     <div class="finale-btns">
       <button class="btn" id="finaleClose" type="button">See bonus tasks</button>
       <button class="btn ghost" id="finaleAgain" type="button">Ring the bells!</button>
@@ -299,36 +299,36 @@ const SEED = `
 CREATE TABLE kingdoms (id INTEGER PRIMARY KEY, name TEXT, ruler TEXT, capital TEXT, army INTEGER, alliance TEXT);
 CREATE TABLE knights (id INTEGER PRIMARY KEY, name TEXT, kingdom_id INTEGER, rank TEXT, weapon TEXT);
 CREATE TABLE letters (id INTEGER PRIMARY KEY, knight_id INTEGER, candle INTEGER, wax TEXT);
-INSERT INTO kingdoms VALUES (1,'Northmark','B. Dániel the Wise','Frostburg',1200,'Silver Pact');
-INSERT INTO kingdoms VALUES (2,'Riverland','F. Lilianna the Gracious','Willowford',900,'Silver Pact');
-INSERT INTO kingdoms VALUES (3,'Sunvale','L. Mária Éva the Merry','Goldenfield',800,'Silver Pact');
-INSERT INTO kingdoms VALUES (4,'Ironhill','M. Márk the Mighty','Anvilrock',2000,'Iron League');
-INSERT INTO kingdoms VALUES (5,'Mistwood','L. Laura the Mysterious','Shadowmere',700,'Iron League');
-INSERT INTO kingdoms VALUES (6,'Goldcoast','R. Benjámin Laurence the Generous','Seagate',1100,'Iron League');
-INSERT INTO knights VALUES (1,'K. Kamilla the Unbreakable',1,'champion','lance');
-INSERT INTO knights VALUES (2,'S. Bálint Máté the Polite',2,'knight','bow');
-INSERT INTO knights VALUES (3,'H. Hunor József the Bold',4,'champion','axe');
-INSERT INTO knights VALUES (4,'B. Rozália the Silent',5,'knight','bow');
-INSERT INTO knights VALUES (5,'É. Bence the Brave',3,'knight','sword');
-INSERT INTO knights VALUES (6,'L. Ágnes Abigél the Valiant',6,'knight','sword');
-INSERT INTO knights VALUES (7,'H. Viktor the Watchful',1,'commander','sword');
-INSERT INTO knights VALUES (8,'W. Jay the Jittery',4,'knight','mace');
-INSERT INTO knights VALUES (9,'F. Réka the Swift',2,'champion','lance');
-INSERT INTO knights VALUES (10,'M. Anna Petra the Fearless',5,'champion','sword');
-INSERT INTO knights VALUES (11,'L. Zorka the Radiant',3,'champion','lance');
-INSERT INTO knights VALUES (12,'K. Nóra the Cunning',6,'champion','lance');
-INSERT INTO knights VALUES (13,'B. Mihály the Strong',1,'knight','axe');
-INSERT INTO knights VALUES (14,'L. Zsombor Attila the Stern',4,'knight','sword');
-INSERT INTO knights VALUES (15,'C. Balázs the Loyal',2,'knight','sword');
-INSERT INTO knights VALUES (16,'S. Eliza the Wanderer',5,'knight','mace');
-INSERT INTO knights VALUES (17,'N. Boglárka the Kind',3,'knight','bow');
-INSERT INTO knights VALUES (18,'P. Petra Patrícia the Fierce',6,'knight','axe');
-INSERT INTO knights VALUES (19,'O. Benjámin Ádám the Young',1,'squire','bow');
-INSERT INTO knights VALUES (20,'K. Luca the Light-Footed',4,'squire','bow');
-INSERT INTO knights VALUES (21,'P. Hanna the Cheerful',2,'squire','mace');
-INSERT INTO knights VALUES (22,'Z. Zalán Benedek the Dreamer',5,'squire','axe');
-INSERT INTO knights VALUES (23,'S. Fruzsina the Lucky',3,'squire','sword');
-INSERT INTO knights VALUES (24,'W. Bianka Kinga the Wealthy',6,'squire','mace');
+INSERT INTO kingdoms VALUES (1,'Northmark','Dániel the Wise','Frostburg',1200,'Silver Pact');
+INSERT INTO kingdoms VALUES (2,'Riverland','Lilianna the Gracious','Willowford',900,'Silver Pact');
+INSERT INTO kingdoms VALUES (3,'Sunvale','Mária Éva the Merry','Goldenfield',800,'Silver Pact');
+INSERT INTO kingdoms VALUES (4,'Ironhill','Márk the Mighty','Anvilrock',2000,'Iron League');
+INSERT INTO kingdoms VALUES (5,'Mistwood','Laura the Mysterious','Shadowmere',700,'Iron League');
+INSERT INTO kingdoms VALUES (6,'Goldcoast','Benjámin Laurence the Generous','Seagate',1100,'Iron League');
+INSERT INTO knights VALUES (1,'Kamilla the Unbreakable',1,'champion','lance');
+INSERT INTO knights VALUES (2,'Bálint Máté the Polite',2,'knight','bow');
+INSERT INTO knights VALUES (3,'Hunor József the Bold',4,'champion','axe');
+INSERT INTO knights VALUES (4,'Rozália the Silent',5,'knight','bow');
+INSERT INTO knights VALUES (5,'Bence the Brave',3,'knight','sword');
+INSERT INTO knights VALUES (6,'Ágnes Abigél the Valiant',6,'knight','sword');
+INSERT INTO knights VALUES (7,'Viktor the Watchful',1,'commander','sword');
+INSERT INTO knights VALUES (8,'Jay the Jittery',4,'knight','mace');
+INSERT INTO knights VALUES (9,'Réka the Swift',2,'champion','lance');
+INSERT INTO knights VALUES (10,'Anna Petra the Fearless',5,'champion','sword');
+INSERT INTO knights VALUES (11,'Zorka the Radiant',3,'champion','lance');
+INSERT INTO knights VALUES (12,'Nóra the Cunning',6,'champion','lance');
+INSERT INTO knights VALUES (13,'Mihály the Strong',1,'knight','axe');
+INSERT INTO knights VALUES (14,'Zsombor Attila the Stern',4,'knight','sword');
+INSERT INTO knights VALUES (15,'Balázs the Loyal',2,'knight','sword');
+INSERT INTO knights VALUES (16,'Eliza the Wanderer',5,'knight','mace');
+INSERT INTO knights VALUES (17,'Boglárka the Kind',3,'knight','bow');
+INSERT INTO knights VALUES (18,'Petra Patrícia the Fierce',6,'knight','axe');
+INSERT INTO knights VALUES (19,'Benjámin Ádám the Young',1,'squire','bow');
+INSERT INTO knights VALUES (20,'Luca the Light-Footed',4,'squire','bow');
+INSERT INTO knights VALUES (21,'Hanna the Cheerful',2,'squire','mace');
+INSERT INTO knights VALUES (22,'Zalán Benedek the Dreamer',5,'squire','axe');
+INSERT INTO knights VALUES (23,'Fruzsina the Lucky',3,'squire','sword');
+INSERT INTO knights VALUES (24,'Bianka Kinga the Wealthy',6,'squire','mace');
 INSERT INTO letters VALUES (1,7,1,'white');
 INSERT INTO letters VALUES (2,6,1,'red');
 INSERT INTO letters VALUES (3,5,2,'gold');
@@ -374,29 +374,29 @@ const CHAPTERS = [
    "ironhill"
   ],
   "placeholder": "kingdom",
-  "success": "Ironhill: 2,000 soldiers. Its king, M. Márk the Mighty, leads the Iron League, the old rival of the Silver Pact. Tonight his knights sleep under your roof.",
+  "success": "Ironhill: 2,000 soldiers. Its king, Márk the Mighty, leads the Iron League, the old rival of the Silver Pact. Tonight his knights sleep under your roof.",
   "starter": "SELECT * FROM kingdoms;"
  },
  {
   "title": "A pigeon at midnight",
-  "story": "<p>1214, Frostburg Castle, the night of the Great Council. There are no clocks in Frostburg: the night is measured by the <b>great candle</b>, which burns down one notch at a time, from notch 1 at sunset to notch 12 at the midnight bell. When it reached its <b>ninth notch</b>, the kings of the <b>Silver Pact</b> finished their secret battle plan. Knights of the rival <b>Iron League</b> are in the castle too, as guests of the peace talks.</p>\n  <p>Now the candle is almost burnt down, and the castle falcon brings down a pigeon flying east, towards the Iron League camp. Tied to its leg: a letter sealed in <mark>black wax, the Iron League's colour</mark>, with a copy of the battle plan inside. The signature is torn off.</p>\n  <p>Lord Commander <b>H. Viktor the Watchful</b> turns to you, the young royal scribe. \"That pigeon left our dovecote tonight. At the midnight bell the gates open for the new guard, and the traitor can ride out. Find him first.\" The night guard already has a name: <b>W. Jay the Jittery</b> walked to the dovecote three times tonight.</p>",
+  "story": "<p>1214, Frostburg Castle, the night of the Great Council. There are no clocks in Frostburg: the night is measured by the <b>great candle</b>, which burns down one notch at a time, from notch 1 at sunset to notch 12 at the midnight bell. When it reached its <b>ninth notch</b>, the kings of the <b>Silver Pact</b> finished their secret battle plan. Knights of the rival <b>Iron League</b> are in the castle too, as guests of the peace talks.</p>\n  <p>Now the candle is almost burnt down, and the castle falcon brings down a pigeon flying east, towards the Iron League camp. Tied to its leg: a letter sealed in <mark>black wax, the Iron League's colour</mark>, with a copy of the battle plan inside. The signature is torn off.</p>\n  <p>Lord Commander <b>Viktor the Watchful</b> turns to you, the young royal scribe. \"That pigeon left our dovecote tonight. At the midnight bell the gates open for the new guard, and the traitor can ride out. Find him first.\" The night guard already has a name: <b>Jay the Jittery</b> walked to the dovecote three times tonight.</p>",
   "learn": "<p>You open the <code>knights</code> table and find no kingdom names, only numbers in <code>kingdom_id</code>. A database keeps each thing in <b>one</b> place: a kingdom's name lives in <code>kingdoms</code>, and <code>knights</code> only stores that kingdom's <code>id</code>. The number is a <b>reference</b>: <code>kingdom_id = 1</code> means \"the kingdom whose id is 1\". For now, look it up by hand with two queries.</p>\n  <pre>SELECT * FROM knights;\n\nSELECT name FROM kingdoms WHERE id = 1;</pre>",
-  "task": "Which kingdom does W. Jay the Jittery serve?",
+  "task": "Which kingdom does Jay the Jittery serve?",
   "hints": [
    "Find his row in knights and note his kingdom_id. Then look that id up in kingdoms.",
    {
-    "sql": "SELECT kingdom_id FROM knights\nWHERE name = 'W. Jay the Jittery';\n\nSELECT name FROM kingdoms WHERE id = 4;"
+    "sql": "SELECT kingdom_id FROM knights\nWHERE name = 'Jay the Jittery';\n\nSELECT name FROM kingdoms WHERE id = 4;"
    }
   ],
   "answers": [
    "ironhill"
   ],
   "placeholder": "kingdom",
-  "success": "Ironhill, King M. Márk the Mighty's own kingdom. A strong first suspect. But two queries for every name is slow, and the candles are burning down."
+  "success": "Ironhill, King Márk the Mighty's own kingdom. A strong first suspect. But two queries for every name is slow, and the candles are burning down."
  },
  {
   "title": "The matching rule",
-  "story": "<p>\"Don't look them up one by one,\" says H. Viktor the Watchful. \"Put the knights and the kingdoms side by side, and see who is who.\"</p>",
+  "story": "<p>\"Don't look them up one by one,\" says Viktor the Watchful. \"Put the knights and the kingdoms side by side, and see who is who.\"</p>",
   "learn": "<p>Naming two tables in <code>FROM</code> pairs up <b>every knight with every kingdom</b>: 24 × 6 = 144 rows, most of them nonsense. The <b>matching rule</b> in <code>WHERE</code> keeps only the pairs that belong together: the knight's <code>kingdom_id</code> equals the kingdom's <code>id</code>.</p>\n  <pre>SELECT knights.name, kingdoms.name, kingdoms.alliance\nFROM knights, kingdoms\nWHERE knights.kingdom_id = kingdoms.id;</pre>\n  <p>Both tables have an <code>id</code> and a <code>name</code>, so write <code>table.column</code>. More conditions follow with <code>AND</code>. Try it without and with the rule:</p>\n  <div class=\"tries\">\n    <button type=\"button\" class=\"try\" data-sql=\"SELECT COUNT(*) FROM knights, kingdoms;\">SELECT COUNT(*) FROM knights, kingdoms;</button>\n    <button type=\"button\" class=\"try\" data-sql=\"SELECT COUNT(*) FROM knights, kingdoms WHERE knights.kingdom_id = kingdoms.id;\">SELECT COUNT(*) FROM knights, kingdoms WHERE knights.kingdom_id = kingdoms.id;</button>\n  </div>",
   "task": "Match every knight to their kingdom. How many Iron League knights are guests in the castle tonight?",
   "hints": [
@@ -414,7 +414,7 @@ const CHAPTERS = [
    "144": "That's every knight paired with every kingdom. Add the matching rule: WHERE knights.kingdom_id = kingdoms.id.",
    "24": "That's all the knights. Keep only the Iron League: AND kingdoms.alliance = 'Iron League'."
   },
-  "success": "Twelve enemy knights under one roof, and W. Jay the Jittery is only one of them. You need the dovecote's records."
+  "success": "Twelve enemy knights under one roof, and Jay the Jittery is only one of them. You need the dovecote's records."
  },
  {
   "title": "The dovecote log",
@@ -428,13 +428,11 @@ const CHAPTERS = [
    }
   ],
   "answers": [
-   "w jay the jittery",
-   "w jay",
-   "jay",
-   "jay w"
+   "jay the jittery",
+   "jay"
   ],
   "placeholder": "name",
-  "success": "W. Jay the Jittery: three black seals. \"There's our man!\" says the guard. H. Viktor the Watchful shakes his head. \"Guests may write home. The question is <i>when</i> he wrote.\""
+  "success": "Jay the Jittery: three black seals. \"There's our man!\" says the guard. Viktor the Watchful shakes his head. \"Guests may write home. The question is <i>when</i> he wrote.\""
  },
  {
   "title": "The ninth notch",
@@ -455,7 +453,7 @@ const CHAPTERS = [
   "traps": {
    "6": "That's every knight who used black wax. Look at the MAX(letters.candle) column: how many are 9 or more?"
   },
-  "success": "Three: L. Zsombor Attila the Stern at notch 9, B. Rozália the Silent at notch 10 and S. Bálint Máté the Polite at notch 11. W. Jay the Jittery's last letter flew at notch 8, before the plan even existed. He was only writing home."
+  "success": "Three: Zsombor Attila the Stern at notch 9, Rozália the Silent at notch 10 and Bálint Máté the Polite at notch 11. Jay the Jittery's last letter flew at notch 8, before the plan even existed. He was only writing home."
  },
  {
   "title": "Whose side?",
@@ -490,19 +488,16 @@ const CHAPTERS = [
    }
   ],
   "answers": [
-   "s balint mate the polite",
-   "s balint mate",
+   "balint mate the polite",
    "balint mate",
-   "balint mate s",
-   "s balint",
    "balint"
   ],
   "placeholder": "name",
-  "success": "S. Bálint Máté the Polite, a knight of Riverland, notch 11: the pigeon the falcon caught. As the bells ring midnight, K. Kamilla the Unbreakable, the champion, finds him at the stables, his horse saddled, black wax still on his fingers. At dawn the Silver Pact writes a new plan, and this one stays secret."
+  "success": "Bálint Máté the Polite, a knight of Riverland, notch 11: the pigeon the falcon caught. As the bells ring midnight, Kamilla the Unbreakable, the champion, finds him at the stables, his horse saddled, black wax still on his fingers. At dawn the Silver Pact writes a new plan, and this one stays secret."
  }
 ];
 const BONUS = ["Which kingdom's knights sent the most letters tonight, whatever the wax? (three tables, GROUP BY kingdoms.name)", "List every knight next to the ruler they serve, sorted by ruler.", "How many letters did the knights of each alliance send from the ninth notch on?", "For each wax colour, how many letters were sent, and at which notch did the last one fly?", "Which weapon do the knights who sent black-wax letters carry most often?", "Hard: which knights sent no letter at all tonight? Hint: knights.id NOT IN (SELECT knight_id FROM letters)."];
-const COLDOCS = {"kingdoms": {"id": "Row number of the kingdom.", "name": "<code>'Northmark'</code>, <code>'Riverland'</code>, <code>'Sunvale'</code>, <code>'Ironhill'</code>, <code>'Mistwood'</code> or <code>'Goldcoast'</code>.", "ruler": "The king or queen, e.g. <code>'B. Dániel the Wise'</code>.", "capital": "The capital city, e.g. <code>'Frostburg'</code>.", "army": "How many soldiers the kingdom has.", "alliance": "<code>'Silver Pact'</code> or <code>'Iron League'</code>."}, "knights": {"id": "Row number of the knight.", "name": "The knight's name.", "kingdom_id": "Which kingdom they serve: the <code>id</code> of a row in <code>kingdoms</code>.", "rank": "<code>'squire'</code>, <code>'knight'</code>, <code>'champion'</code> or <code>'commander'</code>.", "weapon": "<code>'sword'</code>, <code>'lance'</code>, <code>'bow'</code>, <code>'axe'</code> or <code>'mace'</code>."}, "letters": {"id": "Row number of the letter.", "knight_id": "Who sent it: the <code>id</code> of a row in <code>knights</code>.", "candle": "How far the great candle had burned when the pigeon flew: notch <code>1</code> (sunset) to <code>12</code> (the midnight bell).", "wax": "Colour of the wax seal: <code>'black'</code>, <code>'white'</code>, <code>'blue'</code>, <code>'gold'</code>, <code>'grey'</code> or <code>'red'</code>."}};
+const COLDOCS = {"kingdoms": {"id": "Row number of the kingdom.", "name": "<code>'Northmark'</code>, <code>'Riverland'</code>, <code>'Sunvale'</code>, <code>'Ironhill'</code>, <code>'Mistwood'</code> or <code>'Goldcoast'</code>.", "ruler": "The king or queen, e.g. <code>'Dániel the Wise'</code>.", "capital": "The capital city, e.g. <code>'Frostburg'</code>.", "army": "How many soldiers the kingdom has.", "alliance": "<code>'Silver Pact'</code> or <code>'Iron League'</code>."}, "knights": {"id": "Row number of the knight.", "name": "The knight's name.", "kingdom_id": "Which kingdom they serve: the <code>id</code> of a row in <code>kingdoms</code>.", "rank": "<code>'squire'</code>, <code>'knight'</code>, <code>'champion'</code> or <code>'commander'</code>.", "weapon": "<code>'sword'</code>, <code>'lance'</code>, <code>'bow'</code>, <code>'axe'</code> or <code>'mace'</code>."}, "letters": {"id": "Row number of the letter.", "knight_id": "Who sent it: the <code>id</code> of a row in <code>knights</code>.", "candle": "How far the great candle had burned when the pigeon flew: notch <code>1</code> (sunset) to <code>12</code> (the midnight bell).", "wax": "Colour of the wax seal: <code>'black'</code>, <code>'white'</code>, <code>'blue'</code>, <code>'gold'</code>, <code>'grey'</code> or <code>'red'</code>."}};
 const HAND_STEPS = ["Write your name below.", "Click <b>Save answers (.txt)</b>. The file goes to your Downloads folder.", "Open the assignment in <b>Google Classroom</b>, upload the file under <b>Add or create → File</b>, then press <b>Turn in</b>."];
 const RANKS = ["Royal Spymaster", "Lord Chancellor", "Knight of the Realm", "Squire"];
 const T = {

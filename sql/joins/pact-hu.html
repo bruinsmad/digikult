@@ -284,7 +284,7 @@ tr:last-child td{border-bottom:none}
       <div><span>Lekérdezések</span><b id="fQueries">–</b></div>
       <div><span>Rang</span><b id="fRank">–</b></div>
     </div>
-    <div class="caught">Udvarias S. Bálint Máté · az istállóban elfogva, ujjain fekete pecsétviasz</div>
+    <div class="caught">Udvarias Bálint Máté · az istállóban elfogva, ujjain fekete pecsétviasz</div>
     <div class="finale-btns">
       <button class="btn" id="finaleClose" type="button">Bónuszfeladatok</button>
       <button class="btn ghost" id="finaleAgain" type="button">Szóljanak a harangok!</button>
@@ -299,36 +299,36 @@ const SEED = `
 CREATE TABLE kiralysagok (id INTEGER PRIMARY KEY, nev TEXT, uralkodo TEXT, fovaros TEXT, sereg INTEGER, szovetseg TEXT);
 CREATE TABLE lovagok (id INTEGER PRIMARY KEY, nev TEXT, kiralysag_id INTEGER, rang TEXT, fegyver TEXT);
 CREATE TABLE levelek (id INTEGER PRIMARY KEY, lovag_id INTEGER, gyertya INTEGER, pecset TEXT);
-INSERT INTO kiralysagok VALUES (1,'Északhon','Bölcs B. Dániel','Fagyvár',1200,'Ezüst Szövetség');
-INSERT INTO kiralysagok VALUES (2,'Folyóföld','Kegyes F. Lilianna','Fűzgázló',900,'Ezüst Szövetség');
-INSERT INTO kiralysagok VALUES (3,'Napvölgy','Vidám L. Mária Éva','Aranymező',800,'Ezüst Szövetség');
-INSERT INTO kiralysagok VALUES (4,'Vashegy','Hatalmas M. Márk','Üllőkő',2000,'Vas Liga');
-INSERT INTO kiralysagok VALUES (5,'Ködliget','Titokzatos L. Laura','Árnyéktó',700,'Vas Liga');
-INSERT INTO kiralysagok VALUES (6,'Aranypart','Bőkezű R. Benjámin Laurence','Tengerkapu',1100,'Vas Liga');
-INSERT INTO lovagok VALUES (1,'Törhetetlen K. Kamilla',1,'bajnok','lándzsa');
-INSERT INTO lovagok VALUES (2,'Udvarias S. Bálint Máté',2,'lovag','íj');
-INSERT INTO lovagok VALUES (3,'Vakmerő H. Hunor József',4,'bajnok','bárd');
-INSERT INTO lovagok VALUES (4,'Hallgatag B. Rozália',5,'lovag','íj');
-INSERT INTO lovagok VALUES (5,'Bátor É. Bence',3,'lovag','kard');
-INSERT INTO lovagok VALUES (6,'Vitéz L. Ágnes Abigél',6,'lovag','kard');
-INSERT INTO lovagok VALUES (7,'Éber H. Viktor',1,'parancsnok','kard');
-INSERT INTO lovagok VALUES (8,'Izgága W. Jay',4,'lovag','buzogány');
-INSERT INTO lovagok VALUES (9,'Fürge F. Réka',2,'bajnok','lándzsa');
-INSERT INTO lovagok VALUES (10,'Rettenthetetlen M. Anna Petra',5,'bajnok','kard');
-INSERT INTO lovagok VALUES (11,'Ragyogó L. Zorka',3,'bajnok','lándzsa');
-INSERT INTO lovagok VALUES (12,'Furfangos K. Nóra',6,'bajnok','lándzsa');
-INSERT INTO lovagok VALUES (13,'Erős B. Mihály',1,'lovag','bárd');
-INSERT INTO lovagok VALUES (14,'Szigorú L. Zsombor Attila',4,'lovag','kard');
-INSERT INTO lovagok VALUES (15,'Hűséges C. Balázs',2,'lovag','kard');
-INSERT INTO lovagok VALUES (16,'Vándor S. Eliza',5,'lovag','buzogány');
-INSERT INTO lovagok VALUES (17,'Jószívű N. Boglárka',3,'lovag','íj');
-INSERT INTO lovagok VALUES (18,'Harcias P. Petra Patrícia',6,'lovag','bárd');
-INSERT INTO lovagok VALUES (19,'Ifjú O. Benjámin Ádám',1,'apród','íj');
-INSERT INTO lovagok VALUES (20,'Könnyűléptű K. Luca',4,'apród','íj');
-INSERT INTO lovagok VALUES (21,'Jókedvű P. Hanna',2,'apród','buzogány');
-INSERT INTO lovagok VALUES (22,'Álmodozó Z. Zalán Benedek',5,'apród','bárd');
-INSERT INTO lovagok VALUES (23,'Szerencsés S. Fruzsina',3,'apród','kard');
-INSERT INTO lovagok VALUES (24,'Gazdag W. Bianka Kinga',6,'apród','buzogány');
+INSERT INTO kiralysagok VALUES (1,'Északhon','Bölcs Dániel','Fagyvár',1200,'Ezüst Szövetség');
+INSERT INTO kiralysagok VALUES (2,'Folyóföld','Kegyes Lilianna','Fűzgázló',900,'Ezüst Szövetség');
+INSERT INTO kiralysagok VALUES (3,'Napvölgy','Vidám Mária Éva','Aranymező',800,'Ezüst Szövetség');
+INSERT INTO kiralysagok VALUES (4,'Vashegy','Hatalmas Márk','Üllőkő',2000,'Vas Liga');
+INSERT INTO kiralysagok VALUES (5,'Ködliget','Titokzatos Laura','Árnyéktó',700,'Vas Liga');
+INSERT INTO kiralysagok VALUES (6,'Aranypart','Bőkezű Benjámin Laurence','Tengerkapu',1100,'Vas Liga');
+INSERT INTO lovagok VALUES (1,'Törhetetlen Kamilla',1,'bajnok','lándzsa');
+INSERT INTO lovagok VALUES (2,'Udvarias Bálint Máté',2,'lovag','íj');
+INSERT INTO lovagok VALUES (3,'Vakmerő Hunor József',4,'bajnok','bárd');
+INSERT INTO lovagok VALUES (4,'Hallgatag Rozália',5,'lovag','íj');
+INSERT INTO lovagok VALUES (5,'Bátor Bence',3,'lovag','kard');
+INSERT INTO lovagok VALUES (6,'Vitéz Ágnes Abigél',6,'lovag','kard');
+INSERT INTO lovagok VALUES (7,'Éber Viktor',1,'parancsnok','kard');
+INSERT INTO lovagok VALUES (8,'Izgága Jay',4,'lovag','buzogány');
+INSERT INTO lovagok VALUES (9,'Fürge Réka',2,'bajnok','lándzsa');
+INSERT INTO lovagok VALUES (10,'Rettenthetetlen Anna Petra',5,'bajnok','kard');
+INSERT INTO lovagok VALUES (11,'Ragyogó Zorka',3,'bajnok','lándzsa');
+INSERT INTO lovagok VALUES (12,'Furfangos Nóra',6,'bajnok','lándzsa');
+INSERT INTO lovagok VALUES (13,'Erős Mihály',1,'lovag','bárd');
+INSERT INTO lovagok VALUES (14,'Szigorú Zsombor Attila',4,'lovag','kard');
+INSERT INTO lovagok VALUES (15,'Hűséges Balázs',2,'lovag','kard');
+INSERT INTO lovagok VALUES (16,'Vándor Eliza',5,'lovag','buzogány');
+INSERT INTO lovagok VALUES (17,'Jószívű Boglárka',3,'lovag','íj');
+INSERT INTO lovagok VALUES (18,'Harcias Petra Patrícia',6,'lovag','bárd');
+INSERT INTO lovagok VALUES (19,'Ifjú Benjámin Ádám',1,'apród','íj');
+INSERT INTO lovagok VALUES (20,'Könnyűléptű Luca',4,'apród','íj');
+INSERT INTO lovagok VALUES (21,'Jókedvű Hanna',2,'apród','buzogány');
+INSERT INTO lovagok VALUES (22,'Álmodozó Zalán Benedek',5,'apród','bárd');
+INSERT INTO lovagok VALUES (23,'Szerencsés Fruzsina',3,'apród','kard');
+INSERT INTO lovagok VALUES (24,'Gazdag Bianka Kinga',6,'apród','buzogány');
 INSERT INTO levelek VALUES (1,7,1,'fehér');
 INSERT INTO levelek VALUES (2,6,1,'vörös');
 INSERT INTO levelek VALUES (3,5,2,'arany');
@@ -374,29 +374,29 @@ const CHAPTERS = [
    "vashegy"
   ],
   "placeholder": "királyság",
-  "success": "Vashegy: 2000 katona. Királya, Hatalmas M. Márk vezeti a Vas Ligát, az Ezüst Szövetség régi riválisát. Ma éjjel az ő lovagjai is a ti fedeletek alatt alszanak.",
+  "success": "Vashegy: 2000 katona. Királya, Hatalmas Márk vezeti a Vas Ligát, az Ezüst Szövetség régi riválisát. Ma éjjel az ő lovagjai is a ti fedeletek alatt alszanak.",
   "starter": "SELECT * FROM kiralysagok;"
  },
  {
   "title": "Galamb éjfél előtt",
-  "story": "<p>1214, Fagyvár, a Nagy Tanács éjszakája. Fagyvárban nincsenek órák: az éjszakát a <b>nagy gyertya</b> méri, amely rovásról rovásra ég le, napnyugtakor az 1. rovástól az éjféli harangszóig, a 12. rovásig. Amikor a <b>kilencedik rovásig</b> leégett, az <b>Ezüst Szövetség</b> királyai elkészültek titkos haditervükkel. A rivális <b>Vas Liga</b> lovagjai is a várban vannak, a béketárgyalások vendégeiként.</p>\n  <p>A gyertya már majdnem leégett, amikor a vár sólyma lecsap egy kelet felé, a Vas Liga tábora felé repülő galambra. A lábán levél, <mark>fekete viasszal, a Vas Liga színével</mark> lepecsételve, benne a haditerv másolata. Az aláírást letépték.</p>\n  <p><b>Éber H. Viktor</b> főparancsnok hozzád fordul, a fiatal királyi írnokhoz. „Ez a galamb ma éjjel a mi galambdúcunkból szállt fel. Az éjféli harangszóra kinyílik a kapu az őrségváltásnak, és az áruló kilovagolhat. Találd meg előbb!” Az éjjeliőrnek már van is egy neve: <b>Izgága W. Jay</b> ma este háromszor ment fel a galambdúchoz.</p>",
+  "story": "<p>1214, Fagyvár, a Nagy Tanács éjszakája. Fagyvárban nincsenek órák: az éjszakát a <b>nagy gyertya</b> méri, amely rovásról rovásra ég le, napnyugtakor az 1. rovástól az éjféli harangszóig, a 12. rovásig. Amikor a <b>kilencedik rovásig</b> leégett, az <b>Ezüst Szövetség</b> királyai elkészültek titkos haditervükkel. A rivális <b>Vas Liga</b> lovagjai is a várban vannak, a béketárgyalások vendégeiként.</p>\n  <p>A gyertya már majdnem leégett, amikor a vár sólyma lecsap egy kelet felé, a Vas Liga tábora felé repülő galambra. A lábán levél, <mark>fekete viasszal, a Vas Liga színével</mark> lepecsételve, benne a haditerv másolata. Az aláírást letépték.</p>\n  <p><b>Éber Viktor</b> főparancsnok hozzád fordul, a fiatal királyi írnokhoz. „Ez a galamb ma éjjel a mi galambdúcunkból szállt fel. Az éjféli harangszóra kinyílik a kapu az őrségváltásnak, és az áruló kilovagolhat. Találd meg előbb!” Az éjjeliőrnek már van is egy neve: <b>Izgága Jay</b> ma este háromszor ment fel a galambdúchoz.</p>",
   "learn": "<p>Megnyitod a <code>lovagok</code> táblát, de királyságneveket nem találsz benne, csak számokat a <code>kiralysag_id</code> oszlopban. Az adatbázis mindent <b>egy</b> helyen tárol: a királyság neve a <code>kiralysagok</code> táblában van, a <code>lovagok</code> csak a királyság <code>id</code>-jét tárolja. Ez a szám egy <b>hivatkozás</b>: a <code>kiralysag_id = 1</code> azt jelenti, hogy „az a királyság, amelynek az id-je 1”. Egyelőre keresd ki kézzel, két lekérdezéssel.</p>\n  <pre>SELECT * FROM lovagok;\n\nSELECT nev FROM kiralysagok WHERE id = 1;</pre>",
-  "task": "Melyik királyságot szolgálja Izgága W. Jay?",
+  "task": "Melyik királyságot szolgálja Izgága Jay?",
   "hints": [
    "Keresd meg a sorát a lovagok táblában, és jegyezd fel a kiralysag_id-jét. Aztán keresd meg ezt az id-t a kiralysagok táblában.",
    {
-    "sql": "SELECT kiralysag_id FROM lovagok\nWHERE nev = 'Izgága W. Jay';\n\nSELECT nev FROM kiralysagok WHERE id = 4;"
+    "sql": "SELECT kiralysag_id FROM lovagok\nWHERE nev = 'Izgága Jay';\n\nSELECT nev FROM kiralysagok WHERE id = 4;"
    }
   ],
   "answers": [
    "vashegy"
   ],
   "placeholder": "királyság",
-  "success": "Vashegy, Hatalmas M. Márk király saját királysága. Erős első gyanúsított. De minden névhez két lekérdezés lassú, a gyertyák pedig fogynak."
+  "success": "Vashegy, Hatalmas Márk király saját királysága. Erős első gyanúsított. De minden névhez két lekérdezés lassú, a gyertyák pedig fogynak."
  },
  {
   "title": "A párosítási szabály",
-  "story": "<p>„Ne egyenként keresgéld őket – mondja Éber H. Viktor. – Tedd egymás mellé a lovagokat és a királyságokat, és lásd, ki kicsoda.”</p>",
+  "story": "<p>„Ne egyenként keresgéld őket – mondja Éber Viktor. – Tedd egymás mellé a lovagokat és a királyságokat, és lásd, ki kicsoda.”</p>",
   "learn": "<p>Ha a <code>FROM</code>-ban két táblát nevezel meg, az <b>minden lovagot minden királysággal</b> párba állít: 24 × 6 = 144 sor, a legtöbbjük értelmetlen. A <code>WHERE</code>-be írt <b>párosítási szabály</b> csak az összetartozó párokat tartja meg: a lovag <code>kiralysag_id</code>-je egyenlő a királyság <code>id</code>-jével.</p>\n  <pre>SELECT lovagok.nev, kiralysagok.nev, kiralysagok.szovetseg\nFROM lovagok, kiralysagok\nWHERE lovagok.kiralysag_id = kiralysagok.id;</pre>\n  <p>Mindkét táblában van <code>id</code> és <code>nev</code>, ezért írd így: <code>tábla.oszlop</code>. További feltételek <code>AND</code>-del jönnek. Próbáld ki szabály nélkül és szabállyal:</p>\n  <div class=\"tries\">\n    <button type=\"button\" class=\"try\" data-sql=\"SELECT COUNT(*) FROM lovagok, kiralysagok;\">SELECT COUNT(*) FROM lovagok, kiralysagok;</button>\n    <button type=\"button\" class=\"try\" data-sql=\"SELECT COUNT(*) FROM lovagok, kiralysagok WHERE lovagok.kiralysag_id = kiralysagok.id;\">SELECT COUNT(*) FROM lovagok, kiralysagok WHERE lovagok.kiralysag_id = kiralysagok.id;</button>\n  </div>",
   "task": "Párosítsd minden lovagot a királyságával! Hány Vas Liga-beli lovag vendégeskedik ma éjjel a várban?",
   "hints": [
@@ -414,7 +414,7 @@ const CHAPTERS = [
    "144": "Ez minden lovag minden királysággal párosítva. Írd be a párosítási szabályt: WHERE lovagok.kiralysag_id = kiralysagok.id.",
    "24": "Ez az összes lovag. Csak a Vas Ligát tartsd meg: AND kiralysagok.szovetseg = 'Vas Liga'."
   },
-  "success": "Tizenkét ellenséges lovag egy fedél alatt, és Izgága W. Jay csak az egyikük. Kellenek a galambdúc feljegyzései."
+  "success": "Tizenkét ellenséges lovag egy fedél alatt, és Izgága Jay csak az egyikük. Kellenek a galambdúc feljegyzései."
  },
  {
   "title": "A galambdúc naplója",
@@ -428,13 +428,11 @@ const CHAPTERS = [
    }
   ],
   "answers": [
-   "izgaga w jay",
-   "w jay",
-   "jay",
-   "jay w"
+   "izgaga jay",
+   "jay"
   ],
   "placeholder": "név",
-  "success": "Izgága W. Jay: három fekete pecsét. „Megvan az emberünk!” – mondja az őr. Éber H. Viktor a fejét rázza. „A vendégek írhatnak haza. Az a kérdés, <i>mikor</i> írt.”"
+  "success": "Izgága Jay: három fekete pecsét. „Megvan az emberünk!” – mondja az őr. Éber Viktor a fejét rázza. „A vendégek írhatnak haza. Az a kérdés, <i>mikor</i> írt.”"
  },
  {
   "title": "A kilencedik rovás",
@@ -455,7 +453,7 @@ const CHAPTERS = [
   "traps": {
    "6": "Ennyien használtak fekete viaszt. Nézd a MAX(levelek.gyertya) oszlopot: hány érték 9 vagy nagyobb?"
   },
-  "success": "Hárman: Szigorú L. Zsombor Attila a 9., Hallgatag B. Rozália a 10. és Udvarias S. Bálint Máté a 11. rovásnál. Izgága W. Jay utolsó galambja a 8. rovásnál szállt fel, amikor a terv még nem is létezett. Ő csak haza írt."
+  "success": "Hárman: Szigorú Zsombor Attila a 9., Hallgatag Rozália a 10. és Udvarias Bálint Máté a 11. rovásnál. Izgága Jay utolsó galambja a 8. rovásnál szállt fel, amikor a terv még nem is létezett. Ő csak haza írt."
  },
  {
   "title": "Kinek az oldalán?",
@@ -490,19 +488,16 @@ const CHAPTERS = [
    }
   ],
   "answers": [
-   "udvarias s balint mate",
-   "s balint mate",
+   "udvarias balint mate",
    "balint mate",
-   "balint mate s",
-   "s balint",
    "balint"
   ],
   "placeholder": "név",
-  "success": "Udvarias S. Bálint Máté, Folyóföld lovagja, 11. rovás: ez volt a galamb, amelyet a sólyom elkapott. Amikor a harang éjfélt üt, Törhetetlen K. Kamilla bajnok az istállóban talál rá: a lova felnyergelve, az ujjain még ott a fekete viasz. Hajnalban az Ezüst Szövetség új tervet ír, és ez már titok marad."
+  "success": "Udvarias Bálint Máté, Folyóföld lovagja, 11. rovás: ez volt a galamb, amelyet a sólyom elkapott. Amikor a harang éjfélt üt, Törhetetlen Kamilla bajnok az istállóban talál rá: a lova felnyergelve, az ujjain még ott a fekete viasz. Hajnalban az Ezüst Szövetség új tervet ír, és ez már titok marad."
  }
 ];
 const BONUS = ["Melyik királyság lovagjai küldték a legtöbb levelet ma este, bármilyen pecséttel? (három tábla, GROUP BY kiralysagok.nev)", "Listázd ki az összes lovagot annak az uralkodónak a nevével, akit szolgál, uralkodó szerint rendezve.", "Hány levelet küldtek a kilencedik rovástól kezdve az egyes szövetségek lovagjai?", "Pecsétszínenként hány levél ment el, és hányadik rovásnál szállt fel az utolsó?", "Milyen fegyvert hordanak a legtöbben azok közül, akik fekete pecsétes levelet küldtek?", "Nehéz: mely lovagok nem küldtek ma este egyetlen levelet sem? Segítség: lovagok.id NOT IN (SELECT lovag_id FROM levelek)."];
-const COLDOCS = {"kiralysagok": {"id": "A királyság sorszáma.", "nev": "<code>'Északhon'</code>, <code>'Folyóföld'</code>, <code>'Napvölgy'</code>, <code>'Vashegy'</code>, <code>'Ködliget'</code> vagy <code>'Aranypart'</code>.", "uralkodo": "A király vagy királynő, pl. <code>'Bölcs B. Dániel'</code>.", "fovaros": "A főváros, pl. <code>'Fagyvár'</code>.", "sereg": "Hány katonája van a királyságnak.", "szovetseg": "<code>'Ezüst Szövetség'</code> vagy <code>'Vas Liga'</code>."}, "lovagok": {"id": "A lovag sorszáma.", "nev": "A lovag neve.", "kiralysag_id": "Melyik királyságot szolgálja: egy <code>kiralysagok</code>-beli sor <code>id</code>-je.", "rang": "<code>'apród'</code>, <code>'lovag'</code>, <code>'bajnok'</code> vagy <code>'parancsnok'</code>.", "fegyver": "<code>'kard'</code>, <code>'lándzsa'</code>, <code>'íj'</code>, <code>'bárd'</code> vagy <code>'buzogány'</code>."}, "levelek": {"id": "A levél sorszáma.", "lovag_id": "Ki küldte: egy <code>lovagok</code>-beli sor <code>id</code>-je.", "gyertya": "Hányadik rovásig égett le a nagy gyertya, amikor a galamb felszállt: <code>1</code> (napnyugta) … <code>12</code> (éjféli harangszó).", "pecset": "A pecsétviasz színe: <code>'fekete'</code>, <code>'fehér'</code>, <code>'kék'</code>, <code>'arany'</code>, <code>'szürke'</code> vagy <code>'vörös'</code>."}};
+const COLDOCS = {"kiralysagok": {"id": "A királyság sorszáma.", "nev": "<code>'Északhon'</code>, <code>'Folyóföld'</code>, <code>'Napvölgy'</code>, <code>'Vashegy'</code>, <code>'Ködliget'</code> vagy <code>'Aranypart'</code>.", "uralkodo": "A király vagy királynő, pl. <code>'Bölcs Dániel'</code>.", "fovaros": "A főváros, pl. <code>'Fagyvár'</code>.", "sereg": "Hány katonája van a királyságnak.", "szovetseg": "<code>'Ezüst Szövetség'</code> vagy <code>'Vas Liga'</code>."}, "lovagok": {"id": "A lovag sorszáma.", "nev": "A lovag neve.", "kiralysag_id": "Melyik királyságot szolgálja: egy <code>kiralysagok</code>-beli sor <code>id</code>-je.", "rang": "<code>'apród'</code>, <code>'lovag'</code>, <code>'bajnok'</code> vagy <code>'parancsnok'</code>.", "fegyver": "<code>'kard'</code>, <code>'lándzsa'</code>, <code>'íj'</code>, <code>'bárd'</code> vagy <code>'buzogány'</code>."}, "levelek": {"id": "A levél sorszáma.", "lovag_id": "Ki küldte: egy <code>lovagok</code>-beli sor <code>id</code>-je.", "gyertya": "Hányadik rovásig égett le a nagy gyertya, amikor a galamb felszállt: <code>1</code> (napnyugta) … <code>12</code> (éjféli harangszó).", "pecset": "A pecsétviasz színe: <code>'fekete'</code>, <code>'fehér'</code>, <code>'kék'</code>, <code>'arany'</code>, <code>'szürke'</code> vagy <code>'vörös'</code>."}};
 const HAND_STEPS = ["Írd be lent a neved.", "Kattints a <b>Válaszok mentése (.txt)</b> gombra. A fájl a Letöltések mappába kerül.", "Nyisd meg a feladatot a <b>Google Classroomban</b>, töltsd fel a fájlt a <b>Hozzáadás vagy létrehozás → Fájl</b> alatt, majd nyomd meg a <b>Beadás</b> gombot."];
 const RANKS = ["Királyi kémfőnök", "Kancellár", "A birodalom lovagja", "Apród"];
 const T = {
