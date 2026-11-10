@@ -237,6 +237,18 @@
                 },
                 files: { en: "css/basics/makeover.html", hu: "css/basics/makeover-hu.html" },
                 progress: { chapters: 8, keys: { en: "makeover-en-v1", hu: "makeover-hu-v1" } }
+              },
+              {
+                id: "galaxy",
+                kind: "story",
+                minutes: 45,
+                title: { hu: "Csillagközi Klub: CSS a galaxisban", en: "The Star Club: CSS in a Galaxy" },
+                desc: {
+                  hu: "A suli Star Wars-klubjának honlapja még fehér és unalmas. Sötét űr, csillagos háttér, ragyogó Jedi- és Sith-kártyák, fénykard-gombok és ferdén úszó nyitószöveg, 9 fejezetben.",
+                  en: "The school Star Wars club's website is still white and dull. Dark space, a starry background, glowing Jedi and Sith cards, lightsaber buttons and a tilted opening crawl, in 9 chapters."
+                },
+                files: { en: "css/basics/galaxy.html", hu: "css/basics/galaxy-hu.html" },
+                progress: { chapters: 9, keys: { en: "galaxy-en-v1", hu: "galaxy-hu-v1" } }
               }
             ]
           }
