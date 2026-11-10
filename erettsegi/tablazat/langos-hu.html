@@ -80,25 +80,6 @@ window.EXAM = {
     "A szövegbeolvasó varázslóban: <span class=ui>Tagolt</span>, a fájl eredete <span class=ui>65001: Unicode (UTF-8)</span>, határoló a <span class=ui>Tabulátor</span>. Így az ékezetek is jók lesznek.",
     "Mentés: <span class=ui>Fájl</span> › <span class=ui>Mentés másként</span>, típus: <span class=ui>Excel-munkafüzet (*.xlsx)</span>, név: <i>langos</i>."
    ],
-   "asks": [
-    {
-     "q": "Hányadik sorban van az utolsó rendelés?",
-     "num": 71,
-     "traps": {
-      "70": "Ez a rendelések száma. Az első sor a fejléc, így az utolsó rendelés eggyel lejjebb van."
-     }
-    },
-    {
-     "q": "Melyik cellába került az árlap első fajtája, a „Sima”?",
-     "text": [
-      "D2"
-     ],
-     "traps": {
-      "E2": "Akkor az adatok nem az A1-től kezdődnek. Nyisd meg újra a fájlt!",
-      "F2": "Ez már a 2. részfeladat utáni állapot. Most, a beszúrás előtt hol van?"
-     }
-    }
-   ],
    "hints": [
     "Ha az ékezetes betűk furcsán jelennek meg (pl. LÃ¡ngos), a beolvasásnál a fájl eredetének az UTF-8-at válaszd."
    ],
@@ -112,20 +93,6 @@ window.EXAM = {
     "Jelöld ki a C és a D oszlopot (kattints az oszlopfejekre), jobb klikk › <span class=ui>Beszúrás</span>.",
     "A C1-be: Kedvezménnyel, a D1-be: Fizetendő."
    ],
-   "asks": [
-    {
-     "q": "Melyik cellában van most a „Sima”?",
-     "text": [
-      "F2"
-     ]
-    },
-    {
-     "q": "Melyik oszlopban van most az árlap „Ár” oszlopa?",
-     "text": [
-      "H"
-     ]
-    }
-   ],
    "hints": [
     "Két oszlop beszúrása után minden, ami a C oszloptól jobbra volt, két oszloppal jobbra kerül."
    ],
@@ -135,21 +102,6 @@ window.EXAM = {
    "n": 3,
    "title": "Kedvezménnyel",
    "text": "<p>A <i>C</i> oszlop celláiban (<i>Kedvezménnyel</i>) függvény segítségével határozza meg, hogy hány lángos árának megfelelő összeget kellett fizetni! Itt vegye figyelembe, hogy az egy fajtából ötnél több lángost vásárlók az öt fölöttiek árából 10% kedvezményt kapnak. (Például 10 lángos esetén 9,5 lángos árának megfelelő összeget kell fizetni.)</p>",
-   "asks": [
-    {
-     "q": "Mi lett a C5 cellában? (7 lángos)",
-     "num": 6.8,
-     "traps": {
-      "7": "Ez a teljes darabszám. Az öt fölötti lángosok csak 0,9-et „érnek”.",
-      "6,3": "Az első öt lángosra nincs kedvezmény, csak az öt fölöttiekre: 5 + 2 · 0,9.",
-      "6,5": "10% kedvezmény: az öt fölötti lángosok 0,9-et érnek, nem 0,75-öt."
-     }
-    },
-    {
-     "q": "Mi lett a C9 cellában? (6 lángos)",
-     "num": 5.9
-    }
-   ],
    "hints": [
     "Két eset van: ha 5 vagy kevesebb, akkor maga a rendelés; ha több, akkor 5 + (rendelés − 5) · 0,9. Ehhez a HA függvény kell.",
     "C2: <code>=HA(B2>5;5+(B2-5)*0,9;B2)</code>, aztán a kitöltőjellel le a C71-ig (vagy dupla katt a kitöltőjelre)."
@@ -160,19 +112,6 @@ window.EXAM = {
    "n": 4,
    "title": "Fizetendő",
    "text": "<p>A <i>Fizetendő</i> oszlopban másolható függvény segítségével a kedvezménnyel korrigált darabszámból és az árlapra való hivatkozással számítsa ki a rendelési tételek értékét!</p>",
-   "asks": [
-    {
-     "q": "Mennyi a D5 cella értéke? (7 sima lángos)",
-     "num": 1088.0,
-     "traps": {
-      "1120": "Ez kedvezmény nélkül: a C oszlop darabszámával szorozz, ne a B oszlopéval."
-     }
-    },
-    {
-     "q": "Mennyi a D9 cella értéke?",
-     "num": 1475.0
-    }
-   ],
    "hints": [
     "Az árat a lángos kódja (A oszlop) alapján kell kikeresni az árlapból (G:H oszlop). Erre való az FKERES függvény. A „másolható” azt jelenti: lehúzva is jó maradjon, ehhez az árlap tartományát $ jellel rögzítsd.",
     "D2: <code>=C2*FKERES(A2;$G$2:$H$7;2;HAMIS)</code>, aztán le a D71-ig."
@@ -183,19 +122,6 @@ window.EXAM = {
    "n": 5,
    "title": "Darab",
    "text": "<p>Az <i>I1</i> cellába írja, hogy „Darab”, és az <i>I2:I7</i> tartományban adja meg, hogy az eladási adatok alapján az egyes lángosfajtákból összesen hányat adtak el! (Ha szükséges az <i>N</i> oszloptól jobbra segédadatokat írhat.)</p>",
-   "asks": [
-    {
-     "q": "Hány sima lángost adtak el? (I2)",
-     "num": 45,
-     "traps": {
-      "11": "Ez a rendelések (sorok) száma. Nekünk a B oszlopban lévő darabszámok összege kell: SZUMHA."
-     }
-    },
-    {
-     "q": "Hány brindzásat adtak el? (I7)",
-     "num": 16
-    }
-   ],
    "hints": [
     "SZUMHA: összeadja a B oszlop számait azokban a sorokban, ahol az A oszlopban az adott fajta kódja áll.",
     "I2: <code>=SZUMHA($A$2:$A$71;G2;$B$2:$B$71)</code>, aztán le az I7-ig."
@@ -206,12 +132,6 @@ window.EXAM = {
    "n": 6,
    "title": "Összes lángos",
    "text": "<p>Írja a <i>K1</i> cellába, hogy „Összes lángos száma”, és határozza meg a <i>K2</i> cellában, hogy összesen hány lángost adtak el!</p>",
-   "asks": [
-    {
-     "q": "Hány lángost adtak el összesen? (K2)",
-     "num": 192
-    }
-   ],
    "hints": [
     "K2: <code>=SZUM(I2:I7)</code> (vagy a B oszlop összege)."
    ],
@@ -221,15 +141,6 @@ window.EXAM = {
    "n": 7,
    "title": "Bevétel",
    "text": "<p>Az <i>L1</i> cellába írja, hogy „Bevétel”, és számítsa ki az <i>L2</i> cellában a teljes bevételt!</p>",
-   "asks": [
-    {
-     "q": "Mennyi a teljes bevétel? (L2)",
-     "num": 46943.0,
-     "traps": {
-      "47220": "Ez kedvezmény nélkül. A Fizetendő oszlopot add össze."
-     }
-    }
-   ],
    "hints": [
     "L2: <code>=SZUM(D2:D71)</code>"
    ],
@@ -239,10 +150,6 @@ window.EXAM = {
    "n": 8,
    "title": "Ft mértékegység",
    "text": "<p>Állítsa be, hogy a pénzösszeget tartalmazó cellákban „Ft” mértékegység jelenjen meg, és a számok 0 tizedes jegyűek legyenek!</p>",
-   "checklist": [
-    "A Fizetendő oszlop, az árlap árai (H2:H7) és a bevétel (L2) „Ft”-tal jelenik meg",
-    "Ezekben a cellákban nincs tizedesjegy (pl. 1 088 Ft)"
-   ],
    "hints": [
     "Jelöld ki a pénzösszegeket (Ctrl-lal több tartomány is kijelölhető), aztán <span class=ui>Cellák formázása</span> (<kbd>Ctrl</kbd>+<kbd>1</kbd>) › <span class=ui>Szám</span> › <span class=ui>Pénznem</span>: Tizedesjegyek 0, Szimbólum: Ft."
    ]
@@ -251,10 +158,6 @@ window.EXAM = {
    "n": 9,
    "title": "Szegélyek",
    "text": "<p>Az adatokat tartalmazó cellákhoz állítson vékony cellaszegélyezést, de a többi cella szegély nélkül jelenjen meg a nyomtatási képen!</p>",
-   "checklist": [
-    "Az adatokat tartalmazó cellák (a rendelések, az árlap, a K1:L2) körül vékony szegély van",
-    "Az üres cellákon nincs szegély: nézd meg a nyomtatási képen (<kbd>Ctrl</kbd>+<kbd>P</kbd>)"
-   ],
    "hints": [
     "Jelöld ki az A1:D71, az F1:I7 és a K1:L2 tartományt, aztán <span class=ui>Kezdőlap</span> › <span class=ui>Szegély</span> › <span class=ui>Minden szegély</span>. A halvány rácsvonalak nem nyomtatódnak ki, azokkal nincs dolgod."
    ]
@@ -263,10 +166,6 @@ window.EXAM = {
    "n": 10,
    "title": "Az első sor és az oszlopok",
    "text": "<p>Az első sor celláit formázza meg a minta szerint! Változtassa meg az oszlopszélességeket úgy, hogy a táblázat jól áttekinthető legyen!</p>",
-   "checklist": [
-    "Az első sor félkövér, a szöveg függőleges, alulról felfelé fut, mint a mintán",
-    "Az oszlopok szélessége olyan, hogy minden adat jól olvasható"
-   ],
    "hints": [
     "Jelöld ki az első sort, <kbd>Ctrl</kbd>+<kbd>B</kbd>, aztán <span class=ui>Cellák formázása</span> › <span class=ui>Igazítás</span> › <span class=ui>Elrendezés</span>: 90 fok."
    ]
@@ -275,11 +174,6 @@ window.EXAM = {
    "n": 11,
    "title": "Igazítás",
    "text": "<p>A szöveges cellák balra, a pénzértékeket tartalmazók jobbra és a többi számot tartalmazó cella középre igazított legyen!</p>",
-   "checklist": [
-    "A szöveges cellák (pl. a fajták nevei) balra igazítottak",
-    "A forintos cellák jobbra igazítottak",
-    "A többi szám (kód, rendelés, kedvezményes darab, darab) középre igazított"
-   ],
    "hints": [
     "<span class=ui>Kezdőlap</span> › <span class=ui>Igazítás</span> csoport: balra, középre, jobbra. Több tartomány is kijelölhető egyszerre a <kbd>Ctrl</kbd> lenyomásával."
    ]
@@ -288,13 +182,6 @@ window.EXAM = {
    "n": 12,
    "title": "Oszlopdiagram",
    "text": "<p>Ábrázolja beágyazott oszlopdiagrammal, hogy melyik lángos fajtából hány darabot adtak el!</p><ul class=\"dash\"><li>A diagramon ne legyen jelmagyarázat!</li><li>A cím „Napi eladás” 20 pontos betűmérettel, félkövér betűstílussal és Courier New (Courier) betűtípussal készüljön!</li><li>Az oszlopok világos narancssárga kitöltésűek és sötétkék szegélyűek legyenek!</li></ul>",
-   "checklist": [
-    "Beágyazott oszlopdiagram: ugyanazon a munkalapon van, mint az adatok",
-    "A vízszintes tengelyen a fajták neve, az oszlopok az eladott darabszámok",
-    "Nincs jelmagyarázat",
-    "A cím „Napi eladás”: 20 pontos, félkövér, Courier New",
-    "Az oszlopok világos narancssárgák, sötétkék szegéllyel"
-   ],
    "hints": [
     "Jelöld ki az F1:F7 tartományt, aztán <kbd>Ctrl</kbd>-lal az I1:I7-et. <span class=ui>Beszúrás</span> › <span class=ui>Oszlopdiagram</span> › <span class=ui>Csoportosított oszlop</span>.",
     "A diagram melletti <b>+</b> gombbal kapcsold ki a jelmagyarázatot. Az oszlopokra jobb klikk › <span class=ui>Adatsor formázása</span> › <span class=ui>Kitöltés</span> és <span class=ui>Szegély</span>."
@@ -307,23 +194,50 @@ window.EXAM = {
   "text": "Következő: Omega"
  }
 };
-window.EXAM.checks = [
-  { task: 1, label: "A rendelések az A1-től, az árlap a helyén", run: F => F.values("A1:B1", ["Lángos kódja", "Rendelés"]).ok && F.values("A71:B71", [5, 2]).ok ? { ok: true } : F.values("A1:B1", ["Lángos kódja", "Rendelés"]) },
-  { task: 2, label: "Két új oszlop a fejléccel", run: F => F.values("C1:D1", ["Kedvezménnyel", "Fizetendő"]).ok ? F.values("F1:H2", ["Fajta", "Kód", "Ár", "Sima", 1, 160]) : F.values("C1:D1", ["Kedvezménnyel", "Fizetendő"]) },
-  { task: 3, label: "C2:C71 kedvezményes darabszám (képlettel)", run: F => F.values("C2:C71", [2, 3, 1, 6.8, 3, 2, 6.8, 5.9, 4, 1, 5, 2, 1, 1, 3, 2, 1, 1, 1, 5, 1, 1, 1, 3, 2, 5.9, 6.8, 4, 1, 1, 1, 5, 4, 1, 1, 5, 4, 1, 1, 3, 1, 3, 2, 1, 1, 5.9, 1, 4, 3, 3, 1, 4, 3, 1, 1, 3, 4, 5.9, 1, 4, 1, 1, 4, 3, 6.8, 3, 1, 5, 1, 2], { formula: true }) },
-  { task: 4, label: "D2:D71 fizetendő (képlettel)", run: F => F.values("D2:D71", [500, 480, 160, 1088.0, 810, 560, 1088.0, 1475.0, 1000, 300, 1500, 600, 250, 280, 810, 560, 270, 250, 300, 1500, 250, 300, 250, 750, 600, 1475.0, 2040.0, 640, 270, 280, 300, 1250, 640, 300, 280, 1250, 1080, 300, 250, 810, 270, 750, 560, 280, 250, 1593.0, 300, 1120, 810, 750, 280, 1200, 750, 160, 300, 750, 1080, 944.0, 270, 1080, 270, 250, 640, 480, 2040.0, 750, 280, 800, 300, 540], { formula: true }) },
-  { task: 5, label: "I1: Darab, I2:I7 eladott darabszám (képlettel)", run: F => { const h = F.values("I1", "Darab"); return h.ok ? F.values("I2:I7", [45, 23, 30, 41, 37, 16], { formula: true }) : h; } },
-  { task: 6, label: "K1, K2: összes lángos száma", run: F => { const h = F.values("K1", "Összes lángos száma"); return h.ok ? F.values("K2", 192, { formula: true }) : h; } },
-  { task: 7, label: "L1, L2: bevétel", run: F => { const h = F.values("L1", "Bevétel"); return h.ok ? F.values("L2", 46943.0, { formula: true }) : h; } },
-  { task: 8, label: "Ft mértékegység, 0 tizedesjegy", run: F => { const re = /Ft/, dec = /0[.,]0/; for (const rg of ["D2:D71", "H2:H7", "L2"]) { const r = F.numFmt(rg, re); if (!r.ok) return r; const w = F.ws(); const bad = F.cellsOf(rg).find(a => w[a] && dec.test(String(w[a].z || ""))); if (bad) return { ok: false, msg: `${bad} cellában tizedesjegyek is látszanak: 0 tizedesjegy kell.` }; } return { ok: true }; } },
-  { task: 12, label: "Beágyazott oszlopdiagram „Napi eladás” címmel, jelmagyarázat nélkül", run: F => {
-      const ch = F.charts().find(c => c.types.includes("bar") || c.types.includes("bar3D"));
-      if (!ch) return { ok: false, msg: F.charts().length ? "Van diagram, de nem oszlopdiagram." : "Nem találok diagramot a munkalapon." };
-      if (ch.barDir === "bar") return { ok: false, msg: "Ez sávdiagram (vízszintes sávok). Oszlopdiagram kell." };
-      if (ch.title.trim() !== "Napi eladás") return { ok: false, msg: `A diagram címe „${ch.title}”, de „Napi eladás” kell.` };
-      if (ch.legend) return { ok: false, msg: "A diagramon van jelmagyarázat. Kapcsold ki!" };
-      return { ok: true }; } }
-];
+window.EXAM.checks = (() => {
+  const LAST = 71;
+  const fnUsed = (F, col) => { const w = F.ws(); const bad = F.cellsOf(`${col}2:${col}${LAST}`).find(a => w[a] && w[a].f && !/[A-Z]\(/.test(w[a].f)); return bad ? { ok: false, msg: `${bad} képlete (${F.hu(w[bad].f)}) nem használ függvényt. A feladat szerint függvénnyel kell (pl. HA, FKERES).` } : { ok: true }; };
+  const chart = F => { const all = F.charts(), ch = all.find(c => c.types.some(t => /^bar/.test(t)));
+    if (!ch) return { err: { ok: false, msg: all.length ? "Van diagram, de nem oszlopdiagram." : "Nem találok diagramot az adatok munkalapján. (Ha külön diagramlapra került, helyezd át a munkalapra: beágyazott diagram kell.)" } };
+    if (ch.barDir === "bar") return { err: { ok: false, msg: "Ez sávdiagram (vízszintes sávok). Oszlopdiagram kell." } };
+    return { ch }; };
+  return [
+    { task: 1, label: "A rendelések az A1-től, mind a 70 rendeléssel", run: F => F.all(F.values("A1:B1", ["Lángos kódja", "Rendelés"]), F.values("A71:B71", [5, 2]), F.values("A72", null)) },
+    { task: 1, label: "Az árlap a helyén (a „Sima” a D2-ben)", run: F => { const w = F.ws(); return (w.D2 && w.D2.v === "Sima") || (w.F2 && w.F2.v === "Sima") ? { ok: true } : { ok: false, msg: "Nem találom a „Sima” fajtát a D2 cellában: az első beolvasott adat az A1-be kerüljön." }; } },
+    { task: 2, label: "C1: Kedvezménnyel, D1: Fizetendő", run: F => F.values("C1:D1", ["Kedvezménnyel", "Fizetendő"]) },
+    { task: 2, label: "Az árlap két oszloppal jobbra került (F:H)", run: F => F.values("F1:H2", ["Fajta", "Kód", "Ár", "Sima", 1, 160]) },
+    { task: 3, label: `C2:C${LAST}: a kedvezményes darabszám, képlettel`, run: F => F.values(`C2:C${LAST}`, [2, 3, 1, 6.8, 3, 2, 6.8, 5.9, 4, 1, 5, 2, 1, 1, 3, 2, 1, 1, 1, 5, 1, 1, 1, 3, 2, 5.9, 6.8, 4, 1, 1, 1, 5, 4, 1, 1, 5, 4, 1, 1, 3, 1, 3, 2, 1, 1, 5.9, 1, 4, 3, 3, 1, 4, 3, 1, 1, 3, 4, 5.9, 1, 4, 1, 1, 4, 3, 6.8, 3, 1, 5, 1, 2], { formula: true }) },
+    { task: 3, label: "A C oszlopban függvényt használtál", run: F => fnUsed(F, "C") },
+    { task: 4, label: `D2:D${LAST}: a fizetendő összeg, képlettel`, run: F => F.values(`D2:D${LAST}`, [500, 480, 160, 1088.0, 810, 560, 1088.0, 1475.0, 1000, 300, 1500, 600, 250, 280, 810, 560, 270, 250, 300, 1500, 250, 300, 250, 750, 600, 1475.0, 2040.0, 640, 270, 280, 300, 1250, 640, 300, 280, 1250, 1080, 300, 250, 810, 270, 750, 560, 280, 250, 1593.0, 300, 1120, 810, 750, 280, 1200, 750, 160, 300, 750, 1080, 944.0, 270, 1080, 270, 250, 640, 480, 2040.0, 750, 280, 800, 300, 540], { formula: true }) },
+    { task: 4, label: "Az ár az árlapból jön (hivatkozás a G:H oszlopra)", run: F => { const w = F.ws(); const bad = F.cellsOf(`D2:D${LAST}`).find(a => w[a] && w[a].f && !/\$?[GH]\$?\d|\$?[GH]:\$?[GH]/.test(w[a].f));
+        return bad ? { ok: false, msg: `${bad} képlete (${F.hu(w[bad].f)}) nem az árlapból veszi az árat. Ne írd be kézzel az árat: hivatkozz a G:H oszlopra!` } : fnUsed(F, "D"); } },
+    { task: 5, label: "I1: Darab", run: F => F.values("I1", "Darab") },
+    { task: 5, label: "I2:I7: az eladott darabszám fajtánként, képlettel", run: F => F.values("I2:I7", [45, 23, 30, 41, 37, 16], { formula: true }) },
+    { task: 6, label: "K1: Összes lángos száma, K2: képlettel", run: F => F.all(F.values("K1", "Összes lángos száma"), F.values("K2", 192, { formula: true })) },
+    { task: 7, label: "L1: Bevétel, L2: képlettel", run: F => F.all(F.values("L1", "Bevétel"), F.values("L2", 46943.0, { formula: true })) },
+    { task: 8, label: "„Ft” a pénzösszegeken (D oszlop, H2:H7, L2)", run: F => F.numFmt([`D2:D${LAST}`, "H2:H7", "L2"], /Ft/) },
+    { task: 8, label: "0 tizedesjegy a pénzösszegeken", run: F => { const w = F.ws(); const bad = F.many([`D2:D${LAST}`, "H2:H7", "L2"]).find(a => w[a] && /0[.,]0/.test(String(w[a].z || ""))); return bad ? { ok: false, msg: `${bad} cellában tizedesjegyek is látszanak: 0 tizedesjegy kell.` } : { ok: true }; } },
+    { task: 9, label: "Vékony szegély minden adatot tartalmazó cellán", run: F => F.boxed([`A1:D${LAST}`, "F1:I7", "K1:L2"]) },
+    { task: 9, label: "Az üres cellákon nincs szegély", run: F => F.unboxed([`E1:E${LAST}`, "J1:J7", "F8:I9", `A${LAST + 1}:D${LAST + 1}`, "M1:M2", "K3:L3"]) },
+    { task: 10, label: "Az első sor félkövér, a szöveg függőleges (mint a mintán)", run: F => F.styles(["A1:D1", "F1:I1"], s => s.font.b && s.rot === 90, (a, s) => `${a}: ${!s.font || !s.font.b ? "nem félkövér" : "a szöveg nem 90°-ban elforgatott (alulról felfelé futó)"}.`) },
+    { task: 10, label: "Az oszlopok elég szélesek (a „Sajtos-tejfölös” is kifér)", run: F => { const w = F.col("F").wch || F.col("F").width || 8.43; return w >= 13 ? { ok: true } : { ok: false, msg: "Az F oszlop túl keskeny: a „Sajtos-tejfölös” nem fér ki benne." }; } },
+    { task: 11, label: "A szöveges cellák (a fajták) balra igazítva", run: F => F.styles("F2:F7", s => /^(left|general)$/.test(s.h), a => `${a} nem balra igazított.`) },
+    { task: 11, label: "A pénzértékek jobbra igazítva", run: F => F.styles([`D2:D${LAST}`, "H2:H7", "L2"], s => /^(right|general)$/.test(s.h), a => `${a} nem jobbra igazított.`) },
+    { task: 11, label: "A többi szám középre igazítva (A, B, C, G, I oszlop, K2)", run: F => F.styles([`A2:C${LAST}`, "G2:G7", "I2:I7", "K2"], s => s.h === "center", a => `${a} nem középre igazított.`) },
+    { task: 12, label: "Beágyazott oszlopdiagram, jelmagyarázat nélkül", run: F => { const { ch, err } = chart(F); if (err) return err; return ch.legend ? { ok: false, msg: "A diagramon van jelmagyarázat. Kapcsold ki!" } : ch.series !== 1 ? { ok: false, msg: `A diagramon ${ch.series} adatsor van: csak az eladott darabszám (I2:I7) kell.` } : { ok: true }; } },
+    { task: 12, label: "Cím: „Napi eladás”, 20 pontos, félkövér, Courier New", run: F => { const { ch, err } = chart(F); if (err) return err;
+        if (ch.title.trim() !== "Napi eladás") return { ok: false, msg: `A diagram címe „${ch.title}”, de „Napi eladás” kell.` };
+        if (!/\bsz="2000"/.test(ch.titleX)) return { ok: false, msg: "A cím betűmérete nem 20 pont." };
+        if (!/\bb="(1|true)"/.test(ch.titleX)) return { ok: false, msg: "A cím nem félkövér." };
+        if (!/typeface="Courier( New)?"/.test(ch.titleX)) return { ok: false, msg: "A cím betűtípusa nem Courier New." };
+        return { ok: true }; } },
+    { task: 12, label: "Világos narancssárga oszlopok, sötétkék szegéllyel", run: F => { const { ch, err } = chart(F); if (err) return err;
+        if (!F.lightOrange(ch.fill)) return { ok: false, msg: ch.fill ? "Az oszlopok színe nem világos narancssárga." : "Az oszlopoknak nincs beállított kitöltőszíne (világos narancssárga kell)." };
+        if (!F.darkBlue(ch.line)) return { ok: false, msg: ch.line ? "Az oszlopok szegélye nem sötétkék." : "Az oszlopoknak nincs szegélye (sötétkék kell)." };
+        return { ok: true }; } }
+  ];
+})()
+;
 </script>
 <script src="../../excel/cats.js"></script>
 <script src="../exam.js"></script>

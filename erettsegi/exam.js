@@ -1,64 +1,54 @@
 /* digikult — official érettségi spreadsheet tasks, done in Excel (or any spreadsheet program).
-   Every chapter is one részfeladat, shown word for word as on the official feladatlap. Under it the page
-   offers help (how to start, hints), asks for a few values the student reads off the sheet, or gives a
-   checklist for the formatting and chart parts. The last chapter checks the saved .xlsx itself.
-   The whole feladatlap can be opened (and printed) as one page with the Feladatlap button.
+   Every chapter is one részfeladat, shown word for word as on the official feladatlap. The student
+   saves the file in Excel and the page checks that részfeladat in the saved .xlsx (values, formulas,
+   number formats, fonts, borders, alignment, merges, charts). The next részfeladat opens only when
+   the check passes. In Chrome and Edge the page keeps the chosen file, so after the first pick a click
+   on Ellenőrzés re-reads the saved file. The Feladatlap button shows (and prints) the whole sheet.
 
    The page defines EXAM = {
-     key, title, number, subject, level, date, code, points, saveAs,
-     files: [{ name, href }],                     the official source files
-     minta: [{ src, caption, label }],            the official sample pictures
-     intro: html, rules: [html], lead: html,      word for word
-     tasks: [{ n, title, text, before, tips: [html], hints: [html],
-               asks: [{ q, num | text: [..] | date: "yyyy-mm-dd", traps: { answer: msg } }],
-               checklist: [html], done: html }],
-     checks: [{ task, label, run: F => ({ ok, msg, done, total }) }],
-     ending: html
+     key, title, number, subject, level, date, code, points, saveAs, sheets,
+     files: [{ name, href }], minta: [{ src, caption, label }],
+     intro, lead, rules: [html], introFirst,                       word for word
+     tasks: [{ n, title, text, before, ctx, tips: [html], hints: [html], done }],
+     checks: [{ task, label, run: F => ({ ok, msg, done, total }) }]   task 0 = the whole file only
    } */
 (function () {
   "use strict";
   const X = window.EXAM, T = X.tasks, KEY = X.key;
   const $ = id => document.getElementById(id);
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-  /* chapter 0 is the start (the task's introduction), then one chapter per részfeladat, then the check */
-  const CH = [{ start: true, title: "A feladat" }].concat(T.map(t => Object.assign({ task: true }, t)), [{ upload: true, title: "Ellenőrzés" }]);
+  const CH = [{ start: true, title: "A feladat" }].concat(T.map(t => Object.assign({ task: true }, t)), [{ upload: true, title: "A teljes fájl" }]);
   const LAST = CH.length - 1;
+  const checksOf = c => c.upload ? X.checks : X.checks.filter(k => k.task === c.n);
 
-  let state = { solved: [], current: 0, start: Date.now(), end: null, hints: {}, answers: {}, ticks: {}, report: null };
+  let state = { solved: [], current: 0, start: Date.now(), end: null, hints: {}, reports: {} };
   try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && Array.isArray(s.solved)) state = Object.assign(state, s); } catch (e) {}
-  state.solved = state.solved.filter(i => i >= 0 && i < CH.length);
-  if (!(state.current >= 0 && state.current < CH.length)) state.current = 0;
+  state.solved = state.solved.filter(i => i >= 0 && i < CH.length); state.reports = state.reports || {};
   const save = () => { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} };
   const isDone = i => state.solved.includes(i);
+  const isUnlocked = i => i === 0 || isDone(i) || isDone(i - 1);
+  if (!(state.current >= 0 && state.current < CH.length) || !isUnlocked(state.current)) state.current = Math.max(0, ...state.solved.map(i => Math.min(i + 1, LAST)).filter(isUnlocked), 0);
 
   /* ---------- the feladatlap, word for word ---------- */
-  const fileLinks = () => X.files.map(f => `<a class="btn primary" href="${f.href}" download>${esc(f.name)} letöltése</a>`).join(" ");
   const taskHtml = t => `${t.before ? `<div class="pp between">${t.before}</div>` : ""}<div class="pp item"><span class="no">${t.n}.</span><div class="tx">${t.text}</div></div>`;
   const rulesHtml = () => `<div class="pp">${X.lead}</div><ul class="pp rules">${X.rules.map(r => `<li>${r}</li>`).join("")}</ul>`;
-  const mintaHtml = (big) => X.minta.map((m, k) => `${m.caption ? `<p class="pp mcap">${m.caption}</p>` : ""}
+  const headHtml = () => X.introFirst ? X.intro + rulesHtml() : rulesHtml() + X.intro;
+  const mintaHtml = big => X.minta.map(m => `${m.caption ? `<p class="pp mcap">${m.caption}</p>` : ""}
       <figure class="minta"><button type="button" class="zoom" data-src="${m.src}" aria-label="Minta nagyítása"><img src="${m.src}" alt="${esc(m.alt || "Minta")}" loading="${big ? "eager" : "lazy"}"></button>
       ${m.label ? `<figcaption>${m.label}</figcaption>` : ""}</figure>`).join("");
-  function sheetHtml() {
-    const before = T.findIndex(t => t.mintaAfter);   /* most sheets have the minta at the end */
-    return `<article class="paper" id="paper">
+  $("sheetView").innerHTML = `<div class="sv-bar"><b>Feladatlap</b><span>a hivatalos feladatlap szövege, szó szerint</span>
+      <button type="button" class="btn" id="printBtn">Nyomtatás / PDF</button><button type="button" class="btn primary" id="closeSheet">Bezárás</button></div>
+    <article class="paper" id="paper">
       <p class="src">${esc(X.subject)} · ${esc(X.level)} · ${esc(X.date)}${X.code ? ` · ${esc(X.code)}` : ""}</p>
-      <h2 class="ptitle">${X.number}. ${esc(X.title)}</h2>
-      ${X.introFirst ? `${X.intro}${rulesHtml()}` : `${rulesHtml()}${X.intro}`}
-      ${T.map((t, k) => taskHtml(t) + (k === before ? `<p class="pts">${X.points} pont</p>` : "")).join("")}
-      ${before < 0 ? `<p class="pts">${X.points} pont</p>` : ""}
-      ${mintaHtml(true)}
+      <h2 class="ptitle">${X.number}. ${esc(X.title)}</h2>${headHtml()}
+      ${T.map(taskHtml).join("")}<p class="pts">${X.points} pont</p>${mintaHtml(true)}
       <p class="src foot">Forrás: Oktatási Hivatal, ${esc(X.subject)} ${esc(X.level)}ű gyakorlati vizsga${X.code ? `, ${esc(X.code)}` : ""}, ${esc(X.date)}. A feladat szövege és a minta a hivatalos feladatlapról való.</p>
     </article>`;
-  }
-  $("sheetView").innerHTML = `<div class="sv-bar"><b>Feladatlap</b><span>a hivatalos feladatlap szövege, szó szerint</span>
-      <button type="button" class="btn" id="printBtn">Nyomtatás / PDF</button><button type="button" class="btn primary" id="closeSheet">Bezárás</button></div>${sheetHtml()}`;
   const openSheet = () => { $("sheetView").hidden = false; document.body.classList.add("sv-open"); $("closeSheet").focus(); };
   const closeSheet = () => { $("sheetView").hidden = true; document.body.classList.remove("sv-open"); };
   $("sheetBtn").addEventListener("click", openSheet);
   $("sheetView").addEventListener("click", e => { if (e.target.id === "closeSheet") closeSheet(); if (e.target.id === "printBtn") window.print(); });
   document.addEventListener("keydown", e => { if (e.key === "Escape") { if (!$("lightbox").hidden) $("lightbox").hidden = true; else if (!$("sheetView").hidden) closeSheet(); } });
-
-  /* the minta beside the chapters, and a bigger look on click */
   $("mintaBox").innerHTML = mintaHtml(false);
   document.addEventListener("click", e => {
     const z = e.target.closest(".zoom"); if (z) { $("lightbox").innerHTML = `<img src="${z.dataset.src}" alt="Minta, nagyítva"><p>Kattints bárhova a bezáráshoz.</p>`; $("lightbox").hidden = false; return; }
@@ -68,210 +58,253 @@
       <p><b>${esc(f.name)}</b><br>A hivatalos forrásfájl. Ebből dolgozol.</p><a class="btn primary" href="${f.href}" download>Letöltés</a></div>`).join("");
 
   /* ---------- chapter strip ---------- */
-  const label = i => CH[i].start ? "Kezdés" : CH[i].upload ? "Beadás" : `${CH[i].n}. részfeladat`;
   function renderSteps() {
     $("steps").innerHTML = CH.map((c, i) => {
-      const cls = ["step"]; if (isDone(i)) cls.push("done"); if (i === state.current) cls.push("current");
-      return `<button type="button" class="${cls.join(" ")}" data-i="${i}" ${i === state.current ? 'aria-current="step"' : ""}>
+      const cls = ["step"]; if (isDone(i)) cls.push("done"); if (i === state.current) cls.push("current"); if (!isUnlocked(i)) cls.push("locked");
+      return `<button type="button" class="${cls.join(" ")}" data-i="${i}" ${isUnlocked(i) ? "" : 'aria-disabled="true" title="Előbb oldd meg az előző részfeladatot!"'} ${i === state.current ? 'aria-current="step"' : ""}>
         <span class="n">${c.start ? "Kezdés" : c.upload ? "Vége" : c.n + "."}</span><span class="t">${esc(c.title)}</span></button>`;
     }).join("");
     $("solvedCount").textContent = `${state.solved.filter(i => i > 0).length} / ${LAST}`;
   }
-  $("steps").addEventListener("click", e => { const b = e.target.closest(".step"); if (b) goTo(+b.dataset.i); });
+  $("steps").addEventListener("click", e => {
+    const b = e.target.closest(".step"); if (!b) return;
+    const i = +b.dataset.i;
+    if (!isUnlocked(i)) { b.classList.remove("shake"); void b.offsetWidth; b.classList.add("shake"); toast("Ez még zárva van: előbb oldd meg az előző részfeladatot, és ellenőriztesd a fájlodat!"); return; }
+    goTo(i);
+  });
 
   /* ---------- one chapter ---------- */
+  function checkBox(i) {
+    const c = CH[i], rep = state.reports[i], picked = fileLabel();
+    const rows = checksOf(c).map((k, j) => { const r = rep && rep.rows[j];
+      return `<li class="${r && r.ok ? "ok" : ""}"><span class="gt">${c.upload ? `<span class="tn">${k.task}.</span> ` : ""}${k.label}${r && !r.ok ? `<small>${esc(r.msg || "Ez még nincs meg a fájlban.")}</small>` : ""}</span><span class="cnt">${r && r.total > 1 ? `${r.done} / ${r.total}` : ""}</span></li>`; }).join("");
+    return `<div class="checkbox"><h3>${c.upload ? "Az egész fájl ellenőrzése" : "Ellenőrzés: ezt nézi meg az oldal a fájlodban"}</h3>
+        <ul class="goals report">${rows}</ul>
+        ${rep && rep.nameOk === false ? `<p class="export-note warn">A fájl neve <b>${esc(rep.name)}</b>, de a feladat szerint <b>${esc(X.saveAs.replace(/\.xlsx$/, ""))}</b> legyen. A vizsgán ezt is pontozzák!</p>` : ""}
+        ${isDone(i) ? "" : `<p class="howcheck">Mentsd el a fájlt az Excelben (<kbd>Ctrl</kbd>+<kbd>S</kbd>), aztán kattints az <b>Ellenőrzés</b> gombra${picked ? "" : ", és válaszd ki a mentett fájlodat"}. A fájlt ide is behúzhatod.</p>
+        <div class="btns"><button type="button" class="btn primary" id="checkBtn">Ellenőrzés${picked ? `: ${esc(picked)}` : ""}</button>
+          ${picked ? `<button type="button" class="btn" id="pickBtn">Másik fájl</button>` : ""}
+          ${!c.upload && c.hints && (state.hints[i] || 0) < c.hints.length ? `<button type="button" class="btn" id="hintBtn">${state.hints[i] ? "Még egy segítség" : "Segítség"}</button>` : ""}</div>`}
+        <input type="file" id="fileIn" accept=".xlsx" hidden>
+        <div id="verdict" aria-live="polite"></div></div>`;
+  }
   function renderCase() {
     const i = state.current, c = CH[i], solved = isDone(i);
-    let body = "";
+    let body;
     if (c.start) {
       body = `<p class="chap">${esc(X.subject)} · ${esc(X.level)} · ${esc(X.date)}</p><h2>${X.number}. ${esc(X.title)}</h2>
-        <div class="paper inline">${X.introFirst ? `${X.intro}${rulesHtml()}` : `${rulesHtml()}${X.intro}`}</div>
+        <div class="paper inline">${headHtml()}</div>
         <div class="learn"><h3>Hogyan dolgozz ezen az oldalon?</h3><ul>
-          <li>Minden fejezet egy részfeladat, <b>szó szerint</b> a hivatalos feladatlapról. A feladatot a táblázatkezelőben (Excelben) oldod meg.</li>
-          <li>Ha elakadsz, kérj segítséget. A <b>Mit mutat a táblázatod?</b> résznél beírod, mit kaptál, és az oldal megmondja, jó-e.</li>
-          <li>A végén az oldal megnézi az elmentett fájlodat is.</li>
-          <li>A teljes feladatlapot a <b>Feladatlap</b> gombbal egyben is megnézheted vagy kinyomtathatod. A vizsgán ${X.points} pontot ér, nagyjából 45–50 perc alatt kell megoldani.</li></ul></div>
-        <div class="task"><h3>A forrásfájl</h3><p>${fileLinks()}</p>
+          <li>Minden fejezet egy részfeladat, <b>szó szerint</b> a hivatalos feladatlapról. Az Excelben (táblázatkezelőben) oldod meg, sorban.</li>
+          <li>Ha kész egy részfeladat, mentsd el a fájlt, és kattints az <b>Ellenőrzés</b> gombra: az oldal megnézi a mentett fájlodat. A következő részfeladat csak akkor nyílik meg, ha minden stimmel.</li>
+          <li>Chrome-ban és Edge-ben elég egyszer kiválasztani a fájlt: utána mentés után csak az Ellenőrzésre kell kattintanod.</li>
+          <li>A teljes feladatlapot a <b>Feladatlap</b> gombbal egyben is megnézheted vagy kinyomtathatod. A vizsgán ${X.points} pontot ér, nagyjából 45–50 perc jut rá.</li></ul></div>
+        <div class="task"><h3>A forrásfájl</h3><p>${X.files.map(f => `<a class="btn primary" href="${f.href}" download>${esc(f.name)} letöltése</a>`).join(" ")}</p>
           <div class="btns"><button type="button" class="btn primary big" id="startBtn">${solved ? "Tovább az 1. részfeladathoz" : "Elolvastam, kezdjük!"} →</button></div></div>`;
     } else if (c.upload) {
-      body = `<p class="chap">Utolsó lépés</p><h2>Az elmentett fájl ellenőrzése</h2>
-        <div class="story"><p>Mentsd el a munkádat (<kbd>Ctrl</kbd>+<kbd>S</kbd>), és húzd ide a fájlt (${esc(X.saveAs)}). Az oldal megnézi a képleteket, az eredményeket, a munkalapokat és a diagramot.</p>
-        <p>A formázást (betűk, szegélyek, igazítás) nem tudja minden részletében megnézni: azt hasonlítsd össze a mintával!</p></div>
-        <div class="task">${uploadHtml()}</div>`;
+      body = `<p class="chap">Utolsó lépés</p><h2>A teljes fájl ellenőrzése</h2>
+        <div class="story"><p>Minden részfeladat megvan. Most az oldal még egyszer, egyben megnézi a kész fájlt (${esc(X.saveAs)}): ugyanazt, amit a javító tanár is látni fog.</p></div>
+        <div class="task">${checkBox(i)}</div>`;
     } else {
-      const shown = state.hints[i] || 0, ticks = state.ticks[i] || [];
-      const asks = (c.asks || []).map((q, k) => {
-        const prev = (state.answers[i] || {})[k] || "";
-        return `<div class="ask" data-k="${k}"><label for="ans${k}">${q.q}</label>
-          <div class="ask-row"><input id="ans${k}" type="text" inputmode="${q.num !== undefined ? "decimal" : "text"}" autocomplete="off" spellcheck="false" value="${esc(prev)}" ${solved ? "disabled" : ""} placeholder="a táblázatod szerint"><span class="mark" aria-hidden="true"></span></div></div>`;
-      }).join("");
-      const list = (c.checklist || []).map((h, k) => `<li><label><input type="checkbox" data-k="${k}" ${ticks.includes(k) || solved ? "checked" : ""}> <span>${h}</span></label></li>`).join("");
+      const shown = state.hints[i] || 0;
       body = `<p class="chap">${c.n}. részfeladat a ${T.length}-ből</p><h2>${esc(c.title)}</h2>
         <div class="paper inline">${c.ctx ? `<div class="pp between">${c.ctx}</div>` : ""}${taskHtml(c)}</div>
         ${c.tips ? `<div class="learn"><h3>Hogyan kezdj neki?</h3><ul>${c.tips.map(s => `<li>${s}</li>`).join("")}</ul></div>` : ""}
-        <div class="task">
-        ${c.checklist ? `<form class="asks" id="tickForm"><h3>Hasonlítsd össze a mintával</h3><ul class="ticks">${list}</ul>
-            <div class="btns"><button type="submit" class="btn primary" id="checkBtn"${solved ? " hidden" : ""}>Kész vagyok vele</button>
-            <button type="button" class="btn" id="hintBtn"${solved || shown >= (c.hints || []).length ? " hidden" : ""}>${shown ? "Még egy segítség" : "Segítség"}</button></div></form>`
-          : `<form class="asks" id="askForm"><h3>Mit mutat a táblázatod?</h3>${asks}
-            <div class="btns"><button type="submit" class="btn primary" id="checkBtn"${solved ? " hidden" : ""}>Ellenőrzés</button>
-            <button type="button" class="btn" id="hintBtn"${solved || shown >= (c.hints || []).length ? " hidden" : ""}>${shown ? "Még egy segítség" : "Segítség"}</button></div></form>`}
-        <div class="hints">${(c.hints || []).slice(0, shown).map((h, k) => `<div class="hint"><b>${k + 1}. segítség</b> ${h}</div>`).join("")}</div>
-        <div id="verdict" aria-live="polite"></div></div>`;
+        <div class="task">${checkBox(i)}
+        <div class="hints">${(c.hints || []).slice(0, shown).map((h, k) => `<div class="hint"><b>${k + 1}. segítség</b> ${h}</div>`).join("")}</div></div>`;
     }
-    $("case").innerHTML = body + `<div id="won">${solved && !c.start && !c.upload ? wonHtml(i) : ""}</div>`;
-    if (c.upload && state.report) showReport(state.report);
+    $("case").innerHTML = body + `<div id="won">${solved && !c.start ? wonHtml(i) : ""}</div>`;
   }
   function wonHtml(i) {
     const c = CH[i];
-    return `<div class="verdict ok"><b>${c.checklist ? "Rendben!" : "Stimmel!"}</b>${c.done ? `<p>${c.done}</p>` : ""}</div>
-      <button type="button" class="btn primary big" id="next">${i + 1 === LAST ? "Tovább az ellenőrzéshez" : `Tovább: ${CH[i + 1].n}. részfeladat`} →</button>`;
+    if (c.upload) return `<div class="verdict ok"><b>Kész a feladat!</b><p>Minden ellenőrzés rendben.</p></div><button type="button" class="btn primary big" id="toEnd">Tovább a befejezéshez →</button>`;
+    return `<div class="verdict ok"><b>Stimmel!</b>${c.done ? `<p>${c.done}</p>` : ""}</div>
+      <button type="button" class="btn primary big" id="next">${i + 1 === LAST ? "Tovább: az egész fájl ellenőrzése" : `Tovább: ${CH[i + 1].n}. részfeladat`} →</button>`;
   }
   function goTo(i) {
+    if (!isUnlocked(i)) return;
     state.current = i; save(); renderSteps(); renderCase();
     if (innerWidth < 1000) $("case").scrollIntoView({ behavior: "smooth", block: "start" });
     else scrollTo({ top: Math.min(scrollY, $("steps").offsetTop - 70), behavior: "smooth" });
   }
-  function solve(i, quiet) {
+  function solve(i) {
     if (!isDone(i)) state.solved.push(i);
     if (i === LAST && !state.end) state.end = Date.now();
-    save(); renderSteps();
-    if (quiet) return;
-    const cb = $("checkBtn"), hb = $("hintBtn"); if (cb) cb.hidden = true; if (hb) hb.hidden = true;
-    document.querySelectorAll(".ask input").forEach(x => x.disabled = true);
-    if ($("verdict")) $("verdict").innerHTML = "";
-    $("won").innerHTML = wonHtml(i);
+    save(); renderSteps(); renderCase();
     const r = $("won").getBoundingClientRect();
-    celebrate(r.left + r.width / 2, r.top + 20, 50);
+    celebrate(r.left + r.width / 2, r.top + 20, i === LAST ? 90 : 50);
     if (innerWidth < 1000) $("won").scrollIntoView({ behavior: "smooth", block: "center" });
   }
-
-  /* ---------- typed answers ---------- */
-  const normText = s => String(s).toLowerCase().normalize("NFC").replace(/[\s.\-–"„”]/g, "");
-  const normNum = s => { const t = String(s).replace(/[\s  ]/g, "").replace(/(pont|ft|db|m3)$/i, "").replace(",", "."); return /^-?\d+(\.\d+)?$/.test(t) ? parseFloat(t) : null; };
-  const normDate = s => { const m = String(s).trim().match(/^(\d{4})\s*[.\-/]\s*(\d{1,2})\s*[.\-/]\s*(\d{1,2})\.?$/); return m ? `${m[1]}-${m[2].padStart(2, "0")}-${m[3].padStart(2, "0")}` : null; };
-  function judge(q, raw) {
-    if (!raw.trim()) return { ok: false, msg: "Még nem írtál be semmit." };
-    /* typical wrong answers first: a text trap matches the text, a number trap the number */
-    const trap = () => { for (const [k, m] of Object.entries(q.traps || {})) {
-      const nk = normNum(k), nr = normNum(raw);
-      if (q.exact ? k === raw.trim() : normText(k) === normText(raw)) return m;
-      if (nk !== null && nr !== null && Math.abs(nk - nr) < 1e-6) return m; } return null; };
-    let ok;
-    if (q.date) ok = normDate(raw) === q.date;
-    else if (q.text) ok = q.exact ? q.text.some(t => t.normalize("NFC") === raw.trim().normalize("NFC")) : q.text.some(t => normText(t) === normText(raw));
-    else {
-      const n = normNum(raw);
-      if (n === null) return { ok: false, msg: trap() || "Csak a számot írd be, ahogy a táblázatod mutatja (pl. 6,8)." };
-      ok = Math.abs(n - q.num) < 0.0006 * Math.max(1, Math.abs(q.num));
-    }
-    if (ok) return { ok: true };
-    return { ok: false, msg: trap() || q.wrong || "Ez nem egyezik. Nézd meg újra a képletet a szerkesztőlécen, és hasonlítsd össze a feladat szövegével!" };
+  function toast(msg) {
+    let t = $("xtoast"); if (!t) { t = document.createElement("div"); t.id = "xtoast"; t.setAttribute("role", "status"); document.body.appendChild(t); }
+    t.textContent = msg; t.classList.add("on"); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove("on"), 3200);
   }
-  $("case").addEventListener("submit", e => {
-    e.preventDefault();
-    const i = state.current, c = CH[i];
-    if (e.target.id === "tickForm") {
-      const all = [...document.querySelectorAll(".ticks input")], on = all.filter(x => x.checked).map(x => +x.dataset.k);
-      state.ticks[i] = on; save();
-      if (on.length === all.length) { solve(i); return; }
-      $("verdict").innerHTML = `<div class="verdict no"><b>Van még hátra.</b><p>Pipáld ki, amit már megcsináltál. Ami nincs kész, azt hasonlítsd össze a mintával (jobbra), és ha kell, kérj segítséget.</p></div>`;
-      return;
+
+  /* ---------- getting the saved file: kept between checks where the browser allows it ---------- */
+  let handle = null;
+  const fileLabel = () => handle ? handle.name : "";
+  const idb = (mode, fn) => new Promise((ok, no) => { try { const rq = indexedDB.open("digikult-exam", 1); rq.onupgradeneeded = () => rq.result.createObjectStore("h");
+    rq.onsuccess = () => { const tx = rq.result.transaction("h", mode), st = tx.objectStore("h"), r = fn(st); tx.oncomplete = () => ok(r && r.result); tx.onerror = () => no(tx.error); }; rq.onerror = () => no(rq.error); } catch (e) { no(e); } });
+  if (window.showOpenFilePicker) idb("readonly", st => st.get(KEY)).then(h => { if (h) { handle = h; if (!isDone(state.current)) renderCase(); } }).catch(() => {});
+  function pickWithInput() {
+    return new Promise(ok => { const inp = $("fileIn"); inp.value = ""; inp.onchange = () => ok(inp.files[0] || null); inp.click(); });
+  }
+  async function getFile(pickNew) {
+    if (handle && !pickNew) {
+      try {
+        let p = await handle.queryPermission({ mode: "read" });
+        if (p !== "granted") p = await handle.requestPermission({ mode: "read" });
+        if (p === "granted") return await handle.getFile();
+      } catch (e) {}
     }
-    if (e.target.id !== "askForm") return;
-    state.answers[i] = state.answers[i] || {};
-    let first = null;
-    (c.asks || []).forEach((q, k) => {
-      const box = document.querySelector(`.ask[data-k="${k}"]`), raw = box.querySelector("input").value;
-      state.answers[i][k] = raw;
-      const r = judge(q, raw);
-      box.classList.toggle("ok", r.ok); box.classList.toggle("no", !r.ok);
-      if (!r.ok && !first) first = r.msg;
-    });
-    save();
-    if (!first) { solve(i); return; }
-    $("verdict").innerHTML = `<div class="verdict no"><b>Még nem stimmel.</b><p>${first}</p></div>`;
-    buzz();
-  });
-  $("case").addEventListener("change", e => {
-    if (!e.target.matches(".ticks input")) return;
-    state.ticks[state.current] = [...document.querySelectorAll(".ticks input")].filter(x => x.checked).map(x => +x.dataset.k); save();
-  });
-  $("case").addEventListener("click", e => {
+    if (window.showOpenFilePicker) {
+      try {
+        const [h] = await showOpenFilePicker({ id: "digikult-exam", types: [{ description: "Excel-munkafüzet", accept: { "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": [".xlsx"] } }] });
+        handle = h; idb("readwrite", st => st.put(h, KEY)).catch(() => {});
+        return await h.getFile();
+      } catch (e) { if (e && e.name === "AbortError") return null; }
+    }
+    return pickWithInput();
+  }
+
+  $("case").addEventListener("click", async e => {
     const id = e.target.id;
-    if (id === "hintBtn") { const i = state.current; state.hints[i] = (state.hints[i] || 0) + 1; save(); renderCase(); }
-    if (id === "next") goTo(state.current + 1);
-    if (id === "startBtn") { solve(0, true); goTo(1); }
-    if (id === "toEnd") showEnd();
+    if (id === "hintBtn") { const i = state.current; state.hints[i] = (state.hints[i] || 0) + 1; save(); renderCase(); return; }
+    if (id === "next") return goTo(state.current + 1);
+    if (id === "startBtn") { if (!isDone(0)) state.solved.push(0); save(); return goTo(1); }
+    if (id === "toEnd") return showEnd();
+    if (id === "checkBtn" || id === "pickBtn") { const f = await getFile(id === "pickBtn"); if (f) runChecks(f); }
   });
+  $("case").addEventListener("dragover", e => { const d = e.target.closest(".checkbox"); if (d && !isDone(state.current)) { e.preventDefault(); d.classList.add("over"); } });
+  $("case").addEventListener("dragleave", e => { const d = e.target.closest(".checkbox"); if (d) d.classList.remove("over"); });
+  $("case").addEventListener("drop", e => { const d = e.target.closest(".checkbox"); if (!d) return; e.preventDefault(); d.classList.remove("over"); const f = e.dataTransfer.files[0]; if (f) runChecks(f); });
 
-  /* ---------- the saved file, checked here in the browser ---------- */
-  function uploadHtml() {
-    return `<div class="drop" id="drop" tabindex="0" role="button" aria-label="Fájl kiválasztása">
-        <input type="file" id="fileIn" accept=".xlsx" hidden>
-        <b>Húzd ide az elmentett .xlsx fájlodat</b><span>vagy kattints, és válaszd ki. A fájlt az oldal csak itt, a böngésződben nézi meg.</span></div>
-      <div id="report"></div>`;
-  }
-  /* formulas are stored in English in an .xlsx: show them the way the student typed them */
+  /* ---------- reading the .xlsx ---------- */
+  function loadScript(src) { return new Promise((ok, no) => { const s = document.createElement("script"); s.src = src; s.onload = ok; s.onerror = no; document.head.appendChild(s); }); }
   const HU = { SUM: "SZUM", AVERAGE: "ÁTLAG", COUNT: "DARAB", COUNTA: "DARAB2", COUNTBLANK: "DARABÜRES", ROUND: "KEREKÍTÉS", ROUNDUP: "KEREKÍTÉS.FEL", ROUNDDOWN: "KEREKÍTÉS.LE",
     IF: "HA", IFS: "HAELSŐIGAZ", IFERROR: "HAHIBA", COUNTIF: "DARABTELI", COUNTIFS: "DARABHATÖBB", SUMIF: "SZUMHA", SUMIFS: "SZUMHATÖBB", AVERAGEIF: "ÁTLAGHA",
     VLOOKUP: "FKERES", HLOOKUP: "VKERES", XLOOKUP: "XKERES", MATCH: "HOL.VAN", XMATCH: "XHOL.VAN", AND: "ÉS", OR: "VAGY", NOT: "NEM", LARGE: "NAGY", SMALL: "KICSI",
-    LEFT: "BAL", RIGHT: "JOBB", MID: "KÖZÉP", LEN: "HOSSZ", CONCATENATE: "ÖSSZEFŰZ", CONCAT: "FŰZ", TEXT: "SZÖVEG", YEAR: "ÉV", MONTH: "HÓNAP", DAY: "NAP", TODAY: "MA", ABS: "ABS", INT: "INT", MOD: "MARADÉK", RANK: "SORSZÁM", "RANK.EQ": "SORSZÁM.EGY" };
-  const toHu = f => {
-    const parts = String(f).replace(/^_xlfn\./, "").split(/("[^"]*")/);
-    return "=" + parts.map((t, k) => k % 2 ? t : t.replace(/_xlfn\./g, "").replace(/\b(TRUE|FALSE)\(\)/g, "$1").replace(/\bTRUE\b/g, "IGAZ").replace(/\bFALSE\b/g, "HAMIS")
-      .replace(/\b([A-Z][A-Z0-9.]*)\(/g, (m, n) => (HU[n] || n) + "(").replace(/,/g, ";").replace(/(\d)\.(\d)/g, "$1,$2")).join("");
-  };
-  function loadScript(src) { return new Promise((ok, no) => { const s = document.createElement("script"); s.src = src; s.onload = ok; s.onerror = no; document.head.appendChild(s); }); }
+    LEFT: "BAL", RIGHT: "JOBB", MID: "KÖZÉP", LEN: "HOSSZ", CONCATENATE: "ÖSSZEFŰZ", CONCAT: "FŰZ", TEXT: "SZÖVEG", YEAR: "ÉV", MONTH: "HÓNAP", DAY: "NAP", TODAY: "MA", MOD: "MARADÉK", RANK: "SORSZÁM", "RANK.EQ": "SORSZÁM.EGY" };
+  const toHu = f => "=" + String(f).split(/("[^"]*")/).map((t, k) => k % 2 ? t : t.replace(/_xlfn\./g, "").replace(/\b(TRUE|FALSE)\(\)/g, "$1").replace(/\bTRUE\b/g, "IGAZ").replace(/\bFALSE\b/g, "HAMIS")
+    .replace(/\b([A-Z][A-Z0-9.]*)\(/g, (m, n) => (HU[n] || n) + "(").replace(/,/g, ";").replace(/(\d)\.(\d)/g, "$1,$2")).join("");
+  const normDate = s => { const m = String(s).trim().match(/^(\d{4})\s*[.\-/]\s*(\d{1,2})\s*[.\-/]\s*(\d{1,2})\.?$/); return m ? `${m[1]}-${m[2].padStart(2, "0")}-${m[3].padStart(2, "0")}` : null; };
 
   /* F: what the checks can ask about the student's workbook */
   function makeF(wb) {
     const txt = p => { const f = wb.files && wb.files[p]; return f && f.content ? new TextDecoder().decode(f.content instanceof Uint8Array ? f.content : new Uint8Array(f.content)) : ""; };
-    const join = (base, target) => {
-      if (target[0] === "/") return target.slice(1);
-      const parts = base.split("/"); parts.pop();
-      target.split("/").forEach(s => { if (s === "..") parts.pop(); else if (s !== ".") parts.push(s); });
-      return parts.join("/");
-    };
-    const rels = path => { const dir = path.replace(/[^/]+$/, ""), name = path.split("/").pop(); const r = txt(dir + "_rels/" + name + ".rels"); const out = {};
-      r.replace(/<Relationship\b[^>]*>/g, m => { const id = (m.match(/\bId="([^"]+)"/) || [])[1], t = (m.match(/\bTarget="([^"]+)"/) || [])[1]; if (id && t) out[id] = join(path, t); return m; }); return out; };
-    /* sheet name → worksheet xml path, read from the workbook itself */
+    const join = (base, target) => { if (target[0] === "/") return target.slice(1); const parts = base.split("/"); parts.pop(); target.split("/").forEach(s => { if (s === "..") parts.pop(); else if (s !== ".") parts.push(s); }); return parts.join("/"); };
+    const rels = path => { const dir = path.replace(/[^/]+$/, ""), name = path.split("/").pop(), out = {};
+      txt(dir + "_rels/" + name + ".rels").replace(/<Relationship\b[^>]*>/g, m => { const id = (m.match(/\bId="([^"]+)"/) || [])[1], t = (m.match(/\bTarget="([^"]+)"/) || [])[1]; if (id && t) out[id] = join(path, t); return m; }); return out; };
+    const attr = (el, a) => { const m = el.match(new RegExp(`\\b${a}="([^"]*)"`)); return m ? m[1] : null; };
     const sheetPath = {};
-    (() => { const wbx = txt("xl/workbook.xml"), r = rels("xl/workbook.xml");
-      wbx.replace(/<(?:\w+:)?sheet\b[^>]*>/g, m => { const n = (m.match(/\bname="([^"]+)"/) || [])[1], id = (m.match(/\br:id="([^"]+)"/) || m.match(/\bid="([^"]+)"/) || [])[1]; if (n && r[id]) sheetPath[n.replace(/&amp;/g, "&")] = r[id]; return m; }); })();
+    (() => { const r = rels("xl/workbook.xml"); txt("xl/workbook.xml").replace(/<(?:\w+:)?sheet\b[^>]*>/g, m => { const n = attr(m, "name"), id = attr(m, "r:id") || attr(m, "id"); if (n && r[id]) sheetPath[n.replace(/&amp;/g, "&")] = r[id]; return m; }); })();
     const sheetNames = wb.SheetNames.slice();
     const exact = name => sheetNames.find(n => n.trim().toLowerCase() === String(name).toLowerCase());
     const pick = name => !name ? sheetNames[0] : exact(name) || (X.sheets ? sheetNames.find(n => !X.sheets.some(e => exact(e) === n)) : null);
     const ws = name => { const n = pick(name); return n ? wb.Sheets[n] : null; };
-    /* charts of a sheet: type, title, legend, where it sits */
+    const enc = XLSX.utils.encode_cell, dec = XLSX.utils.decode_cell;
+    const cellsOf = rg => { const r = XLSX.utils.decode_range(rg), out = []; for (let R = r.s.r; R <= r.e.r; R++) for (let C = r.s.c; C <= r.e.c; C++) out.push(enc({ r: R, c: C })); return out; };
+    const many = list => [].concat(...list.map(cellsOf));
+
+    /* ---- colours: rgb, theme with tint, lumMod/lumOff ---- */
+    const themeX = txt("xl/theme/theme1.xml");
+    const themeRgb = name => { const m = themeX.match(new RegExp(`<a:${name}>[\\s\\S]*?(?:srgbClr val="([0-9A-Fa-f]{6})"|lastClr="([0-9A-Fa-f]{6})")`)); return m ? (m[1] || m[2]).toUpperCase() : null; };
+    const THEME = ["lt1", "dk1", "lt2", "dk2", "accent1", "accent2", "accent3", "accent4", "accent5", "accent6", "hlink", "folHlink"];
+    const toHsl = hex => { const r = parseInt(hex.slice(0, 2), 16) / 255, g = parseInt(hex.slice(2, 4), 16) / 255, b = parseInt(hex.slice(4, 6), 16) / 255;
+      const mx = Math.max(r, g, b), mn = Math.min(r, g, b), l = (mx + mn) / 2; let h = 0, s = 0;
+      if (mx !== mn) { const d = mx - mn; s = l > .5 ? d / (2 - mx - mn) : d / (mx + mn); h = mx === r ? (g - b) / d + (g < b ? 6 : 0) : mx === g ? (b - r) / d + 2 : (r - g) / d + 4; h *= 60; }
+      return { h, s, l }; };
+    const tintL = (hsl, t) => Object.assign({}, hsl, { l: t < 0 ? hsl.l * (1 + t) : hsl.l * (1 - t) + t });
+    /* a DrawingML colour element (chart fills and lines) */
+    function dmlColor(xml) {
+      if (!xml) return null;
+      let m = xml.match(/<a:srgbClr val="([0-9A-Fa-f]{6})"\s*\/?>([\s\S]*?)(?:<\/a:srgbClr>|$)/), base = null, mods = "";
+      if (m) { base = m[1].toUpperCase(); mods = m[2] || ""; }
+      else { m = xml.match(/<a:schemeClr val="(\w+)"\s*\/?>([\s\S]*?)(?:<\/a:schemeClr>|$)/); if (m) { const n = { bg1: "lt1", tx1: "dk1", bg2: "lt2", tx2: "dk2" }[m[1]] || m[1]; base = themeRgb(n); mods = m[2] || ""; } }
+      if (!base) return null;
+      let c = toHsl(base);
+      const lm = mods.match(/lumMod val="(\d+)"/), lo = mods.match(/lumOff val="(\d+)"/), sh = mods.match(/shade val="(\d+)"/), ti = mods.match(/tint val="(\d+)"/);
+      if (lm) c.l = c.l * (+lm[1] / 100000); if (lo) c.l = c.l + (+lo[1] / 100000); if (sh) c.l = c.l * (+sh[1] / 100000); if (ti) c.l = c.l + (1 - c.l) * (1 - (+ti[1] / 100000));
+      c.l = Math.max(0, Math.min(1, c.l)); return c;
+    }
+
+    /* ---- cell styles, read from styles.xml and the sheet xml ---- */
+    const sx = txt("xl/styles.xml");
+    const sect = tag => (sx.match(new RegExp(`<${tag}\\b[^>]*>([\\s\\S]*?)</${tag}>`)) || [, ""])[1];
+    const items = (body, tag) => body.match(new RegExp(`<${tag}\\b[^>]*?(?:/>|>[\\s\\S]*?</${tag}>)`, "g")) || [];
+    const on = (el, tag) => { const m = el.match(new RegExp(`<${tag}\\b([^>]*)/?>`)); if (!m) return false; const v = attr(m[0], "val"); return v === null || v === "1" || v === "true"; };
+    const fonts = items(sect("fonts"), "font").map(f => ({ b: on(f, "b"), i: on(f, "i"), sz: +(attr((f.match(/<sz\b[^>]*>/) || [""])[0], "val") || 11), name: attr((f.match(/<name\b[^>]*>/) || [""])[0], "val") || "" }));
+    const fills = items(sect("fills"), "fill").map(f => { const p = (f.match(/<patternFill\b[^>]*>/) || [""])[0], fg = (f.match(/<fgColor\b[^>]*>/) || [""])[0];
+      let col = null; const rgb = attr(fg, "rgb"), th = attr(fg, "theme"), tint = +(attr(fg, "tint") || 0);
+      if (rgb) col = toHsl(rgb.slice(-6)); else if (th !== null && themeRgb(THEME[+th])) col = tintL(toHsl(themeRgb(THEME[+th])), tint);
+      return { pattern: attr(p, "patternType") || "none", color: col }; });
+    const borders = items(sect("borders"), "border").map(b => { const side = s => { const m = b.match(new RegExp(`<${s}\\b([^>]*)(?:/>|>)`)); return m ? attr(m[0], "style") || "" : ""; };
+      return { left: side("left"), right: side("right"), top: side("top"), bottom: side("bottom") }; });
+    const xfs = items(sect("cellXfs"), "xf").map(x => { const a = (x.match(/<alignment\b[^>]*>/) || [""])[0];
+      return { font: +(attr(x, "fontId") || 0), fill: +(attr(x, "fillId") || 0), border: +(attr(x, "borderId") || 0), h: attr(a, "horizontal") || "general", v: attr(a, "vertical") || "bottom", rot: +(attr(a, "textRotation") || 0), wrap: /^(1|true)$/.test(attr(a, "wrapText") || "") }; });
+    const styleIdx = {};
+    function sheetStyles(name) {
+      const n = pick(name); if (!n) return null; if (styleIdx[n]) return styleIdx[n];
+      const xml = txt(sheetPath[n] || ""), cells = {}, rows = {}, cols = [];
+      xml.replace(/<(?:\w+:)?c\b[^>]*>/g, m => { const r = attr(m, "r"), s = attr(m, "s"); if (r) cells[r] = +(s || 0); return m; });
+      xml.replace(/<(?:\w+:)?row\b[^>]*>/g, m => { const r = attr(m, "r"), s = attr(m, "s"); if (r && s && /^(1|true)$/.test(attr(m, "customFormat") || "")) rows[r] = +s; return m; });
+      xml.replace(/<(?:\w+:)?col\b[^>]*>/g, m => { const s = attr(m, "style"); if (s) cols.push({ min: +attr(m, "min"), max: +attr(m, "max"), s: +s }); return m; });
+      return (styleIdx[n] = { cells, rows, cols, xml });
+    }
+    function style(a, o = {}) {
+      const S = sheetStyles(o.sheet); if (!S) return null;
+      let k = S.cells[a];
+      if (k === undefined) { const p = dec(a), r = S.rows[p.r + 1]; k = r !== undefined ? r : ((S.cols.find(c => p.c + 1 >= c.min && p.c + 1 <= c.max) || {}).s || 0); }
+      const x = xfs[k] || xfs[0] || { font: 0, fill: 0, border: 0, h: "general", v: "bottom", rot: 0, wrap: false };
+      return { font: fonts[x.font] || fonts[0] || {}, fill: fills[x.fill] || { pattern: "none" }, border: borders[x.border] || {}, h: x.h, v: x.v, rot: x.rot, wrap: x.wrap };
+    }
+    /* merged cells: only the top-left one carries the content and the look */
+    const mergesOf = o => ((ws(o.sheet) || {})["!merges"] || []);
+    const mergeOf = (a, o) => { const p = dec(a); return mergesOf(o).find(m => p.r >= m.s.r && p.r <= m.e.r && p.c >= m.s.c && p.c <= m.e.c) || null; };
+    const hidden = (a, o) => { const m = mergeOf(a, o), p = dec(a); return !!m && (p.r !== m.s.r || p.c !== m.s.c); };
+    /* a side counts if this cell or its neighbour draws it */
+    const OPP = { left: ["right", 0, -1], right: ["left", 0, 1], top: ["bottom", -1, 0], bottom: ["top", 1, 0] };
+    const sideOf = (a, side, o) => { { const m = mergeOf(a, o), p = dec(a), [, dr, dc] = OPP[side]; if (m) { const q = { r: p.r + dr, c: p.c + dc }; if (q.r >= m.s.r && q.r <= m.e.r && q.c >= m.s.c && q.c <= m.e.c) return "thin"; } }
+      const own = (style(a, o) || { border: {} }).border[side]; if (own) return own; const p = dec(a), [op, dr, dc] = OPP[side];
+      if (p.r + dr < 0 || p.c + dc < 0) return ""; return (style(enc({ r: p.r + dr, c: p.c + dc }), o) || { border: {} }).border[op] || ""; };
+    const THIN = /^(thin|hair)$/;
+
+    /* charts of a sheet: type, title and its font, legend, labels, series colours, position */
     function charts(name) {
       const n = pick(name); if (!n || !sheetPath[n]) return [];
-      const out = [], sr = rels(sheetPath[n]);
-      Object.values(sr).filter(p => /drawings\/[^/]+\.xml$/.test(p)).forEach(dp => {
+      const out = [];
+      Object.values(rels(sheetPath[n])).filter(p => /drawings\/[^/]+\.xml$/.test(p)).forEach(dp => {
         const dx = txt(dp), dr = rels(dp);
         dx.replace(/<(?:\w+:)?(twoCellAnchor|oneCellAnchor|absoluteAnchor)\b[\s\S]*?<\/(?:\w+:)?\1>/g, anchor => {
           const id = (anchor.match(/<(?:\w+:)?chart\b[^>]*\br:id="([^"]+)"/) || [])[1]; if (!id || !dr[id]) return anchor;
-          const num = (tag, part) => { const m = anchor.match(new RegExp(`<(?:\\w+:)?${tag}>[\\s\\S]*?<(?:\\w+:)?${part}>(\\d+)<`)); return m ? +m[1] : null; };
-          const cx = txt(dr[id]);
-          const types = (cx.match(/<(?:\w+:)?(pie|pie3D|doughnut|line|line3D|bar|bar3D|area|scatter|radar)Chart\b/g) || []).map(t => t.replace(/<(?:\w+:)?|Chart$/g, ""));
-          const titleXml = (cx.match(/<(?:\w+:)?title>[\s\S]*?<\/(?:\w+:)?title>/) || [""])[0];
-          const title = (titleXml.match(/<(?:\w+:)?t>([^<]*)</g) || []).map(t => t.replace(/<(?:\w+:)?t>|<$/g, "")).join("").replace(/&amp;/g, "&");
-          const legendXml = (cx.match(/<(?:\w+:)?legend>[\s\S]*?<\/(?:\w+:)?legend>/) || [""])[0];
-          const barDir = (cx.match(/<(?:\w+:)?barDir val="(\w+)"/) || [])[1] || null;
-          out.push({ types, title, autoTitleDeleted: /<(?:\w+:)?autoTitleDeleted val="1"/.test(cx), legend: !!legendXml, legendPos: (legendXml.match(/legendPos val="(\w)"/) || [])[1] || (legendXml ? "r" : null),
-            barDir, labels: /<(?:\w+:)?dLbls>[\s\S]*?<(?:\w+:)?show(?:Percent|CatName) val="1"/.test(cx), percent: /<(?:\w+:)?showPercent val="1"/.test(cx), catName: /<(?:\w+:)?showCatName val="1"/.test(cx),
-            from: { c: num("from", "col"), r: num("from", "row") }, to: { c: num("to", "col"), r: num("to", "row") }, xml: cx });
+          const num = (tag, part) => { const m = anchor.match(new RegExp(`<(?:\\w+:)?${tag}>[\\s\\S]*?<(?:\\w+:)?${part}>(-?\\d+)<`)); return m ? +m[1] : null; };
+          const cx = txt(dr[id]).replace(/<(\/?)c:/g, "<$1");      /* drop the c: prefix, keep a: */
+          const types = (cx.match(/<(pie|pie3D|doughnut|line|line3D|bar|bar3D|area|scatter|radar)Chart\b/g) || []).map(t => t.slice(1).replace(/Chart$/, ""));
+          const titleX = (cx.match(/<title>[\s\S]*?<\/title>/) || [""])[0];
+          const title = (titleX.match(/<a:t>([^<]*)</g) || []).map(t => t.replace(/<a:t>|<$/g, "")).join("").replace(/&amp;/g, "&");
+          const legendX = (cx.match(/<legend>[\s\S]*?<\/legend>/) || [""])[0];
+          const sers = cx.match(/<ser>[\s\S]*?<\/ser>/g) || [];
+          const ser0 = sers[0] || "", sp = (ser0.match(/<spPr>[\s\S]*?<\/spPr>/) || [""])[0];
+          const fillX = (sp.replace(/<a:ln\b[\s\S]*?<\/a:ln>/, "").match(/<a:solidFill>[\s\S]*?<\/a:solidFill>/) || [""])[0];
+          const lineX = ((sp.match(/<a:ln\b[\s\S]*?<\/a:ln>/) || [""])[0].match(/<a:solidFill>[\s\S]*?<\/a:solidFill>/) || [""])[0];
+          const dl = (cx.match(/<dLbls>[\s\S]*?<\/dLbls>/g) || []).join("");
+          out.push({ types, title, titleX, legend: !!legendX && !/<delete val="1"\/>/.test(legendX), legendPos: (legendX.match(/legendPos val="(\w)"/) || [])[1] || (legendX ? "r" : null),
+            barDir: (cx.match(/<barDir val="(\w+)"/) || [])[1] || null, series: sers.length,
+            percent: /<showPercent val="1"/.test(dl), catName: /<showCatName val="1"/.test(dl),
+            fill: dmlColor(fillX), line: dmlColor(lineX),
+            from: { c: num("from", "col"), r: num("from", "row") }, to: { c: num("to", "col"), r: num("to", "row"), cOff: num("to", "colOff") } });
           return anchor;
         });
       });
       return out;
     }
-    const cellsOf = rg => { const r = XLSX.utils.decode_range(rg), out = []; for (let R = r.s.r; R <= r.e.r; R++) for (let C = r.s.c; C <= r.e.c; C++) out.push(XLSX.utils.encode_cell({ r: R, c: C })); return out; };
+
     const dateSerial = iso => { const [y, m, d] = iso.split("-").map(Number); return Math.round((Date.UTC(y, m - 1, d) - Date.UTC(1899, 11, 30)) / 86400000); };
-    const fmt = v => typeof v === "number" ? String(Math.round(v * 1000) / 1000).replace(".", ",") : `„${v}”`;   /* 1088 and 6,8, the Hungarian way */
+    const fmt = v => typeof v === "number" ? String(Math.round(v * 1000) / 1000).replace(".", ",") : `„${v}”`;
+    const sheetWord = s => s ? `${/^[aáeéiíoóöőuúüű5]/i.test(s) ? "az" : "a"} ${s} munkalap ` : "";
     /* the expected values of a range: numbers, texts, or { date: "yyyy-mm-dd" }; null = must be empty */
     function values(range, want, o = {}) {
-      const w = ws(o.sheet), cells = cellsOf(range), sname = o.sheet ? `${/^[aáeéiíoóöőuúüű5]/i.test(o.sheet) ? "az" : "a"} ${o.sheet} munkalap ` : "";
+      const w = ws(o.sheet), cells = Array.isArray(range) ? range : cellsOf(range), sname = sheetWord(o.sheet);
       if (!w) return { ok: false, msg: `Nincs ${o.sheet} nevű munkalap a fájlban.`, done: 0, total: cells.length };
       let msg = null, done = 0;
       cells.forEach((a, k) => {
@@ -280,56 +313,57 @@
         if (exp === null) { if (v !== undefined && v !== "") m = `${sname}${a} cellának üresnek kellene lennie.`; }
         else if (v === undefined || v === "") m = `${sname}${a} cella üres.`;
         else if (o.formula && !cell.f) m = `${sname}${a} cellában nincs képlet, csak egy beírt érték. Ide képlet kell (= jellel)!`;
-        else if (exp && exp.date) { const ok = (typeof v === "number" && Math.round(v) === dateSerial(exp.date)) || normDate(v) === exp.date; if (!ok) m = `${sname}${a} értéke ${cell.w || v}, de ${exp.date.replace(/-/g, ".")} kellene.`; }
-        else if (o.loose) { const ok = String(v).trim() === String(exp) || (typeof exp === "number" && Number(String(v).replace(",", ".")) === exp); if (!ok) m = `${sname}${a} értéke ${fmt(typeof v === "number" ? v : String(v))}, de ${fmt(exp)} kellene.${cell.f ? ` A képlet: ${toHu(cell.f)}` : ""}`; }
+        else if (exp && exp.date) { if (!((typeof v === "number" && Math.round(v) === dateSerial(exp.date)) || normDate(v) === exp.date)) m = `${sname}${a} értéke ${cell.w || v}, de ${exp.date.replace(/-/g, ".")} kellene.`; }
+        else if (o.loose) { if (!(String(v).trim() === String(exp) || (typeof exp === "number" && Number(String(v).replace(",", ".")) === exp))) m = `${sname}${a} értéke ${fmt(typeof v === "number" ? v : String(v))}, de ${fmt(exp)} kellene.${cell.f ? ` A képlet: ${toHu(cell.f)}` : ""}`; }
         else if (typeof exp === "number") { if (typeof v !== "number" || Math.abs(v - exp) > 1e-6 * Math.max(1, Math.abs(exp))) m = `${sname}${a} értéke ${fmt(v)}, de ${fmt(exp)} kellene.${cell.f ? ` A képlet: ${toHu(cell.f)}` : ""}`; }
         else if (String(v).trim() !== String(exp)) m = `${sname}${a} értéke ${fmt(typeof v === "number" ? v : String(v))}, de ${fmt(exp)} kellene.${cell.f ? ` A képlet: ${toHu(cell.f)}` : ""}`;
         if (m) { if (!msg) msg = m; } else done++;
       });
       return { ok: done === cells.length, msg, done, total: cells.length };
     }
-    const result = (ok, msg) => ({ ok, msg: ok ? null : msg });
-    return { wb, ws, pick, sheetNames, charts, values, cellsOf, result, hu: toHu,
-      numFmt(range, re, o = {}) { const w = ws(o.sheet), cells = cellsOf(range); let bad = cells.find(a => !w || !w[a] || !re.test(String(w[a].z || ""))); return result(!bad, `${bad} cella számformátuma (${(w && w[bad] && w[bad].z && w[bad].z !== "General") ? w[bad].z : "általános"}) nem olyan, mint a mintán.`); },
+    /* every cell of the list must pass test(style, address); msg(address, style) explains the first that does not */
+    function styles(list, test, msg, o = {}) {
+      const cells = [].concat(...[].concat(list).map(x => /:/.test(x) ? cellsOf(x) : [x]));
+      let bad = null, done = 0;
+      cells.filter(a => !hidden(a, o)).forEach(a => { const s = style(a, o); if (s && test(s, a)) done++; else if (!bad) bad = [a, s]; });
+      return { ok: !bad, msg: bad ? sheetWord(o.sheet) + msg(bad[0], bad[1] || {}) : null };
+    }
+    const all = (...rs) => { for (const r of rs) { const x = typeof r === "function" ? r() : r; if (!x.ok) return x; } return { ok: true }; };
+    return { wb, ws, pick, sheetNames, charts, values, cellsOf, many, style, styles, all, hu: toHu, dec, enc,
+      numFmt(range, re, o = {}) { const w = ws(o.sheet), cells = [].concat(...[].concat(range).map(cellsOf)); const bad = cells.find(a => !w || !w[a] || !re.test(String(w[a].z || "")));
+        return bad ? { ok: false, msg: `${sheetWord(o.sheet)}${bad} cella számformátuma (${(w && w[bad] && w[bad].z && w[bad].z !== "General") ? w[bad].z : "általános"}) nem olyan, mint a mintán.` } : { ok: true }; },
       merged(range, o = {}) { const w = ws(o.sheet); return !!(w && (w["!merges"] || []).some(m => XLSX.utils.encode_range(m) === range)); },
       rowHidden(r, o = {}) { const n = pick(o.sheet); if (!n) return false; if ((((ws(o.sheet) || {})["!rows"] || [])[r - 1] || {}).hidden) return true;
-        const m = txt(sheetPath[n] || "").match(new RegExp(`<(?:\\w+:)?row\\b[^>]*\\br="${r}"[^>]*>`)); return !!(m && /\bhidden="(1|true)"/.test(m[0])); },
+        const m = (sheetStyles(o.sheet) || { xml: "" }).xml.match(new RegExp(`<(?:\\w+:)?row\\b[^>]*\\br="${r}"[^>]*>`)); return !!(m && /\bhidden="(1|true)"/.test(m[0])); },
       row(r, o = {}) { const w = ws(o.sheet); return (w && w["!rows"] && w["!rows"][r - 1]) || {}; },
-      col(c, o = {}) { const w = ws(o.sheet); return (w && w["!cols"] && w["!cols"][XLSX.utils.decode_col(c)]) || {}; }
+      col(c, o = {}) { const w = ws(o.sheet); return (w && w["!cols"] && w["!cols"][XLSX.utils.decode_col(c)]) || {}; },
+      boxed(list, o = {}) { return styles(list, (s, a) => ["left", "right", "top", "bottom"].every(sd => THIN.test(sideOf(a, sd, o))),
+        (a) => { const miss = ["left", "right", "top", "bottom"].filter(sd => !THIN.test(sideOf(a, sd, o))); return `${a} cellának nincs vékony szegélye (${miss.map(x => ({ left: "bal", right: "jobb", top: "felső", bottom: "alsó" }[x])).join(", ")}).`; }, o); },
+      unboxed(list, o = {}) { return styles(list, s => !["left", "right", "top", "bottom"].some(sd => s.border[sd]), a => `${a} cellának is van szegélye, pedig nincs benne adat.`, o); },
+      gray: c => !!c && c.s < .15 && c.l > .45 && c.l < .96,
+      lightOrange: c => !!c && ((c.h >= 15 && c.h <= 50) && c.s > .35 && c.l >= .5),
+      darkBlue: c => !!c && c.h >= 195 && c.h <= 255 && c.l <= .42 && c.s > .2
     };
   }
-  async function checkFile(file) {
-    $("report").innerHTML = `<p class="export-note">Ellenőrzöm: ${esc(file.name)}…</p>`;
-    if (!/\.xlsx$/i.test(file.name)) { $("report").innerHTML = `<div class="verdict no"><b>Ez nem .xlsx fájl.</b><p>A táblázatkezelő saját (alapértelmezett) formátumában mentett fájlt válaszd ki: ${esc(X.saveAs)}.</p></div>`; return; }
+
+  async function runChecks(file) {
+    const i = state.current, c = CH[i];
+    $("verdict").innerHTML = `<p class="export-note">Ellenőrzöm: ${esc(file.name)}…</p>`;
+    if (!/\.xlsx$/i.test(file.name)) { $("verdict").innerHTML = `<div class="verdict no"><b>Ez nem .xlsx fájl.</b><p>A táblázatkezelő saját (alapértelmezett) formátumában mentett fájlt válaszd ki: ${esc(X.saveAs)}.</p></div>`; return; }
     try { if (!window.XLSX) await loadScript("https://cdn.jsdelivr.net/npm/" + "xlsx@0.18.5/dist/xlsx.full.min.js"); }
-    catch (e) { $("report").innerHTML = `<div class="verdict no"><b>Nincs internet.</b><p>A fájl ellenőrzéséhez internetkapcsolat kell. Próbáld újra később.</p></div>`; return; }
+    catch (e) { $("verdict").innerHTML = `<div class="verdict no"><b>Nincs internet.</b><p>A fájl ellenőrzéséhez internetkapcsolat kell. Próbáld újra később.</p></div>`; return; }
     let F;
     try { F = makeF(XLSX.read(await file.arrayBuffer(), { type: "array", cellFormula: true, cellNF: true, cellStyles: true, bookFiles: true })); }
-    catch (e) { $("report").innerHTML = `<div class="verdict no"><b>Ezt a fájlt nem tudom megnyitni.</b><p>Mentsd el újra (Fájl › Mentés), és próbáld újra.</p></div>`; return; }
-    const rows = X.checks.map(ch => {
-      let r; try { r = ch.run(F) || { ok: false }; } catch (e) { r = { ok: false, msg: "Ezt a részt nem sikerült megnézni a fájlban." }; }
-      return { task: ch.task, label: ch.label, ok: !!r.ok, msg: r.msg || null, done: r.done, total: r.total };
-    });
-    const nameOk = new RegExp("^" + X.saveAs.replace(/\.xlsx$/, "").replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "\\b", "i").test(file.name);
-    state.report = { name: file.name, at: Date.now(), rows, nameOk };
-    save(); showReport(state.report);
-    if (rows.every(r => r.ok)) { solve(LAST, true); $("won").innerHTML = `<button type="button" class="btn primary big" id="toEnd">Tovább a befejezéshez →</button>`; const b = $("toEnd").getBoundingClientRect(); celebrate(b.left + b.width / 2, b.top, 70); }
-    else buzz();
+    catch (e) { $("verdict").innerHTML = `<div class="verdict no"><b>Ezt a fájlt nem tudom megnyitni.</b><p>Ha még nyitva van a mentés ablaka, várd meg a végét. Aztán mentsd el újra (<kbd>Ctrl</kbd>+<kbd>S</kbd>), és próbáld újra.</p></div>`; return; }
+    const rows = checksOf(c).map(ch => { let r; try { r = ch.run(F) || { ok: false }; } catch (e) { r = { ok: false, msg: "Ezt a részt nem sikerült megnézni a fájlban." }; } return { ok: !!r.ok, msg: r.msg || null, done: r.done, total: r.total }; });
+    const nameOk = new RegExp("^" + X.saveAs.replace(/\.xlsx$/, "").replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "(\\b|[ _-])", "i").test(file.name);
+    state.reports[i] = { name: file.name, at: Date.now(), rows, nameOk }; save();
+    if (rows.every(r => r.ok)) { solve(i); return; }
+    renderCase();
+    const left = rows.filter(r => !r.ok).length;
+    $("verdict").innerHTML = `<div class="verdict no"><b>Még nem stimmel.</b><p>${left === 1 ? "Egy dolog még hiányzik" : `${left} dolog még hiányzik`}: nézd meg a pirossal írt megjegyzést fent. Javítsd ki az Excelben, mentsd el, és ellenőrizd újra!</p></div>`;
+    buzz();
   }
-  function showReport(rep) {
-    const good = rep.rows.filter(r => r.ok).length;
-    $("report").innerHTML = `<p class="rep-head"><b>${esc(rep.name)}</b>: ${good} / ${rep.rows.length} rész rendben</p>
-      ${rep.nameOk === false ? `<p class="export-note warn">A feladat szerint a fájl neve <b>${esc(X.saveAs.replace(/\.xlsx$/, ""))}</b> legyen. Ezt a vizsgán pontozzák!</p>` : ""}
-      <ul class="goals report">${rep.rows.map(r => `<li class="${r.ok ? "ok" : ""}"><span class="gt"><span class="tn">${r.task}.</span> ${r.label}${r.ok ? "" : `<small>${esc(r.msg || "Ez még nincs meg a fájlban.")}</small>`}</span><span class="cnt">${r.total > 1 ? `${r.done} / ${r.total}` : ""}</span></li>`).join("")}</ul>
-      ${good < rep.rows.length ? `<p class="export-note">Javítsd ki a táblázatkezelőben, mentsd el (<kbd>Ctrl</kbd>+<kbd>S</kbd>), és húzd ide újra.</p>` : ""}`;
-    if (rep.rows.every(r => r.ok) && $("won") && !$("toEnd")) $("won").innerHTML = `<button type="button" class="btn primary big" id="toEnd">Tovább a befejezéshez →</button>`;
-  }
-  $("case").addEventListener("click", e => { if (e.target.closest("#drop")) $("fileIn").click(); });
-  $("case").addEventListener("keydown", e => { if (e.target.id === "drop" && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); $("fileIn").click(); } });
-  $("case").addEventListener("change", e => { if (e.target.id === "fileIn" && e.target.files[0]) checkFile(e.target.files[0]); });
-  $("case").addEventListener("dragover", e => { const d = e.target.closest("#drop"); if (d) { e.preventDefault(); d.classList.add("over"); } });
-  $("case").addEventListener("dragleave", e => { const d = e.target.closest("#drop"); if (d) d.classList.remove("over"); });
-  $("case").addEventListener("drop", e => { const d = e.target.closest("#drop"); if (!d) return; e.preventDefault(); d.classList.remove("over"); const f = e.dataTransfer.files[0]; if (f) checkFile(f); });
 
   /* ---------- the end ---------- */
   function showEnd() {
@@ -342,7 +376,7 @@
         <ul class="stats"><li><b>${T.length}</b> részfeladat</li><li><b>${mins}</b> perc</li><li><b>${hints}</b> segítség</li></ul>
         <p class="rank">${mins <= 50 && hints === 0 ? "Vizsgaérett: segítség nélkül, a vizsgaidőn belül!" : mins <= 50 ? "Időben megvagy. Legközelebb próbáld segítség nélkül!" : "Megvan! A vizsgán kb. 50 perced lesz rá: legközelebb mérd az időt."}</p>
         <div class="reward"><h3>Jutalom</h3><div id="reward"></div></div>
-        <div class="export"><h3>Add be a munkádat</h3><ol class="export-steps"><li>Nyisd meg a feladatot a <b>Google Classroomban</b>.</li><li>Töltsd fel az elmentett fájlodat (${esc((state.report && state.report.name) || X.saveAs)}).</li><li>Kattints a <b>Beadás</b> gombra.</li></ol></div>
+        <div class="export"><h3>Add be a munkádat</h3><ol class="export-steps"><li>Nyisd meg a feladatot a <b>Google Classroomban</b>.</li><li>Töltsd fel az elmentett fájlodat (${esc((state.reports[LAST] && state.reports[LAST].name) || X.saveAs)}).</li><li>Kattints a <b>Beadás</b> gombra.</li></ol></div>
         <div class="end-btns"><button type="button" class="btn" id="backToSheet">← Vissza a részfeladatokhoz</button><button type="button" class="btn reset" id="endReset">Újrakezdés</button>${X.next ? `<a class="btn primary" href="${X.next.href}">${esc(X.next.text)} →</a>` : ""}</div></div>`;
     if (window.DancingCats) DancingCats.mount($("reward"), { sound: () => soundOn, burst: (x, y, n) => celebrate(x, y, n) });
     scrollTo({ top: scrollY + $("endPanel").getBoundingClientRect().top - 70, behavior: "smooth" });
@@ -371,11 +405,11 @@
     return false;
   }
   function doReset() {
-    state = { solved: [], current: 0, start: Date.now(), end: null, hints: {}, answers: {}, ticks: {}, report: null };
+    state = { solved: [], current: 0, start: Date.now(), end: null, hints: {}, reports: {} };
     save(); $("endPanel").hidden = true; $("game").hidden = false; goTo(0); scrollTo({ top: 0, behavior: "smooth" });
   }
   $("resetBtn").addEventListener("click", e => { if (armOrReset(e.currentTarget)) doReset(); });
-  /* teacher shortcut: type the code anywhere and every chapter counts as done */
+  /* teacher shortcut: type the code anywhere and every chapter opens */
   let buf = "";
   document.addEventListener("keydown", e => {
     if (e.key.length !== 1) return;
@@ -387,7 +421,7 @@
   const fx = { c: $("fx"), parts: [], raf: 0 }; fx.ctx = fx.c.getContext("2d");
   const size = () => { const d = devicePixelRatio || 1; fx.c.width = innerWidth * d; fx.c.height = innerHeight * d; fx.ctx.setTransform(d, 0, 0, d, 0, 0); };
   size(); addEventListener("resize", size);
-  const COLS = X.confetti || ["#5b45a8", "#f2d264", "#107c41", "#7fa7ff", "#f0a3b8", "#a8dba0"];
+  const COLS = ["#5b45a8", "#f2d264", "#107c41", "#7fa7ff", "#f0a3b8", "#a8dba0"];
   const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
   function celebrate(x, y, n) {
     chime(); if (reduced) return;
@@ -418,7 +452,6 @@
   const chime = () => { [659, 784, 1047].forEach((f, k) => tone(f, .25, "triangle", .08, k * .07)); };
   const buzz = () => { tone(180, .18, "sawtooth", .05); tone(140, .22, "sawtooth", .05, .1); };
 
-  window.EXAM_CHECK = makeF;      /* for testing the checks without the page */
+  window.EXAM_TEST = { makeF, runChecks, goTo, state: () => state };     /* for testing */
   renderSteps(); renderCase();
-  if (state.end && state.solved.includes(LAST) && state.current === LAST) { /* finished earlier: the report stays on the last chapter */ }
 })();

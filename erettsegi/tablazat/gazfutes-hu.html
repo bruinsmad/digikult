@@ -90,26 +90,6 @@ window.EXAM = {
     "Ha megnyitod a txt-t az Excelben (<span class=ui>Fájl</span> › <span class=ui>Megnyitás</span>, eredet: UTF-8, határoló: tabulátor), az adatok az A1-be kerülnek. Ilyenkor kattints jobb gombbal az A oszlop fejére › <span class=ui>Beszúrás</span>: így minden a B1-től kezdődik.",
     "A munkalap nevére (lent, a lapfülön) kattints duplán, és írd be: évek. Mentés: <span class=ui>Mentés másként</span>, Excel-munkafüzet, név: <i>gazfutes</i>."
    ],
-   "asks": [
-    {
-     "q": "Mi áll a H1 cellában?",
-     "num": 2023,
-     "traps": {
-      "jelleggörbe (m3)": "Az adatok még az A1-től kezdődnek. Szúrj be egy oszlopot az A elé!"
-     }
-    },
-    {
-     "q": "Mi áll a B3 cellában?",
-     "num": 130.9
-    },
-    {
-     "q": "Mi a munkalap neve?",
-     "text": [
-      "évek"
-     ],
-     "exact": true
-    }
-   ],
    "hints": [
     "A 2. sor üres: a forrásfájlban is üres sor van az évek alatt. Ez így jó, a mintán ide kerül a „fűtési idény” felirat."
    ],
@@ -123,25 +103,6 @@ window.EXAM = {
     "Új munkalap: a lapfülek melletti <b>+</b> gomb, aztán dupla katt a nevére: 2023.",
     "<b>Áthelyezés</b> = kivágás (<kbd>Ctrl</kbd>+<kbd>X</kbd>) és beillesztés: az I és J oszlop az évek lapon utána üres marad. <b>Másolás</b> (<kbd>Ctrl</kbd>+<kbd>C</kbd>) után a H oszlop az évek lapon is megmarad."
    ],
-   "asks": [
-    {
-     "q": "Mi áll a 2023 munkalap C6 cellájában?",
-     "num": 274
-    },
-    {
-     "q": "Mi áll a 2023 munkalap D7 cellájában?",
-     "num": 553.2
-    },
-    {
-     "q": "Üres-e most az évek munkalap I3 cellája? (igen vagy nem)",
-     "text": [
-      "igen"
-     ],
-     "traps": {
-      "nem": "Az I és J oszlopot át kell helyezni (kivágni), nem másolni: az évek lapon utána üres marad."
-     }
-    }
-   ],
    "hints": [
     "Az évek lapon jelöld ki az I1:J11-et, <kbd>Ctrl</kbd>+<kbd>X</kbd>, kattints a 2023 lap B1 cellájára, <kbd>Ctrl</kbd>+<kbd>V</kbd>. Aztán az évek lapon H1:H11, <kbd>Ctrl</kbd>+<kbd>C</kbd>, a 2023 lapon D1, <kbd>Ctrl</kbd>+<kbd>V</kbd>."
    ],
@@ -151,20 +112,6 @@ window.EXAM = {
    "n": 3,
    "title": "A hónapok",
    "text": "<p>A két munkalap <i>A</i> oszlopának megfelelő soraiba jegyezze be a hónapok neveit a minta szerint!</p>",
-   "asks": [
-    {
-     "q": "Mi áll az évek munkalap A7 cellájában?",
-     "text": [
-      "január"
-     ]
-    },
-    {
-     "q": "És a 2023 munkalap A11 cellájában?",
-     "text": [
-      "május"
-     ]
-    }
-   ],
    "hints": [
     "Az A3-ba írd be: szeptember, aztán húzd le a kitöltőjelet az A11-ig: az Excel ismeri a hónapneveket, és magától folytatja (október, november, …).",
     "A 2023 lapon ugyanígy, vagy másold át az A3:A11-et."
@@ -175,16 +122,6 @@ window.EXAM = {
    "n": 4,
    "title": "A fűtési idények összege",
    "text": "<p>Az <b><i>évek</i></b> munkalapon a <i>B</i> oszloptól a <i>H</i> oszlopig az adott évben kezdődő fűtési idény adott havi fűtési hőmérsékleti tényezőinek összege található. A munkalap <i>12</i>. sorában határozza meg, hogy az adott fűtési idényben mennyi volt a fűtési hőmérsékleti tényezők összege!</p>",
-   "asks": [
-    {
-     "q": "Mennyi az összeg 2020-ban? (E12)",
-     "num": 3100.3
-    },
-    {
-     "q": "És 2023-ban? (H12)",
-     "num": 2404.4
-    }
-   ],
    "hints": [
     "B12: <code>=SZUM(B3:B11)</code>, aztán húzd jobbra a kitöltőjelet a H12-ig."
    ],
@@ -197,19 +134,6 @@ window.EXAM = {
    "tips": [
     "Fejrész a minta szerint: I1: legmelegebb, J1: leghidegebb, a 2. sorban az I2:J2 egyesítve: hónap éve."
    ],
-   "asks": [
-    {
-     "q": "Melyik évben volt a legmelegebb november? (I5)",
-     "num": 2019,
-     "traps": {
-      "2020": "Ez a leghidegebb: a legmelegebb hónapban a legkisebb a tényező (MIN)."
-     }
-    },
-    {
-     "q": "Melyik évben volt a leghidegebb október? (J4)",
-     "num": 2021
-    }
-   ],
    "hints": [
     "Három lépés egy képletben: MIN a sor legkisebb értéke; HOL.VAN megmondja, hányadik oszlopban van; INDEX kiveszi az ugyanannyiadik évet az 1. sorból.",
     "I3: <code>=INDEX($B$1:$H$1;HOL.VAN(MIN(B3:H3);B3:H3;0))</code>, J3: ugyanez MAX-szal. Aztán mindkettőt le a 11. sorig."
@@ -220,16 +144,6 @@ window.EXAM = {
    "n": 6,
    "title": "Hányszor?",
    "text": "<p>A <i>13</i>. sorban adja meg, hogy az adott év hányszor szerepel a legmelegebb hónapok között! A <i>14</i>. sorban pedig számítsa ki, hogy ugyanez az év hányszor szerepel a leghidegebb hónapok között! A sorfejeket a minta alapján gépelje be!</p>",
-   "asks": [
-    {
-     "q": "Hányszor szerepel a 2023 a legmelegebb hónapok között? (H13)",
-     "num": 5
-    },
-    {
-     "q": "Hányszor szerepel a 2017 a leghidegebb hónapok között? (B14)",
-     "num": 3
-    }
-   ],
    "hints": [
     "DARABTELI: hányszor szerepel az oszlop tetején álló év az I (vagy J) oszlopban?",
     "B13: <code>=DARABTELI($I$3:$I$11;B1)</code>, B14: <code>=DARABTELI($J$3:$J$11;B1)</code>, aztán jobbra a H oszlopig. Sorfejek: A13 legmelegebb, A14 leghidegebb."
@@ -240,13 +154,6 @@ window.EXAM = {
    "n": 7,
    "title": "Vonaldiagram",
    "text": "<p>Készítsen vonaldiagramot a <b><i>2023</i></b>-as munkalapon, amelyen a szeptember, … május hónaphoz tartozó jelleggörbe, fogyasztás és a 2023-as évhez tartozó fűtési hőmérsékleti tényezők szerepelnek.</p><ol class=\"sub\"><li>A diagramot lássa el a mintán szereplő címmel!</li><li>A diagram alatt legyen jelmagyarázat!</li><li>A diagramot helyezze az adatokat tartalmazó cellák alá az <i>A:D</i> oszlopok szélességében!</li></ol>",
-   "checklist": [
-    "Vonaldiagram a 2023 munkalapon, három vonallal: jelleggörbe, fogyasztás, 2023",
-    "A vízszintes tengelyen a hónapok (szeptember … május)",
-    "a. A címe: „A 2023/24-es fűtési idény adatai”",
-    "b. A jelmagyarázat a diagram alatt van",
-    "c. A diagram az adatok alatt, az A:D oszlopok szélességében áll"
-   ],
    "hints": [
     "Jelöld ki az A1:D11 tartományt, <span class=ui>Beszúrás</span> › <span class=ui>Vonaldiagram</span> › <span class=ui>Vonal jelölőkkel</span>.",
     "A <b>+</b> gombbal: <span class=ui>Jelmagyarázat</span> › <span class=ui>Lent</span>. A diagramot az <kbd>Alt</kbd> lenyomásával húzva a cellahatárokhoz illesztheted."
@@ -256,13 +163,6 @@ window.EXAM = {
    "n": 8,
    "title": "Formázás",
    "text": "<p>Formázza meg a munkalapok celláit az alább leírtak és a minta szerint!</p><ol class=\"sub\"><li>A fűtési hőmérsékleti tényezők és azok összegei az <b><i>évek</i></b> munkalapon egy tizedesjegy pontossággal jelenjenek meg!</li><li>A számított értékeket formázza félkövéren és dőlten, és igazítsa a mintának megfelelően!</li><li>Az adatokat tartalmazó cellákat szegélyezze vékony fekete vonallal!</li><li>A munkalapok első két sorát és első oszlopát alakítsa ki és formázza meg a minta szerint! A <b><i>2023</i></b> munkalap első sorában ügyeljen a szöveg tördelésére, a második sort pedig rejtse el!</li><li>Az oszlopok szélessége egyezzen meg<ul class=\"dots\"><li>az <b><i>évek</i></b> munkalapon a <i>B:H</i> tartományban;</li><li>az <b><i>évek</i></b> munkalapon az <i>I:J</i> tartományban;</li><li>a <b><i>2023</i></b> munkalapon a <i>B:D</i> tartományban!</li></ul></li></ol>",
-   "checklist": [
-    "a. Az évek lapon a tényezők és az összegek egy tizedesjeggyel látszanak (67,0 is)",
-    "b. A számított értékek félkövérek és dőltek, a mintán látható igazítással",
-    "c. Az adatokat tartalmazó cellák vékony fekete szegélyt kaptak",
-    "d. Az első két sor és az első oszlop olyan, mint a mintán (szürke háttér, félkövér, egyesítések); a 2023 lapon az első sor tördelve, a második sor elrejtve",
-    "e. Az évek lapon a B:H és az I:J, a 2023 lapon a B:D oszlopok egyforma szélesek"
-   ],
    "hints": [
     "a: jelöld ki a B3:H12-t, <span class=ui>Cellák formázása</span> › <span class=ui>Szám</span>, tizedesjegyek: 1.",
     "d: B2:H2 egyesítése és középre: „fűtési idény”, I2:J2: „hónap éve”. A 2023 lapon az első sor: <span class=ui>Sortöréssel több sorba</span>; a 2. sor: jobb klikk a sorszámra › <span class=ui>Elrejtés</span>."
@@ -272,34 +172,57 @@ window.EXAM = {
  "ending": "<p>Két munkalap, INDEX, HOL.VAN, MIN, MAX, DARABTELI és egy vonaldiagram: ez a 2026-os májusi középszintű érettségi táblázatkezelési feladata volt.</p>",
  "next": null
 };
-window.EXAM.checks = [
-  { task: 1, label: "Az évek munkalap, az adatok a B1-től", run: F => { if (!F.sheetNames.some(n => n.trim().toLowerCase() === "évek")) return { ok: false, msg: `Nincs „évek” nevű munkalap. A lapok: ${F.sheetNames.join(", ")}` };
-      const a = F.values("B1:H1", [2017, 2018, 2019, 2020, 2021, 2022, 2023], { sheet: "évek" }); return a.ok ? F.values("B3", 130.9, { sheet: "évek" }) : a; } },
-  { task: 2, label: "A 2023 munkalap: B, C áthelyezve, D másolva", run: F => { if (!F.sheetNames.some(n => n.trim() === "2023")) return { ok: false, msg: `Nincs „2023” nevű munkalap. A lapok: ${F.sheetNames.join(", ")}` };
-      const h = F.values("B1:D1", ["jelleggörbe (m3)", "fogyasztás (m3)", 2023], { sheet: "2023", loose: true }); if (!h.ok) return h;
-      return F.values("B3:D11", [29.32, 7.0, 34.5, 149.51, 39.0, 109.6, 225.81, 170.0, 382.5, 318.89, 274.0, 485.4, 342.44, 273.0, 553.2, 281.78, 173.0, 316.4, 232.18, 147.0, 291.4, 121.54, 83.0, 182.9, 27.52, 8.0, 48.5], { sheet: "2023" }); } },
-  { task: 3, label: "A hónapok mindkét munkalapon", run: F => { const a = F.values("A3:A11", ["szeptember", "október", "november", "december", "január", "február", "március", "április", "május"], { sheet: "évek" }); return a.ok ? F.values("A3:A11", ["szeptember", "október", "november", "december", "január", "február", "március", "április", "május"], { sheet: "2023" }) : a; } },
-  { task: 4, label: "B12:H12 az idények összege (képlettel)", run: F => F.values("B12:H12", [3005.2, 2997.4, 2790.5, 3100.3, 3082.1, 2895.9, 2404.4], { sheet: "évek", formula: true }) },
-  { task: 5, label: "I1, J1, I2 fejrész", run: F => F.values("I1:J1", ["legmelegebb", "leghidegebb"], { sheet: "évek" }).ok ? F.values("I2", "hónap éve", { sheet: "évek" }) : F.values("I1:J1", ["legmelegebb", "leghidegebb"], { sheet: "évek" }) },
-  { task: 5, label: "I3:J11 a legmelegebb és leghidegebb év (képlettel)", run: F => F.values("I3:J11", [2023, 2017, 2023, 2021, 2019, 2020, 2023, 2018, 2022, 2018, 2023, 2017, 2023, 2017, 2017, 2020, 2017, 2018], { sheet: "évek", formula: true, loose: true }) },
-  { task: 6, label: "B13:H14 hányszor (képlettel), sorfejek", run: F => { const h = F.values("A13:A14", ["legmelegebb", "leghidegebb"], { sheet: "évek" }); return h.ok ? F.values("B13:H14", [2, 0, 1, 0, 0, 1, 5, 3, 3, 0, 2, 1, 0, 0], { sheet: "évek", formula: true }) : h; } },
-  { task: 7, label: "Vonaldiagram a 2023 lapon, címmel, jelmagyarázat lent", run: F => {
-      const all = F.charts("2023"), ch = all.find(c => c.types.some(t => /line/.test(t)));
-      if (!ch) return { ok: false, msg: all.length ? "Van diagram a 2023 lapon, de nem vonaldiagram." : (F.charts("évek").length ? "A diagram az évek lapon van: a 2023 lapra kell." : "Nem találok diagramot a 2023 lapon.") };
-      if (ch.title.trim() !== "A 2023/24-es fűtési idény adatai") return { ok: false, msg: `A diagram címe „${ch.title}”, de „A 2023/24-es fűtési idény adatai” kell.` };
-      if (!ch.legend || ch.legendPos !== "b") return { ok: false, msg: "A jelmagyarázat a diagram alatt legyen (Jelmagyarázat › Lent)." };
-      if (ch.from.r !== null && ch.from.r < 11) return { ok: false, msg: "A diagram az adatok alá kerüljön (a 12. sortól lefelé)." };
-      return { ok: true }; } },
-  { task: 8, label: "a. egy tizedesjegy az évek lapon", run: F => F.numFmt("B3:H12", /^0[.,]0$|#,##0[.,]0$/, { sheet: "évek" }) },
-  { task: 8, label: "d. a 2023 lapon a 2. sor elrejtve", run: F => F.rowHidden(2, { sheet: "2023" }) ? { ok: true } : { ok: false, msg: "A 2023 munkalap 2. sora nincs elrejtve." } },
-  { task: 8, label: "d. egyesítések: B2:H2, I2:J2", run: F => { const m = ["B2:H2", "I2:J2"].find(r => !F.merged(r, { sheet: "évek" })); return m ? { ok: false, msg: `Az évek lapon a ${m} nincs egyesítve.` } : { ok: true }; } },
-  { task: 8, label: "e. egyforma oszlopszélességek", run: F => {
-      const same = (sheet, cols) => { const w = cols.split("").map(c => F.col(c, { sheet }).wch || F.col(c, { sheet }).width); return w.every(x => x && Math.abs(x - w[0]) < 0.05); };
-      if (!same("évek", "BCDEFGH")) return { ok: false, msg: "Az évek lapon a B:H oszlopok nem egyforma szélesek." };
-      if (!same("évek", "IJ")) return { ok: false, msg: "Az évek lapon az I és J oszlop nem egyforma széles." };
-      if (!same("2023", "BCD")) return { ok: false, msg: "A 2023 lapon a B:D oszlopok nem egyforma szélesek." };
-      return { ok: true }; } }
-];
+window.EXAM.checks = (() => {
+  const YRS = [2017, 2018, 2019, 2020, 2021, 2022, 2023], GD = [[130.9, 87.4, 64.1, 64.3, 67.0, 118.3, 34.5, 29.32, 7.0], [219.2, 173.6, 161.8, 223.7, 299.3, 190.3, 109.6, 149.51, 39.0], [411.5, 394.4, 332.7, 421.3, 420.8, 380.2, 382.5, 225.81, 170.0], [514.6, 567.0, 498.3, 514.3, 540.2, 493.0, 485.4, 318.89, 274.0], [502.8, 619.8, 619.5, 548.9, 563.5, 483.2, 553.2, 342.44, 273.0], [570.0, 426.6, 395.3, 426.2, 407.5, 451.7, 316.4, 281.78, 173.0], [498.4, 314.9, 385.6, 415.3, 419.7, 361.0, 291.4, 232.18, 147.0], [114.1, 220.6, 187.7, 318.9, 292.0, 297.3, 182.9, 121.54, 83.0], [43.7, 193.1, 145.5, 167.4, 72.1, 120.9, 48.5, 27.52, 8.0]], MONTHS = ["szeptember", "október", "november", "december", "január", "február", "március", "április", "május"];
+  const E = { sheet: "évek" }, H = { sheet: "2023" };
+  const has = (F, n) => F.sheetNames.some(s => s.trim().toLowerCase() === n);
+  const line = F => { const all = F.charts("2023"), ch = all.find(c => c.types.some(t => /line/.test(t)));
+    return ch ? { ch } : { err: { ok: false, msg: all.length ? "Van diagram a 2023 lapon, de nem vonaldiagram." : (F.charts("évek").length ? "A diagram az évek lapon van: a 2023 lapra kell." : "Nem találok diagramot a 2023 lapon.") } }; };
+  return [
+    { task: 1, label: "A munkalap neve: évek", run: F => has(F, "évek") ? { ok: true } : { ok: false, msg: `Nincs „évek” nevű munkalap. A lapok: ${F.sheetNames.join(", ")}` } },
+    { task: 1, label: "Az adatok a B1-től kezdődnek", run: F => F.all(F.values("A1", null, E), F.values("B1:H1", YRS, E), F.values("B3:B4", [GD[0][0], GD[1][0]], E)) },
+    { task: 2, label: "Van 2023 nevű munkalap", run: F => has(F, "2023") ? { ok: true } : { ok: false, msg: `Nincs „2023” nevű munkalap. A lapok: ${F.sheetNames.join(", ")}` } },
+    { task: 2, label: "A 2023 lapon a B:C oszlop (jelleggörbe, fogyasztás) és a D oszlop (2023)", run: F => F.all(F.values("B1:D1", ["jelleggörbe (m3)", "fogyasztás (m3)", 2023], { sheet: "2023", loose: true }),
+        F.values("B3:D11", [].concat(...GD.map(r => [r[7], r[8], r[6]])), H)) },
+    { task: 2, label: "Az I:J oszlop áthelyezve, a H oszlop másolva", run: F => { const w = F.ws("évek"); if (!w) return { ok: false, msg: "Nincs évek munkalap." };
+        const left = F.cellsOf("I1:J11").find((a, k) => { const c = w[a]; if (!c || c.f) return false; const r = F.dec(a).r, col = F.dec(a).c - 8; return r >= 2 && typeof c.v === "number" && Math.abs(c.v - GD[r - 2][7 + col]) < 1e-9 || (r === 0 && /m3/.test(String(c.v))); });
+        if (left) return { ok: false, msg: `Az évek lapon az ${left} cellában még ott van az adat: az I:J oszlopot áthelyezni (kivágni) kell, nem másolni.` };
+        return F.values("H3", GD[0][6], E).ok ? { ok: true } : { ok: false, msg: "Az évek lapon eltűnt a H oszlop: azt másolni kell, nem áthelyezni." }; } },
+    { task: 3, label: "A hónapok az évek lapon (A3:A11)", run: F => F.values("A3:A11", MONTHS, E) },
+    { task: 3, label: "A hónapok a 2023 lapon (A3:A11)", run: F => F.values("A3:A11", MONTHS, H) },
+    { task: 4, label: "B12:H12: az idények összege, képlettel", run: F => F.values("B12:H12", [3005.2, 2997.4, 2790.5, 3100.3, 3082.1, 2895.9, 2404.4], { sheet: "évek", formula: true }) },
+    { task: 5, label: "Fejrész: I1 legmelegebb, J1 leghidegebb, I2 hónap éve", run: F => F.all(F.values("I1:J1", ["legmelegebb", "leghidegebb"], E), F.values("I2", "hónap éve", E)) },
+    { task: 5, label: "I3:J11: a legmelegebb és a leghidegebb év, képlettel", run: F => F.values("I3:J11", [2023, 2017, 2023, 2021, 2019, 2020, 2023, 2018, 2022, 2018, 2023, 2017, 2023, 2017, 2017, 2020, 2017, 2018], { sheet: "évek", formula: true, loose: true }) },
+    { task: 6, label: "Sorfejek: A13 legmelegebb, A14 leghidegebb", run: F => F.values("A13:A14", ["legmelegebb", "leghidegebb"], E) },
+    { task: 6, label: "B13:H14: hányszor szerepel az év, képlettel", run: F => F.values("B13:H14", [2, 0, 1, 0, 0, 1, 5, 3, 3, 0, 2, 1, 0, 0], { sheet: "évek", formula: true }) },
+    { task: 7, label: "Vonaldiagram a 2023 lapon, három vonallal", run: F => { const { ch, err } = line(F); if (err) return err; return ch.series === 3 ? { ok: true } : { ok: false, msg: `A diagramon ${ch.series} vonal van, de 3 kell: jelleggörbe, fogyasztás és 2023.` }; } },
+    { task: 7, label: "a. Cím: „A 2023/24-es fűtési idény adatai”", run: F => { const { ch, err } = line(F); if (err) return err; return ch.title.trim() === "A 2023/24-es fűtési idény adatai" ? { ok: true } : { ok: false, msg: `A diagram címe „${ch.title}”, de „A 2023/24-es fűtési idény adatai” kell.` }; } },
+    { task: 7, label: "b. A jelmagyarázat a diagram alatt", run: F => { const { ch, err } = line(F); if (err) return err; return ch.legend && ch.legendPos === "b" ? { ok: true } : { ok: false, msg: "A jelmagyarázat a diagram alatt legyen (Diagramelemek › Jelmagyarázat › Lent)." }; } },
+    { task: 7, label: "c. Az adatok alatt, az A:D oszlopok szélességében", run: F => { const { ch, err } = line(F); if (err) return err; const f = ch.from, t = ch.to;
+        if (f.c === null) return { ok: true };
+        /* LibreOffice counts a hidden row out of the anchor: allow for the hidden 2. sor */
+        if (f.r < 11 - (F.rowHidden(2, H) && f.r === 10 ? 1 : 0)) return { ok: false, msg: "A diagram rálóg az adatokra: az adatok alá kerüljön (a 12. sortól)." };
+        return f.c === 0 && (t.c === 3 || (t.c === 4 && !t.cOff)) ? { ok: true } : { ok: false, msg: "A diagram nem pontosan az A:D oszlopok szélességében van. Az Alt lenyomásával húzva a cellahatárokhoz igazíthatod." }; } },
+    { task: 8, label: "a. Egy tizedesjegy az évek lapon (B3:H12)", run: F => F.numFmt("B3:H12", /^0[.,]0$|#,##0[.,]0$/, E) },
+    { task: 8, label: "b. A számított értékek félkövérek és dőltek, a mintának megfelelően igazítva", run: F => F.all(
+        F.styles(["B12:H14", "I3:J11"], s => s.font.b && s.font.i, (a, s) => `${a}: a számított érték nem ${!s.font.b ? "félkövér" : "dőlt"}.`, E),
+        F.styles("I3:J11", s => s.h === "center", a => `${a}: az évszám a mintán középre igazított.`, E)) },
+    { task: 8, label: "c. Vékony szegély az adatokat tartalmazó cellákon", run: F => F.all(F.boxed(["B1:J11", "A3:A11", "A13:H14", "B12:H12"], E), F.boxed(["B1:D1", "A3:D11"], H)) },
+    { task: 8, label: "d. Egyesítések: B2:H2 (fűtési idény), I2:J2 (hónap éve)", run: F => F.all(F.values("B2", "fűtési idény", E), () => { const m = ["B2:H2", "I2:J2"].find(r => !F.merged(r, E)); return m ? { ok: false, msg: `Az évek lapon a ${m} nincs egyesítve.` } : { ok: true }; }) },
+    { task: 8, label: "d. Az első két sor és az első oszlop félkövér, szürke hátterű", run: F => F.all(
+        F.styles(["B1:J2", "A3:A11", "A13:A14"], s => s.font.b && s.fill.pattern === "solid" && F.gray(s.fill.color), (a, s) => `${a}: ${!s.font.b ? "nem félkövér" : "nincs szürke háttere"} (lásd a mintát).`, E),
+        F.styles(["B1:D1", "A3:A11"], s => s.font.b && s.fill.pattern === "solid" && F.gray(s.fill.color), (a, s) => `${a}: ${!s.font.b ? "nem félkövér" : "nincs szürke háttere"} (lásd a mintát).`, H)) },
+    { task: 8, label: "d. A 2023 lapon az első sor tördelve, a második sor elrejtve", run: F => F.all(
+        F.styles("B1:C1", s => s.wrap, a => `${a}: a szöveg nincs tördelve (Kezdőlap › Sortöréssel több sorba).`, H),
+        () => F.rowHidden(2, H) ? { ok: true } : { ok: false, msg: "A 2023 munkalap 2. sora nincs elrejtve." }) },
+    { task: 8, label: "e. Egyforma oszlopszélességek: évek B:H és I:J, 2023 B:D", run: F => {
+        const same = (o, cols) => { const w = cols.split("").map(c => F.col(c, o).wch || F.col(c, o).width); return w.every(x => x && Math.abs(x - w[0]) < 0.05); };
+        if (!same(E, "BCDEFGH")) return { ok: false, msg: "Az évek lapon a B:H oszlopok nem egyforma szélesek." };
+        if (!same(E, "IJ")) return { ok: false, msg: "Az évek lapon az I és J oszlop nem egyforma széles." };
+        return same(H, "BCD") ? { ok: true } : { ok: false, msg: "A 2023 lapon a B:D oszlopok nem egyforma szélesek." }; } }
+  ];
+})()
+;
 </script>
 <script src="../../excel/cats.js"></script>
 <script src="../exam.js"></script>

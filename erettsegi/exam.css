@@ -92,3 +92,14 @@ body.sv-open{overflow:hidden}
   .minta{break-inside:avoid}
   .minta .zoom{border:0}
 }
+
+/* the check under every részfeladat: what the page looks for in the saved file */
+.checkbox{margin-top:4px;padding:12px 14px 14px;border:2px dashed var(--m);border-radius:8px;background:var(--m-soft);transition:background .2s}
+.checkbox.over{background:#fff;border-style:solid}
+.checkbox h3{margin:0 0 6px;font:700 18px var(--f-chalk);color:var(--m-ink)}
+.checkbox .goals li{background:#fff}
+.checkbox .goals li.ok{background:var(--ok-bg)}
+.howcheck{margin:10px 0 0;font-size:15px}
+.step.locked{cursor:not-allowed}
+#xtoast{position:fixed;left:50%;bottom:84px;transform:translate(-50%,20px);z-index:70;max-width:min(560px,calc(100vw - 32px));background:#2b1f55;color:#fff;font:600 15px var(--f-body);padding:10px 16px;border-radius:6px;box-shadow:0 8px 24px rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .2s,transform .2s}
+#xtoast.on{opacity:1;transform:translate(-50%,0)}
