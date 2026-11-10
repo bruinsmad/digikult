@@ -241,14 +241,14 @@
               {
                 id: "galaxy",
                 kind: "story",
-                minutes: 45,
-                title: { hu: "Csillagközi Klub: CSS a galaxisban", en: "The Star Club: CSS in a Galaxy" },
+                minutes: 35,
+                title: { hu: "Birodalmi toborzó: CSS a sötét oldalon", en: "Imperial Recruitment: CSS on the Dark Side" },
                 desc: {
-                  hu: "A suli Star Wars-klubjának honlapja még fehér és unalmas. Sötét űr, csillagos háttér, ragyogó Jedi- és Sith-kártyák, fénykard-gombok és ferdén úszó nyitószöveg, 9 fejezetben.",
-                  en: "The school Star Wars club's website is still white and dull. Dark space, a starry background, glowing Jedi and Sith cards, lightsaber buttons and a tilted opening crawl, in 9 chapters."
+                  hu: "A Birodalom toborzóhirdetése még fehér és unalmas, senki sem jelentkezik. Sötét háttér, piros cím, állás-kártyák, veszélyes állások és kerek bolygók, egyszerű CSS-sel, 8 fejezetben.",
+                  en: "The Empire's recruitment advert is still white and dull, and nobody signs up. Dark background, a red title, job cards, dangerous jobs and round planets, with simple CSS, in 8 chapters."
                 },
                 files: { en: "css/basics/galaxy.html", hu: "css/basics/galaxy-hu.html" },
-                progress: { chapters: 9, keys: { en: "galaxy-en-v1", hu: "galaxy-hu-v1" } }
+                progress: { chapters: 8, keys: { en: "galaxy-en-v2", hu: "galaxy-hu-v2" } }
               }
             ]
           }
