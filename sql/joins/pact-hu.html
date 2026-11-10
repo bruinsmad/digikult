@@ -383,7 +383,7 @@ const CHAPTERS = [
   "learn": "<p>Megnyitod a <code>lovagok</code> táblát, de királyságneveket nem találsz benne, csak számokat a <code>kiralysag_id</code> oszlopban. Az adatbázis mindent <b>egy</b> helyen tárol: a királyság neve a <code>kiralysagok</code> táblában van, a <code>lovagok</code> csak a királyság <code>id</code>-jét tárolja. Ez a szám egy <b>hivatkozás</b>: a <code>kiralysag_id = 1</code> azt jelenti, hogy „az a királyság, amelynek az id-je 1”. Egyelőre keresd ki kézzel, két lekérdezéssel.</p>\n  <pre>SELECT * FROM lovagok;\n\nSELECT nev FROM kiralysagok WHERE id = 1;</pre>",
   "task": "Melyik királyságot szolgálja Izgága Jay?",
   "hints": [
-   "Keresd meg a sorát a lovagok táblában, és jegyezd fel a kiralysag_id-jét. Aztán keresd meg ezt az id-t a kiralysagok táblában.",
+   "A királysága csak egy szám a lovagok táblában. Ezt a számot keresd ki a kiralysagok táblában.",
    {
     "sql": "SELECT kiralysag_id FROM lovagok\nWHERE nev = 'Izgága Jay';\n\nSELECT nev FROM kiralysagok WHERE id = 4;"
    }
@@ -398,9 +398,9 @@ const CHAPTERS = [
   "title": "A párosítási szabály",
   "story": "<p>„Ne egyenként keresgéld őket – mondja Éber Viktor. – Tedd egymás mellé a lovagokat és a királyságokat, és lásd, ki kicsoda.”</p>",
   "learn": "<p>Ha a <code>FROM</code>-ban két táblát nevezel meg, az <b>minden lovagot minden királysággal</b> párba állít: 24 × 6 = 144 sor, a legtöbbjük értelmetlen. A <code>WHERE</code>-be írt <b>párosítási szabály</b> csak az összetartozó párokat tartja meg: a lovag <code>kiralysag_id</code>-je egyenlő a királyság <code>id</code>-jével.</p>\n  <pre>SELECT lovagok.nev, kiralysagok.nev, kiralysagok.szovetseg\nFROM lovagok, kiralysagok\nWHERE lovagok.kiralysag_id = kiralysagok.id;</pre>\n  <p>Mindkét táblában van <code>id</code> és <code>nev</code>, ezért írd így: <code>tábla.oszlop</code>. További feltételek <code>AND</code>-del jönnek. Próbáld ki szabály nélkül és szabállyal:</p>\n  <div class=\"tries\">\n    <button type=\"button\" class=\"try\" data-sql=\"SELECT COUNT(*) FROM lovagok, kiralysagok;\">SELECT COUNT(*) FROM lovagok, kiralysagok;</button>\n    <button type=\"button\" class=\"try\" data-sql=\"SELECT COUNT(*) FROM lovagok, kiralysagok WHERE lovagok.kiralysag_id = kiralysagok.id;\">SELECT COUNT(*) FROM lovagok, kiralysagok WHERE lovagok.kiralysag_id = kiralysagok.id;</button>\n  </div>",
-  "task": "Párosítsd minden lovagot a királyságával! Hány Vas Liga-beli lovag vendégeskedik ma éjjel a várban?",
+  "task": "Hány Vas Liga-beli lovag vendégeskedik ma éjjel a várban?",
   "hints": [
-   "Írd be a párosítási szabályt, aztán: AND kiralysagok.szovetseg = 'Vas Liga'. A sorok száma a válasz, vagy használd a COUNT(*)-ot.",
+   "Két tábla, egy párosítási szabály és még egy feltétel.",
    {
     "sql": "SELECT lovagok.nev, kiralysagok.nev\nFROM lovagok, kiralysagok\nWHERE lovagok.kiralysag_id = kiralysagok.id\n  AND kiralysagok.szovetseg = 'Vas Liga';"
    }
@@ -420,9 +420,9 @@ const CHAPTERS = [
   "title": "A galambdúc naplója",
   "story": "<p>A galambdúc őre átadja a naplóját, a <code>levelek</code> táblát: minden galamb, amely ma este felszállt, ki küldte (<code>lovag_id</code>), hányadik rovásnál tartott közben a nagy gyertya (<code>gyertya</code>), és milyen színű volt a viasz. „A fekete viasz a Vas Ligáé – mondja. – Abból ma este bőven akadt.”</p>",
   "learn": "<p>A <code>levelek.lovag_id</code> a <code>lovagok.id</code>-re hivatkozik, ugyanúgy, mint az előbb. Előbb párosítsd a két táblát, utána a <code>GROUP BY</code> a megszokott módon működik: minden csoportból egy sor.</p>\n  <pre>SELECT lovagok.rang, COUNT(*)\nFROM levelek, lovagok\nWHERE levelek.lovag_id = lovagok.id\nGROUP BY lovagok.rang;</pre>\n  <p>Ez megszámolja, hány levelet küldtek az apródok, a lovagok, a bajnokok és a parancsnokok.</p>",
-  "task": "Csak a fekete pecsétes leveleket tartsd meg, és számold meg őket lovagonként! Ki küldte a legtöbbet?",
+  "task": "Ki küldte ma éjjel a legtöbb fekete pecsétes levelet?",
   "hints": [
-   "Párosítási szabály: levelek.lovag_id = lovagok.id, aztán AND levelek.pecset = 'fekete'. GROUP BY lovagok.nev, rendezés COUNT(*) DESC szerint.",
+   "Párosítsd a leveleket a lovagjaikkal, tartsd meg a feketéket, aztán csoportosíts.",
    {
     "sql": "SELECT lovagok.nev, COUNT(*)\nFROM levelek, lovagok\nWHERE levelek.lovag_id = lovagok.id\n  AND levelek.pecset = 'fekete'\nGROUP BY lovagok.nev\nORDER BY COUNT(*) DESC;"
    }
@@ -438,9 +438,9 @@ const CHAPTERS = [
   "title": "A kilencedik rovás",
   "story": "<p>A haditerv addig nem is létezett, amíg a nagy gyertya le nem égett a <mark>kilencedik rovásig</mark>. Amelyik galamb előtte szállt fel, az nem vihetett róla másolatot.</p>",
   "learn": "<p><code>GROUP BY</code> mellett a <code>MAX(levelek.gyertya)</code> minden csoport <b>legkésőbbi</b> rovását adja, a <code>MIN</code> a legkorábbit. Minél nagyobb a rovás, annál később volt az éjszakában.</p>\n  <pre>SELECT lovagok.rang, MIN(levelek.gyertya)\nFROM levelek, lovagok\nWHERE levelek.lovag_id = lovagok.id\nGROUP BY lovagok.rang;</pre>\n  <p>Ez megmutatja, hányadik rovásnál küldte az első levelét az egyes rangok tagja.</p>",
-  "task": "Csoportosítsd újra lovagonként a fekete pecsétes leveleket, és a MAX(levelek.gyertya)-val mutasd meg mindegyikük legkésőbbi levelét! Közülük hányan küldték az utolsó fekete levelüket a kilencedik rovásnál vagy később?",
+  "task": "A fekete pecsétes levelek küldői közül hányan küldték az utolsó fekete levelüket a kilencedik rovásnál vagy később?",
   "hints": [
-   "Vedd az előző lekérdezést, és a COUNT(*) mellé írd be: MAX(levelek.gyertya). Aztán nézd meg a rovásokat.",
+   "Csoportosítsd a fekete pecsétes leveleket úgy, mint az előbb, és keresd meg mindenkinél a legkésőbbi rovást.",
    {
     "sql": "SELECT lovagok.nev, COUNT(*), MAX(levelek.gyertya)\nFROM levelek, lovagok\nWHERE levelek.lovag_id = lovagok.id\n  AND levelek.pecset = 'fekete'\nGROUP BY lovagok.nev\nORDER BY MAX(levelek.gyertya);"
    }
@@ -459,9 +459,9 @@ const CHAPTERS = [
   "title": "Kinek az oldalán?",
   "story": "<p>A tanácsteremben csak az Ezüst Szövetség ült, így a tervet is csak az Ezüst Szövetség lovagjai ismerik. Ha egy Vas Liga-beli lovag fekete viasszal pecsétel, az semmi különös. <mark>Ha egy Ezüst Szövetség-beli lovag használja az ellenség fekete viaszát, az már igen.</mark></p>",
   "learn": "<p>A levél tudja, ki a lovagja, a lovag pedig tudja, melyik a királysága: <b>levelek → lovagok → kiralysagok</b>. Írd mindhárom táblát a <code>FROM</code>-ba. Minden kapcsolatnak saját párosítási szabály kell, <code>AND</code>-del összekötve: <b>három táblához két szabály kell</b>.</p>\n  <pre>SELECT kiralysagok.nev, COUNT(*)\nFROM levelek, lovagok, kiralysagok\nWHERE levelek.lovag_id = lovagok.id\n  AND lovagok.kiralysag_id = kiralysagok.id\nGROUP BY kiralysagok.nev;</pre>\n  <p>Ez királyságonként megszámolja a ma esti leveleket.</p>",
-  "task": "Kapcsold össze mindhárom táblát, tartsd meg a fekete pecsétes leveleket, és számold meg őket szövetségenként! Hány jött az Ezüst Szövetség lovagjaitól?",
+  "task": "Hány fekete pecsétes levél jött az Ezüst Szövetség lovagjaitól?",
   "hints": [
-   "A fenti két párosítási szabály, aztán AND levelek.pecset = 'fekete'. GROUP BY kiralysagok.szovetseg.",
+   "A szövetség a kiralysagok táblában van, két kapcsolatnyira a levelektől.",
    {
     "sql": "SELECT kiralysagok.szovetseg, COUNT(*)\nFROM levelek, lovagok, kiralysagok\nWHERE levelek.lovag_id = lovagok.id\n  AND lovagok.kiralysag_id = kiralysagok.id\n  AND levelek.pecset = 'fekete'\nGROUP BY kiralysagok.szovetseg;"
    }
@@ -480,9 +480,9 @@ const CHAPTERS = [
   "title": "Az áruló",
   "story": "<p>A gyertya az utolsó rovásnál tart. Az új őrség már a kaputorony lépcsőjén jár. <mark>Ki az az Ezüst Szövetség-beli lovag, akinek fekete viasz van az ujjain?</mark></p>",
   "learn": "<p>Ugyanaz a lánc, ugyanaz a két párosítási szabály. Most nem kellenek csoportok: mutasd a neveket, és szűrj.</p>\n  <pre>SELECT lovagok.nev, kiralysagok.nev, levelek.gyertya\nFROM levelek, lovagok, kiralysagok\nWHERE levelek.lovag_id = lovagok.id\n  AND lovagok.kiralysag_id = kiralysagok.id\n  AND kiralysagok.nev = 'Vashegy';</pre>",
-  "task": "Melyik Ezüst Szövetség-beli lovag küldött ma éjjel fekete pecsétes levelet?",
+  "task": "Ki az áruló?",
   "hints": [
-   "Ugyanaz a három tábla és két párosítási szabály, aztán AND levelek.pecset = 'fekete' AND kiralysagok.szovetseg = 'Ezüst Szövetség'.",
+   "Fekete viasz és Ezüst Szövetség: csak egy név marad.",
    {
     "sql": "SELECT lovagok.nev, kiralysagok.nev, levelek.gyertya\nFROM levelek, lovagok, kiralysagok\nWHERE levelek.lovag_id = lovagok.id\n  AND lovagok.kiralysag_id = kiralysagok.id\n  AND levelek.pecset = 'fekete'\n  AND kiralysagok.szovetseg = 'Ezüst Szövetség';"
    }
@@ -557,7 +557,7 @@ function renderCase(){
   const hints = c.hints.map(h=>{
     if (typeof h === "string") return `<details class="hint"><summary>${T.hint1}</summary><p>${esc(h)}</p></details>`;
     const tries = (state.wrong && state.wrong[i]) || 0;
-    if (!solved && tries < 2) return `<div class="hint locked">${T.sealed(2 - tries)}</div>`;
+    if (!solved && tries < 3) return `<div class="hint locked">${T.sealed(3 - tries)}</div>`;
     return `<details class="hint"><summary>${T.hint2}</summary><pre>${esc(h.sql)}</pre></details>`;
   }).join("");
   const last = i === CHAPTERS.length - 1;

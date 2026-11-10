@@ -383,7 +383,7 @@ const CHAPTERS = [
   "learn": "<p>You open the <code>knights</code> table and find no kingdom names, only numbers in <code>kingdom_id</code>. A database keeps each thing in <b>one</b> place: a kingdom's name lives in <code>kingdoms</code>, and <code>knights</code> only stores that kingdom's <code>id</code>. The number is a <b>reference</b>: <code>kingdom_id = 1</code> means \"the kingdom whose id is 1\". For now, look it up by hand with two queries.</p>\n  <pre>SELECT * FROM knights;\n\nSELECT name FROM kingdoms WHERE id = 1;</pre>",
   "task": "Which kingdom does Jay the Jittery serve?",
   "hints": [
-   "Find his row in knights and note his kingdom_id. Then look that id up in kingdoms.",
+   "His kingdom is only a number in knights. Look that number up in kingdoms.",
    {
     "sql": "SELECT kingdom_id FROM knights\nWHERE name = 'Jay the Jittery';\n\nSELECT name FROM kingdoms WHERE id = 4;"
    }
@@ -398,9 +398,9 @@ const CHAPTERS = [
   "title": "The matching rule",
   "story": "<p>\"Don't look them up one by one,\" says Viktor the Watchful. \"Put the knights and the kingdoms side by side, and see who is who.\"</p>",
   "learn": "<p>Naming two tables in <code>FROM</code> pairs up <b>every knight with every kingdom</b>: 24 × 6 = 144 rows, most of them nonsense. The <b>matching rule</b> in <code>WHERE</code> keeps only the pairs that belong together: the knight's <code>kingdom_id</code> equals the kingdom's <code>id</code>.</p>\n  <pre>SELECT knights.name, kingdoms.name, kingdoms.alliance\nFROM knights, kingdoms\nWHERE knights.kingdom_id = kingdoms.id;</pre>\n  <p>Both tables have an <code>id</code> and a <code>name</code>, so write <code>table.column</code>. More conditions follow with <code>AND</code>. Try it without and with the rule:</p>\n  <div class=\"tries\">\n    <button type=\"button\" class=\"try\" data-sql=\"SELECT COUNT(*) FROM knights, kingdoms;\">SELECT COUNT(*) FROM knights, kingdoms;</button>\n    <button type=\"button\" class=\"try\" data-sql=\"SELECT COUNT(*) FROM knights, kingdoms WHERE knights.kingdom_id = kingdoms.id;\">SELECT COUNT(*) FROM knights, kingdoms WHERE knights.kingdom_id = kingdoms.id;</button>\n  </div>",
-  "task": "Match every knight to their kingdom. How many Iron League knights are guests in the castle tonight?",
+  "task": "How many Iron League knights are guests in the castle tonight?",
   "hints": [
-   "Use the matching rule, then AND kingdoms.alliance = 'Iron League'. The number of rows is your answer, or use COUNT(*).",
+   "Two tables, one matching rule, and one more condition.",
    {
     "sql": "SELECT knights.name, kingdoms.name\nFROM knights, kingdoms\nWHERE knights.kingdom_id = kingdoms.id\n  AND kingdoms.alliance = 'Iron League';"
    }
@@ -420,9 +420,9 @@ const CHAPTERS = [
   "title": "The dovecote log",
   "story": "<p>The dovecote keeper hands you his log, the <code>letters</code> table: every pigeon that left tonight, who sent it (<code>knight_id</code>), at which notch of the great candle (<code>candle</code>), and the colour of the wax. \"Black wax is Iron League wax,\" he says. \"Plenty of that tonight.\"</p>",
   "learn": "<p><code>letters.knight_id</code> refers to <code>knights.id</code>, the same kind of link as before. Match the two tables first, then <code>GROUP BY</code> works as usual: one row for each group.</p>\n  <pre>SELECT knights.rank, COUNT(*)\nFROM letters, knights\nWHERE letters.knight_id = knights.id\nGROUP BY knights.rank;</pre>\n  <p>That counts how many letters the squires, knights, champions and commanders sent.</p>",
-  "task": "Keep only the black-wax letters and count them knight by knight. Who sent the most?",
+  "task": "Which knight sent the most black-wax letters tonight?",
   "hints": [
-   "Matching rule letters.knight_id = knights.id, then AND letters.wax = 'black'. GROUP BY knights.name, sort by COUNT(*) DESC.",
+   "Match the letters to their knights, keep the black ones, then group.",
    {
     "sql": "SELECT knights.name, COUNT(*)\nFROM letters, knights\nWHERE letters.knight_id = knights.id\n  AND letters.wax = 'black'\nGROUP BY knights.name\nORDER BY COUNT(*) DESC;"
    }
@@ -438,9 +438,9 @@ const CHAPTERS = [
   "title": "The ninth notch",
   "story": "<p>The battle plan didn't exist until the great candle reached its <mark>ninth notch</mark>. A pigeon that flew before that couldn't carry a copy of it.</p>",
   "learn": "<p>With <code>GROUP BY</code>, <code>MAX(letters.candle)</code> gives the <b>latest</b> notch in each group, <code>MIN</code> the earliest. The bigger the notch, the later in the night.</p>\n  <pre>SELECT knights.rank, MIN(letters.candle)\nFROM letters, knights\nWHERE letters.knight_id = knights.id\nGROUP BY knights.rank;</pre>\n  <p>That shows at which notch each rank sent its first letter.</p>",
-  "task": "Group the black-wax letters by knight again, and show each knight's latest letter with MAX(letters.candle). How many of them sent their latest black letter at the ninth notch or later?",
+  "task": "How many of the black-wax senders sent their last black letter at the ninth notch or later?",
   "hints": [
-   "Take the last query, and put MAX(letters.candle) next to COUNT(*). Then look at the notches.",
+   "Group the black-wax letters like before, and find each knight's latest notch.",
    {
     "sql": "SELECT knights.name, COUNT(*), MAX(letters.candle)\nFROM letters, knights\nWHERE letters.knight_id = knights.id\n  AND letters.wax = 'black'\nGROUP BY knights.name\nORDER BY MAX(letters.candle);"
    }
@@ -459,9 +459,9 @@ const CHAPTERS = [
   "title": "Whose side?",
   "story": "<p>Only the Silver Pact sat in the council chamber, so only Silver Pact knights know the plan. An Iron League knight sealing a letter in black is nothing strange. <mark>A Silver Pact knight using the enemy's black wax is.</mark></p>",
   "learn": "<p>A letter knows its knight, and a knight knows his kingdom: <b>letters → knights → kingdoms</b>. List all three tables in <code>FROM</code>. Every link needs its own matching rule, joined with <code>AND</code>: <b>three tables need two rules</b>.</p>\n  <pre>SELECT kingdoms.name, COUNT(*)\nFROM letters, knights, kingdoms\nWHERE letters.knight_id = knights.id\n  AND knights.kingdom_id = kingdoms.id\nGROUP BY kingdoms.name;</pre>\n  <p>That counts tonight's letters kingdom by kingdom.</p>",
-  "task": "Join all three tables, keep the black-wax letters, and count them for each alliance. How many came from Silver Pact knights?",
+  "task": "How many black-wax letters came from knights of the Silver Pact?",
   "hints": [
-   "The two matching rules from above, then AND letters.wax = 'black'. GROUP BY kingdoms.alliance.",
+   "The alliance is in kingdoms, two links away from letters.",
    {
     "sql": "SELECT kingdoms.alliance, COUNT(*)\nFROM letters, knights, kingdoms\nWHERE letters.knight_id = knights.id\n  AND knights.kingdom_id = kingdoms.id\n  AND letters.wax = 'black'\nGROUP BY kingdoms.alliance;"
    }
@@ -480,9 +480,9 @@ const CHAPTERS = [
   "title": "The traitor",
   "story": "<p>The candle is down to its last notch. The new guard is already climbing the gate tower. <mark>Who is the Silver Pact knight with black wax on his fingers?</mark></p>",
   "learn": "<p>Same chain, same two matching rules. This time you don't need groups: show the names and filter.</p>\n  <pre>SELECT knights.name, kingdoms.name, letters.candle\nFROM letters, knights, kingdoms\nWHERE letters.knight_id = knights.id\n  AND knights.kingdom_id = kingdoms.id\n  AND kingdoms.name = 'Ironhill';</pre>",
-  "task": "Which Silver Pact knight sent a black-wax letter tonight?",
+  "task": "Who is the traitor?",
   "hints": [
-   "The same three tables and two matching rules, then AND letters.wax = 'black' AND kingdoms.alliance = 'Silver Pact'.",
+   "Black wax and the Silver Pact: only one name is left.",
    {
     "sql": "SELECT knights.name, kingdoms.name, letters.candle\nFROM letters, knights, kingdoms\nWHERE letters.knight_id = knights.id\n  AND knights.kingdom_id = kingdoms.id\n  AND letters.wax = 'black'\n  AND kingdoms.alliance = 'Silver Pact';"
    }
@@ -557,7 +557,7 @@ function renderCase(){
   const hints = c.hints.map(h=>{
     if (typeof h === "string") return `<details class="hint"><summary>${T.hint1}</summary><p>${esc(h)}</p></details>`;
     const tries = (state.wrong && state.wrong[i]) || 0;
-    if (!solved && tries < 2) return `<div class="hint locked">${T.sealed(2 - tries)}</div>`;
+    if (!solved && tries < 3) return `<div class="hint locked">${T.sealed(3 - tries)}</div>`;
     return `<details class="hint"><summary>${T.hint2}</summary><pre>${esc(h.sql)}</pre></details>`;
   }).join("");
   const last = i === CHAPTERS.length - 1;
