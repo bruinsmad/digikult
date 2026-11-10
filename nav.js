@@ -144,11 +144,11 @@
                 minutes: 35,
                 title: { hu: "A megtört szövetség", en: "The Broken Pact" },
                 desc: {
-                  hu: "1214, a Nagy Tanács éjszakája: királyságok, lovagok és lepecsételt levelek. Valaki az ellenségnek ír. Kapcsold össze a táblákat, és leplezd le az árulót.",
-                  en: "1214, the night of the Great Council: kingdoms, knights and sealed letters. Someone is writing to the enemy. Join the tables and unmask the traitor."
+                  hu: "1214, a Nagy Tanács éjszakája: a sólyom elfog egy galambot, a lábán a titkos haditerv. Kapcsold össze a táblákat, csoportosítsd a leveleket, és leplezd le az árulót éjfélig.",
+                  en: "1214, the night of the Great Council: the falcon catches a pigeon carrying the secret battle plan. Join the tables, group the letters and unmask the traitor before midnight."
                 },
                 files: { en: "sql/joins/pact.html", hu: "sql/joins/pact-hu.html" },
-                progress: { chapters: 9, keys: { en: "pact-en-v2", hu: "pact-hu-v2" } }
+                progress: { chapters: 6, keys: { en: "pact-en-v3", hu: "pact-hu-v3" } }
               },
               {
                 id: "matchmaker",

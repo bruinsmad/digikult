@@ -6,12 +6,19 @@
    The file list below is written by tools/build-sw.py: run it before pushing. */
 
 /* FILES:BEGIN (written by tools/build-sw.py, don't edit by hand) */
-const VERSION = "2187354337";
+const VERSION = "a38f320d49";
 const CORE = [
 "./",
 "css/basics/first-steps.html",
+"css/basics/galaxy-hu.html",
+"css/basics/galaxy.html",
 "css/basics/img/bodri.svg",
 "css/basics/img/cirmi.svg",
+"css/basics/img/galaxy/club.svg",
+"css/basics/img/galaxy/endor.svg",
+"css/basics/img/galaxy/hoth.svg",
+"css/basics/img/galaxy/stars.svg",
+"css/basics/img/galaxy/tatooine.svg",
 "css/basics/img/logo.svg",
 "css/basics/img/morzsa.svg",
 "css/basics/img/pamacs.svg",

@@ -284,7 +284,7 @@ tr:last-child td{border-bottom:none}
       <div><span>Queries run</span><b id="fQueries">–</b></div>
       <div><span>Rank</span><b id="fRank">–</b></div>
     </div>
-    <div class="caught">S. Bálint Máté · caught at the stables, black wax on his fingers</div>
+    <div class="caught">Percival the Polite · caught at the stables, black wax on his fingers</div>
     <div class="finale-btns">
       <button class="btn" id="finaleClose" type="button">See bonus tasks</button>
       <button class="btn ghost" id="finaleAgain" type="button">Ring the bells!</button>
@@ -299,36 +299,36 @@ const SEED = `
 CREATE TABLE kingdoms (id INTEGER PRIMARY KEY, name TEXT, ruler TEXT, capital TEXT, army INTEGER, alliance TEXT);
 CREATE TABLE knights (id INTEGER PRIMARY KEY, name TEXT, kingdom_id INTEGER, rank TEXT, weapon TEXT);
 CREATE TABLE letters (id INTEGER PRIMARY KEY, knight_id INTEGER, time TEXT, wax TEXT);
-INSERT INTO kingdoms VALUES (1,'Northmark','B. Dániel','Frostburg',1200,'Silver Pact');
-INSERT INTO kingdoms VALUES (2,'Riverland','F. Lilianna','Willowford',900,'Silver Pact');
-INSERT INTO kingdoms VALUES (3,'Sunvale','L. Mária Éva','Goldenfield',800,'Silver Pact');
-INSERT INTO kingdoms VALUES (4,'Ironhill','M. Márk','Anvilrock',2000,'Iron League');
-INSERT INTO kingdoms VALUES (5,'Mistwood','L. Laura','Shadowmere',700,'Iron League');
-INSERT INTO kingdoms VALUES (6,'Goldcoast','R. Benjámin Laurence','Seagate',1100,'Iron League');
-INSERT INTO knights VALUES (1,'K. Kamilla',1,'champion','lance');
-INSERT INTO knights VALUES (2,'S. Bálint Máté',2,'knight','bow');
-INSERT INTO knights VALUES (3,'H. Hunor József',4,'champion','axe');
-INSERT INTO knights VALUES (4,'B. Rozália',5,'knight','bow');
-INSERT INTO knights VALUES (5,'É. Bence',3,'knight','sword');
-INSERT INTO knights VALUES (6,'L. Ágnes Abigél',6,'knight','sword');
-INSERT INTO knights VALUES (7,'H. Viktor',1,'commander','sword');
-INSERT INTO knights VALUES (8,'W. Jay',4,'knight','mace');
-INSERT INTO knights VALUES (9,'F. Réka',2,'champion','lance');
-INSERT INTO knights VALUES (10,'M. Anna Petra',5,'champion','sword');
-INSERT INTO knights VALUES (11,'L. Zorka',3,'champion','lance');
-INSERT INTO knights VALUES (12,'K. Nóra',6,'champion','lance');
-INSERT INTO knights VALUES (13,'B. Mihály',1,'knight','axe');
-INSERT INTO knights VALUES (14,'L. Zsombor Attila',4,'knight','sword');
-INSERT INTO knights VALUES (15,'C. Balázs',2,'knight','sword');
-INSERT INTO knights VALUES (16,'S. Eliza',5,'knight','mace');
-INSERT INTO knights VALUES (17,'N. Boglárka',3,'knight','bow');
-INSERT INTO knights VALUES (18,'P. Petra Patrícia',6,'knight','axe');
-INSERT INTO knights VALUES (19,'O. Benjámin Ádám',1,'squire','bow');
-INSERT INTO knights VALUES (20,'K. Luca',4,'squire','bow');
-INSERT INTO knights VALUES (21,'P. Hanna',2,'squire','mace');
-INSERT INTO knights VALUES (22,'Z. Zalán Benedek',5,'squire','axe');
-INSERT INTO knights VALUES (23,'S. Fruzsina',3,'squire','sword');
-INSERT INTO knights VALUES (24,'W. Bianka Kinga',6,'squire','mace');
+INSERT INTO kingdoms VALUES (1,'Northmark','Aldric the Bald','Frostburg',1200,'Silver Pact');
+INSERT INTO kingdoms VALUES (2,'Riverland','Isolde the Fair','Willowford',900,'Silver Pact');
+INSERT INTO kingdoms VALUES (3,'Sunvale','Matilda the Merry','Goldenfield',800,'Silver Pact');
+INSERT INTO kingdoms VALUES (4,'Ironhill','Gorm the Grim','Anvilrock',2000,'Iron League');
+INSERT INTO kingdoms VALUES (5,'Mistwood','Morgana Mist-Eye','Shadowmere',700,'Iron League');
+INSERT INTO kingdoms VALUES (6,'Goldcoast','Leopold the Lavish','Seagate',1100,'Iron League');
+INSERT INTO knights VALUES (1,'Brunhilda the Unbreakable',1,'champion','lance');
+INSERT INTO knights VALUES (2,'Percival the Polite',2,'knight','bow');
+INSERT INTO knights VALUES (3,'Ulfric Ironjaw',4,'champion','axe');
+INSERT INTO knights VALUES (4,'Rowena Ravenhair',5,'knight','bow');
+INSERT INTO knights VALUES (5,'Benedict the Brave',3,'knight','sword');
+INSERT INTO knights VALUES (6,'Agatha Goldspur',6,'knight','sword');
+INSERT INTO knights VALUES (7,'Godfrey Greybeard',1,'commander','sword');
+INSERT INTO knights VALUES (8,'Jasper the Jittery',4,'knight','mace');
+INSERT INTO knights VALUES (9,'Rosalind the Swift',2,'champion','lance');
+INSERT INTO knights VALUES (10,'Morwen Moonblade',5,'champion','sword');
+INSERT INTO knights VALUES (11,'Solveig Sunlance',3,'champion','lance');
+INSERT INTO knights VALUES (12,'Cordelia Coinpurse',6,'champion','lance');
+INSERT INTO knights VALUES (13,'Bjorn the Big',1,'knight','axe');
+INSERT INTO knights VALUES (14,'Grimwald the Gruff',4,'knight','sword');
+INSERT INTO knights VALUES (15,'Cedric Crookednose',2,'knight','sword');
+INSERT INTO knights VALUES (16,'Elspeth the Eerie',5,'knight','mace');
+INSERT INTO knights VALUES (17,'Bryony Bramble',3,'knight','bow');
+INSERT INTO knights VALUES (18,'Petronella Pearl-Axe',6,'knight','axe');
+INSERT INTO knights VALUES (19,'Oswald the Small',1,'squire','bow');
+INSERT INTO knights VALUES (20,'Lucinda Lightfoot',4,'squire','bow');
+INSERT INTO knights VALUES (21,'Hilda Hiccup',2,'squire','mace');
+INSERT INTO knights VALUES (22,'Fergus the Foggy',5,'squire','axe');
+INSERT INTO knights VALUES (23,'Florence Freckles',3,'squire','sword');
+INSERT INTO knights VALUES (24,'Wilhelmina the Wealthy',6,'squire','mace');
 INSERT INTO letters VALUES (1,7,'18:10','white');
 INSERT INTO letters VALUES (2,6,'18:20','red');
 INSERT INTO letters VALUES (3,5,'18:30','gold');
@@ -361,8 +361,8 @@ const CHAPTERS = [
  {
   "refresher": true,
   "title": "Quick refresher",
-  "story": "<p>Before the council, a 3-minute reminder of the basics. Every query has the same parts, always in this order.</p>\n  <div class=\"anatomy\" role=\"table\" aria-label=\"Parts of a query\">\n    <div role=\"row\"><code role=\"cell\">SELECT name, army</code><span role=\"cell\">which <b>columns</b> to show. <code>*</code> means all of them.</span></div>\n    <div role=\"row\"><code role=\"cell\">FROM kingdoms</code><span role=\"cell\">which <b>table</b> to read</span></div>\n    <div role=\"row\"><code role=\"cell\">WHERE army &gt; 1000</code><span role=\"cell\">which <b>rows</b> to keep</span></div>\n    <div role=\"row\"><code role=\"cell\">ORDER BY army DESC;</code><span role=\"cell\">how to <b>sort</b> the result</span></div>\n  </div>\n  <ul class=\"rules\">\n    <li>Text values go in single quotes: <code>'Northmark'</code>. Numbers don't: <code>1000</code>.</li>\n    <li>Combine conditions with <code>AND</code> and <code>OR</code>.</li>\n    <li>Today's new idea: one query can read <b>two or three tables</b> at once.</li>\n  </ul>",
-  "learn": "<p>One row in <code>kingdoms</code> is one kingdom. Click one to load and run it:</p>\n  <div class=\"tries\">\n    <button type=\"button\" class=\"try\" data-sql=\"SELECT * FROM kingdoms;\">SELECT * FROM kingdoms;</button>\n    <button type=\"button\" class=\"try\" data-sql=\"SELECT name, ruler FROM kingdoms WHERE army &gt; 1000;\">SELECT name, ruler FROM kingdoms WHERE army &gt; 1000;</button>\n    <button type=\"button\" class=\"try\" data-sql=\"SELECT * FROM knights WHERE rank = 'champion';\">SELECT * FROM knights WHERE rank = 'champion';</button>\n  </div>",
+  "story": "<p>Before the hunt, a 3-minute reminder of the basics. Every query has the same parts, always in this order.</p>\n  <div class=\"anatomy\" role=\"table\" aria-label=\"Parts of a query\">\n    <div role=\"row\"><code role=\"cell\">SELECT name, army</code><span role=\"cell\">which <b>columns</b> to show. <code>*</code> means all of them.</span></div>\n    <div role=\"row\"><code role=\"cell\">FROM kingdoms</code><span role=\"cell\">which <b>table</b> to read</span></div>\n    <div role=\"row\"><code role=\"cell\">WHERE army &gt; 1000</code><span role=\"cell\">which <b>rows</b> to keep</span></div>\n    <div role=\"row\"><code role=\"cell\">GROUP BY alliance</code><span role=\"cell\">one result row for each <b>group</b></span></div>\n    <div role=\"row\"><code role=\"cell\">ORDER BY army DESC;</code><span role=\"cell\">how to <b>sort</b> the result</span></div>\n  </div>\n  <ul class=\"rules\">\n    <li>Text values go in single quotes: <code>'Northmark'</code>. Numbers don't: <code>1000</code>.</li>\n    <li><code>COUNT(*)</code>, <code>SUM</code> and <code>MAX</code> work on each group when there's a <code>GROUP BY</code>.</li>\n    <li>Today's new idea: one query can read <b>two or three tables</b> at once.</li>\n  </ul>",
+  "learn": "<p>One row in <code>kingdoms</code> is one kingdom. Click one to load and run it:</p>\n  <div class=\"tries\">\n    <button type=\"button\" class=\"try\" data-sql=\"SELECT * FROM kingdoms;\">SELECT * FROM kingdoms;</button>\n    <button type=\"button\" class=\"try\" data-sql=\"SELECT alliance, SUM(army) FROM kingdoms GROUP BY alliance;\">SELECT alliance, SUM(army) FROM kingdoms GROUP BY alliance;</button>\n    <button type=\"button\" class=\"try\" data-sql=\"SELECT * FROM knights WHERE rank = 'champion';\">SELECT * FROM knights WHERE rank = 'champion';</button>\n  </div>",
   "task": "Warm-up: which kingdom has the largest army?",
   "hints": [
    "Sort the kingdoms by army, largest first: ORDER BY army DESC.",
@@ -374,96 +374,35 @@ const CHAPTERS = [
    "ironhill"
   ],
   "placeholder": "kingdom",
-  "success": "Ironhill: 2,000 soldiers. Its king, M. Márk, leads the Iron League, the old enemy of the Silver Pact. Remember that name.",
+  "success": "Ironhill: 2,000 soldiers. Its king, Gorm the Grim, leads the Iron League, the old rival of the Silver Pact. Tonight his knights sleep under your roof.",
   "starter": "SELECT * FROM kingdoms;"
  },
  {
-  "title": "Numbers instead of names",
-  "story": "<p>The year 1214, Frostburg Castle, the night before the Great Council. King <b>B. Dániel</b> of Northmark hosts the kingdoms of the <b>Silver Pact</b>. Knights of the Iron League are here too, as guests for the peace talks. At dawn the Silver Pact will seal its secret battle plan.</p>\n  <p>But the plan has leaked: Iron League scouts were seen riding exactly where it says. <mark>Someone inside the castle is writing to the enemy.</mark> Lord Commander H. Viktor unrolls the royal ledger in front of you, the young royal scribe. \"Find the traitor before the bells ring midnight.\"</p>\n  <p>You open the <code>knights</code> table and find no kingdom names at all. Only numbers in a column called <code>kingdom_id</code>.</p>",
-  "learn": "<p>A database keeps each thing in <b>one</b> place. A kingdom's name lives in <code>kingdoms</code>; <code>knights</code> only stores the kingdom's <code>id</code>. That number is a <b>reference</b>: <code>kingdom_id = 1</code> means \"the kingdom whose id is 1\". For now, look it up by hand with two queries.</p>\n  <pre>SELECT * FROM knights;\n\nSELECT name FROM kingdoms WHERE id = 1;</pre>",
-  "task": "Which kingdom does the champion K. Nóra serve?",
+  "title": "A pigeon at midnight",
+  "story": "<p>1214, Frostburg Castle, the night of the Great Council. At the <b>22:00 bell</b> the kings of the <b>Silver Pact</b> finished their secret battle plan. Knights of the rival <b>Iron League</b> are in the castle too, as guests of the peace talks.</p>\n  <p><b>23:35.</b> The castle falcon brings down a pigeon flying east, towards the Iron League camp. Tied to its leg: a letter sealed in <mark>black wax, the Iron League's colour</mark>, with a copy of the battle plan inside. The signature is torn off.</p>\n  <p>Lord Commander <b>Godfrey Greybeard</b> turns to you, the young royal scribe. \"That pigeon left our dovecote tonight. At midnight the gates open for the new guard, and the traitor can ride out. Find him first.\" The night guard already has a name: <b>Jasper the Jittery</b> walked to the dovecote three times tonight.</p>",
+  "learn": "<p>You open the <code>knights</code> table and find no kingdom names, only numbers in <code>kingdom_id</code>. A database keeps each thing in <b>one</b> place: a kingdom's name lives in <code>kingdoms</code>, and <code>knights</code> only stores that kingdom's <code>id</code>. The number is a <b>reference</b>: <code>kingdom_id = 1</code> means \"the kingdom whose id is 1\". For now, look it up by hand with two queries.</p>\n  <pre>SELECT * FROM knights;\n\nSELECT name FROM kingdoms WHERE id = 1;</pre>",
+  "task": "Which kingdom does Jasper the Jittery serve?",
   "hints": [
-   "Find her row in knights and note her kingdom_id. Then look that id up in the kingdoms table.",
+   "Find his row in knights and note his kingdom_id. Then look that id up in kingdoms.",
    {
-    "sql": "SELECT kingdom_id FROM knights\nWHERE name = 'K. Nóra';\n\nSELECT name FROM kingdoms WHERE id = 6;"
+    "sql": "SELECT kingdom_id FROM knights\nWHERE name = 'Jasper the Jittery';\n\nSELECT name FROM kingdoms WHERE id = 4;"
    }
   ],
   "answers": [
-   "goldcoast",
-   "gold coast"
+   "ironhill"
   ],
   "placeholder": "kingdom",
-  "success": "Goldcoast, the kingdom of the red ship. But two queries for one name is slow, and the candles are burning down. There's a faster way."
- },
- {
-  "title": "The multiplication mistake",
-  "story": "<p>You try to list every knight <i>with</i> the name of their kingdom in one go, and write <code>FROM knights, kingdoms</code>. The scroll keeps unrolling. K. Kamilla seems to serve every kingdom in the land at once. <mark>Something has gone very wrong.</mark> Or has it?</p>",
-  "learn": "<p>Naming two tables in <code>FROM</code> pairs up <b>every row of the first with every row of the second</b>. 24 knights × 6 kingdoms = 144 rows, and most of them are nonsense. That's not a bug: it's the raw material. The next step throws the wrong pairs away.</p>\n  <pre>SELECT * FROM knights, kingdoms;</pre>",
-  "task": "How many rows do you get from FROM knights, kingdoms with no WHERE?",
-  "hints": [
-   "COUNT(*) over the two tables, with nothing else. Or count the rows of each table and multiply.",
-   {
-    "sql": "SELECT COUNT(*) FROM knights, kingdoms;"
-   }
-  ],
-  "answers": [
-   "144",
-   "one hundred forty four",
-   "one hundred and forty four"
-  ],
-  "placeholder": "a number",
-  "success": "144 rows: every knight paired with every kingdom. Now let's keep only the pairs that belong together."
+  "success": "Ironhill, King Gorm the Grim's own kingdom. A strong first suspect. But two queries for every name is slow, and the candles are burning down."
  },
  {
   "title": "The matching rule",
-  "story": "<p>H. Viktor taps the ledger. \"A knight serves a kingdom when the knight's <code>kingdom_id</code> equals the kingdom's <code>id</code>. <mark>Tell the ledger that.</mark>\"</p>",
-  "learn": "<p>Add a <code>WHERE</code> condition that compares the two columns. Both tables have an <code>id</code> and a <code>name</code>, so write <code>table.column</code>: then SQL knows which one you mean. Other conditions follow with <code>AND</code>.</p>\n  <pre>SELECT knights.name, knights.rank, kingdoms.name\nFROM knights, kingdoms\nWHERE knights.kingdom_id = kingdoms.id;</pre>\n  <p>24 rows now: one per knight, each with the right kingdom. Many knights share one kingdom: this is a <b>many-to-one</b> link.</p>",
-  "task": "Who is the champion of Ironhill?",
+  "story": "<p>\"Don't look them up one by one,\" says Godfrey Greybeard. \"Put the knights and the kingdoms side by side, and see who is who.\"</p>",
+  "learn": "<p>Naming two tables in <code>FROM</code> pairs up <b>every knight with every kingdom</b>: 24 × 6 = 144 rows, most of them nonsense. The <b>matching rule</b> in <code>WHERE</code> keeps only the pairs that belong together: the knight's <code>kingdom_id</code> equals the kingdom's <code>id</code>.</p>\n  <pre>SELECT knights.name, kingdoms.name, kingdoms.alliance\nFROM knights, kingdoms\nWHERE knights.kingdom_id = kingdoms.id;</pre>\n  <p>Both tables have an <code>id</code> and a <code>name</code>, so write <code>table.column</code>. More conditions follow with <code>AND</code>. Try it without and with the rule:</p>\n  <div class=\"tries\">\n    <button type=\"button\" class=\"try\" data-sql=\"SELECT COUNT(*) FROM knights, kingdoms;\">SELECT COUNT(*) FROM knights, kingdoms;</button>\n    <button type=\"button\" class=\"try\" data-sql=\"SELECT COUNT(*) FROM knights, kingdoms WHERE knights.kingdom_id = kingdoms.id;\">SELECT COUNT(*) FROM knights, kingdoms WHERE knights.kingdom_id = kingdoms.id;</button>\n  </div>",
+  "task": "Match every knight to their kingdom. How many Iron League knights are guests in the castle tonight?",
   "hints": [
-   "Start with the matching rule WHERE knights.kingdom_id = kingdoms.id, then add AND kingdoms.name = 'Ironhill' AND knights.rank = 'champion'.",
+   "Use the matching rule, then AND kingdoms.alliance = 'Iron League'. The number of rows is your answer, or use COUNT(*).",
    {
-    "sql": "SELECT knights.name, knights.rank, kingdoms.name\nFROM knights, kingdoms\nWHERE knights.kingdom_id = kingdoms.id\n  AND kingdoms.name = 'Ironhill'\n  AND knights.rank = 'champion';"
-   }
-  ],
-  "answers": [
-   "h hunor jozsef",
-   "hunor jozsef",
-   "hunor jozsef h",
-   "h hunor",
-   "hunor"
-  ],
-  "placeholder": "name",
-  "success": "H. Hunor József, the axe-swinging champion of Ironhill. He came to the council as a guest of honour. Keep an eye on the Iron League."
- },
- {
-  "title": "Who wears the crown",
-  "story": "<p>Every row of <code>kingdoms</code> also names its ruler. <mark>Once a knight is matched to his kingdom, every column of that kingdom is yours to read.</mark></p>",
-  "learn": "<p>After the matching rule, you can <code>SELECT</code> any column from either table. The rule stays the same; only the column list changes.</p>\n  <pre>SELECT knights.name, kingdoms.name, kingdoms.ruler\nFROM knights, kingdoms\nWHERE knights.kingdom_id = kingdoms.id;</pre>",
-  "task": "Which ruler does the champion M. Anna Petra serve?",
-  "hints": [
-   "Use the same matching rule as before, show kingdoms.ruler, and add AND knights.name = 'M. Anna Petra'.",
-   {
-    "sql": "SELECT knights.name, kingdoms.name, kingdoms.ruler\nFROM knights, kingdoms\nWHERE knights.kingdom_id = kingdoms.id\n  AND knights.name = 'M. Anna Petra';"
-   }
-  ],
-  "answers": [
-   "l laura",
-   "laura",
-   "laura l",
-   "queen l laura"
-  ],
-  "placeholder": "ruler's name",
-  "success": "Queen L. Laura of Mistwood, the kingdom of the grey owl. Mistwood rides with the Iron League."
- },
- {
-  "title": "Friends and enemies",
-  "story": "<p>Only the kingdoms of the Silver Pact know the battle plan. The <code>alliance</code> column of <code>kingdoms</code> says which side each kingdom is on. <mark>How many enemy knights are sleeping inside these walls tonight?</mark></p>",
-  "learn": "<p>Everything you already know still works after a join: <code>COUNT</code>, <code>GROUP BY</code>, <code>ORDER BY</code>. SQL matches the tables first, then counts.</p>\n  <pre>SELECT kingdoms.alliance, COUNT(*) AS knights\nFROM knights, kingdoms\nWHERE knights.kingdom_id = kingdoms.id\nGROUP BY kingdoms.alliance;</pre>",
-  "task": "How many knights at the castle serve an Iron League kingdom?",
-  "hints": [
-   "Join knights and kingdoms, add AND kingdoms.alliance = 'Iron League', and count the rows with COUNT(*).",
-   {
-    "sql": "SELECT COUNT(*)\nFROM knights, kingdoms\nWHERE knights.kingdom_id = kingdoms.id\n  AND kingdoms.alliance = 'Iron League';"
+    "sql": "SELECT knights.name, kingdoms.name\nFROM knights, kingdoms\nWHERE knights.kingdom_id = kingdoms.id\n  AND kingdoms.alliance = 'Iron League';"
    }
   ],
   "answers": [
@@ -471,36 +410,40 @@ const CHAPTERS = [
    "twelve"
   ],
   "placeholder": "a number",
-  "success": "Twelve: half of the knights in the castle serve the Iron League. They're here openly, as guests. The traitor is someone who should be on our side."
+  "traps": {
+   "144": "That's every knight paired with every kingdom. Add the matching rule: WHERE knights.kingdom_id = kingdoms.id.",
+   "24": "That's all the knights. Keep only the Iron League: AND kingdoms.alliance = 'Iron League'."
+  },
+  "success": "Twelve enemy knights under one roof, and Jasper the Jittery is only one of them. You need the dovecote's records."
  },
  {
-  "title": "The letter log",
-  "story": "<p>The Iron League seals its letters with <mark>black wax</mark>. The castle's messengers write down every letter that leaves Frostburg tonight in the <code>letters</code> table: who sent it (<code>knight_id</code>), when, and the colour of the wax.</p>",
-  "learn": "<p><code>letters.knight_id</code> refers to <code>knights.id</code>: the same kind of link as <code>knights.kingdom_id</code> and <code>kingdoms.id</code>. Match first, then group.</p>\n  <pre>SELECT knights.name, COUNT(*) AS letters\nFROM letters, knights\nWHERE letters.knight_id = knights.id\nGROUP BY knights.name\nORDER BY COUNT(*) DESC;</pre>",
-  "task": "Which knight sent the most black-wax letters tonight?",
+  "title": "The dovecote log",
+  "story": "<p>The dovecote keeper hands you his log, the <code>letters</code> table: every pigeon that left tonight, who sent it (<code>knight_id</code>), when, and the colour of the wax. \"Black wax is Iron League wax,\" he says. \"Plenty of that tonight.\"</p>",
+  "learn": "<p><code>letters.knight_id</code> refers to <code>knights.id</code>, the same kind of link as before. Match the two tables first, then <code>GROUP BY</code> works as usual: one row for each group.</p>\n  <pre>SELECT knights.rank, COUNT(*)\nFROM letters, knights\nWHERE letters.knight_id = knights.id\nGROUP BY knights.rank;</pre>\n  <p>That counts how many letters the squires, knights, champions and commanders sent.</p>",
+  "task": "Keep only the black-wax letters and count them knight by knight. Who sent the most?",
   "hints": [
-   "Join letters and knights, add AND letters.wax = 'black', then GROUP BY knights.name and sort by COUNT(*) DESC.",
+   "Matching rule letters.knight_id = knights.id, then AND letters.wax = 'black'. GROUP BY knights.name, sort by COUNT(*) DESC.",
    {
-    "sql": "SELECT knights.name, COUNT(*) AS black_letters\nFROM letters, knights\nWHERE letters.knight_id = knights.id\n  AND letters.wax = 'black'\nGROUP BY knights.name\nORDER BY COUNT(*) DESC;"
+    "sql": "SELECT knights.name, COUNT(*)\nFROM letters, knights\nWHERE letters.knight_id = knights.id\n  AND letters.wax = 'black'\nGROUP BY knights.name\nORDER BY COUNT(*) DESC;"
    }
   ],
   "answers": [
-   "w jay",
-   "jay",
-   "jay w"
+   "jasper the jittery",
+   "jasper",
+   "sir jasper"
   ],
   "placeholder": "name",
-  "success": "W. Jay of Ironhill: three black seals. An Iron League knight writing home in Iron League wax. Busy, but that's not treason."
+  "success": "Jasper the Jittery: three black seals. \"There's our man!\" says the guard. Godfrey Greybeard shakes his head. \"Guests may write home. The question is <i>when</i> he wrote.\""
  },
  {
-  "title": "After the evening bell",
-  "story": "<p>The battle plan lay on the council table until the evening bell at <mark>22:00</mark>. It was copied after that, when the chamber was locked. Whoever sent black wax late tonight has some explaining to do.</p>",
-  "learn": "<p>Times are stored as text like <code>'22:15'</code>. Because they always have the same shape, you can compare them with <code>&gt;=</code>.</p>\n  <pre>SELECT knights.name, letters.time, letters.wax\nFROM letters, knights\nWHERE letters.knight_id = knights.id\n  AND letters.time &gt;= '21:00';</pre>",
-  "task": "How many black-wax letters left the castle at 22:00 or later?",
+  "title": "After the bell",
+  "story": "<p>The battle plan didn't exist until the <mark>22:00 bell</mark>. A letter sent before that couldn't carry a copy of it.</p>",
+  "learn": "<p>With <code>GROUP BY</code>, <code>MAX(letters.time)</code> gives the <b>latest</b> time in each group, <code>MIN</code> the earliest. Times are stored as text like <code>'22:15'</code>, and because they always have the same shape, they sort and compare correctly.</p>\n  <pre>SELECT knights.rank, MIN(letters.time)\nFROM letters, knights\nWHERE letters.knight_id = knights.id\nGROUP BY knights.rank;</pre>\n  <p>That shows when each rank sent its first letter.</p>",
+  "task": "Group the black-wax letters by knight again, and show each knight's latest letter with MAX(letters.time). How many of them sent their latest black letter at 22:00 or later?",
   "hints": [
-   "Join letters and knights, then AND letters.wax = 'black' AND letters.time >= '22:00'. Count the rows.",
+   "Take the last query, and put MAX(letters.time) next to COUNT(*). Then look at the times.",
    {
-    "sql": "SELECT knights.name, letters.time\nFROM letters, knights\nWHERE letters.knight_id = knights.id\n  AND letters.wax = 'black'\n  AND letters.time >= '22:00';"
+    "sql": "SELECT knights.name, COUNT(*), MAX(letters.time)\nFROM letters, knights\nWHERE letters.knight_id = knights.id\n  AND letters.wax = 'black'\nGROUP BY knights.name\nORDER BY MAX(letters.time);"
    }
   ],
   "answers": [
@@ -508,50 +451,54 @@ const CHAPTERS = [
    "three"
   ],
   "placeholder": "a number",
-  "success": "Three letters, three senders. Names alone won't tell you who is a traitor. You need to know whose side each sender is on."
+  "traps": {
+   "6": "That's every knight who used black wax. Look at the MAX(letters.time) column: how many are 22:00 or later?"
+  },
+  "success": "Three: Grimwald the Gruff at 22:15, Rowena Ravenhair at 22:50 and Percival the Polite at 23:20. Jasper the Jittery's last letter left at 21:40, before the plan even existed. He was only writing home."
  },
  {
-  "title": "Three tables in a row",
-  "story": "<p>A letter knows its knight, and a knight knows his kingdom. <mark>Follow the chain: letters → knights → kingdoms.</mark> Three tables, one query.</p>",
-  "learn": "<p>List all three tables in <code>FROM</code>, separated by commas. Every link in the chain needs its own matching rule, joined with <code>AND</code>. <b>Three tables need two rules.</b></p>\n  <pre>SELECT knights.name, kingdoms.name, kingdoms.alliance, letters.time\nFROM letters, knights, kingdoms\nWHERE letters.knight_id = knights.id\n  AND knights.kingdom_id = kingdoms.id;</pre>",
-  "task": "How many black-wax letters were sent tonight by knights of Iron League kingdoms?",
+  "title": "Whose side?",
+  "story": "<p>Only the Silver Pact sat in the council chamber, so only Silver Pact knights know the plan. An Iron League knight sealing a letter in black is nothing strange. <mark>A Silver Pact knight using the enemy's black wax is.</mark></p>",
+  "learn": "<p>A letter knows its knight, and a knight knows his kingdom: <b>letters → knights → kingdoms</b>. List all three tables in <code>FROM</code>. Every link needs its own matching rule, joined with <code>AND</code>: <b>three tables need two rules</b>.</p>\n  <pre>SELECT kingdoms.name, COUNT(*)\nFROM letters, knights, kingdoms\nWHERE letters.knight_id = knights.id\n  AND knights.kingdom_id = kingdoms.id\nGROUP BY kingdoms.name;</pre>\n  <p>That counts tonight's letters kingdom by kingdom.</p>",
+  "task": "Join all three tables, keep the black-wax letters, and count them for each alliance. How many came from Silver Pact knights?",
   "hints": [
-   "Use the two matching rules above, then AND letters.wax = 'black' AND kingdoms.alliance = 'Iron League'. Count the rows.",
+   "The two matching rules from above, then AND letters.wax = 'black'. GROUP BY kingdoms.alliance.",
    {
-    "sql": "SELECT COUNT(*)\nFROM letters, knights, kingdoms\nWHERE letters.knight_id = knights.id\n  AND knights.kingdom_id = kingdoms.id\n  AND letters.wax = 'black'\n  AND kingdoms.alliance = 'Iron League';"
+    "sql": "SELECT kingdoms.alliance, COUNT(*)\nFROM letters, knights, kingdoms\nWHERE letters.knight_id = knights.id\n  AND knights.kingdom_id = kingdoms.id\n  AND letters.wax = 'black'\nGROUP BY kingdoms.alliance;"
    }
   ],
   "answers": [
-   "7",
-   "seven"
+   "1",
+   "one"
   ],
   "placeholder": "a number",
-  "success": "Seven of tonight's eight black seals came from Iron League knights writing to their own side. That's expected. Eight minus seven leaves one."
+  "traps": {
+   "7": "That's the Iron League's group. Look at the other row: the Silver Pact."
+  },
+  "success": "Just one. Seven black seals went to the Iron League from its own knights, and one came from our side. One of our own sealed a letter in the enemy's colour."
  },
  {
   "title": "The traitor",
-  "story": "<p>The bells will ring soon. <mark>A knight of the Silver Pact has no business using the Iron League's black wax.</mark></p>",
-  "learn": "<p>Same chain, same two matching rules. Only the filter changes.</p>\n  <pre>SELECT knights.name, kingdoms.name, letters.time\nFROM letters, knights, kingdoms\nWHERE letters.knight_id = knights.id\n  AND knights.kingdom_id = kingdoms.id;</pre>",
-  "task": "Which knight is the traitor?",
+  "story": "<p>Two minutes to midnight. The new guard is already climbing the gate tower. <mark>Who is the Silver Pact knight with black wax on his fingers?</mark></p>",
+  "learn": "<p>Same chain, same two matching rules. This time you don't need groups: show the names and filter.</p>\n  <pre>SELECT knights.name, kingdoms.name, letters.time\nFROM letters, knights, kingdoms\nWHERE letters.knight_id = knights.id\n  AND knights.kingdom_id = kingdoms.id\n  AND kingdoms.name = 'Ironhill';</pre>",
+  "task": "Which Silver Pact knight sent a black-wax letter tonight?",
   "hints": [
-   "Take your chapter 8 query, show knights.name, and keep the black letters from Silver Pact kingdoms: AND kingdoms.alliance = 'Silver Pact'.",
+   "The same three tables and two matching rules, then AND letters.wax = 'black' AND kingdoms.alliance = 'Silver Pact'.",
    {
-    "sql": "SELECT knights.name, kingdoms.name AS kingdom, letters.time\nFROM letters, knights, kingdoms\nWHERE letters.knight_id = knights.id\n  AND knights.kingdom_id = kingdoms.id\n  AND letters.wax = 'black'\n  AND kingdoms.alliance = 'Silver Pact';"
+    "sql": "SELECT knights.name, kingdoms.name, letters.time\nFROM letters, knights, kingdoms\nWHERE letters.knight_id = knights.id\n  AND knights.kingdom_id = kingdoms.id\n  AND letters.wax = 'black'\n  AND kingdoms.alliance = 'Silver Pact';"
    }
   ],
   "answers": [
-   "s balint mate",
-   "balint mate",
-   "balint mate s",
-   "s balint",
-   "balint"
+   "percival the polite",
+   "percival",
+   "sir percival"
   ],
   "placeholder": "name",
-  "success": "S. Bálint Máté, a knight of Riverland, 23:20. At the stroke of midnight Champion K. Kamilla finds him at the stables, a black-wax letter in his boot and a copy of the battle plan in his saddlebag. At dawn the Silver Pact seals a new plan, and this one stays secret."
+  "success": "Percival the Polite, a knight of Riverland, 23:20: the pigeon the falcon caught. As the bells ring midnight, Brunhilda the Unbreakable, the champion, finds him at the stables, his horse saddled, black wax still on his fingers. At dawn the Silver Pact writes a new plan, and this one stays secret."
  }
 ];
-const BONUS = ["Which kingdom's knights sent the most letters tonight, whatever the wax?", "List every knight next to the ruler they serve, sorted by ruler.", "Which alliance has the larger combined army? (One table is enough: SUM(army) with GROUP BY alliance.)", "How many letters did the knights of each alliance send after 21:00?", "Which weapon do the knights who sent black-wax letters carry most often?", "Hard: which knights sent no letter at all tonight? Hint: knights.id NOT IN (SELECT knight_id FROM letters)."];
-const COLDOCS = {"kingdoms": {"id": "Row number of the kingdom.", "name": "<code>'Northmark'</code>, <code>'Riverland'</code>, <code>'Sunvale'</code>, <code>'Ironhill'</code>, <code>'Mistwood'</code> or <code>'Goldcoast'</code>.", "ruler": "The king or queen, e.g. <code>'B. Dániel'</code>.", "capital": "The capital city, e.g. <code>'Frostburg'</code>.", "army": "How many soldiers the kingdom has.", "alliance": "<code>'Silver Pact'</code> or <code>'Iron League'</code>."}, "knights": {"id": "Row number of the knight.", "name": "The knight's name.", "kingdom_id": "Which kingdom they serve: the <code>id</code> of a row in <code>kingdoms</code>.", "rank": "<code>'squire'</code>, <code>'knight'</code>, <code>'champion'</code> or <code>'commander'</code>.", "weapon": "<code>'sword'</code>, <code>'lance'</code>, <code>'bow'</code>, <code>'axe'</code> or <code>'mace'</code>."}, "letters": {"id": "Row number of the letter.", "knight_id": "Who sent it: the <code>id</code> of a row in <code>knights</code>.", "time": "When it left the castle tonight, as text <code>'HH:MM'</code>.", "wax": "Colour of the wax seal: <code>'black'</code>, <code>'white'</code>, <code>'blue'</code>, <code>'gold'</code>, <code>'grey'</code> or <code>'red'</code>."}};
+const BONUS = ["Which kingdom's knights sent the most letters tonight, whatever the wax? (three tables, GROUP BY kingdoms.name)", "List every knight next to the ruler they serve, sorted by ruler.", "How many letters did the knights of each alliance send after 22:00?", "For each wax colour, how many letters were sent, and when was the last one?", "Which weapon do the knights who sent black-wax letters carry most often?", "Hard: which knights sent no letter at all tonight? Hint: knights.id NOT IN (SELECT knight_id FROM letters)."];
+const COLDOCS = {"kingdoms": {"id": "Row number of the kingdom.", "name": "<code>'Northmark'</code>, <code>'Riverland'</code>, <code>'Sunvale'</code>, <code>'Ironhill'</code>, <code>'Mistwood'</code> or <code>'Goldcoast'</code>.", "ruler": "The king or queen, e.g. <code>'Aldric the Bald'</code>.", "capital": "The capital city, e.g. <code>'Frostburg'</code>.", "army": "How many soldiers the kingdom has.", "alliance": "<code>'Silver Pact'</code> or <code>'Iron League'</code>."}, "knights": {"id": "Row number of the knight.", "name": "The knight's name.", "kingdom_id": "Which kingdom they serve: the <code>id</code> of a row in <code>kingdoms</code>.", "rank": "<code>'squire'</code>, <code>'knight'</code>, <code>'champion'</code> or <code>'commander'</code>.", "weapon": "<code>'sword'</code>, <code>'lance'</code>, <code>'bow'</code>, <code>'axe'</code> or <code>'mace'</code>."}, "letters": {"id": "Row number of the letter.", "knight_id": "Who sent it: the <code>id</code> of a row in <code>knights</code>.", "time": "When it left the castle tonight, as text <code>'HH:MM'</code>.", "wax": "Colour of the wax seal: <code>'black'</code>, <code>'white'</code>, <code>'blue'</code>, <code>'gold'</code>, <code>'grey'</code> or <code>'red'</code>."}};
 const HAND_STEPS = ["Write your name below.", "Click <b>Save answers (.txt)</b>. The file goes to your Downloads folder.", "Open the assignment in <b>Google Classroom</b>, upload the file under <b>Add or create → File</b>, then press <b>Turn in</b>."];
 const RANKS = ["Royal Spymaster", "Lord Chancellor", "Knight of the Realm", "Squire"];
 const T = {
@@ -560,7 +507,7 @@ const T = {
   correct:"Correct.", wrong:"Not quite.", wrongTip:"Look at your result again. Did you include the matching rule (WHERE … = …) for every pair of tables? Check whether the task asks for a number or a name.", prev:"Previous chapter", next:"Next chapter", start:"Begin the hunt", yourans:"Your answer",
   ready:"The ledger is open. Write a query and press Run.", empty:"The query box is empty. Type a query first.", zero:"0 rows. No rows match all of your conditions. Check the spelling of text values and your matching rule.", sound:"Sound", reset:"Start over", reset2:"Click again to erase progress",
   errGeneric:"Check spelling, commas, brackets and quotes. Text values need single quotes, like 'black'.", errCol:"That column name doesn't exist, or it's ambiguous. When two tables have a column with the same name (like id or name), write the table name in front: knights.id.", errTab:"That table doesn't exist. The tables are: kingdoms, knights, letters.", errAmb:"Ambiguous column: both tables have a column with that name. Write the table name in front of it, like knights.name.", sqlErr:"The query has an error.", engFail:"The SQL engine could not load.", engFail2:"Check the internet connection and reload the page.", engStart:"The SQL engine could not start.",
-  endH:"The Pact holds", endP:m=>`The traitor sits in the north tower, the new battle plan is sealed, and the bells of Frostburg ring for the Silver Pact. You unmasked him in about <b>${m} minutes</b>, joining up to three tables with FROM and matching rules in WHERE.`, endBonus:"Bonus tasks for fast spymasters:", handH:"Hand in your answers", name:"Your name", namePh:"Write your name here", save:"Save answers (.txt)", copy:"Copy as text", replay:"Replay the celebration",
+  endH:"The Pact holds", endP:m=>`The traitor sits in the north tower, the new battle plan is sealed, and the bells of Frostburg ring for the Silver Pact. You unmasked him in about <b>${m} minutes</b>: you connected up to three tables with matching rules, and grouped what you found.`, endBonus:"Bonus tasks for fast spymasters:", handH:"Hand in your answers", name:"Your name", namePh:"Write your name here", save:"Save answers (.txt)", copy:"Copy as text", replay:"Replay the celebration",
   xNameFirst:"Write your name first.", xCopied:"Copied. Paste it into the assignment in Google Classroom as a private comment, then press Turn in.", xBlocked:"Copying is blocked here. Use Save answers instead.", xSaved:f=>`Saved as ${f}. Now upload it to the assignment in Google Classroom and press Turn in.`, xSaveBlocked:"Saving is blocked here. Use Copy as text instead.",
   filePrefix:"broken-pact", reportTitle:"THE BROKEN PACT - ANSWER SHEET", rName:"Name", rFinished:"Finished", rTime:"Time taken", rQueries:"Queries run", rDev:"NOTE: completed with the teacher code, so some answers may be missing.",
   rTask:"Task", rAnswer:"Answer", rSkipped:"(skipped)", rUnsolved:"(not solved)", rWrong:"Wrong answers", rQuery:"Query", rNone:"(none saved)",
@@ -568,7 +515,7 @@ const T = {
 };
 
 /* ---------- state ---------- */
-const KEY = "pact-en-v2";
+const KEY = "pact-en-v3";
 let state = { solved: [], current: 0, start: Date.now(), end: null, drafts: {} };
 try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && Array.isArray(s.solved)) state = Object.assign(state, s); } catch(e){}
 function save(){ try { localStorage.setItem(KEY, JSON.stringify(state)); } catch(e){} }
@@ -996,6 +943,6 @@ $("sql").value = state.drafts[state.current] ?? starterFor(state.current);
 if (typeof initSqlJs !== "function"){ $("out").innerHTML = `<div class="err">${T.engFail}<p>${T.engFail2}</p></div>`; }
 else { initSqlJs().then(s=>{ SQL = s; resetDb(); }).catch(e=>{ $("out").innerHTML = `<div class="err">${T.engStart}<p>${esc(e.message)}</p></div>`; }); }
 </script>
-<script src="../../nav.js?v=060909c2" defer></script>
+<script src="../../nav.js?v=2a4ac734" defer></script>
 </body>
 </html>
