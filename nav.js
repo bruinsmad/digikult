@@ -248,7 +248,7 @@
                   en: "The Empire's recruitment advert is still white and dull, and nobody signs up. A starry sky, a yellow title and opening crawl, Imperial red job names and targeted planets, with simple CSS, in 8 chapters."
                 },
                 files: { en: "css/basics/galaxy.html", hu: "css/basics/galaxy-hu.html" },
-                progress: { chapters: 8, keys: { en: "galaxy-en-v4", hu: "galaxy-hu-v4" } }
+                progress: { chapters: 8, keys: { en: "galaxy-en-v5", hu: "galaxy-hu-v5" } }
               }
             ]
           }
