@@ -392,7 +392,7 @@ function tallyMarks(n){
       const rough = xs.map((x, i) => sE(x + jit[i][0], 90 + jit[i][1], 32, 13)(fa(f1))).join("");
       fr({ svg: cur + rough, view: FULL, chips: [M("dup"), TIMES(4)], cap: t("Duplicate it 4×, drag the 5 ellipses along the edge.", "Kettőzd 4×, húzd az 5 ellipszist a szél mentén.") });
       const even = xs.map(x => sE(x, 90, 32, 13)(fa(f1))).join("");
-      fr({ svg: cur + even, sel: [[0, 77, W, 103]], status: ST(5), view: FULL, chips: [M("align"), AL("dh")], cap: t("Drag the 5 ellipses until the gaps look even.", "Húzd az 5 ellipszist, amíg a közök egyformák.") });
+      fr({ svg: cur + even, sel: [[0, 77, W, 103]], view: FULL, chips: [M("align"), AL("dh")], cap: t("Drag the 5 ellipses until the gaps look even.", "Húzd az 5 ellipszist, amíg a közök egyformák.") });
       fr({ svg: cur.replace(/<rect x="0" y="90"[^>]*\/>/, "") + waveSvg, sel: [[0, 77, W, H]], status: ST(6), view: FULL, chips: [K("Shift"), LB(t("+ lower half", "+ alsó fél")), TO, M("union")], cap: t("Add the lower half → Union: a wavy edge.", "Vedd hozzá az alsó felet → Unió: hullámos szél.") });
       colorAt = (x, y) => (y > 90 || xs.some(cx => ((x - cx) / 32) ** 2 + ((y - 90) / 13) ** 2 < 1)) ? f1 : f0;
       skills.add(t("Union", "Unió"));
