@@ -448,7 +448,7 @@
             title: { hu: "Középszint: hivatalos táblázatkezelési feladatok", en: "Standard level: official spreadsheet tasks" },
             pages: [
               {
-                id: "langos",
+                id: "erettsegi-langos",
                 kind: "exam",
                 minutes: 50,
                 title: { hu: "Lángos", en: "Lángos" },
@@ -461,7 +461,7 @@
                 progress: { chapters: 13, keys: { hu: "erettsegi-langos-hu-v1" } }
               },
               {
-                id: "omega",
+                id: "erettsegi-omega",
                 kind: "exam",
                 minutes: 50,
                 title: { hu: "Omega", en: "Omega" },
@@ -474,7 +474,7 @@
                 progress: { chapters: 12, keys: { hu: "erettsegi-omega-hu-v1" } }
               },
               {
-                id: "gazfutes",
+                id: "erettsegi-gazfutes",
                 kind: "exam",
                 minutes: 50,
                 title: { hu: "Gázfűtés", en: "Gas heating" },
