@@ -1,0 +1,357 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>/* moving between pages: the old page drifts aside and fades, the new one glides in; the rail holds still */@view-transition{navigation:auto}.rail{view-transition-name:rail}::view-transition-group(root){animation:none}::view-transition-old(root){animation:dk-out .2s cubic-bezier(.4,0,1,1) both}::view-transition-new(root){animation:dk-in .38s cubic-bezier(.16,1,.3,1) .06s both}::view-transition-old(rail),::view-transition-new(rail){animation:none}@keyframes dk-out{to{opacity:0;transform:translateX(-18px)}}@keyframes dk-in{from{opacity:0;transform:translateX(26px)}}@media (prefers-reduced-motion:reduce){::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none!important}}</style>
+<title>Omega – érettségi feladat</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600;700&display=swap">
+<link rel="stylesheet" href="../../excel/mission.css">
+<link rel="stylesheet" href="../exam.css">
+</head>
+<body>
+<header class="rail"><div class="in">
+  <a class="home" href="../../index.html">Digitális kultúra</a>
+  <span class="crumb"><a href="../../index.html#erettsegi">Táblázatkezelés – Érettségi</a> › <a href="../../index.html#erettsegi-kozep">Középszint</a></span>
+</div></header>
+<div class="top">
+  <span class="art" aria-hidden="true"><svg viewBox="0 0 96 96"><ellipse cx="48" cy="88" rx="30" ry="5" fill="#000" opacity=".25"/>
+<path d="M22 10h40l12 12v60H22z" fill="#fffdf6"/><path d="M62 10v12h12" fill="#e4e1d4"/>
+<g stroke="#b9b5a4" stroke-width="1.6"><path d="M28 34h40M28 44h40M28 54h40M28 64h40M28 74h40M42 28v50M56 28v50"/></g>
+<rect x="28" y="28" width="40" height="6" fill="#c9b8ff"/><text x="30" y="24" font-family="Times New Roman,serif" font-weight="700" font-size="11" fill="#3e2c80">3.</text>
+<path d="M58 70l18-30 6 4-18 30-7 3z" fill="#f2c230"/><path d="M58 70l1 7 6-4z" fill="#5d3820"/><path d="M76 40l6 4 2-3-6-4z" fill="#f0a3b8"/></svg></span>
+  <div><div class="kicker">Érettségi feladat · Digitális kultúra, középszint, 2025. május</div><h1>Omega</h1></div>
+  <div class="meta"><button type="button" class="mbtn" id="sheetBtn">Feladatlap</button><span>Haladás <b id="solvedCount">–</b></span><span>Idő <b id="timer">0:00</b></span><button type="button" class="mbtn" id="soundBtn">Hang: be</button><button type="button" id="resetBtn" title="Az egész feladat újrakezdése">Újrakezdés</button></div>
+</div>
+<nav class="steps" id="steps" aria-label="Részfeladatok"></nav>
+<div id="game"><main>
+  <article class="card" id="case" aria-live="polite"></article>
+  <section class="work" aria-label="Minta"><div class="card">
+    <div id="dlBox"></div>
+    <div class="work-head"><h2>Minta</h2><p>A hivatalos feladatlap mintája. Kattints rá a nagyításhoz.</p></div>
+    <div id="mintaBox"></div>
+  </div></section>
+</main></div>
+<section id="endPanel" hidden></section>
+<footer class="end">Digitális kultúra. A feladat szövege, a minta és a forrásfájl az Oktatási Hivatal hivatalos érettségi feladatlapjáról való. A haladásod a böngésződben marad; a feltöltött fájlt az oldal csak megnézi, nem küldi el sehová.</footer>
+<div id="sheetView" hidden role="dialog" aria-label="A teljes feladatlap"></div>
+<div id="lightbox" hidden></div>
+<canvas id="fx" aria-hidden="true"></canvas>
+<script>
+window.EXAM = {
+ "key": "erettsegi-omega-hu-v1",
+ "title": "Omega",
+ "number": 3,
+ "subject": "Digitális kultúra",
+ "level": "középszint",
+ "date": "2025. május 12.",
+ "code": "K2314",
+ "points": 25,
+ "saveAs": "omega.xlsx",
+ "files": [
+  {
+   "name": "merkozesek.txt",
+   "href": "forras/merkozesek.txt"
+  }
+ ],
+ "minta": [
+  {
+   "src": "img/omega-minta.png",
+   "caption": "<b>Minta a 10. részfeladat végrehajtása előtti adattartalommal:</b>",
+   "alt": "Minta az Omega feladathoz"
+  }
+ ],
+ "introFirst": true,
+ "intro": "<div class=\"intro\"><p>A megyeszékhely középiskolás korú fiataljainak kosárlabda-bajnokságot szerveznek. A csapatalakításnak egy feltétele van: minden csapattag a város valamelyik középiskolájában tanuljon! A csapatok maguknak választhatnak nevet a versenykiírásban meghatározott listából, ebben az esetben a görög ábécé betűi közül. A feladatban az Omega csapat mérkőzéseit követjük figyelemmel. A <i>merkozesek.txt</i> állományban az Omega csapat mérkőzéseinek dátuma, helyszíne és ellenfelei, valamint az eddig lejátszott mérkőzéseinek eredménye (a dobott és a kapott pontok száma) szerepel időrendben.</p><p>Táblázatkezelő program segítségével oldja meg a következő feladatokat!</p></div>",
+ "lead": "<i>A megoldás során vegye figyelembe a következőket!</i>",
+ "rules": [
+  "Amennyiben lehetséges, a megoldás során képletet, függvényt, hivatkozást használjon!",
+  "A részfeladatok között van olyan, amely egy korábbi kérdés eredményét használja fel. Ha a korábbi részfeladatot nem sikerült teljesen megoldania, használja a megoldását úgy, ahogy van, vagy írjon be egy valószínűnek tűnő eredményt, és azzal dolgozzon tovább! Így ugyanis pontokat kaphat erre a részfeladatra is.",
+  "Segédszámításokat a P oszloptól jobbra végezhet."
+ ],
+ "tasks": [
+  {
+   "n": 1,
+   "title": "Betöltés és mentés",
+   "text": "<p>Töltse be a tabulátorokkal tagolt, UTF-8 kódolású <i>merkozesek.txt</i> szövegfájlt a táblázatkezelőbe az <i>A1</i>-es cellától kezdődően! Munkáját <i>omega</i> néven mentse el a táblázatkezelő alapértelmezett formátumában!</p>",
+   "tips": [
+    "Az Excelben: <span class=ui>Fájl</span> › <span class=ui>Megnyitás</span>, a fájltípusnál <span class=ui>Szövegfájlok</span>. A varázslóban: <span class=ui>Tagolt</span>, eredet <span class=ui>65001: Unicode (UTF-8)</span>, határoló a <span class=ui>Tabulátor</span>.",
+    "Mentés: <span class=ui>Fájl</span> › <span class=ui>Mentés másként</span>, típus <span class=ui>Excel-munkafüzet (*.xlsx)</span>, név: <i>omega</i>."
+   ],
+   "asks": [
+    {
+     "q": "Melyik cellába került az „Omega kosárcsapat” szöveg?",
+     "text": [
+      "J1"
+     ]
+    },
+    {
+     "q": "Mi áll az F11 cellában?",
+     "num": 63
+    }
+   ],
+   "hints": [
+    "Ha az ékezetes betűk furcsán jelennek meg (pl. TÃ©ta), a beolvasásnál a fájl eredetének az UTF-8-at válaszd."
+   ],
+   "done": "A forrásban a jobb oldali feliratok (győzelem, vereség, Csúcsok, …) is benne vannak: azokat már nem kell begépelned."
+  },
+  {
+   "n": 2,
+   "title": "A fordulók sorszáma",
+   "text": "<p>Az <i>A2:A23</i> tartomány celláiba jegyezze be a fordulók sorszámát a mintának megfelelően!</p>",
+   "asks": [
+    {
+     "q": "Mi látszik az A23 cellában? (Pontosan úgy írd be, ahogy látszik.)",
+     "text": [
+      "22."
+     ],
+     "exact": true,
+     "traps": {
+      "22": "A mintán a szám után pont van: 1., 2., … 22. Lásd a segítséget!"
+     }
+    }
+   ],
+   "hints": [
+    "Írd be az A2-be az 1-et, az A3-ba a 2-t, jelöld ki a kettőt, és húzd le a kitöltőjelet az A23-ig.",
+    "A pontot a számformátum teszi a szám mögé: <span class=ui>Cellák formázása</span> (<kbd>Ctrl</kbd>+<kbd>1</kbd>) › <span class=ui>Szám</span> › <span class=ui>Egyéni</span>, a formátumkód: <code>0\".\"</code>."
+   ],
+   "done": null
+  },
+  {
+   "n": 3,
+   "title": "Győzelem vagy vereség",
+   "text": "<p>Az eredmény oszlopában határozza meg, hogy az adott mérkőzésen győzött vagy vesztett az Omega csapata! (Kosárlabda-mérkőzésen a több pontot szerző csapat nyer, és nem születhet döntetlen eredmény.) Az eredménytől függően a „győzelem” vagy a „vereség” szöveget jelenítse meg! A cellákat elegendő a már bejegyzett eredmények soraiban kitöltenie.</p>",
+   "asks": [
+    {
+     "q": "Mi áll a G6 cellában?",
+     "text": [
+      "vereség"
+     ]
+    },
+    {
+     "q": "Mi áll a G9 cellában?",
+     "text": [
+      "győzelem"
+     ]
+    }
+   ],
+   "hints": [
+    "HA függvény: ha a dobott pont (E) nagyobb, mint a kapott (F), akkor „győzelem”, különben „vereség”.",
+    "G2: <code>=HA(E2>F2;\"győzelem\";\"vereség\")</code>, aztán le a G11-ig, az utolsó lejátszott mérkőzésig."
+   ],
+   "done": null
+  },
+  {
+   "n": 4,
+   "title": "Sorozat",
+   "text": "<p>A sorozat oszlopában határozza meg, hogy az adott mérkőzést is tekintve milyen hosszú győzelem- vagy vereségsorozatban van éppen a csapat! A cellákat elegendő a már bejegyzett eredmények soraiban kitöltenie. (Ha az előző mérkőzésen vesztett, de most győzött a csapat, akkor egy új sorozat kezdődik, tehát a sorozat értéke 1. Ha az előző fordulóban már 2 hosszú vereségsorozata volt, és most is vesztett, akkor a sorozat hossza 3-ra nő.)</p>",
+   "asks": [
+    {
+     "q": "Mi áll a H8 cellában?",
+     "num": 4,
+     "traps": {
+      "1": "Nézd meg a G oszlopot: a 4. fordulótól sorban négy vereség jön. Ha az eredmény ugyanaz, mint egy sorral feljebb, a sorozat eggyel nő."
+     }
+    },
+    {
+     "q": "Mi áll a H11 cellában?",
+     "num": 3
+    }
+   ],
+   "hints": [
+    "Csak az előző sort kell nézni: ha az eredmény ugyanaz, mint egy sorral feljebb, akkor az ottani sorozat + 1, különben 1.",
+    "H2: <code>=HA(G2=G1;H1+1;1)</code>, aztán le a H11-ig. (A G1 a fejléc, így a H2-ben 1 lesz.)"
+   ],
+   "done": "A 7. fordulóban négy vereség volt sorban: ez lesz a leghosszabb sorozat."
+  },
+  {
+   "n": 5,
+   "title": "Győzelmek és vereségek",
+   "before": "A <i>J</i> oszloptól jobbra a képleteket úgy alkossa meg, hogy azok újabb mérkőzéseredmények bejegyzését követően is helyes eredményt adjanak a 22. fordulóig!",
+   "text": "<p>A <i>K4</i>-es cellában határozza meg, hogy hány győzelmet aratott az Omega csapata, az <i>L4</i>-es cellában pedig a vereségek száma jelenjen meg!</p>",
+   "tips": [
+    "A feladatlap fenti mondata a K–N oszlop minden képletére vonatkozik: a tartományok a 22. fordulóig, vagyis a <b>23. sorig</b> tartsanak, akkor is, ha ott még nincs eredmény."
+   ],
+   "asks": [
+    {
+     "q": "Hány győzelem van? (K4)",
+     "num": 5
+    },
+    {
+     "q": "Hány vereség van? (L4)",
+     "num": 5
+    }
+   ],
+   "hints": [
+    "DARABTELI: megszámolja, hány cellában áll a „győzelem” szó.",
+    "K4: <code>=DARABTELI(G2:G23;\"győzelem\")</code>, L4: <code>=DARABTELI(G2:G23;\"vereség\")</code>"
+   ],
+   "done": null
+  },
+  {
+   "n": 6,
+   "title": "Dobott és kapott pontok",
+   "ctx": "A <i>J</i> oszloptól jobbra a képleteket úgy alkossa meg, hogy azok újabb mérkőzéseredmények bejegyzését követően is helyes eredményt adjanak a 22. fordulóig!",
+   "text": "<p>Az <i>M4</i>-es és az <i>N4</i>-es cellában határozza meg, hogy az idény során összesen hány pontot dobott, illetve kapott a csapat!</p>",
+   "asks": [
+    {
+     "q": "Hány pontot dobott összesen? (M4)",
+     "num": 718
+    },
+    {
+     "q": "Hány pontot kapott összesen? (N4)",
+     "num": 702
+    }
+   ],
+   "hints": [
+    "M4: <code>=SZUM(E2:E23)</code>, N4: <code>=SZUM(F2:F23)</code>. Az üres cellákat a SZUM kihagyja, így a később beírt eredmények is beleszámítanak."
+   ],
+   "done": null
+  },
+  {
+   "n": 7,
+   "title": "Csúcsok",
+   "ctx": "A <i>J</i> oszloptól jobbra a képleteket úgy alkossa meg, hogy azok újabb mérkőzéseredmények bejegyzését követően is helyes eredményt adjanak a 22. fordulóig!",
+   "text": "<p>A <i>K7</i>-es cellában határozza meg, hogy mennyi volt a legtöbb pont egy mérkőzésen, amelyet az Omega csapata dobott! Az <i>N7</i>-es cellában pedig adja meg, milyen hosszú volt az a leghosszabb győzelem- vagy vereségsorozat, amelyben részük volt!</p>",
+   "asks": [
+    {
+     "q": "Mennyi a legtöbb dobott pont? (K7)",
+     "num": 97
+    },
+    {
+     "q": "Milyen hosszú a leghosszabb sorozat? (N7)",
+     "num": 4
+    }
+   ],
+   "hints": [
+    "K7: <code>=MAX(E2:E23)</code>, N7: <code>=MAX(H2:H23)</code>"
+   ],
+   "done": null
+  },
+  {
+   "n": 8,
+   "title": "Következő mérkőzés",
+   "ctx": "A <i>J</i> oszloptól jobbra a képleteket úgy alkossa meg, hogy azok újabb mérkőzéseredmények bejegyzését követően is helyes eredményt adjanak a 22. fordulóig!",
+   "text": "<p>A <i>K10</i>-es cellában határozza meg, hogy mikor lesz a következő mérkőzése az Omega csapatának, az <i>N10</i>-es cellában pedig adja meg a következő ellenfél nevét! Ügyeljen arra, hogy az újabb fordulók eredményének bejegyzése után is helyes érték jelenjen meg!</p>",
+   "asks": [
+    {
+     "q": "Mikor lesz a következő mérkőzés? (K10)",
+     "date": "2022-01-18",
+     "traps": {
+      "44579": "Ez a dátum sorszáma. Állítsd a cella formátumát dátumra, mint a mintán!"
+     }
+    },
+    {
+     "q": "Ki a következő ellenfél? (N10)",
+     "text": [
+      "Lambda"
+     ]
+    }
+   ],
+   "hints": [
+    "A következő mérkőzés az első sor, ahol még nincs eredmény. Ahány eredmény van (DARAB az E oszlopban), utána eggyel jön a következő. Az INDEX függvény kiveszi egy tartomány n-edik elemét.",
+    "K10: <code>=INDEX(B2:B23;DARAB(E2:E23)+1)</code>, N10: <code>=INDEX(C2:C23;DARAB(E2:E23)+1)</code>. Ha a K10-ben szám (44579) jelenik meg, állítsd a formátumát dátumra."
+   ],
+   "done": "Ha beírsz egy újabb eredményt, a DARAB eggyel nő, és a K10, N10 magától a következő mérkőzésre ugrik."
+  },
+  {
+   "n": 9,
+   "title": "Kördiagram",
+   "text": "<p>Készítsen kördiagramot, amely szemlélteti a csapat győzelmi arányát! A diagram címe „Győzelmi arány” legyen! A diagramhoz ne tartozzon jelmagyarázat! A kategóriafeliratokat és a százalékos arányokat a mintának megfelelően jelenítse meg! A diagram a <i>J11:N23</i> tartományon belül helyezkedjen el!</p>",
+   "checklist": [
+    "Kördiagram a győzelmek és vereségek számából (K3:L4)",
+    "A címe „Győzelmi arány”",
+    "Nincs jelmagyarázat",
+    "A szeleteken a „győzelem”, „vereség” felirat és a százalék látszik",
+    "A diagram a J11:N23 tartományon belül van"
+   ],
+   "hints": [
+    "Jelöld ki a K3:L4 tartományt, <span class=ui>Beszúrás</span> › <span class=ui>Kördiagram</span>.",
+    "A diagram melletti <b>+</b> gomb: <span class=ui>Jelmagyarázat</span> ki, <span class=ui>Adatfeliratok</span> › <span class=ui>További beállítások</span>: <span class=ui>Kategórianév</span> és <span class=ui>Százalék</span> be, <span class=ui>Érték</span> ki. Az <kbd>Alt</kbd> lenyomásával húzva a diagram a cellahatárokhoz igazodik."
+   ]
+  },
+  {
+   "n": 10,
+   "title": "Két újabb győzelem",
+   "text": "<p>Az Omega csapata mindkét ezután következő mérkőzését 81:79-re nyerte meg. Jegyezze be ezeket az értékeket a <i>dobott</i> és a <i>kapott</i> oszlopok megfelelő soraiba, és másolja le ide az <i>eredmény</i> és a <i>sorozat</i> oszlopában szereplő képletet!</p>",
+   "asks": [
+    {
+     "q": "Hány győzelem van most? (K4)",
+     "num": 7
+    },
+    {
+     "q": "Milyen hosszú most a leghosszabb sorozat? (N7)",
+     "num": 5
+    },
+    {
+     "q": "Mikor lesz most a következő mérkőzés? (K10)",
+     "date": "2022-02-09"
+    }
+   ],
+   "hints": [
+    "A 12. és a 13. sorba (11. és 12. forduló) írd be: dobott 81, kapott 79. Aztán jelöld ki a G11:H11 cellákat, és húzd le a kitöltőjelet a 13. sorig.",
+    "Ha a K4, N7, K10 nem változott, a képleteid nem a 23. sorig néznek. Javítsd ki a tartományokat!"
+   ],
+   "done": "Most már 7 győzelem van, és a csapat 5 hosszú győzelemsorozatban van. A kördiagram is magától frissült."
+  },
+  {
+   "n": 11,
+   "title": "Formázás",
+   "text": "<p>Az <i>A1:N23</i> tartomány celláit formázza meg a minta és az alábbi leírás szerint!</p><ol class=\"sub\"><li>A táblázat adatokat tartalmazó oszlopai legyenek azonos szélességűek, és minden adat legyen olvasható!</li><li>A sorok magasságát állítsa be úgy, hogy a táblázat első sorának magassága a többi sor magasságának másfélszerese legyen!</li><li>Végezze el a szükséges cellaösszevonásokat a minta szerint!</li><li>Minden cella vízszintes és függőleges igazítása legyen azonos, ezeket állítsa be a minta szerint!</li><li>A dobott és kapott pontok számformátumát a minta alapján állítsa be azon cellákra is, amelyek még le nem játszott fordulókhoz tartoznak!</li><li>A csapat nevét emelje ki nagyobb betűmérettel! A számított értékek celláit formázza dőlt betűstílussal! A többi karakterformázást a minta alapján végezze el!</li><li>Szegélyezze vékony vonallal az <i>A1:H23</i> tartományt és a <i>J:N</i> oszlopok minta szerinti celláit!</li></ol>",
+   "checklist": [
+    "a. Az A:H és a J:N oszlopok egyforma szélesek, minden adat olvasható",
+    "b. Az első sor másfélszer olyan magas, mint a többi (pl. 22,5 és 15)",
+    "c. A J1:N1, J6:N6, J9:N9 cellák egyesítve vannak",
+    "d. Minden cella vízszintesen és függőlegesen is középre igazított",
+    "e. A dobott és kapott pontok „72 pont” alakban jelennek meg, az üres sorokban is ez a formátum",
+    "f. A csapat neve nagyobb betűs, a számított értékek dőltek, a fejléc félkövér",
+    "g. Az A1:H23 és a mintán látható J:N cellák vékony szegélyt kaptak"
+   ],
+   "hints": [
+    "a, b: <span class=ui>Kezdőlap</span> › <span class=ui>Formátum</span> › <span class=ui>Oszlopszélesség</span> / <span class=ui>Sormagasság</span>. Ha a sorok 15 pont magasak, az első sor legyen 22,5.",
+    "e: az E2:F23-ra egyéni számformátum: <code>0\" pont\"</code>. d: <span class=ui>Kezdőlap</span> › középre igazítás vízszintesen és függőlegesen is, az egész A1:N23-ra."
+   ]
+  }
+ ],
+ "ending": "<p>A 25 pontos feladat összes részfeladata megvan: HA, DARABTELI, SZUM, MAX, INDEX és DARAB, kördiagram és formázás. A képleteid a 22. fordulóig maguktól számolnak tovább.</p>",
+ "next": {
+  "href": "gazfutes-hu.html",
+  "text": "Következő: Gázfűtés"
+ }
+};
+window.EXAM.checks = [
+  { task: 1, label: "Betöltés az A1-től", run: F => { const a = F.values("A1:H1", ["forduló", "dátum", "ellenfél", "helyszín", "dobott", "kapott", "eredmény", "sorozat"]); return a.ok ? F.values("J1", "Omega kosárcsapat") : a; } },
+  { task: 2, label: "A2:A23 a fordulók sorszáma", run: F => { const w = F.ws(), want = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22]; let done = 0, msg = null;
+      F.cellsOf("A2:A23").forEach((a, k) => { const c = w[a], ok = c && (c.v === want[k] || String(c.v).trim() === want[k] + "."); if (ok) done++; else if (!msg) msg = `${a} cellában ${want[k]}. kellene.`; });
+      return { ok: done === 22, msg, done, total: 22 }; } },
+  { task: 10, label: "E12:F13: a két új eredmény (81:79)", run: F => F.values("E12:F13", [81, 79, 81, 79]) },
+  { task: 3, label: "G2:G13 eredmény (képlettel)", run: F => F.values("G2:G13", ["vereség", "győzelem", "győzelem", "vereség", "vereség", "vereség", "vereség", "győzelem", "győzelem", "győzelem", "győzelem", "győzelem"], { formula: true }) },
+  { task: 4, label: "H2:H13 sorozat (képlettel)", run: F => F.values("H2:H13", [1, 1, 2, 1, 2, 3, 4, 1, 2, 3, 4, 5], { formula: true }) },
+  { task: 5, label: "K4, L4 győzelmek és vereségek száma", run: F => F.values("K4:L4", [7, 5], { formula: true }) },
+  { task: 6, label: "M4, N4 dobott és kapott pontok", run: F => F.values("M4:N4", [880, 860], { formula: true }) },
+  { task: 7, label: "K7 legtöbb dobott pont, N7 leghosszabb sorozat", run: F => { const a = F.values("K7", 97, { formula: true }); return a.ok ? F.values("N7", 5, { formula: true }) : a; } },
+  { task: 8, label: "K10, N10 következő mérkőzés", run: F => { const a = F.values("K10", { date: "2022-02-09" }, { formula: true }); return a.ok ? F.values("N10", "Lambda", { formula: true }) : a; } },
+  { task: 5, label: "A K–N oszlop képletei a 22. fordulóig (23. sorig) néznek", run: F => { const w = F.ws();
+      const bad = ["K4", "L4", "M4", "N4", "K7", "N7", "K10", "N10"].find(a => w[a] && w[a].f && !/23\b|[A-Z]:\$?[A-Z]\b/.test(w[a].f) && /\d/.test(w[a].f));
+      return bad ? { ok: false, msg: `${bad} képlete (${F.hu(w[bad].f)}) nem a 23. sorig néz: a 22. forduló a 23. sorban van.` } : { ok: true }; } },
+  { task: 9, label: "Kördiagram „Győzelmi arány”, jelmagyarázat nélkül, a J11:N23-ban", run: F => {
+      const ch = F.charts().find(c => c.types.some(t => /pie|doughnut/.test(t)));
+      if (!ch) return { ok: false, msg: F.charts().length ? "Van diagram, de nem kördiagram." : "Nem találok diagramot a munkalapon." };
+      if (ch.title.trim() !== "Győzelmi arány") return { ok: false, msg: `A diagram címe „${ch.title}”, de „Győzelmi arány” kell.` };
+      if (ch.legend) return { ok: false, msg: "A diagramon van jelmagyarázat. Kapcsold ki!" };
+      if (!ch.percent || !ch.catName) return { ok: false, msg: "Az adatfeliratokon a kategória neve és a százalék is látszódjon." };
+      if (ch.from.c !== null && (ch.from.c < 9 || ch.from.r < 10 || (ch.to.c !== null && (ch.to.c > 14 || ch.to.r > 23)))) return { ok: false, msg: "A diagram nem a J11:N23 tartományon belül van." };
+      return { ok: true }; } },
+  { task: 11, label: "a. azonos oszlopszélesség (A:H)", run: F => { const ws = "ABCDEFGH".split("").map(c => F.col(c).wch || F.col(c).width); return ws.every(x => x && Math.abs(x - ws[0]) < 0.05) ? { ok: true } : { ok: false, msg: "Az A:H oszlopok szélessége nem egyforma." }; } },
+  { task: 11, label: "b. az első sor másfélszer olyan magas", run: F => { const h1 = F.row(1).hpt, h2 = F.row(2).hpt || 15; return h1 && h1 / h2 > 1.4 && h1 / h2 < 1.6 ? { ok: true } : { ok: false, msg: `Az első sor ${h1 || 15} pont, a többi ${h2} pont magas: az első a másfélszerese legyen.` }; } },
+  { task: 11, label: "c. cellaösszevonások (J1:N1, J6:N6, J9:N9)", run: F => { const m = ["J1:N1", "J6:N6", "J9:N9"].find(r => !F.merged(r)); return m ? { ok: false, msg: `A ${m} tartomány nincs egyesítve.` } : { ok: true }; } },
+  { task: 11, label: "e. pontok számformátuma (E2:F23)", run: F => F.numFmt("E2:F23", /pont/) }
+];
+</script>
+<script src="../../excel/cats.js"></script>
+<script src="../exam.js"></script>
+<script src="../../nav.js?v=f0ab0bd9" defer></script>
+</body>
+</html>

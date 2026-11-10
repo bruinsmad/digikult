@@ -6,7 +6,7 @@
    The file list below is written by tools/build-sw.py: run it before pushing. */
 
 /* FILES:BEGIN (written by tools/build-sw.py, don't edit by hand) */
-const VERSION = "37fbb38224";
+const VERSION = "e230cb3b6b";
 const CORE = [
 "./",
 "css/basics/first-steps.html",
@@ -18,6 +18,15 @@ const CORE = [
 "css/basics/makeover-hu.html",
 "css/basics/makeover.html",
 "css/index.html",
+"erettsegi/exam.css",
+"erettsegi/exam.js",
+"erettsegi/index.html",
+"erettsegi/tablazat/forras/gaz.txt",
+"erettsegi/tablazat/forras/merkozesek.txt",
+"erettsegi/tablazat/forras/rendeles.txt",
+"erettsegi/tablazat/gazfutes-hu.html",
+"erettsegi/tablazat/langos-hu.html",
+"erettsegi/tablazat/omega-hu.html",
 "excel/cats.js",
 "excel/explainer.css",
 "excel/explainer.js",
@@ -176,6 +185,16 @@ const EXTERNAL = [
 "https://fonts.googleapis.com/css2?family=Young+Serif&family=Kalam:wght@400;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap"
 ];
 const PAGE_IMAGES = {
+"erettsegi/tablazat/gazfutes-hu.html": [
+"erettsegi/tablazat/img/gazfutes-minta-2023.png",
+"erettsegi/tablazat/img/gazfutes-minta-evek.png"
+],
+"erettsegi/tablazat/langos-hu.html": [
+"erettsegi/tablazat/img/langos-minta.png"
+],
+"erettsegi/tablazat/omega-hu.html": [
+"erettsegi/tablazat/img/omega-minta.png"
+],
 "inkscape/path-ops/cheese-moon-hu.html": [
 "inkscape/img/cheese-moon/hu/bonus.png",
 "inkscape/img/cheese-moon/hu/poster.png",

@@ -1,0 +1,94 @@
+/* digikult — érettségi tasks. Builds on excel/mission.css (the chalkboard, the cards, the chapter strip);
+   adds the exam paper: the official text set like the printed feladatlap. */
+:root{--m:#5b45a8;--m-soft:#efeafb;--m-ink:#3e2c80;--f-paper:"Times New Roman","Liberation Serif",Times,serif}
+
+/* the chapter strip: Kezdés, 1., 2., … Vége */
+.steps{grid-template-columns:repeat(auto-fit,minmax(80px,1fr))}
+.step.current{border-color:#c9b8ff;background:rgba(201,184,255,.12)}
+.step.current::before{background:#c9b8ff}
+
+/* the paper: the text of the official feladatlap */
+.paper{background:#fff;color:#111;font:17.5px/1.45 var(--f-paper);border:1px solid #d8d4c6;border-radius:3px;padding:16px 20px 18px;box-shadow:0 1px 0 rgba(0,0,0,.05)}
+.paper.inline{margin:6px 0 4px;position:relative}
+.paper.inline::before{content:"A feladatlapon";position:absolute;top:-10px;right:12px;font:700 11.5px var(--f-body);letter-spacing:.06em;text-transform:uppercase;color:var(--m);background:#fff;padding:1px 7px;border:1px solid #d8d4c6;border-radius:3px}
+.paper p,.pp{margin:0 0 .45em}
+.paper .intro p{text-indent:1.4em;margin:0 0 .35em}
+.paper .intro p.noind{text-indent:0}
+.paper ul.rules{margin:.2em 0 .6em;padding-left:1.6em;font-style:italic}
+.paper ul.rules li{margin:.15em 0}
+.paper .item{display:flex;gap:.5em;margin:.35em 0}
+.paper .item .no{flex:none;min-width:1.4em}
+.paper .item .tx{flex:1;min-width:0}
+.paper .item .tx p{margin:0 0 .3em}
+.paper ol.sub{list-style:lower-alpha;margin:.25em 0 .2em;padding-left:2.4em}
+.paper ol.sub li{margin:.15em 0;padding-left:.3em}
+.paper ol.sub li::marker{font-weight:400}
+.paper ul.dots{margin:.2em 0;padding-left:5.2em}
+.paper ul.dash{margin:.2em 0;padding-left:3.4em;list-style:none}
+.paper ul.dash li{position:relative}
+.paper ul.dash li::before{content:"−";position:absolute;left:-1.2em}
+.paper table.def{border-collapse:collapse;margin:.3em 0 .4em 1.2em;font-size:.97em}
+.paper table.def td{padding:0 1.4em 0 0;vertical-align:top}
+.paper table.def td:first-child{font-style:italic;white-space:nowrap}
+.paper .between{margin:.5em 0 .4em}
+.paper .pts{text-align:right;margin:.6em 0 .2em}
+.paper .pts span,.paper p.pts{font-weight:700}
+.paper p.pts{display:block}
+.paper .mcap{font-weight:700;margin-top:.8em}
+.paper h2.ptitle{font:700 1.15em/1.2 var(--f-paper);margin:0 0 .5em}
+.paper .src{font:13px/1.4 var(--f-body);color:var(--muted);margin:0 0 10px}
+.paper .src.foot{margin:14px 0 0;padding-top:8px;border-top:1px solid #e4e1d4}
+.paper i,.paper em{font-style:italic}
+.paper .num{font-variant-numeric:tabular-nums}
+.card h2 + .paper.inline{margin-top:14px}
+.paper.inline ul.dots{padding-left:2em}
+
+/* the minta beside the chapters */
+.work .card{padding:14px}
+#mintaBox{max-height:calc(100vh - 250px);overflow:auto;padding-right:2px}
+@media (max-width:1000px){ #mintaBox{max-height:none} }
+.minta{margin:4px 0 12px}
+.minta .zoom{all:unset;display:block;cursor:zoom-in;border:1px solid #d8d4c6;border-radius:3px;overflow:hidden;background:#fff}
+.minta .zoom:focus-visible{outline:3px solid var(--m);outline-offset:2px}
+.minta img{display:block;width:auto;max-width:100%;max-height:520px;height:auto;margin:0 auto}
+.minta figcaption{text-align:center;font:italic 700 15px var(--f-paper);color:#222;margin-top:4px}
+#mintaBox .mcap{font:700 14px var(--f-body);color:var(--ink);margin:2px 2px 6px}
+.work-head .btn{padding:5px 11px;font-size:14px}
+.dlcard{border-color:var(--m);background:var(--m-soft);color:var(--m)}
+
+/* checklist for the formatting and chart parts */
+.ticks{list-style:none;margin:6px 0 0;padding:0;display:grid;gap:7px}
+.ticks label{display:flex;gap:10px;align-items:flex-start;padding:8px 11px;border-radius:4px;background:#f6f4ec;border:1.5px solid var(--line);cursor:pointer}
+.ticks input{flex:none;width:20px;height:20px;margin:1px 0 0;accent-color:var(--ok)}
+.ticks input:checked + span{color:#1f4f26}
+.ticks label:has(input:checked){background:var(--ok-bg);border-color:#a9d3a0}
+.learn ul{padding-left:20px}
+.learn code,.hint code{font-size:.92em}
+.hint code{white-space:normal}
+.report .tn{font:700 13px var(--f-mono);color:var(--m-ink)}
+.export-note.warn{color:#7a4a00;background:#fff3d6;border-radius:4px;padding:6px 10px}
+
+/* the whole feladatlap, on top of the page */
+#sheetView{position:fixed;inset:0;z-index:40;overflow:auto;background:rgba(18,26,23,.86);padding:0 14px 40px}
+.sv-bar{position:sticky;top:0;z-index:2;max-width:860px;margin:0 auto;display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;padding:12px 0;background:linear-gradient(rgba(18,26,23,.98) 70%,rgba(18,26,23,0))}
+.sv-bar b{font:700 22px var(--f-chalk);color:var(--chalk)}
+.sv-bar span{flex:1;min-width:160px;color:var(--chalk-dim);font-size:14px}
+#sheetView .paper{max-width:860px;margin:0 auto;padding:34px 46px 30px;font-size:18px}
+body.sv-open{overflow:hidden}
+@media (max-width:640px){ #sheetView .paper{padding:20px 16px} .paper{font-size:16.5px;padding:12px 14px} .paper ul.dots{padding-left:2.4em} }
+
+/* the minta, bigger */
+#lightbox{position:fixed;inset:0;z-index:60;background:rgba(10,14,12,.92);display:grid;place-items:center;padding:16px;cursor:zoom-out}
+#lightbox img{max-width:min(1400px,100%);max-height:calc(100vh - 70px);background:#fff;border-radius:3px}
+#lightbox p{color:#cfd8cf;font-size:14px;margin:8px 0 0}
+
+/* print: only the feladatlap */
+@media print{
+  body{background:#fff!important;color:#000}
+  body > *:not(#sheetView){display:none!important}
+  #sheetView{display:block!important;position:static;background:none;padding:0;overflow:visible}
+  .sv-bar{display:none}
+  #sheetView .paper{border:0;box-shadow:none;padding:0;max-width:none;font-size:12pt}
+  .minta{break-inside:avoid}
+  .minta .zoom{border:0}
+}

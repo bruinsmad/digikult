@@ -435,6 +435,62 @@
         ]
       },
       {
+        id: "erettsegi",
+        accent: "#b9a2ff",
+        title: { hu: "Táblázatkezelés – Érettségi", en: "Spreadsheets – Exam prep" },
+        blurb: {
+          hu: "Hivatalos érettségi feladatok szó szerint, a forrásfájllal és a mintával. Részfeladatonként segítség, a végén az oldal ellenőrzi a mentett fájlodat.",
+          en: "Official Hungarian school-leaving exam tasks, word for word, with the source file and the sample. Help for every subtask, and the page checks your saved file at the end."
+        },
+        lessons: [
+          {
+            id: "kozep",
+            title: { hu: "Középszint: hivatalos táblázatkezelési feladatok", en: "Standard level: official spreadsheet tasks" },
+            pages: [
+              {
+                id: "langos",
+                kind: "exam",
+                minutes: 50,
+                title: { hu: "Lángos", en: "Lángos" },
+                desc: {
+                  hu: "Informatika, középszint. Rendelések, kedvezmény öt lángos fölött, árlap: HA, FKERES, SZUMHA, Ft-formátum és oszlopdiagram.",
+                  en: "IT, standard level. Orders, a discount above five, a price list: HA, FKERES, SZUMHA, currency format and a column chart."
+                },
+                files: { hu: "erettsegi/tablazat/langos-hu.html" },
+                cover: "erettsegi/tablazat/img/langos-cover.png",
+                progress: { chapters: 13, keys: { hu: "erettsegi-langos-hu-v1" } }
+              },
+              {
+                id: "omega",
+                kind: "exam",
+                minutes: 50,
+                title: { hu: "Omega", en: "Omega" },
+                desc: {
+                  hu: "Digitális kultúra, középszint, 2025. május. Egy kosárcsapat idénye: győzelmi sorozatok, a következő meccs (INDEX, DARAB), kördiagram.",
+                  en: "Digital Culture, standard level, May 2025. A basketball team's season: winning streaks, the next match (INDEX, DARAB), a pie chart."
+                },
+                files: { hu: "erettsegi/tablazat/omega-hu.html" },
+                cover: "erettsegi/tablazat/img/omega-cover.png",
+                progress: { chapters: 12, keys: { hu: "erettsegi-omega-hu-v1" } }
+              },
+              {
+                id: "gazfutes",
+                kind: "exam",
+                minutes: 50,
+                title: { hu: "Gázfűtés", en: "Gas heating" },
+                desc: {
+                  hu: "Digitális kultúra, középszint, 2026. május. Két munkalap, hét fűtési idény: legmelegebb és leghidegebb hónapok (INDEX, HOL.VAN), vonaldiagram.",
+                  en: "Digital Culture, standard level, May 2026. Two sheets, seven heating seasons: warmest and coldest months (INDEX, HOL.VAN), a line chart."
+                },
+                files: { hu: "erettsegi/tablazat/gazfutes-hu.html" },
+                cover: "erettsegi/tablazat/img/gazfutes-cover.png",
+                progress: { chapters: 9, keys: { hu: "erettsegi-gazfutes-hu-v1" } }
+              }
+            ]
+          }
+        ]
+      },
+      {
         id: "word",
         accent: "#4f8fe8",
         title: { hu: "Szövegszerkesztés – Word", en: "Word processing – Word" },
@@ -582,6 +638,7 @@
     demo:   { hu: "Bemutató", en: "Demo" },
     lesson: { hu: "Lecke", en: "Lesson" },
     theory: { hu: "Elmélet", en: "Explainer" },
+    exam:   { hu: "Érettségi feladat", en: "Exam task" },
     tool:   { hu: "Eszköz", en: "Tool" }
   };
   const UI = {

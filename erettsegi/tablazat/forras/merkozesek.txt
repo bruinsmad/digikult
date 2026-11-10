@@ -1,0 +1,24 @@
+forduló	dátum	ellenfél	helyszín	dobott	kapott	eredmény	sorozat		Omega kosárcsapat
+	2021.09.14	Alfa	otthon	72	80
+	2021.09.22	Théta	otthon	97	81					győzelem	vereség	dobott	kapott
+	2021.10.04	Delta	idegenben	93	86				összesen
+	2021.10.12	Dzéta	otthon	61	73
+	2021.10.18	Éta	idegenben	68	77				Csúcsok
+	2021.11.03	Kappa	otthon	62	77				dobott			sorozat
+	2021.11.10	Ióta	otthon	49	52
+	2021.11.24	Gamma	otthon	75	59				Következő mérkőzés
+	2021.11.29	Théta	idegenben	69	54				dátuma			ellenfele
+	2021.12.07	Ióta	idegenben	72	63
+	2022.01.18	Lambda	idegenben
+	2022.01.26	Epszilon	otthon
+	2022.02.09	Lambda	otthon
+	2022.02.14	Éta	otthon			
+	2022.02.22	Béta	otthon
+	2022.03.08	Béta	idegenben
+	2022.03.16	Epszilon	idegenben
+	2022.03.22	Dzéta	idegenben
+	2022.03.28	Alfa	idegenben
+	2022.04.13	Gamma	idegenben
+	2022.04.20	Delta	otthon
+	2022.04.25	Kappa	idegenben
+	-	-	-

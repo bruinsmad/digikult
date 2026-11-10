@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>/* moving between pages: the old page drifts aside and fades, the new one glides in; the rail holds still */@view-transition{navigation:auto}.rail{view-transition-name:rail}::view-transition-group(root){animation:none}::view-transition-old(root){animation:dk-out .2s cubic-bezier(.4,0,1,1) both}::view-transition-new(root){animation:dk-in .38s cubic-bezier(.16,1,.3,1) .06s both}::view-transition-old(rail),::view-transition-new(rail){animation:none}@keyframes dk-out{to{opacity:0;transform:translateX(-18px)}}@keyframes dk-in{from{opacity:0;transform:translateX(26px)}}@media (prefers-reduced-motion:reduce){::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none!important}}</style>
+<title>Gázfűtés – érettségi feladat</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600;700&display=swap">
+<link rel="stylesheet" href="../../excel/mission.css">
+<link rel="stylesheet" href="../exam.css">
+</head>
+<body>
+<header class="rail"><div class="in">
+  <a class="home" href="../../index.html">Digitális kultúra</a>
+  <span class="crumb"><a href="../../index.html#erettsegi">Táblázatkezelés – Érettségi</a> › <a href="../../index.html#erettsegi-kozep">Középszint</a></span>
+</div></header>
+<div class="top">
+  <span class="art" aria-hidden="true"><svg viewBox="0 0 96 96"><ellipse cx="48" cy="88" rx="30" ry="5" fill="#000" opacity=".25"/>
+<path d="M22 10h40l12 12v60H22z" fill="#fffdf6"/><path d="M62 10v12h12" fill="#e4e1d4"/>
+<g stroke="#b9b5a4" stroke-width="1.6"><path d="M28 34h40M28 44h40M28 54h40M28 64h40M28 74h40M42 28v50M56 28v50"/></g>
+<rect x="28" y="28" width="40" height="6" fill="#c9b8ff"/><text x="30" y="24" font-family="Times New Roman,serif" font-weight="700" font-size="11" fill="#3e2c80">3.</text>
+<path d="M58 70l18-30 6 4-18 30-7 3z" fill="#f2c230"/><path d="M58 70l1 7 6-4z" fill="#5d3820"/><path d="M76 40l6 4 2-3-6-4z" fill="#f0a3b8"/></svg></span>
+  <div><div class="kicker">Érettségi feladat · Digitális kultúra, középszint, 2026. május</div><h1>Gázfűtés</h1></div>
+  <div class="meta"><button type="button" class="mbtn" id="sheetBtn">Feladatlap</button><span>Haladás <b id="solvedCount">–</b></span><span>Idő <b id="timer">0:00</b></span><button type="button" class="mbtn" id="soundBtn">Hang: be</button><button type="button" id="resetBtn" title="Az egész feladat újrakezdése">Újrakezdés</button></div>
+</div>
+<nav class="steps" id="steps" aria-label="Részfeladatok"></nav>
+<div id="game"><main>
+  <article class="card" id="case" aria-live="polite"></article>
+  <section class="work" aria-label="Minta"><div class="card">
+    <div id="dlBox"></div>
+    <div class="work-head"><h2>Minta</h2><p>A hivatalos feladatlap mintája. Kattints rá a nagyításhoz.</p></div>
+    <div id="mintaBox"></div>
+  </div></section>
+</main></div>
+<section id="endPanel" hidden></section>
+<footer class="end">Digitális kultúra. A feladat szövege, a minta és a forrásfájl az Oktatási Hivatal hivatalos érettségi feladatlapjáról való. A haladásod a böngésződben marad; a feltöltött fájlt az oldal csak megnézi, nem küldi el sehová.</footer>
+<div id="sheetView" hidden role="dialog" aria-label="A teljes feladatlap"></div>
+<div id="lightbox" hidden></div>
+<canvas id="fx" aria-hidden="true"></canvas>
+<script>
+window.EXAM = {
+ "key": "erettsegi-gazfutes-hu-v1",
+ "title": "Gázfűtés",
+ "number": 3,
+ "subject": "Digitális kultúra",
+ "level": "középszint",
+ "date": "2026. május 11.",
+ "code": "K2512",
+ "points": 25,
+ "saveAs": "gazfutes.xlsx",
+ "sheets": [
+  "évek",
+  "2023"
+ ],
+ "files": [
+  {
+   "name": "gaz.txt",
+   "href": "forras/gaz.txt"
+  }
+ ],
+ "minta": [
+  {
+   "src": "img/gazfutes-minta-2023.png",
+   "caption": "<b>Minta a <b><i>Gázfűtés</i></b> feladathoz</b>:",
+   "label": "<b><i>2023</i></b> munkalap",
+   "alt": "Minta: a 2023 munkalap"
+  },
+  {
+   "src": "img/gazfutes-minta-evek.png",
+   "label": "<b><i>évek</i></b> munkalap",
+   "alt": "Minta: az évek munkalap"
+  }
+ ],
+ "introFirst": true,
+ "intro": "<div class=\"intro\"><p>Magyarországon a háztartások felét gázzal fűtik, ahol a fogyasztás meghatározásának alapja a fűtési hőmérsékleti tényező. A fűtési hőmérsékleti tényező naponként megadja, hogy a külső átlaghőmérséklet mennyivel marad el a 20°C-tól, azaz minél nagyobb ez a szám, annál hidegebb volt.</p><p>A továbbiakban hét korábbi év meglévő fűtési hőmérsékleti tényező adataiból, és egy év fogyasztási adataiból kell kimutatást készítenie az alábbi feladatok szerint.</p></div>",
+ "lead": "<i>A megoldás során vegye figyelembe a következőket!</i>",
+ "rules": [
+  "Amennyiben lehetséges, a megoldás során képletet, függvényt, hivatkozást használjon, hogy az alapadatok módosítása esetén is a kívánt eredményeket kapja!",
+  "Amennyiben szükséges, segédszámításokat a K oszloptól jobbra végezzen!",
+  "A részfeladatok között van olyan, amely egy korábbi kérdés eredményét használja fel. Ha a korábbi részfeladatot nem sikerült teljesen megoldania, használja a megoldását úgy, ahogy van, vagy írjon be egy valószínűnek tűnő eredményt, és azzal dolgozzon tovább! Így ugyanis pontokat kaphat erre a részfeladatra is."
+ ],
+ "tasks": [
+  {
+   "n": 1,
+   "title": "Betöltés a B1-től",
+   "text": "<p>Töltse be a tabulátorokkal tagolt, UTF-8 kódolású <i>gaz.txt</i> szövegfájlt a táblázatkezelő munkalapjára a <i>B1</i>-es cellától kezdődően! A munkalap neve legyen <b><i>évek</i></b>, munkáját <i>gazfutes</i> néven mentse el a táblázatkezelő alapértelmezett formátumában!</p>",
+   "tips": [
+    "Ha megnyitod a txt-t az Excelben (<span class=ui>Fájl</span> › <span class=ui>Megnyitás</span>, eredet: UTF-8, határoló: tabulátor), az adatok az A1-be kerülnek. Ilyenkor kattints jobb gombbal az A oszlop fejére › <span class=ui>Beszúrás</span>: így minden a B1-től kezdődik.",
+    "A munkalap nevére (lent, a lapfülön) kattints duplán, és írd be: évek. Mentés: <span class=ui>Mentés másként</span>, Excel-munkafüzet, név: <i>gazfutes</i>."
+   ],
+   "asks": [
+    {
+     "q": "Mi áll a H1 cellában?",
+     "num": 2023,
+     "traps": {
+      "jelleggörbe (m3)": "Az adatok még az A1-től kezdődnek. Szúrj be egy oszlopot az A elé!"
+     }
+    },
+    {
+     "q": "Mi áll a B3 cellában?",
+     "num": 130.9
+    },
+    {
+     "q": "Mi a munkalap neve?",
+     "text": [
+      "évek"
+     ],
+     "exact": true
+    }
+   ],
+   "hints": [
+    "A 2. sor üres: a forrásfájlban is üres sor van az évek alatt. Ez így jó, a mintán ide kerül a „fűtési idény” felirat."
+   ],
+   "done": "Az évek a B1:H1-ben, a havi tényezők a 3–11. sorban, az I és J oszlopban a jelleggörbe és a fogyasztás."
+  },
+  {
+   "n": 2,
+   "title": "A 2023 munkalap",
+   "text": "<p>Szúrjon be egy új munkalapot, nevezze el <b><i>2023</i></b> néven! Az <b><i>évek</i></b> munkalap <i>I</i> és <i>J</i> oszlopának adatait helyezze át a <b><i>2023</i></b>-as munkalap <i>B</i> és <i>C</i> oszlopába a <i>B1</i> cellától kezdődően! Az <b><i>évek</i></b> munkalap <i>H</i> oszlopának adatait másolja át a <b><i>2023</i></b>-as munkalap <i>D</i> oszlopába a <i>D1</i> cellától kezdődően!</p>",
+   "tips": [
+    "Új munkalap: a lapfülek melletti <b>+</b> gomb, aztán dupla katt a nevére: 2023.",
+    "<b>Áthelyezés</b> = kivágás (<kbd>Ctrl</kbd>+<kbd>X</kbd>) és beillesztés: az I és J oszlop az évek lapon utána üres marad. <b>Másolás</b> (<kbd>Ctrl</kbd>+<kbd>C</kbd>) után a H oszlop az évek lapon is megmarad."
+   ],
+   "asks": [
+    {
+     "q": "Mi áll a 2023 munkalap C6 cellájában?",
+     "num": 274
+    },
+    {
+     "q": "Mi áll a 2023 munkalap D7 cellájában?",
+     "num": 553.2
+    },
+    {
+     "q": "Üres-e most az évek munkalap I3 cellája? (igen vagy nem)",
+     "text": [
+      "igen"
+     ],
+     "traps": {
+      "nem": "Az I és J oszlopot át kell helyezni (kivágni), nem másolni: az évek lapon utána üres marad."
+     }
+    }
+   ],
+   "hints": [
+    "Az évek lapon jelöld ki az I1:J11-et, <kbd>Ctrl</kbd>+<kbd>X</kbd>, kattints a 2023 lap B1 cellájára, <kbd>Ctrl</kbd>+<kbd>V</kbd>. Aztán az évek lapon H1:H11, <kbd>Ctrl</kbd>+<kbd>C</kbd>, a 2023 lapon D1, <kbd>Ctrl</kbd>+<kbd>V</kbd>."
+   ],
+   "done": null
+  },
+  {
+   "n": 3,
+   "title": "A hónapok",
+   "text": "<p>A két munkalap <i>A</i> oszlopának megfelelő soraiba jegyezze be a hónapok neveit a minta szerint!</p>",
+   "asks": [
+    {
+     "q": "Mi áll az évek munkalap A7 cellájában?",
+     "text": [
+      "január"
+     ]
+    },
+    {
+     "q": "És a 2023 munkalap A11 cellájában?",
+     "text": [
+      "május"
+     ]
+    }
+   ],
+   "hints": [
+    "Az A3-ba írd be: szeptember, aztán húzd le a kitöltőjelet az A11-ig: az Excel ismeri a hónapneveket, és magától folytatja (október, november, …).",
+    "A 2023 lapon ugyanígy, vagy másold át az A3:A11-et."
+   ],
+   "done": null
+  },
+  {
+   "n": 4,
+   "title": "A fűtési idények összege",
+   "text": "<p>Az <b><i>évek</i></b> munkalapon a <i>B</i> oszloptól a <i>H</i> oszlopig az adott évben kezdődő fűtési idény adott havi fűtési hőmérsékleti tényezőinek összege található. A munkalap <i>12</i>. sorában határozza meg, hogy az adott fűtési idényben mennyi volt a fűtési hőmérsékleti tényezők összege!</p>",
+   "asks": [
+    {
+     "q": "Mennyi az összeg 2020-ban? (E12)",
+     "num": 3100.3
+    },
+    {
+     "q": "És 2023-ban? (H12)",
+     "num": 2404.4
+    }
+   ],
+   "hints": [
+    "B12: <code>=SZUM(B3:B11)</code>, aztán húzd jobbra a kitöltőjelet a H12-ig."
+   ],
+   "done": null
+  },
+  {
+   "n": 5,
+   "title": "Legmelegebb, leghidegebb",
+   "text": "<p>Az <b><i>évek</i></b> munkalapon az <i>I</i> és <i>J</i> oszlopok fejrészét a minta szerint készítse el! Az <i>I</i> oszlopban minden hónap esetén határozza meg, hogy melyik évben volt a legmelegebb, a <i>J</i> oszlopban pedig azt, hogy melyik évben volt a leghidegebb! Vegye figyelembe, hogy a fűtési hőmérsékleti tényező annál nagyobb, minél hidegebb van!</p>",
+   "tips": [
+    "Fejrész a minta szerint: I1: legmelegebb, J1: leghidegebb, a 2. sorban az I2:J2 egyesítve: hónap éve."
+   ],
+   "asks": [
+    {
+     "q": "Melyik évben volt a legmelegebb november? (I5)",
+     "num": 2019,
+     "traps": {
+      "2020": "Ez a leghidegebb: a legmelegebb hónapban a legkisebb a tényező (MIN)."
+     }
+    },
+    {
+     "q": "Melyik évben volt a leghidegebb október? (J4)",
+     "num": 2021
+    }
+   ],
+   "hints": [
+    "Három lépés egy képletben: MIN a sor legkisebb értéke; HOL.VAN megmondja, hányadik oszlopban van; INDEX kiveszi az ugyanannyiadik évet az 1. sorból.",
+    "I3: <code>=INDEX($B$1:$H$1;HOL.VAN(MIN(B3:H3);B3:H3;0))</code>, J3: ugyanez MAX-szal. Aztán mindkettőt le a 11. sorig."
+   ],
+   "done": null
+  },
+  {
+   "n": 6,
+   "title": "Hányszor?",
+   "text": "<p>A <i>13</i>. sorban adja meg, hogy az adott év hányszor szerepel a legmelegebb hónapok között! A <i>14</i>. sorban pedig számítsa ki, hogy ugyanez az év hányszor szerepel a leghidegebb hónapok között! A sorfejeket a minta alapján gépelje be!</p>",
+   "asks": [
+    {
+     "q": "Hányszor szerepel a 2023 a legmelegebb hónapok között? (H13)",
+     "num": 5
+    },
+    {
+     "q": "Hányszor szerepel a 2017 a leghidegebb hónapok között? (B14)",
+     "num": 3
+    }
+   ],
+   "hints": [
+    "DARABTELI: hányszor szerepel az oszlop tetején álló év az I (vagy J) oszlopban?",
+    "B13: <code>=DARABTELI($I$3:$I$11;B1)</code>, B14: <code>=DARABTELI($J$3:$J$11;B1)</code>, aztán jobbra a H oszlopig. Sorfejek: A13 legmelegebb, A14 leghidegebb."
+   ],
+   "done": null
+  },
+  {
+   "n": 7,
+   "title": "Vonaldiagram",
+   "text": "<p>Készítsen vonaldiagramot a <b><i>2023</i></b>-as munkalapon, amelyen a szeptember, … május hónaphoz tartozó jelleggörbe, fogyasztás és a 2023-as évhez tartozó fűtési hőmérsékleti tényezők szerepelnek.</p><ol class=\"sub\"><li>A diagramot lássa el a mintán szereplő címmel!</li><li>A diagram alatt legyen jelmagyarázat!</li><li>A diagramot helyezze az adatokat tartalmazó cellák alá az <i>A:D</i> oszlopok szélességében!</li></ol>",
+   "checklist": [
+    "Vonaldiagram a 2023 munkalapon, három vonallal: jelleggörbe, fogyasztás, 2023",
+    "A vízszintes tengelyen a hónapok (szeptember … május)",
+    "a. A címe: „A 2023/24-es fűtési idény adatai”",
+    "b. A jelmagyarázat a diagram alatt van",
+    "c. A diagram az adatok alatt, az A:D oszlopok szélességében áll"
+   ],
+   "hints": [
+    "Jelöld ki az A1:D11 tartományt, <span class=ui>Beszúrás</span> › <span class=ui>Vonaldiagram</span> › <span class=ui>Vonal jelölőkkel</span>.",
+    "A <b>+</b> gombbal: <span class=ui>Jelmagyarázat</span> › <span class=ui>Lent</span>. A diagramot az <kbd>Alt</kbd> lenyomásával húzva a cellahatárokhoz illesztheted."
+   ]
+  },
+  {
+   "n": 8,
+   "title": "Formázás",
+   "text": "<p>Formázza meg a munkalapok celláit az alább leírtak és a minta szerint!</p><ol class=\"sub\"><li>A fűtési hőmérsékleti tényezők és azok összegei az <b><i>évek</i></b> munkalapon egy tizedesjegy pontossággal jelenjenek meg!</li><li>A számított értékeket formázza félkövéren és dőlten, és igazítsa a mintának megfelelően!</li><li>Az adatokat tartalmazó cellákat szegélyezze vékony fekete vonallal!</li><li>A munkalapok első két sorát és első oszlopát alakítsa ki és formázza meg a minta szerint! A <b><i>2023</i></b> munkalap első sorában ügyeljen a szöveg tördelésére, a második sort pedig rejtse el!</li><li>Az oszlopok szélessége egyezzen meg<ul class=\"dots\"><li>az <b><i>évek</i></b> munkalapon a <i>B:H</i> tartományban;</li><li>az <b><i>évek</i></b> munkalapon az <i>I:J</i> tartományban;</li><li>a <b><i>2023</i></b> munkalapon a <i>B:D</i> tartományban!</li></ul></li></ol>",
+   "checklist": [
+    "a. Az évek lapon a tényezők és az összegek egy tizedesjeggyel látszanak (67,0 is)",
+    "b. A számított értékek félkövérek és dőltek, a mintán látható igazítással",
+    "c. Az adatokat tartalmazó cellák vékony fekete szegélyt kaptak",
+    "d. Az első két sor és az első oszlop olyan, mint a mintán (szürke háttér, félkövér, egyesítések); a 2023 lapon az első sor tördelve, a második sor elrejtve",
+    "e. Az évek lapon a B:H és az I:J, a 2023 lapon a B:D oszlopok egyforma szélesek"
+   ],
+   "hints": [
+    "a: jelöld ki a B3:H12-t, <span class=ui>Cellák formázása</span> › <span class=ui>Szám</span>, tizedesjegyek: 1.",
+    "d: B2:H2 egyesítése és középre: „fűtési idény”, I2:J2: „hónap éve”. A 2023 lapon az első sor: <span class=ui>Sortöréssel több sorba</span>; a 2. sor: jobb klikk a sorszámra › <span class=ui>Elrejtés</span>."
+   ]
+  }
+ ],
+ "ending": "<p>Két munkalap, INDEX, HOL.VAN, MIN, MAX, DARABTELI és egy vonaldiagram: ez a 2026-os májusi középszintű érettségi táblázatkezelési feladata volt.</p>",
+ "next": null
+};
+window.EXAM.checks = [
+  { task: 1, label: "Az évek munkalap, az adatok a B1-től", run: F => { if (!F.sheetNames.some(n => n.trim().toLowerCase() === "évek")) return { ok: false, msg: `Nincs „évek” nevű munkalap. A lapok: ${F.sheetNames.join(", ")}` };
+      const a = F.values("B1:H1", [2017, 2018, 2019, 2020, 2021, 2022, 2023], { sheet: "évek" }); return a.ok ? F.values("B3", 130.9, { sheet: "évek" }) : a; } },
+  { task: 2, label: "A 2023 munkalap: B, C áthelyezve, D másolva", run: F => { if (!F.sheetNames.some(n => n.trim() === "2023")) return { ok: false, msg: `Nincs „2023” nevű munkalap. A lapok: ${F.sheetNames.join(", ")}` };
+      const h = F.values("B1:D1", ["jelleggörbe (m3)", "fogyasztás (m3)", 2023], { sheet: "2023", loose: true }); if (!h.ok) return h;
+      return F.values("B3:D11", [29.32, 7.0, 34.5, 149.51, 39.0, 109.6, 225.81, 170.0, 382.5, 318.89, 274.0, 485.4, 342.44, 273.0, 553.2, 281.78, 173.0, 316.4, 232.18, 147.0, 291.4, 121.54, 83.0, 182.9, 27.52, 8.0, 48.5], { sheet: "2023" }); } },
+  { task: 3, label: "A hónapok mindkét munkalapon", run: F => { const a = F.values("A3:A11", ["szeptember", "október", "november", "december", "január", "február", "március", "április", "május"], { sheet: "évek" }); return a.ok ? F.values("A3:A11", ["szeptember", "október", "november", "december", "január", "február", "március", "április", "május"], { sheet: "2023" }) : a; } },
+  { task: 4, label: "B12:H12 az idények összege (képlettel)", run: F => F.values("B12:H12", [3005.2, 2997.4, 2790.5, 3100.3, 3082.1, 2895.9, 2404.4], { sheet: "évek", formula: true }) },
+  { task: 5, label: "I1, J1, I2 fejrész", run: F => F.values("I1:J1", ["legmelegebb", "leghidegebb"], { sheet: "évek" }).ok ? F.values("I2", "hónap éve", { sheet: "évek" }) : F.values("I1:J1", ["legmelegebb", "leghidegebb"], { sheet: "évek" }) },
+  { task: 5, label: "I3:J11 a legmelegebb és leghidegebb év (képlettel)", run: F => F.values("I3:J11", [2023, 2017, 2023, 2021, 2019, 2020, 2023, 2018, 2022, 2018, 2023, 2017, 2023, 2017, 2017, 2020, 2017, 2018], { sheet: "évek", formula: true, loose: true }) },
+  { task: 6, label: "B13:H14 hányszor (képlettel), sorfejek", run: F => { const h = F.values("A13:A14", ["legmelegebb", "leghidegebb"], { sheet: "évek" }); return h.ok ? F.values("B13:H14", [2, 0, 1, 0, 0, 1, 5, 3, 3, 0, 2, 1, 0, 0], { sheet: "évek", formula: true }) : h; } },
+  { task: 7, label: "Vonaldiagram a 2023 lapon, címmel, jelmagyarázat lent", run: F => {
+      const all = F.charts("2023"), ch = all.find(c => c.types.some(t => /line/.test(t)));
+      if (!ch) return { ok: false, msg: all.length ? "Van diagram a 2023 lapon, de nem vonaldiagram." : (F.charts("évek").length ? "A diagram az évek lapon van: a 2023 lapra kell." : "Nem találok diagramot a 2023 lapon.") };
+      if (ch.title.trim() !== "A 2023/24-es fűtési idény adatai") return { ok: false, msg: `A diagram címe „${ch.title}”, de „A 2023/24-es fűtési idény adatai” kell.` };
+      if (!ch.legend || ch.legendPos !== "b") return { ok: false, msg: "A jelmagyarázat a diagram alatt legyen (Jelmagyarázat › Lent)." };
+      if (ch.from.r !== null && ch.from.r < 11) return { ok: false, msg: "A diagram az adatok alá kerüljön (a 12. sortól lefelé)." };
+      return { ok: true }; } },
+  { task: 8, label: "a. egy tizedesjegy az évek lapon", run: F => F.numFmt("B3:H12", /^0[.,]0$|#,##0[.,]0$/, { sheet: "évek" }) },
+  { task: 8, label: "d. a 2023 lapon a 2. sor elrejtve", run: F => F.rowHidden(2, { sheet: "2023" }) ? { ok: true } : { ok: false, msg: "A 2023 munkalap 2. sora nincs elrejtve." } },
+  { task: 8, label: "d. egyesítések: B2:H2, I2:J2", run: F => { const m = ["B2:H2", "I2:J2"].find(r => !F.merged(r, { sheet: "évek" })); return m ? { ok: false, msg: `Az évek lapon a ${m} nincs egyesítve.` } : { ok: true }; } },
+  { task: 8, label: "e. egyforma oszlopszélességek", run: F => {
+      const same = (sheet, cols) => { const w = cols.split("").map(c => F.col(c, { sheet }).wch || F.col(c, { sheet }).width); return w.every(x => x && Math.abs(x - w[0]) < 0.05); };
+      if (!same("évek", "BCDEFGH")) return { ok: false, msg: "Az évek lapon a B:H oszlopok nem egyforma szélesek." };
+      if (!same("évek", "IJ")) return { ok: false, msg: "Az évek lapon az I és J oszlop nem egyforma széles." };
+      if (!same("2023", "BCD")) return { ok: false, msg: "A 2023 lapon a B:D oszlopok nem egyforma szélesek." };
+      return { ok: true }; } }
+];
+</script>
+<script src="../../excel/cats.js"></script>
+<script src="../exam.js"></script>
+<script src="../../nav.js?v=f0ab0bd9" defer></script>
+</body>
+</html>

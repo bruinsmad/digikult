@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>/* moving between pages: the old page drifts aside and fades, the new one glides in; the rail holds still */@view-transition{navigation:auto}.rail{view-transition-name:rail}::view-transition-group(root){animation:none}::view-transition-old(root){animation:dk-out .2s cubic-bezier(.4,0,1,1) both}::view-transition-new(root){animation:dk-in .38s cubic-bezier(.16,1,.3,1) .06s both}::view-transition-old(rail),::view-transition-new(rail){animation:none}@keyframes dk-out{to{opacity:0;transform:translateX(-18px)}}@keyframes dk-in{from{opacity:0;transform:translateX(26px)}}@media (prefers-reduced-motion:reduce){::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none!important}}</style>
+<title>Lángos – érettségi feladat</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600;700&display=swap">
+<link rel="stylesheet" href="../../excel/mission.css">
+<link rel="stylesheet" href="../exam.css">
+</head>
+<body>
+<header class="rail"><div class="in">
+  <a class="home" href="../../index.html">Digitális kultúra</a>
+  <span class="crumb"><a href="../../index.html#erettsegi">Táblázatkezelés – Érettségi</a> › <a href="../../index.html#erettsegi-kozep">Középszint</a></span>
+</div></header>
+<div class="top">
+  <span class="art" aria-hidden="true"><svg viewBox="0 0 96 96"><ellipse cx="48" cy="88" rx="30" ry="5" fill="#000" opacity=".25"/>
+<path d="M22 10h40l12 12v60H22z" fill="#fffdf6"/><path d="M62 10v12h12" fill="#e4e1d4"/>
+<g stroke="#b9b5a4" stroke-width="1.6"><path d="M28 34h40M28 44h40M28 54h40M28 64h40M28 74h40M42 28v50M56 28v50"/></g>
+<rect x="28" y="28" width="40" height="6" fill="#c9b8ff"/><text x="30" y="24" font-family="Times New Roman,serif" font-weight="700" font-size="11" fill="#3e2c80">3.</text>
+<path d="M58 70l18-30 6 4-18 30-7 3z" fill="#f2c230"/><path d="M58 70l1 7 6-4z" fill="#5d3820"/><path d="M76 40l6 4 2-3-6-4z" fill="#f0a3b8"/></svg></span>
+  <div><div class="kicker">Érettségi feladat · Informatika, középszint</div><h1>Lángos</h1></div>
+  <div class="meta"><button type="button" class="mbtn" id="sheetBtn">Feladatlap</button><span>Haladás <b id="solvedCount">–</b></span><span>Idő <b id="timer">0:00</b></span><button type="button" class="mbtn" id="soundBtn">Hang: be</button><button type="button" id="resetBtn" title="Az egész feladat újrakezdése">Újrakezdés</button></div>
+</div>
+<nav class="steps" id="steps" aria-label="Részfeladatok"></nav>
+<div id="game"><main>
+  <article class="card" id="case" aria-live="polite"></article>
+  <section class="work" aria-label="Minta"><div class="card">
+    <div id="dlBox"></div>
+    <div class="work-head"><h2>Minta</h2><p>A hivatalos feladatlap mintája. Kattints rá a nagyításhoz.</p></div>
+    <div id="mintaBox"></div>
+  </div></section>
+</main></div>
+<section id="endPanel" hidden></section>
+<footer class="end">Digitális kultúra. A feladat szövege, a minta és a forrásfájl az Oktatási Hivatal hivatalos érettségi feladatlapjáról való. A haladásod a böngésződben marad; a feltöltött fájlt az oldal csak megnézi, nem küldi el sehová.</footer>
+<div id="sheetView" hidden role="dialog" aria-label="A teljes feladatlap"></div>
+<div id="lightbox" hidden></div>
+<canvas id="fx" aria-hidden="true"></canvas>
+<script>
+window.EXAM = {
+ "key": "erettsegi-langos-hu-v1",
+ "title": "Lángos",
+ "number": 3,
+ "subject": "Informatika",
+ "level": "középszint",
+ "date": "régi típusú érettségi",
+ "code": "0911",
+ "points": 30,
+ "saveAs": "langos.xlsx",
+ "files": [
+  {
+   "name": "rendeles.txt",
+   "href": "forras/rendeles.txt"
+  }
+ ],
+ "minta": [
+  {
+   "src": "img/langos-minta.png",
+   "caption": "<b>Minta:</b>",
+   "alt": "Minta a Lángos feladathoz"
+  }
+ ],
+ "introFirst": false,
+ "lead": "<i>A megoldás során vegye figyelembe a következőket:</i>",
+ "rules": [
+  "A megoldás során törekedjen képlet, függvény, hivatkozás használatára!",
+  "A részfeladatok között van olyan, amely egy korábbi kérdés eredményét használja fel. Ha egy részfeladatot nem sikerült teljesen megoldania, használja a megoldását úgy, ahogy van, vagy számot adó kifejezés helyett írjon be tetszőleges egész számot, és azzal dolgozzon tovább! Így ugyanis pontokat kaphat erre a részfeladatra is."
+ ],
+ "intro": "<div class=\"intro\"><p>Egy lángossütő pultosa egész nap feljegyzi a rendeléseket és záráskor ez alapján összesítést végez. Megkaptuk az egyik nap rendelési adatait és az árlapot a <i>rendeles.txt</i> fájlban (tabulátorokkal tagolt, UTF-8 kódolású szövegállomány).</p><p>Fontos tudni, hogy a vevők, ha egy fajta lángosból ötnél többet vásárolnak, akkor az öt fölöttiek árából 10% kedvezményt kapnak.</p></div>",
+ "tasks": [
+  {
+   "n": 1,
+   "title": "Betöltés és mentés",
+   "text": "<p>Nyissa meg táblázatkezelő program segítségével a <i>rendeles.txt</i> fájlt úgy, hogy az első beolvasott adat az <i>A1</i>-es cellába kerüljön! A táblát mentse a táblázatkezelő saját formátumában <i>langos</i> néven!</p><p>A forrásadatok oszlopainak jelentése:</p><table class=\"def\"><tr><td>Lángos kódja</td><td>A rendelt lángos fajtájának azonosítója (a pultos ezt írja fel a rendeléskor)</td></tr><tr><td>Rendelés</td><td>Egy fajtából rendelt lángosok száma</td></tr><tr><td>Fajta</td><td>A lángos fajtája</td></tr><tr><td>Kód</td><td>A lángos fajtájának azonosítója</td></tr><tr><td>Ár</td><td>A lángos ára</td></tr></table>",
+   "tips": [
+    "Töltsd le a <i>rendeles.txt</i> fájlt. Az Excelben: <span class=ui>Fájl</span> › <span class=ui>Megnyitás</span>, a fájltípusnál válaszd a <span class=ui>Szövegfájlok</span> vagy <span class=ui>Minden fájl</span> lehetőséget.",
+    "A szövegbeolvasó varázslóban: <span class=ui>Tagolt</span>, a fájl eredete <span class=ui>65001: Unicode (UTF-8)</span>, határoló a <span class=ui>Tabulátor</span>. Így az ékezetek is jók lesznek.",
+    "Mentés: <span class=ui>Fájl</span> › <span class=ui>Mentés másként</span>, típus: <span class=ui>Excel-munkafüzet (*.xlsx)</span>, név: <i>langos</i>."
+   ],
+   "asks": [
+    {
+     "q": "Hányadik sorban van az utolsó rendelés?",
+     "num": 71,
+     "traps": {
+      "70": "Ez a rendelések száma. Az első sor a fejléc, így az utolsó rendelés eggyel lejjebb van."
+     }
+    },
+    {
+     "q": "Melyik cellába került az árlap első fajtája, a „Sima”?",
+     "text": [
+      "D2"
+     ],
+     "traps": {
+      "E2": "Akkor az adatok nem az A1-től kezdődnek. Nyisd meg újra a fájlt!",
+      "F2": "Ez már a 2. részfeladat utáni állapot. Most, a beszúrás előtt hol van?"
+     }
+    }
+   ],
+   "hints": [
+    "Ha az ékezetes betűk furcsán jelennek meg (pl. LÃ¡ngos), a beolvasásnál a fájl eredetének az UTF-8-at válaszd."
+   ],
+   "done": "A rendelések az A:B oszlopban, az árlap a D:F oszlopban van."
+  },
+  {
+   "n": 2,
+   "title": "Két új oszlop",
+   "text": "<p>A rendelés oszlopa után szúrjon be két oszlopot a minta szerint, és az első sor két cellájába a fejléc szövegét gépelje be! Ezek jelentése:</p><table class=\"def\"><tr><td>Kedvezménnyel</td><td>Az öt fölöttiek kedvezményét figyelembevevő darabszám</td></tr><tr><td>Fizetendő</td><td>Egy rendelésért számolt ár</td></tr></table>",
+   "tips": [
+    "Jelöld ki a C és a D oszlopot (kattints az oszlopfejekre), jobb klikk › <span class=ui>Beszúrás</span>.",
+    "A C1-be: Kedvezménnyel, a D1-be: Fizetendő."
+   ],
+   "asks": [
+    {
+     "q": "Melyik cellában van most a „Sima”?",
+     "text": [
+      "F2"
+     ]
+    },
+    {
+     "q": "Melyik oszlopban van most az árlap „Ár” oszlopa?",
+     "text": [
+      "H"
+     ]
+    }
+   ],
+   "hints": [
+    "Két oszlop beszúrása után minden, ami a C oszloptól jobbra volt, két oszloppal jobbra kerül."
+   ],
+   "done": "Az árlap most az F:H oszlopban van, a C és D oszlop vár a számolásra."
+  },
+  {
+   "n": 3,
+   "title": "Kedvezménnyel",
+   "text": "<p>A <i>C</i> oszlop celláiban (<i>Kedvezménnyel</i>) függvény segítségével határozza meg, hogy hány lángos árának megfelelő összeget kellett fizetni! Itt vegye figyelembe, hogy az egy fajtából ötnél több lángost vásárlók az öt fölöttiek árából 10% kedvezményt kapnak. (Például 10 lángos esetén 9,5 lángos árának megfelelő összeget kell fizetni.)</p>",
+   "asks": [
+    {
+     "q": "Mi lett a C5 cellában? (7 lángos)",
+     "num": 6.8,
+     "traps": {
+      "7": "Ez a teljes darabszám. Az öt fölötti lángosok csak 0,9-et „érnek”.",
+      "6,3": "Az első öt lángosra nincs kedvezmény, csak az öt fölöttiekre: 5 + 2 · 0,9.",
+      "6,5": "10% kedvezmény: az öt fölötti lángosok 0,9-et érnek, nem 0,75-öt."
+     }
+    },
+    {
+     "q": "Mi lett a C9 cellában? (6 lángos)",
+     "num": 5.9
+    }
+   ],
+   "hints": [
+    "Két eset van: ha 5 vagy kevesebb, akkor maga a rendelés; ha több, akkor 5 + (rendelés − 5) · 0,9. Ehhez a HA függvény kell.",
+    "C2: <code>=HA(B2>5;5+(B2-5)*0,9;B2)</code>, aztán a kitöltőjellel le a C71-ig (vagy dupla katt a kitöltőjelre)."
+   ],
+   "done": "7 lángosért 6,8, 6 lángosért 5,9 lángos árát kell fizetni."
+  },
+  {
+   "n": 4,
+   "title": "Fizetendő",
+   "text": "<p>A <i>Fizetendő</i> oszlopban másolható függvény segítségével a kedvezménnyel korrigált darabszámból és az árlapra való hivatkozással számítsa ki a rendelési tételek értékét!</p>",
+   "asks": [
+    {
+     "q": "Mennyi a D5 cella értéke? (7 sima lángos)",
+     "num": 1088.0,
+     "traps": {
+      "1120": "Ez kedvezmény nélkül: a C oszlop darabszámával szorozz, ne a B oszlopéval."
+     }
+    },
+    {
+     "q": "Mennyi a D9 cella értéke?",
+     "num": 1475.0
+    }
+   ],
+   "hints": [
+    "Az árat a lángos kódja (A oszlop) alapján kell kikeresni az árlapból (G:H oszlop). Erre való az FKERES függvény. A „másolható” azt jelenti: lehúzva is jó maradjon, ehhez az árlap tartományát $ jellel rögzítsd.",
+    "D2: <code>=C2*FKERES(A2;$G$2:$H$7;2;HAMIS)</code>, aztán le a D71-ig."
+   ],
+   "done": "A kedvezményes darabszám szorozva az árlapról kikeresett árral."
+  },
+  {
+   "n": 5,
+   "title": "Darab",
+   "text": "<p>Az <i>I1</i> cellába írja, hogy „Darab”, és az <i>I2:I7</i> tartományban adja meg, hogy az eladási adatok alapján az egyes lángosfajtákból összesen hányat adtak el! (Ha szükséges az <i>N</i> oszloptól jobbra segédadatokat írhat.)</p>",
+   "asks": [
+    {
+     "q": "Hány sima lángost adtak el? (I2)",
+     "num": 45,
+     "traps": {
+      "11": "Ez a rendelések (sorok) száma. Nekünk a B oszlopban lévő darabszámok összege kell: SZUMHA."
+     }
+    },
+    {
+     "q": "Hány brindzásat adtak el? (I7)",
+     "num": 16
+    }
+   ],
+   "hints": [
+    "SZUMHA: összeadja a B oszlop számait azokban a sorokban, ahol az A oszlopban az adott fajta kódja áll.",
+    "I2: <code>=SZUMHA($A$2:$A$71;G2;$B$2:$B$71)</code>, aztán le az I7-ig."
+   ],
+   "done": "A minta oszlopdiagramján is 45 sima lángos látszik."
+  },
+  {
+   "n": 6,
+   "title": "Összes lángos",
+   "text": "<p>Írja a <i>K1</i> cellába, hogy „Összes lángos száma”, és határozza meg a <i>K2</i> cellában, hogy összesen hány lángost adtak el!</p>",
+   "asks": [
+    {
+     "q": "Hány lángost adtak el összesen? (K2)",
+     "num": 192
+    }
+   ],
+   "hints": [
+    "K2: <code>=SZUM(I2:I7)</code> (vagy a B oszlop összege)."
+   ],
+   "done": null
+  },
+  {
+   "n": 7,
+   "title": "Bevétel",
+   "text": "<p>Az <i>L1</i> cellába írja, hogy „Bevétel”, és számítsa ki az <i>L2</i> cellában a teljes bevételt!</p>",
+   "asks": [
+    {
+     "q": "Mennyi a teljes bevétel? (L2)",
+     "num": 46943.0,
+     "traps": {
+      "47220": "Ez kedvezmény nélkül. A Fizetendő oszlopot add össze."
+     }
+    }
+   ],
+   "hints": [
+    "L2: <code>=SZUM(D2:D71)</code>"
+   ],
+   "done": null
+  },
+  {
+   "n": 8,
+   "title": "Ft mértékegység",
+   "text": "<p>Állítsa be, hogy a pénzösszeget tartalmazó cellákban „Ft” mértékegység jelenjen meg, és a számok 0 tizedes jegyűek legyenek!</p>",
+   "checklist": [
+    "A Fizetendő oszlop, az árlap árai (H2:H7) és a bevétel (L2) „Ft”-tal jelenik meg",
+    "Ezekben a cellákban nincs tizedesjegy (pl. 1 088 Ft)"
+   ],
+   "hints": [
+    "Jelöld ki a pénzösszegeket (Ctrl-lal több tartomány is kijelölhető), aztán <span class=ui>Cellák formázása</span> (<kbd>Ctrl</kbd>+<kbd>1</kbd>) › <span class=ui>Szám</span> › <span class=ui>Pénznem</span>: Tizedesjegyek 0, Szimbólum: Ft."
+   ]
+  },
+  {
+   "n": 9,
+   "title": "Szegélyek",
+   "text": "<p>Az adatokat tartalmazó cellákhoz állítson vékony cellaszegélyezést, de a többi cella szegély nélkül jelenjen meg a nyomtatási képen!</p>",
+   "checklist": [
+    "Az adatokat tartalmazó cellák (a rendelések, az árlap, a K1:L2) körül vékony szegély van",
+    "Az üres cellákon nincs szegély: nézd meg a nyomtatási képen (<kbd>Ctrl</kbd>+<kbd>P</kbd>)"
+   ],
+   "hints": [
+    "Jelöld ki az A1:D71, az F1:I7 és a K1:L2 tartományt, aztán <span class=ui>Kezdőlap</span> › <span class=ui>Szegély</span> › <span class=ui>Minden szegély</span>. A halvány rácsvonalak nem nyomtatódnak ki, azokkal nincs dolgod."
+   ]
+  },
+  {
+   "n": 10,
+   "title": "Az első sor és az oszlopok",
+   "text": "<p>Az első sor celláit formázza meg a minta szerint! Változtassa meg az oszlopszélességeket úgy, hogy a táblázat jól áttekinthető legyen!</p>",
+   "checklist": [
+    "Az első sor félkövér, a szöveg függőleges, alulról felfelé fut, mint a mintán",
+    "Az oszlopok szélessége olyan, hogy minden adat jól olvasható"
+   ],
+   "hints": [
+    "Jelöld ki az első sort, <kbd>Ctrl</kbd>+<kbd>B</kbd>, aztán <span class=ui>Cellák formázása</span> › <span class=ui>Igazítás</span> › <span class=ui>Elrendezés</span>: 90 fok."
+   ]
+  },
+  {
+   "n": 11,
+   "title": "Igazítás",
+   "text": "<p>A szöveges cellák balra, a pénzértékeket tartalmazók jobbra és a többi számot tartalmazó cella középre igazított legyen!</p>",
+   "checklist": [
+    "A szöveges cellák (pl. a fajták nevei) balra igazítottak",
+    "A forintos cellák jobbra igazítottak",
+    "A többi szám (kód, rendelés, kedvezményes darab, darab) középre igazított"
+   ],
+   "hints": [
+    "<span class=ui>Kezdőlap</span> › <span class=ui>Igazítás</span> csoport: balra, középre, jobbra. Több tartomány is kijelölhető egyszerre a <kbd>Ctrl</kbd> lenyomásával."
+   ]
+  },
+  {
+   "n": 12,
+   "title": "Oszlopdiagram",
+   "text": "<p>Ábrázolja beágyazott oszlopdiagrammal, hogy melyik lángos fajtából hány darabot adtak el!</p><ul class=\"dash\"><li>A diagramon ne legyen jelmagyarázat!</li><li>A cím „Napi eladás” 20 pontos betűmérettel, félkövér betűstílussal és Courier New (Courier) betűtípussal készüljön!</li><li>Az oszlopok világos narancssárga kitöltésűek és sötétkék szegélyűek legyenek!</li></ul>",
+   "checklist": [
+    "Beágyazott oszlopdiagram: ugyanazon a munkalapon van, mint az adatok",
+    "A vízszintes tengelyen a fajták neve, az oszlopok az eladott darabszámok",
+    "Nincs jelmagyarázat",
+    "A cím „Napi eladás”: 20 pontos, félkövér, Courier New",
+    "Az oszlopok világos narancssárgák, sötétkék szegéllyel"
+   ],
+   "hints": [
+    "Jelöld ki az F1:F7 tartományt, aztán <kbd>Ctrl</kbd>-lal az I1:I7-et. <span class=ui>Beszúrás</span> › <span class=ui>Oszlopdiagram</span> › <span class=ui>Csoportosított oszlop</span>.",
+    "A diagram melletti <b>+</b> gombbal kapcsold ki a jelmagyarázatot. Az oszlopokra jobb klikk › <span class=ui>Adatsor formázása</span> › <span class=ui>Kitöltés</span> és <span class=ui>Szegély</span>."
+   ]
+  }
+ ],
+ "ending": "<p>Ez egy teljes, 30 pontos középszintű táblázatkezelési feladat volt: HA, FKERES, SZUMHA, formázás és diagram.</p>",
+ "next": {
+  "href": "omega-hu.html",
+  "text": "Következő: Omega"
+ }
+};
+window.EXAM.checks = [
+  { task: 1, label: "A rendelések az A1-től, az árlap a helyén", run: F => F.values("A1:B1", ["Lángos kódja", "Rendelés"]).ok && F.values("A71:B71", [5, 2]).ok ? { ok: true } : F.values("A1:B1", ["Lángos kódja", "Rendelés"]) },
+  { task: 2, label: "Két új oszlop a fejléccel", run: F => F.values("C1:D1", ["Kedvezménnyel", "Fizetendő"]).ok ? F.values("F1:H2", ["Fajta", "Kód", "Ár", "Sima", 1, 160]) : F.values("C1:D1", ["Kedvezménnyel", "Fizetendő"]) },
+  { task: 3, label: "C2:C71 kedvezményes darabszám (képlettel)", run: F => F.values("C2:C71", [2, 3, 1, 6.8, 3, 2, 6.8, 5.9, 4, 1, 5, 2, 1, 1, 3, 2, 1, 1, 1, 5, 1, 1, 1, 3, 2, 5.9, 6.8, 4, 1, 1, 1, 5, 4, 1, 1, 5, 4, 1, 1, 3, 1, 3, 2, 1, 1, 5.9, 1, 4, 3, 3, 1, 4, 3, 1, 1, 3, 4, 5.9, 1, 4, 1, 1, 4, 3, 6.8, 3, 1, 5, 1, 2], { formula: true }) },
+  { task: 4, label: "D2:D71 fizetendő (képlettel)", run: F => F.values("D2:D71", [500, 480, 160, 1088.0, 810, 560, 1088.0, 1475.0, 1000, 300, 1500, 600, 250, 280, 810, 560, 270, 250, 300, 1500, 250, 300, 250, 750, 600, 1475.0, 2040.0, 640, 270, 280, 300, 1250, 640, 300, 280, 1250, 1080, 300, 250, 810, 270, 750, 560, 280, 250, 1593.0, 300, 1120, 810, 750, 280, 1200, 750, 160, 300, 750, 1080, 944.0, 270, 1080, 270, 250, 640, 480, 2040.0, 750, 280, 800, 300, 540], { formula: true }) },
+  { task: 5, label: "I1: Darab, I2:I7 eladott darabszám (képlettel)", run: F => { const h = F.values("I1", "Darab"); return h.ok ? F.values("I2:I7", [45, 23, 30, 41, 37, 16], { formula: true }) : h; } },
+  { task: 6, label: "K1, K2: összes lángos száma", run: F => { const h = F.values("K1", "Összes lángos száma"); return h.ok ? F.values("K2", 192, { formula: true }) : h; } },
+  { task: 7, label: "L1, L2: bevétel", run: F => { const h = F.values("L1", "Bevétel"); return h.ok ? F.values("L2", 46943.0, { formula: true }) : h; } },
+  { task: 8, label: "Ft mértékegység, 0 tizedesjegy", run: F => { const re = /Ft/, dec = /0[.,]0/; for (const rg of ["D2:D71", "H2:H7", "L2"]) { const r = F.numFmt(rg, re); if (!r.ok) return r; const w = F.ws(); const bad = F.cellsOf(rg).find(a => w[a] && dec.test(String(w[a].z || ""))); if (bad) return { ok: false, msg: `${bad} cellában tizedesjegyek is látszanak: 0 tizedesjegy kell.` }; } return { ok: true }; } },
+  { task: 12, label: "Beágyazott oszlopdiagram „Napi eladás” címmel, jelmagyarázat nélkül", run: F => {
+      const ch = F.charts().find(c => c.types.includes("bar") || c.types.includes("bar3D"));
+      if (!ch) return { ok: false, msg: F.charts().length ? "Van diagram, de nem oszlopdiagram." : "Nem találok diagramot a munkalapon." };
+      if (ch.barDir === "bar") return { ok: false, msg: "Ez sávdiagram (vízszintes sávok). Oszlopdiagram kell." };
+      if (ch.title.trim() !== "Napi eladás") return { ok: false, msg: `A diagram címe „${ch.title}”, de „Napi eladás” kell.` };
+      if (ch.legend) return { ok: false, msg: "A diagramon van jelmagyarázat. Kapcsold ki!" };
+      return { ok: true }; } }
+];
+</script>
+<script src="../../excel/cats.js"></script>
+<script src="../exam.js"></script>
+<script src="../../nav.js?v=f0ab0bd9" defer></script>
+</body>
+</html>
