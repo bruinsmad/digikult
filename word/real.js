@@ -173,6 +173,12 @@
 
   /* ---------- the saved file ---------- */
   let handle = null;   /* FileSystemFileHandle (Chrome, Edge): drop once, check again with one click */
+  /* some school PCs block reading files this way (policy, a declined prompt, the page shown in a frame):
+     then the page simply asks for the file every time, like in Firefox and Safari */
+  const NOH = "digikult-word-nohandle";
+  let noHandle = false; try { noHandle = localStorage.getItem(NOH) === "1" || window.top !== window; } catch (e) { noHandle = true; }
+  const giveUpHandles = () => { noHandle = true; handle = null; IDB("readwrite", st => st.delete(KEY)); try { localStorage.setItem(NOH, "1"); } catch (e) {} };
+  let lastSeen = null;  /* name, size and time of the file checked last, to notice a file that was not saved again */
   const IDB = (mode, fn) => new Promise(ok => {
     try {
       const rq = indexedDB.open("digikult-word", 1);
@@ -181,31 +187,44 @@
       rq.onerror = () => ok(null);
     } catch (e) { ok(null); }
   });
-  const keepHandle = h => { handle = h; IDB("readwrite", st => st.put(h, KEY)); };
-  IDB("readonly", st => st.get(KEY)).then(h => { if (h && h.kind === "file") { handle = h; if (!CH[state.current].asks) paintFileBox(); } });
+  const keepHandle = h => { if (noHandle) return; handle = h; IDB("readwrite", st => st.put(h, KEY)); };
+  if (!noHandle) IDB("readonly", st => st.get(KEY)).then(h => { if (h && h.kind === "file" && !noHandle) { handle = h; if (!CH[state.current].asks) paintFileBox(); } });
 
   function paintFileBox() {
     const box = $("fileBox"); if (!box) return;
     const solved = state.solved.includes(state.current);
     if (handle) {
       box.innerHTML = `<div class="linked"><svg class="ic" viewBox="0 0 40 46" aria-hidden="true"><path d="M4 2h22l10 10v32H4z" fill="#fff" stroke="#185abd" stroke-width="2"/><path d="M26 2v10h10" fill="#dbe7fb" stroke="#185abd" stroke-width="2"/><rect x="0" y="18" width="24" height="20" rx="2" fill="#185abd"/><path d="M5 23l3 10 4-8 4 8 3-10" fill="none" stroke="#fff" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/></svg>
-        <p><b>${esc(handle.name)}</b><br>Mentsd el a Wordben (<span class='nw'><kbd>Ctrl</kbd>+<kbd>S</kbd></span>), aztán kattints az Ellenőrzésre.</p>
+        <p><b>${esc(handle.name)}</b>${lastSeen && lastSeen.name === handle.name ? ` · mentve ${clock(lastSeen.mod)}` : ""}<br>Mentsd el a Wordben (<span class='nw'><kbd>Ctrl</kbd>+<kbd>S</kbd></span>), aztán kattints az Ellenőrzésre.</p>
         <button type="button" class="btn primary" id="recheck"${solved ? " hidden" : ""}>Ellenőrzés</button><button type="button" class="linkbtn" id="otherFile">másik fájl</button></div>`;
     } else {
       box.innerHTML = `<div class="drop" id="drop" tabindex="0" role="button" aria-label="Fájl kiválasztása">
-        <input type="file" id="fileIn" accept=".docx" hidden>
+        <input type="file" id="fileIn" accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document" hidden>
         <b>Mentsd el a Wordben (Ctrl+S), és húzd ide a fájlt</b><span>vagy kattints ide, és válaszd ki a mentett .docx fájlt</span></div>`;
     }
   }
+  const clock = t => new Date(t).toLocaleTimeString("hu-HU", { hour: "2-digit", minute: "2-digit" });
   async function pick() {
-    if (window.showOpenFilePicker) {
-      try { const [h] = await showOpenFilePicker({ types: [{ description: "Word-dokumentum", accept: { "application/vnd.openxmlformats-officedocument.wordprocessingml.document": [".docx"] } }] }); keepHandle(h); paintFileBox(); checkHandle(); }
-      catch (e) { if (e && e.name !== "AbortError") $("fileIn") && $("fileIn").click(); }
+    if (window.showOpenFilePicker && !noHandle) {
+      let h;
+      try { [h] = await showOpenFilePicker({ types: [{ description: "Word-dokumentum", accept: { "application/vnd.openxmlformats-officedocument.wordprocessingml.document": [".docx"] } }] }); }
+      catch (e) {
+        if (e && e.name === "AbortError") return;
+        /* blocked here: from now on use the ordinary file dialog. It has to be opened by a fresh click. */
+        giveUpHandles(); paintFileBox();
+        $("report").innerHTML = `<div class="verdict no"><b>Kattints még egyszer a mezőre.</b><p>Ezen a gépen a fájlt mindig ki kell választani (vagy ide kell húzni), amikor ellenőrzöl.</p></div>`;
+        return;
+      }
+      keepHandle(h); paintFileBox(); checkHandle();
     } else if ($("fileIn")) $("fileIn").click();
   }
   async function checkHandle() {
     try {
-      if (handle.queryPermission && (await handle.queryPermission({ mode: "read" })) !== "granted" && (await handle.requestPermission({ mode: "read" })) !== "granted") throw new Error("perm");
+      if (handle.queryPermission && (await handle.queryPermission({ mode: "read" })) !== "granted" && (await handle.requestPermission({ mode: "read" })) !== "granted") {
+        giveUpHandles(); paintFileBox();
+        $("report").innerHTML = `<div class="verdict no"><b>A böngésző nem engedi újra megnyitni a fájlt.</b><p>Semmi gond: húzd ide a mentett fájlt (vagy kattints a mezőre, és válaszd ki), és ellenőrzöm.</p></div>`;
+        return;
+      }
       let f;
       try { f = await handle.getFile(); } catch (e1) { await new Promise(r => setTimeout(r, 600)); f = await handle.getFile(); }
       checkFile(f);
@@ -214,20 +233,41 @@
       $("report").innerHTML = `<div class="verdict no"><b>Nem érem el a fájlt.</b><p>Húzd ide újra a mentett fájlt.</p></div>`;
     }
   }
+  let starter = null;   /* the downloaded starter file, to recognise it if a student checks it by mistake */
+  const sameBytes = (a, b) => { if (!a || !b || a.length !== b.length) return false; for (let k = 0; k < a.length; k++) if (a[k] !== b[k]) return false; return true; };
+  const note = (title, text) => { $("report").innerHTML = `<div class="verdict no"><b>${title}</b><p>${text}</p></div>`; buzz(); };
   async function checkFile(file) {
     const i = state.current, c = CH[i];
     $("report").innerHTML = `<p class="export-note">Ellenőrzöm: ${esc(file.name)}…</p>`;
-    if (/\.doc$/i.test(file.name)) { $("report").innerHTML = `<div class="verdict no"><b>Ez régi Word-formátum (.doc).</b><p>Mentsd el .docx formátumban: Fájl › Mentés másként › Word-dokumentum (*.docx).</p></div>`; return; }
-    if (!/\.docx$/i.test(file.name)) { $("report").innerHTML = `<div class="verdict no"><b>Ez nem Word-fájl.</b><p>A Wordben mentett .docx fájlt válaszd ki (pl. ${esc(M.saveAs)}).</p></div>`; return; }
+    const ext = (file.name.match(/\.([a-z0-9]+)$/i) || [])[1] || "";
+    if (/^doc$/i.test(ext)) return note("Ez régi Word-formátum (.doc).", "Mentsd el .docx formátumban: Fájl › Mentés másként › Word-dokumentum (*.docx).");
+    if (/^odt$/i.test(ext)) return note("Ez LibreOffice-formátum (.odt).", "Mentsd el Word-formátumban: Fájl › Mentés másként › Fájltípus: Word 2007–365 (.docx).");
+    if (/^pages$/i.test(ext)) return note("Ez Pages-fájl.", "A Pagesben: Fájl › Exportálás › Word… (.docx), és azt a fájlt válaszd ki.");
+    if (/^pdf$/i.test(ext)) return note("Ez PDF-fájl.", "A Wordben mentett .docx fájlt válaszd ki, ne a PDF-et.");
+    if (/^(tmp|asd|wbk)$/i.test(ext) || /^~\$/.test(file.name)) return note("Ez a Word egyik ideiglenes fájlja.", `A saját mentett fájlodat válaszd ki (pl. ${esc(M.saveAs)}), ne a ~$ kezdetűt.`);
+    if (ext && !/^docx$/i.test(ext)) return note("Ez nem Word-fájl.", `A Wordben mentett .docx fájlt válaszd ki (pl. ${esc(M.saveAs)}).`);
+    let bytes;
+    try { bytes = new Uint8Array(await file.arrayBuffer()); }
+    catch (e) { return note("Nem tudom beolvasni a fájlt.", "Lehet, hogy a Word épp most menti. Várj egy pillanatot, és próbáld újra. Ha a fájl a OneDrive-on van, várd meg, amíg a szinkronizálás befejeződik."); }
+    if (!bytes.length) return note("A fájl üres.", "Ha a OneDrive-on van, várj pár másodpercet, amíg letöltődik, és próbáld újra. Vagy mentsd el újra a Wordben (Ctrl+S).");
+    if (starter === null) { try { starter = new Uint8Array(await (await fetch(M.file, { cache: "force-cache" })).arrayBuffer()); } catch (e) { starter = false; } }
+    if (sameBytes(bytes, starter)) return note("Ez még a letöltött, eredeti fájl.", `Nincs benne semmi a munkádból. A Wordben elmentett fájlodat válaszd ki (pl. ${esc(M.saveAs)}). Ha a Wordben dolgozol, előbb mentsd el: Ctrl+S.`);
     let doc;
-    try { doc = await DOCX.read(await file.arrayBuffer()); }
-    catch (e) { $("report").innerHTML = `<div class="verdict no"><b>Ezt a fájlt nem tudom megnyitni.</b><p>Mentsd el újra a Wordben (Fájl › Mentés), és próbáld újra.</p></div>`; return; }
-    if (M.fingerprint && !DOCX.findParas(doc, M.fingerprint, { contains: true }).length) { $("report").innerHTML = `<div class="verdict no"><b>Ez nem a küldetés fájlja.</b><p>A letöltött ${esc(M.file)} fájlban dolgozz, és azt húzd ide.</p></div>`; return; }
+    try { doc = await DOCX.read(bytes.buffer); }
+    catch (e) { return note("Ezt a fájlt nem tudom megnyitni.", "Mentsd el újra a Wordben (Fájl › Mentés), és próbáld újra. Ha most is ezt látod, mentsd el más néven, és azt válaszd ki."); }
+    const fps = [].concat(M.fingerprint || []);
+    if (fps.length && !fps.some(f => DOCX.findParas(doc, f, { contains: true }).length)) return note("Ez nem a küldetés fájlja.", `A letöltött ${esc(M.file)} fájlban dolgozz, és azt (a mentett változatát) válaszd ki.`);
+    const unchanged = lastSeen && lastSeen.name === file.name && lastSeen.size === file.size && lastSeen.mod === file.lastModified && lastSeen.failed;
     const goals = c.upload ? ALL : (c.goals || []);
     const rows = goals.map(g => { const r = DOCX.check(doc, g); return { label: g.label, ok: r.ok, done: r.done, total: r.total, msg: r.msg }; });
     const report = { name: file.name, at: Date.now(), rows };
     state.reports[i] = report; save(); showReport(report, c.upload);
-    if (rows.every(r => r.ok)) solve(i); else buzz();
+    const allOk = rows.every(r => r.ok);
+    lastSeen = { name: file.name, size: file.size, mod: file.lastModified, failed: !allOk };
+    if (handle) paintFileBox();
+    if (allOk) { solve(i); return; }
+    if (unchanged) $("report").insertAdjacentHTML("afterbegin", `<div class="verdict no"><b>A fájl nem változott az előző ellenőrzés óta</b> (mentve: ${clock(file.lastModified)}).<p>Elmentetted a Wordben (Ctrl+S)? Ha más néven mentetted el, ${handle ? "kattints a „másik fájl” gombra, és válaszd ki az újat" : "azt a fájlt válaszd ki"}.</p></div>`);
+    buzz();
   }
   function showReport(rep, full) {
     const good = rep.rows.filter(r => r.ok).length;
@@ -251,15 +291,25 @@
     else if (e.target.closest("#drop")) pick();
   });
   $("case").addEventListener("keydown", e => { if (e.target.id === "drop" && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); pick(); } });
-  $("case").addEventListener("change", e => { if (e.target.id === "fileIn" && e.target.files[0]) checkFile(e.target.files[0]); });
+  /* the input is emptied after each read: choosing the same (re-saved) file again must fire "change" again */
+  $("case").addEventListener("change", e => { if (e.target.id === "fileIn" && e.target.files[0]) { const f = e.target.files[0]; e.target.value = ""; checkFile(f); } });
   $("case").addEventListener("dragover", e => { const d = e.target.closest("#drop, .linked"); if (d) { e.preventDefault(); d.classList.add("over"); } });
   $("case").addEventListener("dragleave", e => { const d = e.target.closest("#drop, .linked"); if (d) d.classList.remove("over"); });
-  $("case").addEventListener("drop", async e => {
-    const d = e.target.closest("#drop, .linked"); if (!d) return;
-    e.preventDefault(); d.classList.remove("over");
-    const it = e.dataTransfer.items && e.dataTransfer.items[0], f = e.dataTransfer.files[0];
-    if (it && it.getAsFileSystemHandle) { try { const h = await it.getAsFileSystemHandle(); if (h && h.kind === "file" && /\.docx$/i.test(h.name)) { keepHandle(h); paintFileBox(); } } catch (err) {} }
-    if (f) checkFile(f);
+  /* a file dropped anywhere on the page is caught: a missed drop would otherwise make the browser open the file and leave the page */
+  const fileChapter = () => !$("game").hidden && !CH[state.current].asks;
+  document.addEventListener("dragover", e => { if (e.dataTransfer && Array.from(e.dataTransfer.types || []).includes("Files")) { e.preventDefault(); e.dataTransfer.dropEffect = fileChapter() ? "copy" : "none"; } });
+  document.addEventListener("drop", async e => {
+    if (!e.dataTransfer || !e.dataTransfer.files || !e.dataTransfer.files.length) return;
+    e.preventDefault();
+    document.querySelectorAll("#drop.over, .linked.over").forEach(d => d.classList.remove("over"));
+    if (!fileChapter()) return;
+    const f = e.dataTransfer.files[0];
+    const it = e.dataTransfer.items && e.dataTransfer.items[0];
+    const hp = !noHandle && it && it.getAsFileSystemHandle ? it.getAsFileSystemHandle().catch(() => null) : null;
+    checkFile(f);
+    const h = hp && await hp;
+    if (h && h.kind === "file" && /\.docx$/i.test(h.name)) { keepHandle(h); paintFileBox(); }
+    if (innerWidth < 1000 && $("report")) $("report").scrollIntoView({ behavior: "smooth", block: "nearest" });
   });
 
   /* ---------- the end ---------- */
@@ -301,7 +351,7 @@
     if (Date.now() - resetArmed > 4000) { resetArmed = Date.now(); $("resetBtn").textContent = "Biztos? Kattints újra"; $("resetBtn").classList.add("armed"); setTimeout(() => { $("resetBtn").textContent = "Újrakezdés"; $("resetBtn").classList.remove("armed"); }, 4000); return; }
     resetArmed = 0; $("resetBtn").textContent = "Újrakezdés"; $("resetBtn").classList.remove("armed");
     state = { solved: [], current: 0, start: Date.now(), end: null, hints: {}, answers: {}, reports: {}, marks: false };
-    handle = null; IDB("readwrite", st => st.delete(KEY));
+    handle = null; lastSeen = null; IDB("readwrite", st => st.delete(KEY));
     save(); $("endPanel").hidden = true; $("game").hidden = false; goTo(0);
   });
 

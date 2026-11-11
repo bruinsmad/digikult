@@ -176,14 +176,23 @@
   function loadScript(src) { return new Promise((ok, no) => { const s = document.createElement("script"); s.src = src; s.onload = ok; s.onerror = no; document.head.appendChild(s); }); }
   async function checkFile(file) {
     $("report").innerHTML = `<p class="export-note">Ellenőrzöm: ${esc(file.name)}…</p>`;
-    if (!/\.xlsx$/i.test(file.name)) { $("report").innerHTML = `<div class="verdict no"><b>Ez nem Excel-fájl.</b><p>Az Excelben mentett .xlsx fájlt válaszd ki (pl. ${esc(M.saveAs)}).</p></div>`; return; }
+    const note = (t, x) => { $("report").innerHTML = `<div class="verdict no"><b>${t}</b><p>${x}</p></div>`; buzz(); };
+    const ext = (file.name.match(/\.([a-z0-9]+)$/i) || [])[1] || "";
+    if (/^xls$/i.test(ext)) return note("Ez régi Excel-formátum (.xls).", "Mentsd el .xlsx formátumban: Fájl › Mentés másként › Excel-munkafüzet (*.xlsx).");
+    if (/^ods$/i.test(ext)) return note("Ez LibreOffice-formátum (.ods).", "Mentsd el Excel-formátumban: Fájl › Mentés másként › Fájltípus: Excel 2007–365 (.xlsx).");
+    if (/^numbers$/i.test(ext)) return note("Ez Numbers-fájl.", "A Numbersben: Fájl › Exportálás › Excel… (.xlsx), és azt a fájlt válaszd ki.");
+    if (/^(csv|tmp)$/i.test(ext) || /^~\$/.test(file.name)) return note("Ezt a fájlt nem tudom ellenőrizni.", `Az Excelben mentett .xlsx fájlt válaszd ki (pl. ${esc(M.saveAs)}).`);
+    if (ext && !/^xlsx$/i.test(ext)) return note("Ez nem Excel-fájl.", `Az Excelben mentett .xlsx fájlt válaszd ki (pl. ${esc(M.saveAs)}).`);
+    if (!file.size) return note("A fájl üres.", "Ha a OneDrive-on van, várj pár másodpercet, amíg letöltődik, és próbáld újra. Vagy mentsd el újra az Excelben (Ctrl+S).");
+    /* the spreadsheet reader comes from this site (some school networks block outside CDNs), the CDN is only a fallback */
+    if (!window.XLSX) { try { await loadScript("../../vendor/xlsx.full.min.js"); } catch (e) {} }
     try { if (!window.XLSX) await loadScript("https://cdn.jsdelivr.net/npm/" + "xlsx@0.18.5/dist/xlsx.full.min.js"); }
-    catch (e) { $("report").innerHTML = `<div class="verdict no"><b>Nincs internet.</b><p>A fájl ellenőrzéséhez internetkapcsolat kell. Próbáld újra később.</p></div>`; return; }
+    catch (e) { return note("Nem sikerült betölteni az ellenőrzőt.", "Frissítsd az oldalt (F5), és próbáld újra."); }
     let ws;
     try {
       const wb = XLSX.read(await file.arrayBuffer(), { type: "array", cellFormula: true });
       ws = wb.Sheets[M.sheetName] || wb.Sheets[wb.SheetNames[0]];
-    } catch (e) { $("report").innerHTML = `<div class="verdict no"><b>Ezt a fájlt nem tudom megnyitni.</b><p>Mentsd el újra az Excelben (Fájl › Mentés), és próbáld újra.</p></div>`; return; }
+    } catch (e) { return note("Ezt a fájlt nem tudom megnyitni.", "Lehet, hogy az Excel épp most menti. Várj egy pillanatot, és próbáld újra. Ha most is ezt látod, mentsd el más néven, és azt válaszd ki."); }
     /* expected values are worked out from the student's own cells, so one wrong cell is reported once,
        not again in every cell that builds on it */
     const theirs = new XL.Sheet(M.sheet.cols, M.sheet.rows);
@@ -218,10 +227,20 @@
   }
   $("case").addEventListener("click", e => { if (e.target.closest("#drop")) $("fileIn").click(); });
   $("case").addEventListener("keydown", e => { if (e.target.id === "drop" && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); $("fileIn").click(); } });
-  $("case").addEventListener("change", e => { if (e.target.id === "fileIn" && e.target.files[0]) checkFile(e.target.files[0]); });
+  /* the input is emptied after each read: choosing the same (re-saved) file again must fire "change" again */
+  $("case").addEventListener("change", e => { if (e.target.id === "fileIn" && e.target.files[0]) { const f = e.target.files[0]; e.target.value = ""; checkFile(f); } });
   $("case").addEventListener("dragover", e => { const d = e.target.closest("#drop"); if (d) { e.preventDefault(); d.classList.add("over"); } });
   $("case").addEventListener("dragleave", e => { const d = e.target.closest("#drop"); if (d) d.classList.remove("over"); });
-  $("case").addEventListener("drop", e => { const d = e.target.closest("#drop"); if (!d) return; e.preventDefault(); d.classList.remove("over"); const f = e.dataTransfer.files[0]; if (f) checkFile(f); });
+  /* a file dropped anywhere on the page is caught: a missed drop would otherwise make the browser open the file and leave the page */
+  document.addEventListener("dragover", e => { if (e.dataTransfer && Array.from(e.dataTransfer.types || []).includes("Files")) { e.preventDefault(); e.dataTransfer.dropEffect = $("drop") ? "copy" : "none"; } });
+  document.addEventListener("drop", e => {
+    if (!e.dataTransfer || !e.dataTransfer.files || !e.dataTransfer.files.length) return;
+    e.preventDefault();
+    const d = $("drop"); if (!d) return;
+    d.classList.remove("over");
+    checkFile(e.dataTransfer.files[0]);
+    if (innerWidth < 1000 && $("report")) $("report").scrollIntoView({ behavior: "smooth", block: "nearest" });
+  });
 
   /* ---------- the end ---------- */
   function showEnd() {

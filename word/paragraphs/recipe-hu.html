@@ -53,7 +53,7 @@ const STEPS = ["A vajat a mézzel együtt kis lángon olvaszd fel, aztán hagyd 
 const empties = m => m.blocks.forEach(b => { if (!b.type && !WD.textOf(b).trim()) b.target = true; });
 
 window.MISSION = {
-  key: "recipe-hu-v1", title: "Mamó mézeskalácsa", file: "recept.docx", saveAs: "recept-Kovacs-Anna.docx", fingerprint: "Mamó mézeskalácsa",
+  key: "recipe-hu-v1", title: "Mamó mézeskalácsa", file: "recept.docx", saveAs: "recept-Kovacs-Anna.docx", fingerprint: ["Mamó mézeskalácsa", "Nálunk karácsony előtt"],
   confetti: ["#b8692e", "#e2463a", "#3f8f4a", "#f2d264", "#185abd", "#fff6e8"],
   next: { href: "../page/intro-hu.html", text: "Tovább: oldal, táblázat, kép" },
   doc: { blocks: [
