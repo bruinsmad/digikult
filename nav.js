@@ -161,6 +161,23 @@
                 files: { en: "sql/joins/matchmaker.html", hu: "sql/joins/matchmaker-hu.html" }
               }
             ]
+          },
+          {
+            id: "summary",
+            title: { hu: "Összefoglaló: az SQL záradékai", en: "Summary: the SQL clauses" },
+            pages: [
+              {
+                id: "clauses",
+                kind: "theory",
+                minutes: 10,
+                title: { hu: "Záradékok – összefoglaló", en: "Clauses – summary" },
+                desc: {
+                  hu: "SELECT, FROM, WHERE, GROUP BY, HAVING, ORDER BY, LIMIT egy lapon: mit csinálnak, milyen sorrendben írjuk és hajtja végre őket a gép, feltételek, összesítő függvények, táblák összekapcsolása.",
+                  en: "SELECT, FROM, WHERE, GROUP BY, HAVING, ORDER BY, LIMIT on one page: what each does, the order you write them and the order they run, conditions, aggregates, joining tables."
+                },
+                files: { en: "sql/summary/clauses.html", hu: "sql/summary/clauses-hu.html" }
+              }
+            ]
           }
         ]
       },
