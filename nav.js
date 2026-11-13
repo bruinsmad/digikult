@@ -183,8 +183,8 @@
                 minutes: 35,
                 title: { hu: "Témazáró: SQL", en: "SQL test" },
                 desc: {
-                  hu: "35 perc, 40 pont, egy iskolai könyvtár táblái: feleletválasztás, igaz-hamis, sorrend, párosítás, kimenet, kiegészítés, hibakeresés és saját lekérdezések. Automatikus pontozás, beadás Classroomba.",
-                  en: "35 minutes, 40 points, a school library's tables: multiple choice, true or false, ordering, matching, predicting, gap-filling, finding mistakes and writing queries. Marked automatically, handed in on Classroom."
+                  hu: "Kb. 35 perc, 40 pont, egy iskolai könyvtár táblái: feleletválasztás, igaz-hamis, sorrend, párosítás, kimenet, kiegészítés, hibakeresés és saját lekérdezések. Automatikus pontozás, beadás Classroomba.",
+                  en: "About 35 minutes, 40 points, a school library's tables: multiple choice, true or false, ordering, matching, predicting, gap-filling, finding mistakes and writing queries. Marked automatically, handed in on Classroom."
                 },
                 files: { en: "sql/summary/test.html", hu: "sql/summary/test-hu.html" }
               }
