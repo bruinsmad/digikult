@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>/* moving between pages: the old page drifts aside and fades, the new one glides in; the rail holds still */@view-transition{navigation:auto}.rail{view-transition-name:rail}::view-transition-group(root){animation:none}::view-transition-old(root){animation:dk-out .2s cubic-bezier(.4,0,1,1) both}::view-transition-new(root){animation:dk-in .38s cubic-bezier(.16,1,.3,1) .06s both}::view-transition-old(rail),::view-transition-new(rail){animation:none}@keyframes dk-out{to{opacity:0;transform:translateX(-18px)}}@keyframes dk-in{from{opacity:0;transform:translateX(26px)}}@media (prefers-reduced-motion:reduce){::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none!important}}</style>
+<title>Témazáró: SQL</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600;700&display=swap">
+<style>
+/* A timed test sheet: chalkboard around, a sheet of paper in the middle, one card per question */
+:root{
+  --board:#22362f; --board-deep:#1a2a24; --chalk:#efeee6; --chalk-dim:#b4c4b8; --yellow:#f2d264;
+  --paper:#fbfaf4; --ink:#1d2622; --muted:#5b6660; --line:#e4e1d4;
+  --accent:#b8860b; --accent-bg:#fbf1cf; --ok:#2f7a3a; --ok-bg:#e3f2df; --bad:#b3362f; --bad-bg:#fbe3df;
+  --code-bg:#1f2a26; --code-ink:#e9efe9; --kw:#f2d264; --str:#a8dba0; --num:#9cc8e8; --fn:#f0a3b8;
+  --f-chalk:"Kalam","Segoe Print","Comic Sans MS",cursive;
+  --f-body:"Atkinson Hyperlegible","Segoe UI",system-ui,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
+}
+*{box-sizing:border-box}
+*,*::before,*::after{font-feature-settings:"calt" 0,"liga" 0}
+[hidden]{display:none!important}
+html,body{margin:0}
+body{color:var(--chalk);font:17px/1.55 var(--f-body);background:var(--board);
+  background-image:radial-gradient(60% 40% at 18% 12%,rgba(255,255,255,.05),transparent 70%),radial-gradient(50% 35% at 82% 40%,rgba(255,255,255,.035),transparent 70%)}
+:focus-visible{outline:3px solid var(--yellow);outline-offset:2px}
+code,pre,textarea{font-family:var(--f-mono)}
+a{color:inherit}
+.wrap{max-width:960px;margin:0 auto;padding:0 max(16px,env(safe-area-inset-left))}
+.topline{display:flex;align-items:center;gap:12px;padding:14px 0;font-size:14px;color:var(--chalk-dim)}
+.crumb a{text-decoration:none}.crumb a:hover{color:#fff6e8;text-decoration:underline}
+.langlink{margin-left:auto;font:700 14px var(--f-body);color:#fff6e8;border:1.5px solid rgba(255,246,232,.45);border-radius:4px;padding:4px 10px;text-decoration:none}
+.hero{padding:18px 0 26px}
+.kicker{font:700 21px/1.2 var(--f-chalk);color:var(--yellow)}
+h1{font:700 clamp(32px,5.4vw,52px)/1.08 Georgia,"Times New Roman",serif;margin:6px 0 10px;color:#fff6e8;text-wrap:balance}
+.lead{max-width:66ch;color:var(--chalk-dim);font-size:18px;margin:0}
+
+/* sticky bar: name, time left, answered */
+.bar{position:sticky;top:0;z-index:20;background:rgba(26,42,36,.96);backdrop-filter:blur(4px);border-bottom:2px solid rgba(239,238,230,.12)}
+.bar .wrap{display:flex;flex-wrap:wrap;align-items:center;gap:8px 22px;padding-top:10px;padding-bottom:10px}
+.bar .who{font-weight:700;color:#fff6e8}
+.bar .stat{font-size:14px;color:var(--chalk-dim)}
+.bar .stat b{font:700 20px var(--f-mono);color:var(--yellow);margin-left:6px}
+.bar .stat.low b{color:#ff8a7a}
+.bar .btn{margin-left:auto}
+
+.sheet{background:var(--paper);color:var(--ink);border-radius:6px;box-shadow:0 20px 50px rgba(0,0,0,.35);padding:30px clamp(16px,4vw,44px) 36px;margin:22px auto 30px;max-width:960px}
+.sheet h2{font:700 25px/1.2 var(--f-body);margin:0 0 6px;display:flex;align-items:baseline;gap:10px}
+.sheet h2 .pts{margin-left:auto;font:700 14px var(--f-body);color:var(--muted);white-space:nowrap}
+.sec{padding:22px 0 8px;border-top:2px dashed var(--line)}
+.sec:first-of-type{border-top:0;padding-top:0}
+.sec>.intro{color:var(--muted);margin:0 0 10px}
+
+.start{display:grid;gap:14px;max-width:560px}
+.start label{font-weight:700}
+.start input{font:17px var(--f-body);padding:10px 12px;border:2px solid #cfcab8;border-radius:8px;width:100%}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:6px 0 4px}
+.fact{border:2px solid var(--ink);border-radius:10px;padding:10px 12px;background:#fff}
+.fact b{display:block;font:700 26px/1.1 var(--f-chalk);color:var(--accent)}
+.fact span{font-size:14px;color:var(--muted)}
+.rules{margin:0;padding-left:20px;color:var(--ink)}
+.rules li{margin:3px 0}
+
+.btn{font:700 15px var(--f-body);border:0;border-radius:8px;padding:9px 16px;cursor:pointer;background:var(--ink);color:#fff}
+.btn:hover{background:#000}
+.btn.ghost{background:transparent;color:var(--ink);border:2px solid var(--ink)}
+.btn.big{font-size:17px;padding:12px 22px}
+.btn.gold{background:var(--yellow);color:#2d2300}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+
+/* tables reference */
+details.ref{margin:0 0 6px;border:2px solid var(--ink);border-radius:10px;background:#fff}
+details.ref summary{cursor:pointer;font-weight:700;padding:10px 14px}
+.ref-body{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(270px,100%),1fr));gap:12px;padding:0 14px 14px}
+.dt{border:2px solid var(--ink);border-radius:8px;overflow:hidden}
+.dt h4{margin:0;background:var(--code-bg);color:var(--kw);font:700 14px var(--f-mono);padding:6px 10px;display:flex;justify-content:space-between}
+.dt h4 span{color:#cfd8d2;font-weight:400}
+.dt .scroll{overflow-x:auto;max-height:330px;overflow-y:auto}
+table{border-collapse:collapse;width:100%;font:13.5px var(--f-mono)}
+th,td{text-align:left;padding:5px 9px;border-bottom:1px solid var(--line);white-space:nowrap}
+th{background:#eeebe0;position:sticky;top:0}
+td.n{text-align:right}
+td.null{color:#9a9a8e;font-style:italic}
+
+/* question cards */
+.q{border:2px solid var(--ink);border-radius:12px;background:#fff;padding:14px 16px;margin:12px 0;position:relative}
+.q .qh{display:flex;gap:10px;align-items:baseline}
+.q .no{flex:none;font:700 19px/1 var(--f-chalk);color:var(--accent);min-width:2.2em}
+.q .qt{flex:1;font-weight:700}
+.q .qp{flex:none;font-size:13px;color:var(--muted);white-space:nowrap}
+.q pre.code{margin:10px 0;background:var(--code-bg);color:var(--code-ink);border-radius:8px;padding:10px 14px;font-size:14.5px;line-height:1.5;white-space:pre-wrap;overflow-wrap:anywhere}
+.k{color:var(--kw);font-weight:600}.s{color:var(--str)}.nm{color:var(--num)}.f{color:var(--fn)}
+.opts{display:grid;gap:6px;margin-top:8px}
+.opt{display:flex;gap:10px;align-items:flex-start;border:1.5px solid var(--line);border-radius:8px;padding:8px 10px;cursor:pointer;background:#fdfcf8}
+.opt:hover{border-color:var(--ink)}
+.opt input{margin-top:4px;accent-color:var(--ink);flex:none}
+.opt:has(input:checked){border-color:var(--ink);background:var(--accent-bg)}
+.tf{display:grid;grid-template-columns:1fr auto;gap:8px 14px;align-items:center;border-top:1px solid var(--line);padding:8px 0}
+.tf:first-of-type{border-top:0}
+.tf .seg{display:flex;border:2px solid var(--ink);border-radius:8px;overflow:hidden}
+.tf .seg label{padding:5px 12px;cursor:pointer;font-weight:700;font-size:14px}
+.tf .seg input{position:absolute;opacity:0;pointer-events:none}
+.tf .seg label:has(input:checked){background:var(--ink);color:#fff}
+.tf .seg label:has(input:focus-visible){outline:3px solid var(--yellow);outline-offset:-3px}
+@media (max-width:520px){ .tf{grid-template-columns:1fr} }
+.order{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:6px;max-width:440px}
+.order li{display:flex;align-items:center;gap:8px;border:2px solid var(--ink);border-radius:8px;padding:6px 8px 6px 12px;background:#fff;font:700 15px var(--f-mono)}
+.order li .ix{font:700 16px var(--f-chalk);color:var(--accent);width:1.4em}
+.order li .mv{margin-left:auto;display:flex;gap:4px}
+.order li button{font:700 15px var(--f-body);width:34px;height:30px;border-radius:6px;border:1.5px solid var(--ink);background:#f6f3e8;cursor:pointer}
+.order li button[disabled]{opacity:.3;cursor:default}
+.match{display:grid;gap:8px;margin-top:8px}
+.match .row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:10px;align-items:center}
+.match code{font-weight:700}
+.match select{font:15px var(--f-body);padding:7px 8px;border:2px solid #cfcab8;border-radius:8px;width:100%;background:#fff}
+@media (max-width:560px){ .match .row{grid-template-columns:1fr} }
+.num input,.blank input{font:15px var(--f-mono);padding:6px 8px;border:2px solid #cfcab8;border-radius:6px;background:#fff;color:var(--ink)}
+.num{margin-top:6px}.num input{width:8em}
+pre.code .blank-in{display:inline-block;vertical-align:baseline}
+pre.code input{font:600 14.5px var(--f-mono);width:9em;padding:1px 6px;border:2px dashed var(--kw);border-radius:5px;background:#2c3a35;color:#fff}
+.lines{margin:10px 0 0;border-radius:8px;overflow:hidden;background:var(--code-bg)}
+.lines label{display:flex;gap:12px;align-items:baseline;padding:4px 12px;color:var(--code-ink);font:14.5px/1.5 var(--f-mono);cursor:pointer;border-left:4px solid transparent}
+.lines label:hover{background:#2a3833}
+.lines label input{accent-color:var(--yellow)}
+.lines label .ln{color:#8fa39a;width:1.2em;text-align:right}
+.lines label:has(input:checked){background:#3a3a22;border-left-color:var(--yellow)}
+.sqlbox textarea{width:100%;min-height:120px;resize:vertical;font-size:15px;line-height:1.5;padding:10px 12px;border-radius:8px;border:2px solid var(--ink);background:var(--code-bg);color:var(--code-ink);caret-color:var(--yellow);margin-top:10px}
+.sqlbox .row{display:flex;gap:8px;align-items:center;margin-top:6px;flex-wrap:wrap}
+.sqlbox .hint{font-size:13px;color:var(--muted)}
+.out{margin-top:8px}
+.out .meta{font:700 13px var(--f-body);color:var(--muted);margin-bottom:4px}
+.out .tbl{border:1.5px solid var(--line);border-radius:8px;overflow:auto;max-height:260px}
+.err{background:var(--bad-bg);color:var(--bad);border-radius:8px;padding:8px 12px;font-weight:700;font-size:15px}
+
+/* marking after submit */
+.q.right{border-color:var(--ok);box-shadow:inset 6px 0 0 var(--ok)}
+.q.wrong{border-color:var(--bad);box-shadow:inset 6px 0 0 var(--bad)}
+.q.part{border-color:var(--accent);box-shadow:inset 6px 0 0 var(--accent)}
+.q .got{position:absolute;top:-12px;right:12px;font:700 13px var(--f-body);padding:2px 10px;border-radius:999px;color:#fff}
+.q.right .got{background:var(--ok)}.q.wrong .got{background:var(--bad)}.q.part .got{background:var(--accent)}
+.locked input,.locked select,.locked textarea,.locked button.mvb{pointer-events:none}
+
+.result{border:2px solid var(--ink);border-radius:12px;padding:18px;background:#fff;margin-bottom:10px}
+.result .big{font:700 46px/1 var(--f-chalk);color:var(--accent)}
+.result .sub{color:var(--muted)}
+.result table{font:15px var(--f-body);margin-top:12px}
+.result td.n{font-family:var(--f-mono)}
+.export{margin-top:16px}
+.export ol{padding-left:20px;margin:6px 0 12px}
+.export .row{display:flex;gap:8px;flex-wrap:wrap}
+.note{min-height:1.4em;font-size:14px;color:var(--ok);margin:8px 0 0}
+.submit{display:flex;justify-content:center;gap:10px;padding:18px 0 4px;flex-wrap:wrap}
+footer.end{text-align:center;color:var(--chalk-dim);font-size:14px;padding:4px 0 34px}
+@media print{ .bar,.topline,footer,.submit,.export{display:none} body{background:#fff} .sheet{box-shadow:none} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topline">
+    <span class="crumb"><a href="../../index.html#sql">Adatbázisok – SQL</a> › <a href="../../index.html#sql-summary">Összefoglaló</a></span>
+    <a class="langlink" href="test.html" lang="en">English</a>
+  </div>
+  <header class="hero">
+    <div class="kicker">SQL, témazáró</div>
+    <h1>Témazáró dolgozat: SQL</h1>
+    <p class="lead">Egy iskolai könyvtár három táblája: szerzők, könyvek és kölcsönzések. Szűrés, csoportosítás és táblák összekapcsolása, nyolcféle feladatban.</p>
+  </header>
+</div>
+
+<div class="bar" id="bar" hidden>
+  <div class="wrap">
+    <span class="who" id="who"></span>
+    <span class="stat" id="tleft"></span>
+    <span class="stat" id="tans"></span>
+    <button type="button" class="btn gold" id="submitTop"></button>
+  </div>
+</div>
+
+<main class="sheet" id="sheet"></main>
+<footer class="end">Digitális kultúra. A dolgozat a böngésződben fut, semmit sem küldünk el.</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/sql.js@1.10.3/dist/sql-asm.js"></script>
+<script>
+const CFG = {"lang": "hu", "key": "sql-test-hu-v1", "minutes": 35, "seed": "CREATE TABLE szerzok (id INTEGER PRIMARY KEY, nev TEXT, orszag TEXT);\nINSERT INTO szerzok VALUES (1,'Szabó Magda','Magyarország');\nINSERT INTO szerzok VALUES (2,'Molnár Ferenc','Magyarország');\nINSERT INTO szerzok VALUES (3,'J. K. Rowling','Egyesült Királyság');\nINSERT INTO szerzok VALUES (4,'Astrid Lindgren','Svédország');\nINSERT INTO szerzok VALUES (5,'Jules Verne','Franciaország');\nINSERT INTO szerzok VALUES (6,'Rejtő Jenő','Magyarország');\nCREATE TABLE konyvek (id INTEGER PRIMARY KEY, cim TEXT, szerzo_id INTEGER, mufaj TEXT, oldalak INTEGER, ev INTEGER);\nINSERT INTO konyvek VALUES (1,'Abigél',1,'regény',360,1970);\nINSERT INTO konyvek VALUES (2,'Az ajtó',1,'regény',280,1987);\nINSERT INTO konyvek VALUES (3,'A Pál utcai fiúk',2,'ifjúsági',220,1906);\nINSERT INTO konyvek VALUES (4,'Harry Potter és a bölcsek köve',3,'fantasy',330,1997);\nINSERT INTO konyvek VALUES (5,'Harry Potter és a Titkok Kamrája',3,'fantasy',360,1998);\nINSERT INTO konyvek VALUES (6,'Harisnyás Pippi',4,'ifjúsági',160,1945);\nINSERT INTO konyvek VALUES (7,'Oroszlánszívű testvérek',4,'fantasy',230,1973);\nINSERT INTO konyvek VALUES (8,'Nemo kapitány',5,'kaland',420,1870);\nINSERT INTO konyvek VALUES (9,'80 nap alatt a Föld körül',5,'kaland',250,1872);\nINSERT INTO konyvek VALUES (10,'A tizennégy karátos autó',6,'kaland',300,1940);\nINSERT INTO konyvek VALUES (11,'Piszkos Fred, a kapitány',6,'kaland',310,1940);\nCREATE TABLE kolcsonzesek (id INTEGER PRIMARY KEY, konyv_id INTEGER, diak TEXT, osztaly TEXT, napok INTEGER);\nINSERT INTO kolcsonzesek VALUES (1,4,'Anna','9.A',14);\nINSERT INTO kolcsonzesek VALUES (2,5,'Anna','9.A',10);\nINSERT INTO kolcsonzesek VALUES (3,1,'Bence','9.B',21);\nINSERT INTO kolcsonzesek VALUES (4,3,'Csilla','9.A',7);\nINSERT INTO kolcsonzesek VALUES (5,8,'Dávid','10.A',30);\nINSERT INTO kolcsonzesek VALUES (6,4,'Emma','9.B',12);\nINSERT INTO kolcsonzesek VALUES (7,6,'Emma','9.B',NULL);\nINSERT INTO kolcsonzesek VALUES (8,10,'Bence','9.B',9);\nINSERT INTO kolcsonzesek VALUES (9,11,'Dávid','10.A',15);\nINSERT INTO kolcsonzesek VALUES (10,4,'Csilla','9.A',20);\nINSERT INTO kolcsonzesek VALUES (11,9,'Gergő','10.A',NULL);\nINSERT INTO kolcsonzesek VALUES (12,2,'Hanna','10.A',25);\nINSERT INTO kolcsonzesek VALUES (13,5,'Gergő','10.A',8);\nINSERT INTO kolcsonzesek VALUES (14,7,'Anna','9.A',11);\nINSERT INTO kolcsonzesek VALUES (15,3,'Hanna','10.A',5);\nINSERT INTO kolcsonzesek VALUES (16,8,'Csilla','9.A',18);", "tables": ["szerzok", "konyvek", "kolcsonzesek"], "sections": [{"id": "mc", "title": "Feleletválasztós kérdések", "intro": "Minden kérdésre egy helyes válasz van.", "questions": [{"id": "a1", "type": "mc", "pts": 1, "q": "Melyik záradék szűri a <b>csoportokat<\/b>?", "opts": ["<code>WHERE<\/code>", "<code>HAVING<\/code>", "<code>GROUP BY<\/code>", "<code>ORDER BY<\/code>"], "ok": 1}, {"id": "a2", "type": "mc", "pts": 1, "q": "Mi történik, ha két táblát párosítási szabály nélkül írsz a <code>FROM<\/code>-ba?", "opts": ["Hibaüzenetet kapsz", "Minden sor minden sorral párba áll", "Csak az első tábla sorai jelennek meg", "Az adatbázis magától kitalálja a szabályt"], "ok": 1}, {"id": "a3", "type": "mc", "pts": 1, "q": "Melyik feltétel találja meg azokat a kölcsönzéseket, ahol a könyv még nincs visszahozva (a <code>napok<\/code> üres)?", "opts": ["<code>napok = NULL<\/code>", "<code>napok IS NULL<\/code>", "<code>napok = 0<\/code>", "<code>napok = ''<\/code>"], "ok": 1}, {"id": "a4", "type": "mc", "pts": 1, "q": "Melyik feltétel illik minden olyan címre, amely <b>Harry<\/b> szóval kezdődik?", "opts": ["<code>cim LIKE 'Harry%'<\/code>", "<code>cim LIKE '%Harry'<\/code>", "<code>cim = 'Harry'<\/code>", "<code>cim LIKE 'Harry_'<\/code>"], "ok": 0}, {"id": "a5", "type": "mc", "pts": 1, "q": "Mit ad vissza ez a lekérdezés?", "code": "SELECT cim, oldalak\nFROM konyvek\nORDER BY oldalak DESC\nLIMIT 1;", "opts": ["A legvastagabb könyvet", "A legvékonyabb könyvet", "A tábla első könyvét", "Az összes könyvet, oldalszám szerint"], "ok": 0}]}, {"id": "tf", "title": "Igaz vagy hamis?", "intro": null, "questions": [{"id": "b1", "type": "tf", "q": "Döntsd el mindegyik állításról!", "items": [["A <code>WHERE<\/code>-ben használhatsz <code>SUM<\/code>-ot.", false], ["Az <code>ORDER BY<\/code> magától csökkenő sorrendbe rendez.", false], ["Három tábla összekapcsolásához két párosítási szabály kell.", true], ["A <code>COUNT(DISTINCT osztaly)<\/code> megmondja, hány különböző osztály van.", true]]}]}, {"id": "order", "title": "Sorrend", "intro": null, "questions": [{"id": "c1", "type": "order", "pts": 2, "q": "Tedd a záradékokat abba a sorrendbe, ahogyan egy lekérdezésben állnak! (a nyilakkal mozgathatod őket)", "items": ["SELECT", "FROM", "WHERE", "GROUP BY", "HAVING", "ORDER BY"], "start": [5, 1, 4, 0, 2, 3]}]}, {"id": "match", "title": "Párosítás", "intro": null, "questions": [{"id": "d1", "type": "match", "q": "Mit ad az egyes kifejezés a táblákon? Válaszd ki mindegyikhez!", "left": ["<code>COUNT(*)<\/code> a <code>konyvek<\/code> táblán", "<code>SUM(oldalak)<\/code>", "<code>AVG(napok)<\/code>", "<code>MAX(ev)<\/code>", "<code>MIN(oldalak)<\/code>"], "right": ["hány könyv van", "az összes könyv oldalainak összege", "átlagosan hány napig volt kint egy könyv", "a legújabb könyv kiadási éve", "a legvékonyabb könyv oldalszáma"], "shown": [3, 0, 4, 2, 1]}]}, {"id": "predict", "title": "Mit ad vissza?", "intro": "Nézd meg a táblákat fent, és írd be a választ számmal, vagy jelöld be!", "questions": [{"id": "e1", "type": "num", "pts": 1, "q": "Mennyi az eredmény?", "code": "SELECT COUNT(*)\nFROM konyvek\nWHERE oldalak > 300;", "ok": 5}, {"id": "e2", "type": "num", "pts": 1, "q": "Hány sora lesz az eredménynek?", "code": "SELECT mufaj, COUNT(*)\nFROM konyvek\nGROUP BY mufaj;", "ok": 4}, {"id": "e3", "type": "num", "pts": 1, "q": "Hány sora lesz az eredménynek?", "code": "SELECT *\nFROM konyvek, szerzok;", "ok": 66}, {"id": "e4", "type": "multi", "pts": 2, "q": "Mely osztályok jelennek meg az eredményben? Jelöld be mindet!", "code": "SELECT osztaly, COUNT(*)\nFROM kolcsonzesek\nGROUP BY osztaly\nHAVING COUNT(*) > 4;", "opts": ["9.A", "9.B", "10.A"], "ok": [0, 2]}]}, {"id": "blanks", "title": "Egészítsd ki!", "intro": "Írd be a hiányzó szavakat úgy, hogy a lekérdezés azt adja, amit a feladat kér.", "questions": [{"id": "f1", "type": "blank", "q": "Az 1950 előtt kiadott könyvek címe, a legrégebbivel kezdve.", "code": "SELECT cim\nFROM konyvek\n{0} ev < 1950\nORDER BY ev {1};", "ok": [["WHERE"], ["ASC"]]}, {"id": "f2", "type": "blank", "q": "Műfajonként az oldalszámok átlaga.", "code": "SELECT mufaj, {0}(oldalak)\nFROM konyvek\n{1} mufaj;", "ok": [["AVG"], ["GROUP BY"]]}, {"id": "f3", "type": "blank", "q": "Minden könyv címe a szerzője nevével.", "code": "SELECT konyvek.cim, szerzok.nev\nFROM konyvek, szerzok\nWHERE konyvek.{0} = szerzok.{1};", "ok": [["szerzo_id", "konyvek.szerzo_id"], ["id", "szerzok.id"]]}]}, {"id": "bugs", "title": "Keresd a hibát!", "intro": "Mindegyik lekérdezésben egy sor hibás. Kattints rá!", "questions": [{"id": "g1", "type": "bug", "pts": 1, "q": "Melyik sor hibás?", "code": "SELECT mufaj, COUNT(*)\nFROM konyvek\nWHERE COUNT(*) > 2\nGROUP BY mufaj;", "ok": 2}, {"id": "g2", "type": "bug", "pts": 1, "q": "Melyik sor hibás?", "code": "SELECT cim\nFROM konyvek\nWHERE mufaj = fantasy\nORDER BY ev;", "ok": 2}, {"id": "g3", "type": "bug", "pts": 1, "q": "Ez a lekérdezés lefut, mégis 0 sort ad 11 helyett. Melyik sor hibás?", "code": "SELECT konyvek.cim, szerzok.nev\nFROM konyvek, szerzok\nWHERE konyvek.szerzo_id = szerzok.nev\nORDER BY szerzok.nev;", "ok": 2}]}, {"id": "write", "title": "Írd meg!", "intro": "Írd meg a lekérdezést! A Futtatással kipróbálhatod, a beadáskor a gép ellenőrzi az eredményét.", "questions": [{"id": "h1", "type": "sql", "pts": 2, "q": "Írasd ki a 300 oldalnál vastagabb kalandregények címét!", "expect": "SELECT cim FROM konyvek WHERE mufaj = 'kaland' AND oldalak > 300;"}, {"id": "h2", "type": "sql", "pts": 2, "q": "Osztályonként hány kölcsönzés volt? (az osztály és a darabszám)", "expect": "SELECT osztaly, COUNT(*) FROM kolcsonzesek GROUP BY osztaly;"}, {"id": "h3", "type": "sql", "pts": 3, "q": "Írasd ki a fantasy könyvek kölcsönzéseit: a diák nevét és a könyv címét!", "expect": "SELECT kolcsonzesek.diak, konyvek.cim FROM kolcsonzesek, konyvek WHERE kolcsonzesek.konyv_id = konyvek.id AND konyvek.mufaj = 'fantasy';"}, {"id": "h4", "type": "sql", "pts": 3, "q": "Szerzőnként hányszor kölcsönözték ki a könyveiket? Csak azok a szerzők kellenek, akiknek a könyveit legalább háromszor kikölcsönözték. (a szerző neve és a darabszám)", "expect": "SELECT szerzok.nev, COUNT(*) FROM kolcsonzesek, konyvek, szerzok WHERE kolcsonzesek.konyv_id = konyvek.id AND konyvek.szerzo_id = szerzok.id GROUP BY szerzok.nev HAVING COUNT(*) >= 3;"}]}], "reportTitle": "SQL TEMAZARO - VALASZLAP", "filePrefix": "sql-temazaro","ui":{"pts":n=>n+' pont',"rows":n=>n+' sor',"noRows":"Nincs eredmény.","tables":"A táblák (bármikor visszanézheted)","t":"Igaz","f":"Hamis","up":"Feljebb","down":"Lejjebb","choose":"Válassz…","answer":"Válasz","number":"szám","blank":i=>i+'. hiányzó szó',"query":"SQL-lekérdezés","run":"Futtatás","runHint":"Ctrl + Enter is futtatja","empty":"Üres a lekérdezés.","sqlErr":"Hiba","submit":"Beadás","submitSure":"Biztosan beadod? Kattints még egyszer!","confirm":m=>m ? `Még ${m} kérdés nincs megválaszolva. Ha így is beadod, kattints még egyszer a Beadásra.` : 'Kattints még egyszer a Beadásra.',"facts":(p,q,m)=>[[m+' perc','időd van'],[q+' kérdés','8-féle típus'],[p+' pont','összesen']],"rules":["A táblákat a lap tetején bármikor megnézheted.", "Az „Írd meg!” feladatokat a <b>Futtatás</b> gombbal kipróbálhatod.", "A válaszaid automatikusan mentődnek: ha véletlenül bezárod a lapot, onnan folytatod.", "Amikor lejár az idő, a gép magától beadja a dolgozatot."],"name":"A neved","namePh":"Vezetéknév Keresztnév","nameFirst":"Először írd be a neved.","start":"Kezdés","left":"Hátralévő idő","used":"Felhasznált idő","answered":"Megválaszolva","resultSub":(p,t,auto)=>`${p}% · ${t} alatt${auto ? ' · lejárt az idő' : ''}`,"handH":"Add be a válaszaidat","handSteps":["Kattints a <b>Válaszok mentése (.txt)</b> gombra. A fájl a Letöltések mappába kerül.", "Nyisd meg a feladatot a <b>Google Classroomban</b>, töltsd fel a fájlt a <b>Hozzáadás vagy létrehozás → Fájl</b> alatt, majd nyomd meg a <b>Beadás</b> gombot."],"save":"Válaszok mentése (.txt)","copy":"Másolás szövegként","saved":f=>`Mentve: ${f}. Most töltsd fel a Classroomba.`,"saveBlocked":"A mentés itt le van tiltva. Használd a másolást.","copied":"Kimásolva. Illeszd be a Classroom-feladathoz privát megjegyzésként.","copyBlocked":"A másolás itt le van tiltva. Használd a mentést.","none":"(nincs válasz)","line":n=>n+'. sor',"rName":"Név","rDate":"Beadva","rTime":"Eltelt idő","rScore":"Pontszám","timeUp":"lejárt az idő","engFail":"Az SQL-motor nem töltődött be. Ellenőrizd az internetkapcsolatot, és töltsd újra az oldalt."}};
+const U = CFG.ui;
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const KEY = CFG.key;
+let S = load() || { name: "", started: 0, submitted: 0, ans: {} };
+let SQL = null, timerId = 0;
+
+function load(){ try { return JSON.parse(localStorage.getItem(KEY)); } catch(e){ return null; } }
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){} }
+
+/* ---------- SQL ---------- */
+function freshDb(){ const db = new SQL.Database(); db.run(CFG.seed); return db; }
+function runQuery(q){
+  const db = freshDb();
+  try { const r = db.exec(q); return { res: r.length ? r[r.length - 1] : { columns: [], values: [] } }; }
+  catch(e){ return { err: e.message }; }
+  finally { db.close(); }
+}
+function hl(code){
+  const kw = /\b(SELECT|FROM|WHERE|GROUP BY|HAVING|ORDER BY|LIMIT|AND|OR|NOT|LIKE|IS|NULL|ASC|DESC|DISTINCT|AS)\b/g;
+  return esc(code).replace(/('[^']*')|\b(COUNT|SUM|AVG|MIN|MAX|ROUND)\b|\b(\d+)\b|\b(SELECT|FROM|WHERE|GROUP BY|HAVING|ORDER BY|LIMIT|AND|OR|NOT|LIKE|IS|NULL|ASC|DESC|DISTINCT|AS)\b/g,
+    (m, s, f, n, k) => s ? `<span class="s">${s}</span>` : f ? `<span class="f">${f}</span>` : n ? `<span class="nm">${n}</span>` : `<span class="k">${k}</span>`);
+}
+function tableHtml(r){
+  if (!r.columns.length) return `<p class="sub">${U.noRows}</p>`;
+  const head = r.columns.map(c => `<th>${esc(c)}</th>`).join("");
+  const body = r.values.map(row => "<tr>" + row.map(v => v === null ? `<td class="null">NULL</td>` : `<td class="${typeof v === "number" ? "n" : ""}">${esc(v)}</td>`).join("") + "</tr>").join("");
+  return `<div class="tbl"><table><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></div>`;
+}
+const normV = v => v === null ? "∅" : typeof v === "number" ? String(Math.round(v * 1000) / 1000) : String(v).trim().toLowerCase();
+/* the student's result is right if it has as many rows as the expected one, and every expected column
+   can be found (as a multiset of values) among the student's columns: extra columns and row order don't matter */
+function sameResult(got, exp){
+  if (!got || got.values.length !== exp.values.length) return false;
+  const col = (r, i) => r.values.map(row => normV(row[i])).sort().join("\u0001");
+  const have = got.columns.map((_, i) => col(got, i)), used = new Set();
+  for (let i = 0; i < exp.columns.length; i++){
+    const want = col(exp, i), j = have.findIndex((h, k) => !used.has(k) && h === want);
+    if (j < 0) return false; used.add(j);
+  }
+  return true;
+}
+
+/* ---------- rendering ---------- */
+let qno = 0;
+const QS = [];   /* flat list of questions, in order */
+CFG.sections.forEach(sec => sec.questions.forEach(q => { q.sec = sec.id; QS.push(q); }));
+const maxOf = q => q.type === "match" ? q.left.length : q.type === "tf" ? q.items.length : q.type === "blank" ? q.ok.length : q.pts;
+const TOTAL = QS.reduce((a, q) => a + maxOf(q), 0);
+const ans = id => S.ans[id];
+function setAns(id, v){ S.ans[id] = v; save(); updateBar(); }
+
+function qCard(q, inner){
+  qno++;
+  return `<div class="q" id="q-${q.id}" data-id="${q.id}"><div class="qh"><span class="no">${qno}.</span><span class="qt">${q.q}</span><span class="qp">${U.pts(maxOf(q))}</span></div>${inner}</div>`;
+}
+function render(){
+  qno = 0;
+  const parts = CFG.sections.map(sec => {
+    const pts = sec.questions.reduce((a, q) => a + maxOf(q), 0);
+    return `<section class="sec" id="s-${sec.id}"><h2>${sec.title}<span class="pts">${U.pts(pts)}</span></h2>${sec.intro ? `<p class="intro">${sec.intro}</p>` : ""}${sec.questions.map(renderQ).join("")}</section>`;
+  }).join("");
+  $("sheet").innerHTML = refHtml() + parts + `<div class="submit"><button type="button" class="btn big gold" id="submitBottom">${U.submit}</button></div><p class="sub" id="submitNote" style="text-align:center;color:var(--muted)"></p>`;
+  wire();
+}
+function refHtml(){
+  const db = freshDb();
+  const html = CFG.tables.map(t => { const r = db.exec(`SELECT * FROM ${t}`)[0];
+    return `<div class="dt"><h4>${t}<span>${U.rows(r.values.length)}</span></h4><div class="scroll">${tableHtml(r).replace('<div class="tbl">', "<div>")}</div></div>`; }).join("");
+  db.close();
+  return `<details class="ref" open><summary>${U.tables}</summary><div class="ref-body">${html}</div></details>`;
+}
+function renderQ(q){
+  const id = q.id, a = ans(id);
+  switch (q.type){
+    case "mc": case "multi": {
+      const t = q.type === "mc" ? "radio" : "checkbox";
+      const sel = i => q.type === "mc" ? a === i : Array.isArray(a) && a.includes(i);
+      return qCard(q, `${q.code ? `<pre class="code">${hl(q.code)}</pre>` : ""}<div class="opts">${q.opts.map((o, i) =>
+        `<label class="opt"><input type="${t}" name="${id}" value="${i}"${sel(i) ? " checked" : ""}><span>${o}</span></label>`).join("")}</div>`);
+    }
+    case "tf":
+      return qCard(q, q.items.map((it, i) => `<div class="tf"><span>${it[0]}</span><span class="seg" role="radiogroup" aria-label="${esc(it[0].replace(/<[^>]+>/g, ""))}">
+        <label><input type="radio" name="${id}-${i}" value="1"${a && a[i] === true ? " checked" : ""}>${U.t}</label>
+        <label><input type="radio" name="${id}-${i}" value="0"${a && a[i] === false ? " checked" : ""}>${U.f}</label></span></div>`).join(""));
+    case "order": {
+      const cur = a || q.start.map(i => q.items[i]);
+      return qCard(q, `<ol class="order" data-q="${id}">${cur.map((it, i) => `<li><span class="ix">${i + 1}.</span>${esc(it)}<span class="mv">
+        <button type="button" class="mvb" data-d="-1" aria-label="${U.up}"${i === 0 ? " disabled" : ""}>↑</button>
+        <button type="button" class="mvb" data-d="1" aria-label="${U.down}"${i === cur.length - 1 ? " disabled" : ""}>↓</button></span></li>`).join("")}</ol>`);
+    }
+    case "match": {
+      const opts = q.shown.map(i => q.right[i]);
+      return qCard(q, `<div class="match">${q.left.map((l, i) => `<div class="row"><span>${l}</span><select data-i="${i}" aria-label="${esc(l.replace(/<[^>]+>/g, ""))}">
+        <option value="">${U.choose}</option>${opts.map(o => `<option${a && a[i] === o ? " selected" : ""}>${esc(o)}</option>`).join("")}</select></div>`).join("")}</div>`);
+    }
+    case "num":
+      return qCard(q, `${q.code ? `<pre class="code">${hl(q.code)}</pre>` : ""}<div class="num"><input type="text" inputmode="numeric" autocomplete="off" aria-label="${U.answer}" value="${a != null ? esc(a) : ""}" placeholder="${U.number}"></div>`);
+    case "blank": {
+      let k = 0;
+      const code = hl(q.code.replace(/\{(\d)\}/g, (m, d) => "⟦" + "ABCDEFGHI"[d] + "⟧")).replace(/⟦[A-I]⟧/g, () => { const i = k++; return `<input type="text" data-i="${i}" autocomplete="off" spellcheck="false" aria-label="${U.blank(i + 1)}" value="${a && a[i] ? esc(a[i]) : ""}">`; });
+      return qCard(q, `<pre class="code">${code}</pre>`);
+    }
+    case "bug":
+      return qCard(q, `<div class="lines">${q.code.split("\n").map((ln, i) =>
+        `<label><input type="radio" name="${id}" value="${i}"${a === i ? " checked" : ""}><span class="ln">${i + 1}</span><span>${hl(ln)}</span></label>`).join("")}</div>`);
+    case "sql":
+      return qCard(q, `<div class="sqlbox"><textarea spellcheck="false" aria-label="${U.query}" placeholder="SELECT …">${a ? esc(a) : ""}</textarea>
+        <div class="row"><button type="button" class="btn run">${U.run}</button><span class="hint">${U.runHint}</span></div><div class="out" aria-live="polite"></div></div>`);
+  }
+}
+function wire(){
+  QS.forEach(q => {
+    const el = $("q-" + q.id);
+    if (q.type === "mc") el.querySelectorAll("input").forEach(i => i.onchange = () => setAns(q.id, +i.value));
+    if (q.type === "multi") el.querySelectorAll("input").forEach(i => i.onchange = () => setAns(q.id, [...el.querySelectorAll("input:checked")].map(x => +x.value)));
+    if (q.type === "tf") el.querySelectorAll("input").forEach(i => i.onchange = () => {
+      const v = (ans(q.id) || q.items.map(() => null)).slice(); v[+i.name.split("-").pop()] = i.value === "1"; setAns(q.id, v); });
+    if (q.type === "order") el.querySelectorAll(".mvb").forEach(b => b.onclick = () => {
+      const li = b.closest("li"), i = [...li.parentNode.children].indexOf(li), d = +b.dataset.d;
+      const cur = (ans(q.id) || q.start.map(k => q.items[k])).slice(); [cur[i], cur[i + d]] = [cur[i + d], cur[i]];
+      setAns(q.id, cur); el.outerHTML = renderQ(q).replace(/<span class="no">\d+\.<\/span>/, `<span class="no">${QS.indexOf(q) + 1}.</span>`); wire();
+      $("q-" + q.id).querySelectorAll(".mvb")[Math.max(0, (i + d) * 2 + (d > 0 ? 1 : 0))]?.focus(); });
+    if (q.type === "match") el.querySelectorAll("select").forEach(s => s.onchange = () => {
+      const v = (ans(q.id) || q.left.map(() => "")).slice(); v[+s.dataset.i] = s.value; setAns(q.id, v); });
+    if (q.type === "num") el.querySelector("input").oninput = e => setAns(q.id, e.target.value);
+    if (q.type === "blank") el.querySelectorAll("input").forEach(i => i.oninput = () => {
+      const v = (ans(q.id) || q.ok.map(() => "")).slice(); v[+i.dataset.i] = i.value; setAns(q.id, v); });
+    if (q.type === "bug") el.querySelectorAll("input").forEach(i => i.onchange = () => setAns(q.id, +i.value));
+    if (q.type === "sql"){
+      const ta = el.querySelector("textarea"), out = el.querySelector(".out");
+      ta.oninput = () => setAns(q.id, ta.value);
+      const go = () => { if (!ta.value.trim()) { out.innerHTML = `<div class="err">${U.empty}</div>`; return; }
+        const r = runQuery(ta.value);
+        out.innerHTML = r.err ? `<div class="err">${U.sqlErr}: ${esc(r.err)}</div>` : `<div class="meta">${U.rows(r.res.values.length)}</div>${tableHtml(r.res)}`; };
+      el.querySelector(".run").onclick = go;
+      ta.onkeydown = e => { if ((e.ctrlKey || e.metaKey) && e.key === "Enter"){ e.preventDefault(); go(); } };
+    }
+  });
+  $("submitBottom").onclick = askSubmit;
+  if (S.submitted) showResults();
+}
+
+/* ---------- start, timer ---------- */
+function startScreen(){
+  $("bar").hidden = true;
+  $("sheet").innerHTML = `<div class="start">
+    <div class="facts">${U.facts(TOTAL, QS.length, CFG.minutes).map(([b, s]) => `<div class="fact"><b>${b}</b><span>${s}</span></div>`).join("")}</div>
+    <ul class="rules">${U.rules.map(r => `<li>${r}</li>`).join("")}</ul>
+    <label for="nm">${U.name}</label><input id="nm" autocomplete="name" placeholder="${U.namePh}" value="${esc(S.name)}">
+    <div><button type="button" class="btn big gold" id="go">${U.start}</button></div><p class="note" id="startNote" style="color:var(--bad)"></p></div>`;
+  $("go").onclick = () => { const n = $("nm").value.trim(); if (!n){ $("startNote").textContent = U.nameFirst; $("nm").focus(); return; }
+    S = { name: n, started: Date.now(), submitted: 0, ans: {} }; save(); begin(); };
+  $("nm").onkeydown = e => { if (e.key === "Enter") $("go").click(); };
+}
+function begin(){
+  $("bar").hidden = false; $("who").textContent = S.name;
+  $("submitTop").textContent = U.submit; $("submitTop").onclick = askSubmit;
+  render(); updateBar(); tick(); clearInterval(timerId); timerId = setInterval(tick, 1000);
+}
+const leftMs = () => CFG.minutes * 60000 - (Date.now() - S.started);
+const mmss = ms => { const s = Math.max(0, Math.round(ms / 1000)); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`; };
+function tick(){
+  if (S.submitted){ $("tleft").innerHTML = `${U.used}<b>${mmss(S.submitted - S.started)}</b>`; return; }
+  const l = leftMs();
+  $("tleft").className = "stat" + (l < 5 * 60000 ? " low" : "");
+  $("tleft").innerHTML = `${U.left}<b>${mmss(l)}</b>`;
+  if (l <= 0) submit(true);
+}
+function answered(q){
+  const a = ans(q.id);
+  if (a == null || a === "") return false;
+  if (q.type === "order") return true;
+  if (Array.isArray(a)) return q.type === "multi" ? a.length > 0 : a.every(x => x !== null && x !== "" && x !== undefined);
+  return String(a).trim() !== "";
+}
+function updateBar(){ $("tans").innerHTML = `${U.answered}<b>${QS.filter(answered).length}/${QS.length}</b>`; }
+let confirmT = 0;
+function askSubmit(){
+  if (S.submitted) return;
+  const missing = QS.length - QS.filter(answered).length;
+  const note = $("submitNote");
+  if (Date.now() - confirmT > 4000){ confirmT = Date.now(); note.textContent = U.confirm(missing); $("submitBottom").textContent = U.submitSure; $("submitTop").textContent = U.submitSure;
+    if (this && this.id === "submitTop") note.scrollIntoView({ block: "center", behavior: "smooth" }); return; }
+  submit(false);
+}
+
+/* ---------- grading ---------- */
+const nb = s => String(s || "").trim().replace(/\s+/g, " ").replace(/;$/, "").toUpperCase();
+function grade(q){
+  const a = ans(q.id);
+  switch (q.type){
+    case "mc": case "bug": return a === q.ok ? q.pts : 0;
+    case "multi": return Array.isArray(a) && a.slice().sort().join() === q.ok.slice().sort().join() ? q.pts : 0;
+    case "tf": return q.items.reduce((s, it, i) => s + (a && a[i] === it[1] ? 1 : 0), 0);
+    case "order": return (a || q.start.map(i => q.items[i])).join("|") === q.items.join("|") ? q.pts : 0;
+    case "match": return q.left.reduce((s, _, i) => s + (a && a[i] === q.right[i] ? 1 : 0), 0);
+    case "num": return a != null && String(a).trim().replace(",", ".") !== "" && Number(String(a).trim().replace(",", ".")) === q.ok ? q.pts : 0;
+    case "blank": return q.ok.reduce((s, alts, i) => s + (a && alts.some(x => nb(x) === nb(a[i])) ? 1 : 0), 0);
+    case "sql": {
+      if (!a || !a.trim()) return 0;
+      const got = runQuery(a), exp = runQuery(q.expect);
+      return !got.err && sameResult(got.res, exp.res) ? q.pts : 0;
+    }
+  }
+  return 0;
+}
+function submit(auto){
+  if (S.submitted) return;
+  S.submitted = Math.min(Date.now(), S.started + CFG.minutes * 60000); S.auto = !!auto;
+  S.score = {}; QS.forEach(q => S.score[q.id] = grade(q)); save();
+  clearInterval(timerId); tick(); showResults(); window.scrollTo({ top: 0, behavior: "smooth" });
+}
+function showResults(){
+  const sheet = $("sheet"); sheet.classList.add("locked");
+  QS.forEach(q => {
+    const el = $("q-" + q.id); if (!el || el.querySelector(".got")) return;
+    const g = S.score[q.id], m = maxOf(q);
+    el.classList.add(g === m ? "right" : g === 0 ? "wrong" : "part");
+    el.insertAdjacentHTML("beforeend", `<span class="got">${g} / ${m}</span>`);
+    el.querySelectorAll("input,select,textarea,button").forEach(x => { x.disabled = true; });
+  });
+  const got = QS.reduce((a, q) => a + S.score[q.id], 0), pct = Math.round(got / TOTAL * 100);
+  const rows = CFG.sections.map(sec => { const qs = sec.questions; const g = qs.reduce((a, q) => a + S.score[q.id], 0), m = qs.reduce((a, q) => a + maxOf(q), 0);
+    return `<tr><td>${sec.title}</td><td class="n">${g} / ${m}</td></tr>`; }).join("");
+  const box = document.createElement("div"); box.className = "result"; box.id = "result";
+  box.innerHTML = `<div class="big">${got} / ${TOTAL}</div><div class="sub">${U.resultSub(pct, mmss(S.submitted - S.started), S.auto)}</div>
+    <table><tbody>${rows}</tbody></table>
+    <div class="export"><h3>${U.handH}</h3><ol>${U.handSteps.map(s => `<li>${s}</li>`).join("")}</ol>
+    <div class="row"><button type="button" class="btn gold" id="saveTxt">${U.save}</button><button type="button" class="btn ghost" id="copyTxt">${U.copy}</button></div>
+    <p class="note" id="exNote" aria-live="polite"></p></div>`;
+  $("result")?.remove(); sheet.prepend(box);
+  $("saveTxt").onclick = saveTxt; $("copyTxt").onclick = copyTxt;
+  document.querySelectorAll("#submitTop,#submitBottom").forEach(b => b.hidden = true);
+  $("submitNote").textContent = "";
+  updateBar(); tick();
+}
+
+/* ---------- export ---------- */
+function answerText(q){
+  const a = ans(q.id);
+  if (a == null || a === "" || (Array.isArray(a) && !a.length)) return U.none;
+  const plain = s => String(s).replace(/<[^>]+>/g, "").replace(/&gt;/g, ">").replace(/&lt;/g, "<").replace(/&amp;/g, "&");
+  switch (q.type){
+    case "mc": return plain(q.opts[a]);
+    case "multi": return a.map(i => plain(q.opts[i])).join(", ");
+    case "tf": return q.items.map((_, i) => a[i] === true ? U.t : a[i] === false ? U.f : "-").join(", ");
+    case "order": return a.join(" → ");
+    case "match": return q.left.map((l, i) => `${plain(l)} = ${a[i] || "-"}`).join("; ");
+    case "num": return String(a).trim();
+    case "blank": return a.map(x => x || "-").join(" | ");
+    case "bug": return U.line(a + 1);
+    case "sql": return "\n    " + a.trim().replace(/\n/g, "\n    ");
+  }
+}
+function report(){
+  const got = QS.reduce((s, q) => s + S.score[q.id], 0);
+  const L = [CFG.reportTitle, "", `${U.rName}: ${S.name}`, `${U.rDate}: ${new Date(S.submitted).toLocaleString(CFG.lang === "hu" ? "hu-HU" : "en-GB")}`,
+    `${U.rTime}: ${mmss(S.submitted - S.started)}${S.auto ? " (" + U.timeUp + ")" : ""}`, `${U.rScore}: ${got} / ${TOTAL} (${Math.round(got / TOTAL * 100)}%)`, ""];
+  CFG.sections.forEach(sec => {
+    L.push("== " + sec.title.replace(/<[^>]+>/g, ""));
+    sec.questions.forEach(q => L.push(`${QS.indexOf(q) + 1}. [${S.score[q.id]}/${maxOf(q)}] ${answerText(q)}`));
+    L.push("");
+  });
+  return L.join("\n");
+}
+function fileName(){ return `${CFG.filePrefix}-${S.name.normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^A-Za-z0-9]+/g, "-").replace(/^-|-$/g, "").toLowerCase() || "valasz"}.txt`; }
+function saveTxt(){
+  try { const b = new Blob([report()], { type: "text/plain;charset=utf-8" }), u = URL.createObjectURL(b), a = document.createElement("a");
+    a.href = u; a.download = fileName(); document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(u), 1500);
+    $("exNote").textContent = U.saved(fileName()); }
+  catch(e){ $("exNote").textContent = U.saveBlocked; }
+}
+function copyTxt(){
+  navigator.clipboard.writeText(report()).then(() => $("exNote").textContent = U.copied, () => $("exNote").textContent = U.copyBlocked);
+}
+
+/* ---------- boot ---------- */
+function boot(){
+  if (typeof initSqlJs !== "function"){ $("sheet").innerHTML = `<div class="err">${U.engFail}</div>`; return; }
+  initSqlJs().then(s => { SQL = s; if (S.started) begin(); else startScreen(); })
+    .catch(() => { $("sheet").innerHTML = `<div class="err">${U.engFail}</div>`; });
+}
+boot();
+</script>
+<script src="../../nav.js?v=d3a6550b" defer></script>
+</body>
+</html>

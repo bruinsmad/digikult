@@ -164,7 +164,7 @@
           },
           {
             id: "summary",
-            title: { hu: "Összefoglaló: az SQL záradékai", en: "Summary: the SQL clauses" },
+            title: { hu: "Összefoglaló: záradékok és témazáró", en: "Summary: clauses and test" },
             pages: [
               {
                 id: "clauses",
@@ -176,6 +176,17 @@
                   en: "SELECT, FROM, WHERE, GROUP BY, HAVING, ORDER BY, LIMIT on one page: what each does, the order you write them and the order they run, conditions, aggregates, joining tables."
                 },
                 files: { en: "sql/summary/clauses.html", hu: "sql/summary/clauses-hu.html" }
+              },
+              {
+                id: "sql-test",
+                kind: "quiz",
+                minutes: 35,
+                title: { hu: "Témazáró: SQL", en: "SQL test" },
+                desc: {
+                  hu: "35 perc, 40 pont, egy iskolai könyvtár táblái: feleletválasztás, igaz-hamis, sorrend, párosítás, kimenet, kiegészítés, hibakeresés és saját lekérdezések. Automatikus pontozás, beadás Classroomba.",
+                  en: "35 minutes, 40 points, a school library's tables: multiple choice, true or false, ordering, matching, predicting, gap-filling, finding mistakes and writing queries. Marked automatically, handed in on Classroom."
+                },
+                files: { en: "sql/summary/test.html", hu: "sql/summary/test-hu.html" }
               }
             ]
           }
@@ -668,6 +679,7 @@
     lesson: { hu: "Lecke", en: "Lesson" },
     theory: { hu: "Elmélet", en: "Explainer" },
     exam:   { hu: "Érettségi feladat", en: "Exam task" },
+    quiz:   { hu: "Témazáró", en: "Test" },
     tool:   { hu: "Eszköz", en: "Tool" }
   };
   const UI = {

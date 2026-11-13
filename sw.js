@@ -6,7 +6,7 @@
    The file list below is written by tools/build-sw.py: run it before pushing. */
 
 /* FILES:BEGIN (written by tools/build-sw.py, don't edit by hand) */
-const VERSION = "e547ec324c";
+const VERSION = "0256ed4353";
 const CORE = [
 "./",
 "css/basics/first-steps.html",
@@ -154,6 +154,8 @@ const CORE = [
 "sql/joins/pact.html",
 "sql/summary/clauses-hu.html",
 "sql/summary/clauses.html",
+"sql/summary/test-hu.html",
+"sql/summary/test.html",
 "sql/where/heist-hu.html",
 "sql/where/heist.html",
 "sql/where/intro-hu.html",

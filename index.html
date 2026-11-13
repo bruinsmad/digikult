@@ -442,7 +442,7 @@ body.subject .hero{display:none}
   </div>
 </footer>
 
-<script src="nav.js?v=20f7f6ec"></script>
+<script src="nav.js?v=d3a6550b"></script>
 <script>
 (function(){
   const D = window.DIGIKULT;
@@ -514,6 +514,19 @@ function puliSvg(){
 }
   const PULI = puliSvg().replace(/^<svg[^>]*>/, "").replace(/<\/svg>\s*$/, "");   /* Bodri, shared with the Round-Up page */
   const COVERS = {
+    "sql-test":`<svg viewBox="0 0 400 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <rect width="400" height="200" fill="#22362f"/>
+      <g transform="translate(118 18) rotate(-4 82 90)"><rect width="168" height="196" rx="4" fill="#fbfaf4"/><rect width="168" height="26" fill="#efe9d6"/>
+        <text x="12" y="18" font-family="JetBrains Mono,monospace" font-weight="700" font-size="12" fill="#1d2622">SELECT … ?</text>
+        <g font-family="JetBrains Mono,monospace" font-size="11" fill="#5b6660">
+          <rect x="12" y="40" width="12" height="12" rx="2" fill="none" stroke="#1d2622" stroke-width="2"/><path d="M14 46l3 4 6-8" stroke="#2f7a3a" stroke-width="3" fill="none" stroke-linecap="round"/><rect x="32" y="43" width="96" height="6" rx="3" fill="#d9d4c3"/>
+          <rect x="12" y="64" width="12" height="12" rx="2" fill="none" stroke="#1d2622" stroke-width="2"/><rect x="32" y="67" width="110" height="6" rx="3" fill="#d9d4c3"/>
+          <rect x="12" y="88" width="12" height="12" rx="2" fill="none" stroke="#1d2622" stroke-width="2"/><path d="M14 94l3 4 6-8" stroke="#2f7a3a" stroke-width="3" fill="none" stroke-linecap="round"/><rect x="32" y="91" width="80" height="6" rx="3" fill="#d9d4c3"/>
+          <rect x="12" y="114" width="144" height="40" rx="5" fill="#1f2a26"/><text x="20" y="131" fill="#f2d264" font-weight="700">GROUP BY</text><text x="20" y="146" fill="#e9efe9">HAVING …</text>
+          <rect x="12" y="164" width="60" height="18" rx="4" fill="none" stroke="#b8860b" stroke-width="2" stroke-dasharray="4 3"/></g></g>
+      <text x="300" y="186" font-family="Kalam,cursive" font-weight="700" font-size="44" fill="#e85d50" transform="rotate(-12 300 186)">40/40</text>
+      <g transform="translate(296 34) rotate(35)"><rect width="16" height="96" rx="3" fill="#f2d264"/><rect width="16" height="12" fill="#e98fa0"/><path d="M0 96l8 18 8-18z" fill="#e9cf98"/><path d="M5 107l3 7 3-7z" fill="#1d2622"/></g>
+    </svg>`,
     heist:`<svg viewBox="0 0 400 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
       <defs><linearGradient id="hb" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0d141b"/><stop offset="1" stop-color="#182230"/></linearGradient>
       <linearGradient id="hs" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff4cf" stop-opacity=".42"/><stop offset="1" stop-color="#fff4cf" stop-opacity="0"/></linearGradient></defs>
@@ -953,7 +966,7 @@ function puliSvg(){
 
   /* ---------- render ---------- */
   const TILTS = ["-.7deg", ".6deg", "-.4deg", ".8deg"];
-  const KCOL = { story:"#9a5b00", lesson:"#1f3f88", demo:"#1f5a88", tool:"#225c43", exam:"#5b45a8" };   /* stamp ink per kind */
+  const KCOL = { story:"#9a5b00", lesson:"#1f3f88", demo:"#1f5a88", tool:"#225c43", exam:"#5b45a8", quiz:"#a0372c" };   /* stamp ink per kind */
 
   let shown = null;     /* the subject currently on screen, for the transition between views */
   function draw(){
