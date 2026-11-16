@@ -601,16 +601,16 @@
           },
           {
             id: "long",
-            title: { hu: "Hosszú dokumentumok: csere, címsorok, tartalomjegyzék, felirat, lábjegyzet", en: "Long documents: replace, headings, table of contents, captions, footnotes" },
+            title: { hu: "Hosszú dokumentumok: csere, új oldalak, felirat, lábjegyzet", en: "Long documents: replace, page breaks, captions, footnotes" },
             pages: [
               {
                 id: "long-intro",
                 kind: "theory",
-                minutes: 20,
+                minutes: 15,
                 title: { hu: "Hosszú dokumentumok – elmélet", en: "Long documents – explainer" },
                 desc: {
-                  hu: "Keresés és csere, stílusok és címsorok, automatikus tartalomjegyzék, ábrafeliratok, lábjegyzet és eltérő első oldal. Minden példa kipróbálható.",
-                  en: "Find and replace, styles and headings, an automatic table of contents, captions, footnotes and a different first page. Every example can be tried."
+                  hu: "Keresés és csere, minden fejezet új oldalon, ábrafeliratok, lábjegyzet és eltérő első oldal. Minden példa kipróbálható.",
+                  en: "Find and replace, every chapter on a new page, captions, footnotes and a different first page. Every example can be tried."
                 },
                 files: { hu: "word/long/intro-hu.html" }
               },
@@ -620,12 +620,12 @@
                 minutes: 50,
                 title: { hu: "Beszámoló az erdei iskoláról", en: "Forest School Report" },
                 desc: {
-                  hu: "A 7.B beszámolója az iskola honlapjára: csere, címsorok, borító, automatikus tartalomjegyzék, ábrafeliratok, lábjegyzet és eltérő első oldal, a Wordben. A legnehezebb Word-küldetés.",
-                  en: "Class 7B's report for the school website: replace, headings, a cover, an automatic table of contents, captions, a footnote and a different first page, in Word. The hardest Word mission."
+                  hu: "A 7.B beszámolója az iskola honlapjára: csere, borító, új oldalon kezdődő fejezetek, ábrafeliratok, lábjegyzet és eltérő első oldal, a Wordben. A legnehezebb Word-küldetés.",
+                  en: "Class 7B's report for the school website: replace, a cover, chapters on new pages, captions, a footnote and a different first page, in Word. The hardest Word mission."
                 },
                 files: { hu: "word/long/report-hu.html" },
                 cover: "word/long/turistahaz.png",
-                progress: { chapters: 7, keys: { hu: "report-hu-v1" } }
+                progress: { chapters: 6, keys: { hu: "report-hu-v2" } }
               }
             ]
           }

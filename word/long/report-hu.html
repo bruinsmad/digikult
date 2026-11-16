@@ -71,10 +71,9 @@ const img = (src, n) => P("", { align: "center", pic: n, img: { src, w: 8, h: 6,
 const at = (m, start) => m.blocks.findIndex(b => !b.type && WD.textOf(b).startsWith(start));
 const blk = (m, start) => m.blocks[at(m, start)];
 const COVER_END = "Szilvásvárad, 2027";
-const tocEntries = m => m.blocks.filter(b => b.style === "h1" || b.style === "h2").map((b, k) => ({ text: WD.textOf(b), level: b.style === "h1" ? 1 : 2, page: 3 + Math.floor(k / 6) }));
 
 window.MISSION = {
-  key: "report-hu-v1", title: "Beszámoló az erdei iskoláról", file: "beszamolo.docx", saveAs: "beszamolo-Kovacs-Anna.docx", fingerprint: ["Beszámoló", "Hétfő reggel fél nyolckor"],
+  key: "report-hu-v2", title: "Beszámoló az erdei iskoláról", file: "beszamolo.docx", saveAs: "beszamolo-Kovacs-Anna.docx", fingerprint: ["Beszámoló", "Hétfő reggel fél nyolckor"],
   confetti: ["#2f5496", "#8fbf7a", "#7fc2df", "#f2d264", "#b5793f", "#1f3864"],
   doc: { blocks: [
     P("Erdei iskola a Bükkben", { align: "center", b: true, size: 28, color: "#2e6b30", after: 10 }), P("Beszámoló", { align: "center", size: 20, color: "#2e6b30", after: 10 }),
@@ -87,9 +86,9 @@ window.MISSION = {
   ] },
   chapters: [
     { refresher: true, title: "Nyisd meg a Wordöt",
-      story: `<p>Hazaértetek az erdei iskolából, és az igazgató kért egy <b>beszámolót</b> az iskola honlapjára. Az osztály összedobta a szöveget, de mindenki másképp gépelt: a <i>Szalajka-völgyet</i> többen kötőjel nélkül írták; a címek csak kézzel vannak kiemelve; nincs tartalomjegyzék, nincsenek ábrafeliratok, és még oldalszám sincs.</p>
-        <p>Ez egy <b>hosszabb dokumentum</b>, és ezekhez a Wordnek vannak okos eszközei: keresés és csere, stílusok, automatikus tartalomjegyzék, feliratok, lábjegyzet. Ezt a küldetést a Wordben oldod meg, az oldal minden fejezet végén ellenőrzi a mentett fájlodat.</p>`,
-      learn: `<ul><li>A <b>Keresés</b> (<span class='nw'><kbd>Ctrl</kbd>+<kbd>F</kbd></span>) bal oldalt megnyitja a <span class="ui">Navigáció</span> ablakot. Írd be, mit keresel: a Word sárgával kiemeli, és kiírja, hány találat van.</li><li>A <b>stílusok</b> a Kezdőlap lap jobb oldalán vannak, egy sorban: <span class="ui">Normál</span>, <span class="ui">Nincs térköz</span>, <span class="ui">Címsor 1</span>, <span class="ui">Címsor 2</span>…</li></ul>`,
+      story: `<p>Hazaértetek az erdei iskolából, és az igazgató kért egy <b>beszámolót</b> az iskola honlapjára. Az osztály összedobta a szöveget, de mindenki másképp gépelt: a <i>Szalajka-völgyet</i> többen kötőjel nélkül írták; a fejezetek egymás után folynak, nincsenek ábrafeliratok, és még oldalszám sincs.</p>
+        <p>Ez egy <b>hosszabb dokumentum</b>, és ezekhez a Wordnek vannak okos eszközei: keresés és csere, oldaltörés, ábrafeliratok, lábjegyzet, eltérő első oldal. Ezt a küldetést a Wordben oldod meg, az oldal minden fejezet végén ellenőrzi a mentett fájlodat.</p>`,
+      learn: `<ul><li>A <b>Keresés</b> (<span class='nw'><kbd>Ctrl</kbd>+<kbd>F</kbd></span>) bal oldalt megnyitja a <span class="ui">Navigáció</span> ablakot. Írd be, mit keresel: a Word sárgával kiemeli, és kiírja, hány találat van.</li></ul>`,
       steps: [
         `Töltsd le a fájlt: <br><a class="btn primary" href="beszamolo.docx" download>beszamolo.docx letöltése</a>`,
         `Nyisd meg a Wordben. Ha felül azt látod, hogy <span class=ui>Védett nézet</span>, kattints a <span class=ui>Szerkesztés engedélyezése</span> gombra.`,
@@ -99,7 +98,7 @@ window.MISSION = {
       asks: [{ q: "Hány találatot ír ki a Word a <b>Szalajka völgy</b> keresésre?", num: 7,
                traps: { "6": "Majdnem! A fejezetcímekben is benne van. Mennyit ír ki a Navigáció ablak a keresőmező alatt?", "0": "Szóközzel írd be, kötőjel nélkül: Szalajka völgy", "1": "A Navigáció ablakban a keresőmező alatt kiírja az összes találat számát (pl. „1/7 eredmény”). Az utolsó szám kell." },
                wrong: "Nézd meg a keresőmező alatt: ott áll, hány eredmény van." },
-             { q: "Mi a neve a Kezdőlap lapon a stílusok közül az <b>elsőnek</b>?", text: ["normál", "normal"], traps: { "címsor 1": "Az a harmadik. Nézd meg a sor legelejét!", "nincs térköz": "Az a második. Melyik áll előtte?" } }],
+],
       hints: ["A Keresés gombot a Kezdőlap lap jobb szélén is megtalálod (nagyító).", "A keresőmező alatt ezt látod: „1/7 eredmény”. A második szám az összes találat."],
       success: "7 helyen van kötőjel nélkül. Kézzel javítani unalmas lenne, és könnyű kihagyni egyet. A Word megcsinálja egy kattintással!" },
 
@@ -124,44 +123,23 @@ window.MISSION = {
       hints: ["Ha a Word 0 cserét írt ki: nézd meg, jól írtad-e a Keresett szöveget (Szalajka, nagy S, utána szóköz, völgy).", "Ha elrontottad, a Ctrl+Z egyetlen lépésben visszavonja az összes cserét."],
       success: "7 csere egy kattintással. Így javítanak a profik egy 100 oldalas könyvben is." },
 
-    { title: "Címsorok",
-      story: `<p>A fejezetcímek most csak <b>kézzel</b> vannak kiemelve: félkövér és nagyobb betű. Te látod, hogy ezek címek, de a Word nem tudja. Ha a címek <b>címsor-stílust</b> kapnak, a Word is tudni fogja, és ebből készít majd tartalomjegyzéket.</p>`,
-      learn: `<ul><li>A <b>stílus</b> egy elmentett formázás-csomag. Ha egy bekezdés a <span class="ui">Címsor 1</span> stílust kapja, a Word tudja, hogy az egy fejezetcím.</li><li><b>Címsor 1</b>: a fő fejezetek. <b>Címsor 2</b>: az alfejezetek.</li><li>A <span class="ui">Nézet</span> › <span class="ui">Navigációs ablak</span> <b>Címsorok</b> fülén látod a dokumentum vázlatát. Kattintással oda is ugorhatsz.</li></ul>`,
-      steps: [
-        `Kattints az első fejezetcímbe: <b>${H1[0]}</b>. A Kezdőlap lap <span class=ui>Stílusok</span> csoportjában kattints a <span class=ui>Címsor 1</span> stílusra.`,
-        `Ugyanígy legyen <span class=ui>Címsor 1</span> a többi fejezetcím is: <b>${H1.slice(1).join("</b>, <b>").replace(OLD, NEW)}</b>.`,
-        `A hét alcím legyen <span class=ui>Címsor 2</span>: <b>${H2.join("</b>, <b>")}</b>.`,
-        `Ellenőrizd a <span class=ui>Navigáció</span> ablak <span class=ui>Címsorok</span> fülén: 4 fejezet, alattuk beljebb az alfejezetek. Mentsd el, és ellenőrizd.`
-      ],
-      goals: [
-        { label: "A 4 fejezetcím Címsor 1 stílusú", find: H1F, any: true, want: { style: "heading 1" },
-          apply: m => m.blocks.forEach(b => { if (b.role === "h1") { b.style = "h1"; delete b.b; delete b.size; delete b.color; b.before = 12; b.after = 0; } }),
-          target: m => m.blocks.forEach(b => { if (b.role === "h1") b.target = true; }) },
-        { label: "A 7 alcím Címsor 2 stílusú", find: H2F, exact: true, any: true, want: { style: "heading 2" },
-          apply: m => m.blocks.forEach(b => { if (b.role === "h2") { b.style = "h2"; delete b.b; delete b.size; b.before = 2; b.after = 0; } }),
-          target: m => m.blocks.forEach(b => { if (b.role === "h2") b.target = true; }) }
-      ],
-      hints: ["Gyorsabb: tartsd lenyomva a Ctrl billentyűt, és jelöld ki egymás után mind a négy fejezetcímet. Aztán egyetlen kattintás a Címsor 1-re.", "Ha nem látod a Címsor 2-t a stílusok között: a Címsor 1 használata után magától megjelenik. Ha mégsem, kattints a stílusok jobb alsó sarkában a kis nyílra."],
-      success: "A Navigáció ablakban ott a beszámoló vázlata. Most már a Word is tudja, melyik a fejezetcím." },
-
-    { title: "Borító és tartalomjegyzék",
-      story: `<p>A beszámoló első oldala legyen a <b>borító</b>: csak a cím és a szerzők. A második oldalra jön a <b>tartalomjegyzék</b>, és a harmadik oldalon kezdődik az első fejezet. A tartalomjegyzéket nem gépeled be: a Word a címsorokból magától összeállítja, oldalszámokkal együtt.</p>`,
-      learn: `<ul><li><b>Automatikus tartalomjegyzék:</b> <span class="ui">Hivatkozások</span> lap › <span class="ui">Tartalomjegyzék</span> › <span class="ui">Automatikus tábla 1</span>.</li><li>Ha később változik a szöveg, a tartalomjegyzék nem frissül magától. Kattints bele › <span class="ui">Tábla frissítése</span> › <span class="ui">Teljes tábla frissítése</span>.</li><li>Az oldaltörés (<span class='nw'><kbd>Ctrl</kbd>+<kbd>Enter</kbd></span>) a 2. leckéből már ismerős.</li></ul>`,
+    { title: "Borító és új oldalak",
+      story: `<p>A beszámoló első oldala legyen a <b>borító</b>: csak a cím és a szerzők. Utána minden fejezet <b>új oldalon</b> kezdődjön, ahogy a könyvekben. Sok Enterrel ne próbálkozz: amint valaki beír egy mondatot, minden elcsúszik.</p>`,
+      learn: `<ul><li>Az <b>oldaltörés</b> (<span class='nw'><kbd>Ctrl</kbd>+<kbd>Enter</kbd></span>, vagy Beszúrás › <span class="ui">Oldaltörés</span>) után mindig új oldal kezdődik. Ez a 2. leckéből már ismerős.</li><li>A ¶ gombbal látod is: <code>·····Oldaltörés·····</code></li><li>A <span class="ui">Navigáció</span> ablak <span class="ui">Oldalak</span> fülén kicsiben látod az összes oldalt: így gyorsan ellenőrizheted, hol kezdődnek a fejezetek.</li></ul>`,
       steps: [
         `Kattints a borító utolsó sorának végére (<i>Szilvásvárad, 2027. május 10–14.</i>), és nyomd meg: <span class='nw'><kbd>Ctrl</kbd>+<kbd>Enter</kbd></span>. Az <b>${H1[0]}</b> átugrik a 2. oldalra.`,
-        `Kattints az <b>${H1[0]}</b> cím elejére. <span class=ui>Hivatkozások</span> › <span class=ui>Tartalomjegyzék</span> › <span class=ui>Automatikus tábla 1</span>. A tartalomjegyzék a cím fölé kerül.`,
-        `Kattints újra az <b>${H1[0]}</b> cím elejére, és nyomd meg: <span class='nw'><kbd>Ctrl</kbd>+<kbd>Enter</kbd></span>. Így az első fejezet a 3. oldalon kezdődik.`,
-        `Görgess vissza: a tartalomjegyzékben ott van mind a 4 fejezet és a 7 alfejezet, oldalszámmal. Mentsd el, és ellenőrizd.`
+        `Kattints a <b>${H1[1].replace(OLD, NEW)}</b> fejezetcím elejére, és nyomd meg: <span class='nw'><kbd>Ctrl</kbd>+<kbd>Enter</kbd></span>.`,
+        `Ugyanígy az <b>${H1[2]}</b> és az <b>${H1[3]}</b> elé.`,
+        `Kapcsold be a ¶ gombot, és nézd meg: négy <i>Oldaltörés</i> van a dokumentumban, és egyik fejezet előtt sincs üres sor. Mentsd el, és ellenőrizd.`
       ],
       goals: [
-        { label: "Tartalomjegyzék a borító után, az első fejezet előtt, minden címmel", type: "toc", after: COVER_END, before: H1[0], entries: [...H1F, ...H2F],
-          apply: m => { const k = at(m, COVER_END); m.blocks.splice(k + 1, 0, { type: "break" }, { type: "toc", role: "toc", entries: [] }, { type: "break" }); },
-          target: m => { blk(m, COVER_END).target = true; blk(m, H1[0]).target = true; } },
-        { label: "Oldaltörés a borító után", type: "breakBetween", from: COVER_END, to: "@toc", msg: "A borító és a tartalomjegyzék között még nincs oldaltörés. Kattints a borító utolsó sorának végére, és nyomd meg: Ctrl+Enter.", missing: "Nem találom a tartalomjegyzéket a borító után.", apply: () => {}, target: () => {} },
-        { label: "Oldaltörés az első fejezet előtt", type: "pageBreakBefore", find: H1[0], apply: () => {}, target: () => {} }
+        { label: "Oldaltörés a borító után", type: "pageBreakBefore", find: H1[0],
+          apply: m => H1F.forEach(h => { const k = at(m, h); if (k >= 0) m.blocks.splice(k, 0, { type: "break" }); }),
+          target: m => { blk(m, COVER_END).target = true; } },
+        { label: "A többi 3 fejezet is új oldalon kezdődik", type: "pageBreakBefore", find: H1F.slice(1), apply: () => {}, target: m => H1F.slice(1).forEach(h => { const x = blk(m, h); if (x) x.target = true; }) }
       ],
-      hints: ["Ha a tartalomjegyzék azt írja: „Nincs tartalomjegyzék-bejegyzés”, akkor a címek még nem kaptak címsor-stílust. Nézd meg az előző fejezetet!", "Ha a tartalomjegyzék rossz helyre került: kattints bele, fent a keretén megjelenik egy kis lap ikon és a Tartalomjegyzék gomb, onnan: Tartalomjegyzék eltávolítása. Aztán kezdd újra."],
-      success: "Borító, tartalomjegyzék, fejezetek. És ha valaki kattint egy címre a tartalomjegyzékben, a Word oda is ugrik!" },
+      hints: ["Ha a Ctrl+Enter után egy üres sor maradt a fejezetcím fölött, töröld ki: a ¶ gombbal látod.", "Ha a fejezetcím a régi oldal aljára került és alatta van az oldaltörés: kattints a cím elé (nem mögé), és ott nyomd meg a Ctrl+Enter-t."],
+      success: "Borító, és minden fejezet új oldalon. Akármit írsz bele, a fejezetek az oldalak tetején maradnak." },
 
     { title: "Ábrafeliratok",
       story: `<p>A két kép alá <b>felirat</b> kell, mint a tankönyvekben: <i>1. ábra</i>, <i>2. ábra</i>. A sorszámot nem írod be: a Word számozza az ábrákat. Ha később beszúrsz elé egy új képet, a számok maguktól frissülnek.</p>`,
@@ -211,9 +189,8 @@ window.MISSION = {
       success: "A borító tiszta, a többi oldalon cím és oldalszám. Kész a beszámoló!" },
 
     { title: "Beadás", upload: true,
-      story: `<p>Az ábrafeliratok és a lábjegyzet miatt a szöveg elcsúszhatott, ezért az oldalszámok a tartalomjegyzékben már nem biztos, hogy jók. Egy utolsó lépés, aztán az oldal <b>még egyszer átnézi az egész fájlt</b>.</p>`,
+      story: `<p>Kész a beszámoló! Mielőtt felkerül a honlapra, az oldal <b>még egyszer átnézi az egész fájlt</b>.</p>`,
       steps: [
-        `Kattints a tartalomjegyzékbe › <span class=ui>Tábla frissítése</span> › <span class=ui>Teljes tábla frissítése</span> › <span class=ui>OK</span>.`,
         `Mentsd el a fájlt: <span class='nw'><kbd>Ctrl</kbd>+<kbd>S</kbd></span>.`,
         `Kattints az Ellenőrzés gombra (vagy húzd ide újra a fájlt). Ha valami piros, javítsd ki a Wordben, mentsd el, és ellenőrizd újra.`
       ],
@@ -221,18 +198,11 @@ window.MISSION = {
   ],
   ending: {
     title: "Felkerülhet a honlapra!",
-    text: `<p>A beszámoló úgy néz ki, mint egy nyomtatott kiadvány: borító, automatikus tartalomjegyzék, címsorok, számozott ábrák, lábjegyzet, élőfej és oldalszám, a borító kivételével. És a Szalajka-völgy mind a hét helyen helyesen szerepel.</p>
+    text: `<p>A beszámoló úgy néz ki, mint egy nyomtatott kiadvány: borító, új oldalon kezdődő fejezetek, számozott ábrák, lábjegyzet, élőfej és oldalszám, a borító kivételével. És a Szalajka-völgy mind a hét helyen helyesen szerepel.</p>
       <p>Ezek az eszközök minden hosszabb munkánál jól jönnek: kiselőadásnál, projektmunkánál, később a szakdolgozatnál is.</p>`,
     rank: (min, hints) => hints === 0 ? "Rang: Főszerkesztő. Egyetlen segítség nélkül!" : hints <= 3 ? "Rang: Profi tördelő" : "Rang: Ügyes szerkesztő. Legközelebb kevesebb segítséggel is menni fog!"
   }
 };
-</script>
-<script>
-/* keep the preview's table of contents in step with the headings */
-(function () {
-  const orig = WD.page;
-  WD.page = (host, model) => { const api = orig(host, model); const render = api.render; api.render = m => { if (m) (m.blocks || []).forEach(b => { if (b.type === "toc") b.entries = tocEntries(m); }); render(m); }; api.render(model); return api; };
-})();
 </script>
 <script src="../real.js"></script>
 <script src="../../nav.js?v=2b949d3f" defer></script>

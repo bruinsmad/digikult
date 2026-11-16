@@ -454,6 +454,12 @@
       if (goal.minWidth && im.widthCm < goal.minWidth - 0.05) return one(false, `A kép csak ${fmtNum(im.widthCm, 1)} cm széles, ez túl kicsi. Legyen legalább ${fmtNum(goal.minWidth)} cm.`);
       return one(true);
     }
+    if (T === "pageBreakBefore" && Array.isArray(goal.find)) {
+      /* several places: each needs its own page break */
+      const rs = goal.find.map(f => check(doc, Object.assign({}, goal, { find: f })));
+      const bad = rs.find(r => !r.ok);
+      return { ok: !bad, done: rs.filter(r => r.ok).length, total: rs.length, msg: bad ? bad.msg : null };
+    }
     if (T === "pageBreakBefore") {
       const ps = doc.paras.filter(p => !p.inTable), k = ps.findIndex(p => !p.isToc && p.norm.startsWith(normText(goal.find)));
       if (k < 0) return one(false, `Nem találom ${az(goal.find)} „${short(goal.find)}” kezdetű bekezdést.`);
