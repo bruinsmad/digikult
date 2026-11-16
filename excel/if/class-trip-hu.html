@@ -30,22 +30,23 @@
 <div id="game"><main>
   <article class="card" id="case" aria-live="polite"></article>
   <section class="work" aria-label="Munkalap"><div class="card">
-    <div class="work-head"><h2>kirandulas.xlsx</h2><p>Kattints egy cellára, és kezdj el gépelni.</p></div>
+    <div class="dlcard"><svg class="ic" viewBox="0 0 40 46" aria-hidden="true"><path d="M4 2h22l10 10v32H4z" fill="#fff" stroke="#107c41" stroke-width="2"/><path d="M26 2v10h10" fill="#d9efe2" stroke="#107c41" stroke-width="2"/><rect x="0" y="18" width="24" height="20" rx="2" fill="#107c41"/><path d="M6 23l12 10M18 23L6 33" stroke="#fff" stroke-width="3" stroke-linecap="round"/></svg><p><b>kirandulas.xlsx</b><br>Ebben a fájlban dolgozol, az Excelben.</p><a class="btn primary" href="kirandulas.xlsx" download>Letöltés</a></div>
+    <div class="work-head"><h2>Előnézet</h2><p>Így kell kinéznie a fájlodnak. A sárga cellák tartoznak a mostani feladathoz.</p></div>
     <div id="sheet"></div>
-    <p class="keys"><kbd>Enter</kbd> kész · <kbd>Esc</kbd> mégse · <kbd>F2</kbd> javítás · <kbd>Ctrl</kbd>+<kbd>Z</kbd> visszavonás · <kbd>Ctrl</kbd>+<kbd>C</kbd> / <kbd>V</kbd> másolás · a cella sarkában lévő ▪ a <b>kitöltőjel</b>: húzd le vagy jobbra</p>
+    <p class="preview-note">Ez csak előnézet, ide nem lehet írni. Ahogy haladsz, itt is megjelennek a jó képletek: a <b>Képletek</b> gombbal megnézheted őket.</p>
   </div></section>
 </main></div>
 <section id="endPanel" hidden></section>
-<footer class="end">Digitális kultúra. A táblázat a böngésződben számol, és ott is marad: ha bezárod az oldalt, legközelebb innen folytathatod.</footer>
+<footer class="end">Digitális kultúra. A haladásod a böngésződben marad: ha bezárod az oldalt, legközelebb innen folytathatod. A feltöltött fájlt az oldal csak megnézi, nem küldi el sehová.</footer>
 <canvas id="fx" aria-hidden="true"></canvas>
 <script src="../sheet.js"></script>
 <script>
 
 window.MISSION = {
-  key: "class-trip-hu-v2", file: "kirandulas", title: "Irány a Mátra!", sheetName: "Kirándulás",
+  key: "class-trip-xlsx-hu-v1", title: "Irány a Mátra!", sheetName: "Kirándulás", saveAs: "kirandulas-Kovacs-Anna.xlsx",
   confetti: ["#2f6fa0", "#f2d264", "#5f8f6e", "#a8dba0", "#7fa7ff", "#ff9e7a"],
   sheet: {
-    cols: 7, rows: 28, widths: [118, 100, 80, 76, 100, 104, 96], select: "E2",
+    cols: 7, rows: 28, widths: [118, 100, 80, 76, 100, 104, 96], select: "A1",
     cells: {
       A1: "Név", B1: "Befizetett (Ft)", C1: "Menü", D1: "Túra", E1: "Hátralék (Ft)", F1: "Állapot", G1: "Libegő (Ft)",
       A2: "Ádám", B2: 12000, C2: "normál", D2: "hosszú",   A3: "Bori", B3: 12000, C3: "vega", D3: "rövid",
@@ -62,78 +63,133 @@ window.MISSION = {
       A25: "Bónusz: rövid túrára megy (fő)", A26: "Bónusz: nem vega menü (fő)", A27: "Bónusz: a vegák befizetése (Ft)", A28: "Bónusz: hosszú túrázók hátraléka (Ft)"
     },
     formats: { "B2:B17": "ft", "E2:E17": "ft", "G2:G18": "ft", E23: "ft", "E27:E28": "ft" },
-    styles: { "A1:G1": "head", F18: "label", G18: "total", "A19:A28": "label", "E19:E28": "sum" },
-    locked: ["A1:G1", "A2:D17", "F18", "A19:A28"],
-    lockedText: "Ezek Kati néni adatai, ezeket nem kell átírni. A sárgával kiemelt cellákba dolgozz!"
+    styles: { "A1:G1": "head", F18: "label", G18: "total", "A19:A28": "label", "E19:E28": "sum" }
   },
   chapters: [
     { refresher: true, title: "Ki mennyivel tartozik?", select: "E2",
       story: `<p>A sütivásár bevételéből kifizették a buszt. Már csak a <b>részvételi díjat</b> (a szállás és az étkezés árát) kell befizetnie mindenkinek: fejenként 12 000 Ft-ot. <span class="who">Kati néni</span> táblázatában ott van, ki mennyit fizetett eddig, ki milyen menüt kér, és ki melyik túrára megy.</p>
-        <p>„Te kezeled a táblázatot – mondja Kati néni. – Először azt szeretném látni, kinek mennyit kell még befizetnie.”</p>`,
-      learn: `<ul><li>Hátralék = részvételi díj − amit már befizetett.</li><li>A díj mindenkinek ugyanannyi, 12 000 Ft, ezért most beírhatod a képletbe: <code>=12000-B2</code>.</li><li>Egy képletet írsz, a többit a kitöltőjellel lehúzod.</li></ul>`,
-      goals: [{ text: "<b>E2–E17</b>: mindenkinél a hátralék: 12 000 Ft-ból vond ki, amit befizetett (B oszlop).", range: "E2:E17", ref: "=12000-B2" }],
-      hints: ["E2: <code>=12000-B2</code>", "Aztán húzd le a kitöltőjelet az E17-ig."],
-      success: "Akinél 0 Ft a hátralék, az mindent kifizetett. Akinél nem, annak még fizetnie kell. De ezt ne nekünk kelljen végignézni: döntsön az Excel!" },
+        <p>„Te kezeled a táblázatot – mondja Kati néni. – Először azt szeretném látni, kinek mennyit kell még befizetnie.” Ezt a küldetést <b>Excelben</b> oldod meg: ez az oldal megmutatja, mit csinálj, és ellenőrzi az eredményeidet.</p>`,
+      learn: `<ul><li>Minden képlet <code>=</code> jellel kezdődik, és a végén <kbd>Enter</kbd>.</li><li>Hátralék = részvételi díj − amit már befizetett. A díj mindenkinek ugyanannyi, ezért most beírhatod a képletbe: <code>=12000-B2</code>.</li><li>Egy képletet írsz, a többit a kitöltőjellel lehúzod.</li></ul>`,
+      steps: [
+        `Töltsd le a fájlt: <br><a class="btn primary" href="kirandulas.xlsx" download>kirandulas.xlsx letöltése</a>`,
+        `Nyisd meg az Excelben. Ha felül egy sárga sávban azt látod, hogy <span class=ui>Védett nézet</span>, kattints a <span class=ui>Szerkesztés engedélyezése</span> gombra.`,
+        `Mentsd el úgy, hogy a fájl nevében benne legyen a neved: <span class=ui>Fájl</span> › <span class=ui>Mentés másként</span> (vagy <kbd>F12</kbd>), például <code>kirandulas-Kovacs-Anna</code>.`,
+        `Kattints az <b>E2</b>-re, írd be: <code>=12000-B2</code>, és nyomd meg az <kbd>Enter</kbd> billentyűt.`,
+        `Kattints vissza az E2-re, és húzd le a kitöltőjelet (a cella jobb alsó sarkában lévő kis négyzetet) az <b>E17</b>-ig.`
+      ],
+      goals: [{ label: "E2–E17: hátralék", range: "E2:E17", ref: "=12000-B2" }],
+      asks: [{ q: "Mennyi <b>Csenge</b> hátraléka? (E4)", cell: "E4", traps: { "8000": "Ez a befizetett összeg. A hátralék az, ami még hiányzik a 12 000 Ft-ból." } }],
+      hints: ["E2: <code>=12000-B2</code>, aztán a kitöltőjellel le az E17-ig.", "Csenge a 4. sorban van: 12 000 − 8 000."],
+      success: "4000 Ft. Akinél 0 Ft a hátralék, az mindent kifizetett. De ezt ne nekünk kelljen végignézni: döntsön az Excel!" },
+
     { title: "Rendben vagy tartozik?", select: "F2",
       story: `<p>Kati néni egy szót szeretne minden név mellé: <b>rendben</b>, ha valaki mindent befizetett, és <b>tartozik</b>, ha még nem.</p>`,
-      learn: `<p>A <b>HA</b> függvény dönt. Három része van:</p><pre>=<span class="fn">HA</span>(<span class="rf">E2</span>=0;<span class="st">&quot;rendben&quot;</span>;<span class="st">&quot;tartozik&quot;</span>)</pre>
+      learn: `<p>A <b>HA</b> függvény dönt. Három része van, pontosvesszővel elválasztva:</p><pre>=<span class="fn">HA</span>(<span class="rf">E2</span>=0;<span class="st">&quot;rendben&quot;</span>;<span class="st">&quot;tartozik&quot;</span>)</pre>
         <ol><li><b>Feltétel</b>: igaz vagy hamis? (<code>E2=0</code>: nulla a hátralék?)</li><li>Mit írjon, ha <b>igaz</b>.</li><li>Mit írjon, ha <b>hamis</b>.</li></ol>
-        <p>A szöveget <b>idézőjelbe</b> kell tenni: <code>"rendben"</code>. Idézőjel nélkül <code>#NÉV?</code> hibát kapsz.</p>`,
-      goals: [{ text: "<b>F2–F17</b>: <code>rendben</code>, ha nulla a hátralék, különben <code>tartozik</code> (<b>HA</b>).", range: "F2:F17", ref: '=HA(E2=0;"rendben";"tartozik")', use: ["HA"] }],
-      hints: ['F2: <code>=HA(E2=0;"rendben";"tartozik")</code>', "Aztán húzd le az F17-ig. Ha <code>#NÉV?</code> jön ki, lemaradt egy idézőjel."],
-      success: "Hatan tartoznak még. Ha valaki befizet, Kati néni átírja a B oszlopot, és a szó magától átvált „rendben”-re." },
+        <p>A szöveget <b>idézőjelbe</b> kell tenni: <code>"rendben"</code>. Az idézőjel a magyar billentyűzeten: <kbd>Shift</kbd>+<kbd>2</kbd>. Idézőjel nélkül <code>#NÉV?</code> hibát kapsz.</p>`,
+      steps: [
+        `Kattints az <b>F2</b>-re, és írd be: <code>=HA(E2=0;"rendben";"tartozik")</code>, majd nyomd meg az <kbd>Enter</kbd> billentyűt.`,
+        `Húzd le a kitöltőjelet az <b>F17</b>-ig.`,
+        `Ha <code>#NÉV?</code> jelenik meg, lemaradt egy idézőjel. Kattints a cellára, javítsd a szerkesztőlécen, és nyomj <kbd>Enter</kbd>-t.`
+      ],
+      goals: [{ label: "F2–F17: rendben vagy tartozik (HA)", range: "F2:F17", ref: '=HA(E2=0;"rendben";"tartozik")', fn: "HA" }],
+      asks: [{ q: "Mit ír ki az F oszlop <b>Imrénél</b>? (F10)", text: ["tartozik"], traps: { "rendben": "Imre még csak 4000 Ft-ot fizetett be. Nézd meg, jó-e a feltétel: E2=0." }, wrong: "Nézd meg az F10 cellát: ott a HA eredménye áll, „rendben” vagy „tartozik”." },
+             { q: "Mit ír ki <b>Daninál</b>? (F5)", text: ["rendben"], traps: { "tartozik": "Dani mindent befizetett, a hátraléka 0. Nézd meg, jó-e a feltétel: E2=0." }, wrong: "Nézd meg az F5 cellát." }],
+      hints: ['F2: <code>=HA(E2=0;"rendben";"tartozik")</code>', "Aztán húzd le az F17-ig. Imre a 10. sorban, Dani az 5. sorban van."],
+      success: "Imre tartozik, Dani rendben van. Ha valaki befizet, Kati néni átírja a B oszlopot, és a szó magától átvált „rendben”-re." },
+
     { title: "Libegő a hosszú túrán", select: "G2",
       story: `<p>A második napon kétféle túra lesz. A <b>hosszú</b> túrán libegővel megyünk fel a csúcsra, a jegy 1500 Ft. A <b>rövid</b> túra ingyenes. Mennyit kell fizetni a libegőért?</p>`,
-      learn: `<p>A feltételben szöveget is összehasonlíthatsz, ilyenkor az is idézőjelbe kerül: <code>D2="hosszú"</code>. Az eredmény lehet szám vagy egy cella is:</p><pre>=<span class="fn">HA</span>(<span class="rf">D2</span>=<span class="st">&quot;hosszú&quot;</span>;1500;0)</pre>
+      learn: `<p>A feltételben szöveget is összehasonlíthatsz, ilyenkor az is idézőjelbe kerül: <code>D2="hosszú"</code>. Az eredmény lehet szám is:</p><pre>=<span class="fn">HA</span>(<span class="rf">D2</span>=<span class="st">&quot;hosszú&quot;</span>;1500;0)</pre>
         <p>A számokat (1500 és 0) nem kell idézőjelbe tenni.</p>`,
-      goals: [{ text: "<b>G2–G17</b>: 1500, ha hosszú túrára megy, különben 0 (<b>HA</b>).", range: "G2:G17", ref: '=HA(D2="hosszú";1500;0)', use: ["HA"],
-                traps: [raw => /hosszu/i.test(raw) && !/hosszú/i.test(raw) ? "A táblázatban „hosszú” áll, ékezettel. A feltételben is pontosan így kell írni." : null] },
-              { text: "<b>G18</b>: mennyit fizetünk összesen a libegőért? (SZUM)", range: "G18", ref: "=SZUM(G2:G17)", use: ["SZUM"] }],
-      hints: ['G2: <code>=HA(D2="hosszú";1500;0)</code>, aztán húzd le a G17-ig.', "G18: <code>=SZUM(G2:G17)</code>"],
+      steps: [
+        `<b>G2</b>: <code>=HA(D2="hosszú";1500;0)</code>, aztán húzd le a <b>G17</b>-ig.`,
+        `<b>G18</b>: a libegőjegyek összege: <code>=SZUM(G2:G17)</code>.`
+      ],
+      goals: [{ label: "G2–G17: libegőjegy (HA)", range: "G2:G17", ref: '=HA(D2="hosszú";1500;0)', fn: "HA" }, { label: "G18: összesen (SZUM)", range: "G18", ref: "=SZUM(G2:G17)", fn: "SZUM" }],
+      asks: [{ q: "Mennyit fizetünk összesen a libegőért? (G18)", cell: "G18", traps: { "0": "Úgy tűnik, minden sorban 0 jött ki. A táblázatban „hosszú” áll, ékezettel: a feltételben is pontosan így kell írni." } }],
+      hints: ['G2: <code>=HA(D2="hosszú";1500;0)</code>, le a G17-ig.', "G18: <code>=SZUM(G2:G17)</code>"],
       success: "10 jegy, összesen 15 000 Ft. A rövid túrázóknál 0 Ft áll: a HA nemcsak szöveget, hanem számot is tud adni." },
+
     { title: "Vega vagy normál?", select: "E19",
       story: `<p>A szállás konyhája tudni szeretné, <b>hány vega és hány normál menüt</b> főzzön. Megszámolhatnád fejben is, de mi van, ha valaki meggondolja magát?</p>`,
       learn: `<p>A <b>DARABTELI</b> megszámolja, hány cella felel meg egy feltételnek. Két része van: <i>hol számoljon</i> (tartomány), és <i>mit</i> (kritérium, idézőjelben):</p><pre>=<span class="fn">DARABTELI</span>(<span class="rf">C2:C17</span>;<span class="st">&quot;vega&quot;</span>)</pre>
         <p>A kis- és nagybetű mindegy neki: a „Vega” és a „vega” ugyanaz.</p>`,
-      goals: [{ text: "<b>E19</b>: hány vega menü kell? (C oszlop)", range: "E19", ref: '=DARABTELI(C2:C17;"vega")', use: ["DARABTELI"] },
-              { text: "<b>E20</b>: hány normál menü kell?", range: "E20", ref: '=DARABTELI(C2:C17;"normál")', use: ["DARABTELI"],
-                traps: [raw => /normal/i.test(raw) && !/normál/i.test(raw) ? "A táblázatban „normál” áll, ékezettel. A kritériumban is pontosan így kell írni." : null] }],
+      steps: [
+        `<b>E19</b>: <code>=DARABTELI(C2:C17;"vega")</code>`,
+        `<b>E20</b>: ugyanez a normál menüre. Vigyázz az ékezetre: <code>"normál"</code>.`
+      ],
+      goals: [{ label: "E19: vega menü (DARABTELI)", range: "E19", ref: '=DARABTELI(C2:C17;"vega")', fn: "DARABTELI" }, { label: "E20: normál menü (DARABTELI)", range: "E20", ref: '=DARABTELI(C2:C17;"normál")', fn: "DARABTELI" }],
+      asks: [{ q: "Hány vega menü kell? (E19)", cell: "E19" }, { q: "Hány normál menü kell? (E20)", cell: "E20", traps: { "0": "0 jött ki? A táblázatban „normál” áll, ékezettel. A kritériumban is pontosan így kell írni." } }],
       hints: ['E19: <code>=DARABTELI(C2:C17;"vega")</code>', 'E20: <code>=DARABTELI(C2:C17;"normál")</code>'],
       success: "5 vega és 11 normál menü, összesen 16. Pont annyi, ahányan megyünk." },
+
     { title: "Kik tartoznak még?", select: "E21",
       story: `<p>Kati néni a szülői értekezleten el szeretné mondani, <b>hányan tartoznak még</b>, és hányan tartoznak <b>5000 Ft-nál többel</b>.</p>`,
       learn: `<p>A kritérium lehet egy összehasonlítás is. Ilyenkor a jel és a szám <b>együtt</b> kerül idézőjelbe:</p><pre>=<span class="fn">DARABTELI</span>(<span class="rf">E2:E17</span>;<span class="st">&quot;&gt;5000&quot;</span>)</pre>
         <p>Jelek: <code>&gt;</code> nagyobb, <code>&lt;</code> kisebb, <code>&gt;=</code> legalább, <code>&lt;=</code> legfeljebb, <code>&lt;&gt;</code> nem egyenlő.</p>`,
-      goals: [{ text: "<b>E21</b>: hányan tartoznak még? (Hány „tartozik” van az F oszlopban?)", range: "E21", ref: '=DARABTELI(F2:F17;"tartozik")', use: ["DARABTELI"] },
-              { text: "<b>E22</b>: hányan tartoznak 5000 Ft-nál többel? (E oszlop)", range: "E22", ref: '=DARABTELI(E2:E17;">5000")', use: ["DARABTELI"],
-                traps: [raw => />=\s*5000/.test(raw) ? "„Több mint 5000”: a >= azt jelentené, hogy legalább 5000. Itt a > kell." : null, raw => /;\s*>/.test(raw) ? "A jel és a szám együtt kerül idézőjelbe: \">5000\"" : null] }],
-      hints: ['E21: <code>=DARABTELI(F2:F17;"tartozik")</code>', 'E22: <code>=DARABTELI(E2:E17;">5000")</code>'],
+      steps: [
+        `<b>E21</b>: hány „tartozik” van az F oszlopban? <code>=DARABTELI(F2:F17;"tartozik")</code>`,
+        `<b>E22</b>: hányan tartoznak 5000 Ft-nál többel? <code>=DARABTELI(E2:E17;"&gt;5000")</code>`
+      ],
+      goals: [{ label: "E21: még tartozik (DARABTELI)", range: "E21", ref: '=DARABTELI(F2:F17;"tartozik")', fn: "DARABTELI" }, { label: "E22: 5000 Ft-nál többel tartozik (DARABTELI)", range: "E22", ref: '=DARABTELI(E2:E17;">5000")', fn: "DARABTELI" }],
+      asks: [{ q: "Hányan tartoznak még? (E21)", cell: "E21" }, { q: "Hányan tartoznak 5000 Ft-nál többel? (E22)", cell: "E22", traps: { "4": "4 jött ki? Akkor a >= jel került a képletbe, ami azt jelenti: legalább 5000. Itt a > kell: több mint 5000." } }],
+      hints: ['E21: <code>=DARABTELI(F2:F17;"tartozik")</code>', 'E22: <code>=DARABTELI(E2:E17;"&gt;5000")</code>'],
       success: "Hatan tartoznak, közülük hárman 5000 Ft-nál többel. Kati néni nekik külön üzen." },
-    { title: "Mehet a foglalás?", select: "E23",
-      story: `<p>A szállást csak akkor lehet véglegesen lefoglalni, ha <b>mindenki mindent befizetett</b>. Utolsó feladat: a táblázat mondja meg magától, mehet-e a foglalás.</p>`,
+
+    { title: "Mehet a foglalás?", select: "E23", isNew: false,
+      story: `<p>A szállást csak akkor lehet véglegesen lefoglalni, ha <b>mindenki mindent befizetett</b>. A táblázat mondja meg magától, mehet-e a foglalás.</p>`,
       learn: `<p>Előbb add össze a hátralékokat. Utána a HA dönt: ha az összeg 0, mehet a foglalás, különben még várunk.</p><pre>=<span class="fn">HA</span>(<span class="rf">E23</span>=0;<span class="st">&quot;Mehet!&quot;</span>;<span class="st">&quot;Még várunk&quot;</span>)</pre>`,
-      isNew: false,
-      goals: [{ text: "<b>E23</b>: az összes hátralék (SZUM).", range: "E23", ref: "=SZUM(E2:E17)", use: ["SZUM"] },
-              { text: "<b>E24</b>: <code>Mehet!</code>, ha az összes hátralék 0, különben <code>Még várunk</code> (HA).", range: "E24", ref: '=HA(E23=0;"Mehet!";"Még várunk")', use: ["HA"],
-                traps: [raw => !/mehet!/i.test(raw) || !/még várunk/i.test(raw) ? "A HA-ba mindkét szöveg kell, pontosan így: \"Mehet!\" (ha igaz) és \"Még várunk\" (ha hamis)." : null] }],
+      steps: [
+        `<b>E23</b>: az összes hátralék: <code>=SZUM(E2:E17)</code>`,
+        `<b>E24</b>: <code>=HA(E23=0;"Mehet!";"Még várunk")</code>`
+      ],
+      goals: [{ label: "E23: összes hátralék (SZUM)", range: "E23", ref: "=SZUM(E2:E17)", fn: "SZUM" }, { label: "E24: mehet a foglalás? (HA)", range: "E24", ref: '=HA(E23=0;"Mehet!";"Még várunk")', fn: "HA" }],
+      asks: [{ q: "Mennyi az összes hátralék? (E23)", cell: "E23" }, { q: "Mit ír ki az E24?", text: ["Még várunk", "még várunk."], traps: { "Mehet!": "Még 32 000 Ft hiányzik, ezért a feltétel (E23=0) hamis. Nézd meg, jó sorrendben van-e a két szöveg." }, wrong: "Nézd meg, mit ír ki az E24 cella." }],
       hints: ["E23: <code>=SZUM(E2:E17)</code>", 'E24: <code>=HA(E23=0;"Mehet!";"Még várunk")</code>'],
       success: "Még 32 000 Ft hiányzik, ezért „Még várunk”. Amint beérkezik az utolsó befizetés, és Kati néni beírja, a cella magától átvált „Mehet!”-re." },
+
+    { title: "Beadás", upload: true,
+      story: `<p>Kész a táblázat! Mielőtt beadod, az oldal <b>megnézi a fájlodat</b>: mindenhol képlet van-e, jó függvényt használtál-e, és jó-e az eredmény.</p>`,
+      steps: [
+        `Mentsd el a fájlt az Excelben: <kbd>Ctrl</kbd>+<kbd>S</kbd>.`,
+        `Húzd a fájlt az alábbi mezőbe (vagy kattints rá, és válaszd ki). A fájlt az oldal csak itt a böngészőben nézi meg, nem küldi el sehová.`,
+        `Ha valami piros, javítsd ki az Excelben, mentsd el, és húzd ide újra.`
+      ],
+      success: "Minden képlet a helyén, minden eredmény stimmel. Kati néni ebből a táblázatból szervezi a kirándulást!" },
+
     { bonus: true, title: "Még több számolás", select: "E25",
       story: `<p>A túravezető is kérdez: <b>hányan jönnek a rövid túrára</b>? A konyha pedig azt szeretné tudni, <b>hány nem vega</b> menü kell.</p>`,
       learn: `<p>A <code>&lt;&gt;</code> jel azt jelenti: <b>nem egyenlő</b>. Így a DARABTELI mindent megszámol, ami nem „vega”:</p><pre>=<span class="fn">DARABTELI</span>(<span class="rf">C2:C17</span>;<span class="st">&quot;&lt;&gt;vega&quot;</span>)</pre>`,
-      goals: [{ text: "<b>E25</b>: hányan mennek a rövid túrára? (D oszlop)", range: "E25", ref: '=DARABTELI(D2:D17;"rövid")', use: ["DARABTELI"],
-                traps: [raw => /rovid/i.test(raw) && !/rövid/i.test(raw) ? "A táblázatban „rövid” áll, ékezettel. A kritériumban is pontosan így kell írni." : null] },
-              { text: "<b>E26</b>: hány nem vega menü kell? Használd a <code>&lt;&gt;</code> jelet!", range: "E26", ref: '=DARABTELI(C2:C17;"<>vega")', use: ["DARABTELI"],
-                traps: [raw => !/<>/.test(raw) ? "Most a <> jelet gyakoroljuk: \"<>vega\" azt jelenti, hogy nem vega." : null] }],
+      steps: [
+        `<b>E25</b>: hányan mennek a rövid túrára? <code>=DARABTELI(D2:D17;"rövid")</code>`,
+        `<b>E26</b>: hány nem vega menü kell? <code>=DARABTELI(C2:C17;"&lt;&gt;vega")</code>`
+      ],
+      goals: [{ label: "E25: rövid túrára megy (DARABTELI)", range: "E25", ref: '=DARABTELI(D2:D17;"rövid")', fn: "DARABTELI" }, { label: "E26: nem vega menü (DARABTELI)", range: "E26", ref: '=DARABTELI(C2:C17;"<>vega")', fn: "DARABTELI" }],
+      asks: [{ q: "Hányan mennek a rövid túrára? (E25)", cell: "E25" }, { q: "Hány nem vega menü kell? (E26)", cell: "E26" }],
       hints: ['E25: <code>=DARABTELI(D2:D17;"rövid")</code>', 'E26: <code>=DARABTELI(C2:C17;"&lt;&gt;vega")</code>'],
       success: "Hatan mennek a rövid túrára, és 11 nem vega menü kell. Ugyanannyi, mint a normál menü: hiszen ami nem vega, az normál." },
+
     { bonus: true, title: "Összeadás feltétellel", select: "E27",
       story: `<p>Kati néni két összeget kér: mennyit fizettek be eddig <b>a vega menüt kérők</b>, és mennyi <b>a hosszú túrázók hátraléka</b>?</p>`,
       learn: `<p>A <b>SZUMHA</b> csak azokat a számokat adja össze, amelyeknek a sora megfelel a feltételnek. Három része van: <i>hol nézze a feltételt</i>, <i>mi a feltétel</i>, és <i>mit adjon össze</i>:</p><pre>=<span class="fn">SZUMHA</span>(<span class="rf">C2:C17</span>;<span class="st">&quot;vega&quot;</span>;<span class="rf">B2:B17</span>)</pre>`,
-      goals: [{ text: "<b>E27</b>: a vega menüt kérők befizetései összesen (SZUMHA: C oszlop, \"vega\", B oszlop).", range: "E27", ref: '=SZUMHA(C2:C17;"vega";B2:B17)', use: ["SZUMHA"] },
-              { text: "<b>E28</b>: a hosszú túrázók hátraléka összesen (D oszlop, \"hosszú\", E oszlop).", range: "E28", ref: '=SZUMHA(D2:D17;"hosszú";E2:E17)', use: ["SZUMHA"] }],
+      steps: [
+        `<b>E27</b>: a vegák befizetései: <code>=SZUMHA(C2:C17;"vega";B2:B17)</code>`,
+        `<b>E28</b>: a hosszú túrázók hátraléka: <code>=SZUMHA(D2:D17;"hosszú";E2:E17)</code>`
+      ],
+      goals: [{ label: "E27: a vegák befizetése (SZUMHA)", range: "E27", ref: '=SZUMHA(C2:C17;"vega";B2:B17)', fn: "SZUMHA" }, { label: "E28: a hosszú túrázók hátraléka (SZUMHA)", range: "E28", ref: '=SZUMHA(D2:D17;"hosszú";E2:E17)', fn: "SZUMHA" }],
+      asks: [{ q: "Mennyit fizettek be eddig a vegák? (E27)", cell: "E27" }, { q: "Mennyi a hosszú túrázók hátraléka? (E28)", cell: "E28" }],
       hints: ['E27: <code>=SZUMHA(C2:C17;"vega";B2:B17)</code>', 'E28: <code>=SZUMHA(D2:D17;"hosszú";E2:E17)</code>'],
-      success: "A vegák eddig 51 000 Ft-ot fizettek be, a hosszú túrázók hátraléka pedig 12 000 Ft. Kati néni most már mindent tud!" }
+      success: "A vegák eddig 51 000 Ft-ot fizettek be, a hosszú túrázók hátraléka pedig 12 000 Ft." },
+
+    { bonus: true, title: "Bónusz beadás", upload: true,
+      story: `<p>Ha a bónuszt is megcsináltad, az oldal ellenőrzi a <b>bónusz cellákat</b> is (E25–E28).</p>`,
+      steps: [
+        `Mentsd el a fájlt az Excelben: <kbd>Ctrl</kbd>+<kbd>S</kbd>.`,
+        `Húzd a fájlt az alábbi mezőbe, vagy kattints rá, és válaszd ki.`,
+        `Ha a Classroomban már beadtad a fájlt, vond vissza a beadást, töltsd fel az újat, és add be újra.`
+      ],
+      success: "A bónusz is kész, minden képlet stimmel. Kati néni főszervezője lehetnél!" }
   ],
   ending: {
     title: "Indulhat a szervezés!",
@@ -144,7 +200,7 @@ window.MISSION = {
 };
 </script>
 <script src="../cats.js"></script>
-<script src="../mission.js"></script>
-<script src="../../nav.js?v=6484c1c1" defer></script>
+<script src="../real.js"></script>
+<script src="../../nav.js?v=90a18e3c" defer></script>
 </body>
 </html>

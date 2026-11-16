@@ -174,6 +174,13 @@
   const HU = Object.fromEntries(Object.entries(EN).map(([h, e]) => [e, h]));
   const toHu = f => "=" + String(f).replace(/\b([A-Z][A-Z0-9.]*)\(/g, (m, n) => (HU[n] || n) + "(").replace(/,/g, ";").replace(/(\d)\.(\d)/g, "$1,$2");
   function loadScript(src) { return new Promise((ok, no) => { const s = document.createElement("script"); s.src = src; s.onload = ok; s.onerror = no; document.head.appendChild(s); }); }
+  /* numbers with a little tolerance, texts (from HA) without regard to capitals or spaces at the ends */
+  function sameValue(v, exp) {
+    if (typeof exp === "number") return typeof v === "number" && Math.abs(v - exp) <= 1e-6 * Math.max(1, Math.abs(exp));
+    if (typeof exp === "string") return typeof v === "string" && v.trim().toLocaleLowerCase("hu") === exp.trim().toLocaleLowerCase("hu");
+    if (typeof exp === "boolean") return v === exp;
+    return false;
+  }
   async function checkFile(file) {
     $("report").innerHTML = `<p class="export-note">Ellenőrzöm: ${esc(file.name)}…</p>`;
     const note = (t, x) => { $("report").innerHTML = `<div class="verdict no"><b>${t}</b><p>${x}</p></div>`; buzz(); };
@@ -208,7 +215,7 @@
         if (!cell || cell.v === undefined || cell.v === "") m = `${XL.Az(a)} ${a} cella üres.`;
         else if (!f) m = `${XL.Az(a)} ${a} cellában nincs képlet, csak egy beírt érték. Írj képletet = jellel!`;
         else if (goal.fn && !new RegExp("\\b" + EN[goal.fn] + "\\(").test(f.toUpperCase())) m = `${XL.Az(a)} ${a} képlete (${toHu(f)}) nem ${XL.az(goal.fn)} ${goal.fn} függvényt használja.`;
-        else if (typeof exp !== "number" || typeof cell.v !== "number" || Math.abs(cell.v - exp) > 1e-6 * Math.max(1, Math.abs(exp))) m = `${XL.Az(a)} ${a} értéke ${cell.w || cell.v}, de ${(typeof exp === "number" ? XL.fmtGeneral(exp) : XL.textOf(exp)).replace(/(,\d{2})\d+$/, "$1…")} kellene. A képleted: ${toHu(f)}`;
+        else if (!sameValue(cell.v, exp)) m = `${XL.Az(a)} ${a} értéke ${typeof cell.v === "string" ? "„" + cell.v + "”" : (cell.w || XL.textOf(cell.v))}, de ${typeof exp === "string" ? "„" + exp + "”" : (typeof exp === "number" ? XL.fmtGeneral(exp) : XL.textOf(exp)).replace(/(,\d{2})\d+$/, "$1…")} kellene. A képleted: ${toHu(f)}`;
         if (m) { if (!msg) msg = m; } else ok++;
       }
       rows.push({ label: goal.label, ok: ok === cells.length, done: ok, total: cells.length, msg });

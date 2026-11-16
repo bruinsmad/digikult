@@ -461,14 +461,14 @@
               {
                 id: "class-trip",
                 kind: "story",
-                minutes: 35,
+                minutes: 45,
                 title: { hu: "Irány a Mátra!", en: "Off to the Mátra!" },
                 desc: {
-                  hu: "16 diák, egy kirándulás: ki fizetett, ki melyik túrára megy, hány vega menü kell, és mehet-e a foglalás? HA és DARABTELI.",
-                  en: "16 students, one trip: who has paid, who takes which hike, how many veggie meals, and can we book? HA and DARABTELI."
+                  hu: "Letöltöd a fájlt, és Excelben szervezed meg a kirándulást: ki fizetett, ki melyik túrára megy, hány vega menü kell, és mehet-e a foglalás? HA és DARABTELI. A végén az oldal ellenőrzi a mentett fájlodat.",
+                  en: "Download the file and organise the class trip in Excel: who has paid, who takes which hike, how many veggie meals, and can we book? HA and DARABTELI. At the end the page checks your saved file."
                 },
                 files: { hu: "excel/if/class-trip-hu.html" },
-                progress: { chapters: 5, keys: { hu: "class-trip-hu-v2" } }
+                progress: { chapters: 6, keys: { hu: "class-trip-xlsx-hu-v1" } }
               }
             ]
           }
