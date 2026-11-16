@@ -6,7 +6,7 @@
      chapters: [{ title, refresher, story, learn, isNew, steps: [html], asks: [{ q, text: [..] | num, traps: { answer: msg }, wrong }],
                   hints, success, upload }],
      checks: [{ label, test(deck) → true | "what is wrong" }],
-     play (optional): the animation steps the preview can play (see anim.js), ending: { title, text, rank(min, hints) }
+     play (optional): the animation steps the preview can play (see anim.js; ch: from which chapter, until: gone from that chapter on), ending: { title, text, rank(min, hints) }
    }
    In the slide picture, an element with data-ch="k" shows up from chapter k on, data-until="k" disappears from chapter k on,
    and data-hl="k" glows in chapter k. */
@@ -37,7 +37,7 @@
     });
     stage.querySelectorAll("[data-hl]").forEach(el => el.classList.toggle("hl", el.dataset.hl.split(" ").includes(String(i)) && !CH[i].upload));
     if (window.ANIM && M.play) {
-      const steps = M.play.filter(s => s.ch <= upto);
+      const steps = M.play.filter(s => s.ch <= upto && !(s.until <= upto));
       ANIM.reset(stage);
       $("pane").innerHTML = ANIM.paneHtml(steps, M.names || {});
       $("playBtn").disabled = !steps.length;
@@ -46,7 +46,7 @@
   if (window.ANIM && M.play && $("playBtn")) {
     $("playBtn").addEventListener("click", () => {
       const i = state.current, upto = CH[i].upload ? CH.length : i;
-      ANIM.play(stage, M.play.filter(s => s.ch <= upto), { pane: $("pane"), hint: $("clickHint") });
+      ANIM.play(stage, M.play.filter(s => s.ch <= upto && !(s.until <= upto)), { pane: $("pane"), hint: $("clickHint") });
     });
   }
 

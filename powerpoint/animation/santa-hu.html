@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>/* moving between pages: the old page drifts aside and fades, the new one glides in; the rail holds still */@view-transition{navigation:auto}.rail{view-transition-name:rail}::view-transition-group(root){animation:none}::view-transition-old(root){animation:dk-out .2s cubic-bezier(.4,0,1,1) both}::view-transition-new(root){animation:dk-in .38s cubic-bezier(.16,1,.3,1) .06s both}::view-transition-old(rail),::view-transition-new(rail){animation:none}@keyframes dk-out{to{opacity:0;transform:translateX(-18px)}}@keyframes dk-in{from{opacity:0;transform:translateX(26px)}}@media (prefers-reduced-motion:reduce){::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none!important}}</style>
+<title>Jön a Mikulás! – PowerPoint-küldetés</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600;700&display=swap">
+<link rel="stylesheet" href="../mission.css">
+</head>
+<body>
+<header class="rail"><div class="in">
+  <a class="home" href="../../index.html">Digitális kultúra</a>
+  <span class="crumb"><a href="../../index.html#powerpoint">Bemutatókészítés – PowerPoint</a> › <a href="../../index.html#powerpoint-animation">2. lecke</a></span>
+</div></header>
+<div class="top">
+  <span class="art" aria-hidden="true"><svg viewBox="0 0 96 96"><circle cx="48" cy="48" r="46" fill="#10284a"/><path d="M2 70h92v6a46 46 0 0 1-92 0z" fill="#eef3f8"/>
+<path d="M22 60l20-18 20 18z" fill="#5b3a29"/><rect x="26" y="60" width="32" height="14" fill="#c0504d"/><rect x="36" y="63" width="10" height="8" fill="#ffd966"/><rect x="50" y="44" width="5" height="10" fill="#7f3f2a"/>
+<path d="M88 22C74 18 66 30 56 40" fill="none" stroke="#f2d264" stroke-width="2" stroke-dasharray="3 3"/><circle cx="88" cy="22" r="3" fill="#2f9e44"/>
+<g transform="translate(58 18)"><ellipse cx="6" cy="10" rx="7" ry="4" fill="#8b5a2b"/><circle cx="0" cy="6" r="3" fill="#8b5a2b"/><circle cx="-2" cy="6" r="1.2" fill="#e03131"/><rect x="14" y="8" width="16" height="7" rx="2" fill="#e03131"/><circle cx="20" cy="4" r="3.6" fill="#f5d0b0"/><path d="M16.4 3a3.6 3.6 0 0 1 7.2 0z" fill="#e03131"/></g>
+<g fill="#fff"><circle cx="20" cy="30" r="1.6"/><circle cx="34" cy="20" r="1.4"/><circle cx="76" cy="50" r="1.4"/><circle cx="16" cy="50" r="1.2"/></g></svg></span>
+  <div><div class="kicker">PowerPoint, 2. lecke: küldetés a PowerPointban</div><h1>Jön a Mikulás!</h1></div>
+  <div class="meta"><span>Haladás <b id="solvedCount">–</b></span><span>Idő <b id="timer">0:00</b></span><button type="button" class="mbtn" id="soundBtn">Hang: be</button><button type="button" id="resetBtn" title="Az egész küldetés újrakezdése">Újrakezdés</button></div>
+</div>
+<nav class="steps" id="steps" aria-label="Fejezetek"></nav>
+<div id="game"><main>
+  <article class="card" id="case" aria-live="polite"></article>
+  <section class="work" aria-label="A dia"><div class="card">
+    <div class="dlcard"><svg class="ic" viewBox="0 0 40 46" aria-hidden="true"><path d="M4 2h22l10 10v32H4z" fill="#fff" stroke="#c43e1c" stroke-width="2"/><path d="M26 2v10h10" fill="#fbebe5" stroke="#c43e1c" stroke-width="2"/><rect x="0" y="18" width="24" height="20" rx="2" fill="#c43e1c"/><path d="M8 33V23h5a3.2 3.2 0 0 1 0 6.4H8" fill="none" stroke="#fff" stroke-width="2.6" stroke-linejoin="round"/></svg><p><b>mikulas.pptx</b><br>Ebben a fájlban dolgozol, a PowerPointban.</p><a class="btn primary" href="mikulas.pptx" download>Letöltés</a></div>
+    <div class="work-head"><h2>Így működjön a diád</h2><p>A <b>Lejátszás</b> gombbal megnézheted, mit kell tudnia eddig.</p></div>
+    <div class="slidebox" id="slide" tabindex="0"></div>
+    <div class="playrow"><button type="button" class="btn primary" id="playBtn">▶ Lejátszás</button><p>Lejátszás közben ott, ahol egér van a listában, kattints a diára, mint diavetítéskor.</p></div>
+    <div class="mission-pane"><h3>Animációs munkaablak (minta)</h3><div class="ap-list" id="pane"></div></div>
+    <div class="ap-hint" id="clickHint" hidden>🖱 Kattints a diára!</div>
+  </div></section>
+</main></div>
+<section id="endPanel" hidden></section>
+<footer class="end">Digitális kultúra. A haladásod a böngésződben marad: ha bezárod az oldalt, legközelebb innen folytathatod. A feltöltött fájlt az oldal csak megnézi, nem küldi el sehová.</footer>
+<canvas id="fx" aria-hidden="true"></canvas>
+<script src="../pptx.js"></script>
+<script src="../anim.js"></script>
+<script>
+const star = c => `<svg class="star" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1l2.1 4.6 5 .5-3.8 3.4 1.1 4.9L8 11.9 3.6 14.4l1.1-4.9L.9 6.1l5-.5z" fill="${c}"/></svg>`;
+const GREEN = star("#2f9e44"), YELLOW = star("#e0a800"), RED = star("#d6336c");
+/* the slide with the most animations is the one to check */
+const sceneOf = d => d.slides.slice().sort((a, b) => b.anims.length - a.anims.length)[0] || { shapes: [], anims: [] };
+const START = { click: "Kattintásra", with: "Együtt az előzővel", after: "Az előző után" };
+function animOf(d, name, cls) {
+  const sl = sceneOf(d), sh = PPTX.byName(sl, name);
+  if (!sh) return { err: `Nem találom a dián ezt: <b>${name}</b>. Az eredeti, letöltött fájlban dolgozz, és ne töröld ki a részeit!` };
+  const list = PPTX.animsOf(sl, sh);
+  const a = list.find(x => x.cls === cls);
+  return { a, list, sl, err: null };
+}
+const CLS = { entr: "megjelenési (zöld) effektus", emph: "kiemelési (sárga) effektus", exit: "eltűnési (piros) effektus", path: "mozgásvonal" };
+const CLS_ACC = { entr: "megjelenési (zöld) effektust", emph: "kiemelési (sárga) effektust", exit: "eltűnési (piros) effektust", path: "mozgásvonalat" };
+function need(d, name, cls, start, extra) {
+  const r = animOf(d, name, cls); if (r.err) return r.err;
+  if (!r.a) return r.list.length ? `${name}: van animációja, de nem ${CLS[cls]}. Jelöld ki, és cseréld le.` : `${name}: még nincs animációja. Jelöld ki, és adj neki egy ${CLS_ACC[cls]}.`;
+  if (start && r.a.start !== start) return `${name}: az <i>Indítás</i> most „${START[r.a.start]}”, de „${START[start]}” kellene.`;
+  return extra ? extra(r.a) : true;
+}
+
+window.MISSION = {
+  key: "santa-hu-v1", title: "Jön a Mikulás!", saveAs: "mikulas-Kovacs-Anna.pptx",
+  confetti: ["#e03131", "#ffffff", "#2f9e44", "#ffd43b", "#8b5a2b", "#7fa7ff"],
+  next: { href: "../../index.html#powerpoint", text: "Vissza a PowerPoint-leckékhez" },
+  names: { "#x-moon": "Hold", "#x-snow": "Hópelyhek", "#x-sleigh": "Szán", "#x-light": "Fény", "#x-gift": "Csomag" },
+  slide: `<svg viewBox="0 0 960 540" role="img" aria-label="A mintadia: téli éjszaka, ház világító ablakkal és csizmával, fenyőfa, hópelyhek, jobbra fent a Mikulás szánja rénszarvassal, balra fent a Hold">
+    <rect width="960" height="540" fill="#10284a"/><rect y="453.6" width="960" height="86.4" fill="#eef3f8"/>
+    <g id="x-moon" data-hl="1"><circle cx="100.8" cy="90" r="57.6" fill="#f3efd8" stroke="#cfc59d" stroke-width="2.5"/><g fill="#ddd5b2"><circle cx="75.6" cy="68.4" r="14.4"/><circle cx="118.8" cy="104.4" r="18.7"/><circle cx="126" cy="61.2" r="8.6"/></g></g>
+    <text x="300" y="70" font-family="Aptos, Calibri, 'Atkinson Hyperlegible', sans-serif" font-size="40" font-weight="700" fill="#fff">Jön a Mikulás!</text>
+    <rect x="446.4" y="144" width="36" height="93.6" fill="#7f3f2a" stroke="#4a2416" stroke-width="2"/>
+    <path d="M201.6 262.8H547.2L374.4 144z" fill="#5b3a29" stroke="#3b2418" stroke-width="2"/>
+    <rect x="230.4" y="259.2" width="288" height="198" fill="#c0504d" stroke="#7f2a28" stroke-width="2"/>
+    <rect x="288" y="302.4" width="100.8" height="86.4" fill="#2b3a55" stroke="#f2f2f2" stroke-width="5"/>
+    <rect x="421.2" y="342" width="61.2" height="115.2" fill="#6b4226" stroke="#3b2418" stroke-width="2"/><circle cx="473" cy="399.6" r="3.6" fill="#ffd966"/>
+    <g id="x-light" data-hl="4"><rect x="292.3" y="306.7" width="92.2" height="77.8" fill="#ffd966"/></g>
+    <g id="x-gift" data-hl="5"><rect x="321.8" y="309.6" width="30.2" height="27.4" fill="#2f9e44" stroke="#1b5e20" stroke-width="1.5"/><rect x="334.8" y="309.6" width="5" height="27.4" fill="#ffd43b"/><path d="M337 309c-5-6-11-2-8 2l8 5 8-5c3-4-3-8-8-2z" fill="#ffd43b"/></g>
+    <g><rect x="324" y="342" width="23" height="36" fill="#e03131" stroke="#8f1d1d" stroke-width="1.5"/><rect x="324" y="368.6" width="39.6" height="15.8" rx="5" fill="#e03131" stroke="#8f1d1d" stroke-width="1.5"/><rect x="321" y="338.4" width="28.8" height="8.6" fill="#fff"/></g>
+    <g><rect x="752.4" y="410.4" width="21.6" height="46.8" fill="#6b4226"/><g fill="#2b8a3e" stroke="#1b5e20" stroke-width="2"><path d="M684 417.6H842.4L763.2 316.8z"/><path d="M698.4 360H828L763.2 259.2z"/><path d="M714.6 306H811.8L763.2 205.2z"/></g>
+      <path d="M763.2 187l4.6 9.4 10.4 1.1-7.8 7 2.2 10.2-9.4-5.2-9.4 5.2 2.2-10.2-7.8-7 10.4-1.1z" fill="#ffd43b"/></g>
+    <g id="x-snow" data-hl="2">${[[1.4,2.6],[2.6,1.3],[3.6,2.9],[4.9,1.0],[5.6,3.3],[7.6,1.6],[8.4,3.0],[9.3,1.1],[8.9,4.6],[12.2,3.0],[11.8,5.0],[2.2,4.2],[1.0,5.4],[7.9,5.4],[12.6,1.9],[9.9,2.2]]
+      .map(([x, y]) => `<path transform="translate(${x * 72 + 7.2} ${y * 72 + 7.2})" d="M0-7.2L2.1-3.6 6.2-3.6 4.2 0 6.2 3.6 2.1 3.6 0 7.2-2.1 3.6-6.2 3.6-4.2 0-6.2-3.6-2.1-3.6z" fill="#fff"/>`).join("")}</g>
+    <g id="x-sleigh" data-hl="3 6">
+      <g stroke="#4a2f16" stroke-width="3.6"><path d="M752 128V100M764 128V100M786 128V100M798 128V100"/><path d="M744 58l-6-22M754 58l6-22"/></g>
+      <ellipse cx="775.8" cy="91.8" rx="30.6" ry="16.2" fill="#8b5a2b" stroke="#4a2f16" stroke-width="1.5"/><circle cx="741.2" cy="67.7" r="12.5" fill="#8b5a2b" stroke="#4a2f16" stroke-width="1.5"/><circle cx="731.5" cy="68" r="3.4" fill="#e03131"/>
+      <rect x="806" y="90" width="32" height="3" fill="#c9a227"/>
+      <ellipse cx="912.6" cy="74.2" rx="16.2" ry="18" fill="#8b5a2b" stroke="#4a2f16" stroke-width="1.5"/>
+      <circle cx="868.3" cy="59.8" r="15" fill="#e03131" stroke="#8f1d1d" stroke-width="1.5"/><circle cx="868.3" cy="70" r="11" fill="#f5d0b0"/><ellipse cx="868.3" cy="82.8" rx="13" ry="11" fill="#fff"/>
+      <rect x="835.2" y="82.8" width="90" height="39.6" rx="10" fill="#e03131" stroke="#8f1d1d" stroke-width="2"/><rect x="828" y="129.6" width="104.4" height="4.3" fill="#c9a227"/></g>
+  </svg>`,
+  play: [
+    { ch: 0, until: 1, el: "#x-moon", cls: "emph", fx: "spin", start: "click", dur: 1000, label: "Forgás" },
+    { ch: 2, el: "#x-snow", cls: "entr", fx: "fly", dir: "top", start: "with", dur: 2000, label: "Beúszás" },
+    { ch: 3, el: "#x-sleigh", cls: "path", fx: "path", dx: -317, dy: 29, start: "click", dur: 3000, label: "Vonalak" },
+    { ch: 4, el: "#x-light", cls: "entr", fx: "fade", start: "after", dur: 500, label: "Fokozatos megjelenés" },
+    { ch: 5, el: "#x-gift", cls: "entr", fx: "zoom", start: "after", delay: 1000, dur: 500, label: "Nagyítás" },
+    { ch: 5, el: "#x-gift", cls: "emph", fx: "grow", scale: 1.4, start: "after", dur: 2000, label: "Növekedés/kicsinyítés" },
+    { ch: 6, el: "#x-sleigh", cls: "exit", fx: "flyout", dir: "top", start: "click", dur: 500, label: "Kiúszás" }
+  ],
+  chapters: [
+    { refresher: true, title: "Nyisd meg a fájlt",
+      story: `<p>December 6-án jön a Mikulás! A rajz már kész: ott a ház, az ablakban a csizma, a fenyőfa, a hópelyhek, fent pedig a Mikulás szánja a rénszarvassal.</p>
+        <p>A feladatod: <b>animációkkal</b> megmutatni, hogyan érkezik. Hull a hó, a szán a kéményhez repül, kigyullad a fény, a csizmában megjelenik egy csomag, aztán a szán továbbrepül.</p>
+        <p>De vigyázz: valaki már belepiszkált a fájlba…</p>`,
+      learn: `<ul><li>Az animációk az <span class="ui">Animációk</span> lapon vannak.</li><li>Előbb mindig <b>jelöld ki</b>, mit akarsz animálni, csak utána válassz effektust.</li><li>Az elméletet <a href="intro-hu.html">itt</a> olvashatod el újra.</li></ul>`,
+      steps: [
+        `Töltsd le a fájlt: <br><a class="btn primary" href="mikulas.pptx" download>mikulas.pptx letöltése</a>`,
+        `Nyisd meg a PowerPointban. Ha felül sárga sávban azt látod: <span class="ui">Védett nézet</span>, kattints a <span class="ui">Szerkesztés engedélyezése</span> gombra.`,
+        `Mentsd el a neveddel: <span class="ui">Fájl</span> › <span class="ui">Mentés másként</span>, például <code>mikulas-Kovacs-Anna</code>.`,
+        `<span class="ui">Animációk</span> › <span class="ui">Animációs munkaablak</span>. Nézd meg a listát!`
+      ],
+      asks: [{ q: "Hány animáció van <b>már most</b> a munkaablak listájában?", num: 1, traps: { "0": "Nézd meg jobban: a lista nem üres. Van benne egy sor." } }],
+      hints: ["Egy sor van a listában: a Holdé."],
+      success: "Egy: valaki megpörgette a Holdat. Nézzük meg, mit csinál!" },
+
+    { title: "Ki pörgeti a Holdat?",
+      story: `<p>Valaki adott a Holdnak egy animációt: kattintásra pörögni kezd, és meg sem áll. Ez nagyon zavaró egy mikulásos dián! Töröljük ki.</p>`,
+      learn: `<p>Egy animációt a munkaablakban törölsz: kattints a sorára, hogy ki legyen jelölve, és nyomd meg a <kbd>Delete</kbd> billentyűt. (Vagy kattints rá jobb gombbal, és válaszd az <span class="ui">Eltávolítás</span> parancsot.)</p><p>Az alakzat ettől megmarad, csak az animációja tűnik el.</p>`,
+      steps: [
+        `Nézd meg, mit csinál most a dia: nyomd meg az <kbd>F5</kbd> billentyűt, és kattints egyet. Kilépés: <kbd>Esc</kbd>.`,
+        `A munkaablakban kattints a Hold sorára.`,
+        `Nyomd meg a <kbd>Delete</kbd> billentyűt. A lista üres lett, a Hold mellől eltűnt a kis szám.`
+      ],
+      asks: [{ q: "Melyik billentyűvel törölted az animációt?", text: ["delete", "del", "delete billentyű", "deletet", "deletevel", "eltávolítás"], traps: { "backspace": "A munkaablakban a <kbd>Delete</kbd> billentyű a biztos. Melyik az?", "esc": "Az Esc a diavetítésből lép ki. A törléshez másik billentyű kell." } }],
+      hints: ["Ugyanaz a billentyű, amivel egy kijelölt alakzatot is törölsz: <kbd>Delete</kbd> (a billentyűzeten gyakran <kbd>Del</kbd>)."],
+      success: "Delete: a Hold megnyugodott. Most jöhetnek a jó animációk!" },
+
+    { title: "Hull a hó",
+      story: `<p>A dia elején, magától, kattintás nélkül kezdjen <b>hullani a hó</b>: a hópelyhek lassan ússzanak be felülről.</p>`,
+      learn: `<p>Ha a <b>legelső</b> animáció <span class="ui">Együtt az előzővel</span> indul, akkor rögtön elindul, amikor a dia megjelenik. Az <span class="ui">Időtartam</span> pedig azt mondja meg, milyen lassan: a nagyobb szám lassabb.</p>`,
+      steps: [
+        `Kattints az egyik hópehelyre. Mivel csoportba vannak foglalva, az összes kijelölődik.`,
+        `${GREEN} Megjelenés: <span class="ui">Beúszás</span>, aztán <span class="ui">Effektus beállításai</span> › <span class="ui">Felülről</span>.`,
+        `<span class="ui">Indítás</span> › <span class="ui">Együtt az előzővel</span>.`,
+        `Nézd meg, mennyi most az <span class="ui">Időtartam</span>! Aztán írd át <b>2</b>-re, és nyomd meg az <kbd>Enter</kbd> billentyűt.`
+      ],
+      asks: [{ q: "Mennyi volt az <b>Időtartam</b>, mielőtt átírtad? (másodpercben)", num: 0.5, traps: { "2": "Az már az új érték. Mennyi volt előtte? Ha már átírtad, válassz egy új effektust, és nézd meg.", "500": "Majdnem: másodpercben kérdezzük. Hány másodperc az 00,50?", "50": "Az 00,50 nem ötven, hanem nulla egész öt tized: fél másodperc." } }],
+      hints: ["A PowerPoint így írja: 00,50. Ez fél másodperc, vagyis 0,5."],
+      success: "Fél másodperc volt, most 2: a hó szépen, lassan hull." },
+
+    { title: "Megérkezik a szán",
+      story: `<p>Kattintásra a Mikulás szánja <b>a kéményhez repül</b>. A szán most jobbra fent van, a kémény balra: a mozgásvonalnak balra kell vezetnie.</p>`,
+      isNew: false,
+      learn: `<p>A mozgásvonal a <b>zöld</b> jeltől a <b>piros</b> jelig visz. A piros jelet egérrel arrébb húzhatod: oda megy majd a szán.</p>`,
+      steps: [
+        `Kattints a szánra. (Ha csak egy darabja jelölődik ki, kattints a dián egy üres helyre, aztán egyszer újra a szánra.)`,
+        `<i>Mozgásvonalak</i> › <span class="ui">Vonalak</span>, aztán <span class="ui">Effektus beállításai</span> › válaszd azt az irányt, amelyik <b>balra</b> mutat.`,
+        `Húzd a vonal végén a <b>piros</b> jelet úgy, hogy a szán a kémény mellett álljon meg.`,
+        `<span class="ui">Időtartam</span>: <b>3</b>. Az <span class="ui">Indítás</span> maradjon <span class="ui">Kattintásra</span>.`
+      ],
+      asks: [{ q: "Hányadik kattintásra indul a szán? (Nézd meg a kis számot a szán mellett vagy a munkaablakban.)", num: 1, traps: { "0": "A 0 a hópelyheké: azok kattintás nélkül indulnak. A szán melyik kattintásra jön?", "2": "Nézd meg a munkaablakban: hány kattintásos animáció van a szán előtt?" } }],
+      hints: ["A hópelyhek a 0-t kapták (kattintás nélkül indulnak), így a szán az első kattintásra jön."],
+      success: "Az első kattintásra: a szán megérkezik a kéményhez." },
+
+    { title: "Kigyullad a fény",
+      story: `<p>Amikor a szán megérkezik, a házban <b>felkapcsolják a villanyt</b>: magától, kattintás nélkül.</p>`,
+      isNew: false,
+      learn: `<p>Az <span class="ui">Az előző után</span> indítás megvárja, hogy az előző animáció befejeződjön, aztán magától indul. A munkaablakban ilyenkor egy kis <b>óra</b> áll a sor előtt.</p>`,
+      steps: [
+        `Kattints a sárga ablakra (ez a <i>Fény</i>; ne a csizmára kattints!).`,
+        `${GREEN} Megjelenés: <span class="ui">Fokozatos megjelenés</span>.`,
+        `<span class="ui">Indítás</span> › <span class="ui">Az előző után</span>.`
+      ],
+      asks: [{ q: "Milyen jel áll a Fény sora előtt a munkaablakban? (Írd be: <i>szám</i>, <i>óra</i> vagy <i>semmi</i>.)", text: ["óra", "órát", "egy óra", "kis óra", "óra jel"], traps: { "szám": "Akkor a Fény még kattintásra indul. Állítsd: Indítás › Az előző után!", "semmi": "Az az Együtt az előzővel jele. A Fény Az előző után indul?" } }],
+      hints: ["Az előző után = várakozás: a jele egy kis óra."],
+      success: "Óra: a fény magától kigyullad, amikor a szán megérkezett." },
+
+    { title: "Csomag a csizmában",
+      story: `<p>A Mikulás nem felejtette el a csizmát! Egy másodperccel azután, hogy kigyulladt a fény, <b>megjelenik a csomag</b>, aztán egy kicsit <b>meg is nő</b>, hogy mindenki lássa.</p>`,
+      learn: `<p>Egy dolognak <b>több animációja</b> is lehet. De vigyázz: ha a nagy effektuslistából választasz, az <b>lecseréli</b> a régit! A másodikat az <span class="ui">Animáció hozzáadása</span> gombbal add hozzá: így új sor kerül a munkaablakba.</p>`,
+      steps: [
+        `Kattints a zöld csomagra.`,
+        `${GREEN} Megjelenés: <span class="ui">Nagyítás</span>. <span class="ui">Indítás</span> › <span class="ui">Az előző után</span>, <span class="ui">Késleltetés</span>: <b>1</b>.`,
+        `A csomag még ki van jelölve. Most <b>ne</b> a nagy listából válassz! Kattints az <span class="ui">Animáció hozzáadása</span> gombra, és ott ${YELLOW} Kiemelés: <span class="ui">Növekedés/kicsinyítés</span>.`,
+        `Ennek is: <span class="ui">Indítás</span> › <span class="ui">Az előző után</span>.`
+      ],
+      asks: [{ q: "Hány sor tartozik most a <b>Csomaghoz</b> a munkaablakban?", num: 2, traps: { "1": "Akkor a második effektus lecserélte az elsőt. Add hozzá újra a Nagyítást, aztán az Animáció hozzáadása gombbal a Növekedés/kicsinyítést!", "3": "Egy-egy effektus egy sor. Kettő kell: Nagyítás és Növekedés/kicsinyítés. A fölöslegeset töröld!" } }],
+      hints: ["Egy sor a Nagyításé, egy a Növekedés/kicsinyítésé."],
+      success: "Két sor: a csomag előbb megjelenik, aztán megnő. Ezt csak az Animáció hozzáadása tudja!" },
+
+    { title: "Tovább repül a szán",
+      story: `<p>A Mikulásnak még sok csizmához el kell jutnia. A következő kattintásra a szán <b>felfelé kiúszik</b> a diáról.</p>`,
+      learn: `<p>Az ${RED} <b>eltűnési</b> effektus után a dolog nem látszik többé. A szánnak már van egy mozgásvonala: ezt a második animációt is az <span class="ui">Animáció hozzáadása</span> gombbal adod hozzá, különben elveszne a mozgásvonal!</p>`,
+      steps: [
+        `Kattints a szánra.`,
+        `<span class="ui">Animáció hozzáadása</span> › ${RED} Eltűnés: <span class="ui">Kiúszás</span>.`,
+        `<span class="ui">Effektus beállításai</span> › válaszd azt az irányt, amelyik <b>felfelé</b> visz. Az <span class="ui">Indítás</span> maradjon <span class="ui">Kattintásra</span>.`,
+        `Nézd meg az egészet <kbd>F5</kbd>-tel, és mentsd el: <kbd>Ctrl</kbd>+<kbd>S</kbd>.`
+      ],
+      asks: [{ q: "Diavetítésben hányszor kell kattintanod, hogy minden animáció lejátszódjon?", num: 2,
+        traps: { "6": "Nem mindegyik indul kattintásra! Számold meg a munkaablakban a számokat (a 0 nem kattintás).", "3": "A 0 előtti hópelyhek nem kellenek kattintás: rögtön indulnak. Hány szám van még?", "1": "A szán érkezése és a szán távozása is kattintásra indul." } }],
+      hints: ["Az első kattintás hozza a szánt, a második viszi el. Minden más magától megy."],
+      success: "Kétszer: egyszer jön, egyszer megy a Mikulás." },
+
+    { title: "Beadás", upload: true,
+      story: `<p>Kész a mikulásos dia! Mielőtt beadod, az oldal <b>megnézi a fájlodat</b>: megvan-e minden animáció, jó-e az indításuk, és jó-e a sorrendjük.</p>`,
+      steps: [
+        `Mentsd el a fájlt a PowerPointban: <kbd>Ctrl</kbd>+<kbd>S</kbd>.`,
+        `Húzd a fájlt az alábbi mezőbe (vagy kattints rá, és válaszd ki). A fájlt az oldal csak itt a böngészőben nézi meg, nem küldi el sehová.`,
+        `Ha valami piros, javítsd ki a PowerPointban, mentsd el, és húzd ide újra.`
+      ],
+      success: "Minden animáció a helyén van. Boldog Mikulást!" }
+  ],
+  checks: [
+    { label: "Hold: nincs animációja", test: d => { const r = animOf(d, "Hold", "emph"); if (r.err) return r.err; return !r.list.length || "A Holdnak még van animációja. A munkaablakban jelöld ki a sorát, és nyomd meg a Delete billentyűt."; } },
+    { label: "Hópelyhek: megjelenés, legelöl, kattintás nélkül, 2 mp", test: d => need(d, "Hópelyhek", "entr", null, a => {
+        const sl = sceneOf(d);
+        if (sl.anims[0] !== a) return "A Hópelyhek animációja még nem a lista legtetején van. Jelöld ki, és <i>Áthelyezés korábbra</i>.";
+        if (a.start === "click") return "Hópelyhek: az <i>Indítás</i> most „Kattintásra”, de „Együtt az előzővel” kellene.";
+        return Math.abs(a.dur - 2000) <= 60 || `Hópelyhek: az időtartam most ${(a.dur / 1000).toLocaleString("hu-HU")} mp, de 2 mp kellene.`; }) },
+    { label: "Szán: mozgásvonal balra, kattintásra, 3 mp", test: d => need(d, "Szán", "path", "click", a => {
+        const e = PPTX.pathEnd(a.motion);
+        if (!(e && e[0] < -0.15)) return "Szán: a mozgásvonal nem vezet elég messzire balra. Húzd a piros jelet a kémény mellé!";
+        return Math.abs(a.dur - 3000) <= 60 || `Szán: az időtartam most ${(a.dur / 1000).toLocaleString("hu-HU")} mp, de 3 mp kellene.`; }) },
+    { label: "Fény: megjelenés, az előző után", test: d => need(d, "Fény", "entr", "after") },
+    { label: "Csomag: megjelenés, az előző után, 1 mp késleltetéssel", test: d => need(d, "Csomag", "entr", "after", a => Math.abs(a.delay - 1000) <= 30 || `Csomag: a késleltetés most ${(a.delay / 1000).toLocaleString("hu-HU")} mp, de 1 mp kellene.`) },
+    { label: "Csomag: második animáció, kiemelés, az előző után", test: d => {
+        const r = animOf(d, "Csomag", "emph"); if (r.err) return r.err;
+        if (!r.a && r.list.length) return "Csomag: hiányzik a második animáció. Jelöld ki a csomagot, és <i>Animáció hozzáadása › Kiemelés › Növekedés/kicsinyítés</i>.";
+        return need(d, "Csomag", "emph", "after"); } },
+    { label: "Szán: második animáció, eltűnés, kattintásra", test: d => {
+        const r = animOf(d, "Szán", "exit"); if (r.err) return r.err;
+        if (r.a && !r.list.some(a => a.cls === "path")) return "A szánnak már nincs mozgásvonala: az eltűnés lecserélte. A mozgásvonalat add vissza, az eltűnést pedig az <i>Animáció hozzáadása</i> gombbal!";
+        if (!r.a && r.list.length) return "Szán: hiányzik a második animáció. Jelöld ki a szánt, és <i>Animáció hozzáadása › Eltűnés › Kiúszás</i>.";
+        return need(d, "Szán", "exit", "click"); } },
+    { label: "Jó sorrend: hó → szán érkezik → fény → csomag → csomag nő → szán elmegy", test: d => {
+        const sl = sceneOf(d), want = [["Hópelyhek", "entr"], ["Szán", "path"], ["Fény", "entr"], ["Csomag", "entr"], ["Csomag", "emph"], ["Szán", "exit"]];
+        const pos = want.map(([n, c]) => { const sh = PPTX.byName(sl, n); return sh ? sl.anims.findIndex(a => a.cls === c && a.shape && PPTX.inside(a.shape, sh)) : -1; });
+        if (pos.some(p => p < 0)) return "Még nincs meg mind a hat animáció.";
+        const label = ([n, c]) => n + ({ entr: " (megjelenés)", emph: " (kiemelés)", exit: " (eltűnés)", path: " (mozgásvonal)" })[c];
+        for (let k = 1; k < pos.length; k++) if (pos[k] < pos[k - 1]) return `${label(want[k])} a ${label(want[k - 1])} előtt van. Rendezd át a munkaablakban!`;
+        return true; } }
+  ],
+  ending: {
+    title: "Boldog Mikulást!",
+    text: `<p>A dián most hull a hó, megérkezik a szán, kigyullad a fény, a csizmában megjelenik a csomag, aztán a Mikulás továbbrepül.</p>
+      <p>Kitöröltél egy fölösleges animációt, és megtanultad, hogyan kap egy dolog <b>két animációt</b> az <span class="ui">Animáció hozzáadása</span> gombbal.</p>`,
+    rank: (min, hints) => hints === 0 ? "Rang: Főrénszarvas. Egyetlen segítség nélkül!" : hints <= 3 ? "Rang: A Mikulás segítője" : "Rang: Rénszarvas-tanonc. Legközelebb kevesebb segítséggel is menni fog!"
+  }
+};
+</script>
+<script src="../real.js"></script>
+<script src="../../nav.js?v=6484c1c1" defer></script>
+</body>
+</html>

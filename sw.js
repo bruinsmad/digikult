@@ -6,7 +6,7 @@
    The file list below is written by tools/build-sw.py: run it before pushing. */
 
 /* FILES:BEGIN (written by tools/build-sw.py, don't edit by hand) */
-const VERSION = "2bdcefdf10";
+const VERSION = "84e38f33b1";
 const CORE = [
 "./",
 "css/basics/first-steps.html",
@@ -126,7 +126,9 @@ const CORE = [
 "powerpoint/anim.js",
 "powerpoint/animation/holdutazas.pptx",
 "powerpoint/animation/intro-hu.html",
+"powerpoint/animation/mikulas.pptx",
 "powerpoint/animation/moon-hu.html",
+"powerpoint/animation/santa-hu.html",
 "powerpoint/explainer.css",
 "powerpoint/explainer.js",
 "powerpoint/index.html",

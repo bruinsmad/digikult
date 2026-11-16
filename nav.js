@@ -695,6 +695,18 @@
                 },
                 files: { hu: "powerpoint/animation/moon-hu.html" },
                 progress: { chapters: 7, keys: { hu: "moon-trip-hu-v1" } }
+              },
+              {
+                id: "santa",
+                kind: "story",
+                minutes: 40,
+                title: { hu: "Jön a Mikulás!", en: "Here Comes Santa!" },
+                desc: {
+                  hu: "Valaki már belepiszkált a fájlba: előbb törlöd a fölösleges animációt, aztán hull a hó, megérkezik a szán, és a csizmába csomag kerül – két animáció egy dolgon.",
+                  en: "Someone has already meddled with the file: first delete the stray animation, then the snow falls, the sleigh arrives and a present lands in the boot – two animations on one thing."
+                },
+                files: { hu: "powerpoint/animation/santa-hu.html" },
+                progress: { chapters: 7, keys: { hu: "santa-hu-v1" } }
               }
             ]
           }

@@ -89,7 +89,7 @@
         const row = rows[x.k];
         setTimeout(() => { if (stage.__token !== token) return; if (row) row.classList.add("on"); if (x.s.cls === "entr") el.style.opacity = ""; }, x.start);
         setTimeout(() => { if (row) row.classList.remove("on"); }, x.end + 120);
-        el.animate(keyframes(x.s), { duration: reduced() ? 1 : x.dur, delay: x.start, fill: "both", easing: x.s.fx === "path" || x.s.fx === "spin" ? "ease-in-out" : "ease-out", composite: x.s.fx === "path" || x.s.fx === "grow" || x.s.fx === "spin" || x.s.fx === "pulse" ? "accumulate" : "replace" });
+        el.animate(keyframes(x.s), { duration: reduced() ? 1 : x.dur, delay: x.start, fill: "both", easing: x.s.fx === "path" || x.s.fx === "spin" ? "ease-in-out" : "ease-out", composite: ["path", "grow", "spin", "pulse", "flyout"].includes(x.s.fx) ? "accumulate" : "replace" });
       });
       await sleep(span + 60);
     }
