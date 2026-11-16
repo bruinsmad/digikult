@@ -127,7 +127,11 @@
   /* ---------- typed answers (the starting chapter) ---------- */
   const normText = s => String(s).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[\s.,\-–!?„”"']/g, "");
   const WORDS = { nulla: 0, egy: 1, ketto: 2, ket: 2, harom: 3, negy: 4, ot: 5, hat: 6, het: 7, nyolc: 8, kilenc: 9, tiz: 10 };
-  const normNum = s => { const w = String(s).trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s*(db|darab)$/, ""); if (w in WORDS) return WORDS[w]; const t = String(s).replace(/[\s  ]/g, "").replace(/(db|darab|cm|pt|oldal)$/i, "").replace(",", "."); return /^-?\d+(\.\d+)?$/.test(t) ? parseFloat(t) : null; };
+  /* "7", "7 eredmény", "1/7 találat", "2,5 cm" all count as the number */
+  const normNum = s => { let w = String(s).trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    w = w.replace(/\s*(db|darab|eredmeny|talalat|cm|pt|oldal|szor|szer|x)\.?$/, "").trim(); if (w in WORDS) return WORDS[w];
+    if (/^\d+\s*\/\s*\d+$/.test(w)) w = w.split("/").pop();
+    const t = w.replace(/[\s\u00a0]/g, "").replace(",", "."); return /^-?\d+(\.\d+)?$/.test(t) ? parseFloat(t) : null; };
   function judge(q, raw) {
     if (!raw.trim()) return { ok: false, msg: "Még nem írtál be semmit." };
     if (q.num !== undefined) {

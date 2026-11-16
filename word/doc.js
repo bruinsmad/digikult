@@ -6,7 +6,9 @@
              blocks: [ para | { type: "table", rows: [[..]], widths: [cm], headBold, headShade } | { type: "break" } ] }
    para  = { text | runs: [{ t, b, i, u, size, color }], align: left|center|right|both, left, right, firstLine (cm),
              before, after (pt), line (×), list: "bullet"|"number", box, shade, b, i, size, color (defaults for runs),
-             target (yellow), img: { src, w, h (cm), wrap: inline|square|tight|topAndBottom|behind|front, side } } */
+             target (yellow), img: { src, w, h (cm), wrap: inline|square|tight|topAndBottom|behind|front, side },
+             style: "h1"|"h2"|"title"|"caption" (Word's built-in look), fn: "footnote text" (a numbered footnote at the end) }
+   more blocks: { type: "toc", entries: [{ text, level, page }], stale } ; model.titlePg: no header/footer on page 1 */
 (function () {
   "use strict";
   const CM = 37.8, PT = 96 / 72;
@@ -25,7 +27,11 @@
     if (marks) t = t.replace(/ /g, '<span class="sp"> </span>').replace(/\t/g, '<span class="tb">\t</span>');
     return `<span class="w" data-w="${k}" style="${st.join(";")}">${t}</span>`;
   }
-  function paraHtml(p, idx, num, marks, base) {
+  const STYLES = { h1: { size: 16, color: "#2f5496", before: 12, after: 0 }, h2: { size: 13, color: "#2f5496", before: 2, after: 0 },
+    title: { size: 28 }, caption: { size: 9, i: true, color: "#44546a", after: 10 } };
+  function paraHtml(p0, idx, num, marks, base, fnNo) {
+    const p = p0.style && STYLES[p0.style] ? Object.assign({}, STYLES[p0.style], p0) : p0;
+    if (p0.style && STYLES[p0.style]) { if (p0.before === undefined) p.before = STYLES[p0.style].before; if (p0.after === undefined) p.after = STYLES[p0.style].after; }
     const st = [], cls = ["wd-p"];
     const left = p.left || 0, right = p.right || 0, fl = p.firstLine || 0;
     const size = (p.size || 11) * PT;
@@ -42,7 +48,7 @@
     const img = p.img ? imgHtml(p.img) : "";
     const runs = runsOf(p);
     const inner = runs.map((r, k) => runHtml(p, r, k, marks)).join("");
-    const pm = marks ? `<span class="pm">¶</span>` : "";
+    const pm = (fnNo ? `<sup class="wd-fn">${fnNo}</sup>` : "") + (marks ? `<span class="pm">¶</span>` : "");
     return `<div class="${cls.join(" ")}" data-p="${idx}" style="${st.join(";")}">${img && p.img.wrap !== "inline" ? img : ""}${marker}${img && p.img.wrap === "inline" ? img : ""}${inner || (marks ? "" : "​")}${pm}</div>`;
   }
   function imgHtml(m) {
@@ -57,21 +63,27 @@
       ${t.rows.map((row, ri) => `<tr>${row.map(c => `<td style="${ri === 0 && t.headShade ? `background:${t.headShade};` : ""}${ri === 0 && t.headBold ? "font-weight:700;" : ""}">${esc(c)}${marks ? '<span class="pm">¤</span>' : ""}</td>`).join("")}</tr>`).join("")}</table>`;
   }
 
+  function tocHtml(t, idx) {
+    return `<div class="wd-toc${t.target ? " wd-target" : ""}${t.stale ? " stale" : ""}" data-p="${idx}"><div class="wd-toch">Tartalom</div>${(t.entries || []).map(e => `<div class="wd-toce l${e.level || 1}"><span>${esc(e.text)}</span><i></i><b>${e.page ?? ""}</b></div>`).join("") || `<div class="wd-toce"><span>Nincs tartalomjegyzék-bejegyzés.</span></div>`}</div>`;
+  }
   function pagesHtml(m) {
     const pg = Object.assign({}, PAGE, m.page || {}), marks = !!m.marks;
-    const pages = [[]]; let num = 0;
+    const pages = [[]], notes = [[]]; let num = 0, fn = 0;
     (m.blocks || []).forEach((b, idx) => {
       if (b.hidden) return;
-      if (b.type === "break") { if (marks) pages[pages.length - 1].push(`<div class="wd-break">Oldaltörés</div>`); pages.push([]); num = 0; return; }
+      if (b.type === "break") { if (marks) pages[pages.length - 1].push(`<div class="wd-break">Oldaltörés</div>`); pages.push([]); notes.push([]); num = 0; return; }
       if (b.type === "table") { pages[pages.length - 1].push(tableHtml(b, idx, marks)); num = 0; return; }
+      if (b.type === "toc") { pages[pages.length - 1].push(tocHtml(b, idx)); num = 0; return; }
       num = b.list === "number" ? num + 1 : 0;
-      pages[pages.length - 1].push(paraHtml(b, idx, num, marks));
+      if (b.fn) { fn++; notes[notes.length - 1].push(`<div class="wd-fnt"><sup>${fn}</sup> ${esc(b.fn)}</div>`); }
+      pages[pages.length - 1].push(paraHtml(b, idx, num, marks, null, b.fn ? fn : 0));
     });
     return pages.map((blocks, k) => `<div class="wd-pg${m.headerTarget ? " ht" : ""}${m.footerTarget ? " ft" : ""}${m.pageTarget ? " pt" : ""}" style="width:${pg.w * CM}px;min-height:${(m.pageH ?? pg.h) * CM}px;padding:${pg.top * CM}px ${pg.right * CM}px ${pg.bottom * CM}px ${pg.left * CM}px;--l:${pg.left * CM}px;--r:${pg.right * CM}px;--t:${pg.top * CM}px;--b:${pg.bottom * CM}px">
       ${m.showMargins ? `<span class="wd-mg" aria-hidden="true"></span>` : ""}
-      ${m.header != null ? `<div class="wd-hd${m.header ? "" : " empty"}">${esc(m.header || "Élőfej")}</div>` : ""}
+      ${m.header != null && !(m.titlePg && k === 0) ? `<div class="wd-hd${m.header ? "" : " empty"}">${esc(m.header || "Élőfej")}</div>` : ""}
       <div class="wd-body">${blocks.join("")}</div>
-      ${m.footerPage || m.footer != null ? `<div class="wd-ft${m.footer || m.footerPage ? "" : " empty"}">${m.footer ? esc(m.footer) + " " : ""}${m.footerPage ? k + 1 : m.footer ? "" : "Élőláb"}</div>` : ""}
+      ${notes[k] && notes[k].length ? `<div class="wd-notes">${notes[k].join("")}</div>` : ""}
+      ${(m.footerPage || m.footer != null) && !(m.titlePg && k === 0) ? `<div class="wd-ft${m.footer || m.footerPage ? "" : " empty"}">${m.footer ? esc(m.footer) + " " : ""}${m.footerPage ? k + 1 : m.footer ? "" : "Élőláb"}</div>` : ""}
     </div>`).join("");
   }
 

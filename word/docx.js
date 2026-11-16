@@ -151,7 +151,7 @@
       if (dd) { defRPr = desc(dd, "rPr")[0] || null; defPPr = desc(dd, "pPr")[0] || null; }
       desc(stylesX, "style").forEach(s => {
         const id = attr(s, "styleId");
-        styles[id] = { type: attr(s, "type"), basedOn: val(kid(s, "basedOn")), pPr: kid(s, "pPr"), rPr: kid(s, "rPr"), tblPr: kid(s, "tblPr"), tcPr: kid(s, "tcPr"),
+        styles[id] = { name: String(val(kid(s, "name")) || id).toLowerCase(), type: attr(s, "type"), basedOn: val(kid(s, "basedOn")), pPr: kid(s, "pPr"), rPr: kid(s, "rPr"), tblPr: kid(s, "tblPr"), tcPr: kid(s, "tcPr"),
           cond: Object.fromEntries(kids(s, "tblStylePr").map(c => [attr(c, "type"), { rPr: kid(c, "rPr"), tcPr: kid(c, "tcPr"), pPr: kid(c, "pPr") }])) };
         if (attr(s, "type") === "paragraph" && on2(attr(s, "default"))) defPara = id;
       });
@@ -210,6 +210,9 @@
       const pb = pel("pageBreakBefore");
       const sp = kid(pPr, "sectPr"), stype = sp && val(kid(sp, "type"));
       const sectBreak = !!sp && stype !== "continuous";
+      /* fields (TOC, SEQ for captions, PAGE…) and footnote marks in this paragraph */
+      const fields = [...desc(p, "instrText").map(t => t.textContent), ...desc(p, "fldSimple").map(f => attr(f, "instr") || "")].map(x => x.trim()).filter(Boolean);
+      const footnotes = desc(p, "footnoteReference").map(f => attr(f, "id"));
 
       /* runs (skip those inside text boxes / nested paragraphs) */
       const runs = []; let text = "", drawings = 0, pageBreak = false, pageBreakAt = -1;
@@ -241,7 +244,10 @@
       });
       desc(p, "drawing").forEach(imageInfo);
       drawings = Math.max(drawings, desc(p, "drawing").length + desc(p, "pict").length);
-      return { text, norm: normText(text), style: sid, align: jc, ind: { left: cm(left), right: cm(right), firstLine: cm(fl - hg) },
+      const styleNames = sChain.map(x => x.name);
+      /* lines of a table of contents repeat the headings' text: they are marked, so text searches skip them */
+      const isToc = !!ctx.inToc || styleNames.some(n => /^(toc \d|contents \d|toc heading|contents heading)$/.test(n)) || fields.some(f => /^TOC\b/i.test(f));
+      return { text, norm: normText(text), style: sid, styleNames, isToc, fields, footnotes, align: jc, ind: { left: cm(left), right: cm(right), firstLine: cm(fl - hg) },
         before: before / 20, after: after / 20, line: rule === "auto" ? (lineRaw || 240) / 240 : (lineRaw || 240) / 20, lineRule: rule,
         list, runs, box, drawings, pageBreak, sectBreak, pageBreakEnd: pageBreak && pageBreakAt >= text.trimEnd().length, pageBreakBefore: !!on(pb),
         inTable: !!ctx.inTable, table: ctx.table, row: ctx.row };
@@ -263,7 +269,10 @@
         if (c.namespaceURI !== W) return;
         if (c.localName === "p") paras.push(paraInfo(c, ctx));
         else if (c.localName === "tbl") tableInfo(c, ctx);
-        else if (c.localName === "sdt") { const sc = kid(c, "sdtContent"); if (sc) walk(sc, ctx); }
+        else if (c.localName === "sdt") {
+          const sc = kid(c, "sdtContent"), gal = desc(kid(c, "sdtPr"), "docPartGallery")[0];
+          if (sc) walk(sc, gal && /table of contents/i.test(val(gal) || "") ? Object.assign({}, ctx, { inToc: true }) : ctx);
+        }
         else if (c.localName === "customXml" || c.localName === "ins") walk(c, ctx);
       });
     }
@@ -306,23 +315,33 @@
       const pg = { top: cm(g(mar, "top", 1418)), bottom: cm(g(mar, "bottom", 1418)), left: cm(g(mar, "left", 1418)), right: cm(g(mar, "right", 1418)),
         width: cm(g(sz, "w", 11906)), height: cm(g(sz, "h", 16838)) };
       pg.landscape = attr(sz, "orient") === "landscape" || pg.width > pg.height;
+      pg.titlePg = !!on(kid(sp, "titlePg"));
       return pg;
     };
     const page = pageOf(sect), sections = sects.map(pageOf);
+    /* header/footer text and page-number field; the first-page ones ("Első oldal eltérő") are kept apart */
     const hf = async kind => {
-      const out = { text: "", page: false };
-      const ids = new Set(); sects.forEach(s => kids(s, kind + "Reference").forEach(r => ids.add(r.getAttributeNS(R, "id") || r.getAttribute("r:id"))));
-      for (const id of ids) {
-        const tgt = rels[id]; if (!tgt) continue;
+      const out = { text: "", page: false, first: { exists: false, text: "", page: false } };
+      const refs = []; sects.forEach(s => kids(s, kind + "Reference").forEach(r => refs.push({ id: r.getAttributeNS(R, "id") || r.getAttribute("r:id"), type: attr(r, "type") || "default" })));
+      const seen = new Set();
+      for (const ref of refs) {
+        if (seen.has(ref.id + ref.type)) continue; seen.add(ref.id + ref.type);
+        const tgt = rels[ref.id]; if (!tgt) continue;
         const x = await parse("word/" + tgt.replace(/^\/?word\//, "").replace(/^\//, ""));
         if (!x) continue;
-        out.text += desc(x, "p").map(p => desc(p, "t").map(t => t.textContent).join("")).join("\n") + "\n";
-        if (desc(x, "fldSimple").some(f => /\bPAGE\b/.test(attr(f, "instr") || "")) || desc(x, "instrText").some(t => /\bPAGE\b/.test(t.textContent))) out.page = true;
+        const into = ref.type === "first" ? out.first : out;
+        if (ref.type === "first") into.exists = true;
+        into.text += desc(x, "p").map(p => desc(p, "t").map(t => t.textContent).join("")).join("\n") + "\n";
+        if (desc(x, "fldSimple").some(f => /\bPAGE\b/.test(attr(f, "instr") || "")) || desc(x, "instrText").some(t => /\bPAGE\b/.test(t.textContent))) into.page = true;
       }
-      out.text = out.text.trim();
+      out.text = out.text.trim(); out.first.text = out.first.text.trim();
       return out;
     };
-    return { paras, tables, images, page, sections, header: await hf("header"), footer: await hf("footer") };
+    /* footnotes: id → text */
+    const fnX = await parse("word/footnotes.xml"), notes = {};
+    if (fnX) desc(fnX, "footnote").forEach(f => { const t = attr(f, "type"); if (t && t !== "normal") return; notes[attr(f, "id")] = desc(f, "t").map(x => x.textContent).join("").trim(); });
+    const text = paras.filter(p => !p.isToc).map(p => p.text).join("\n");
+    return { paras, tables, images, page, sections, text, notes, header: await hf("header"), footer: await hf("footer") };
   }
 
   /* ---------- checking ---------- */
@@ -337,16 +356,18 @@
   const near = (a, b, tol) => Math.abs(a - b) <= tol;
 
   function findParas(doc, find, opts = {}) {
-    const list = doc.paras.filter(p => opts.inTable ? true : !p.inTable);
+    const list = doc.paras.filter(p => (opts.inTable ? true : !p.inTable) && !p.isToc);
     const f = normText(find);
     return list.filter(p => opts.exact ? p.norm === f : p.norm.startsWith(f) || (opts.contains && p.norm.includes(f)));
   }
   /* what is wrong with one paragraph, or null. {P} stands for: A „…” bekezdés */
+  const STYLE = { "heading 1": "Címsor 1", "heading 2": "Címsor 2", "heading 3": "Címsor 3", "title": "Cím", "caption": "Képaláírás" };
   const BTN = { left: "Balra igazítás", center: "Középre igazítás", right: "Jobbra igazítás", both: "Sorkizárt" };
   function paraProblem(p, w) {
     const runs = p.runs.filter(r => r.text.trim());
     if (w.noLeading && /^[ \t\u00a0]/.test(p.text)) return w.noLeadingMsg || "{P} elején még szóközök vannak. Töröld ki őket: az igazítás a gombok dolga!";
     if (w.noPrefix && new RegExp(w.noPrefix).test(p.text.replace(/^[ \t]+/, ""))) return "{P} " + (w.noPrefixMsg || "elején még ott van a kézzel beírt jel. Töröld ki!");
+    if (w.style && !(p.styleNames || []).includes(w.style)) return `{P} még nem ${STYLE[w.style] || w.style} stílusú. Kattints bele, és a Kezdőlap › Stílusok közül válaszd ${az(STYLE[w.style] || w.style)} ${STYLE[w.style] || w.style} stílust.`;
     if (w.align && p.align !== w.align) return `{P} most ${ALIGN[p.align] || p.align}. Kattints bele, és nyomd meg ${az(BTN[w.align])} ${BTN[w.align]} gombot.`;
     if (w.list && p.list !== w.list) return p.list ? (w.list === "bullet" ? "{P} számozott lista lett, de felsorolás (pöttyös lista) kell." : "{P} felsorolás lett, de számozás kell.") : (w.list === "bullet" ? "{P} még nem felsorolás." : "{P} még nincs számozva.");
     if (w.firstLine !== undefined && !near(p.ind.firstLine, w.firstLine, 0.06)) return p.ind.firstLine < -0.01 ? `{P} függő behúzást kapott (${fmtNum(-p.ind.firstLine)} cm). Első sor behúzása kell, ${fmtNum(w.firstLine)} cm.` : `{P} első sorának behúzása most ${fmtNum(p.ind.firstLine)} cm, de ${fmtNum(w.firstLine)} cm kell.`;
@@ -378,7 +399,12 @@
         const ps = findParas(doc, f, goal);
         let m = null;
         if (!ps.length) m = `Nem találom ${az(f)} „${short(f)}” kezdetű bekezdést. Nem törölted ki véletlenül? Ha igen, a Visszavonás gomb (Ctrl+Z) visszahozza.`;
-        else { const pr = ps.map(p => paraProblem(p, goal.want || {})).find(Boolean); if (pr) m = pr.replace("{P}", `${Az(f)} „${short(f)}” bekezdés`); }
+        else {
+          /* any: one matching paragraph is enough (e.g. a heading whose text also appears in a hand-typed list) */
+          const probs = ps.map(p => paraProblem(p, goal.want || {}));
+          const pr = goal.any ? (probs.some(x => !x) ? null : probs[0]) : probs.find(Boolean);
+          if (pr) m = pr.replace("{P}", `${Az(f)} „${short(f)}” bekezdés`);
+        }
         if (m) { if (!msg) msg = m; } else done++;
       }
       return { ok: done === finds.length, done, total: finds.length, msg };
@@ -429,7 +455,7 @@
       return one(true);
     }
     if (T === "pageBreakBefore") {
-      const ps = doc.paras.filter(p => !p.inTable), k = ps.findIndex(p => p.norm.startsWith(normText(goal.find)));
+      const ps = doc.paras.filter(p => !p.inTable), k = ps.findIndex(p => !p.isToc && p.norm.startsWith(normText(goal.find)));
       if (k < 0) return one(false, `Nem találom ${az(goal.find)} „${short(goal.find)}” kezdetű bekezdést.`);
       let ok = ps[k].pageBreakBefore || (ps[k].pageBreak && !ps[k].pageBreakEnd);
       let enters = 0;
@@ -440,6 +466,70 @@
         enters++;
       }
       return one(ok, enters > 1 ? `${Az(goal.find)} „${short(goal.find)}” előtt ${enters} üres bekezdés van, de nincs oldaltörés. Töröld ki az üres sorokat, és tegyél oda oldaltörést: Ctrl+Enter.` : `${Az(goal.find)} „${short(goal.find)}” előtt még nincs oldaltörés. Kattints a szó elé, és nyomd meg: Ctrl+Enter.`);
+    }
+    if (T === "textCount") {
+      /* how often a phrase occurs (Keresés és csere) */
+      const hay = doc.text.toLowerCase(), needle = goal.text.toLowerCase();
+      let n = 0, k = hay.indexOf(needle); while (k >= 0) { n++; k = hay.indexOf(needle, k + needle.length); }
+      if (goal.max !== undefined && n > goal.max) return one(false, goal.maxMsg ? goal.maxMsg.replace("{n}", n) : `„${goal.text}” még ${n}-szor szerepel a szövegben.`);
+      if (goal.min !== undefined && n < goal.min) return one(false, goal.minMsg ? goal.minMsg.replace("{n}", n) : `„${goal.text}” csak ${n}-szor szerepel, de legalább ${goal.min}-szer kellene.`);
+      return one(true);
+    }
+    if (T === "toc") {
+      /* an automatic table of contents: the TOC field, its place, and whether it is up to date */
+      const ps = doc.paras.filter(p => !p.inTable);
+      const at = ps.findIndex(p => p.fields.some(f => /^TOC\b/i.test(f)));
+      const isEntry = p => p.isToc && p.norm && !/^(tartalom|tartalomjegyzék|contents|table of contents)$/.test(p.norm);
+      if (at < 0) {
+        if (ps.some(p => /tartalom/i.test(p.text)) && !ps.some(isEntry)) return one(false, "Nem találok automatikus tartalomjegyzéket. Kézzel ne írd be: Hivatkozások › Tartalomjegyzék › Automatikus tábla 1.");
+        return one(false, "Még nincs tartalomjegyzék. Hivatkozások › Tartalomjegyzék › Automatikus tábla 1.");
+      }
+      if (goal.before) { const h = ps.findIndex(p => !p.isToc && p.norm.startsWith(normText(goal.before))); if (h >= 0 && h < at) return one(false, `A tartalomjegyzék ${az(goal.before)} „${short(goal.before)}” fejezet után van. A borító utáni oldalra kell, az első fejezet elé.`); }
+      if (goal.after) { const c = ps.findIndex(p => !p.isToc && p.norm.startsWith(normText(goal.after))); if (c >= 0 && c > at) return one(false, `A tartalomjegyzék a borítón van, ${az(goal.after)} „${short(goal.after)}” sor előtt. Tedd a borító utáni oldalra.`); }
+      const entries = ps.filter(isEntry).map(p => p.norm.replace(/\s*\d+$/, ""));
+      const missing = (goal.entries || []).find(e => !entries.some(x => x.startsWith(normText(e))));
+      if (missing) return one(false, entries.length ? `A tartalomjegyzékből hiányzik ${az(missing)} „${short(missing)}” fejezet. Kattints a tartalomjegyzékbe › Tábla frissítése › Teljes tábla frissítése. (Ha így sem jelenik meg, annak a címnek még nincs címsor-stílusa.)` : "A tartalomjegyzék üres. Előbb adj címsor-stílust a fejezetcímeknek, aztán kattints a tartalomjegyzékbe › Tábla frissítése.");
+      return one(true);
+    }
+    if (T === "breakBetween") {
+      /* a page break (or a new section) somewhere between two places; "@toc" is the table of contents */
+      const ps = doc.paras.filter(p => !p.inTable);
+      const pos = w => w === "@toc" ? ps.findIndex(p => p.isToc) : ps.findIndex(p => !p.isToc && p.norm.startsWith(normText(w)));
+      const a = pos(goal.from), b = pos(goal.to);
+      if (a < 0 || b < 0 || b <= a) return one(false, goal.missing || "Nem találom a két részt, amik közé az oldaltörés kell.");
+      let ok = ps[a].pageBreakEnd || ps[a].sectBreak || ps[b].pageBreakBefore;
+      for (let k = a + 1; k <= b && !ok; k++) ok = ps[k].pageBreak || ps[k].sectBreak || ps[k].pageBreakBefore;
+      return one(ok, goal.msg || "Itt még nincs oldaltörés: Ctrl+Enter.");
+    }
+    if (T === "captions") {
+      const caps = doc.paras.filter(p => (p.styleNames || []).includes("caption"));
+      for (const want of goal.items) {
+        const c = caps.find(p => p.norm.includes(normText(want)));
+        if (!c) {
+          const typed = doc.paras.find(p => p.norm.includes(normText(want)) && /ábra/i.test(p.text));
+          return one(false, typed ? `${Az(want)} „${short(want)}” feliratot kézzel írtad be. Töröld, kattints a képre, és Hivatkozások › Felirat beszúrása: így a Word számozza az ábrákat.` : `Még nincs felirat ezzel a szöveggel: „${want}”. Kattints a képre › Hivatkozások › Felirat beszúrása.`);
+        }
+        if (!c.fields.some(f => /^SEQ\b/i.test(f))) return one(false, `${Az(want)} „${short(want)}” feliratból hiányzik a Word sorszáma (pl. 1. ábra). Szúrd be újra a Hivatkozások › Felirat beszúrása gombbal.`);
+      }
+      return one(true);
+    }
+    if (T === "footnote") {
+      const host = doc.paras.find(p => p.norm.includes(normText(goal.near)));
+      if (!host) return one(false, `Nem találom a mondatot: „${goal.near}…”.`);
+      const texts = host.footnotes.map(id => doc.notes[id] || "");
+      if (!texts.length) {
+        const any = doc.paras.some(p => p.footnotes.length);
+        return one(false, any ? `Van lábjegyzeted, de nem ${az(goal.near)} „${short(goal.near)}…” bekezdésben. Kattints a mondat végére, és ott szúrd be.` : "Még nincs lábjegyzet. Kattints a mondat végére › Hivatkozások › Lábjegyzet beszúrása.");
+      }
+      if (goal.contains && !texts.some(t => normText(t).includes(normText(goal.contains)))) return one(false, `A lábjegyzet szövege: „${short(texts[0])}”. Írd be a mintában lévő szöveget.`);
+      return one(true);
+    }
+    if (T === "titlePage") {
+      const sec = doc.sections[0] || {};
+      if (!sec.titlePg) return one(false, "Az első oldal még nem eltérő. Kattints duplán az élőfejbe, és pipáld be: Első oldal eltérő.");
+      if (doc.footer.first.page || doc.header.first.page) return one(false, "A borítón még látszik az oldalszám. Az első oldal élőlábából töröld ki.");
+      if (goal.emptyFirst && (doc.header.first.text || doc.footer.first.text.replace(/\d/g, "").trim())) return one(false, "A borító élőfejében vagy élőlábában még van szöveg. Töröld ki.");
+      return one(true);
     }
     return one(false, "Ismeretlen ellenőrzés.");
   }

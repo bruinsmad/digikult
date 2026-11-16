@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>/* moving between pages: the old page drifts aside and fades, the new one glides in; the rail holds still */@view-transition{navigation:auto}.rail{view-transition-name:rail}::view-transition-group(root){animation:none}::view-transition-old(root){animation:dk-out .2s cubic-bezier(.4,0,1,1) both}::view-transition-new(root){animation:dk-in .38s cubic-bezier(.16,1,.3,1) .06s both}::view-transition-old(rail),::view-transition-new(rail){animation:none}@keyframes dk-out{to{opacity:0;transform:translateX(-18px)}}@keyframes dk-in{from{opacity:0;transform:translateX(26px)}}@media (prefers-reduced-motion:reduce){::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none!important}}</style>
+<title>Hosszú dokumentumok – elmélet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600;700&display=swap">
+<link rel="stylesheet" href="../doc.css">
+<link rel="stylesheet" href="../explainer.css">
+<style>
+.fr{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:end;margin:0 0 8px;font-size:14.5px}
+.fr label{display:grid;gap:2px;font-weight:700}
+.fr input{font:15px var(--f-body);padding:5px 9px;border:2px solid #cfd2c8;border-radius:4px;width:190px;font-weight:400}
+.fr input:focus{outline:none;border-color:var(--accent)}
+.fr .cnt{font-size:14px;color:var(--muted);padding-bottom:7px}
+.fr .try-btns{margin:0}
+.wd mark{background:#ffe066;color:inherit;padding:0}
+.split{display:grid;grid-template-columns:minmax(150px,200px) 1fr;gap:10px;align-items:start}
+@media (max-width:640px){.split{grid-template-columns:1fr}}
+.navp{background:#fff;border:1.5px solid #d6d4d1;border-radius:4px;font:13px "Segoe UI",system-ui,sans-serif;color:#252423;min-height:120px}
+.navp h5{margin:0;padding:6px 10px;border-bottom:1px solid #e1dfdd;font:600 13px "Segoe UI",system-ui,sans-serif}
+.navp ul{list-style:none;margin:0;padding:6px 0}
+.navp li{padding:3px 10px}
+.navp li.l2{padding-left:24px;color:#444}
+.navp .none{padding:8px 10px;color:#777}
+.gal{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 8px}
+.gal button{all:unset;cursor:pointer;box-sizing:border-box;width:96px;height:52px;border:1.5px solid #d6d4d1;border-radius:3px;background:#fff;padding:4px 8px;display:grid;align-content:space-between;font-family:Calibri,Carlito,Arial,sans-serif}
+.gal button:hover{border-color:#a19f9d}
+.gal button.on{border-color:#185abd;box-shadow:inset 0 0 0 1px #185abd}
+.gal button span{font-size:11px;color:#605e5c;font-family:"Segoe UI",system-ui,sans-serif}
+.gal .g-n b{font-weight:400;font-size:14px}
+.gal .g-h1 b{color:#2f5496;font-size:18px;font-weight:400}
+.gal .g-h2 b{color:#2f5496;font-size:15px;font-weight:400}
+.pages3 .wd-pages{grid-auto-flow:column;gap:14px}
+.chk{display:inline-flex;gap:6px;align-items:center;font:600 14.5px var(--f-body);cursor:pointer}
+.chk input{width:18px;height:18px;accent-color:var(--accent)}
+</style>
+</head>
+<body>
+<header class="rail"><div class="in">
+  <a class="home" href="../../index.html">Digitális kultúra</a>
+  <span class="crumb"><a href="../../index.html#word">Szövegszerkesztés – Word</a> › <a href="../../index.html#word-long">3. lecke</a></span>
+</div></header>
+
+<section class="hero">
+  <div class="kicker">Word, 3. lecke: elmélet</div>
+  <h1>Hosszú dokumentumok</h1>
+  <p class="lead">Egy beszámoló, egy kiselőadás vagy egy projektmunka már több oldal. Ilyenkor a Word okos eszközei rengeteg munkát spórolnak meg: <b>keresés és csere</b>, <b>stílusok</b>, <b>automatikus tartalomjegyzék</b>, <b>feliratok</b>, <b>lábjegyzet</b> és <b>eltérő első oldal</b>.</p>
+  <div class="meta"><span>kb. 20 perc</span><span>minden példa kipróbálható</span><span>a végén 6 kérdés</span></div>
+  <ul class="toc"><li><a href="#csere">Keresés és csere</a></li><li><a href="#stilus">Stílusok és címsorok</a></li><li><a href="#tartalom">Automatikus tartalomjegyzék</a></li><li><a href="#felirat">Feliratok és lábjegyzet</a></li><li><a href="#elso">Eltérő első oldal</a></li><li><a href="#kviz">Ellenőrizd magad</a></li><li><a href="#gyakorolj">Gyakorolj</a></li></ul>
+</section>
+
+<main class="sheet">
+<section class="sec" id="csere"><h2><span class="n">1</span>Keresés és csere</h2>
+<p>Egy hosszú szövegben egy elírást kézzel javítani lassú, és könnyű kihagyni egyet. A Word megkeresi az összeset, és ha kéred, mindet egyszerre kicseréli.</p>
+<ul><li><b>Keresés:</b> <span class='nw'><kbd>Ctrl</kbd>+<kbd>F</kbd></span>. Bal oldalt megnyílik a Navigáció ablak; a Word kiemeli a találatokat, és kiírja, hány van.</li><li><b>Csere:</b> <span class='nw'><kbd>Ctrl</kbd>+<kbd>H</kbd></span>. Megadod, mit keres és mire cserélje, aztán <span class="ui">Az összes cseréje</span>.</li></ul>
+<div data-try="csere"></div>
+<div class="rule-box"><b>Vigyázz!</b> Az összes cseréje mindent cserél, a szavak belsejében is. Ha a „tó” szót cseréled „tenger”-re, a „fotó”-ból „fotenger” lesz. Ilyenkor pipáld be a Csere ablakban (a <span class="ui">Bővebben</span> gomb alatt): <span class="ui">Csak teljes szavak</span>.</div>
+</section>
+
+<section class="sec" id="stilus"><h2><span class="n">2</span>Stílusok és címsorok</h2>
+<p>A <b>stílus</b> egy elmentett formázás-csomag, névvel: betűtípus, méret, szín, térköz egyszerre. A Kezdőlap lap jobb oldalán találod őket. A legfontosabbak a <b>címsorok</b>:</p>
+<ul><li><b>Címsor 1</b>: a fő fejezetek címe.</li><li><b>Címsor 2</b>: az alfejezetek címe.</li></ul>
+<p>Ha egy címet csak félkövérré és nagyobbá teszel, az <i>úgy néz ki</i>, mint egy cím. Ha <b>címsor-stílust</b> kap, a Word is <i>tudja</i>, hogy cím. Ebből lesz a Navigáció ablak vázlata, és ebből a tartalomjegyzék.</p>
+<div data-try="stilus"></div>
+</section>
+
+<section class="sec" id="tartalom"><h2><span class="n">3</span>Automatikus tartalomjegyzék</h2>
+<p>A tartalomjegyzéket nem gépeled be. A Word a címsorokból magától összeállítja, oldalszámokkal együtt: <span class="ui">Hivatkozások</span> › <span class="ui">Tartalomjegyzék</span> › <span class="ui">Automatikus tábla 1</span>.</p>
+<p>Fontos: a tartalomjegyzék <b>nem frissül magától</b>. Ha később új fejezetet írsz, vagy elcsúsznak az oldalak, kattints bele › <span class="ui">Tábla frissítése</span> › <span class="ui">Teljes tábla frissítése</span>.</p>
+<div data-try="tartalom"></div>
+<div class="idea"><span class="i">🔗</span><p>Az automatikus tartalomjegyzékben a címekre <span class='nw'><kbd>Ctrl</kbd>+kattintással</span> oda is ugorhatsz az adott fejezethez.</p></div>
+</section>
+
+<section class="sec" id="felirat"><h2><span class="n">4</span>Feliratok és lábjegyzet</h2>
+<p>A képek alá <b>feliratot</b> teszünk: <i>1. ábra: …</i>. A sorszámot a Word adja: kattints a képre › <span class="ui">Hivatkozások</span> › <span class="ui">Felirat beszúrása</span>. Ha később beszúrsz elé egy új képet, a számok maguktól frissülnek.</p>
+<p>A <b>lábjegyzet</b> egy kis szám a mondat végén, és hozzá egy magyarázat az oldal alján: <span class="ui">Hivatkozások</span> › <span class="ui">Lábjegyzet beszúrása</span>. Ezeket is a Word számozza.</p>
+<div data-try="felirat"></div>
+</section>
+
+<section class="sec" id="elso"><h2><span class="n">5</span>Eltérő első oldal</h2>
+<p>A borítón nem szokott élőfej és oldalszám lenni. Ha az élőfejben bepipálod az <span class="ui">Első oldal eltérő</span> négyzetet, az első oldal élőfeje és élőlába külön lesz: üresen hagyhatod, a többi oldalé pedig marad.</p>
+<div data-try="elso"></div>
+</section>
+
+<section class="sec" id="kviz"><h2><span class="n">6</span>Ellenőrizd magad</h2>
+<div class="quiz" id="quiz"></div>
+</section>
+
+<section class="sec" id="gyakorolj"><h2><span class="n">7</span>Gyakorolj</h2>
+<p>Most jöhet a Word! A 7.B erdei iskolás beszámolóját te teszed rendbe a honlapra: csere, címsorok, borító, tartalomjegyzék, ábrafeliratok, lábjegyzet és eltérő első oldal. Minden fejezet végén az oldal ellenőrzi a mentett fájlodat.</p>
+<div class="practice"><a class="pcard" href="report-hu.html"><span class="k">Küldetés · Wordben</span><h4>Beszámoló az erdei iskoláról</h4><p>Egy többoldalas dokumentum a honlapra, minden profi eszközzel: a 7.B legnehezebb Word-küldetése.</p></a></div>
+</section>
+</main>
+<footer class="end">Digitális kultúra. A kis dokumentumok itt a böngészőben működnek, semmi sem kerül elküldésre.</footer>
+
+<script src="../doc.js"></script>
+<script>
+const P = (text, x) => Object.assign({ text }, x || {});
+const pg = (h, x) => Object.assign({ page: { w: 15, h: h, top: 1, bottom: 1, left: 1.3, right: 1.3 } }, x || {});
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+/* a page whose paragraphs can be clicked (selects one) */
+function clickable(host, model, onPick) {
+  const api = WD.page(host, model);
+  host.addEventListener("click", e => { const p = e.target.closest(".wd-p"); if (p) onPick(+p.dataset.p); });
+  host.style.cursor = "pointer";
+  return api;
+}
+
+window.TRY = {
+  csere: { title: "Próbáld ki!", sub: "keresd meg, aztán cseréld ki mindet",
+    model: { text: ["A Szalajka völgy a Bükk egyik legszebb része.", "A Szalajka völgy bejáratánál van a turistaház.", "A patak végig a völgyön folyik, a Szalajka völgy közepén van a Fátyol-vízesés.", "Jövőre is a Szalajka völgybe megyünk!"], found: 0, replaced: 0 },
+    mount(host, changed) {
+      const m = this.model;
+      host.innerHTML = `<div class="fr"><label>Keresett szöveg <input class="q" value="" placeholder="pl. Szalajka völgy"></label><label>Csere erre <input class="r" value="" placeholder="pl. Szalajka-völgy"></label>
+        <span class="try-btns"><button type="button" data-a="find">Keresés</button><button type="button" data-a="all">Az összes cseréje</button></span><span class="cnt"></span></div>
+        <div class="wd"><div class="wd-pg" style="width:100%;max-width:560px;padding:14px 18px"><div class="wd-body"></div></div></div>`;
+      const q = host.querySelector(".q"), r = host.querySelector(".r"), out = host.querySelector(".wd-body"), cnt = host.querySelector(".cnt");
+      let hl = "";
+      const draw = () => { out.innerHTML = m.text.map(t => `<div class="wd-p" style="margin-bottom:6px">${hl ? esc(t).split(esc(hl)).join(`<mark>${esc(hl)}</mark>`) : esc(t)}</div>`).join(""); };
+      const count = s => s ? m.text.reduce((n, t) => n + t.split(s).length - 1, 0) : 0;
+      draw();
+      host.querySelector(".try-btns").addEventListener("click", e => {
+        const a = e.target.dataset.a; if (!a) return;
+        if (a === "find") { hl = q.value; const n = count(hl); cnt.textContent = hl ? `${n} találat` : ""; if (hl === "Szalajka völgy") m.found = n; }
+        if (a === "all") {
+          const n = count(q.value);
+          if (q.value) { m.text = m.text.map(t => t.split(q.value).join(r.value)); cnt.textContent = `${n} csere történt.`; hl = r.value; if (q.value === "Szalajka völgy" && r.value === "Szalajka-völgy") m.replaced = n; }
+        }
+        draw(); changed();
+      });
+      return {};
+    },
+    goals: [
+      { text: "Keresd meg: <b>Szalajka völgy</b> (kötőjel nélkül). Hány találat van?", test: m => m.found === 4 },
+      { text: "Cseréld ki mindet erre: <b>Szalajka-völgy</b>.", test: m => m.replaced === 4 }
+    ] },
+
+  stilus: { title: "Próbáld ki!", sub: "kattints egy bekezdésre, aztán egy stílusra",
+    model: pg(7.2, { blocks: [P("Utazás és érkezés", { role: "h1" }), P("Hétfő reggel fél nyolckor indult a buszunk az iskola elől."), P("A turistaház", { role: "h2" }), P("Négyágyas szobákban aludtunk, az ablakunkból a völgy fáira láttunk."),
+      P("Túrák a Szalajka-völgyben", { role: "h1" }), P("A Fátyol-vízesés", { role: "h2" }), P("A víz mészkőlépcsőkön zúdul le, mint egy fehér fátyol.")] }),
+    mount(host, changed) {
+      const m = this.model; let sel = 0;
+      host.innerHTML = `<div class="gal" role="toolbar" aria-label="Stílusok"><button type="button" class="g-n" data-s=""><b>AaBbCc</b><span>Normál</span></button><button type="button" class="g-h1" data-s="h1"><b>AaBbC</b><span>Címsor 1</span></button><button type="button" class="g-h2" data-s="h2"><b>AaBbCc</b><span>Címsor 2</span></button></div>
+        <div class="split"><div class="navp"><h5>Navigáció · Címsorok</h5><div class="nl"></div></div><div class="pg"></div></div>`;
+      const nav = host.querySelector(".nl"), gal = host.querySelector(".gal");
+      const paint = () => {
+        m.blocks.forEach((b, i) => b.target = i === sel);
+        api.render(m);
+        const hs = m.blocks.filter(b => b.style === "h1" || b.style === "h2");
+        nav.innerHTML = hs.length ? `<ul>${hs.map(b => `<li class="${b.style === "h2" ? "l2" : ""}">${esc(b.text)}</li>`).join("")}</ul>` : `<p class="none">Még nincs egy címsor sem. A Word nem tudja, hol kezdődnek a fejezetek.</p>`;
+        gal.querySelectorAll("button").forEach(b => b.classList.toggle("on", (m.blocks[sel].style || "") === b.dataset.s));
+      };
+      const api = clickable(host.querySelector(".pg"), m, i => { sel = i; paint(); });
+      gal.addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; m.blocks[sel].style = b.dataset.s || undefined; paint(); changed(); });
+      paint();
+      return {};
+    },
+    goals: [
+      { text: "A két fejezetcím (<b>Utazás és érkezés</b>, <b>Túrák a Szalajka-völgyben</b>) legyen <b>Címsor 1</b>.", test: m => m.blocks.filter(b => b.role === "h1").every(b => b.style === "h1") },
+      { text: "A két alcím (<b>A turistaház</b>, <b>A Fátyol-vízesés</b>) legyen <b>Címsor 2</b>.", test: m => m.blocks.filter(b => b.role === "h2").every(b => b.style === "h2") },
+      { text: "A szöveges bekezdések maradjanak <b>Normál</b> stílusúak.", test: m => m.blocks.filter(b => !b.role).every(b => !b.style) }
+    ],
+    note: "Figyeld a bal oldali Navigáció ablakot: csak a címsor-stílusú bekezdések jelennek meg benne." },
+
+  tartalom: { title: "Próbáld ki!", sub: "szúrd be, írj új fejezetet, frissítsd",
+    model: pg(9.5, { blocks: [{ type: "toc", entries: [], hidden: true }, P("Utazás és érkezés", { style: "h1" }), P("Hétfő reggel indult a buszunk.", { after: 4 }), P("Túrák a Szalajka-völgyben", { style: "h1" }), P("A völgyben egy patak folyik.", { after: 4 }), P("Állatok és növények", { style: "h1" }), P("Kedden meglátogattuk a ménest.", { after: 4 })] }),
+    mount(host, changed) {
+      const m = this.model; m._added = false; m._fresh = false;
+      host.innerHTML = `<div class="try-btns" style="margin:0 0 8px"><button type="button" data-a="ins">Tartalomjegyzék beszúrása</button><button type="button" data-a="new">Új fejezet a végére</button><button type="button" data-a="upd">Tábla frissítése</button></div><div class="pg"></div>`;
+      const api = WD.page(host.querySelector(".pg"), m);
+      const heads = () => m.blocks.filter(b => b.style === "h1").map((b, k) => ({ text: b.text, level: 1, page: 2 + k }));
+      host.querySelector(".try-btns").addEventListener("click", e => {
+        const a = e.target.dataset.a, t = m.blocks[0]; if (!a) return;
+        if (a === "ins" && t.hidden) { t.hidden = false; t.entries = heads(); }
+        if (a === "new" && !m._added) { m.blocks.push(P("Esti programok", { style: "h1", target: true }), P("Az utolsó este tábortüzet raktunk.")); m._added = true; if (!t.hidden) t.stale = true; }
+        if (a === "upd" && !t.hidden) { t.entries = heads(); t.stale = false; m._fresh = m._added; }
+        api.render(m); changed();
+      });
+      return api;
+    },
+    goals: [
+      { text: "Szúrd be a <b>tartalomjegyzéket</b>.", test: m => !m.blocks[0].hidden },
+      { text: "Írj egy <b>új fejezetet</b> a végére. Megjelent a tartalomjegyzékben?", test: m => m._added && !m.blocks[0].hidden },
+      { text: "<b>Frissítsd</b> a táblát, hogy az új fejezet is benne legyen.", test: m => m._fresh && !m.blocks[0].stale }
+    ] },
+
+  felirat: { title: "Próbáld ki!", sub: "a sorszámokat a Word adja",
+    model: pg(12, { caps: {}, blocks: [] }),
+    mount(host, changed) {
+      const m = this.model; m.pics = [{ src: "turistahaz.png", t: "Szállásunk az erdő szélén" }, { src: "szalajka.png", t: "A Fátyol-vízesés" }]; m.cap = [false, false]; m.newPic = false; m.fn = false;
+      host.innerHTML = `<div class="try-btns" style="margin:0 0 8px"><button type="button" data-a="c0">Felirat az első kép alá</button><button type="button" data-a="c1">Felirat a második kép alá</button><button type="button" data-a="np">Új kép beszúrása legfelülre</button><button type="button" data-a="fn">Lábjegyzet a lovas mondathoz</button></div><div class="pg"></div>`;
+      const api = WD.page(host.querySelector(".pg"), m);
+      const build = () => {
+        const b = [], pics = (m.newPic ? [{ src: "szalajka.png", t: "A Bükk erdei", fresh: true }] : []).concat(m.pics.map((p, i) => Object.assign({ cap: m.cap[i] }, p)));
+        let n = 0;
+        pics.forEach(p => {
+          b.push(P("", { align: "center", img: { src: p.src, w: 3.6, h: 2.7, wrap: "inline" }, target: p.fresh }));
+          if (p.cap || p.fresh) { n++; b.push(P(`${n}. ábra: ${p.t}`, { style: "caption", align: "center", target: true })); }
+        });
+        b.push(P("Szilvásváradon ma is lipicai lovakat tenyésztenek.", { fn: m.fn ? "A lipicai ló régi lófajta." : undefined, target: m.fn }));
+        m.blocks = b;
+      };
+      build();
+      host.querySelector(".try-btns").addEventListener("click", e => {
+        const a = e.target.dataset.a; if (!a) return;
+        if (a === "c0") m.cap[0] = true; if (a === "c1") m.cap[1] = true; if (a === "np") m.newPic = true; if (a === "fn") m.fn = true;
+        build(); api.render(m); changed();
+      });
+      return api;
+    },
+    goals: [
+      { text: "Tegyél feliratot <b>mindkét</b> kép alá. Milyen számot kaptak?", test: m => m.cap[0] && m.cap[1] },
+      { text: "Szúrj be egy <b>új képet</b> legfelülre. Mi lett a régi feliratok számával?", test: m => m.cap[0] && m.cap[1] && m.newPic },
+      { text: "Tegyél <b>lábjegyzetet</b> a lovas mondat végére.", test: m => m.fn }
+    ] },
+
+  elso: { title: "Próbáld ki!", sub: "borító, aztán a fejezetek",
+    model: { page: { w: 7, h: 6.5, top: 1.4, bottom: 1.4, left: 0.9, right: 0.9 }, header: "Beszámoló az erdei iskoláról", footerPage: true, titlePg: false,
+      blocks: [P("Erdei iskola a Bükkben", { b: true, size: 14, align: "center", before: 30 }), P("Beszámoló", { size: 11, align: "center" }), { type: "break" },
+               P("Tartalom", { size: 13, color: "#2f5496" }), P("Utazás és érkezés ......... 3", { size: 9 }), { type: "break" }, P("Utazás és érkezés", { style: "h1", size: 13 }), P("Hétfő reggel indult a buszunk.", { size: 9 })] },
+    mount(host, changed) {
+      const m = this.model;
+      host.innerHTML = `<p style="margin:0 0 8px"><label class="chk"><input type="checkbox"> Első oldal eltérő</label></p><div class="pages3"></div>`;
+      const api = WD.page(host.querySelector(".pages3"), m);
+      host.querySelector("input").addEventListener("change", e => { m.titlePg = e.target.checked; api.render(m); changed(); });
+      return api;
+    },
+    goals: [{ text: "Pipáld be: <b>Első oldal eltérő</b>. Mi tűnt el a borítóról? És a többi oldalon megmaradt?", test: m => m.titlePg }],
+    note: "Az oldalszámozás a borítóval együtt számol: a tartalomjegyzék a 2. oldal, akkor is, ha a borítón nem látszik az 1-es." }
+};
+
+window.QUIZ = [
+  { q: "Melyik billentyűkombináció nyitja meg a <b>Csere</b> ablakot?", opts: ["Ctrl+H", "Ctrl+F", "Ctrl+C", "Ctrl+R"], right: 0,
+    fb: "A Ctrl+H a Csere, a Ctrl+F a Keresés. A Ctrl+C a másolás." },
+  { q: "Miért jobb a címekre <b>Címsor 1</b> stílust tenni, mint csak félkövérre és nagyobbra állítani?", opts: ["Mert így a Word is tudja, hogy az fejezetcím, és tartalomjegyzéket készíthet belőle", "Mert a Címsor 1 mindig piros", "Mert a félkövér címet nem lehet kinyomtatni", "Nincs különbség"], right: 0,
+    fb: "A címsor-stílusból tudja a Word, melyik bekezdés a cím. Ebből lesz a Navigáció ablak vázlata és az automatikus tartalomjegyzék." },
+  { q: "Beírtál egy új fejezetet, de nem jelenik meg a tartalomjegyzékben. Mit csinálsz?", opts: ["Kattintok a tartalomjegyzékbe, és Tábla frissítése", "Kézzel beírom a tartalomjegyzékbe", "Törlöm és újraírom az egész fejezetet", "Semmit, magától megjelenik"], right: 0,
+    fb: "A tartalomjegyzék nem frissül magától. Tábla frissítése › Teljes tábla frissítése: így az oldalszámok is újraszámolódnak." },
+  { q: "Hova kerül a <b>lábjegyzet</b> szövege?", opts: ["Az oldal aljára, egy kis szám alá", "A dokumentum legelejére", "Az élőfejbe", "A mondat közepébe, zárójelbe"], right: 0,
+    fb: "A mondat végén egy kis szám jelzi, a magyarázat pedig ugyanannak az oldalnak az aljára kerül." },
+  { q: "Három kép van a feliratokkal (1., 2., 3. ábra). Beszúrsz egy új képet legelőre, és feliratot teszel alá. Mi történik?", opts: ["Az új kép lesz az 1. ábra, a régiek 2., 3., 4. lesznek", "Az új kép lesz a 4. ábra", "Két 1. ábra lesz", "Minden feliratot újra be kell írni"], right: 0,
+    fb: "A feliratok számát a Word adja, sorrendben. (Néha egy frissítés kell hozzá: jelöld ki az egészet, és nyomd meg az F9-et.)" },
+  { q: "Mire jó az <b>Első oldal eltérő</b>?", opts: ["Hogy a borítón ne legyen élőfej és oldalszám, a többi oldalon viszont igen", "Hogy az első oldal fekvő legyen", "Hogy az első oldal más betűtípust kapjon", "Hogy a dokumentum a második oldallal kezdődjön"], right: 0,
+    fb: "Bepipálva az első oldal élőfeje és élőlába külön van, így a borító tiszta maradhat." }
+];
+</script>
+<script src="../explainer.js"></script>
+<script src="../../nav.js?v=2b949d3f" defer></script>
+</body>
+</html>
