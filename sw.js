@@ -6,7 +6,7 @@
    The file list below is written by tools/build-sw.py: run it before pushing. */
 
 /* FILES:BEGIN (written by tools/build-sw.py, don't edit by hand) */
-const VERSION = "03f3fd3e2b";
+const VERSION = "3e0eb0eefd";
 const CORE = [
 "./",
 "css/basics/first-steps.html",

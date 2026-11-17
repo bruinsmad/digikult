@@ -196,6 +196,7 @@ window.EXAM = {
 };
 window.EXAM.checks = (() => {
   const LAST = 71;
+  const fnUsed = (F, col) => { const w = F.ws(); const bad = F.cellsOf(`${col}2:${col}${LAST}`).find(a => w[a] && w[a].f && !/[A-Z]\(/.test(w[a].f)); return bad ? { ok: false, msg: `${bad} képlete (${F.hu(w[bad].f)}) nem használ függvényt. A feladat szerint függvénnyel kell (pl. HA, FKERES).` } : { ok: true }; };
   const chart = F => { const all = F.charts(), ch = all.find(c => c.types.some(t => /^bar/.test(t)));
     if (!ch) return { err: { ok: false, msg: all.length ? "Van diagram, de nem oszlopdiagram." : "Nem találok diagramot az adatok munkalapján. (Ha külön diagramlapra került, helyezd át a munkalapra: beágyazott diagram kell.)" } };
     if (ch.barDir === "bar") return { err: { ok: false, msg: "Ez sávdiagram (vízszintes sávok). Oszlopdiagram kell." } };
@@ -205,12 +206,15 @@ window.EXAM.checks = (() => {
     { task: 1, label: "Az árlap a helyén (a „Sima” a D2-ben)", run: F => { const w = F.ws(); return (w.D2 && w.D2.v === "Sima") || (w.F2 && w.F2.v === "Sima") ? { ok: true } : { ok: false, msg: "Nem találom a „Sima” fajtát a D2 cellában: az első beolvasott adat az A1-be kerüljön." }; } },
     { task: 2, label: "C1: Kedvezménnyel, D1: Fizetendő", run: F => F.values("C1:D1", ["Kedvezménnyel", "Fizetendő"]) },
     { task: 2, label: "Az árlap két oszloppal jobbra került (F:H)", run: F => F.values("F1:H2", ["Fajta", "Kód", "Ár", "Sima", 1, 160]) },
-    { task: 3, label: `C2:C${LAST}: a kedvezményes darabszám`, run: F => F.values(`C2:C${LAST}`, [2, 3, 1, 6.8, 3, 2, 6.8, 5.9, 4, 1, 5, 2, 1, 1, 3, 2, 1, 1, 1, 5, 1, 1, 1, 3, 2, 5.9, 6.8, 4, 1, 1, 1, 5, 4, 1, 1, 5, 4, 1, 1, 3, 1, 3, 2, 1, 1, 5.9, 1, 4, 3, 3, 1, 4, 3, 1, 1, 3, 4, 5.9, 1, 4, 1, 1, 4, 3, 6.8, 3, 1, 5, 1, 2]) },
-    { task: 4, label: `D2:D${LAST}: a fizetendő összeg`, run: F => F.values(`D2:D${LAST}`, [500, 480, 160, 1088.0, 810, 560, 1088.0, 1475.0, 1000, 300, 1500, 600, 250, 280, 810, 560, 270, 250, 300, 1500, 250, 300, 250, 750, 600, 1475.0, 2040.0, 640, 270, 280, 300, 1250, 640, 300, 280, 1250, 1080, 300, 250, 810, 270, 750, 560, 280, 250, 1593.0, 300, 1120, 810, 750, 280, 1200, 750, 160, 300, 750, 1080, 944.0, 270, 1080, 270, 250, 640, 480, 2040.0, 750, 280, 800, 300, 540]) },
+    { task: 3, label: `C2:C${LAST}: a kedvezményes darabszám, képlettel`, run: F => F.values(`C2:C${LAST}`, [2, 3, 1, 6.8, 3, 2, 6.8, 5.9, 4, 1, 5, 2, 1, 1, 3, 2, 1, 1, 1, 5, 1, 1, 1, 3, 2, 5.9, 6.8, 4, 1, 1, 1, 5, 4, 1, 1, 5, 4, 1, 1, 3, 1, 3, 2, 1, 1, 5.9, 1, 4, 3, 3, 1, 4, 3, 1, 1, 3, 4, 5.9, 1, 4, 1, 1, 4, 3, 6.8, 3, 1, 5, 1, 2], { formula: true }) },
+    { task: 3, label: "A C oszlopban függvényt használtál", run: F => fnUsed(F, "C") },
+    { task: 4, label: `D2:D${LAST}: a fizetendő összeg, képlettel`, run: F => F.values(`D2:D${LAST}`, [500, 480, 160, 1088.0, 810, 560, 1088.0, 1475.0, 1000, 300, 1500, 600, 250, 280, 810, 560, 270, 250, 300, 1500, 250, 300, 250, 750, 600, 1475.0, 2040.0, 640, 270, 280, 300, 1250, 640, 300, 280, 1250, 1080, 300, 250, 810, 270, 750, 560, 280, 250, 1593.0, 300, 1120, 810, 750, 280, 1200, 750, 160, 300, 750, 1080, 944.0, 270, 1080, 270, 250, 640, 480, 2040.0, 750, 280, 800, 300, 540], { formula: true }) },
+    { task: 4, label: "Az ár az árlapból jön (hivatkozás a G:H oszlopra)", run: F => { const w = F.ws(); const bad = F.cellsOf(`D2:D${LAST}`).find(a => w[a] && w[a].f && !/\$?[GH]\$?\d|\$?[GH]:\$?[GH]/.test(w[a].f));
+        return bad ? { ok: false, msg: `${bad} képlete (${F.hu(w[bad].f)}) nem az árlapból veszi az árat. Ne írd be kézzel az árat: hivatkozz a G:H oszlopra!` } : fnUsed(F, "D"); } },
     { task: 5, label: "I1: Darab", run: F => F.values("I1", "Darab") },
-    { task: 5, label: "I2:I7: az eladott darabszám fajtánként", run: F => F.values("I2:I7", [45, 23, 30, 41, 37, 16]) },
-    { task: 6, label: "K1: Összes lángos száma, K2: az összes eladott lángos", run: F => F.all(F.values("K1", "Összes lángos száma"), F.values("K2", 192)) },
-    { task: 7, label: "L1: Bevétel, L2: a teljes bevétel", run: F => F.all(F.values("L1", "Bevétel"), F.values("L2", 46943.0)) },
+    { task: 5, label: "I2:I7: az eladott darabszám fajtánként, képlettel", run: F => F.values("I2:I7", [45, 23, 30, 41, 37, 16], { formula: true }) },
+    { task: 6, label: "K1: Összes lángos száma, K2: képlettel", run: F => F.all(F.values("K1", "Összes lángos száma"), F.values("K2", 192, { formula: true })) },
+    { task: 7, label: "L1: Bevétel, L2: képlettel", run: F => F.all(F.values("L1", "Bevétel"), F.values("L2", 46943.0, { formula: true })) },
     { task: 8, label: "„Ft” a pénzösszegeken (D oszlop, H2:H7, L2)", run: F => F.numFmt([`D2:D${LAST}`, "H2:H7", "L2"], /Ft/) },
     { task: 8, label: "0 tizedesjegy a pénzösszegeken", run: F => { const w = F.ws(); const bad = F.many([`D2:D${LAST}`, "H2:H7", "L2"]).find(a => w[a] && /0[.,]0/.test(String(w[a].z || ""))); return bad ? { ok: false, msg: `${bad} cellában tizedesjegyek is látszanak: 0 tizedesjegy kell.` } : { ok: true }; } },
     { task: 9, label: "Vékony szegély minden adatot tartalmazó cellán", run: F => F.boxed([`A1:D${LAST}`, "F1:I7", "K1:L2"]) },
