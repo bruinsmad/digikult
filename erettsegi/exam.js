@@ -97,6 +97,7 @@
         <div class="learn"><h3>Hogyan dolgozz ezen az oldalon?</h3><ul>
           <li>Minden fejezet egy részfeladat, <b>szó szerint</b> a hivatalos feladatlapról. Az Excelben (táblázatkezelőben) oldod meg, sorban.</li>
           <li>Ha kész egy részfeladat, mentsd el a fájlt, és kattints az <b>Ellenőrzés</b> gombra: az oldal megnézi a mentett fájlodat. A következő részfeladat csak akkor nyílik meg, ha minden stimmel.</li>
+          ${X.strict ? `<li><b>Ennél a feladatnál nincs segítség</b>, és az ellenőrzés sem árulja el a jó eredményt, csak azt, hogy mi nem stimmel. Úgy dolgozol, mint a vizsgán.</li>` : ""}
           <li>Chrome-ban és Edge-ben elég egyszer kiválasztani a fájlt: utána mentés után csak az Ellenőrzésre kell kattintanod.</li>
           <li>A teljes feladatlapot a <b>Feladatlap</b> gombbal egyben is megnézheted vagy kinyomtathatod. A vizsgán ${X.points} pontot ér, nagyjából 45–50 perc jut rá.</li></ul></div>
         <div class="task"><h3>A forrásfájl</h3><p>${X.files.map(f => `<a class="btn primary" href="${f.href}" download>${esc(f.name)} letöltése</a>`).join(" ")}</p>
@@ -288,7 +289,11 @@
           const fillX = (sp.replace(/<a:ln\b[\s\S]*?<\/a:ln>/, "").match(/<a:solidFill>[\s\S]*?<\/a:solidFill>/) || [""])[0];
           const lineX = ((sp.match(/<a:ln\b[\s\S]*?<\/a:ln>/) || [""])[0].match(/<a:solidFill>[\s\S]*?<\/a:solidFill>/) || [""])[0];
           const dl = (cx.match(/<dLbls>[\s\S]*?<\/dLbls>/g) || []).join("");
-          out.push({ types, title, titleX, legend: !!legendX && !/<delete val="1"\/>/.test(legendX), legendPos: (legendX.match(/legendPos val="(\w)"/) || [])[1] || (legendX ? "r" : null),
+          const series = sers.map(x => { const sp = (x.match(/<spPr>[\s\S]*?<\/spPr>/) || [""])[0];
+            return { ref: ((x.match(/<tx>[\s\S]*?<f>([^<]*)<\/f>/) || [])[1] || "").replace(/\$/g, ""), name: ((x.match(/<tx>[\s\S]*?<v>([^<]*)<\/v>/) || [])[1] || ""),
+              val: ((x.match(/<val>[\s\S]*?<f>([^<]*)<\/f>/) || [])[1] || "").replace(/\$/g, ""),
+              fill: dmlColor((sp.replace(/<a:ln\b[\s\S]*?<\/a:ln>/, "").match(/<a:solidFill>[\s\S]*?<\/a:solidFill>/) || [""])[0]) }; });
+          out.push({ types, title, titleX, seriesList: series, legend: !!legendX && !/<delete val="1"\/>/.test(legendX), legendPos: (legendX.match(/legendPos val="(\w)"/) || [])[1] || (legendX ? "r" : null),
             barDir: (cx.match(/<barDir val="(\w+)"/) || [])[1] || null, series: sers.length,
             percent: /<showPercent val="1"/.test(dl), catName: /<showCatName val="1"/.test(dl),
             fill: dmlColor(fillX), line: dmlColor(lineX),
@@ -317,6 +322,7 @@
         else if (o.loose) { if (!(String(v).trim() === String(exp) || (typeof exp === "number" && Number(String(v).replace(",", ".")) === exp))) m = `${sname}${a} értéke ${fmt(typeof v === "number" ? v : String(v))}, de ${fmt(exp)} kellene.${cell.f ? ` A képlet: ${toHu(cell.f)}` : ""}`; }
         else if (typeof exp === "number") { if (typeof v !== "number" || Math.abs(v - exp) > 1e-6 * Math.max(1, Math.abs(exp))) m = `${sname}${a} értéke ${fmt(v)}, de ${fmt(exp)} kellene.${cell.f ? ` A képlet: ${toHu(cell.f)}` : ""}`; }
         else if (String(v).trim() !== String(exp)) m = `${sname}${a} értéke ${fmt(typeof v === "number" ? v : String(v))}, de ${fmt(exp)} kellene.${cell.f ? ` A képlet: ${toHu(cell.f)}` : ""}`;
+        if (m && X.strict && !/üres|nincs képlet|üresnek/.test(m)) m = `${sname}${a} cella értéke nem jó.${cell && cell.f ? ` A képleted: ${toHu(cell.f)}` : ""}`;
         if (m) { if (!msg) msg = m; } else done++;
       });
       return { ok: done === cells.length, msg, done, total: cells.length };
@@ -340,7 +346,10 @@
       boxed(list, o = {}) { return styles(list, (s, a) => ["left", "right", "top", "bottom"].every(sd => THIN.test(sideOf(a, sd, o))),
         (a) => { const miss = ["left", "right", "top", "bottom"].filter(sd => !THIN.test(sideOf(a, sd, o))); return `${a} cellának nincs vékony szegélye (${miss.map(x => ({ left: "bal", right: "jobb", top: "felső", bottom: "alsó" }[x])).join(", ")}).`; }, o); },
       unboxed(list, o = {}) { return styles(list, s => !["left", "right", "top", "bottom"].some(sd => s.border[sd]), a => `${a} cellának is van szegélye, pedig nincs benne adat.`, o); },
+      side: (a, sd, o = {}) => sideOf(a, sd, o),
       gray: c => !!c && c.s < .15 && c.l > .45 && c.l < .96,
+      green: c => !!c && c.h >= 70 && c.h <= 170 && c.s > .25 && c.l > .12 && c.l < .85,
+      red: c => !!c && (c.h <= 15 || c.h >= 340) && c.s > .4 && c.l > .2 && c.l < .75,
       lightOrange: c => !!c && ((c.h >= 15 && c.h <= 50) && c.s > .35 && c.l >= .5),
       darkBlue: c => !!c && c.h >= 195 && c.h <= 255 && c.l <= .42 && c.s > .2
     };

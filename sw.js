@@ -6,7 +6,7 @@
    The file list below is written by tools/build-sw.py: run it before pushing. */
 
 /* FILES:BEGIN (written by tools/build-sw.py, don't edit by hand) */
-const VERSION = "747741d450";
+const VERSION = "3e0eb0eefd";
 const CORE = [
 "./",
 "css/basics/first-steps.html",
@@ -28,6 +28,8 @@ const CORE = [
 "erettsegi/exam.css",
 "erettsegi/exam.js",
 "erettsegi/index.html",
+"erettsegi/tablazat/bajnoksag-hu.html",
+"erettsegi/tablazat/forras/alapszakasz.txt",
 "erettsegi/tablazat/forras/gaz.txt",
 "erettsegi/tablazat/forras/merkozesek.txt",
 "erettsegi/tablazat/forras/rendeles.txt",
@@ -203,6 +205,9 @@ const EXTERNAL = [
 "https://fonts.googleapis.com/css2?family=Young+Serif&family=Kalam:wght@400;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap"
 ];
 const PAGE_IMAGES = {
+"erettsegi/tablazat/bajnoksag-hu.html": [
+"erettsegi/tablazat/img/bajnoksag-minta.png"
+],
 "erettsegi/tablazat/gazfutes-hu.html": [
 "erettsegi/tablazat/img/gazfutes-minta-2023.png",
 "erettsegi/tablazat/img/gazfutes-minta-evek.png"

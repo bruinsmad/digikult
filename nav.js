@@ -525,6 +525,19 @@
                 files: { hu: "erettsegi/tablazat/gazfutes-hu.html" },
                 cover: "erettsegi/tablazat/img/gazfutes-cover.png",
                 progress: { chapters: 9, keys: { hu: "erettsegi-gazfutes-hu-v1" } }
+              },
+              {
+                id: "erettsegi-bajnoksag",
+                kind: "exam",
+                minutes: 50,
+                title: { hu: "Bajnokság", en: "Championship" },
+                desc: {
+                  hu: "Informatika, középszint, 2019. május. Kézilabda-tabella segítség nélkül: DARABTELI, rendezés, másolható képlet a rájátszáshoz, sávdiagram, szegélyek.",
+                  en: "IT, standard level, May 2019. A handball league table with no help: DARABTELI, sorting, a copyable formula for the playoff, a bar chart, borders."
+                },
+                files: { hu: "erettsegi/tablazat/bajnoksag-hu.html" },
+                cover: "erettsegi/tablazat/img/bajnoksag-cover.png",
+                progress: { chapters: 11, keys: { hu: "erettsegi-bajnoksag-hu-v1" } }
               }
             ]
           }

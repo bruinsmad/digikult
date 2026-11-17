@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>/* moving between pages: the old page drifts aside and fades, the new one glides in; the rail holds still */@view-transition{navigation:auto}.rail{view-transition-name:rail}::view-transition-group(root){animation:none}::view-transition-old(root){animation:dk-out .2s cubic-bezier(.4,0,1,1) both}::view-transition-new(root){animation:dk-in .38s cubic-bezier(.16,1,.3,1) .06s both}::view-transition-old(rail),::view-transition-new(rail){animation:none}@keyframes dk-out{to{opacity:0;transform:translateX(-18px)}}@keyframes dk-in{from{opacity:0;transform:translateX(26px)}}@media (prefers-reduced-motion:reduce){::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none!important}}</style>
+<title>Bajnokság – érettségi feladat</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600;700&display=swap">
+<link rel="stylesheet" href="../../excel/mission.css">
+<link rel="stylesheet" href="../exam.css">
+</head>
+<body>
+<header class="rail"><div class="in">
+  <a class="home" href="../../index.html">Digitális kultúra</a>
+  <span class="crumb"><a href="../../index.html#erettsegi">Táblázatkezelés – Érettségi</a> › <a href="../../index.html#erettsegi-kozep">Középszint</a></span>
+</div></header>
+<div class="top">
+  <span class="art" aria-hidden="true"><svg viewBox="0 0 96 96"><ellipse cx="48" cy="88" rx="30" ry="5" fill="#000" opacity=".25"/>
+<path d="M22 10h40l12 12v60H22z" fill="#fffdf6"/><path d="M62 10v12h12" fill="#e4e1d4"/>
+<g stroke="#b9b5a4" stroke-width="1.6"><path d="M28 34h40M28 44h40M28 54h40M28 64h40M28 74h40M42 28v50M56 28v50"/></g>
+<rect x="28" y="28" width="40" height="6" fill="#c9b8ff"/><text x="30" y="24" font-family="Times New Roman,serif" font-weight="700" font-size="11" fill="#3e2c80">3.</text>
+<path d="M58 70l18-30 6 4-18 30-7 3z" fill="#f2c230"/><path d="M58 70l1 7 6-4z" fill="#5d3820"/><path d="M76 40l6 4 2-3-6-4z" fill="#f0a3b8"/></svg></span>
+  <div><div class="kicker">Érettségi feladat · Informatika, középszint, 2019. május</div><h1>Bajnokság</h1></div>
+  <div class="meta"><button type="button" class="mbtn" id="sheetBtn">Feladatlap</button><span>Haladás <b id="solvedCount">–</b></span><span>Idő <b id="timer">0:00</b></span><button type="button" class="mbtn" id="soundBtn">Hang: be</button><button type="button" id="resetBtn" title="Az egész feladat újrakezdése">Újrakezdés</button></div>
+</div>
+<nav class="steps" id="steps" aria-label="Részfeladatok"></nav>
+<div id="game"><main>
+  <article class="card" id="case" aria-live="polite"></article>
+  <section class="work" aria-label="Minta"><div class="card">
+    <div id="dlBox"></div>
+    <div class="work-head"><h2>Minta</h2><p>A hivatalos feladatlap mintája. Kattints rá a nagyításhoz.</p></div>
+    <div id="mintaBox"></div>
+  </div></section>
+</main></div>
+<section id="endPanel" hidden></section>
+<footer class="end">Digitális kultúra. A feladat szövege, a minta és a forrásfájl az Oktatási Hivatal hivatalos érettségi feladatlapjáról való. A haladásod a böngésződben marad; a feltöltött fájlt az oldal csak megnézi, nem küldi el sehová.</footer>
+<div id="sheetView" hidden role="dialog" aria-label="A teljes feladatlap"></div>
+<div id="lightbox" hidden></div>
+<canvas id="fx" aria-hidden="true"></canvas>
+<script>
+window.EXAM = {
+ "key": "erettsegi-bajnoksag-hu-v1",
+ "title": "Bajnokság",
+ "number": 3,
+ "strict": true,
+ "subject": "Informatika",
+ "level": "középszint",
+ "date": "2019. május 16.",
+ "code": "1721",
+ "points": 30,
+ "saveAs": "bajnoksag.xlsx",
+ "files": [
+  {
+   "name": "alapszakasz.txt",
+   "href": "forras/alapszakasz.txt"
+  }
+ ],
+ "minta": [
+  {
+   "src": "img/bajnoksag-minta.png",
+   "caption": "<b>Minta a Bajnokság feladathoz:</b>",
+   "alt": "Minta a Bajnokság feladathoz"
+  }
+ ],
+ "introFirst": true,
+ "intro": "<div class=\"intro\"><p>A magyar női kézilabdasport legmagasabb szintű bajnoksága az NB I Liga. Ez egy évente megrendezésre kerülő bajnokság, amelyben az ország 12 legjobb női kézilabdacsapata vesz részt. A bajnokság alapszakaszból és rájátszásból áll. Az alapszakasz 22 fordulós, ahol a csapatok körmérkőzésben játszanak egymással. Ezt követi a rájátszás.</p><p>Az UTF-8 kódolású, tabulátorokkal tagolt <i>alapszakasz.txt</i> állomány tartalmazza a 2015-2016. évi bajnokság alapszakaszának adatait. Feladata, hogy az adatok alapján a bajnokság állását bemutató tabellát elkészítse.</p></div>",
+ "lead": "<i>A megoldás során vegye figyelembe a következőket!</i>",
+ "rules": [
+  "Segédszámításokat az AG oszlopban vagy attól jobbra végezhet. Amennyiben lehetséges, a megoldás során képletet, függvényt, hivatkozást használjon, hogy az alapadatok módosítása esetén is a kívánt eredményeket kapja!",
+  "A részfeladatok között van olyan, amely egy korábbi kérdés eredményét használja fel. Ha a korábbi részfeladatot nem sikerült teljesen megoldania, használja a megoldását úgy, ahogy van, vagy írjon be egy valószínűnek tűnő eredményt, és azzal dolgozzon tovább! Így ugyanis pontokat kaphat erre a részfeladatra is."
+ ],
+ "tasks": [
+  {
+   "n": 1,
+   "title": "Betöltés és mentés",
+   "text": "<p>Töltse be a tabulátorokkal tagolt <i>alapszakasz.txt</i> állományt a táblázatkezelő program munkalapjára az <i>A1</i>-es cellától kezdődően! Munkáját <i>bajnoksag</i> néven a táblázatkezelő alapértelmezett formátumában mentse!</p><p>A táblázat <i>J2:AE13</i> tartomány cellái tartalmazzák az alapszakasz 22 fordulójának csapatonkénti eredményét. Egy adott cellában „<b><i>GY</i></b>” betű van, ha a csapat győzött a mérkőzésen, „<b><i>V</i></b>” betű, ha vesztett és „<b><i>D</i></b>” betű, ha döntetlent játszott.</p>"
+  },
+  {
+   "n": 2,
+   "title": "Győzelem, vereség, döntetlen",
+   "text": "<p>A <i>B2:D13</i> tartomány celláiban határozza meg függvény vagy képlet segítségével, hogy az adott csapat hány mérkőzést nyert meg, hányat veszített el és hány mérkőzésen játszott döntetlent a 22 fordulóban!</p>"
+  },
+  {
+   "n": 3,
+   "title": "Gólkülönbség",
+   "text": "<p>Az <i>E2:F13</i> tartomány cellái tartalmazzák a 22 forduló alatt lőtt és kapott gólokat. Határozza meg a <i>G2:G13</i> tartományban a lőtt és kapott gólok különbségét!</p>"
+  },
+  {
+   "n": 4,
+   "title": "Pontok",
+   "text": "<p>A <i>H2:H13</i> tartomány celláiban határozza meg képlet segítségével a 22 forduló alatt szerzett pontokat! A győzelemért 2 pont jár, a döntetlenért 1 pont.</p>"
+  },
+  {
+   "n": 5,
+   "title": "Összes gól",
+   "text": "<p>A <i>C16</i> cellában határozza meg, hogy a bajnokság alapszakaszában a csapatok összesen hány gólt lőttek!</p>"
+  },
+  {
+   "n": 6,
+   "title": "Átlag meccsenként",
+   "text": "<p>A <i>C17</i> cellában határozza meg és függvénnyel kerekítse egészre, hogy az alapszakaszban mérkőzésenként átlagban hány gól esett!</p>"
+  },
+  {
+   "n": 7,
+   "title": "Rendezés",
+   "text": "<p>Rendezze ezeket az adatokat elsődlegesen a pontok alapján csökkenően! Pontegyezőség esetén a nagyobb gólkülönbség számít. (A rendezés során ügyeljen arra, hogy az egymáshoz tartozó adatok a rendezés után is együtt maradjanak.)</p>"
+  },
+  {
+   "n": 8,
+   "title": "Rájátszás",
+   "text": "<p>Az alapszakasz után a rájátszás következik. Ebben a bajnokságot vezető csapat a 8. helyezettel játszik, a 2. helyezett a 7. helyezettel, a 3. a 6. helyezettel és a 4. az 5. helyezettel. A <i>B20:B30</i> tartomány megfelelő nyolc cellájába határozza meg másolható képlet alkalmazásával a rájátszás első fordulójának csapatait!</p>"
+  },
+  {
+   "n": 9,
+   "title": "Sávdiagram",
+   "text": "<p>Készítsen sávdiagramot a minta és a leírás alapján, amelyen a csapatok lőtt és kapott góljait ábrázolja!</p><ol class=\"sub\"><li>A diagramot az adatok alatt a <i>D</i> oszloptól jobbra és a <i>15</i>. sor alá helyezze el!</li><li>A diagramon a lőtt gólokat mutató sávok zöld színűek, a kapott gólok sávja pedig piros színű legyen!</li><li>A diagramhoz tartozzon jelmagyarázat, amit a diagram alatt, egy sorban helyezzen el!</li><li>A címként írja be: „A 2015-2016. évi bajnokságban lőtt és kapott gólok”!</li></ol>"
+  },
+  {
+   "n": 10,
+   "title": "Formázás",
+   "text": "<p>Formázza a táblázatot a leírás és a minta alapján!</p><ol class=\"sub\"><li>Az <i>A:H</i> oszlopok szélességét úgy válassza meg, hogy minden adat olvasható legyen! A <i>B:H</i> oszlopok szélessége legyen egyenlő! A <i>J:AE</i> oszlopok szélessége legyen egyforma, de a lehető legkisebb úgy, hogy a tartalom még olvasható maradjon!</li><li>Az <i>A1:H1</i> és az <i>A19:C19</i> tartomány celláinak hátterét állítsa világosszürkére és a betűstílust félkövérre! Az itt lévő címkék igazítását a minta alapján végezze el!</li><li>Az <i>A16:B16</i>, az <i>A17:B17</i> és az <i>A19:C19</i> tartomány celláit, illetve a <i>20</i>. sortól lefelé a megfelelő <i>B</i> és <i>C</i> oszlopbeli cellákat vonja össze!</li><li>A <i>B2:H13</i>, a <i>J2:AE13</i> tartomány celláiban és a rájátszás részen az előzőleg összevont cellák esetén alkalmazzon vízszintesen középre igazítást!</li><li>Szegélyezze a táblázatot a minta szerint! Az <i>A1:H13</i> cellatartomány körül alkalmazzon vastagabb vonalat, valamint az <i>1</i>. és a <i>2</i>. sor között dupla szegélyt! Vékony szegélyt alkalmazzon az <i>A16:C17</i> tartomány cellái és a rájátszásban résztvevő csapatokat tartalmazó cellák körül!</li></ol>"
+  }
+ ],
+ "ending": "<p>A teljes, 30 pontos feladat segítség nélkül: DARABTELI, összesítés, kerekítés, rendezés, másolható INDEX-képlet, sávdiagram és szegélyezés.</p>",
+ "next": null
+};
+window.EXAM.checks = (() => {
+  const TEAMS = {"Békéscsaba": {"res": ["V", "V", "V", "V", "GY", "GY", "V", "V", "V", "GY", "V", "V", "V", "V", "D", "V", "GY", "V", "V", "V", "V", "V"], "e": 538, "f": 703, "w": 4, "l": 17, "d": 1, "diff": -165, "pts": 9}, "Budaörs": {"res": ["V", "V", "V", "GY", "V", "V", "V", "GY", "V", "V", "V", "V", "V", "V", "V", "V", "V", "V", "V", "V", "V", "V"], "e": 477, "f": 714, "w": 2, "l": 20, "d": 0, "diff": -237, "pts": 4}, "Dunaújváros": {"res": ["D", "GY", "V", "GY", "GY", "GY", "V", "GY", "GY", "GY", "GY", "V", "GY", "V", "GY", "D", "GY", "D", "V", "GY", "GY", "GY"], "e": 621, "f": 556, "w": 14, "l": 5, "d": 3, "diff": 65, "pts": 31}, "DVSC-TVP": {"res": ["GY", "GY", "V", "GY", "V", "V", "GY", "V", "V", "GY", "V", "GY", "GY", "V", "GY", "V", "V", "V", "GY", "V", "V", "GY"], "e": 567, "f": 555, "w": 10, "l": 12, "d": 0, "diff": 12, "pts": 20}, "Érd": {"res": ["V", "GY", "V", "V", "GY", "GY", "GY", "GY", "GY", "V", "GY", "V", "GY", "GY", "V", "GY", "GY", "GY", "GY", "V", "GY", "V"], "e": 614, "f": 526, "w": 14, "l": 8, "d": 0, "diff": 88, "pts": 28}, "Fehérép Alcoa": {"res": ["V", "GY", "V", "GY", "V", "V", "V", "GY", "GY", "GY", "V", "GY", "V", "V", "V", "D", "V", "GY", "V", "GY", "GY", "V"], "e": 546, "f": 540, "w": 9, "l": 12, "d": 1, "diff": 6, "pts": 19}, "Ferencvárosi TC": {"res": ["GY", "GY", "V", "GY", "GY", "GY", "GY", "GY", "GY", "GY", "GY", "GY", "GY", "GY", "GY", "GY", "D", "GY", "GY", "GY", "GY", "GY"], "e": 703, "f": 507, "w": 20, "l": 1, "d": 1, "diff": 196, "pts": 41}, "Győri ETO": {"res": ["D", "GY", "GY", "GY", "GY", "GY", "GY", "GY", "GY", "GY", "GY", "GY", "V", "GY", "GY", "GY", "GY", "GY", "GY", "GY", "GY", "GY"], "e": 719, "f": 457, "w": 20, "l": 1, "d": 1, "diff": 262, "pts": 41}, "Mosonmagyaróvár": {"res": ["V", "D", "V", "V", "V", "V", "V", "V", "V", "V", "V", "V", "V", "V", "GY", "V", "GY", "V", "V", "V", "V", "V"], "e": 496, "f": 617, "w": 2, "l": 19, "d": 1, "diff": -121, "pts": 5}, "MTK Budapest": {"res": ["V", "D", "V", "GY", "V", "V", "D", "V", "V", "V", "GY", "GY", "GY", "V", "GY", "D", "V", "V", "GY", "V", "V", "V"], "e": 504, "f": 623, "w": 6, "l": 13, "d": 3, "diff": -119, "pts": 15}, "Siófok KC": {"res": ["GY", "GY", "GY", "V", "V", "GY", "GY", "D", "GY", "V", "GY", "GY", "GY", "GY", "V", "V", "GY", "GY", "GY", "GY", "V", "GY"], "e": 590, "f": 555, "w": 15, "l": 6, "d": 1, "diff": 35, "pts": 31}, "Vác": {"res": ["GY", "V", "GY", "GY", "GY", "V", "V", "V", "V", "V", "V", "V", "V", "GY", "GY", "GY", "V", "V", "V", "GY", "GY", "GY"], "e": 571, "f": 593, "w": 10, "l": 12, "d": 0, "diff": -22, "pts": 20}}, ORDER = ["Győri ETO", "Ferencvárosi TC", "Dunaújváros", "Siófok KC", "Érd", "DVSC-TVP", "Vác", "Fehérép Alcoa", "MTK Budapest", "Békéscsaba", "Mosonmagyaróvár", "Budaörs"], TOTAL = 6946, AVG = 53;
+  const COLS = "J K L M N O P Q R S T U V W X Y Z AA AB AC AD AE".split(" ");
+  const team = (F, r) => { const c = F.ws()["A" + r]; return c ? TEAMS[String(c.v).trim()] && String(c.v).trim() : null; };
+  /* every row 2–13 holds one of the 12 teams, with its own results still next to it */
+  const rowsOk = F => { const seen = new Set(), w = F.ws();
+    for (let r = 2; r <= 13; r++) {
+      const t = team(F, r); if (!t) return { ok: false, msg: `Az A${r} cellában nem egy csapat neve áll.` };
+      if (seen.has(t)) return { ok: false, msg: `${t} kétszer szerepel a táblázatban.` }; seen.add(t);
+      const bad = COLS.find((c, k) => !w[c + r] || String(w[c + r].v).trim() !== TEAMS[t].res[k]);
+      if (bad) return { ok: false, msg: `A ${r}. sorban (${t}) a fordulók eredménye (${bad}${r}) nem az, ami a forrásfájlban van. ${seen.size > 1 ? "Rendezéskor szétváltak az összetartozó adatok?" : ""}` };
+      if (!w["E" + r] || w["E" + r].v !== TEAMS[t].e || !w["F" + r] || w["F" + r].v !== TEAMS[t].f) return { ok: false, msg: `A ${r}. sorban (${t}) a lőtt vagy a kapott gólok nem stimmelnek a forrásfájllal.` };
+    }
+    return { ok: true }; };
+  /* a column of the table, team by team: formula and value */
+  const perTeam = (F, col, key, extra) => { const w = F.ws(); let done = 0, msg = null;
+    for (let r = 2; r <= 13; r++) {
+      const t = team(F, r), c = w[col + r]; let m = null;
+      if (!t) m = `Az A${r} cellában nem egy csapat neve áll.`;
+      else if (!c || c.v === "" || c.v === undefined) m = `${col}${r} cella üres.`;
+      else if (!c.f) m = `${col}${r} cellában nincs képlet, csak egy beírt érték. Ide képlet kell!`;
+      else if (c.v !== TEAMS[t][key]) m = `${col}${r} cella értéke nem jó (${t}). A képleted: ${F.hu(c.f)}`;
+      else if (extra) m = extra(c, r);
+      if (m) { if (!msg) msg = m; } else done++;
+    }
+    return { ok: done === 12, msg, done, total: 12 }; };
+  const PO = [["B20", 1, "A20"], ["B21", 8, "A21"], ["B23", 4, "A23"], ["B24", 5, "A24"], ["B26", 2, "A26"], ["B27", 7, "A27"], ["B29", 3, "A29"], ["B30", 6, "A30"]];
+  const bar = F => { const all = F.charts(), ch = all.find(c => c.types.some(t => /^bar/.test(t)));
+    if (!ch) return { err: { ok: false, msg: all.length ? "Van diagram, de nem sávdiagram." : "Nem találok diagramot a munkalapon." } };
+    if (ch.barDir !== "bar") return { err: { ok: false, msg: "Ez oszlopdiagram (függőleges oszlopok). Sávdiagram kell (vízszintes sávok)." } };
+    return { ch }; };
+  const serOf = (ch, col) => ch.seriesList.find(s => new RegExp(`!?${col}2:${col}13\\b`).test(s.val));
+  const THICK = /^(medium|thick|double)$/;
+  return [
+    { task: 1, label: "Az alapszakasz.txt az A1-től betöltve", run: F => F.all(F.values("A1:H1", ["Csapat", "Győzelem", "Vereség", "Döntetlen", "Lőtt gólok", "Kapott gólok", "Különbség", "Pont"]), () => rowsOk(F),
+        F.values(["A16", "A17", "A19", "A20", "A21", "A30"], ["Gólok száma összesen:", "Gólok átlaga meccsenként:", "Rájátszás", 1, 8, 6])) },
+    { task: 2, label: "B2:D13: győzelmek, vereségek, döntetlenek, képlettel", run: F => F.all(() => perTeam(F, "B", "w"), () => perTeam(F, "C", "l"), () => perTeam(F, "D", "d")) },
+    { task: 3, label: "G2:G13: a gólkülönbség, képlettel", run: F => perTeam(F, "G", "diff") },
+    { task: 4, label: "H2:H13: a pontszám, képlettel", run: F => perTeam(F, "H", "pts") },
+    { task: 5, label: "C16: az összes lőtt gól, képlettel", run: F => F.values("C16", TOTAL, { formula: true }) },
+    { task: 6, label: "C17: a meccsenkénti átlag, függvénnyel egészre kerekítve", run: F => { const r = F.values("C17", AVG, { formula: true }); if (!r.ok) return r;
+        const f = F.ws().C17.f; return /\b(ROUND|ROUNDUP|ROUNDDOWN|MROUND)\(/.test(f) ? { ok: true } : { ok: false, msg: `A C17 képlete (${F.hu(f)}) nem kerekít függvénnyel. A feladat szerint függvénnyel kell egészre kerekíteni.` }; } },
+    { task: 7, label: "A csapatok sorrendje: pont, azon belül gólkülönbség szerint csökkenően", run: F => { for (let r = 2; r <= 13; r++) if (team(F, r) !== ORDER[r - 2]) return { ok: false, msg: `A ${r}. sorban nem az a csapat áll, amelyiknek a rendezés után ott kellene.` }; return { ok: true }; } },
+    { task: 7, label: "Az összetartozó adatok együtt maradtak", run: F => F.all(() => rowsOk(F), () => perTeam(F, "B", "w"), () => perTeam(F, "H", "pts")) },
+    { task: 8, label: "A rájátszás nyolc csapata a B oszlopban, képlettel", run: F => { const w = F.ws(); let done = 0, msg = null;
+        PO.forEach(([a, rank]) => { const c = w[a]; let m = null;
+          if (!c || c.v === undefined || c.v === "") m = `${a} cella üres.`; else if (!c.f) m = `${a} cellában nincs képlet. Ide képlet kell!`;
+          else if (String(c.v).trim() !== ORDER[rank - 1]) m = `${a} cellában nem a jó csapat áll. A képleted: ${F.hu(c.f)}`;
+          if (m) { if (!msg) msg = m; } else done++; });
+        return { ok: done === 8, msg, done, total: 8 }; } },
+    { task: 8, label: "A képlet másolható: a mellette álló helyezésből dolgozik", run: F => { const w = F.ws();
+        const none = PO.find(([a]) => !w[a] || !w[a].f); if (none) return { ok: false, msg: `${none[0]} cellában nincs képlet.` };
+        const bad = PO.find(([a, , ref]) => !new RegExp(`\\$?A\\$?${ref.slice(1)}\\b`).test(w[a].f));
+        return bad ? { ok: false, msg: `${bad[0]} képlete (${F.hu(w[bad[0]].f)}) nem az A oszlopban mellette álló helyezést használja, így nem másolható.` } : { ok: true }; } },
+    { task: 9, label: "Sávdiagram a lőtt és kapott gólokról", run: F => { const { ch, err } = bar(F); if (err) return err;
+        return serOf(ch, "E") && serOf(ch, "F") ? { ok: true } : { ok: false, msg: "A diagramon a lőtt (E2:E13) és a kapott (F2:F13) gólok adatsora legyen." }; } },
+    { task: 9, label: "a. Az adatok alatt, a D oszloptól jobbra, a 15. sor alatt", run: F => { const { ch, err } = bar(F); if (err) return err; const f = ch.from;
+        return f.c === null || (f.c >= 3 && f.r >= 15) ? { ok: true } : { ok: false, msg: "A diagram nem a D oszloptól jobbra és a 15. sor alatt van." }; } },
+    { task: 9, label: "b. Lőtt gólok zöld, kapott gólok piros", run: F => { const { ch, err } = bar(F); if (err) return err;
+        const e = serOf(ch, "E"), f = serOf(ch, "F"); if (!e || !f) return { ok: false, msg: "Nem találom a lőtt és a kapott gólok adatsorát." };
+        if (!F.green(e.fill)) return { ok: false, msg: "A lőtt gólok sávjai nem zöldek." };
+        return F.red(f.fill) ? { ok: true } : { ok: false, msg: "A kapott gólok sávjai nem pirosak." }; } },
+    { task: 9, label: "c. Jelmagyarázat a diagram alatt", run: F => { const { ch, err } = bar(F); if (err) return err; return ch.legend && ch.legendPos === "b" ? { ok: true } : { ok: false, msg: "A jelmagyarázat nem a diagram alatt van." }; } },
+    { task: 9, label: "d. A cím", run: F => { const { ch, err } = bar(F); if (err) return err; return ch.title.trim() === "A 2015-2016. évi bajnokságban lőtt és kapott gólok" ? { ok: true } : { ok: false, msg: "A diagram címe nem pontosan az, ami a feladatban áll." }; } },
+    { task: 10, label: "a. Oszlopszélességek: A elég széles, B:H egyenlő, J:AE egyforma és keskeny", run: F => {
+        const w = c => F.col(c).wch || F.col(c).width || 8.43;
+        if (w("A") < 15) return { ok: false, msg: "Az A oszlop túl keskeny: nem minden csapatnév olvasható." };
+        const bh = "BCDEFGH".split("").map(w); if (!bh.every(x => Math.abs(x - bh[0]) < 0.05)) return { ok: false, msg: "A B:H oszlopok szélessége nem egyenlő." };
+        const jae = COLS.map(w); if (!jae.every(x => Math.abs(x - jae[0]) < 0.05)) return { ok: false, msg: "A J:AE oszlopok szélessége nem egyforma." };
+        return jae[0] <= 5 ? { ok: true } : { ok: false, msg: "A J:AE oszlopok lehetnek keskenyebbek is: a lehető legkisebb szélesség kell, amelynél a tartalom még olvasható." }; } },
+    { task: 10, label: "b. Az A1:H1 és az A19:C19 világosszürke hátterű, félkövér, a minta szerint igazítva", run: F => F.all(
+        F.styles(["A1:H1", "A19"], s => s.fill.pattern === "solid" && F.gray(s.fill.color) && s.fill.color.l > .6, a => `${a}: a háttér nem világosszürke.`),
+        F.styles(["A1:H1", "A19"], s => s.font.b, a => `${a}: nem félkövér.`),
+        F.styles(["A1:H1", "A19"], s => s.h === "center", a => `${a}: a címke igazítása nem olyan, mint a mintán.`)) },
+    { task: 10, label: "c. Cellaösszevonások", run: F => { const m = ["A16:B16", "A17:B17", "A19:C19", "B20:C20", "B21:C21", "B23:C23", "B24:C24", "B26:C26", "B27:C27", "B29:C29", "B30:C30"].find(r => !F.merged(r));
+        return m ? { ok: false, msg: `A ${m} tartomány nincs összevonva.` } : { ok: true }; } },
+    { task: 10, label: "d. Vízszintesen középre: B2:H13, J2:AE13 és a rájátszás cellái", run: F => F.styles(["B2:H13", "J2:AE13", "B20", "B21", "B23", "B24", "B26", "B27", "B29", "B30"], s => s.h === "center", a => `${a}: vízszintesen nem középre igazított.`) },
+    { task: 10, label: "e. Vastagabb keret az A1:H13 körül, dupla vonal az 1. és 2. sor között", run: F => {
+        for (let r = 1; r <= 13; r++) { if (!THICK.test(F.side("A" + r, "left"))) return { ok: false, msg: `Az A${r} bal oldalán nem vastagabb a vonal: az A1:H13 körül vastagabb keret kell.` };
+          if (!THICK.test(F.side("H" + r, "right"))) return { ok: false, msg: `A H${r} jobb oldalán nem vastagabb a vonal: az A1:H13 körül vastagabb keret kell.` }; }
+        for (const c of "ABCDEFGH") { if (!THICK.test(F.side(c + "1", "top"))) return { ok: false, msg: `A ${c}1 tetején nem vastagabb a vonal.` };
+          if (!THICK.test(F.side(c + "13", "bottom"))) return { ok: false, msg: `A ${c}13 alján nem vastagabb a vonal.` };
+          if (F.side(c + "1", "bottom") !== "double" && F.side(c + "2", "top") !== "double") return { ok: false, msg: `A ${c}1 és ${c}2 között nem dupla a vonal.` }; }
+        return F.styles("A1:H13", (s, a) => ["left", "right", "top", "bottom"].every(sd => F.side(a, sd)), a => `${a}: a táblázat belsejében is legyen szegély (lásd a mintát).`); } },
+    { task: 10, label: "e. Vékony szegély az A16:C17 és a rájátszás csapatai körül", run: F => F.boxed(["A16:C17", "B20:C21", "B23:C24", "B26:C27", "B29:C30"]) }
+  ];
+})()
+;
+</script>
+<script src="../../excel/cats.js"></script>
+<script src="../exam.js"></script>
+<script src="../../nav.js?v=e4c5a8c8" defer></script>
+</body>
+</html>

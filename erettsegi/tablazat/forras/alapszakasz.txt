@@ -1,0 +1,30 @@
+Csapat	Győzelem	Vereség	Döntetlen	Lőtt gólok	Kapott gólok	Különbség	Pont
+Békéscsaba				538	703				V	V	V	V	GY	GY	V	V	V	GY	V	V	V	V	D	V	GY	V	V	V	V	V
+Budaörs				477	714				V	V	V	GY	V	V	V	GY	V	V	V	V	V	V	V	V	V	V	V	V	V	V
+Dunaújváros				621	556				D	GY	V	GY	GY	GY	V	GY	GY	GY	GY	V	GY	V	GY	D	GY	D	V	GY	GY	GY
+DVSC-TVP				567	555				GY	GY	V	GY	V	V	GY	V	V	GY	V	GY	GY	V	GY	V	V	V	GY	V	V	GY
+Érd				614	526				V	GY	V	V	GY	GY	GY	GY	GY	V	GY	V	GY	GY	V	GY	GY	GY	GY	V	GY	V
+Fehérép Alcoa				546	540				V	GY	V	GY	V	V	V	GY	GY	GY	V	GY	V	V	V	D	V	GY	V	GY	GY	V
+Ferencvárosi TC				703	507				GY	GY	V	GY	GY	GY	GY	GY	GY	GY	GY	GY	GY	GY	GY	GY	D	GY	GY	GY	GY	GY
+Győri ETO				719	457				D	GY	GY	GY	GY	GY	GY	GY	GY	GY	GY	GY	V	GY	GY	GY	GY	GY	GY	GY	GY	GY
+Mosonmagyaróvár				496	617				V	D	V	V	V	V	V	V	V	V	V	V	V	V	GY	V	GY	V	V	V	V	V
+MTK Budapest				504	623				V	D	V	GY	V	V	D	V	V	V	GY	GY	GY	V	GY	D	V	V	GY	V	V	V
+Siófok KC				590	555				GY	GY	GY	V	V	GY	GY	D	GY	V	GY	GY	GY	GY	V	V	GY	GY	GY	GY	V	GY
+Vác				571	593				GY	V	GY	GY	GY	V	V	V	V	V	V	V	V	GY	GY	GY	V	V	V	GY	GY	GY
+
+
+Gólok száma összesen:
+Gólok átlaga meccsenként:
+
+Rájátszás
+1
+8
+
+4
+5
+
+2
+7
+
+3
+6
