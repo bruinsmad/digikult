@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>/* moving between pages: the old page drifts aside and fades, the new one glides in; the rail holds still */@view-transition{navigation:auto}.rail{view-transition-name:rail}::view-transition-group(root){animation:none}::view-transition-old(root){animation:dk-out .2s cubic-bezier(.4,0,1,1) both}::view-transition-new(root){animation:dk-in .38s cubic-bezier(.16,1,.3,1) .06s both}::view-transition-old(rail),::view-transition-new(rail){animation:none}@keyframes dk-out{to{opacity:0;transform:translateX(-18px)}}@keyframes dk-in{from{opacity:0;transform:translateX(26px)}}@media (prefers-reduced-motion:reduce){::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none!important}}</style>
+<title>Témazáró: HTML és CSS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600;700&display=swap">
+<style>
+/* A timed test sheet: chalkboard around, a sheet of paper in the middle, one card per question */
+:root{
+  --board:#22362f; --board-deep:#1a2a24; --chalk:#efeee6; --chalk-dim:#b4c4b8; --yellow:#f2d264;
+  --paper:#fbfaf4; --ink:#1d2622; --muted:#5b6660; --line:#e4e1d4;
+  --accent:#b8860b; --accent-bg:#fbf1cf; --ok:#2f7a3a; --ok-bg:#e3f2df; --bad:#b3362f; --bad-bg:#fbe3df;
+  --code-bg:#1f2a26; --code-ink:#e9efe9; --kw:#f2d264; --str:#a8dba0; --num:#9cc8e8; --fn:#f0a3b8;
+  --f-chalk:"Kalam","Segoe Print","Comic Sans MS",cursive;
+  --f-body:"Atkinson Hyperlegible","Segoe UI",system-ui,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
+}
+*{box-sizing:border-box}
+*,*::before,*::after{font-feature-settings:"calt" 0,"liga" 0}
+[hidden]{display:none!important}
+html,body{margin:0}
+body{color:var(--chalk);font:17px/1.55 var(--f-body);background:var(--board);
+  background-image:radial-gradient(60% 40% at 18% 12%,rgba(255,255,255,.05),transparent 70%),radial-gradient(50% 35% at 82% 40%,rgba(255,255,255,.035),transparent 70%)}
+:focus-visible{outline:3px solid var(--yellow);outline-offset:2px}
+code,pre,textarea{font-family:var(--f-mono)}
+a{color:inherit}
+.wrap{max-width:960px;margin:0 auto;padding:0 max(16px,env(safe-area-inset-left))}
+.topline{display:flex;align-items:center;gap:12px;padding:14px 0;font-size:14px;color:var(--chalk-dim)}
+.crumb a{text-decoration:none}.crumb a:hover{color:#fff6e8;text-decoration:underline}
+.langlink{margin-left:auto;font:700 14px var(--f-body);color:#fff6e8;border:1.5px solid rgba(255,246,232,.45);border-radius:4px;padding:4px 10px;text-decoration:none}
+.hero{padding:18px 0 26px}
+.kicker{font:700 21px/1.2 var(--f-chalk);color:var(--yellow)}
+h1{font:700 clamp(32px,5.4vw,52px)/1.08 Georgia,"Times New Roman",serif;margin:6px 0 10px;color:#fff6e8;text-wrap:balance}
+.lead{max-width:66ch;color:var(--chalk-dim);font-size:18px;margin:0}
+
+/* sticky bar: name, answered, hand in */
+.bar{position:sticky;top:0;z-index:20;background:rgba(26,42,36,.96);backdrop-filter:blur(4px);border-bottom:2px solid rgba(239,238,230,.12)}
+.bar .wrap{display:flex;flex-wrap:wrap;align-items:center;gap:8px 22px;padding-top:10px;padding-bottom:10px}
+.bar .who{font-weight:700;color:#fff6e8}
+.bar .stat{font-size:14px;color:var(--chalk-dim)}
+.bar .stat b{font:700 20px var(--f-mono);color:var(--yellow);margin-left:6px}
+.bar .btn{margin-left:auto}
+
+.sheet{background:var(--paper);color:var(--ink);border-radius:6px;box-shadow:0 20px 50px rgba(0,0,0,.35);padding:30px clamp(16px,4vw,44px) 36px;margin:22px auto 30px;max-width:960px}
+.sheet h2{font:700 25px/1.2 var(--f-body);margin:0 0 6px;display:flex;align-items:baseline;gap:10px}
+.sheet h2 .pts{margin-left:auto;font:700 14px var(--f-body);color:var(--muted);white-space:nowrap}
+.sec{padding:22px 0 8px;border-top:2px dashed var(--line)}
+.sec:first-of-type{border-top:0;padding-top:0}
+.sec>.intro{color:var(--muted);margin:0 0 10px}
+
+.start{display:grid;gap:14px;max-width:560px}
+.start label{font-weight:700}
+.start input{font:17px var(--f-body);padding:10px 12px;border:2px solid #cfcab8;border-radius:8px;width:100%}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:6px 0 4px}
+.fact{border:2px solid var(--ink);border-radius:10px;padding:10px 12px;background:#fff}
+.fact b{display:block;font:700 26px/1.1 var(--f-chalk);color:var(--accent)}
+.fact span{font-size:14px;color:var(--muted)}
+.rules{margin:0;padding-left:20px;color:var(--ink)}
+.rules li{margin:3px 0}
+
+.btn{font:700 15px var(--f-body);border:0;border-radius:8px;padding:9px 16px;cursor:pointer;background:var(--ink);color:#fff}
+.btn:hover{background:#000}
+.btn.ghost{background:transparent;color:var(--ink);border:2px solid var(--ink)}
+.btn.big{font-size:17px;padding:12px 22px}
+.btn.gold{background:var(--yellow);color:#2d2300}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+
+/* tables reference */
+details.ref{margin:0 0 6px;border:2px solid var(--ink);border-radius:10px;background:#fff}
+details.ref summary{cursor:pointer;font-weight:700;padding:10px 14px}
+.ref-body{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(270px,100%),1fr));gap:12px;padding:0 14px 14px}
+.dt{border:2px solid var(--ink);border-radius:8px;overflow:hidden}
+.dt h4{margin:0;background:var(--code-bg);color:var(--kw);font:700 14px var(--f-mono);padding:6px 10px;display:flex;justify-content:space-between}
+.dt h4 span{color:#cfd8d2;font-weight:400}
+.dt .scroll{overflow-x:auto;max-height:330px;overflow-y:auto}
+table{border-collapse:collapse;width:100%;font:13.5px var(--f-mono)}
+th,td{text-align:left;padding:5px 9px;border-bottom:1px solid var(--line);white-space:nowrap}
+th{background:#eeebe0;position:sticky;top:0}
+td.n{text-align:right}
+td.null{color:#9a9a8e;font-style:italic}
+
+/* question cards */
+.q{border:2px solid var(--ink);border-radius:12px;background:#fff;padding:14px 16px;margin:12px 0;position:relative}
+.q .qh{display:flex;gap:10px;align-items:baseline}
+.q .no{flex:none;font:700 19px/1 var(--f-chalk);color:var(--accent);min-width:2.2em}
+.q .qt{flex:1;font-weight:700}
+.q .qp{flex:none;font-size:13px;color:var(--muted);white-space:nowrap}
+.q pre.code{margin:10px 0;background:var(--code-bg);color:var(--code-ink);border-radius:8px;padding:10px 14px;font-size:14.5px;line-height:1.5;white-space:pre-wrap;overflow-wrap:anywhere}
+.k{color:var(--kw);font-weight:600}.s{color:var(--str)}.nm{color:var(--num)}.f{color:var(--fn)}
+.opts{display:grid;gap:6px;margin-top:8px}
+.opt{display:flex;gap:10px;align-items:flex-start;border:1.5px solid var(--line);border-radius:8px;padding:8px 10px;cursor:pointer;background:#fdfcf8}
+.opt:hover{border-color:var(--ink)}
+.opt input{margin-top:4px;accent-color:var(--ink);flex:none}
+.opt:has(input:checked){border-color:var(--ink);background:var(--accent-bg)}
+.tf{display:grid;grid-template-columns:1fr auto;gap:8px 14px;align-items:center;border-top:1px solid var(--line);padding:8px 0}
+.tf:first-of-type{border-top:0}
+.tf .seg{display:flex;border:2px solid var(--ink);border-radius:8px;overflow:hidden}
+.tf .seg label{padding:5px 12px;cursor:pointer;font-weight:700;font-size:14px}
+.tf .seg input{position:absolute;opacity:0;pointer-events:none}
+.tf .seg label:has(input:checked){background:var(--ink);color:#fff}
+.tf .seg label:has(input:focus-visible){outline:3px solid var(--yellow);outline-offset:-3px}
+@media (max-width:520px){ .tf{grid-template-columns:1fr} }
+.order{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:6px;max-width:440px}
+.order li{display:flex;align-items:center;gap:8px;border:2px solid var(--ink);border-radius:8px;padding:6px 8px 6px 12px;background:#fff;font:700 15px var(--f-mono)}
+.order li .ix{font:700 16px var(--f-chalk);color:var(--accent);width:1.4em}
+.order li .mv{margin-left:auto;display:flex;gap:4px}
+.order li button{font:700 15px var(--f-body);width:34px;height:30px;border-radius:6px;border:1.5px solid var(--ink);background:#f6f3e8;cursor:pointer}
+.order li button[disabled]{opacity:.3;cursor:default}
+.match{display:grid;gap:8px;margin-top:8px}
+.match .row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:10px;align-items:center}
+.match code{font-weight:700}
+.match select{font:15px var(--f-body);padding:7px 8px;border:2px solid #cfcab8;border-radius:8px;width:100%;background:#fff}
+@media (max-width:560px){ .match .row{grid-template-columns:1fr} }
+.num input,.blank input{font:15px var(--f-mono);padding:6px 8px;border:2px solid #cfcab8;border-radius:6px;background:#fff;color:var(--ink)}
+.num{margin-top:6px}.num input{width:8em}
+pre.code .blank-in{display:inline-block;vertical-align:baseline}
+pre.code input{font:600 14.5px var(--f-mono);width:9em;padding:1px 6px;border:2px dashed var(--kw);border-radius:5px;background:#2c3a35;color:#fff}
+.lines{margin:10px 0 0;border-radius:8px;overflow:hidden;background:var(--code-bg)}
+.lines label{display:flex;gap:12px;align-items:baseline;padding:4px 12px;color:var(--code-ink);font:14.5px/1.5 var(--f-mono);cursor:pointer;border-left:4px solid transparent}
+.lines label:hover{background:#2a3833}
+.lines label input{accent-color:var(--yellow)}
+.lines label .ln{color:#8fa39a;width:1.2em;text-align:right}
+.lines label:has(input:checked){background:#3a3a22;border-left-color:var(--yellow)}
+.sqlbox textarea{width:100%;min-height:120px;resize:vertical;font-size:15px;line-height:1.5;padding:10px 12px;border-radius:8px;border:2px solid var(--ink);background:var(--code-bg);color:var(--code-ink);caret-color:var(--yellow);margin-top:10px}
+.sqlbox .row{display:flex;gap:8px;align-items:center;margin-top:6px;flex-wrap:wrap}
+.sqlbox .hint{font-size:13px;color:var(--muted)}
+.out{margin-top:8px}
+.out .meta{font:700 13px var(--f-body);color:var(--muted);margin-bottom:4px}
+.out .tbl{border:1.5px solid var(--line);border-radius:8px;overflow:auto;max-height:260px}
+.err{background:var(--bad-bg);color:var(--bad);border-radius:8px;padding:8px 12px;font-weight:700;font-size:15px}
+
+/* marking after submit */
+.q.right{border-color:var(--ok);box-shadow:inset 6px 0 0 var(--ok)}
+.q.wrong{border-color:var(--bad);box-shadow:inset 6px 0 0 var(--bad)}
+.q.part{border-color:var(--accent);box-shadow:inset 6px 0 0 var(--accent)}
+.q .got{position:absolute;top:-12px;right:12px;font:700 13px var(--f-body);padding:2px 10px;border-radius:999px;color:#fff}
+.q.right .got{background:var(--ok)}.q.wrong .got{background:var(--bad)}.q.part .got{background:var(--accent)}
+.locked input,.locked select,.locked textarea,.locked button.mvb{pointer-events:none}
+
+.result{border:2px solid var(--ink);border-radius:12px;padding:18px;background:#fff;margin-bottom:10px}
+.result .big{font:700 46px/1 var(--f-chalk);color:var(--accent)}
+.result .sub{color:var(--muted)}
+.result table{font:15px var(--f-body);margin-top:12px}
+.result td.n{font-family:var(--f-mono)}
+.export{margin-top:16px}
+.export ol{padding-left:20px;margin:6px 0 12px}
+.export .row{display:flex;gap:8px;flex-wrap:wrap}
+.note{min-height:1.4em;font-size:14px;color:var(--ok);margin:8px 0 0}
+.send{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin-top:14px;padding:10px 14px;border-radius:10px;font-weight:700;background:#f1efe6;color:var(--muted)}
+.send.ok{background:var(--ok-bg);color:var(--ok)}
+.send.bad{background:var(--bad-bg);color:var(--bad)}
+.submit{display:flex;justify-content:center;gap:10px;padding:18px 0 4px;flex-wrap:wrap}
+footer.end{text-align:center;color:var(--chalk-dim);font-size:14px;padding:4px 0 34px}
+@media print{ .bar,.topline,footer,.submit,.export{display:none} body{background:#fff} .sheet{box-shadow:none} }
+
+/* web test extras: the given page, the live preview, comments in code */
+.given{margin-top:8px}.given>span{font:700 13px var(--f-body);color:var(--muted)}
+.given pre.code{margin-top:4px}
+.prev{display:block;width:100%;height:190px;border:2px solid var(--line);border-radius:8px;background:#fff}
+.cm{color:#8fa39a;font-style:italic}
+.order li .tx{white-space:pre}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topline">
+    <span class="crumb"><a href="../../index.html#web">Weboldalak – HTML és CSS</a> › <a href="../../index.html#web-summary">Összefoglaló</a></span>
+    <a class="langlink" href="test.html" lang="en">English</a>
+  </div>
+  <header class="hero">
+    <div class="kicker">Weboldalak, témazáró</div>
+    <h1>Témazáró dolgozat: HTML és CSS</h1>
+    <p class="lead">A Suli Rádió honlapja: HTML-elemek, attribútumok és CSS-szabályok, nyolcféle feladatban.</p>
+  </header>
+</div>
+
+<div class="bar" id="bar" hidden>
+  <div class="wrap">
+    <span class="who" id="who"></span>
+    <span class="stat" id="tans"></span>
+    <button type="button" class="btn gold" id="submitTop"></button>
+  </div>
+</div>
+
+<main class="sheet" id="sheet"></main>
+<footer class="end">Digitális kultúra. A dolgozat a böngésződben fut, semmit sem küldünk el.</footer>
+
+<script>
+const CFG = {"lang": "hu", "key": "web-test-hu-v1", "minutes": 35, "sections": [{"id": "mc", "title": "Feleletválasztós kérdések", "intro": "Minden kérdésre egy helyes válasz van.", "questions": [{"id": "a1", "type": "mc", "pts": 1, "q": "Melyik címke jelöli a legfontosabb, legnagyobb címsort?", "opts": ["<code>&lt;h6&gt;<\/code>", "<code>&lt;h1&gt;<\/code>", "<code>&lt;head&gt;<\/code>", "<code>&lt;title&gt;<\/code>"], "ok": 1}, {"id": "a2", "type": "mc", "pts": 1, "q": "Mire való az <code>&lt;img&gt;<\/code> elem <code>alt<\/code> attribútuma?", "opts": ["Megadja, hol van a képfájl", "Ez a szöveg jelenik meg, ha a kép nem töltődik be, és ezt olvassa fel a felolvasóprogram", "Megadja a kép szélességét", "Keretet rajzol a kép köré"], "ok": 1}, {"id": "a3", "type": "mc", "pts": 1, "q": "Hová kerül a <code>&lt;style&gt;<\/code> elem?", "opts": ["A <code>body<\/code> elem végére", "A <code>head<\/code> elembe", "A <code>&lt;!DOCTYPE html&gt;<\/code> elé", "Bármelyik bekezdésbe"], "ok": 1}, {"id": "a4", "type": "mc", "pts": 1, "q": "Melyik CSS-szabály helyes?", "opts": ["<code>h1 { color: red; }<\/code>", "<code>&lt;h1&gt; { color: red; }<\/code>", "<code>h1 ( color = red )<\/code>", "<code>h1 { color red }<\/code>"], "ok": 0}, {"id": "a5", "type": "mc", "pts": 1, "q": "Melyik kijelölő vonatkozik a <code>kiemelt<\/code> osztályú elemekre (<code>class=\"kiemelt\"<\/code>)?", "opts": ["<code>kiemelt<\/code>", "<code>.kiemelt<\/code>", "<code>#kiemelt<\/code>", "<code>&lt;kiemelt&gt;<\/code>"], "ok": 1}]}, {"id": "tf", "title": "Igaz vagy hamis?", "intro": null, "questions": [{"id": "b1", "type": "tf", "q": "Döntsd el mindegyik állításról, hogy igaz vagy hamis!", "items": [["A <code>&lt;br&gt;<\/code> elemnek nincs záró címkéje.", true], ["Az <code>&lt;ul&gt;<\/code> számozott listát készít.", false], ["A CSS-ben a megjegyzés így néz ki: <code>&lt;!-- megjegyzés --&gt;<\/code>", false], ["A <code>padding<\/code> (belső margó) a keret és a tartalom közötti távolság.", true]]}]}, {"id": "order", "title": "Sorrend", "intro": null, "questions": [{"id": "c1", "type": "order", "pts": 2, "q": "Tedd helyes sorrendbe egy HTML-oldal vázának sorait! (A nyilakkal mozgathatod őket.)", "items": ["<!DOCTYPE html>", "<html>", "<head>", "<title>Suli Rádió<\/title>", "<\/head>", "<body>", "<\/body>", "<\/html>"], "start": [5, 2, 7, 0, 3, 6, 1, 4]}]}, {"id": "match", "title": "Párosítás", "intro": null, "questions": [{"id": "d1", "type": "match", "q": "Mit állítanak be ezek a CSS-tulajdonságok? Válaszd ki mindegyikhez a megfelelőt!", "left": ["<code>color<\/code>", "<code>background-color<\/code>", "<code>text-align<\/code>", "<code>border-radius<\/code>", "<code>font-size<\/code>"], "right": ["a szöveg színét", "a háttér színét", "a szöveg vízszintes igazítását", "a sarkok lekerekítését", "a betűméretet"], "shown": [3, 0, 4, 2, 1]}]}, {"id": "predict", "title": "Mit jelenít meg a böngésző?", "intro": "Nézd meg a kódot, majd írd be a választ számmal, vagy jelöld be a helyes válaszokat!", "questions": [{"id": "e1", "type": "num", "pts": 1, "q": "Hány listaelem jelenik meg összesen?", "code": "<ul>\n  <li>Hírek<\/li>\n  <li>Zene<\/li>\n<\/ul>\n<ol>\n  <li>Reggel<\/li>\n  <li>Délben<\/li>\n  <li>Délután<\/li>\n<\/ol>", "ok": 5}, {"id": "e2", "type": "num", "pts": 1, "q": "Hány cellája van a táblázatnak (a fejléccellákkal együtt)?", "code": "<table border=\"1\">\n  <tr><th>Nap<\/th><th>Műsor<\/th><th>Idő<\/th><\/tr>\n  <tr><td>Hétfő<\/td><td>Hírek<\/td><td>10:00<\/td><\/tr>\n  <tr><td>Szerda<\/td><td>Toplista<\/td><td>12:00<\/td><\/tr>\n<\/table>", "ok": 9}, {"id": "e3", "type": "num", "pts": 1, "q": "Hány bekezdésnek lesz sárga a háttere?", "code": "<style>\n  .kiemelt { background-color: yellow; }\n<\/style>\n\n<p>Hétfő<\/p>\n<p class=\"kiemelt\">Kedd<\/p>\n<p>Szerda<\/p>\n<p class=\"kiemelt\">Csütörtök<\/p>\n<h2 class=\"kiemelt\">Péntek<\/h2>", "ok": 2}, {"id": "e4", "type": "multi", "pts": 2, "q": "Mely szavak jelennek meg félkövéren? Jelöld be mindet!", "code": "<p><strong>Élő<\/strong> adás minden <em>hétfőn<\/em>,\n<strong>szerdán<\/strong> és pénteken.<\/p>", "opts": ["Élő", "adás", "hétfőn", "szerdán", "pénteken"], "ok": [0, 3]}]}, {"id": "blanks", "title": "Egészítsd ki!", "intro": "Írd be a hiányzó szavakat úgy, hogy a kód azt csinálja, amit a feladat kér.", "questions": [{"id": "f1", "type": "blank", "q": "Egy hivatkozás, amely a <code>musor.html<\/code> oldalra visz.", "code": "<{0} {1}=\"musor.html\">Heti műsor<\/a>", "ok": [["a"], ["href"]]}, {"id": "f2", "type": "blank", "q": "Egy kép a képfájl helyével és egy rövid leírással (ez jelenik meg, ha a kép nem töltődik be).", "code": "<img {0}=\"studio.jpg\" {1}=\"A rádió stúdiója\">", "ok": [["src"], ["alt"]]}, {"id": "f3", "type": "blank", "q": "A <code>h2<\/code> címsorok legyenek kékek és középre igazítottak.", "code": "h2 {\n  {0}: blue;\n  text-align: {1};\n}", "ok": [["color"], ["center"]]}]}, {"id": "bugs", "title": "Keresd a hibát!", "intro": "Mindegyik kódban egy sor hibás. Kattints rá!", "questions": [{"id": "g1", "type": "bug", "pts": 1, "q": "Melyik sor hibás?", "code": "<ul>\n  <li>Hírek<\/li>\n  <li>Sport<\/ul>\n  <li>Zene<\/li>\n<\/ul>", "ok": 2}, {"id": "g2", "type": "bug", "pts": 1, "q": "Melyik sor hibás?", "code": "body {\n  background-color: #f2f2f2;\n  color #333333;\n  font-family: Arial, sans-serif;\n}", "ok": 2}, {"id": "g3", "type": "bug", "pts": 1, "q": "A kép nem jelenik meg, pedig a <code>kep.png<\/code> ugyanabban a mappában van, mint az oldal. Melyik sor hibás?", "code": "<h2>A stúdió<\/h2>\n<img scr=\"kep.png\" alt=\"A stúdió\">\n<p>Itt készül a műsor.<\/p>", "ok": 1}]}, {"id": "write", "title": "Írd meg!", "intro": "Írd meg a kódot! Az <b>Előnézet<\/b> gombbal kipróbálhatod. Beadáskor a gép azt ellenőrzi, mi jelenik meg az oldalon.", "questions": [{"id": "h1", "type": "html", "kind": "list", "tag": "ol", "pts": 2, "q": "Írj egy <b>számozott listát<\/b> a rádió három műsorával, ebben a sorrendben: Reggeli hírek, Zenei toplista, Sportpercek!", "want": ["Reggeli hírek", "Zenei toplista", "Sportpercek"]}, {"id": "h2", "type": "html", "kind": "table", "pts": 2, "q": "Írj egy két sorból álló <b>táblázatot<\/b>! Az első sorban két fejléccella legyen: Nap, Műsor; a második sorban két sima cella: Hétfő, Reggeli hírek.", "head": ["Nap", "Műsor"], "row": ["Hétfő", "Reggeli hírek"]}, {"id": "h3", "type": "css", "pts": 3, "q": "Írd meg a CSS-kódot az alábbi oldalhoz: a <code>body<\/code> háttere legyen sötétkék (<code>#1d3557<\/code>), a szövege fehér (<code>white<\/code>), a <code>h1<\/code> pedig álljon középen!", "page": "<h1>Suli Rádió<\/h1>\n<p>Szólunk a szünetben!<\/p>\n<p class=\"kiemelt\">Ma délben: élő adás!<\/p>\n<p>Kívánságokat a stúdióban várunk.<\/p>", "model": "body { background-color: #1d3557; color: white; }\nh1 { text-align: center; }", "checks": [{"sel": "body", "prop": "background-color"}, {"sel": "body", "prop": "color"}, {"sel": "h1", "prop": "text-align"}]}, {"id": "h4", "type": "css", "pts": 3, "q": "Most a <code>kiemelt<\/code> osztályú bekezdést formázd meg: kapjon sárga hátteret (<code>#ffd166<\/code>), 10 képpontos belső margót és 8 képpontos lekerekítést! A többi bekezdés ne változzon!", "page": "<h1>Suli Rádió<\/h1>\n<p>Szólunk a szünetben!<\/p>\n<p class=\"kiemelt\">Ma délben: élő adás!<\/p>\n<p>Kívánságokat a stúdióban várunk.<\/p>", "model": ".kiemelt { background-color: #ffd166; padding: 10px; border-radius: 8px; }", "checks": [{"sel": ".kiemelt", "prop": "background-color"}, {"sel": ".kiemelt", "prop": "padding-top"}, {"sel": ".kiemelt", "prop": "border-top-left-radius"}], "keep": [{"sel": "p:not(.kiemelt)", "prop": "background-color"}, {"sel": "p:not(.kiemelt)", "prop": "padding-top"}]}]}], "reportTitle": "HTML-CSS TEMAZARO - VALASZLAP", "filePrefix": "html-css-temazaro", "endpoint": "", "sendKey": "digikult-web-test", "testId": "web-test","ui":{"pts":n=>n+' pont',"t":"Igaz","f":"Hamis","up":"Feljebb","down":"Lejjebb","choose":"Válassz…","answer":"Válasz","number":"szám","blank":i=>i+'. hiányzó szó',
+"given":"A megadott oldal (ezt nem kell megírnod):","phList":"&lt;ol&gt; …","phTable":"&lt;table&gt; …","htmlCode":"HTML-kód","cssCode":"CSS-kód","run":"Előnézet","runHint":"Ctrl + Enter is frissíti","preview":"Előnézet",
+"submit":"Beadás","submitSure":"Biztosan beadod? Kattints még egyszer!","confirm":m=>m ? `Még ${m} kérdés nincs megválaszolva. Ha így is beadod, kattints még egyszer a Beadásra.` : 'Kattints még egyszer a Beadásra.',
+"facts":(p,q,m)=>[['kb. '+m+' perc','ennyi idő kell hozzá'],[q+' kérdés','8-féle típus'],[p+' pont','összesen']],
+"rules":["Az „Írd meg!” feladatokat az <b>Előnézet</b> gombbal kipróbálhatod.", "Ezeknél a gép nem a kódot betűről betűre, hanem az eredményt pontozza: azt, ami megjelenik az oldalon.", "A válaszaid automatikusan mentődnek: ha véletlenül bezárod a lapot, onnan folytatod.", "Ha minden kérdéssel végeztél, nyomd meg a <b>Beadás</b> gombot."],
+"name":"A neved","namePh":"Vezetéknév Keresztnév","nameFirst":"Először írd be a neved.","start":"Kezdés","answered":"Megválaszolva","resultSub":p=>p+'%',
+"handH":"Add be a válaszaidat","handSteps":["Kattints a <b>Válaszok mentése (.txt)</b> gombra. A fájl a Letöltések mappába kerül.", "Nyisd meg a feladatot a <b>Google Classroomban</b>, töltsd fel a fájlt a <b>Hozzáadás vagy létrehozás → Fájl</b> alatt, majd nyomd meg a <b>Beadás</b> gombot."],
+"sending":"Küldés a tanárnak…","sent":"✓ A válaszaid megérkeztek a tanárodhoz.","sendFail":"Nem sikerült elküldeni (nincs internet?).","resend":"Újraküldés",
+"backupH":"Biztonsági másolat","backupSteps":["Ha a küldés nem sikerült, vagy a tanárod kéri, mentsd el a válaszaidat, és töltsd fel a <b>Google Classroomba</b>."],
+"save":"Válaszok mentése (.txt)","copy":"Másolás szövegként","saved":f=>`Mentve: ${f}. Most töltsd fel a Classroomba.`,"saveBlocked":"A mentés itt le van tiltva. Használd a másolást.",
+"copied":"Kimásolva. Illeszd be a Classroom-feladathoz privát megjegyzésként.","copyBlocked":"A másolás itt le van tiltva. Használd a mentést.","none":"(nincs válasz)","line":n=>n+'. sor',
+"rName":"Név","rDate":"Beadva","rTime":"Eltelt idő","rScore":"Pontszám"}};
+const U = CFG.ui;
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const KEY = CFG.key;
+let S = load() || { name: "", started: 0, submitted: 0, ans: {} };
+
+function load(){ try { return JSON.parse(localStorage.getItem(KEY)); } catch(e){ return null; } }
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){} }
+
+/* ---------- colouring HTML and CSS in the code boxes ---------- */
+function hlLine(line){
+  const e = esc(line);
+  if (e.includes("&lt;"))   // HTML: tags yellow, attribute names pink, values green
+    return e.replace(/(&lt;\/?)([a-zA-Z][a-zA-Z0-9]*|!DOCTYPE)([^]*?)(\/?&gt;)/g, (m, open, tag, attrs, close) =>
+      `<span class="k">${open}${tag}</span>` + attrs.replace(/([a-zA-Z-]+)(=)(&quot;[^&]*?&quot;)/g, '<span class="f">$1</span>$2<span class="s">$3</span>') + `<span class="k">${close}</span>`);
+  let m;
+  if ((m = /^(\s*)([^{}:]+?)(\s*\{\s*)$/.exec(e)) && !/^\s*[a-z-]+\s*:/.test(e)) return `${m[1]}<span class="k">${m[2]}</span>${m[3]}`;
+  if ((m = /^(\s*)([^{}:]+?:[a-z-]+)(\s*\{\s*)$/.exec(e))) return `${m[1]}<span class="k">${m[2]}</span>${m[3]}`;
+  if ((m = /^(\s*)([a-z-]+)(\s*:\s*)(.*?)(;?\s*)$/.exec(e))) return `${m[1]}<span class="f">${m[2]}</span>${m[3]}<span class="s">${m[4]}</span>${m[5]}`;
+  return e.replace(/(\/\*.*?\*\/)/g, '<span class="cm">$1</span>');
+}
+const hl = code => code.split("\n").map(hlLine).join("\n");
+
+/* ---------- rendering the student's HTML / CSS ---------- */
+const noScript = s => String(s).replace(/<script[\s\S]*?<\/script\s*>/gi, "");
+const htmlDoc = body => /<html[\s>]/i.test(body) ? noScript(body)
+  : `<!DOCTYPE html><html><head><meta charset="utf-8"></head><body>${noScript(body)}</body></html>`;
+const cssDoc = (q, css) => `<!DOCTYPE html><html><head><meta charset="utf-8"><style>${String(css).replace(/<\/?style[^>]*>/gi, "")}</style></head><body>${q.page}</body></html>`;
+const docOf = (q, a) => q.type === "css" ? cssDoc(q, a || "") : htmlDoc(a || "");
+/* a hidden frame for marking: written synchronously, so its styles can be read at once */
+let gframe = null;
+function renderDoc(src){
+  if (!gframe){
+    gframe = document.createElement("iframe");
+    gframe.setAttribute("aria-hidden", "true"); gframe.tabIndex = -1;
+    gframe.style.cssText = "position:absolute;left:-9999px;top:0;width:800px;height:600px;border:0;visibility:hidden";
+    document.body.appendChild(gframe);
+  }
+  const d = gframe.contentDocument; d.open(); d.write(src); d.close();
+  return d;
+}
+const norm = s => String(s || "").replace(/\s+/g, " ").trim().toLowerCase();
+
+/* ---------- rendering the sheet ---------- */
+let qno = 0;
+const QS = [];
+CFG.sections.forEach(sec => sec.questions.forEach(q => { q.sec = sec.id; QS.push(q); }));
+const maxOf = q => q.type === "match" ? q.left.length : q.type === "tf" ? q.items.length : q.type === "blank" ? q.ok.length : q.pts;
+const TOTAL = QS.reduce((a, q) => a + maxOf(q), 0);
+const ans = id => S.ans[id];
+function setAns(id, v){ S.ans[id] = v; save(); updateBar(); }
+
+function qCard(q, inner){
+  qno++;
+  return `<div class="q" id="q-${q.id}" data-id="${q.id}"><div class="qh"><span class="no">${qno}.</span><span class="qt">${q.q}</span><span class="qp">${U.pts(maxOf(q))}</span></div>${inner}</div>`;
+}
+function render(){
+  qno = 0;
+  const parts = CFG.sections.map(sec => {
+    const pts = sec.questions.reduce((a, q) => a + maxOf(q), 0);
+    return `<section class="sec" id="s-${sec.id}"><h2>${sec.title}<span class="pts">${U.pts(pts)}</span></h2>${sec.intro ? `<p class="intro">${sec.intro}</p>` : ""}${sec.questions.map(renderQ).join("")}</section>`;
+  }).join("");
+  $("sheet").innerHTML = parts + `<div class="submit"><button type="button" class="btn big gold" id="submitBottom">${U.submit}</button></div><p class="sub" id="submitNote" style="text-align:center;color:var(--muted)"></p>`;
+  wire();
+}
+function renderQ(q){
+  const id = q.id, a = ans(id);
+  switch (q.type){
+    case "mc": case "multi": {
+      const t = q.type === "mc" ? "radio" : "checkbox";
+      const sel = i => q.type === "mc" ? a === i : Array.isArray(a) && a.includes(i);
+      return qCard(q, `${q.code ? `<pre class="code">${hl(q.code)}</pre>` : ""}<div class="opts">${q.opts.map((o, i) =>
+        `<label class="opt"><input type="${t}" name="${id}" value="${i}"${sel(i) ? " checked" : ""}><span>${o}</span></label>`).join("")}</div>`);
+    }
+    case "tf":
+      return qCard(q, q.items.map((it, i) => `<div class="tf"><span>${it[0]}</span><span class="seg" role="radiogroup" aria-label="${esc(it[0].replace(/<[^>]+>/g, ""))}">
+        <label><input type="radio" name="${id}-${i}" value="1"${a && a[i] === true ? " checked" : ""}>${U.t}</label>
+        <label><input type="radio" name="${id}-${i}" value="0"${a && a[i] === false ? " checked" : ""}>${U.f}</label></span></div>`).join(""));
+    case "order": {
+      const cur = a || q.start.map(i => q.items[i]);
+      return qCard(q, `<ol class="order" data-q="${id}">${cur.map((it, i) => `<li><span class="ix">${i + 1}.</span><span class="tx">${hl(it)}</span><span class="mv">
+        <button type="button" class="mvb" data-d="-1" aria-label="${U.up}"${i === 0 ? " disabled" : ""}>↑</button>
+        <button type="button" class="mvb" data-d="1" aria-label="${U.down}"${i === cur.length - 1 ? " disabled" : ""}>↓</button></span></li>`).join("")}</ol>`);
+    }
+    case "match": {
+      const opts = q.shown.map(i => q.right[i]);
+      return qCard(q, `<div class="match">${q.left.map((l, i) => `<div class="row"><span>${l}</span><select data-i="${i}" aria-label="${esc(l.replace(/<[^>]+>/g, ""))}">
+        <option value="">${U.choose}</option>${opts.map(o => `<option${a && a[i] === o ? " selected" : ""}>${esc(o)}</option>`).join("")}</select></div>`).join("")}</div>`);
+    }
+    case "num":
+      return qCard(q, `${q.code ? `<pre class="code">${hl(q.code)}</pre>` : ""}<div class="num"><input type="text" inputmode="numeric" autocomplete="off" aria-label="${U.answer}" value="${a != null ? esc(a) : ""}" placeholder="${U.number}"></div>`);
+    case "blank": {
+      let k = 0;
+      const code = hl(q.code.replace(/\{(\d)\}/g, (m, d) => "⟦" + "ABCDEFGHI"[d] + "⟧")).replace(/⟦[A-I]⟧/g, () => { const i = k++; return `<input type="text" data-i="${i}" autocomplete="off" spellcheck="false" aria-label="${U.blank(i + 1)}" value="${a && a[i] ? esc(a[i]) : ""}">`; });
+      return qCard(q, `<pre class="code">${code}</pre>`);
+    }
+    case "bug":
+      return qCard(q, `<div class="lines">${q.code.split("\n").map((ln, i) =>
+        `<label><input type="radio" name="${id}" value="${i}"${a === i ? " checked" : ""}><span class="ln">${i + 1}</span><span>${hlLine(ln)}</span></label>`).join("")}</div>`);
+    case "html": case "css":
+      return qCard(q, `${q.type === "css" ? `<div class="given"><span>${U.given}</span><pre class="code">${hl(q.page)}</pre></div>` : ""}
+        <div class="sqlbox"><textarea spellcheck="false" aria-label="${q.type === "css" ? U.cssCode : U.htmlCode}" placeholder="${q.type === "css" ? "body { … }" : q.kind === "table" ? U.phTable : U.phList}">${a ? esc(a) : ""}</textarea>
+        <div class="row"><button type="button" class="btn run">${U.run}</button><span class="hint">${U.runHint}</span></div>
+        <div class="out" hidden><div class="meta">${U.preview}</div><iframe class="prev" sandbox="" title="${U.preview}"></iframe></div></div>`);
+  }
+}
+function wire(){
+  QS.forEach(q => {
+    const el = $("q-" + q.id);
+    if (q.type === "mc") el.querySelectorAll("input").forEach(i => i.onchange = () => setAns(q.id, +i.value));
+    if (q.type === "multi") el.querySelectorAll("input").forEach(i => i.onchange = () => setAns(q.id, [...el.querySelectorAll("input:checked")].map(x => +x.value)));
+    if (q.type === "tf") el.querySelectorAll("input").forEach(i => i.onchange = () => {
+      const v = (ans(q.id) || q.items.map(() => null)).slice(); v[+i.name.split("-").pop()] = i.value === "1"; setAns(q.id, v); });
+    if (q.type === "order") el.querySelectorAll(".mvb").forEach(b => b.onclick = () => {
+      const li = b.closest("li"), i = [...li.parentNode.children].indexOf(li), d = +b.dataset.d;
+      const cur = (ans(q.id) || q.start.map(k => q.items[k])).slice(); [cur[i], cur[i + d]] = [cur[i + d], cur[i]];
+      setAns(q.id, cur); el.outerHTML = renderQ(q).replace(/<span class="no">\d+\.<\/span>/, `<span class="no">${QS.indexOf(q) + 1}.</span>`); wire();
+      $("q-" + q.id).querySelectorAll(".mvb")[Math.max(0, (i + d) * 2 + (d > 0 ? 1 : 0))]?.focus(); });
+    if (q.type === "match") el.querySelectorAll("select").forEach(s => s.onchange = () => {
+      const v = (ans(q.id) || q.left.map(() => "")).slice(); v[+s.dataset.i] = s.value; setAns(q.id, v); });
+    if (q.type === "num") el.querySelector("input").oninput = e => setAns(q.id, e.target.value);
+    if (q.type === "blank") el.querySelectorAll("input").forEach(i => i.oninput = () => {
+      const v = (ans(q.id) || q.ok.map(() => "")).slice(); v[+i.dataset.i] = i.value; setAns(q.id, v); });
+    if (q.type === "bug") el.querySelectorAll("input").forEach(i => i.onchange = () => setAns(q.id, +i.value));
+    if (q.type === "html" || q.type === "css"){
+      const ta = el.querySelector("textarea"), out = el.querySelector(".out"), fr = el.querySelector("iframe");
+      ta.oninput = () => setAns(q.id, ta.value);
+      const go = () => { out.hidden = false; fr.srcdoc = docOf(q, ta.value); };
+      el.querySelector(".run").onclick = go;
+      ta.onkeydown = e => {
+        if ((e.ctrlKey || e.metaKey) && e.key === "Enter"){ e.preventDefault(); go(); }
+        if (e.key === "Tab" && !e.shiftKey){ e.preventDefault(); const s = ta.selectionStart; ta.setRangeText("  ", s, ta.selectionEnd, "end"); setAns(q.id, ta.value); }
+      };
+    }
+  });
+  $("submitBottom").onclick = askSubmit;
+  if (S.submitted) showResults();
+}
+
+/* ---------- start ---------- */
+function startScreen(){
+  $("bar").hidden = true;
+  $("sheet").innerHTML = `<div class="start">
+    <div class="facts">${U.facts(TOTAL, QS.length, CFG.minutes).map(([b, s]) => `<div class="fact"><b>${b}</b><span>${s}</span></div>`).join("")}</div>
+    <ul class="rules">${U.rules.map(r => `<li>${r}</li>`).join("")}</ul>
+    <label for="nm">${U.name}</label><input id="nm" autocomplete="name" placeholder="${U.namePh}" value="${esc(S.name)}">
+    <div><button type="button" class="btn big gold" id="go">${U.start}</button></div><p class="note" id="startNote" style="color:var(--bad)"></p></div>`;
+  $("go").onclick = () => { const n = $("nm").value.trim(); if (!n){ $("startNote").textContent = U.nameFirst; $("nm").focus(); return; }
+    S = { name: n, started: Date.now(), submitted: 0, ans: {} }; save(); begin(); };
+  $("nm").onkeydown = e => { if (e.key === "Enter") $("go").click(); };
+}
+function begin(){
+  $("bar").hidden = false; $("who").textContent = S.name;
+  $("submitTop").textContent = U.submit; $("submitTop").onclick = askSubmit;
+  render(); updateBar();
+}
+const mmss = ms => { const s = Math.max(0, Math.round(ms / 1000)); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`; };
+function answered(q){
+  const a = ans(q.id);
+  if (a == null || a === "") return false;
+  if (q.type === "order") return true;
+  if (Array.isArray(a)) return q.type === "multi" ? a.length > 0 : a.every(x => x !== null && x !== "" && x !== undefined);
+  return String(a).trim() !== "";
+}
+function updateBar(){ $("tans").innerHTML = `${U.answered}<b>${QS.filter(answered).length}/${QS.length}</b>`; }
+let confirmT = 0;
+function askSubmit(){
+  if (S.submitted) return;
+  const missing = QS.length - QS.filter(answered).length;
+  const note = $("submitNote");
+  if (Date.now() - confirmT > 4000){ confirmT = Date.now(); note.textContent = U.confirm(missing); $("submitBottom").textContent = U.submitSure; $("submitTop").textContent = U.submitSure;
+    if (this && this.id === "submitTop") note.scrollIntoView({ block: "center", behavior: "smooth" }); return; }
+  submit();
+}
+
+/* ---------- marking ---------- */
+const nb = s => String(s || "").trim().replace(/\s+/g, " ").replace(/[;:]$/, "").toLowerCase();
+/* HTML tasks: the page the student's code makes is checked, not the wording of the code */
+function gradeHtml(q, a){
+  const d = renderDoc(htmlDoc(a));
+  if (q.kind === "list"){
+    const lists = [...d.querySelectorAll(q.tag)];
+    const items = l => [...l.children].filter(c => c.tagName === "LI");
+    const fit = lists.find(l => items(l).length === q.want.length);
+    if (!fit) return 0;
+    const texts = items(fit).map(li => norm(li.textContent));
+    return 1 + (texts.join("|") === q.want.map(norm).join("|") ? 1 : 0);
+  }
+  if (q.kind === "table"){
+    const t = d.querySelector("table"); if (!t) return 0;
+    const rows = [...t.rows]; if (rows.length !== 2) return 0;
+    const c0 = [...rows[0].cells], c1 = [...rows[1].cells];
+    const shape = c0.length === q.head.length && c0.every(c => c.tagName === "TH") && c1.length === q.row.length && c1.every(c => c.tagName === "TD");
+    if (!shape) return 0;
+    const same = (cells, want) => cells.map(c => norm(c.textContent)).join("|") === want.map(norm).join("|");
+    return 1 + (same(c0, q.head) && same(c1, q.row) ? 1 : 0);
+  }
+  return 0;
+}
+/* CSS tasks: the given page is styled with the student's CSS and with the model answer; every checked
+   property must come out the same. A "keep" check must stay as on the unstyled page, or a point is lost. */
+function gradeCss(q, a){
+  const snap = (css, list) => { const d = renderDoc(cssDoc(q, css)), w = d.defaultView;
+    return list.map(c => [...d.querySelectorAll(c.sel)].map(el => w.getComputedStyle(el).getPropertyValue(c.prop)).join("|")); };
+  const got = snap(a, q.checks), want = snap(q.model, q.checks);
+  let pts = q.checks.reduce((s, c, i) => s + (got[i] === want[i] && got[i] !== "" ? (c.pts || 1) : 0), 0);
+  if (q.keep && q.keep.length){
+    const now = snap(a, q.keep), base = snap("", q.keep);
+    if (now.some((v, i) => v !== base[i])) pts = Math.max(0, pts - 1);
+  }
+  return Math.min(q.pts, pts);
+}
+function grade(q){
+  const a = ans(q.id);
+  switch (q.type){
+    case "mc": case "bug": return a === q.ok ? q.pts : 0;
+    case "multi": return Array.isArray(a) && a.slice().sort().join() === q.ok.slice().sort().join() ? q.pts : 0;
+    case "tf": return q.items.reduce((s, it, i) => s + (a && a[i] === it[1] ? 1 : 0), 0);
+    case "order": return (a || q.start.map(i => q.items[i])).join("|") === q.items.join("|") ? q.pts : 0;
+    case "match": return q.left.reduce((s, _, i) => s + (a && a[i] === q.right[i] ? 1 : 0), 0);
+    case "num": return a != null && String(a).trim() !== "" && Number(String(a).trim().replace(",", ".")) === q.ok ? q.pts : 0;
+    case "blank": return q.ok.reduce((s, alts, i) => s + (a && alts.some(x => nb(x) === nb(a[i])) ? 1 : 0), 0);
+    case "html": return a && a.trim() ? gradeHtml(q, a) : 0;
+    case "css": return a && a.trim() ? gradeCss(q, a) : 0;
+  }
+  return 0;
+}
+function submit(){
+  if (S.submitted) return;
+  S.submitted = Date.now();
+  S.score = {}; QS.forEach(q => S.score[q.id] = grade(q)); save();
+  showResults(); window.scrollTo({ top: 0, behavior: "smooth" });
+}
+function showResults(){
+  const sheet = $("sheet"); sheet.classList.add("locked");
+  QS.forEach(q => {
+    const el = $("q-" + q.id); if (!el || el.querySelector(".got")) return;
+    const g = S.score[q.id], m = maxOf(q);
+    el.classList.add(g === m ? "right" : g === 0 ? "wrong" : "part");
+    el.insertAdjacentHTML("beforeend", `<span class="got">${g} / ${m}</span>`);
+    el.querySelectorAll("input,select,textarea,button:not(.run)").forEach(x => { x.disabled = true; });
+  });
+  const got = QS.reduce((a, q) => a + S.score[q.id], 0), pct = Math.round(got / TOTAL * 100);
+  const rows = CFG.sections.map(sec => { const qs = sec.questions; const g = qs.reduce((a, q) => a + S.score[q.id], 0), m = qs.reduce((a, q) => a + maxOf(q), 0);
+    return `<tr><td>${sec.title}</td><td class="n">${g} / ${m}</td></tr>`; }).join("");
+  const box = document.createElement("div"); box.className = "result"; box.id = "result";
+  box.innerHTML = `<div class="big">${got} / ${TOTAL}</div><div class="sub">${U.resultSub(pct)}</div>
+    <table><tbody>${rows}</tbody></table>
+    ${CFG.endpoint ? `<div class="send" id="sendBox" aria-live="polite"><span id="sendMsg"></span><button type="button" class="btn" id="resend" hidden>${U.resend}</button></div>` : ""}
+    <div class="export"><h3>${CFG.endpoint ? U.backupH : U.handH}</h3><ol>${(CFG.endpoint ? U.backupSteps : U.handSteps).map(s => `<li>${s}</li>`).join("")}</ol>
+    <div class="row"><button type="button" class="btn gold" id="saveTxt">${U.save}</button><button type="button" class="btn ghost" id="copyTxt">${U.copy}</button></div>
+    <p class="note" id="exNote" aria-live="polite"></p></div>`;
+  $("result")?.remove(); sheet.prepend(box);
+  $("saveTxt").onclick = saveTxt; $("copyTxt").onclick = copyTxt;
+  document.querySelectorAll("#submitTop,#submitBottom").forEach(b => b.hidden = true);
+  $("submitNote").textContent = "";
+  updateBar();
+  if (CFG.endpoint){ $("resend").onclick = sendResults; S.sent ? sendState("ok") : sendResults(); }
+}
+
+/* ---------- sending the result to the teacher's Google Sheet (Apps Script web app) ---------- */
+let sending = false;
+function sendState(k){
+  const box = $("sendBox"); if (!box) return;
+  box.className = "send" + (k === "ok" ? " ok" : k === "bad" ? " bad" : "");
+  $("sendMsg").textContent = k === "ok" ? U.sent : k === "bad" ? U.sendFail : U.sending;
+  $("resend").hidden = k !== "bad";
+}
+function sendResults(){
+  if (!CFG.endpoint || sending) return;
+  sending = true; sendState("busy");
+  const payload = { key: CFG.sendKey, test: CFG.testId, lang: CFG.lang, name: S.name,
+    submittedAt: new Date(S.submitted).toISOString(), timeUsed: mmss(S.submitted - S.started),
+    score: QS.reduce((a, q) => a + S.score[q.id], 0), max: TOTAL,
+    items: QS.map((q, i) => ({ no: i + 1, id: q.id, max: maxOf(q), pts: S.score[q.id], answer: String(answerText(q)).trim() })) };
+  fetch(CFG.endpoint, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(payload) })
+    .then(() => { S.sent = Date.now(); save(); sendState("ok"); })
+    .catch(() => sendState("bad"))
+    .finally(() => { sending = false; });
+}
+
+/* ---------- export ---------- */
+function answerText(q){
+  const a = ans(q.id);
+  if (a == null || a === "" || (Array.isArray(a) && !a.length)) return U.none;
+  const plain = s => String(s).replace(/<[^>]+>/g, "").replace(/&gt;/g, ">").replace(/&lt;/g, "<").replace(/&amp;/g, "&");
+  switch (q.type){
+    case "mc": return plain(q.opts[a]);
+    case "multi": return a.map(i => plain(q.opts[i])).join(", ");
+    case "tf": return q.items.map((_, i) => a[i] === true ? U.t : a[i] === false ? U.f : "-").join(", ");
+    case "order": return a.join(" → ");
+    case "match": return q.left.map((l, i) => `${plain(l)} = ${a[i] || "-"}`).join("; ");
+    case "num": return String(a).trim();
+    case "blank": return a.map(x => x || "-").join(" | ");
+    case "bug": return U.line(a + 1);
+    case "html": case "css": return "\n    " + a.trim().replace(/\n/g, "\n    ");
+  }
+}
+function report(){
+  const got = QS.reduce((s, q) => s + S.score[q.id], 0);
+  const L = [CFG.reportTitle, "", `${U.rName}: ${S.name}`, `${U.rDate}: ${new Date(S.submitted).toLocaleString(CFG.lang === "hu" ? "hu-HU" : "en-GB")}`,
+    `${U.rTime}: ${mmss(S.submitted - S.started)}`, `${U.rScore}: ${got} / ${TOTAL} (${Math.round(got / TOTAL * 100)}%)`, ""];
+  CFG.sections.forEach(sec => {
+    L.push("== " + sec.title.replace(/<[^>]+>/g, ""));
+    sec.questions.forEach(q => L.push(`${QS.indexOf(q) + 1}. [${S.score[q.id]}/${maxOf(q)}] ${answerText(q)}`));
+    L.push("");
+  });
+  return L.join("\n");
+}
+function fileName(){ return `${CFG.filePrefix}-${S.name.normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^A-Za-z0-9]+/g, "-").replace(/^-|-$/g, "").toLowerCase() || "valasz"}.txt`; }
+function saveTxt(){
+  try { const b = new Blob([report()], { type: "text/plain;charset=utf-8" }), u = URL.createObjectURL(b), a = document.createElement("a");
+    a.href = u; a.download = fileName(); document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(u), 1500);
+    $("exNote").textContent = U.saved(fileName()); }
+  catch(e){ $("exNote").textContent = U.saveBlocked; }
+}
+function copyTxt(){
+  navigator.clipboard.writeText(report()).then(() => $("exNote").textContent = U.copied, () => $("exNote").textContent = U.copyBlocked);
+}
+
+/* ---------- boot ---------- */
+if (S.started) begin(); else startScreen();
+</script>
+<script src="../../nav.js?v=1cbefdae" defer></script>
+</body>
+</html>

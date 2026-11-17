@@ -1,5 +1,5 @@
 /**
- * SQL témazáró – eredmények gyűjtése egy Google-táblázatba.
+ * Témazárók (SQL, HTML–CSS) – eredmények gyűjtése egy Google-táblázatba.
  *
  * Telepítés (egyszer):
  *  1. Hozz létre egy új Google-táblázatot (pl. „SQL témazáró – eredmények”).
@@ -10,19 +10,25 @@
  *     Telepítés → engedélyezd a hozzáférést a saját fiókoddal.
  *  4. Másold ki a webalkalmazás URL-jét (…/exec), és küldd el, hogy bekerüljön a dolgozatba.
  *
- * Minden beadás egy új sor az „SQL témazáró” lapon: név, nyelv, pontszám, idő, kérdésenként a pont és a válasz.
+ * Minden beadás egy új sor a dolgozat saját lapján („SQL témazáró” vagy „HTML–CSS témazáró”):
+ * név, nyelv, pontszám, idő, kérdésenként a pont és a válasz. Egy telepítés mindkét dolgozatot fogadja.
  * Ha ugyanaz a beadás kétszer érkezik (újraküldés), csak egyszer kerül be.
  */
 
-const SHEET_NAME = "SQL témazáró";
-const SEND_KEY = "digikult-sql-test";   // ugyanaz, mint a dolgozat oldalán: a véletlen, idegen kéréseket kiszűri
+// dolgozat → [lap neve, kulcs]; a kulcs ugyanaz, mint a dolgozat oldalán: a véletlen, idegen kéréseket kiszűri
+const TESTS = {
+  "sql-test": ["SQL témazáró", "digikult-sql-test"],
+  "web-test": ["HTML–CSS témazáró", "digikult-web-test"],
+};
 
 function doPost(e) {
   const lock = LockService.getScriptLock();
   lock.waitLock(15000);
   try {
     const d = JSON.parse(e.postData.contents);
-    if (!d || d.key !== SEND_KEY || d.test !== "sql-test" || !Array.isArray(d.items) || d.items.length > 100) return reply({ ok: false });
+    const t = d && TESTS[d.test];
+    if (!t || d.key !== t[1] || !Array.isArray(d.items) || d.items.length > 100) return reply({ ok: false });
+    const SHEET_NAME = t[0];
 
     const ss = SpreadsheetApp.getActiveSpreadsheet();
     const sh = ss.getSheetByName(SHEET_NAME) || ss.insertSheet(SHEET_NAME);
@@ -65,7 +71,7 @@ function doPost(e) {
 
 // opening the URL in a browser shows that the web app is running
 function doGet() {
-  return reply({ ok: true, msg: "Az SQL témazáró eredménygyűjtője működik." });
+  return reply({ ok: true, msg: "A témazárók eredménygyűjtője működik." });
 }
 
 function reply(o) {

@@ -302,6 +302,23 @@
                 progress: { chapters: 8, keys: { en: "galaxy-en-v6", hu: "galaxy-hu-v6" } }
               }
             ]
+          },
+          {
+            id: "summary",
+            title: { hu: "Összefoglaló: témazáró", en: "Summary: test" },
+            pages: [
+              {
+                id: "web-test",
+                kind: "quiz",
+                minutes: 35,
+                title: { hu: "Témazáró: HTML és CSS", en: "Test: HTML and CSS" },
+                desc: {
+                  hu: "Kb. 35 perc, 40 pont, a Suli Rádió honlapja: feleletválasztás, igaz-hamis, sorrend, párosítás, mit jelenít meg a böngésző, kiegészítés, hibakeresés, és saját HTML- és CSS-kód. Automatikus pontozás, beadás Classroomba.",
+                  en: "About 35 minutes, 40 points, the School Radio website: multiple choice, true or false, ordering, matching, predicting what the browser shows, gap-filling, finding mistakes, and writing your own HTML and CSS. Marked automatically, handed in on Classroom."
+                },
+                files: { en: "css/summary/test.html", hu: "css/summary/test-hu.html" }
+              }
+            ]
           }
         ]
       },
