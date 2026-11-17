@@ -164,7 +164,7 @@
           },
           {
             id: "summary",
-            title: { hu: "Összefoglaló: záradékok és témazáró", en: "Summary: clauses and test" },
+            title: { hu: "Összefoglaló: záradékok, témazáró, gyakorlás", en: "Summary: clauses, test, practice" },
             pages: [
               {
                 id: "clauses",
@@ -187,6 +187,17 @@
                   en: "About 35 minutes, 40 points, a school library's tables: multiple choice, true or false, ordering, matching, predicting, gap-filling, finding mistakes and writing queries. Marked automatically, handed in on Classroom."
                 },
                 files: { en: "sql/summary/test.html", hu: "sql/summary/test-hu.html" }
+              },
+              {
+                id: "sql-practice",
+                kind: "practice",
+                minutes: 40,
+                title: { hu: "Gyakorló feladatlap: a nehéz pontok", en: "Practice sheet: the tricky parts" },
+                desc: {
+                  hu: "A témazáró kilenc pontja, ahol a legtöbben hibáztak: HAVING, NULL, rendezés és LIMIT, a záradékok sorrendje, az összekötő oszlop, minták, három tábla csoportokkal. Minden feladat rögtön ellenőrizhető, tippekkel.",
+                  en: "The nine points of the test where most people slipped: HAVING, NULL, sorting and LIMIT, clause order, the linking column, patterns, three tables with groups. Every task can be checked at once, with tips."
+                },
+                files: { en: "sql/summary/practice.html", hu: "sql/summary/practice-hu.html" }
               }
             ]
           }
@@ -735,6 +746,7 @@
     theory: { hu: "Elmélet", en: "Explainer" },
     exam:   { hu: "Érettségi feladat", en: "Exam task" },
     quiz:   { hu: "Témazáró", en: "Test" },
+    practice: { hu: "Gyakorló", en: "Practice" },
     tool:   { hu: "Eszköz", en: "Tool" }
   };
   const UI = {

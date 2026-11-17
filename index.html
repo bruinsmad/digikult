@@ -442,7 +442,7 @@ body.subject .hero{display:none}
   </div>
 </footer>
 
-<script src="nav.js?v=e4c5a8c8"></script>
+<script src="nav.js?v=2aefc33e"></script>
 <script>
 (function(){
   const D = window.DIGIKULT;
@@ -514,6 +514,20 @@ function puliSvg(){
 }
   const PULI = puliSvg().replace(/^<svg[^>]*>/, "").replace(/<\/svg>\s*$/, "");   /* Bodri, shared with the Round-Up page */
   const COVERS = {
+    "sql-practice":`<svg viewBox="0 0 400 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <rect width="400" height="200" fill="#2a3a52"/>
+      <g transform="translate(70 22) rotate(3 90 90)"><rect width="176" height="190" rx="4" fill="#fbfaf4"/><rect width="176" height="26" fill="#e3eedd"/>
+        <text x="12" y="18" font-family="JetBrains Mono,monospace" font-weight="700" font-size="12" fill="#1d2622">HAVING COUNT(*)</text>
+        <g font-family="JetBrains Mono,monospace" font-size="11">
+          <rect x="12" y="40" width="98" height="20" rx="4" fill="none" stroke="#1d2622" stroke-width="2"/><text x="20" y="54" fill="#1d2622">IS NULL</text><path d="M120 50l5 6 10-13" stroke="#2f7a3a" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+          <rect x="12" y="70" width="98" height="20" rx="4" fill="none" stroke="#1d2622" stroke-width="2"/><text x="20" y="84" fill="#1d2622">= NULL</text><path d="M122 74l10 10M132 74l-10 10" stroke="#c0392b" stroke-width="3.5" stroke-linecap="round"/>
+          <rect x="12" y="100" width="98" height="20" rx="4" fill="none" stroke="#1d2622" stroke-width="2"/><text x="20" y="114" fill="#1d2622">DESC LIMIT 3</text><path d="M120 110l5 6 10-13" stroke="#2f7a3a" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+          <rect x="12" y="132" width="152" height="44" rx="5" fill="#eef4fb" stroke="#7aa2d6" stroke-width="1.5"/><rect x="22" y="144" width="110" height="6" rx="3" fill="#b9cde6"/><rect x="22" y="158" width="80" height="6" rx="3" fill="#b9cde6"/></g></g>
+      <g transform="translate(290 36) rotate(8)"><rect width="84" height="80" fill="#f2d264"/><path d="M0 0h84v10H0z" fill="#e2bd45"/>
+        <text x="42" y="44" text-anchor="middle" font-family="Kalam,cursive" font-weight="700" font-size="24" fill="#5a4300">Tipp!</text>
+        <circle cx="42" cy="62" r="6" fill="none" stroke="#5a4300" stroke-width="2"/><path d="M42 68v4" stroke="#5a4300" stroke-width="2"/></g>
+      <path d="M300 168a26 26 0 1 0 8-30" fill="none" stroke="#9fd39a" stroke-width="5" stroke-linecap="round"/><path d="M300 128l8 10-12 4z" fill="#9fd39a"/>
+    </svg>`,
     "sql-test":`<svg viewBox="0 0 400 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
       <rect width="400" height="200" fill="#22362f"/>
       <g transform="translate(118 18) rotate(-4 82 90)"><rect width="168" height="196" rx="4" fill="#fbfaf4"/><rect width="168" height="26" fill="#efe9d6"/>
@@ -978,7 +992,7 @@ function puliSvg(){
 
   /* ---------- render ---------- */
   const TILTS = ["-.7deg", ".6deg", "-.4deg", ".8deg"];
-  const KCOL = { story:"#9a5b00", lesson:"#1f3f88", demo:"#1f5a88", tool:"#225c43", exam:"#5b45a8", quiz:"#a0372c" };   /* stamp ink per kind */
+  const KCOL = { story:"#9a5b00", lesson:"#1f3f88", demo:"#1f5a88", tool:"#225c43", exam:"#5b45a8", quiz:"#a0372c", practice:"#2f6b3a" };   /* stamp ink per kind */
 
   let shown = null;     /* the subject currently on screen, for the transition between views */
   function draw(){
