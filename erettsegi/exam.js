@@ -98,6 +98,7 @@
           <li>Minden fejezet egy részfeladat, <b>szó szerint</b> a hivatalos feladatlapról. Az Excelben (táblázatkezelőben) oldod meg, sorban.</li>
           <li>Ha kész egy részfeladat, mentsd el a fájlt, és kattints az <b>Ellenőrzés</b> gombra: az oldal megnézi a mentett fájlodat. A következő részfeladat csak akkor nyílik meg, ha minden stimmel.</li>
           ${X.strict ? `<li><b>Ennél a feladatnál nincs segítség</b>, és az ellenőrzés sem árulja el a jó eredményt, csak azt, hogy mi nem stimmel. Úgy dolgozol, mint a vizsgán.</li>` : ""}
+          <li>Az oldal a cellák <b>eredményét</b> nézi, azt nem, hogy milyen képlettel vagy függvénnyel jutottál hozzá.</li>
           <li>Chrome-ban és Edge-ben elég egyszer kiválasztani a fájlt: utána mentés után csak az Ellenőrzésre kell kattintanod.</li>
           <li>A teljes feladatlapot a <b>Feladatlap</b> gombbal egyben is megnézheted vagy kinyomtathatod. A vizsgán ${X.points} pontot ér, nagyjából 45–50 perc jut rá.</li></ul></div>
         <div class="task"><h3>A forrásfájl</h3><p>${X.files.map(f => `<a class="btn primary" href="${f.href}" download>${esc(f.name)} letöltése</a>`).join(" ")}</p>
@@ -317,12 +318,11 @@
         let m = null;
         if (exp === null) { if (v !== undefined && v !== "") m = `${sname}${a} cellának üresnek kellene lennie.`; }
         else if (v === undefined || v === "") m = `${sname}${a} cella üres.`;
-        else if (o.formula && !cell.f) m = `${sname}${a} cellában nincs képlet, csak egy beírt érték. Ide képlet kell (= jellel)!`;
         else if (exp && exp.date) { if (!((typeof v === "number" && Math.round(v) === dateSerial(exp.date)) || normDate(v) === exp.date)) m = `${sname}${a} értéke ${cell.w || v}, de ${exp.date.replace(/-/g, ".")} kellene.`; }
         else if (o.loose) { if (!(String(v).trim() === String(exp) || (typeof exp === "number" && Number(String(v).replace(",", ".")) === exp))) m = `${sname}${a} értéke ${fmt(typeof v === "number" ? v : String(v))}, de ${fmt(exp)} kellene.${cell.f ? ` A képlet: ${toHu(cell.f)}` : ""}`; }
         else if (typeof exp === "number") { if (typeof v !== "number" || Math.abs(v - exp) > 1e-6 * Math.max(1, Math.abs(exp))) m = `${sname}${a} értéke ${fmt(v)}, de ${fmt(exp)} kellene.${cell.f ? ` A képlet: ${toHu(cell.f)}` : ""}`; }
         else if (String(v).trim() !== String(exp)) m = `${sname}${a} értéke ${fmt(typeof v === "number" ? v : String(v))}, de ${fmt(exp)} kellene.${cell.f ? ` A képlet: ${toHu(cell.f)}` : ""}`;
-        if (m && X.strict && !/üres|nincs képlet|üresnek/.test(m)) m = `${sname}${a} cella értéke nem jó.${cell && cell.f ? ` A képleted: ${toHu(cell.f)}` : ""}`;
+        if (m && X.strict && !/üres|üresnek/.test(m)) m = `${sname}${a} cella értéke nem jó.${cell && cell.f ? ` A képleted: ${toHu(cell.f)}` : ""}`;
         if (m) { if (!msg) msg = m; } else done++;
       });
       return { ok: done === cells.length, msg, done, total: cells.length };

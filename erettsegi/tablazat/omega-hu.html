@@ -200,8 +200,6 @@ window.EXAM.checks = (() => {
   const OM = F => { const w = F.ws(), rows = []; for (let r = 2; r <= 23; r++) { const e = w["E" + r], f = w["F" + r]; if (!e || !f || typeof e.v !== "number" || typeof f.v !== "number") break; rows.push({ r, e: e.v, f: f.v }); }
     let prev = null, s = 0; rows.forEach(x => { x.g = x.e > x.f ? "győzelem" : "vereség"; s = x.g === prev ? s + 1 : 1; x.h = s; prev = x.g; }); return rows; };
   const need = (rows, n) => rows.length >= n ? null : { ok: false, msg: `Az E:F oszlopban csak ${rows.length} eredményt találok, de ${n} kellene. Nem írtál véletlenül bele az eredményekbe?` };
-  const to23 = (F, cells) => () => { const w = F.ws(); const bad = cells.find(a => w[a] && w[a].f && /\d/.test(w[a].f) && !/23\b|[A-Z]:\$?[A-Z]\b/.test(w[a].f));
-    return bad ? { ok: false, msg: `${bad} képlete (${F.hu(w[bad].f)}) nem a 23. sorig néz. A képletek a 22. fordulóig (a 23. sorig) jók legyenek, ott is, ahol még nincs eredmény!` } : { ok: true }; };
   const pie = F => { const all = F.charts(), ch = all.find(c => c.types.some(t => /pie|doughnut/.test(t)));
     return ch ? { ch } : { err: { ok: false, msg: all.length ? "Van diagram, de nem kördiagram." : "Nem találok diagramot a munkalapon." } }; };
   const CALC = ["K4", "L4", "M4", "N4", "K7", "N7", "K10", "N10"];
@@ -212,14 +210,14 @@ window.EXAM.checks = (() => {
         F.cellsOf("A2:A23").forEach((a, k) => { const c = w[a], ok = c && ((c.v === k + 1 && /^\s*\d+\.\s*$/.test(c.w || "")) || String(c.v).trim() === `${k + 1}.`);
           if (ok) done++; else if (!msg) msg = !c ? `${a} cella üres.` : c.v === k + 1 ? `${a} cellában ${k + 1} áll, de a mintán ${k + 1}. látszik (ponttal). Lásd a segítséget!` : `${a} cellában ${k + 1}. kellene.`; });
         return { ok: done === 22, msg, done, total: 22 }; } },
-    { task: 3, label: "Az eredmény oszlopa: győzelem vagy vereség, képlettel", run: F => { const rows = OM(F); return need(rows, 10) || F.values(rows.map(x => "G" + x.r), rows.map(x => x.g), { formula: true }); } },
-    { task: 4, label: "A sorozat oszlopa, képlettel", run: F => { const rows = OM(F); return need(rows, 10) || F.values(rows.map(x => "H" + x.r), rows.map(x => x.h), { formula: true }); } },
-    { task: 5, label: "K4: győzelmek, L4: vereségek száma, képlettel", run: F => { const rows = OM(F); return F.all(F.values("K4:L4", [rows.filter(x => x.g === "győzelem").length, rows.filter(x => x.g === "vereség").length], { formula: true }), to23(F, ["K4", "L4"])); } },
-    { task: 6, label: "M4: dobott, N4: kapott pontok összesen, képlettel", run: F => { const rows = OM(F); return F.all(F.values("M4:N4", [rows.reduce((s, x) => s + x.e, 0), rows.reduce((s, x) => s + x.f, 0)], { formula: true }), to23(F, ["M4", "N4"])); } },
-    { task: 7, label: "K7: legtöbb dobott pont, N7: leghosszabb sorozat, képlettel", run: F => { const rows = OM(F); return F.all(F.values("K7", Math.max(...rows.map(x => x.e)), { formula: true }), F.values("N7", Math.max(...rows.map(x => x.h)), { formula: true }), to23(F, ["K7", "N7"])); } },
-    { task: 8, label: "K10: a következő mérkőzés dátuma, N10: az ellenfél, képlettel", run: F => { const w = F.ws(), rows = OM(F), nx = rows.length + 2, b = w["B" + nx], c = w["C" + nx];
+    { task: 3, label: "Az eredmény oszlopa: győzelem vagy vereség", run: F => { const rows = OM(F); return need(rows, 10) || F.values(rows.map(x => "G" + x.r), rows.map(x => x.g)); } },
+    { task: 4, label: "A sorozat oszlopa", run: F => { const rows = OM(F); return need(rows, 10) || F.values(rows.map(x => "H" + x.r), rows.map(x => x.h)); } },
+    { task: 5, label: "K4: győzelmek, L4: vereségek száma", run: F => { const rows = OM(F); return F.all(F.values("K4:L4", [rows.filter(x => x.g === "győzelem").length, rows.filter(x => x.g === "vereség").length])); } },
+    { task: 6, label: "M4: dobott, N4: kapott pontok összesen", run: F => { const rows = OM(F); return F.all(F.values("M4:N4", [rows.reduce((s, x) => s + x.e, 0), rows.reduce((s, x) => s + x.f, 0)])); } },
+    { task: 7, label: "K7: legtöbb dobott pont, N7: leghosszabb sorozat", run: F => { const rows = OM(F); return F.all(F.values("K7", Math.max(...rows.map(x => x.e))), F.values("N7", Math.max(...rows.map(x => x.h)))); } },
+    { task: 8, label: "K10: a következő mérkőzés dátuma, N10: az ellenfél", run: F => { const w = F.ws(), rows = OM(F), nx = rows.length + 2, b = w["B" + nx], c = w["C" + nx];
         if (!b || !c) return { ok: false, msg: "Nem találom a következő mérkőzés sorát." };
-        return F.all(F.values("K10", typeof b.v === "number" ? b.v : { date: String(b.v).replace(/\./g, "-") }, { formula: true }), F.values("N10", c.v, { formula: true }), to23(F, ["K10", "N10"]),
+        return F.all(F.values("K10", typeof b.v === "number" ? b.v : { date: String(b.v).replace(/\./g, "-") }), F.values("N10", c.v),
           () => /^\d+$/.test(String(w.K10.w || "").trim()) ? { ok: false, msg: `A K10-ben szám (${w.K10.w}) látszik dátum helyett: állítsd a cella formátumát dátumra, mint a mintán.` } : { ok: true }); } },
     { task: 9, label: "Kördiagram „Győzelmi arány” címmel", run: F => { const { ch, err } = pie(F); if (err) return err; return ch.title.trim() === "Győzelmi arány" ? { ok: true } : { ok: false, msg: `A diagram címe „${ch.title}”, de „Győzelmi arány” kell.` }; } },
     { task: 9, label: "Nincs jelmagyarázat; a szeleteken név és százalék", run: F => { const { ch, err } = pie(F); if (err) return err;
@@ -228,7 +226,7 @@ window.EXAM.checks = (() => {
     { task: 9, label: "A diagram a J11:N23 tartományon belül van", run: F => { const { ch, err } = pie(F); if (err) return err; const f = ch.from, t = ch.to;
         return f.c === null || (f.c >= 9 && f.r >= 10 && (t.c === null || ((t.c < 14 || (t.c === 14 && !t.cOff)) && t.r <= 23))) ? { ok: true } : { ok: false, msg: "A diagram kilóg a J11:N23 tartományból. Az Alt lenyomásával húzva a cellahatárokhoz igazíthatod." }; } },
     { task: 10, label: "A két új eredmény (81:79) a 11. és 12. forduló sorában", run: F => F.values("E12:F13", [81, 79, 81, 79]) },
-    { task: 10, label: "Az eredmény és a sorozat képlete lemásolva a 13. sorig", run: F => { const rows = OM(F); return need(rows, 12) || F.all(F.values(rows.map(x => "G" + x.r), rows.map(x => x.g), { formula: true }), F.values(rows.map(x => "H" + x.r), rows.map(x => x.h), { formula: true })); } },
+    { task: 10, label: "Az eredmény és a sorozat a 12. és 13. sorban is", run: F => { const rows = OM(F); return need(rows, 12) || F.all(F.values(rows.map(x => "G" + x.r), rows.map(x => x.g)), F.values(rows.map(x => "H" + x.r), rows.map(x => x.h))); } },
     { task: 10, label: "A K–N oszlop értékei frissültek", run: F => { const rows = OM(F); return F.all(F.values("K4", rows.filter(x => x.g === "győzelem").length), F.values("N7", Math.max(...rows.map(x => x.h)))); } },
     { task: 11, label: "a. Az A:H oszlopok egyforma szélesek", run: F => { const ws = "ABCDEFGH".split("").map(c => F.col(c).wch || F.col(c).width); return ws.every(x => x && Math.abs(x - ws[0]) < 0.05) ? { ok: true } : { ok: false, msg: "Az A:H oszlopok szélessége nem egyforma. Jelöld ki mindet, és állíts be egy szélességet." }; } },
     { task: 11, label: "b. Az első sor másfélszer olyan magas, mint a többi", run: F => { const h1 = F.row(1).hpt || 15, h2 = F.row(2).hpt || 15; return h1 / h2 > 1.4 && h1 / h2 < 1.6 ? { ok: true } : { ok: false, msg: `Az első sor ${String(h1).replace(".", ",")} pont, a többi ${String(h2).replace(".", ",")} pont magas: az első a másfélszerese legyen.` }; } },

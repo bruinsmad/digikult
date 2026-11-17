@@ -140,14 +140,13 @@ window.EXAM.checks = (() => {
       if (!w["E" + r] || w["E" + r].v !== TEAMS[t].e || !w["F" + r] || w["F" + r].v !== TEAMS[t].f) return { ok: false, msg: `A ${r}. sorban (${t}) a lőtt vagy a kapott gólok nem stimmelnek a forrásfájllal.` };
     }
     return { ok: true }; };
-  /* a column of the table, team by team: formula and value */
+  /* a column of the table, team by team: the value only */
   const perTeam = (F, col, key, extra) => { const w = F.ws(); let done = 0, msg = null;
     for (let r = 2; r <= 13; r++) {
       const t = team(F, r), c = w[col + r]; let m = null;
       if (!t) m = `Az A${r} cellában nem egy csapat neve áll.`;
       else if (!c || c.v === "" || c.v === undefined) m = `${col}${r} cella üres.`;
-      else if (!c.f) m = `${col}${r} cellában nincs képlet, csak egy beírt érték. Ide képlet kell!`;
-      else if (c.v !== TEAMS[t][key]) m = `${col}${r} cella értéke nem jó (${t}). A képleted: ${F.hu(c.f)}`;
+      else if (c.v !== TEAMS[t][key]) m = `${col}${r} cella értéke nem jó (${t}).${c.f ? ` A képleted: ${F.hu(c.f)}` : ""}`;
       else if (extra) m = extra(c, r);
       if (m) { if (!msg) msg = m; } else done++;
     }
@@ -162,24 +161,19 @@ window.EXAM.checks = (() => {
   return [
     { task: 1, label: "Az alapszakasz.txt az A1-től betöltve", run: F => F.all(F.values("A1:H1", ["Csapat", "Győzelem", "Vereség", "Döntetlen", "Lőtt gólok", "Kapott gólok", "Különbség", "Pont"]), () => rowsOk(F),
         F.values(["A16", "A17", "A19", "A20", "A21", "A30"], ["Gólok száma összesen:", "Gólok átlaga meccsenként:", "Rájátszás", 1, 8, 6])) },
-    { task: 2, label: "B2:D13: győzelmek, vereségek, döntetlenek, képlettel", run: F => F.all(() => perTeam(F, "B", "w"), () => perTeam(F, "C", "l"), () => perTeam(F, "D", "d")) },
-    { task: 3, label: "G2:G13: a gólkülönbség, képlettel", run: F => perTeam(F, "G", "diff") },
-    { task: 4, label: "H2:H13: a pontszám, képlettel", run: F => perTeam(F, "H", "pts") },
-    { task: 5, label: "C16: az összes lőtt gól, képlettel", run: F => F.values("C16", TOTAL, { formula: true }) },
-    { task: 6, label: "C17: a meccsenkénti átlag, függvénnyel egészre kerekítve", run: F => { const r = F.values("C17", AVG, { formula: true }); if (!r.ok) return r;
-        const f = F.ws().C17.f; return /\b(ROUND|ROUNDUP|ROUNDDOWN|MROUND)\(/.test(f) ? { ok: true } : { ok: false, msg: `A C17 képlete (${F.hu(f)}) nem kerekít függvénnyel. A feladat szerint függvénnyel kell egészre kerekíteni.` }; } },
+    { task: 2, label: "B2:D13: győzelmek, vereségek, döntetlenek", run: F => F.all(() => perTeam(F, "B", "w"), () => perTeam(F, "C", "l"), () => perTeam(F, "D", "d")) },
+    { task: 3, label: "G2:G13: a gólkülönbség", run: F => perTeam(F, "G", "diff") },
+    { task: 4, label: "H2:H13: a pontszám", run: F => perTeam(F, "H", "pts") },
+    { task: 5, label: "C16: az összes lőtt gól", run: F => F.values("C16", TOTAL) },
+    { task: 6, label: "C17: a meccsenkénti átlag, egészre kerekítve", run: F => F.values("C17", AVG) },
     { task: 7, label: "A csapatok sorrendje: pont, azon belül gólkülönbség szerint csökkenően", run: F => { for (let r = 2; r <= 13; r++) if (team(F, r) !== ORDER[r - 2]) return { ok: false, msg: `A ${r}. sorban nem az a csapat áll, amelyiknek a rendezés után ott kellene.` }; return { ok: true }; } },
     { task: 7, label: "Az összetartozó adatok együtt maradtak", run: F => F.all(() => rowsOk(F), () => perTeam(F, "B", "w"), () => perTeam(F, "H", "pts")) },
-    { task: 8, label: "A rájátszás nyolc csapata a B oszlopban, képlettel", run: F => { const w = F.ws(); let done = 0, msg = null;
+    { task: 8, label: "A rájátszás nyolc csapata a B oszlopban", run: F => { const w = F.ws(); let done = 0, msg = null;
         PO.forEach(([a, rank]) => { const c = w[a]; let m = null;
-          if (!c || c.v === undefined || c.v === "") m = `${a} cella üres.`; else if (!c.f) m = `${a} cellában nincs képlet. Ide képlet kell!`;
-          else if (String(c.v).trim() !== ORDER[rank - 1]) m = `${a} cellában nem a jó csapat áll. A képleted: ${F.hu(c.f)}`;
+          if (!c || c.v === undefined || c.v === "") m = `${a} cella üres.`; 
+          else if (String(c.v).trim() !== ORDER[rank - 1]) m = `${a} cellában nem a jó csapat áll.${c.f ? ` A képleted: ${F.hu(c.f)}` : ""}`;
           if (m) { if (!msg) msg = m; } else done++; });
         return { ok: done === 8, msg, done, total: 8 }; } },
-    { task: 8, label: "A képlet másolható: a mellette álló helyezésből dolgozik", run: F => { const w = F.ws();
-        const none = PO.find(([a]) => !w[a] || !w[a].f); if (none) return { ok: false, msg: `${none[0]} cellában nincs képlet.` };
-        const bad = PO.find(([a, , ref]) => !new RegExp(`\\$?A\\$?${ref.slice(1)}\\b`).test(w[a].f));
-        return bad ? { ok: false, msg: `${bad[0]} képlete (${F.hu(w[bad[0]].f)}) nem az A oszlopban mellette álló helyezést használja, így nem másolható.` } : { ok: true }; } },
     { task: 9, label: "Sávdiagram a lőtt és kapott gólokról", run: F => { const { ch, err } = bar(F); if (err) return err;
         return serOf(ch, "E") && serOf(ch, "F") ? { ok: true } : { ok: false, msg: "A diagramon a lőtt (E2:E13) és a kapott (F2:F13) gólok adatsora legyen." }; } },
     { task: 9, label: "a. Az adatok alatt, a D oszloptól jobbra, a 15. sor alatt", run: F => { const { ch, err } = bar(F); if (err) return err; const f = ch.from;
