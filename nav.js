@@ -164,7 +164,7 @@
           },
           {
             id: "summary",
-            title: { hu: "Összefoglaló: záradékok, témazáró, gyakorlás", en: "Summary: clauses, test, practice" },
+            title: { hu: "Összefoglaló: záradékok, témazáró, gyakorlás, küldetés", en: "Summary: clauses, test, practice, mission" },
             pages: [
               {
                 id: "clauses",
@@ -198,6 +198,18 @@
                   en: "The nine points of the test where most people slipped: HAVING, NULL, sorting and LIMIT, clause order, the linking column, patterns, three tables with groups. Every task can be checked at once, with tips."
                 },
                 files: { en: "sql/summary/practice.html", hu: "sql/summary/practice-hu.html" }
+              },
+              {
+                id: "valve",
+                kind: "story",
+                minutes: 35,
+                title: { hu: "A nyitott szelep", en: "The Open Valve" },
+                desc: {
+                  hu: "2089, Aurora űrállomás: valaki kinyitotta az oxigénszelepet, a komp pedig a műszak végén indul. Az ajtók naplójából, NULL-lal, LIKE-kal és HAVING-gel leplezd le a szabotőrt.",
+                  en: "2089, Station Aurora: someone opened the oxygen valve, and the shuttle leaves at the end of the shift. Use the door log, NULL, LIKE and HAVING to unmask the saboteur."
+                },
+                files: { en: "sql/summary/valve.html", hu: "sql/summary/valve-hu.html" },
+                progress: { chapters: 6, keys: { en: "aurora-en-v1", hu: "aurora-hu-v1" } }
               }
             ]
           }
