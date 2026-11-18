@@ -698,6 +698,34 @@
         ]
       },
       {
+        id: "dk6",
+        accent: "#7bc4a4",
+        title: { hu: "6. évfolyam – Elméleti ismétlés", en: "Year 6 – Theory review" },
+        blurb: {
+          hu: "A 6.-os tankönyv elmélete röviden: szövegszerkesztés, e-világ, multimédia, adatok és felhő. Minden rész végén feladatok.",
+          en: "The Year 6 textbook theory in short, with tasks after every part."
+        },
+        lessons: [
+          {
+            id: "elmelet",
+            title: { hu: "Elméleti összefoglaló", en: "Theory summary" },
+            pages: [
+              {
+                id: "dk6-osszefoglalo",
+                kind: "theory",
+                minutes: 40,
+                title: { hu: "Digitális kultúra 6. – elméleti összefoglaló", en: "Digital Culture 6 – theory summary" },
+                desc: {
+                  hu: "Rövid magyarázatok és változatos feladatok (párosítás, igaz-hamis, sorba rendezés, csoportosítás), a végén pontszámmal.",
+                  en: "Short explanations and varied tasks, with a score at the end."
+                },
+                files: { hu: "dk6/elmelet/osszefoglalo-hu.html" }
+              }
+            ]
+          }
+        ]
+      },
+      {
         id: "powerpoint",
         accent: "#ff9e6b",
         title: { hu: "Bemutatókészítés – PowerPoint", en: "Presentations – PowerPoint" },

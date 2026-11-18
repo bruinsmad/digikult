@@ -6,7 +6,7 @@
    The file list below is written by tools/build-sw.py: run it before pushing. */
 
 /* FILES:BEGIN (written by tools/build-sw.py, don't edit by hand) */
-const VERSION = "74df6ac361";
+const VERSION = "aa16248dbc";
 const CORE = [
 "./",
 "css/basics/first-steps.html",
@@ -27,6 +27,7 @@ const CORE = [
 "css/index.html",
 "css/summary/test-hu.html",
 "css/summary/test.html",
+"dk6/elmelet/osszefoglalo-hu.html",
 "erettsegi/exam.css",
 "erettsegi/exam.js",
 "erettsegi/index.html",
@@ -181,7 +182,9 @@ const CORE = [
 "word/index.html",
 "word/long/beszamolo.docx",
 "word/long/intro-hu.html",
+"word/long/kirandulas.docx",
 "word/long/report-hu.html",
+"word/long/trip-hu.html",
 "word/mission.css",
 "word/page/erdei-iskola.docx",
 "word/page/forest-school-hu.html",
@@ -209,6 +212,7 @@ const EXTERNAL = [
 "https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600;700&display=swap",
 "https://fonts.googleapis.com/css2?family=Kalam:wght@700&family=Atkinson+Hyperlegible:wght@400;700&display=swap",
 "https://fonts.googleapis.com/css2?family=Kalam:wght@700&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@400;600&display=swap",
+"https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap",
 "https://fonts.googleapis.com/css2?family=Young+Serif&family=Kalam:wght@400;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap"
 ];
 const PAGE_IMAGES = {
@@ -322,6 +326,10 @@ const PAGE_IMAGES = {
 "word/long/report-hu.html": [
 "word/long/szalajka.png",
 "word/long/turistahaz.png"
+],
+"word/long/trip-hu.html": [
+"word/long/fellegvar.png",
+"word/long/hajo.png"
 ],
 "word/page/forest-school-hu.html": [
 "word/page/szalajka.png"

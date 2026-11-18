@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Digitális kultúra 6. – Elméleti összefoglaló</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f7f4ee; --paper:#ffffff; --ink:#1e2833; --muted:#5d6b78; --line:#e3ddd2;
+  --ok:#1f9d57; --okbg:#e5f6ec; --bad:#d64545; --badbg:#fdeaea; --info:#2f6fb5; --infobg:#e8f0fa;
+  --accent:#2f7dd1; --accentbg:#e9f2fc;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Nunito",system-ui,sans-serif;font-size:18px;line-height:1.55}
+button,select,input{font:inherit;color:inherit}
+kbd{display:inline-block;min-width:1.7em;padding:.05em .45em;border:1px solid #b9b2a6;border-bottom-width:3px;border-radius:6px;background:#fff;font-family:"Nunito",sans-serif;font-weight:800;font-size:.85em;text-align:center;white-space:nowrap}
+
+/* fejléc */
+.top{position:sticky;top:0;z-index:20;background:rgba(247,244,238,.96);backdrop-filter:blur(6px);border-bottom:1px solid var(--line)}
+.top-in{max-width:980px;margin:0 auto;padding:10px 16px 8px}
+.brand{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px}
+.brand h1{font-size:1.05rem;margin:0;font-weight:900;letter-spacing:.2px}
+.score-pill{font-weight:800;font-size:.9rem;background:var(--paper);border:1px solid var(--line);border-radius:999px;padding:3px 12px;white-space:nowrap}
+.steps{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;scrollbar-width:thin}
+.step{flex:0 0 auto;display:flex;align-items:center;gap:6px;border:2px solid var(--line);background:var(--paper);border-radius:999px;padding:4px 12px 4px 6px;cursor:pointer;font-weight:700;font-size:.85rem}
+.step .dot{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:#efeae1;font-size:.9rem}
+.step.active{border-color:var(--c,var(--accent));box-shadow:0 0 0 2px color-mix(in srgb,var(--c,var(--accent)) 25%,transparent)}
+.step.complete .dot{background:var(--ok);color:#fff}
+.bar{height:8px;background:#e6e0d5;border-radius:99px;margin-top:6px;overflow:hidden}
+.bar>i{display:block;height:100%;width:0;background:linear-gradient(90deg,#2f7dd1,#1f9d57);border-radius:99px;transition:width .4s}
+
+main{max-width:860px;margin:0 auto;padding:22px 16px 80px}
+section.page{display:none}
+section.page.show{display:block;animation:fade .25s ease}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1}}
+
+.hero{background:var(--c);color:#fff;border-radius:22px;padding:22px 24px;margin-bottom:18px;position:relative;overflow:hidden}
+.hero .ico{font-size:2.6rem;line-height:1}
+.hero .kicker{font-weight:800;opacity:.9;text-transform:uppercase;letter-spacing:1px;font-size:.8rem;margin-top:6px}
+.hero h2{margin:2px 0 6px;font-size:1.8rem;line-height:1.2;font-weight:900}
+.hero .meta{display:flex;flex-wrap:wrap;gap:8px;font-weight:700;font-size:.9rem}
+.hero .meta span{background:rgba(255,255,255,.2);border-radius:999px;padding:2px 10px}
+
+.card{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:18px 20px;margin:0 0 14px}
+.card h3{margin:0 0 8px;font-size:1.2rem;font-weight:900;color:var(--c,var(--ink))}
+.card p{margin:.4em 0}
+.card ul{margin:.4em 0;padding-left:1.2em}
+.card li{margin:.25em 0}
+.remember{background:#fff8e1;border:2px dashed #e7b93c;border-radius:16px;padding:12px 16px;margin:0 0 14px}
+.remember b.t{display:block;color:#9a6b00;margin-bottom:2px}
+.tip{background:var(--accentbg);border-radius:12px;padding:8px 12px;margin-top:8px;font-size:.95rem}
+.keytable{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;align-items:center;margin-top:8px}
+.demo{display:inline-block;font-family:Consolas,monospace;background:#f3f1ec;border-radius:6px;padding:0 6px}
+.demo .cur{color:var(--bad);font-weight:900}
+.stepsx{counter-reset:s;list-style:none;padding:0!important}
+.stepsx li{counter-increment:s;position:relative;padding-left:2.1em!important;margin:.45em 0}
+.stepsx li::before{content:counter(s);position:absolute;left:0;top:.05em;width:1.55em;height:1.55em;border-radius:50%;background:var(--c,var(--accent));color:#fff;font-weight:900;font-size:.85em;display:grid;place-items:center}
+.fonts span{display:inline-block;margin:2px 10px 2px 0;padding:2px 8px;background:#f3f1ec;border-radius:8px}
+.align-demo{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin-top:10px}
+.align-demo div{border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-size:.78rem;line-height:1.35;background:#fcfbf8}
+.align-demo b{display:block;font-size:.85rem;margin-bottom:4px;text-align:left}
+.twocol{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:620px){.twocol{grid-template-columns:1fr}}
+.mini{background:#fcfbf8;border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+table.tt{border-collapse:collapse;margin:8px 0;font-size:.95rem}
+table.tt td,table.tt th{border:1px solid var(--line);padding:5px 10px;text-align:center}
+table.tt th{background:#f3f1ec}
+.T{color:var(--ok);font-weight:800}.F{color:var(--bad);font-weight:800}
+.mb-fig{display:inline-grid;grid-template-columns:28px repeat(5,44px);grid-template-rows:24px repeat(5,44px);gap:4px;margin:8px 0;font-size:.75rem;font-weight:800}
+.mb-fig .lab{display:grid;place-items:center;color:var(--muted)}
+.mb-fig .led{background:#2b2b2b;border-radius:8px;display:grid;place-items:center;color:#888;font-size:.68rem}
+.mb-fig .led.on{background:#ff3b30;color:#fff;box-shadow:0 0 10px #ff3b30}
+.swatches{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.sw{display:flex;align-items:center;gap:6px;background:#f3f1ec;border-radius:10px;padding:4px 10px 4px 4px;font-family:Consolas,monospace;font-size:.85rem}
+.sw i{width:26px;height:26px;border-radius:7px;border:1px solid #0002;display:inline-block}
+.layers{position:relative;height:150px;margin:10px 0 4px;max-width:340px}
+.layers div{position:absolute;width:200px;height:96px;border-radius:12px;border:2px solid #0003;display:flex;align-items:flex-end;padding:6px 10px;font-weight:800;font-size:.85rem}
+.stair{display:flex;align-items:flex-end;gap:8px;margin-top:8px}
+.stair div{background:var(--c);color:#fff;border-radius:10px 10px 4px 4px;width:64px;display:flex;align-items:flex-end;justify-content:center;padding-bottom:6px;font-weight:900}
+
+/* feladatok */
+.taskhdr{display:flex;align-items:center;gap:10px;margin:28px 0 12px}
+.taskhdr h3{margin:0;font-size:1.4rem;font-weight:900}
+.taskhdr::after{content:"";flex:1;height:3px;background:var(--line);border-radius:3px}
+.task{background:var(--paper);border:2px solid var(--line);border-radius:18px;padding:16px 18px;margin-bottom:16px}
+.task.done{border-color:color-mix(in srgb,var(--ok) 55%,var(--line))}
+.thead{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:6px}
+.tnum{font-weight:900;color:var(--c)}
+.ttype{font-size:.78rem;font-weight:800;background:color-mix(in srgb,var(--c) 14%,#fff);color:color-mix(in srgb,var(--c) 75%,#000);padding:2px 10px;border-radius:999px;text-transform:uppercase;letter-spacing:.5px}
+.tpts{margin-left:auto;font-weight:800;font-size:.9rem;color:var(--muted)}
+.task.done .tpts{color:var(--ok)}
+.q{font-weight:700;margin:4px 0 4px}
+.hint{font-size:.88rem;color:var(--muted);margin:0 0 10px}
+.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.btn{border:none;border-radius:12px;padding:9px 18px;font-weight:800;cursor:pointer;background:var(--c,var(--accent));color:#fff;transition:transform .08s,filter .15s}
+.btn:hover{filter:brightness(1.07)}
+.btn:active{transform:translateY(1px)}
+.btn:disabled{opacity:.45;cursor:default;filter:none}
+.btn.ghost{background:#efeae1;color:var(--ink)}
+.btn.big{font-size:1.05rem;padding:12px 24px}
+.fb{margin-top:10px;border-radius:12px;padding:8px 12px;font-weight:700;display:none}
+.fb.ok{display:block;background:var(--okbg);color:#14653a}
+.fb.bad{display:block;background:var(--badbg);color:#9b2525}
+.fb.info{display:block;background:var(--infobg);color:#1e4f86}
+.ok{outline:3px solid var(--ok)!important;background:var(--okbg)!important}
+.bad{outline:3px solid var(--bad)!important;background:var(--badbg)!important}
+
+/* párosítás */
+.match .mrow{display:grid;grid-template-columns:minmax(120px,38%) 1fr;gap:10px;align-items:center;padding:8px 10px;border-radius:12px;margin-bottom:6px;background:#faf8f4}
+.match .mleft{font-weight:700}
+select{width:100%;padding:8px 10px;border:2px solid var(--line);border-radius:10px;background:#fff;cursor:pointer}
+select:focus,input:focus{outline:none;border-color:var(--c)}
+@media(max-width:560px){.match .mrow{grid-template-columns:1fr}}
+.match.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
+.match.cards .mrow{grid-template-columns:1fr;margin:0}
+.match.cards .mleft{font-weight:400;font-size:.8rem;line-height:1.35;background:#fff;border:1px solid var(--line);border-radius:8px;padding:8px}
+
+/* kiegészítés */
+.fill{line-height:2.3}
+.fill select{width:auto;display:inline-block;padding:3px 6px;margin:0 2px}
+.fill input{width:5.5em;padding:3px 8px;border:2px solid var(--line);border-radius:10px;text-align:center;font-weight:800}
+.fill .slot{display:inline-block;border-radius:10px}
+.fill table{border-collapse:collapse;line-height:1.4}
+.fill td,.fill th{border:1px solid var(--line);padding:6px 10px;text-align:center}
+.fill th{background:#f3f1ec}
+
+/* igaz-hamis */
+.tf .row{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:12px;background:#faf8f4;margin-bottom:6px}
+.tf .row p{flex:1;margin:0}
+.tf .opt{display:flex;gap:6px}
+.tf .opt button{border:2px solid var(--line);background:#fff;border-radius:10px;padding:5px 12px;font-weight:800;cursor:pointer}
+.tf .opt button.sel.i{background:var(--ok);border-color:var(--ok);color:#fff}
+.tf .opt button.sel.h{background:var(--bad);border-color:var(--bad);color:#fff}
+@media(max-width:560px){.tf .row{flex-direction:column;align-items:stretch}}
+
+/* sorrend */
+.sort{list-style:none;margin:0;padding:0}
+.sort li{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:12px;background:#faf8f4;margin-bottom:6px;border:1px solid var(--line)}
+.sort .n{width:28px;height:28px;flex:0 0 28px;border-radius:50%;background:var(--c);color:#fff;display:grid;place-items:center;font-weight:900;font-size:.9rem}
+.sort .txt{flex:1}
+.sort .mv{display:flex;gap:4px}
+.sort .mv button{width:38px;height:34px;border-radius:9px;border:2px solid var(--line);background:#fff;cursor:pointer;font-weight:900}
+.sort .mv button:disabled{opacity:.3;cursor:default}
+
+/* csoportosítás */
+.pool{min-height:56px;border:2px dashed var(--line);border-radius:14px;padding:8px;display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;cursor:pointer}
+.pool:empty::after{content:"Minden kártya a helyén van 👍";color:var(--muted);font-size:.9rem;padding:6px}
+.buckets{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.bucket{border:2px solid var(--line);border-radius:14px;background:#faf8f4;min-height:120px;cursor:pointer;transition:border-color .15s,background .15s}
+.bucket.ready{border-color:var(--c);background:color-mix(in srgb,var(--c) 7%,#fff)}
+.bucket h4{margin:0;padding:8px 12px;border-bottom:1px solid var(--line);font-size:1rem}
+.bucket .bb{padding:8px;display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:2px solid var(--line);background:#fff;border-radius:10px;padding:5px 10px;cursor:pointer;font-weight:700;font-size:.92rem;text-align:left}
+.chip.selected{border-color:var(--c);box-shadow:0 0 0 3px color-mix(in srgb,var(--c) 30%,transparent);transform:translateY(-1px)}
+
+/* micro:bit rács */
+.gridwrap{display:inline-grid;grid-template-columns:30px repeat(5,52px);grid-template-rows:26px repeat(5,52px);gap:5px;background:#1d1d1d;padding:12px 14px 14px 8px;border-radius:18px}
+.gridwrap .lab{color:#bbb;font-weight:800;display:grid;place-items:center;font-size:.85rem}
+.gridwrap button{border:none;border-radius:10px;background:#3a3a3a;cursor:pointer;transition:background .15s,box-shadow .15s}
+.gridwrap button.on{background:#ff3b30;box-shadow:0 0 14px #ff3b30}
+.gridwrap button.ok{outline:3px solid #46e08a!important;background:#ff3b30!important}
+.gridwrap button.bad{outline:3px solid #ffd23f!important;background:#7a2c28!important}
+.gridnote{font-size:.85rem;color:var(--muted);margin-top:6px}
+@media(max-width:420px){.gridwrap{grid-template-columns:24px repeat(5,44px);grid-template-rows:24px repeat(5,44px)}}
+
+.nextnav{display:flex;justify-content:space-between;gap:10px;margin-top:26px}
+.start-card{background:var(--paper);border:1px solid var(--line);border-radius:22px;padding:26px}
+.start-card h2{font-size:2rem;line-height:1.15;margin:0 0 6px;font-weight:900}
+.start-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px;margin:16px 0}
+.start-list div{border-radius:14px;padding:10px 14px;color:#fff;font-weight:800}
+.start-list small{display:block;font-weight:600;opacity:.9}
+.namebox{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:12px}
+.namebox input{flex:1;min-width:200px;padding:10px 14px;border:2px solid var(--line);border-radius:12px;font-weight:700}
+.res-table{width:100%;border-collapse:collapse;margin:12px 0}
+.res-table td,.res-table th{padding:9px 10px;border-bottom:1px solid var(--line);text-align:left}
+.res-table td.r,.res-table th.r{text-align:right}
+.big-score{font-size:3rem;font-weight:900;line-height:1}
+.foot{font-size:.8rem;color:var(--muted);text-align:center;margin-top:40px}
+
+/* ===================== ANIMÁCIÓK ===================== */
+@keyframes rise{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
+@keyframes float{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-8px) rotate(-6deg)}}
+@keyframes wave{0%,55%,100%{transform:rotate(0)}10%,30%{transform:rotate(16deg)}20%{transform:rotate(-8deg)}40%{transform:rotate(-4deg)}48%{transform:rotate(10deg)}}
+@keyframes drift{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-18px,14px) scale(1.12)}}
+@keyframes okpop{0%{transform:scale(1)}35%{transform:scale(1.06)}100%{transform:scale(1)}}
+@keyframes badwig{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(5px)}60%{transform:translateX(-4px)}80%{transform:translateX(2px)}}
+@keyframes shake{0%,100%{transform:translateX(0)}15%{transform:translateX(-10px) rotate(-.6deg)}30%{transform:translateX(9px) rotate(.5deg)}45%{transform:translateX(-7px)}60%{transform:translateX(5px)}75%{transform:translateX(-3px)}}
+@keyframes drop{0%{transform:scale(.4) rotate(-12deg);opacity:0}60%{transform:scale(1.15) rotate(4deg);opacity:1}100%{transform:scale(1) rotate(0)}}
+@keyframes bob{0%,100%{transform:translateY(-2px)}50%{transform:translateY(-6px)}}
+@keyframes pulseB{0%,100%{box-shadow:0 0 0 0 color-mix(in srgb,var(--c) 45%,transparent)}50%{box-shadow:0 0 0 7px color-mix(in srgb,var(--c) 0%,transparent)}}
+@keyframes ledon{0%{transform:scale(.6)}55%{transform:scale(1.18)}100%{transform:scale(1)}}
+@keyframes ledoff{0%{transform:scale(1)}50%{transform:scale(.82)}100%{transform:scale(1)}}
+@keyframes press{0%{transform:scale(1)}40%{transform:scale(.88)}75%{transform:scale(1.1)}100%{transform:scale(1)}}
+@keyframes moved{0%{background:color-mix(in srgb,var(--c) 22%,#fff);transform:scale(1.03)}100%{background:#faf8f4;transform:scale(1)}}
+@keyframes bump{0%{transform:scale(1)}35%{transform:scale(1.3) rotate(-4deg)}70%{transform:scale(.95)}100%{transform:scale(1)}}
+@keyframes floatUp{0%{opacity:0;transform:translate(-50%,0) scale(.6)}15%{opacity:1;transform:translate(-50%,-12px) scale(1.2)}100%{opacity:0;transform:translate(-50%,-90px) scale(1)}}
+@keyframes fbIn{from{opacity:0;transform:translateY(-6px) scale(.97)}to{opacity:1;transform:none}}
+@keyframes shimmer{from{background-position:0 0}to{background-position:44px 0}}
+@keyframes dotpop{0%{transform:scale(.3) rotate(-180deg)}70%{transform:scale(1.3) rotate(10deg)}100%{transform:scale(1) rotate(0)}}
+@keyframes toastIn{0%{transform:translate(-50%,140%)}60%{transform:translate(-50%,-8%)}100%{transform:translate(-50%,0)}}
+@keyframes toastOut{to{transform:translate(-50%,160%);opacity:0}}
+@keyframes trophy{0%,100%{transform:translateY(0) rotate(0)}25%{transform:translateY(-14px) rotate(-10deg)}50%{transform:translateY(0) rotate(0)}75%{transform:translateY(-7px) rotate(8deg)}}
+@keyframes glowPulse{0%,100%{box-shadow:0 4px 0 color-mix(in srgb,var(--c) 60%,#000)}50%{box-shadow:0 4px 0 color-mix(in srgb,var(--c) 60%,#000),0 0 0 8px color-mix(in srgb,var(--c) 18%,transparent)}}
+
+.rise{animation:rise .5s cubic-bezier(.2,.8,.3,1) both}
+.hero .ico{display:inline-block;animation:float 3.2s ease-in-out infinite;transform-origin:50% 80%}
+.hero::before,.hero::after{content:"";position:absolute;border-radius:50%;background:rgba(255,255,255,.14);pointer-events:none}
+.hero::before{width:180px;height:180px;right:-40px;top:-60px;animation:drift 7s ease-in-out infinite}
+.hero::after{width:90px;height:90px;right:120px;bottom:-40px;animation:drift 9s ease-in-out infinite reverse}
+.wave{display:inline-block;animation:wave 2.4s ease-in-out infinite;transform-origin:70% 80%}
+.start-list div{transition:transform .2s,box-shadow .2s}
+.start-list div:hover{transform:translateY(-4px) rotate(-1deg);box-shadow:0 10px 18px #0002}
+#goBtn{animation:glowPulse 1.8s ease-in-out infinite}
+.btn{box-shadow:0 4px 0 color-mix(in srgb,var(--c,#2f7dd1) 60%,#000)}
+.btn.ghost{box-shadow:0 3px 0 #d6cfc2}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 color-mix(in srgb,var(--c,#2f7dd1) 60%,#000)}
+.btn:disabled{box-shadow:none}
+.a-ok{animation:okpop .45s ease both}
+.a-bad{animation:badwig .45s ease both}
+.task.shake{animation:shake .5s ease}
+.chip.drop{animation:drop .45s cubic-bezier(.2,.9,.3,1.3) both}
+.chip.selected{animation:bob .9s ease-in-out infinite}
+.bucket.ready{animation:pulseB 1.2s ease-in-out infinite}
+.bucket.ready:hover{transform:scale(1.02)}
+.bucket{transition:transform .15s,border-color .15s,background .15s}
+.gridwrap button.on{animation:ledon .3s ease both}
+.gridwrap button.off-anim{animation:ledoff .25s ease both}
+.tf .opt button.press{animation:press .35s ease}
+.sort li.moved{animation:moved .55s ease}
+.score-pill.bump{animation:bump .6s ease}
+.plus{position:fixed;z-index:60;pointer-events:none;font-weight:900;font-size:1.4rem;color:#e0a100;text-shadow:0 2px 0 #fff,0 0 12px #fff;animation:floatUp 1.3s ease-out forwards}
+.fb.ok,.fb.bad,.fb.info{animation:fbIn .3s ease both}
+.bar>i{background:repeating-linear-gradient(-45deg,rgba(255,255,255,.22) 0 11px,transparent 11px 22px),linear-gradient(90deg,#2f7dd1,#1f9d57);animation:shimmer 1.2s linear infinite}
+.step.complete .dot.popd{animation:dotpop .6s cubic-bezier(.2,.9,.3,1.3)}
+.toast{position:fixed;left:50%;bottom:22px;z-index:70;background:#1e2833;color:#fff;font-weight:900;font-size:1.1rem;padding:14px 22px;border-radius:18px;box-shadow:0 12px 30px #0005;animation:toastIn .55s cubic-bezier(.2,.9,.3,1.2) both;white-space:nowrap}
+.toast.out{animation:toastOut .4s ease forwards}
+.trophy{display:inline-block;animation:trophy 2s ease-in-out infinite}
+#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:65}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="top"><div class="top-in">
+  <div class="brand"><h1>💻 Digitális kultúra 6. – Elmélet</h1><span class="score-pill" id="scorePill">0 pont</span></div>
+  <nav class="steps" id="steps"></nav>
+  <div class="bar"><i id="bar"></i></div>
+</div></div>
+<main id="main"></main>
+
+<script>
+/* ===================== TARTALOM ===================== */
+const SECTIONS = [
+{
+  id:"s1", icon:"⌨️", color:"#2f7dd1", title:"Szöveg beírása és szerkesztése", time:"kb. 6 perc",
+  theory:`
+<div class="card"><h3>Hol írhatunk szöveget?</h3>
+<p>Rövid jegyzetekhez minden számítógépen és telefonon van egyszerű program: a Windowsban a <b>Jegyzettömb</b>, az androidos telefonokon a <b>Jegyzetek</b>. Ezekkel gyorsan leírhatunk például egy bevásárlólistát vagy néhány közmondást.</p></div>
+
+<div class="card"><h3>A gépelés aranyszabályai</h3>
+<ul>
+<li>A szavak közé mindig <b>csak egy szóközt</b> teszünk.</li>
+<li>Az <kbd>Enter</kbd>-t <b>csak a bekezdés végén</b> nyomjuk le, nem minden sor végén. Ha betelik a sor, a program magától új sort kezd.</li>
+<li>A hibákat érdemes a gépelés <b>után, egyszerre</b> kijavítani, nem minden betű után megállni.</li>
+</ul></div>
+
+<div class="card"><h3>A kurzor és a fontos billentyűk</h3>
+<p>A <b>kurzor</b> egy villogó függőleges vonal: a következő betű mindig ide kerül. Mozgathatod a nyilakkal, az egérrel vagy a képernyőre koppintva.</p>
+<div class="keytable">
+<kbd>Home</kbd><span>a kurzor a sor <b>elejére</b> ugrik</span>
+<kbd>End</kbd><span>a kurzor a sor <b>végére</b> ugrik</span>
+<kbd>Backspace&nbsp;←</kbd><span>a kurzor <b>előtti</b> (bal oldali) betűt törli: <span class="demo">ab<span class="cur">|</span>cd</span> → <span class="demo">a<span class="cur">|</span>cd</span></span>
+<kbd>Delete</kbd><span>a kurzor <b>utáni</b> (jobb oldali) betűt törli: <span class="demo">ab<span class="cur">|</span>cd</span> → <span class="demo">ab<span class="cur">|</span>d</span></span>
+<kbd>Shift&nbsp;⇧</kbd><span>a betűvel együtt lenyomva <b>nagybetűt</b> ír (mondat elején)</span>
+<kbd>Caps&nbsp;Lock</kbd><span>bekapcsolva <b>csupa nagybetűvel</b> írunk, amíg újra le nem nyomjuk</span>
+<span><kbd>Ctrl</kbd>+<kbd>Z</kbd></span><span><b>visszavonja</b> az utolsó lépést (ha véletlenül elrontottál valamit)</span>
+<span><kbd>Ctrl</kbd>+<kbd>S</kbd></span><span><b>menti</b> a fájlt (save = mentés)</span>
+</div></div>
+
+<div class="card"><h3>Másolás, kivágás, beillesztés – a Vágólap</h3>
+<p>Ha egy szövegrész többször ismétlődik, nem kell újra begépelni. A <b>Vágólap</b> olyan, mint egy láthatatlan zseb: a gép ide teszi félre, amit lemásolsz. Két program között is működik – például a Számológépből át tudod vinni az eredményt a Jegyzettömbbe.</p>
+<ol class="stepsx">
+<li><b>Jelöld ki</b> a szöveget (például az egérrel végighúzva rajta)!</li>
+<li><kbd>Ctrl</kbd>+<kbd>C</kbd> = <b>másolás</b> (a szöveg a helyén marad) <i>vagy</i> <kbd>Ctrl</kbd>+<kbd>X</kbd> = <b>kivágás</b> (a szöveg eltűnik a helyéről)</li>
+<li>Vidd a kurzort az új helyre!</li>
+<li><kbd>Ctrl</kbd>+<kbd>V</kbd> = <b>beillesztés</b> – akárhányszor megismételheted.</li>
+</ol>
+<div class="tip">💡 Az <b>X</b> úgy néz ki, mint egy nyitott olló ✂️ – ezért ez a kivágás.</div></div>
+
+<div class="card"><h3>Keresés és csere</h3>
+<p><kbd>Ctrl</kbd>+<kbd>F</kbd> (find = keresés): megkeresi egy szó összes előfordulását a szövegben.<br>
+<kbd>Ctrl</kbd>+<kbd>H</kbd> = <b>csere</b>: a megtalált szót egy másikra cseréli – egyenként vagy egyszerre („Az összes cseréje”).</p>
+<div class="tip">⚠️ Ha be van kapcsolva a kis- és nagybetűk megkülönböztetése, akkor a „kutya” keresése nem találja meg a „Kutyából nem lesz szalonna” mondatot!</div></div>
+
+<div class="remember"><b class="t">⭐ Jegyezd meg!</b>Kijelölés → <kbd>Ctrl</kbd>+<kbd>C</kbd> (vagy <kbd>Ctrl</kbd>+<kbd>X</kbd>) → kurzor az új helyre → <kbd>Ctrl</kbd>+<kbd>V</kbd></div>
+`,
+  tasks:[
+    {type:"match", q:"Kösd össze a billentyűt azzal, amit csinál!", hint:"Minden sorban válaszd ki a legördülő listából a helyes leírást.",
+     pairs:[
+      ["<kbd>Enter</kbd>","Lezárja a bekezdést, és újat kezd."],
+      ["<kbd>Backspace ←</kbd>","Törli a kurzor előtti (bal oldali) betűt."],
+      ["<kbd>Delete</kbd>","Törli a kurzor utáni (jobb oldali) betűt."],
+      ["<kbd>Home</kbd>","A kurzor a sor elejére ugrik."],
+      ["<kbd>End</kbd>","A kurzor a sor végére ugrik."],
+      ["<kbd>Caps Lock</kbd>","Bekapcsolva csak nagybetűket írunk."],
+      ["<kbd>Szóköz</kbd>","Üres helyet tesz két szó közé."]
+     ]},
+    {type:"fill", q:"Írd be a hiányzó betűt a billentyűkombinációba!", hint:"Csak egy betűt írj a mezőbe (kisbetű is jó).",
+     html:`<table><tr><th>Mit szeretnék?</th><th>Billentyűk</th></tr>
+<tr><td>Másolás</td><td><kbd>Ctrl</kbd> + [[0]]</td></tr>
+<tr><td>Kivágás</td><td><kbd>Ctrl</kbd> + [[1]]</td></tr>
+<tr><td>Beillesztés</td><td><kbd>Ctrl</kbd> + [[2]]</td></tr>
+<tr><td>Visszavonás</td><td><kbd>Ctrl</kbd> + [[3]]</td></tr>
+<tr><td>Keresés</td><td><kbd>Ctrl</kbd> + [[4]]</td></tr>
+<tr><td>Mentés</td><td><kbd>Ctrl</kbd> + [[5]]</td></tr></table>`,
+     blanks:[{ans:["c"],w:2},{ans:["x"],w:2},{ans:["v"],w:2},{ans:["z"],w:2},{ans:["f"],w:2},{ans:["s"],w:2}]},
+    {type:"sort", q:"Egy dal sorát háromszor kell leírnod, de csak egyszer szeretnéd begépelni. Tedd sorba a lépéseket!", hint:"A ▲ és ▼ gombokkal mozgathatod a lépéseket. Legfelül legyen az első lépés.",
+     items:["Begépelem a sort.","Kijelölöm a sort.","Lenyomom: Ctrl + C (másolás).","A kurzort a következő sor elejére viszem.","Lenyomom: Ctrl + V (beillesztés)."]}
+  ]
+},
+{
+  id:"s2", icon:"🎨", color:"#8a4fd0", title:"Betűk, bekezdések, képek – a szöveg formázása", time:"kb. 7 perc",
+  theory:`
+<div class="card"><h3>Szövegszerkesztő programok</h3>
+<p>A <b>Microsoft Word</b> és a <b>LibreOffice Writer</b> szövegszerkesztő programok. A Jegyzettömbbel ellentétben ezekben a szöveget <b>meg is formázhatjuk</b>, és képeket, táblázatokat is beszúrhatunk.</p></div>
+
+<div class="remember"><b class="t">⭐ Aranyszabály</b>Amit formázni akarsz, azt <b>előbb ki kell jelölnöd!</b> Az egész szöveget a <kbd>Ctrl</kbd>+<kbd>A</kbd> jelöli ki (A = all, azaz összes).<br>
+Sorrend: <b>1.</b> először az egész szöveget egységesre állítjuk (betűtípus, méret, igazítás), <b>2.</b> csak utána jönnek a kiemelések (cím, fontos szavak).</div>
+
+<div class="card"><h3>🔤 Betűformázás</h3>
+<p>A betűket, számokat, írásjeleket és jeleket (például # vagy @) együtt <b>karaktereknek</b> hívjuk.</p>
+<ul>
+<li><b>Betűtípus:</b> egyforma stílusban megtervezett ábécé, a neve azonosítja:
+<div class="fonts"><span style="font-family:'Times New Roman',serif">Times New Roman</span><span style="font-family:'Courier New',monospace">Courier New</span><span style="font-family:'Comic Sans MS','Comic Sans',cursive">Comic Sans</span><span style="font-family:Arial,sans-serif">Arial</span></div></li>
+<li><b>Betűméret:</b> mértékegysége a <b>pont</b>. Könyvekben, újságokban általában <b>10–12 pont</b>, egy plakáton sokkal nagyobb.</li>
+<li><b>Betűstílus:</b> <b>félkövér</b>, <i>dőlt</i>, <u>aláhúzott</u>, felső index (m<sup>2</sup>), alsó index (H<sub>2</sub>O).</li>
+<li>Továbbá: <b style="color:#c62828">betűszín</b>, <span style="letter-spacing:4px">ritkítás</span> (nagyobb hely a betűk között).</li>
+<li><b>Szimbólum:</b> olyan jel, ami nincs a billentyűzeten (☎ ✈ 🚲). Beszúrás > Szimbólum menüvel tehetjük be.</li>
+</ul></div>
+
+<div class="card"><h3>¶ Bekezdésformázás</h3>
+<p>A <b>bekezdés</b> az a rész, amit egy <kbd>Enter</kbd> zár le. A bekezdés formázásai:</p>
+<p><b>1. Igazítás</b> – hogyan állnak egymás alatt a sorok:</p>
+<div class="align-demo">
+<div style="text-align:left"><b>Balra zárt</b>A sorok bal széle egy vonalban van, a jobb széle egyenetlen.</div>
+<div style="text-align:center"><b style="text-align:center">Középre zárt</b>Minden sor középen van. Címekhez jó.</div>
+<div style="text-align:right"><b style="text-align:right">Jobbra zárt</b>A sorok jobb széle van egy vonalban, a bal egyenetlen.</div>
+<div style="text-align:justify"><b>Sorkizárt</b>A sorok bal és jobb széle is egy vonalban van, a program a szóközöket nyújtja meg.</div>
+</div>
+<p><b>2. Behúzás</b> – milyen messze van a bekezdés széle a margótól (az első sort is kezdhetjük beljebb). A vonalzón lévő csúszkákkal is állítható.<br>
+<b>3. Térköz</b> – a távolság <b>két bekezdés között</b>.<br>
+<b>4. Sorköz</b> – a távolság egy bekezdés <b>sorai között</b>.</p></div>
+
+<div class="card"><h3>Felsorolás és számozás</h3>
+<div class="twocol">
+<div class="mini"><b>Felsorolás</b> – minden elem előtt ugyanaz a jel. Ha a sorrend nem számít.<ul><li>liszt</li><li>tojás</li><li>tej</li></ul></div>
+<div class="mini"><b>Számozás</b> – 1., 2., 3. vagy a), b), c). Ha a <b>sorrend fontos</b>.<ol style="padding-left:1.4em;margin:.4em 0"><li>Keverd össze!</li><li>Hagyd pihenni!</li><li>Süsd ki!</li></ol></div>
+</div>
+<p>Minden listaelem külön bekezdés. A <b>Formátummásoló</b> 🖌 ecsettel egy kész formázást átvihetünk egy másik szövegrészre.</p></div>
+
+<div class="card"><h3>Képek a szövegben</h3>
+<ul>
+<li>Beszúrás: <b>Beszúrás > Képek</b> menü.</li>
+<li><b>Körbefuttatás:</b> a szöveg körbefolyja a képet (például négyzetes vagy szoros körbefuttatás).</li>
+<li><b>Méretezés:</b> a kép sarkát húzzuk. Ügyelj a <b>rögzített méretarányra</b>, különben a kép <b>torzul</b> (megnyúlik vagy összenyomódik)!</li>
+<li>A képet <b>körül is vághatjuk</b> és <b>tükrözhetjük</b>.</li>
+</ul>
+<div class="tip">⚠️ Az interneten talált képeket nem használhatjuk akárhogyan – a képeknek is van szerzőjük!</div></div>
+`,
+  tasks:[
+    {type:"cat", q:"Betűformázás vagy bekezdésformázás? Tedd a kártyákat a jó dobozba!",
+     buckets:["🔤 Betűformázás","¶ Bekezdésformázás"],
+     items:[["félkövér",0],["dőlt",0],["betűméret",0],["betűszín",0],["felső index",0],["igazítás (pl. középre zárt)",1],["térköz",1],["sorköz",1],["behúzás",1]]},
+    {type:"match", layout:"cards", q:"Milyen igazítást látsz? Válaszd ki mindegyik bekezdés alatt!",
+     pairs:[
+      ['<div style="text-align:center">A Pál utcai fiúk a grundon gyülekeztek. Boka kiáltványt írt a csapatnak.</div>',"középre zárt"],
+      ['<div style="text-align:justify">A Pál utcai fiúk a grundon gyülekeztek. Boka kiáltványt írt a csapatnak, mert veszélyben volt a grund.</div>',"sorkizárt"],
+      ['<div style="text-align:right">A Pál utcai fiúk a grundon gyülekeztek. Boka kiáltványt írt a csapatnak.</div>',"jobbra zárt"],
+      ['<div style="text-align:left">A Pál utcai fiúk a grundon gyülekeztek. Boka kiáltványt írt a csapatnak.</div>',"balra zárt"]
+     ]},
+    {type:"fill", q:"Egészítsd ki a mondatokat! Válassz a legördülő listákból!",
+     html:`<p>Mielőtt formázok egy szövegrészt, először [[0]].</p>
+<p>Az egész szöveget a [[1]] billentyűkombinációval jelölöm ki.</p>
+<p>Könyvekben a betűméret általában [[2]] pont.</p>
+<p>A palacsinta hozzávalóit [[3]] írom le, az elkészítés lépéseit [[4]].</p>
+<p>Kép átméretezésekor a [[5]] meg kell tartani, különben a kép torzul.</p>`,
+     blanks:[
+      {opts:["ki kell jelölnöm","ki kell nyomtatnom","el kell mentenem"],ans:"ki kell jelölnöm"},
+      {opts:["Ctrl + A","Ctrl + V","Ctrl + Z"],ans:"Ctrl + A"},
+      {opts:["2–4","10–12","40–50"],ans:"10–12"},
+      {opts:["felsorolással","számozással"],ans:"felsorolással"},
+      {opts:["felsorolással","számozással"],ans:"számozással"},
+      {opts:["méretarányt","betűméretet","térközt"],ans:"méretarányt"}
+     ]}
+  ]
+},
+{
+  id:"s3", icon:"🌐", color:"#0f9a8e", title:"Az e-világ és az online kommunikáció", time:"kb. 7 perc",
+  theory:`
+<div class="card"><h3>Mi az az e-világ?</h3>
+<p>Az <b>e-világ</b> minden, amit digitális eszközökkel, az interneten intézünk: tanulás, vásárlás, ügyintézés, beszélgetés, szórakozás. (Az „e” az <i>elektronikus</i> szó rövidítése.)</p></div>
+
+<div class="card"><h3>Elektronikus ügyintézés</h3>
+<p>Egy <b>regisztráció</b> után sok hivatalos ügyet elintézhetünk otthonról, <b>személyes megjelenés nélkül</b> – így időt spórolunk. Ha mégis be kell menni, online <b>időpontot foglalhatunk</b>.</p>
+<ul>
+<li><b>Egészségügy:</b> az orvos az <b>e-receptet</b> a felhőbe menti, a gyógyszert a patikában a <b>TAJ-kártyával</b> váltjuk ki.</li>
+<li><b>Mindennapok:</b> számlabefizetés, bankolás, mozi- és vonatjegy, ételrendelés, digitális bérlet.</li>
+</ul></div>
+
+<div class="card"><h3>Az e-világ az iskolában</h3>
+<ul>
+<li><b>Digitális tanterem</b> (például Google Classroom, Microsoft Teams, KRÉTA): a tanár hozza létre, feladatokat ad ki, és visszajelzést ad.</li>
+<li><b>E-napló, e-ellenőrző:</b> jegyek, órarend, hiányzások, házi feladatok – a tanár, a szülő és a diák is látja a saját azonosítójával.</li>
+<li><b>E-könyvtár:</b> a <b>MEK</b> (Magyar Elektronikus Könyvtár, mek.oszk.hu) – digitális könyvek, hangoskönyvek.</li>
+<li><b>Online feladatbankok:</b> hasznosak, de légy kritikus – nem mindig tudjuk, ki készítette a feladatot.</li>
+</ul></div>
+
+<div class="card"><h3>Adatvédelem és adatbiztonság</h3>
+<div class="twocol">
+<div class="mini">🔒 <b>Adatvédelem:</b> az adataink megvédése az <b>idegenektől</b> (például csak névvel és jelszóval lehet belépni).</div>
+<div class="mini">💾 <b>Adatbiztonság:</b> az adataink megóvása attól, hogy <b>elvesszenek vagy megsérüljenek</b> (gyakori mentés, biztonsági másolat).</div>
+</div>
+<p><b>Jelszó:</b> ne add meg senkinek, legyen erős, ne használd ugyanazt minden oldalon, és időnként cseréld le!</p></div>
+
+<div class="card"><h3>Keresés és álhírek</h3>
+<p>Kereshetünk <b>kulcsszóval</b>, <b>térképen</b> (útvonal, menetrend) vagy adatbázisokban. A találatokat <b>szűrhetjük</b> (fájltípus, nyelv, időpont).</p>
+<p>Az <b>álhír</b> olyan hír, ami nem igaz – sokszor csak azért készül, hogy rákattintsunk, mert a kattintásokért pénzt kap az oldal. Csak megbízható forrásnak higgy, és az álhíreket <b>ne oszd meg</b>! A képeket, videókat is könnyű megszerkeszteni.</p></div>
+
+<div class="card"><h3>Biztonságosan online</h3>
+<ul>
+<li>Csak olyanokkal beszélgess, akiket <b>a valóságban is ismersz</b>.</li>
+<li>Ne ossz meg olyan képet, amivel később visszaélhetnek.</li>
+<li>Ha online zaklatnak (vagy mást zaklatnak), <b>szólj a szüleidnek, a tanárodnak</b>!</li>
+<li>Webáruházaknál figyelj a <b>csaló oldalak</b> jeleire: kéretlen reklámlevél (spam), nincs cégnév, nincs ügyfélszolgálat, gyanúsan olcsó termékek.</li>
+<li>Az internet túlzott használata függőséghez vezethet – a valódi kapcsolatok fontosabbak!</li>
+</ul></div>
+`,
+  tasks:[
+    {type:"sort", q:"Regisztrálsz egy webáruházba. Tedd sorba a lépéseket!", hint:"Legfelül legyen az első lépés.",
+     items:["Megnyitom a webáruház honlapját.","Kitöltöm a regisztrációs űrlapot (név, e-mail-cím).","Megadok egy jelszót, és még egyszer beírom.","Elolvasom és elfogadom a felhasználási feltételeket.","Rákattintok a „Regisztráció” gombra.","Az e-mailben kapott linkre kattintva véglegesítem a regisztrációt."]},
+    {type:"cat", q:"Megbízható webáruház vagy gyanús? Tedd a kártyákat a jó dobozba!",
+     buckets:["✅ Megbízható jel","⚠️ Gyanús jel"],
+     items:[["Fel van tüntetve a cégnév és az elérhetőség.",0],["Az ügyfélszolgálat gyorsan válaszol.",0],["Az árak hasonlók más boltokéhoz.",0],["Sok helyen írnak róla a keresőkben.",0],["A reklámja kéretlen levélben (spamként) érkezik.",1],["Nincs ügyfélszolgálat.",1],["Nincs feltüntetve cégnév.",1],["A termékek gyanúsan olcsók.",1]]},
+    {type:"tf", q:"Igaz vagy hamis? Kattints a megfelelő gombra!",
+     items:[
+      ["A gyógyszert az e-recept miatt a TAJ-kártyánkkal is kiválthatjuk a patikában.",true],
+      ["A MEK a Magyar Elektronikus Könyvtár rövidítése.",true],
+      ["Az adatbiztonság azt jelenti, hogy biztonsági másolatot készítünk, hogy ne vesszenek el az adataink.",true],
+      ["Érdemes minden oldalon ugyanazt a jelszót használni, hogy ne felejtsük el.",false],
+      ["Ha egy hír érdekes, nyugodtan továbbküldhetjük, nem kell ellenőrizni.",false],
+      ["Ha valaki online zaklat, szólnom kell a szüleimnek vagy a tanáromnak.",true]
+     ]}
+  ]
+},
+{
+  id:"s4", icon:"🤖", color:"#e0662b", title:"Programozás: micro:bit és robotok", time:"kb. 7 perc",
+  theory:`
+<div class="card"><h3>Ismétlés: a programozás alapfogalmai</h3>
+<ul>
+<li><b>Algoritmus:</b> lépések sorozata egy feladat megoldására. <b>Szekvencia:</b> utasítások egymás után.</li>
+<li><b>Ciklus:</b> ismétlés – lehet számlálós (pl. 10-szer), feltételes (amíg…) vagy végtelen (állandóan).</li>
+<li><b>Elágazás:</b> <i>ha</i> teljesül egy feltétel, <i>akkor</i> csinálj valamit (különben mást).</li>
+<li><b>Változó:</b> egy név, amely alatt egy értéket tárol a program (pl. pontszám).</li>
+<li><b>Szenzor</b> (érzékelő): ezzel érzékeli a robot a környezetét.</li>
+</ul></div>
+
+<div class="card"><h3>A micro:bit kijelzője</h3>
+<p>A micro:bit kijelzője <b>5 × 5 = 25 LED</b>-ből áll. Minden LED-nek van egy <b>koordinátája</b>:</p>
+<ul>
+<li>A <b>bal felső sarok</b> a (0;0) – ez az origó.</li>
+<li>Az <b>x</b> jobbra nő (oszlop), az <b>y</b> lefelé nő (sor). Az értékek csak 0, 1, 2, 3, 4 lehetnek.</li>
+<li>Mindig <b>először az x-et</b>, aztán az y-t írjuk: (x;y).</li>
+</ul>
+<div id="mbfig"></div>
+<p>A LED-et <b>felkapcsolhatjuk, lekapcsolhatjuk</b> vagy <b>átválthatjuk</b> (ha égett, kialszik; ha nem égett, felkapcsolódik). A „led állapota” blokk <b>igaz</b>, ha a LED ég, és <b>hamis</b>, ha nem.</p>
+<p>A Játék kategóriában <b>szereplőt</b> (angolul <i>sprite</i>, magyarul manó) is létrehozhatunk: ez egy pont, amelynek <b>iránya van</b>, és előre tud lépni.</p></div>
+
+<div class="card"><h3>Összetett feltételek: ÉS, VAGY, NEM</h3>
+<p>A feltételek értéke <b class="T">igaz</b> vagy <b class="F">hamis</b> lehet (ez a <b>logikai adattípus</b>).</p>
+<div class="mini" style="margin-bottom:8px"><b>ÉS</b> – „Ha hazaérsz 4 óráig <b>és</b> jó az idő, vidd el a kutyát sétálni!”<br>→ Csak akkor <b class="T">igaz</b>, ha <b>mindkét</b> feltétel igaz.</div>
+<div class="mini" style="margin-bottom:8px"><b>VAGY</b> – „Ha lázas vagy <b>vagy</b> köhögsz, maradj otthon!”<br>→ Akkor <b class="T">igaz</b>, ha <b>legalább az egyik</b> igaz. Csak akkor <b class="F">hamis</b>, ha mindkettő hamis.</div>
+<div class="mini"><b>NEM</b> (tagadás) – „Ha <b>nem</b> esik az eső, biciklizünk!”<br>→ Megfordítja az értéket: igazból hamis lesz, hamisból igaz.</div></div>
+
+<div class="card"><h3>Valódi robot: LEGO Mindstorms EV3</h3>
+<p>Az <b>EV3 tégla</b> a robot <b>irányítóközpontja</b>. Az <b>1–4</b> számú csatlakozókba (portokba) az érzékelők, az <b>A–D</b> jelűekbe a motorok kerülnek.</p>
+<ul>
+<li><b>Színérzékelő:</b> 7 színt ismer fel, és a fényerősséget is méri (0 = sötét, 100 = világos).</li>
+<li><b>Ütközésérzékelő:</b> egy gomb – benyomva 1, kiengedve 0 értéket ad.</li>
+<li><b>Ultrahangos távolságérzékelő:</b> 1–250 cm távolságot mér, úgy, ahogy a denevér tájékozódik.</li>
+<li><b>Infravörös érzékelő:</b> távolságot érzékel, és a távirányító jelét is észleli.</li>
+<li><b>Gyroszenzor:</b> azt méri, hány fokkal fordult el a robot.</li>
+<li><b>Motorok:</b> a nagy motor a kerekeket hajtja, a közepes kisebb és gyorsabb.</li>
+</ul>
+<p>Programozni <b>blokkokkal</b> lehet (EV3 Classroom vagy MakeCode – ebben szimulátor is van). A programot <b>USB-kábellel, Bluetooth-on vagy wifin</b> töltjük fel a robotra.</p></div>
+`,
+  tasks:[
+    {type:"grid", q:"Kapcsold fel ezeket a LED-eket: (3;0), (0;1), (2;2), (4;3), (1;4)", hint:"Kattints a LED-re a felkapcsoláshoz, újra kattintva lekapcsolod. Ne feledd: először x (oszlop, jobbra), aztán y (sor, lefelé)!",
+     targets:[[3,0],[0,1],[2,2],[4,3],[1,4]]},
+    {type:"fill", q:"Töltsd ki a táblázatot! Mi lesz az ÉS, illetve a VAGY eredménye?", hint:"Emlékezz: az ÉS csak akkor igaz, ha mindkettő igaz. A VAGY akkor igaz, ha legalább az egyik igaz.",
+     html:`<table><tr><th>A feltétel</th><th>B feltétel</th><th>A ÉS B</th><th>A VAGY B</th></tr>
+<tr><td class="T">igaz</td><td class="T">igaz</td><td>[[0]]</td><td>[[1]]</td></tr>
+<tr><td class="T">igaz</td><td class="F">hamis</td><td>[[2]]</td><td>[[3]]</td></tr>
+<tr><td class="F">hamis</td><td class="T">igaz</td><td>[[4]]</td><td>[[5]]</td></tr>
+<tr><td class="F">hamis</td><td class="F">hamis</td><td>[[6]]</td><td>[[7]]</td></tr></table>`,
+     blanks:[
+      {opts:["igaz","hamis"],ans:"igaz",keep:true},{opts:["igaz","hamis"],ans:"igaz",keep:true},
+      {opts:["igaz","hamis"],ans:"hamis",keep:true},{opts:["igaz","hamis"],ans:"igaz",keep:true},
+      {opts:["igaz","hamis"],ans:"hamis",keep:true},{opts:["igaz","hamis"],ans:"igaz",keep:true},
+      {opts:["igaz","hamis"],ans:"hamis",keep:true},{opts:["igaz","hamis"],ans:"hamis",keep:true}
+     ]},
+    {type:"match", q:"Melyik alkatrész mit csinál? Párosítsd!",
+     pairs:[
+      ["EV3 tégla","A robot irányítóközpontja."],
+      ["Színérzékelő","Felismeri a színeket és méri a fényerősséget."],
+      ["Ütközésérzékelő","Érzékeli, hogy a gombja be van-e nyomva."],
+      ["Ultrahangos érzékelő","Távolságot mér, mint a denevér."],
+      ["Gyroszenzor","Méri, hány fokkal fordult el a robot."],
+      ["Nagy motor","Hajtja a robot kerekeit."]
+     ]}
+  ]
+},
+{
+  id:"s5", icon:"📷", color:"#c2408b", title:"Kép, hang, videó – multimédia", time:"kb. 7 perc",
+  theory:`
+<div class="card"><h3>Mi az a multimédia?</h3>
+<p>A <b>médium</b> az, amin keresztül adatot továbbítunk: például a <b>kép</b>, a <b>hang</b> és a <b>videó</b>. Egy gép akkor <b>multimédiás</b>, ha többféle médiumot is kezel. A mai laptopok, telefonok mind ilyenek. A gép mindegyiket <b>fájlként</b>, végső soron <b>számokként</b> tárolja.</p></div>
+
+<div class="card"><h3>A digitális kép</h3>
+<ul>
+<li>A kép apró <b>képpontokból (pixelekből)</b> áll.</li>
+<li>A <b>felbontás</b> megmondja, hány képpont van egymás mellett és egymás alatt, például <b>1920 × 1080</b> (1920 oszlop, 1080 sor).</li>
+<li>Minden képpont színét a gép <b>vörös, zöld és kék</b> fény keverékéből állítja elő – ez az <b>RGB-kód</b> (Red, Green, Blue).</li>
+<li>A <b>digitális</b> szó azt jelenti: számokkal leírható.</li>
+<li>Több képpont → szebb kép, de <b>nagyobb fájl</b> (több helyet foglal, lassabban töltődik le). Ezért a képeket <b>tömörítik</b>: <b>.jpg</b>, <b>.png</b>, <b>.gif</b>.</li>
+</ul>
+<p>A képet a telefonról USB-kábellel, memóriakártyával, Bluetooth-szal (lassú) vagy az interneten át (e-mail, felhőtárhely) juttathatjuk a számítógépre.</p></div>
+
+<div class="card"><h3>Hang és videó</h3>
+<p>🔊 <b>Hang:</b> a mikrofon a hanghullámokat számokká alakítja. A mély hang ritkább, a magas sűrűbb hullám; a hangos hang magasabb hullám. Tömörítetlen: <b>.wav</b>, tömörített: <b>.mp3</b>, <b>.ogg</b>, <b>.flac</b>.</p>
+<p>🎬 <b>Videó:</b> sok állókép gyorsan egymás után – ma általában <b>50–60 kép másodpercenként</b>. Hogy ne legyen óriási a fájl, csak minden 20–25. képet tárolnak egészben (<b>kulcsképkocka</b>), a köztes képeken csak azt, ami változott. Egy videófájlban lehet több <b>hangsáv</b> (pl. eredeti és magyar szinkron) és több <b>felirat</b> is. Gyakori kiterjesztések: <b>.mp4</b>, <b>.avi</b>.</p></div>
+
+<div class="card"><h3>Rajzolás képszerkesztővel (GIMP, Photoshop)</h3>
+<p><b>Kijelölő eszközök:</b></p>
+<ul>
+<li><b>Téglalap</b> és <b>ellipszis</b> kijelölő – téglalap, négyzet, ellipszis vagy kör alakú részhez.</li>
+<li><b>Varázspálca</b> – egy kattintással kijelöli az <b>egyforma színű</b> részt.</li>
+<li><b>Lasszó</b> – <b>szabadkézzel</b>, bármilyen alakot körberajzolhatsz vele.</li>
+</ul>
+<p><b>Rétegek:</b> olyanok, mint az egymásra tett, átlátszó lapok. Ami az egyik rétegen van, azt külön mozgathatod, méretezheted, forgathatod.</p>
+<div class="layers">
+<div style="left:0;top:0;background:#bfe3ff">Háttér (víz)</div>
+<div style="left:60px;top:26px;background:#cdeccf;opacity:.95">Növények</div>
+<div style="left:120px;top:52px;background:#ffd9a8;opacity:.95">🐠 Hal</div>
+</div>
+<p><b>Színátmenet:</b> az egyik színből fokozatosan megy át a másikba (lehet lineáris, sugaras…).</p>
+<p><b>Színkód:</b> a vörös, zöld és kék értékét írja le, tizenhatos számrendszerben:</p>
+<div class="swatches">
+<span class="sw"><i style="background:#FF0000"></i>FF0000 piros</span>
+<span class="sw"><i style="background:#00FF00"></i>00FF00 zöld</span>
+<span class="sw"><i style="background:#0000FF"></i>0000FF kék</span>
+<span class="sw"><i style="background:#000000"></i>000000 fekete</span>
+<span class="sw"><i style="background:#FFFFFF"></i>FFFFFF fehér</span>
+</div>
+<div class="tip">💡 Munka közben a program saját formátumában mentünk (ez megőrzi a rétegeket), a kész képet pedig <b>exportáljuk</b> ismert formátumba (pl. .png, .jpg).</div></div>
+`,
+  tasks:[
+    {type:"cat", q:"Kép, hang vagy videó? Tedd a kiterjesztéseket a jó dobozba!",
+     buckets:["🖼️ Kép","🔊 Hang","🎬 Videó"],
+     items:[[".jpg",0],[".png",0],[".gif",0],[".mp3",1],[".wav",1],[".ogg",1],[".mp4",2],[".avi",2]]},
+    {type:"match", q:"Párosítsd a képszerkesztő eszközt azzal, amire használjuk!",
+     pairs:[
+      ["Téglalap kijelölő","Négyzet vagy téglalap alakú részt jelöl ki."],
+      ["Ellipszis kijelölő","Kör vagy ellipszis alakú részt jelöl ki."],
+      ["Varázspálca","Egy kattintással kijelöli az egyforma színű részt."],
+      ["Lasszó","Szabadkézzel bármilyen alakot körberajzolhatsz vele."],
+      ["Réteg","Mint egy külön átlátszó lap: ami rajta van, külön mozgatható."],
+      ["Színátmenet","Az egyik színből fokozatosan megy át a másikba."]
+     ]},
+    {type:"fill", q:"Egészítsd ki a mondatokat! Ahol üres mező van, írd be a számot!",
+     html:`<p>A digitális képek apró [[0]] állnak.</p>
+<p>A gép minden színt a vörös, a zöld és a [[1]] fény keverékéből állít elő.</p>
+<p>Egy 1920 × 1080-as képen egy sorban [[2]] képpont van.</p>
+<p>Egy videóban másodpercenként 50 kép van. Egy 10 másodperces videó tehát [[3]] képből áll.</p>
+<p>Az FFFFFF színkód a [[4]] színt jelenti.</p>
+<p>A tömörített képfájl [[5]], ezért gyorsabban letöltődik.</p>`,
+     blanks:[
+      {opts:["képpontokból (pixelekből)","rétegekből","hangsávokból"],ans:"képpontokból (pixelekből)"},
+      {opts:["kék","sárga","fekete"],ans:"kék"},
+      {ans:["1920"],w:5},
+      {ans:["500"],w:5},
+      {opts:["fehér","fekete","piros"],ans:"fehér"},
+      {opts:["kisebb","nagyobb"],ans:"kisebb"}
+     ]}
+  ]
+},
+{
+  id:"s6", icon:"☁️", color:"#3c8d2f", title:"Adatok, felhő, biztonságos és egészséges eszközhasználat", time:"kb. 6 perc",
+  theory:`
+<div class="card"><h3>Adat és információ</h3>
+<p><b>Adat</b> minden, amit valamilyen <b>adathordozón</b> jelekkel rögzítünk. Adathordozó lehet a hangunk, a papír, a pendrive, az SSD, de még a füstjel is.</p>
+<p>Ha egy adatból <b>megtudunk valamit</b> (mi az, milyen, mennyi), akkor az számunkra <b>információ</b>. Az „L29b49+**?” is adat, de nekünk nem mond semmit, tehát nem információ.</p>
+<div class="remember" style="margin:8px 0 0"><b class="t">⭐ Jegyezd meg!</b>Minden információ adat, de <b>nem minden adat információ</b>.</div></div>
+
+<div class="card"><h3>Hol tárolja a gép az adatokat?</h3>
+<div class="twocol">
+<div class="mini">⚡ <b>Memória:</b> itt vannak azok az adatok, amelyekkel a gép <b>éppen most</b> dolgozik.</div>
+<div class="mini">🗄️ <b>Háttértár</b> (merevlemez, SSD, pendrive, memóriakártya): itt őrzi azt, amire <b>később</b> is szükség lesz.</div>
+</div>
+<p>A háttértáron az adatok <b>fájlokban</b> (állományokban) vannak. A fájl <b>neve</b> a tartalmára utal, a <b>kiterjesztése</b> (pl. .docx, .jpg, .mp3) pedig megmutatja, milyen adat van benne – ebből tudja a gép, <b>melyik programmal nyissa meg</b>.</p>
+<p>A fájlokat <b>mappákba</b> (régi nevükön könyvtárakba) rendezzük, és egy mappában újabb mappák is lehetnek.</p>
+<p><b>Mértékegységek</b> – mindegyik nagyjából ezerszer nagyobb az előzőnél:</p>
+<div class="stair">
+<div style="height:40px">KB</div><div style="height:62px">MB</div><div style="height:86px">GB</div><div style="height:112px">TB</div>
+</div></div>
+
+<div class="card"><h3>A felhő</h3>
+<p>A <b>felhő</b> olyan számítógépeket jelent valahol az interneten, amelyeknek a szolgáltatásait használjuk – nem tudjuk, pontosan hol vannak. A <b>felhőtárhelyre</b> feltölthetjük a fájljainkat, egy <b>linkkel megoszthatjuk</b> őket, és <b>biztonsági másolatnak</b> is jók.</p>
+<p>A „ingyenes” oldalaknak is sok pénzbe kerül a működés (gépek, áram, programozók) – ezt gyakran reklámokból fizetik.</p></div>
+
+<div class="card"><h3>Biztonságosan és etikusan</h3>
+<ul>
+<li>A regisztráció olyan, mint egy <b>szerződés</b>. 14 éves kor alatt a szülő köti meg helyetted, utána is csak <b>szülői beleegyezéssel</b> regisztrálhatsz. Egyedül ne regisztrálj sehova!</li>
+<li><b>Az internet nem felejt!</b> Ne posztold a lakcímedet, telefonszámodat, és azt se, hogy éppen hol nyaral a család.</li>
+<li>Másokról csak akkor készíthetsz fényképet, ha <b>beleegyeznek</b> – a közzétételhez pedig külön engedély kell.</li>
+<li>Bántani, sértegetni másokat az interneten is csúnya dolog. Ha téged bántanak, kérj felnőtt segítségét!</li>
+<li><b>Függőség jelei:</b> nincs más hobbija, kevesebb a barátja, dühös lesz, ha elhívják a géptől, nem bír ki egy napot internet nélkül.</li>
+</ul></div>
+
+<div class="card"><h3>Egészségesen a gép előtt (ergonómia)</h3>
+<ul>
+<li>Ülj úgy, hogy a <b>felkarod nagyjából függőleges</b> legyen, a csuklód legyen alátámasztva.</li>
+<li>Óránként legalább egyszer csinálj <b>szemtornát</b>: nézz sokfelé, és fókuszálj hol közelre, hol távolra!</li>
+<li>Időnként <b>állj fel és mozogj</b> – a test nem arra készült, hogy órákig üljön.</li>
+</ul></div>
+`,
+  tasks:[
+    {type:"sort", q:"Tedd növekvő sorrendbe a tárhelyeket! Legfelül legyen a legkisebb.", hint:"Gondolj a lépcsőre: KB → MB → GB → TB.",
+     items:["100 KB","12 MB","2 GB","1 TB"]},
+    {type:"cat", q:"Mit szabad posztolni? Tedd a kártyákat a jó dobozba!",
+     buckets:["👍 Biztonságos","🚫 Veszélyes vagy nem illik"],
+     items:[["Egy szép tájkép egy régi nyaralásról.",0],["„Holnapra szép időt mondanak.”",0],["Egy kép a felszeletelt születésnapi tortáról.",0],["A telefonszámod és a lakcímed.",1],["Egy friss kép arról, hol nyaral éppen a családod.",1],["Kép arról, ahogy egy osztálytársad alszik az órán.",1]]},
+    {type:"tf", q:"Igaz vagy hamis? Kattints a megfelelő gombra!",
+     items:[
+      ["Minden adat információ is.",false],
+      ["A háttértáron az adatok fájlokban vannak.",true],
+      ["A kiterjesztésből tudja a gép, melyik programmal nyissa meg a fájlt.",true],
+      ["12 évesen egyedül is regisztrálhatok egy közösségi oldalra.",false],
+      ["Valakiről csak akkor készíthetek fényképet, ha beleegyezik.",true],
+      ["Számítógépezés közben érdemes időnként felállni és szemtornát csinálni.",true]
+     ]}
+  ]
+}
+];
+
+/* ===================== SEGÉDEK ===================== */
+const TYPE_LABEL={match:"Párosítás",fill:"Kiegészítés",tf:"Igaz vagy hamis?",sort:"Sorba rendezés",cat:"Csoportosítás",grid:"Rajzolj a kijelzőre!"};
+const STORE="dk6-elmelet-v1";
+let store={name:"",res:{}};
+try{const s=JSON.parse(localStorage.getItem(STORE));if(s&&s.res)store=s;}catch(e){}
+function save(){try{localStorage.setItem(STORE,JSON.stringify(store));}catch(e){}}
+function el(tag,cls,html){const e=document.createElement(tag);if(cls)e.className=cls;if(html!=null)e.innerHTML=html;return e;}
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function mark(node,ok){node.classList.remove("ok","bad");node.classList.add(ok?"ok":"bad");}
+function unmark(node){node.classList.remove("ok","bad");}
+function norm(s){return String(s).toLowerCase().replace(/\s+/g,"").replace(/[–—]/g,"-");}
+function opt(sel,text){const o=document.createElement("option");o.value=text;o.textContent=text;sel.appendChild(o);}
+
+/* ===================== FELADATTÍPUSOK ===================== */
+const TYPES={
+match(t){
+  const wrap=el("div","match"+(t.layout==="cards"?" cards":""));
+  const opts=shuffle(t.pairs.map(p=>p[1]));
+  const rows=t.pairs.map(([l,r])=>{
+    const row=el("div","mrow");const left=el("div","mleft",l);
+    const sel=document.createElement("select");opt(sel,"");sel.options[0].textContent="– válassz –";
+    opts.forEach(o=>opt(sel,o));
+    sel.onchange=()=>unmark(row);
+    row.append(left,sel);wrap.append(row);return{row,sel,ans:r};
+  });
+  return{el:wrap,total:rows.length,
+    check(){let c=0;rows.forEach(r=>{const ok=r.sel.value===r.ans;mark(r.row,ok);if(ok)c++;});return c;},
+    solve(){rows.forEach(r=>{r.sel.value=r.ans;mark(r.row,true);});},
+    lock(){rows.forEach(r=>r.sel.disabled=true);}};
+},
+fill(t){
+  const wrap=el("div","fill",t.html.replace(/\[\[(\d+)\]\]/g,(m,i)=>`<span class="slot" data-i="${i}"></span>`));
+  const items=t.blanks.map((b,i)=>{
+    const slot=wrap.querySelector(`.slot[data-i="${i}"]`);let ctrl;
+    if(b.opts){ctrl=document.createElement("select");opt(ctrl,"");ctrl.options[0].textContent="…";(b.keep?b.opts:shuffle(b.opts)).forEach(o=>opt(ctrl,o));ctrl.onchange=()=>unmark(slot);}
+    else{ctrl=document.createElement("input");ctrl.type="text";ctrl.autocomplete="off";ctrl.spellcheck=false;if(b.w)ctrl.style.width=(b.w+1.5)+"em";ctrl.oninput=()=>unmark(slot);}
+    slot.appendChild(ctrl);return{slot,ctrl,b};
+  });
+  return{el:wrap,total:items.length,
+    check(){let c=0;items.forEach(({slot,ctrl,b})=>{const ok=b.opts?ctrl.value===b.ans:b.ans.some(a=>norm(a)===norm(ctrl.value));mark(slot,ok);if(ok)c++;});return c;},
+    solve(){items.forEach(({slot,ctrl,b})=>{ctrl.value=b.opts?b.ans:b.ans[0];mark(slot,true);});},
+    lock(){items.forEach(i=>i.ctrl.disabled=true);}};
+},
+tf(t){
+  const wrap=el("div","tf");
+  const rows=t.items.map(([s,a])=>{
+    const row=el("div","row");row.append(el("p","",s));
+    const o=el("div","opt");const bi=el("button","i","Igaz");const bh=el("button","h","Hamis");
+    bi.type=bh.type="button";const st={v:null};
+    const set=v=>{st.v=v;bi.classList.toggle("sel",v===true);bh.classList.toggle("sel",v===false);unmark(row);};
+    bi.onclick=()=>set(true);bh.onclick=()=>set(false);
+    o.append(bi,bh);row.append(o);wrap.append(row);return{row,st,a,set,bi,bh};
+  });
+  return{el:wrap,total:rows.length,
+    check(){let c=0;rows.forEach(r=>{const ok=r.st.v===r.a;mark(r.row,ok);if(ok)c++;});return c;},
+    solve(){rows.forEach(r=>{r.set(r.a);mark(r.row,true);});},
+    lock(){rows.forEach(r=>{r.bi.disabled=r.bh.disabled=true;});}};
+},
+sort(t){
+  const ul=el("ul","sort");const n=t.items.length;
+  let order;do{order=shuffle([...Array(n).keys()]);}while(order.every((v,i)=>v===i));
+  let marks=null,locked=false;
+  function render(){
+    ul.innerHTML="";
+    order.forEach((idx,pos)=>{
+      const li=el("li");li.append(el("span","n",pos+1),el("span","txt",t.items[idx]));
+      const mv=el("div","mv");const up=el("button","","▲");const dn=el("button","","▼");
+      up.type=dn.type="button";up.title="Feljebb";dn.title="Lejjebb";
+      up.disabled=locked||pos===0;dn.disabled=locked||pos===n-1;
+      up.onclick=()=>{[order[pos-1],order[pos]]=[order[pos],order[pos-1]];marks=null;render();};
+      dn.onclick=()=>{[order[pos+1],order[pos]]=[order[pos],order[pos+1]];marks=null;render();};
+      mv.append(up,dn);li.append(mv);
+      if(marks)mark(li,marks[pos]);
+      ul.append(li);
+    });
+  }
+  render();
+  return{el:ul,total:n,
+    check(){marks=order.map((v,i)=>v===i);render();return marks.filter(Boolean).length;},
+    solve(){order=[...Array(n).keys()];marks=order.map(()=>true);render();},
+    lock(){locked=true;render();}};
+},
+cat(t){
+  const wrap=el("div");
+  wrap.append(el("p","hint","👉 Kattints egy kártyára, aztán arra a dobozra, ahová tartozik! Ha rossz helyre tetted, kattints rá újra, és tedd át."));
+  const pool=el("div","pool");const bw=el("div","buckets");
+  const items=shuffle(t.items.map(([txt,b])=>({txt,b,place:-1,mark:null})));
+  let sel=null,locked=false;
+  const bucks=t.buckets.map((name,bi)=>{
+    const b=el("div","bucket");b.append(el("h4","",name));const body=el("div","bb");b.append(body);
+    b.onclick=()=>{if(locked||sel===null)return;items[sel].place=bi;items[sel].mark=null;sel=null;render();};
+    bw.append(b);return{b,body};
+  });
+  pool.onclick=()=>{if(locked||sel===null)return;items[sel].place=-1;items[sel].mark=null;sel=null;render();};
+  function render(){
+    pool.innerHTML="";bucks.forEach(x=>{x.body.innerHTML="";x.b.classList.toggle("ready",sel!==null);});
+    items.forEach((it,i)=>{
+      const c=el("button","chip",it.txt);c.type="button";
+      if(sel===i)c.classList.add("selected");
+      if(it.mark!==null)mark(c,it.mark);
+      c.onclick=e=>{e.stopPropagation();if(locked)return;sel=(sel===i)?null:i;render();};
+      (it.place<0?pool:bucks[it.place].body).append(c);
+    });
+  }
+  render();wrap.append(pool,bw);
+  return{el:wrap,total:items.length,
+    check(){let c=0;sel=null;items.forEach(it=>{it.mark=it.place===it.b;if(it.mark)c++;});render();return c;},
+    solve(){sel=null;items.forEach(it=>{it.place=it.b;it.mark=true;});render();},
+    lock(){locked=true;sel=null;render();}};
+},
+grid(t){
+  const wrap=el("div");const g=el("div","gridwrap");
+  g.append(el("span","lab",""));
+  for(let x=0;x<5;x++)g.append(el("span","lab","x="+x));
+  const cells={};
+  for(let y=0;y<5;y++){
+    g.append(el("span","lab","y="+y));
+    for(let x=0;x<5;x++){
+      const b=el("button");b.type="button";b.title=`(${x};${y})`;b.setAttribute("aria-label",`LED (${x};${y})`);
+      b.onclick=()=>{b.classList.toggle("on");unmark(b);};
+      cells[x+","+y]=b;g.append(b);
+    }
+  }
+  wrap.append(g,el("div","gridnote","x → jobbra nő (oszlop) &nbsp;•&nbsp; y ↓ lefelé nő (sor) &nbsp;•&nbsp; Ha az egeret egy LED fölé viszed, látod a koordinátáját."));
+  const tset=new Set(t.targets.map(([x,y])=>x+","+y));
+  return{el:wrap,total:t.targets.length,
+    check(){let hits=0,extra=0;Object.entries(cells).forEach(([k,b])=>{unmark(b);if(b.classList.contains("on")){if(tset.has(k)){hits++;mark(b,true);}else{extra++;mark(b,false);}}});return Math.max(0,hits-extra);},
+    solve(){Object.entries(cells).forEach(([k,b])=>{unmark(b);b.classList.toggle("on",tset.has(k));if(tset.has(k))mark(b,true);});},
+    lock(){Object.values(cells).forEach(b=>b.disabled=true);}};
+}
+};
+
+/* ===================== OLDALAK FELÉPÍTÉSE ===================== */
+const main=document.getElementById("main");
+const stepsNav=document.getElementById("steps");
+const TASKS=[];  // {id,secIdx,total}
+let pages=[];
+
+function buildStart(){
+  const p=el("section","page");p.id="p-start";
+  p.innerHTML=`<div class="start-card">
+  <div style="font-size:2.6rem">👋</div>
+  <h2>Digitális kultúra 6. – elméleti összefoglaló</h2>
+  <p>Ebben az anyagban a tankönyv legfontosabb elméleti részeit ismételjük át. <b>6 rész</b> vár rád, mindegyik végén néhány rövid feladattal. Az egész kb. <b>40 perc</b>.</p>
+  <div class="start-list">${SECTIONS.map((s,i)=>`<div style="background:${s.color}">${s.icon} ${i+1}. ${s.title}<small>⏱ ${s.time} • ${s.tasks.length} feladat</small></div>`).join("")}</div>
+  <p><b>Hogyan dolgozz?</b></p>
+  <ol class="stepsx" style="--c:#2f7dd1">
+   <li>Olvasd el figyelmesen a magyarázatot. A <span style="background:#fff8e1;border:1px dashed #e7b93c;border-radius:6px;padding:0 6px">⭐ Jegyezd meg!</span> dobozokra különösen figyelj!</li>
+   <li>Oldd meg a feladatokat, majd nyomd meg az <b>Ellenőrzés</b> gombot.</li>
+   <li>A <span style="color:#1f9d57;font-weight:800">zöld</span> jó, a <span style="color:#d64545;font-weight:800">piros</span> rossz. A pirosakat javítsd ki, és ellenőrizd újra! Ha másodszorra sem sikerül, megnézheted a megoldást.</li>
+   <li>A végén az <b>🏁 Eredmény</b> oldalon látod, hány pontot szereztél.</li>
+  </ol>
+  <div class="namebox"><input id="nameIn" placeholder="Írd ide a neved…" maxlength="60"><button class="btn big" id="goBtn" style="--c:#2f7dd1">Kezdjük! →</button></div>
+  </div>`;
+  main.append(p);
+  const ni=p.querySelector("#nameIn");ni.value=store.name||"";
+  ni.oninput=()=>{store.name=ni.value.trim();save();};
+  p.querySelector("#goBtn").onclick=()=>show(1);
+  return p;
+}
+
+function buildSection(s,si){
+  const p=el("section","page");p.id="p-"+s.id;p.style.setProperty("--c",s.color);
+  p.append(el("div","hero",`<div class="ico">${s.icon}</div><div class="kicker">${si+1}. rész</div><h2>${s.title}</h2><div class="meta"><span>⏱ ${s.time}</span><span>✏️ ${s.tasks.length} feladat</span></div>`));
+  p.append(el("div","",s.theory));
+  const th=el("div","taskhdr","<h3>✏️ Ellenőrizd magad!</h3>");p.append(th);
+  s.tasks.forEach((t,ti)=>p.append(buildTask(s,si,t,ti)));
+  const nav=el("div","nextnav");
+  const back=el("button","btn ghost",si===0?"← Kezdőlap":`← ${si}. rész`);back.onclick=()=>show(si);
+  const next=el("button","btn big",si===SECTIONS.length-1?"Eredmény 🏁":`Tovább: ${si+2}. rész →`);next.onclick=()=>show(si+2);
+  nav.append(back,next);p.append(nav);
+  main.append(p);
+  if(s.id==="s4"){ // micro:bit ábra
+    const f=p.querySelector("#mbfig");const lit={"0,0":"(0;0)","4,0":"(4;0)","2,2":"(2;2)","0,4":"(0;4)","4,4":"(4;4)"};
+    let h=`<div class="mb-fig"><span class="lab"></span>`;for(let x=0;x<5;x++)h+=`<span class="lab">x=${x}</span>`;
+    for(let y=0;y<5;y++){h+=`<span class="lab">y=${y}</span>`;for(let x=0;x<5;x++){const k=x+","+y;h+=`<span class="led${k in lit&&lit[k]?" on":""}">${lit[k]||""}</span>`;}}
+    f.innerHTML=h+`</div>`;
+  }
+  return p;
+}
+
+function buildTask(s,si,t,ti){
+  const id=`${s.id}-t${ti+1}`;const impl=TYPES[t.type](t);
+  const box=el("div","task");
+  const head=el("div","thead",`<span class="tnum">${ti+1}. feladat</span><span class="ttype">${TYPE_LABEL[t.type]}</span>`);
+  const pts=el("span","tpts");head.append(pts);box.append(head);
+  box.append(el("p","q",t.q));
+  if(t.hint)box.append(el("p","hint",t.hint));
+  box.append(impl.el);
+  const act=el("div","actions");const bc=el("button","btn","Ellenőrzés");const bs=el("button","btn ghost","Megoldás mutatása");bs.hidden=true;
+  act.append(bc,bs);box.append(act);const fb=el("div","fb");box.append(fb);
+  const r=store.res[id]||(store.res[id]={best:0,done:false});
+  TASKS.push({id,secIdx:si,total:impl.total});
+  let tries=0;
+  const upd=()=>{pts.textContent=`${r.best}/${impl.total} pont`;box.classList.toggle("done",!!r.done);};
+  const say=(cls,msg)=>{fb.className="fb "+cls;fb.innerHTML=msg;};
+  if(r.done)say("info",`Ezt a feladatot már befejezted (${r.best}/${impl.total} pont). Gyakorlásként újra kitöltheted.`);
+  bc.onclick=()=>{
+    tries++;const c=impl.check();r.best=Math.max(r.best,c);
+    if(c===impl.total){r.done=true;impl.lock();bc.disabled=true;bs.hidden=true;say("ok","Szuper! Minden válaszod helyes. ⭐");}
+    else{say("bad",`${c}/${impl.total} jó. A pirossal jelölteket javítsd ki, aztán ellenőrizd újra!`);if(tries>=2)bs.hidden=false;}
+    save();upd();refresh();
+  };
+  bs.onclick=()=>{impl.solve();impl.lock();r.done=true;bc.disabled=true;bs.hidden=true;
+    say("info",`Itt a helyes megoldás – nézd meg figyelmesen, és jegyezd meg! Pontod ennél a feladatnál: ${r.best}/${impl.total}`);save();upd();refresh();};
+  upd();return box;
+}
+
+function buildResults(){
+  const p=el("section","page");p.id="p-res";p.style.setProperty("--c","#2f7dd1");
+  main.append(p);return p;
+}
+function renderResults(){
+  const p=pages[pages.length-1];
+  let tot=0,max=0;
+  const rows=SECTIONS.map((s,si)=>{
+    const ts=TASKS.filter(t=>t.secIdx===si);let a=0,m=0,d=0;
+    ts.forEach(t=>{const r=store.res[t.id]||{};a+=r.best||0;m+=t.total;if(r.done)d++;});
+    tot+=a;max+=m;
+    return `<tr><td>${s.icon} ${si+1}. ${s.title}</td><td class="r">${d}/${ts.length} kész</td><td class="r"><b>${a}/${m}</b></td></tr>`;
+  }).join("");
+  const pct=max?Math.round(tot/max*100):0;
+  const undone=TASKS.filter(t=>!(store.res[t.id]||{}).done).length;
+  const msg=pct>=90?"Kiváló munka! 🏆":pct>=70?"Szép munka! 👏":pct>=50?"Jó úton jársz! Nézd át újra azokat a részeket, ahol kevesebb pontot kaptál.":"Olvasd át újra az anyagot, és próbáld meg ismét! 💪";
+  p.innerHTML=`<div class="start-card">
+   <div style="font-size:2.6rem">🏁</div>
+   <h2>Eredmény${store.name?": "+store.name.replace(/[<>&]/g,""):""}</h2>
+   <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin:10px 0"><span class="big-score">${tot}/${max}</span><span style="font-size:1.4rem;font-weight:900;color:var(--muted)">pont • ${pct}%</span></div>
+   <p style="font-weight:800;font-size:1.15rem">${msg}</p>
+   ${undone?`<p class="fb bad" style="display:block">Még ${undone} feladat nincs befejezve. Lépj vissza, és fejezd be őket!</p>`:`<p class="fb ok" style="display:block">Minden feladatot befejeztél! Mutasd meg az eredményed a tanárodnak. 🙂</p>`}
+   <table class="res-table"><tr><th>Rész</th><th class="r">Feladatok</th><th class="r">Pont</th></tr>${rows}</table>
+   <div class="actions"><button class="btn ghost" id="resetBtn">Újrakezdés</button></div>
+  </div>`;
+  const rb=p.querySelector("#resetBtn");let armed=false;
+  rb.onclick=()=>{if(!armed){armed=true;rb.textContent="Biztosan? Minden pont törlődik – kattints újra!";rb.style.background="#fdeaea";return;}
+    store={name:"",res:{}};save();location.hash="";location.reload();};
+}
+
+function buildSteps(){
+  const items=[{icon:"🏠",label:"Kezdés",c:"#2f7dd1"},...SECTIONS.map((s,i)=>({icon:s.icon,label:`${i+1}. rész`,c:s.color})),{icon:"🏁",label:"Eredmény",c:"#2f7dd1"}];
+  items.forEach((it,i)=>{
+    const b=el("button","step",`<span class="dot">${it.icon}</span>${it.label}`);b.type="button";b.style.setProperty("--c",it.c);
+    b.onclick=()=>show(i);stepsNav.append(b);
+  });
+}
+
+let current=0;
+function show(i){
+  current=i;pages.forEach((p,k)=>p.classList.toggle("show",k===i));
+  [...stepsNav.children].forEach((b,k)=>b.classList.toggle("active",k===i));
+  stepsNav.children[i].scrollIntoView({block:"nearest",inline:"center"});
+  if(i===pages.length-1)renderResults();
+  window.scrollTo({top:0,behavior:"instant"});
+}
+
+function refresh(){
+  let tot=0,max=0,done=0;
+  TASKS.forEach(t=>{const r=store.res[t.id]||{};tot+=r.best||0;max+=t.total;if(r.done)done++;});
+  document.getElementById("scorePill").textContent=`⭐ ${tot}/${max} pont`;
+  document.getElementById("bar").style.width=(TASKS.length?done/TASKS.length*100:0)+"%";
+  SECTIONS.forEach((s,si)=>{const all=TASKS.filter(t=>t.secIdx===si).every(t=>(store.res[t.id]||{}).done);
+    const b=stepsNav.children[si+1];b.classList.toggle("complete",all);b.querySelector(".dot").textContent=all?"✓":s.icon;});
+}
+
+buildSteps();
+pages.push(buildStart());
+SECTIONS.forEach((s,si)=>pages.push(buildSection(s,si)));
+pages.push(buildResults());
+refresh();show(0);
+</script>
+<p class="foot">Forrás: Digitális kultúra 6. (A) tankönyv, Nemzeti Köznevelési Portál (nkp.hu) – az elméleti részek alapján, egyszerűsítve.</p>
+<script src="../../nav.js?v=1cbefdae" defer></script>
+</body>
+</html>
