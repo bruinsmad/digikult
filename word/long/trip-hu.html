@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>/* moving between pages: the old page drifts aside and fades, the new one glides in; the rail holds still */@view-transition{navigation:auto}.rail{view-transition-name:rail}::view-transition-group(root){animation:none}::view-transition-old(root){animation:dk-out .2s cubic-bezier(.4,0,1,1) both}::view-transition-new(root){animation:dk-in .38s cubic-bezier(.16,1,.3,1) .06s both}::view-transition-old(rail),::view-transition-new(rail){animation:none}@keyframes dk-out{to{opacity:0;transform:translateX(-18px)}}@keyframes dk-in{from{opacity:0;transform:translateX(26px)}}@media (prefers-reduced-motion:reduce){::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none!important}}</style>
+<title>Osztálykirándulás a Dunakanyarban – Word-küldetés</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600;700&display=swap">
+<link rel="stylesheet" href="../doc.css">
+<link rel="stylesheet" href="../mission.css">
+<style>:root{--m:#2f5496;--m-soft:#e8eef8;--m-ink:#1f3864}
+.mock{display:inline-block;margin:6px 0;padding:8px 12px;border:1.5px solid #c8c6c4;border-radius:4px;background:#faf9f8;font:13.5px "Segoe UI",system-ui,sans-serif;color:#252423}
+.mock b{display:inline-block;min-width:110px;font-weight:600}
+.mock code{background:#fff;border:1px solid #8a8886;padding:1px 6px;border-radius:2px}</style>
+</head>
+<body>
+<header class="rail"><div class="in">
+  <a class="home" href="../../index.html">Digitális kultúra</a>
+  <span class="crumb"><a href="../../index.html#word">Szövegszerkesztés – Word</a> › <a href="../../index.html#word-long">3. lecke</a></span>
+</div></header>
+<div class="top">
+  <span class="art" aria-hidden="true"><svg viewBox="0 0 96 96"><ellipse cx="48" cy="88" rx="30" ry="5" fill="#000" opacity=".25"/>
+<path d="M16 16h30l4 4v64H16z" fill="#fffdf6" stroke="#1f3864" stroke-width="2.5"/><path d="M50 20l4-4h26v68H50" fill="#f1ede0" stroke="#1f3864" stroke-width="2.5"/>
+<path d="M22 28h18" stroke="#2f5496" stroke-width="4"/><g stroke="#1f3864" stroke-width="2" stroke-dasharray="1.5 2.5"><path d="M22 40h14M22 48h18M26 56h12M22 64h16"/></g>
+<g fill="#1f3864" font-family="Arial" font-size="6" font-weight="700"><text x="40" y="42">3</text><text x="40" y="50">4</text><text x="40" y="58">4</text><text x="40" y="66">6</text></g>
+<rect x="56" y="26" width="18" height="14" fill="#8fbf7a"/><path d="M56 46h18M56 52h18M56 58h12" stroke="#1f3864" stroke-width="2"/><text x="54" y="76" font-family="Arial" font-size="7" fill="#1f3864">¹ ………</text></svg></span>
+  <div><div class="kicker">Word, 3. lecke: küldetés a Wordben</div><h1>Osztálykirándulás a Dunakanyarban</h1></div>
+  <div class="meta"><span>Haladás <b id="solvedCount">–</b></span><span>Idő <b id="timer">0:00</b></span><button type="button" class="mbtn" id="soundBtn">Hang: be</button><button type="button" id="resetBtn" title="Az egész küldetés újrakezdése">Újrakezdés</button></div>
+</div>
+<nav class="steps" id="steps" aria-label="Fejezetek"></nav>
+<div id="game"><main>
+  <article class="card" id="case" aria-live="polite"></article>
+  <section class="work" aria-label="Előnézet"><div class="card">
+    <div class="dlcard"><svg class="ic" viewBox="0 0 40 46" aria-hidden="true"><path d="M4 2h22l10 10v32H4z" fill="#fff" stroke="#185abd" stroke-width="2"/><path d="M26 2v10h10" fill="#dbe7fb" stroke="#185abd" stroke-width="2"/><rect x="0" y="18" width="24" height="20" rx="2" fill="#185abd"/><path d="M5 23l3 10 4-8 4 8 3-10" fill="none" stroke="#fff" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/></svg><p><b>kirandulas.docx</b><br>Ebben a fájlban dolgozol, a Wordben.</p><a class="btn primary" href="kirandulas.docx" download>Letöltés</a></div>
+    <div class="work-head"><h2>Előnézet</h2><button type="button" class="tog" id="marksBtn" title="Mindent mutat" aria-pressed="false">¶<span>jelek</span></button></div>
+    <div class="doc-wrap"><div id="doc"></div></div>
+    <p class="legend"><span><i></i>A sárga részek tartoznak a mostani feladathoz.</span><span>Ahogy haladsz, itt is összeáll a beszámoló.</span></p>
+  </div></section>
+</main></div>
+<section id="endPanel" hidden></section>
+<footer class="end">Digitális kultúra. A haladásod a böngésződben marad: ha bezárod az oldalt, legközelebb innen folytathatod. A Word-fájlodat az oldal csak itt, a böngészőben nézi meg, nem küldi el sehová.</footer>
+<canvas id="fx" aria-hidden="true"></canvas>
+<script src="../docx.js"></script>
+<script src="../doc.js"></script>
+<script>
+const P = (text, x) => Object.assign({ text }, x || {});
+const OLD = "Duna kanyar", NEW = "Dunakanyar";
+const H1 = ["Indulás és hajóút", "Visegrád, a királyok városa", "Szállás a Duna kanyarban", "Szentendre"];
+const H2 = ["A hajón", "A fellegvár", "A királyi palota", "Az ifjúsági szálló", "Esti kvíz", "A skanzen", "A belváros"];
+const H1F = ["Indulás és hajóút", "Visegrád, a királyok", "Szállás a Duna", "Szentendre"], H2F = H2;   /* what the checks look for: the start of each title */
+const TEXT = {
+  indulas: "Kedd reggel nyolckor találkoztunk a Vigadó téri hajóállomásnál. A hajó lassan haladt felfelé a folyón, mi pedig a fedélzetről néztük, ahogy elmaradnak a budapesti hidak. Két és fél óra múlva értünk be a Duna kanyar szívébe.",
+  hajon: "A hajón büfé is volt, de a legtöbben a felső fedélzeten álltunk. Bence megszámolta: hat kompot és két sétahajót láttunk útközben. Sokan itt látták először közelről a Duna kanyar hegyeit.",
+  kanyar: "Tóth tanár úr közben elmesélte, hogy a folyó itt fordul dél felé, és ezért hívják ezt a vidéket kanyarnak. Ezt később a térképen is megnéztük.",
+  visegrad: "Visegrádon szálltunk ki a hajóból. A kisváros fölött magasodik a fellegvár, a hegy lábánál pedig a királyi palota maradványai állnak.",
+  var: "A hajóállomásról meredek ösvény vezet fel a fellegvárhoz. Fent szuszogva álltunk meg, de megérte: a bástyákról az egész Duna kanyar látszik. Régen itt őrizték a Szent Koronát. A vár falai között ma kiállítás mutatja be a lovagok életét.",
+  palota: "Délután a királyi palotát néztük meg, ahol egykor Mátyás király is vendégeskedett. A díszudvar szökőkútja a Duna kanyar egyik legszebb látnivalója.",
+  szallo: "Este a nagymarosi ifjúsági szállóban aludtunk, a folyó túlpartján. Komppal keltünk át, és a naplementében az egész Duna kanyar aranyszínű volt.",
+  kviz: "Vacsora után kvízt rendeztünk a nap látnivalóiról. A győztes csapat pontosan tudta, hány tornya van a fellegvárnak, a többiek inkább csak tippeltek.",
+  skanzen: "Szerdán busszal mentünk Szentendrére, a skanzenbe. Régi falusi házakat, malmot és iskolát láttunk, ahol a padokba még tintatartót süllyesztettek.",
+  belvaros: "A belvárosban marcipánt kóstoltunk, és sétáltunk a Duna-parton. Hazafelé a buszon mindenki egyetértett: a Duna kanyar szebb, mint bármelyik képeslapon!"
+};
+const FOOTNOTE = "A Szent Koronát 1440-ben innen vitte el titokban Kottanner Jánosné, a királyné udvarhölgye.";
+const CAP1 = "Hajónk a Dunán", CAP2 = "A visegrádi fellegvár a hegytetőn";
+const h1 = t => P(t, { role: "h1", b: true, size: 16, color: "#1f3864", before: 18, after: 6 });
+const h2 = t => P(t, { role: "h2", b: true, size: 13, before: 10, after: 4 });
+const body = t => P(t, { align: "both", after: 6, line: 1.15 });
+const img = (src, n) => P("", { align: "center", pic: n, img: { src, w: 8, h: 6, wrap: "inline" } });
+const at = (m, start) => m.blocks.findIndex(b => !b.type && WD.textOf(b).startsWith(start));
+const blk = (m, start) => m.blocks[at(m, start)];
+const COVER_END = "2027. április";
+
+window.MISSION = {
+  key: "trip-hu-v1", title: "Osztálykirándulás a Dunakanyarban", file: "kirandulas.docx", saveAs: "kirandulas-Kovacs-Anna.docx", fingerprint: ["Osztálykirándulás", "Kedd reggel nyolckor"],
+  confetti: ["#1f5f8b", "#6fa9c9", "#7aa86a", "#f6e08a", "#c0392b", "#d8cdb6"],
+  doc: { blocks: [
+    P("Osztálykirándulás", { align: "center", b: true, size: 28, color: "#1f5f8b", after: 10 }), P("Visegrád és Szentendre", { align: "center", size: 20, color: "#1f5f8b", after: 10 }),
+    P("Írták: a 7.B tanulói", { align: "center", size: 12, after: 10 }), P("2027. április 13–14.", { align: "center", size: 12, after: 10 }),
+    h1(H1[0]), body(TEXT.indulas), h2(H2[0]), body(TEXT.hajon), img("hajo.png", 1), body(TEXT.kanyar),
+    h1(H1[1]), body(TEXT.visegrad), h2(H2[1]), body(TEXT.var), img("fellegvar.png", 2), h2(H2[2]), body(TEXT.palota),
+    h1(H1[2]), h2(H2[3]), body(TEXT.szallo), h2(H2[4]), body(TEXT.kviz),
+    h1(H1[3]), h2(H2[5]), body(TEXT.skanzen), h2(H2[6]), body(TEXT.belvaros),
+    P("Írta és szerkesztette: a 7.B", { align: "right", i: true, before: 12 })
+  ] },
+  chapters: [
+    { refresher: true, title: "Nyisd meg a Wordöt",
+      story: `<p>Visszaértetek a kétnapos osztálykirándulásról, és az osztályfőnök kért egy <b>beszámolót</b> az iskolaújságba. Az osztály összedobta a szöveget, de mindenki másképp gépelt: a <i>Dunakanyart</i> többen két szóba írták; a fejezetek egymás után folynak, nincsenek ábrafeliratok, és még oldalszám sincs.</p>
+        <p>Ez egy <b>hosszabb dokumentum</b>, és ezekhez a Wordnek vannak okos eszközei: keresés és csere, oldaltörés, ábrafeliratok, lábjegyzet, eltérő első oldal. Ezt a küldetést a Wordben oldod meg, az oldal minden fejezet végén ellenőrzi a mentett fájlodat.</p>`,
+      learn: `<ul><li>A <b>Keresés</b> (<span class='nw'><kbd>Ctrl</kbd>+<kbd>F</kbd></span>) bal oldalt megnyitja a <span class="ui">Navigáció</span> ablakot. Írd be, mit keresel: a Word sárgával kiemeli, és kiírja, hány találat van.</li></ul>`,
+      steps: [
+        `Töltsd le a fájlt: <br><a class="btn primary" href="kirandulas.docx" download>kirandulas.docx letöltése</a>`,
+        `Nyisd meg a Wordben. Ha felül azt látod, hogy <span class=ui>Védett nézet</span>, kattints a <span class=ui>Szerkesztés engedélyezése</span> gombra.`,
+        `Mentsd el a neveddel: <span class=ui>Fájl</span> › <span class=ui>Mentés másként</span> (vagy <kbd>F12</kbd>), például <code>kirandulas-Kovacs-Anna</code>.`,
+        `Nyomd meg: <span class='nw'><kbd>Ctrl</kbd>+<kbd>F</kbd></span>, és a bal oldali keresőmezőbe írd be: <b>Duna kanyar</b> (két szóban, szóközzel).`
+      ],
+      asks: [{ q: "Hány találatot ír ki a Word a <b>Duna kanyar</b> keresésre?", num: 7,
+               traps: { "6": "Majdnem! A fejezetcímekben is benne van. Mennyit ír ki a Navigáció ablak a keresőmező alatt?", "0": "Szóközzel írd be, két szóban: Duna kanyar", "1": "A Navigáció ablakban a keresőmező alatt kiírja az összes találat számát (pl. „1/7 eredmény”). Az utolsó szám kell." },
+               wrong: "Nézd meg a keresőmező alatt: ott áll, hány eredmény van." },
+],
+      hints: ["A Keresés gombot a Kezdőlap lap jobb szélén is megtalálod (nagyító).", "A keresőmező alatt ezt látod: „1/7 eredmény”. A második szám az összes találat."],
+      success: "7 helyen van két szóban. Kézzel javítani unalmas lenne, és könnyű kihagyni egyet. A Word megcsinálja egy kattintással!" },
+
+    { title: "Keresés és csere",
+      story: `<p>A helyes írásmód <b>Dunakanyar</b>, egy szóban. A szöveg 7 helyén rosszul van. Egyenként javítani lassú, és könnyű kihagyni egyet. A <b>Csere</b> ablak mindet egyszerre kijavítja.</p>`,
+      learn: `<p>A <b>Csere</b> ablak (<span class='nw'><kbd>Ctrl</kbd>+<kbd>H</kbd></span>, vagy Kezdőlap › <span class="ui">Csere</span>):</p>
+        <div class="mock"><b>Keresett szöveg:</b> <code>Duna kanyar</code><br><b>Csere erre:</b> <code>Dunakanyar</code><br>[<span class="ui">Az összes cseréje</span>]</div>
+        <p>Az <span class="ui">Az összes cseréje</span> után a Word kiírja, hány cserét végzett. Ha nem 7-et, valamit elírtál!</p>`,
+      steps: [
+        `Nyomd meg: <span class='nw'><kbd>Ctrl</kbd>+<kbd>H</kbd></span>. Megnyílik a <span class=ui>Keresés és csere</span> ablak.`,
+        `A <span class=ui>Keresett szöveg</span> mezőbe írd: <b>Duna kanyar</b> (szóközzel).`,
+        `A <span class=ui>Csere erre</span> mezőbe írd: <b>Dunakanyar</b> (egy szóban).`,
+        `Kattints <span class=ui>Az összes cseréje</span> gombra. A Word kiírja: <i>7 csere történt.</i> Zárd be az ablakot.`,
+        `Mentsd el (<span class='nw'><kbd>Ctrl</kbd>+<kbd>S</kbd></span>), és ellenőrizd.`
+      ],
+      goals: [
+        { label: "Nincs több „Duna kanyar” (két szóban)", type: "textCount", text: OLD, max: 0, maxMsg: "Még {n} helyen szerepel két szóban: „Duna kanyar”. Nyisd meg a Csere ablakot (Ctrl+H), és nyomd meg Az összes cseréje gombot.",
+          apply: m => m.blocks.forEach(b => { if (!b.type && WD.textOf(b).includes(OLD)) { b.text = WD.textOf(b).split(OLD).join(NEW); b.runs = null; } }),
+          target: m => m.blocks.forEach(b => { if (!b.type && WD.textOf(b).includes(OLD)) b.target = true; }) },
+        { label: "„Dunakanyar” mind a 7 helyen", type: "textCount", text: NEW, min: 7, minMsg: "„Dunakanyar” csak {n} helyen szerepel, pedig 7 kellene. Nézd meg, jól írtad-e be a Csere erre mezőbe (egy szóban, szóköz nélkül).", apply: () => {}, target: () => {} }
+      ],
+      hints: ["Ha a Word 0 cserét írt ki: nézd meg, jól írtad-e a Keresett szöveget (Duna, nagy D, utána szóköz, kanyar).", "Ha elrontottad, a Ctrl+Z egyetlen lépésben visszavonja az összes cserét."],
+      success: "7 csere egy kattintással. Így javítanak a profik egy 100 oldalas könyvben is." },
+
+    { title: "Borító és új oldalak",
+      story: `<p>A beszámoló első oldala legyen a <b>borító</b>: csak a cím és a szerzők. Utána minden fejezet <b>új oldalon</b> kezdődjön, ahogy a könyvekben. Sok Enterrel ne próbálkozz: amint valaki beír egy mondatot, minden elcsúszik.</p>`,
+      learn: `<ul><li>Az <b>oldaltörés</b> (<span class='nw'><kbd>Ctrl</kbd>+<kbd>Enter</kbd></span>, vagy Beszúrás › <span class="ui">Oldaltörés</span>) után mindig új oldal kezdődik. Ez a 2. leckéből már ismerős.</li><li>A ¶ gombbal látod is: <code>·····Oldaltörés·····</code></li><li>A <span class="ui">Navigáció</span> ablak <span class="ui">Oldalak</span> fülén kicsiben látod az összes oldalt: így gyorsan ellenőrizheted, hol kezdődnek a fejezetek.</li></ul>`,
+      steps: [
+        `Kattints a borító utolsó sorának végére (<i>2027. április 13–14.</i>), és nyomd meg: <span class='nw'><kbd>Ctrl</kbd>+<kbd>Enter</kbd></span>. Az <b>${H1[0]}</b> átugrik a 2. oldalra.`,
+        `Kattints a <b>${H1[1].replace(OLD, NEW)}</b> fejezetcím elejére, és nyomd meg: <span class='nw'><kbd>Ctrl</kbd>+<kbd>Enter</kbd></span>.`,
+        `Ugyanígy az <b>${H1[2]}</b> és az <b>${H1[3]}</b> elé.`,
+        `Kapcsold be a ¶ gombot, és nézd meg: négy <i>Oldaltörés</i> van a dokumentumban, és egyik fejezet előtt sincs üres sor. Mentsd el, és ellenőrizd.`
+      ],
+      goals: [
+        { label: "Oldaltörés a borító után", type: "pageBreakBefore", find: H1[0],
+          apply: m => H1F.forEach(h => { const k = at(m, h); if (k >= 0) m.blocks.splice(k, 0, { type: "break" }); }),
+          target: m => { blk(m, COVER_END).target = true; } },
+        { label: "A többi 3 fejezet is új oldalon kezdődik", type: "pageBreakBefore", find: H1F.slice(1), apply: () => {}, target: m => H1F.slice(1).forEach(h => { const x = blk(m, h); if (x) x.target = true; }) }
+      ],
+      hints: ["Ha a Ctrl+Enter után egy üres sor maradt a fejezetcím fölött, töröld ki: a ¶ gombbal látod.", "Ha a fejezetcím a régi oldal aljára került és alatta van az oldaltörés: kattints a cím elé (nem mögé), és ott nyomd meg a Ctrl+Enter-t."],
+      success: "Borító, és minden fejezet új oldalon. Akármit írsz bele, a fejezetek az oldalak tetején maradnak." },
+
+    { title: "Ábrafeliratok",
+      story: `<p>A két kép alá <b>felirat</b> kell, mint a tankönyvekben: <i>1. ábra</i>, <i>2. ábra</i>. A sorszámot nem írod be: a Word számozza az ábrákat. Ha később beszúrsz elé egy új képet, a számok maguktól frissülnek.</p>`,
+      learn: `<p>Kattints a képre › <span class="ui">Hivatkozások</span> lap › <span class="ui">Felirat beszúrása</span>. A <span class="ui">Felirat</span> mezőben már ott a sorszám (pl. <i>1. ábra</i>): írd utána a kép leírását. A <span class="ui">Címke</span> legyen <b>ábra</b>, a <span class="ui">Pozíció</span>: <b>A kijelölt elem alá</b>.</p>`,
+      steps: [
+        `Kattints a hajó képére. <span class=ui>Hivatkozások</span> › <span class=ui>Felirat beszúrása</span>.`,
+        `A Felirat mezőben ezt látod: <i>1. ábra</i>. Írd utána: <b>: ${CAP1}</b>, és kattints az <span class=ui>OK</span> gombra.`,
+        `Ugyanígy a fellegvár képe alá: <b>: ${CAP2}</b>. (A Word magától <i>2. ábra</i> lesz.)`,
+        `Mentsd el, és ellenőrizd.`
+      ],
+      goals: [{ label: "Feliratok a két kép alatt (a Word sorszámával)", type: "captions", items: [CAP1, CAP2],
+        apply: m => m.blocks.slice().forEach(b => { if (b.pic) { const k = m.blocks.indexOf(b); m.blocks.splice(k + 1, 0, P(`${b.pic}. ábra: ${b.pic === 1 ? CAP1 : CAP2}`, { style: "caption", align: "center" })); } }),
+        target: m => m.blocks.forEach(b => { if (b.pic) b.target = true; }) }],
+      hints: ["Ha a Címke listában nincs „ábra”: kattints az Új címke gombra, és írd be: ábra.", "Ha a feliratot kézzel írtad be, az ellenőrzés jelzi: töröld ki, és szúrd be a Felirat beszúrása gombbal."],
+      success: "1. ábra, 2. ábra: a Word számolja. Egy 30 képes kiselőadásnál ez aranyat ér." },
+
+    { title: "Lábjegyzet",
+      story: `<p>Kevesen tudják, hogyan tűnt el egyszer a Szent Korona a visegrádi fellegvárból. Egy rövid magyarázat jól jönne, de a mondat közepén megakasztaná az olvasást. Erre való a <b>lábjegyzet</b>: egy kis szám a mondat végén, és a magyarázat az oldal alján.</p>`,
+      learn: `<p>Kattints oda, ahová a kis szám kerüljön › <span class="ui">Hivatkozások</span> › <span class="ui">Lábjegyzet beszúrása</span>. A Word beteszi a számot, és az oldal aljára ugrik: ott írd be a magyarázatot. A lábjegyzeteket is a Word számozza.</p>`,
+      steps: [
+        `Keresd meg a <b>fellegvárról</b> szóló részben ezt a mondatot: <i>Régen itt őrizték a Szent Koronát.</i> Kattints közvetlenül a pont <b>után</b>.`,
+        `<span class=ui>Hivatkozások</span> › <span class=ui>Lábjegyzet beszúrása</span>.`,
+        `Az oldal alján ezt írd be: <b>${FOOTNOTE}</b>`,
+        `Mentsd el, és ellenőrizd.`
+      ],
+      goals: [{ label: "Lábjegyzet a Szent Koronánál, a mintában lévő szöveggel", type: "footnote", near: "őrizték a Szent Koronát", contains: "1440",
+        apply: m => { blk(m, "A hajóállomásról").fn = FOOTNOTE; }, target: m => { blk(m, "A hajóállomásról").target = true; } }],
+      hints: ["A lábjegyzet billentyűvel is beszúrható: Ctrl+Alt+F.", "Ha rossz helyre került: kattints az oldal alján a lábjegyzet számára jobb gombbal… egyszerűbb: a szövegben jelöld ki a kis számot, és nyomd meg a Delete billentyűt. A lábjegyzet vele együtt törlődik."],
+      success: "A kis szám a mondat végén, a magyarázat az oldal alján, ahogy a tankönyvekben." },
+
+    { title: "Élőfej és élőláb",
+      story: `<p>Az utolsó simítás: minden oldal tetején legyen ott a beszámoló címe, alján az oldalszám. De a <b>borítón ne</b>: azon csak a cím és a szerzők legyenek. Erre való az <b>Első oldal eltérő</b> beállítás.</p>`,
+      learn: `<p>Az <span class="ui">Élőfej és élőláb</span> lapon (dupla kattintás az oldal tetejére) van egy jelölőnégyzet: <span class="ui">Első oldal eltérő</span>. Ha bepipálod, az első oldal élőfeje és élőlába külön van: üresen hagyhatod, a többi oldalé pedig mindenhol ugyanaz.</p>`,
+      steps: [
+        `Kattints duplán a <b>2. oldal</b> legtetejére, a felső margóba.`,
+        `Az <span class=ui>Élőfej és élőláb</span> lapon pipáld be: <span class=ui>Első oldal eltérő</span>.`,
+        `A 2. oldal élőfejébe írd be: <b>Osztálykirándulás – 7.B</b>, és tedd középre.`,
+        `Még mindig a 2. oldalon: <span class=ui>Oldalszám</span> › <span class=ui>Lap alja</span> › <span class=ui>Egyszerű szám 2</span>.`,
+        `Görgess fel a borítóra: ott ne legyen se élőfej, se oldalszám. Lépj ki az élőfejből (dupla kattintás a szövegre), mentsd el, és ellenőrizd.`
+      ],
+      goals: [
+        { label: "Élőfej: Osztálykirándulás – 7.B", type: "header", contains: "Osztálykirándulás", apply: m => { m.header = "Osztálykirándulás – 7.B"; }, target: m => { if (m.header == null) m.header = ""; m.headerTarget = true; } },
+        { label: "Élőláb: oldalszám", type: "footerPage", apply: m => { m.footerPage = true; }, target: m => { if (!m.footerPage) m.footer = ""; m.footerTarget = true; } },
+        { label: "A borítón nincs élőfej és oldalszám (Első oldal eltérő)", type: "titlePage", emptyFirst: true, apply: m => { m.titlePg = true; }, target: () => {} }
+      ],
+      hints: ["Ha a borítón is megjelent az oldalszám: kattints duplán a borító aljára, jelöld ki a számot, és töröld. Ha az Első oldal eltérő be van pipálva, a többi oldalon megmarad.", "Ha az élőfejet a borítóra írtad, és a 2. oldalon üres: írd be a 2. oldalon is, a borítóról pedig töröld."],
+      success: "A borító tiszta, a többi oldalon cím és oldalszám. Kész a beszámoló!" },
+
+    { title: "Beadás", upload: true,
+      story: `<p>Kész a beszámoló! Mielőtt bekerül az iskolaújságba, az oldal <b>még egyszer átnézi az egész fájlt</b>.</p>`,
+      steps: [
+        `Mentsd el a fájlt: <span class='nw'><kbd>Ctrl</kbd>+<kbd>S</kbd></span>.`,
+        `Kattints az Ellenőrzés gombra (vagy húzd ide újra a fájlt). Ha valami piros, javítsd ki a Wordben, mentsd el, és ellenőrizd újra.`
+      ],
+      success: "Minden a helyén! A beszámoló mehet az iskolaújságba." }
+  ],
+  ending: {
+    title: "Mehet az újságba!",
+    text: `<p>A beszámoló úgy néz ki, mint egy nyomtatott kiadvány: borító, új oldalon kezdődő fejezetek, számozott ábrák, lábjegyzet, élőfej és oldalszám, a borító kivételével. És a Dunakanyar mind a hét helyen helyesen szerepel.</p>
+      <p>Ezek az eszközök minden hosszabb munkánál jól jönnek: kiselőadásnál, projektmunkánál, később a szakdolgozatnál is.</p>`,
+    rank: (min, hints) => hints === 0 ? "Rang: Főszerkesztő. Egyetlen segítség nélkül!" : hints <= 3 ? "Rang: Profi tördelő" : "Rang: Ügyes szerkesztő. Legközelebb kevesebb segítséggel is menni fog!"
+  }
+};
+</script>
+<script src="../real.js"></script>
+<script src="../../nav.js?v=1cbefdae" defer></script>
+</body>
+</html>

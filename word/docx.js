@@ -211,6 +211,14 @@
       const sp = kid(pPr, "sectPr"), stype = sp && val(kid(sp, "type"));
       const sectBreak = !!sp && stype !== "continuous";
       /* fields (TOC, SEQ for captions, PAGE…) and footnote marks in this paragraph */
+      const fp = kid(pPr, "framePr"), dropCap = fp ? attr(fp, "dropCap") : null;
+      /* tab stops: direct ones win over the style's; "clear" removes one */
+      const tabMap = new Map();
+      [...sChain.slice().reverse().map(x => x.pPr), pPr].forEach(src => kids(kid(src, "tabs"), "tab").forEach(t => {
+        const pos = num(attr(t, "pos")); if (pos === undefined) return;
+        if (attr(t, "val") === "clear") tabMap.delete(pos); else tabMap.set(pos, { align: { start: "left", end: "right" }[attr(t, "val")] || attr(t, "val"), pos: cm(pos), leader: attr(t, "leader") || "none" });
+      }));
+      const tabs = [...tabMap.values()].sort((a, b) => a.pos - b.pos);
       const fields = [...desc(p, "instrText").map(t => t.textContent), ...desc(p, "fldSimple").map(f => attr(f, "instr") || "")].map(x => x.trim()).filter(Boolean);
       const footnotes = desc(p, "footnoteReference").map(f => attr(f, "id"));
 
@@ -247,7 +255,7 @@
       const styleNames = sChain.map(x => x.name);
       /* lines of a table of contents repeat the headings' text: they are marked, so text searches skip them */
       const isToc = !!ctx.inToc || styleNames.some(n => /^(toc \d|contents \d|toc heading|contents heading)$/.test(n)) || fields.some(f => /^TOC\b/i.test(f));
-      return { text, norm: normText(text), style: sid, styleNames, isToc, fields, footnotes, align: jc, ind: { left: cm(left), right: cm(right), firstLine: cm(fl - hg) },
+      return { text, norm: normText(text), style: sid, styleNames, isToc, fields, footnotes, dropCap: dropCap && dropCap !== "none" ? dropCap : null, tabs, section: ctx.secRef ? ctx.secRef.n : 0, align: jc, ind: { left: cm(left), right: cm(right), firstLine: cm(fl - hg) },
         before: before / 20, after: after / 20, line: rule === "auto" ? (lineRaw || 240) / 240 : (lineRaw || 240) / 20, lineRule: rule,
         list, runs, box, drawings, pageBreak, sectBreak, pageBreakEnd: pageBreak && pageBreakAt >= text.trimEnd().length, pageBreakBefore: !!on(pb),
         inTable: !!ctx.inTable, table: ctx.table, row: ctx.row };
@@ -267,7 +275,7 @@
     function walk(el, ctx) {
       Array.from(el.children).forEach(c => {
         if (c.namespaceURI !== W) return;
-        if (c.localName === "p") paras.push(paraInfo(c, ctx));
+        if (c.localName === "p") { paras.push(paraInfo(c, ctx)); if (kid(kid(c, "pPr"), "sectPr") && ctx.secRef) ctx.secRef.n++; }
         else if (c.localName === "tbl") tableInfo(c, ctx);
         else if (c.localName === "sdt") {
           const sc = kid(c, "sdtContent"), gal = desc(kid(c, "sdtPr"), "docPartGallery")[0];
@@ -283,13 +291,18 @@
       const ti = tables.length, info = { rows: [], nCols: kids(kid(t, "tblGrid"), "gridCol").length, headBold: false, headShaded: false };
       tables.push(info);
       const tChain = chain(ts);
+      info.cells = [];
       kids(t, "tr").forEach((tr, ri) => {
-        const row = [];
+        const row = [], crow = [];
+        info.cells.push(crow);
         kids(tr, "tc").forEach(tc => {
           const start = paras.length;
-          walk(tc, { inTable: true, table: ti, row: ri, tblStyle: ts, firstRow: ri === 0 && firstOn });
+          walk(tc, { inTable: true, table: ti, row: ri, tblStyle: ts, firstRow: ri === 0 && firstOn, secRef: ctx.secRef });
           const ps = paras.slice(start);
           row.push(ps.map(p => p.text).join("\n"));
+          const tcPr = kid(tc, "tcPr");
+          crow.push({ text: ps.map(p => p.text).join("\n"), span: num(val(kid(tcPr, "gridSpan"))) || 1, vmerge: !!kid(tcPr, "vMerge"),
+            align: (ps.find(p => p.text.trim()) || ps[0] || {}).align || "left", valign: val(kid(tcPr, "vAlign")) || "top" });
           if (ri === 0) {
             const tcShd = kid(kid(tc, "tcPr"), "shd");
             const styled = tChain.some(s => (firstOn && s.cond.firstRow && s.cond.firstRow.tcPr && realFill(attr(kid(s.cond.firstRow.tcPr, "shd"), "fill"))) || (s.tcPr && realFill(attr(kid(s.tcPr, "shd"), "fill"))));
@@ -303,8 +316,11 @@
       });
       if (!info.nCols) info.nCols = Math.max(0, ...info.rows.map(r => r.length));
     }
-    walk(body, {});
+    walk(body, { secRef: { n: 0 } });
     for (let k = paras.length - 1; k >= 0; k--) if (!paras[k].inTable) { paras[k].last = true; break; }
+    /* a drop cap is a paragraph of its own holding the first letter: give the letter back to the next paragraph
+       for text searches, and keep the one-letter paragraph out of them */
+    paras.forEach((p, k) => { if (p.dropCap && paras[k + 1]) { const n = paras[k + 1]; n.norm = normText(p.text.trim() + n.text); n.dcLetter = p.text.trim(); p.isDropCap = true; } });
 
     /* page setup, header, footer (all sections) */
     const sects = desc(body, "sectPr"), sect = sects[sects.length - 1];
@@ -316,9 +332,14 @@
         width: cm(g(sz, "w", 11906)), height: cm(g(sz, "h", 16838)) };
       pg.landscape = attr(sz, "orient") === "landscape" || pg.width > pg.height;
       pg.titlePg = !!on(kid(sp, "titlePg"));
+      const cols = kid(sp, "cols"); pg.cols = Math.max(1, num(attr(cols, "num")) || kids(cols, "col").length || 1);
+      pg.borders = !!kid(sp, "pgBorders") && Array.from(kid(sp, "pgBorders").children).some(c => !/^(nil|none)$/.test(val(c) || ""));
       return pg;
     };
     const page = pageOf(sect), sections = sects.map(pageOf);
+    paras.forEach(p => { p.cols = (sections[p.section] || page).cols; });
+    /* text boxes (wps text boxes and old VML ones; Word writes both, so the same text may come twice) */
+    const textboxes = [...new Set(desc(docX, "txbxContent").map(x => desc(x, "p").map(q => desc(q, "t").map(t => t.textContent).join("")).join("\n").trim()))].filter(Boolean);
     /* header/footer text and page-number field; the first-page ones ("Első oldal eltérő") are kept apart */
     const hf = async kind => {
       const out = { text: "", page: false, first: { exists: false, text: "", page: false } };
@@ -341,7 +362,7 @@
     const fnX = await parse("word/footnotes.xml"), notes = {};
     if (fnX) desc(fnX, "footnote").forEach(f => { const t = attr(f, "type"); if (t && t !== "normal") return; notes[attr(f, "id")] = desc(f, "t").map(x => x.textContent).join("").trim(); });
     const text = paras.filter(p => !p.isToc).map(p => p.text).join("\n");
-    return { paras, tables, images, page, sections, text, notes, header: await hf("header"), footer: await hf("footer") };
+    return { paras, tables, images, page, sections, text, notes, textboxes, header: await hf("header"), footer: await hf("footer") };
   }
 
   /* ---------- checking ---------- */
@@ -356,7 +377,7 @@
   const near = (a, b, tol) => Math.abs(a - b) <= tol;
 
   function findParas(doc, find, opts = {}) {
-    const list = doc.paras.filter(p => (opts.inTable ? true : !p.inTable) && !p.isToc);
+    const list = doc.paras.filter(p => (opts.inTable ? true : !p.inTable) && !p.isToc && !p.isDropCap);
     const f = normText(find);
     return list.filter(p => opts.exact ? p.norm === f : p.norm.startsWith(f) || (opts.contains && p.norm.includes(f)));
   }
@@ -367,6 +388,14 @@
     const runs = p.runs.filter(r => r.text.trim());
     if (w.noLeading && /^[ \t\u00a0]/.test(p.text)) return w.noLeadingMsg || "{P} elején még szóközök vannak. Töröld ki őket: az igazítás a gombok dolga!";
     if (w.noPrefix && new RegExp(w.noPrefix).test(p.text.replace(/^[ \t]+/, ""))) return "{P} " + (w.noPrefixMsg || "elején még ott van a kézzel beírt jel. Töröld ki!");
+    if (w.cols !== undefined && p.cols !== w.cols) return w.cols === 1 ? `{P} most ${p.cols} hasábos, pedig a teljes szélességben kell maradnia. Csak a cikkeket jelöld ki, amikor hasábokra bontasz.` : `{P} még nem ${w.cols === 2 ? "két" : w.cols} hasábos. Jelöld ki a cikkeket, és Elrendezés › Hasábok › ${w.cols === 2 ? "Kettő" : w.cols}.`;
+    if (w.tab) {
+      if (!p.text.includes("\t")) return "{P} sorában nincs tabulátor (→). Töröld ki a szóközöket a két rész között, és nyomj egy Tab-ot.";
+      const t = p.tabs.find(t => t.align === w.tab.align && (!w.tab.minPos || t.pos >= w.tab.minPos - 0.05) && (!w.tab.maxPos || t.pos <= w.tab.maxPos + 0.05));
+      const ALN = { left: "balra igazító", right: "jobbra igazító", center: "középre igazító", decimal: "decimális" };
+      if (!t) return p.tabs.length ? `{P} tabulátora ${p.tabs.map(t => `${fmtNum(t.pos)} cm, ${ALN[t.align] || t.align}`).join("; ")}. ${ALN[w.tab.align]} tabulátor kell${w.tab.minPos ? ` (legalább ${fmtNum(w.tab.minPos)} cm-nél)` : ""}.` : `{P} sorában még nincs beállított tabulátor. Kezdőlap › Bekezdés ablak › Tabulátorok…`;
+      if (w.tab.leader && t.leader !== w.tab.leader) return `{P} tabulátorának még nincs pontozott kitöltése. A Tabulátorok ablakban a Kitöltésnél válaszd a pontozottat (2 ....).`;
+    }
     if (w.style && !(p.styleNames || []).includes(w.style)) return `{P} még nem ${STYLE[w.style] || w.style} stílusú. Kattints bele, és a Kezdőlap › Stílusok közül válaszd ${az(STYLE[w.style] || w.style)} ${STYLE[w.style] || w.style} stílust.`;
     if (w.align && p.align !== w.align) return `{P} most ${ALIGN[p.align] || p.align}. Kattints bele, és nyomd meg ${az(BTN[w.align])} ${BTN[w.align]} gombot.`;
     if (w.list && p.list !== w.list) return p.list ? (w.list === "bullet" ? "{P} számozott lista lett, de felsorolás (pöttyös lista) kell." : "{P} felsorolás lett, de számozás kell.") : (w.list === "bullet" ? "{P} még nem felsorolás." : "{P} még nincs számozva.");
@@ -441,6 +470,16 @@
       const miss = (goal.contains || []).find(c => !all.includes(normText(c)));
       if (miss) return one(false, `A táblázatból még hiányzik ez: „${miss}”. Nézd meg a mintát!`);
       if (goal.first && !normText(t.rows[0][0] || "").startsWith(normText(goal.first))) return one(false, `A táblázat bal felső cellájába ez kell: „${goal.first}”.`);
+      if (goal.mergedTitle) {
+        const r0 = t.cells[0] || [];
+        if (r0.length > 1 && !(r0.length === 1 || r0[0].span >= t.nCols)) return one(false, `A táblázat első sorában még ${r0.length} külön cella van. Jelöld ki az egész első sort, és Elrendezés › Cellák egyesítése.`);
+        if (!normText(r0[0] ? r0[0].text : "").includes(normText(goal.mergedTitle))) return one(false, `Az egyesített első cellában ez kell legyen: „${goal.mergedTitle}”.`);
+        if (goal.titleAlign && r0[0].align !== goal.titleAlign) return one(false, "Az egyesített cím még nincs középre igazítva a cellában.");
+      }
+      if (goal.colAlign) {
+        const bad = t.cells.slice(goal.colAlign.fromRow || 1).find(r => r.length >= t.nCols && r[goal.colAlign.col] && r[goal.colAlign.col].text.trim() && !goal.colAlign.align.includes(r[goal.colAlign.col].align));
+        if (bad) return one(false, `${goal.colAlign.name || "Az oszlop"} celláiban a számok még nincsenek ${goal.colAlign.align[0] === "center" ? "középre" : "jobbra"} igazítva (pl. „${short(bad[goal.colAlign.col].text)}”). Jelöld ki az oszlopot, és igazítsd.`);
+      }
       if (goal.headBold && !t.headBold) return one(false, "Az első sor (a fejléc) még nem félkövér.");
       if (goal.headShaded && !t.headShaded) return one(false, "Az első sornak még nincs háttérszíne. Jelöld ki az első sort, és Táblázattervezés › Mintázat (Árnyékolás).");
       return one(true);
@@ -472,6 +511,22 @@
         enters++;
       }
       return one(ok, enters > 1 ? `${Az(goal.find)} „${short(goal.find)}” előtt ${enters} üres bekezdés van, de nincs oldaltörés. Töröld ki az üres sorokat, és tegyél oda oldaltörést: Ctrl+Enter.` : `${Az(goal.find)} „${short(goal.find)}” előtt még nincs oldaltörés. Kattints a szó elé, és nyomd meg: Ctrl+Enter.`);
+    }
+    if (T === "dropCap") {
+      const ps = doc.paras.filter(p => !p.inTable);
+      const k = ps.findIndex(p => p.dropCap);
+      if (k < 0) return one(false, "Még nincs iniciálé. Kattints a cikk első bekezdésébe › Beszúrás › Iniciálé › Süllyesztett.");
+      const next = ps.slice(k + 1).find(p => p.text.trim());
+      const joined = next ? next.norm : normText(ps[k].text);
+      if (!joined.startsWith(normText(goal.find).slice(0, 25))) return one(false, `Az iniciálé nem ${az(goal.find)} „${short(goal.find)}” bekezdésnél van. Vond vissza (Ctrl+Z), és a cikk első bekezdésénél szúrd be.`);
+      if (goal.mode && ps[k].dropCap !== goal.mode) return one(false, "Az iniciálé a margóra került. A Süllyesztett változat kell (a betű a szövegbe süllyed).");
+      return one(true);
+    }
+    if (T === "textbox") {
+      const box = (doc.textboxes || []).find(t => normText(t).includes(normText(goal.contains)));
+      if (!box) return one(false, (doc.textboxes || []).length ? `Van szövegdobozod, de nincs benne ez: „${short(goal.contains)}”. Másold (vagy vágd ki) a hirdetés szövegét, és illeszd be a dobozba.` : "Még nincs szövegdoboz. Beszúrás › Szövegdoboz › Egyszerű szövegdoboz.");
+      if (goal.moved && doc.paras.some(p => p.norm.includes(normText(goal.contains)))) return one(false, "A hirdetés szövege a dobozban is ott van, és a cikkek között is. A régit töröld ki a szövegből (a dobozba áthelyezni kell, nem másolni).");
+      return one(true);
     }
     if (T === "textCount") {
       /* how often a phrase occurs (Keresés és csere) */

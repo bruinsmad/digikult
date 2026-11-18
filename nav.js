@@ -679,6 +679,19 @@
                 files: { hu: "word/long/report-hu.html" },
                 cover: "word/long/turistahaz.png",
                 progress: { chapters: 6, keys: { hu: "report-hu-v2" } }
+              },
+              {
+                id: "trip",
+                kind: "story",
+                minutes: 50,
+                title: { hu: "Osztálykirándulás a Dunakanyarban", en: "Class Trip to the Danube Bend" },
+                desc: {
+                  hu: "Még egy gyakorló küldetés ugyanezekkel a feladatokkal: csere, borító, új oldalon kezdődő fejezetek, ábrafeliratok, lábjegyzet és eltérő első oldal, a Wordben.",
+                  en: "One more practice mission with the same tasks: replace, a cover, chapters on new pages, captions, a footnote and a different first page, in Word."
+                },
+                files: { hu: "word/long/trip-hu.html" },
+                cover: "word/long/fellegvar.png",
+                progress: { chapters: 6, keys: { hu: "trip-hu-v1" } }
               }
             ]
           }

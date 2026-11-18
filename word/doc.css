@@ -96,3 +96,15 @@ table.wd-target{box-shadow:0 0 0 4px #fff3b0}
 .wd-pg .wd-body{min-height:0}
 .wd-pg{display:flex;flex-direction:column}
 .wd-pg>.wd-notes{margin-top:auto}
+/* newspaper: columns, drop cap, tab stops, text box */
+.wd-cols{column-count:2;column-gap:.75cm;margin:4px 0}
+.wd-cols.rule{column-rule:1px solid #555}
+.wd-cols>*{break-inside:avoid-column}
+.wd-cols>.wd-p{break-inside:auto}
+.wd-dc{float:left;font-size:3.6em;line-height:.82;margin:.06em .08em 0 0;font-weight:400}
+.wd-tab{display:inline-block;width:1.25cm}
+.wd-p.tabbed{display:flex;align-items:baseline;text-indent:0}
+.wd-p.tabbed .wd-lead{flex:1;margin:0 3px}
+.wd-p.tabbed .wd-lead.dot{border-bottom:2px dotted #444;transform:translateY(-3px)}
+.wd-p.tbox{float:right;width:6.2cm;margin:4px 0 6px 12px;padding:6px 8px;border:1.5px solid #333;box-shadow:2px 2px 0 rgba(0,0,0,.15);background:#fff}
+.wd-dc.margin{width:0;margin-left:-.72em;margin-right:.72em}

@@ -8,7 +8,9 @@
              before, after (pt), line (×), list: "bullet"|"number", box, shade, b, i, size, color (defaults for runs),
              target (yellow), img: { src, w, h (cm), wrap: inline|square|tight|topAndBottom|behind|front, side },
              style: "h1"|"h2"|"title"|"caption" (Word's built-in look), fn: "footnote text" (a numbered footnote at the end) }
-   more blocks: { type: "toc", entries: [{ text, level, page }], stale } ; model.titlePg: no header/footer on page 1 */
+   more blocks: { type: "toc", entries: [{ text, level, page }], stale } ; model.titlePg: no header/footer on page 1
+   newspaper: para.cols = 2 (runs of such blocks flow in two columns), para.dropCap, para.tabRight: { leader: "dot" } (text "a\tb"),
+              para.textbox (a bordered box floated right), table.merge0 (first row is one cell), table.colAlign: { col, align } */
 (function () {
   "use strict";
   const CM = 37.8, PT = 96 / 72;
@@ -24,7 +26,8 @@
     if (b) st.push("font-weight:700"); if (i) st.push("font-style:italic"); if (u) st.push("text-decoration:underline");
     if (color) st.push(`color:${color}`);
     let t = esc(r.t);
-    if (marks) t = t.replace(/ /g, '<span class="sp"> </span>').replace(/\t/g, '<span class="tb">\t</span>');
+    if (marks) t = t.replace(/ /g, '<span class="sp"> </span>').replace(/\t/g, '<span class="tb wd-tab">\t</span>');
+    else t = t.replace(/\t/g, '<span class="wd-tab"></span>');
     return `<span class="w" data-w="${k}" style="${st.join(";")}">${t}</span>`;
   }
   const STYLES = { h1: { size: 16, color: "#2f5496", before: 12, after: 0 }, h2: { size: 13, color: "#2f5496", before: 2, after: 0 },
@@ -46,8 +49,15 @@
     if (p.target) cls.push("wd-target");
     const marker = p.list ? `<span class="mk" style="width:${0.63 * CM}px">${p.list === "bullet" ? "•" : num + "."}</span>` : "";
     const img = p.img ? imgHtml(p.img) : "";
-    const runs = runsOf(p);
-    const inner = runs.map((r, k) => runHtml(p, r, k, marks)).join("");
+    let runs = runsOf(p), dc = "";
+    if (p.dropCap) { const t = textOf(p); dc = `<span class="wd-dc${p.dropCap === "margin" ? " margin" : ""}" style="color:${p.dcColor || "inherit"}">${esc(t.charAt(0))}</span>`; runs = tokens(t.slice(1)).map(t => ({ t })); }
+    let inner = dc + runs.map((r, k) => runHtml(p, r, k, marks)).join("");
+    if (p.tabRight && textOf(p).includes("\t")) {
+      const [a, ...rest] = textOf(p).split("\t"), tb = marks ? '<span class="tb">\t</span>' : "";
+      inner = `<span>${esc(a)}</span>${tb}<span class="wd-lead ${p.tabRight.leader || ""}"></span><span>${esc(rest.join(" "))}</span>`;
+      cls.push("tabbed");
+    }
+    if (p.textbox) cls.push("tbox");
     const pm = (fnNo ? `<sup class="wd-fn">${fnNo}</sup>` : "") + (marks ? `<span class="pm">¶</span>` : "");
     return `<div class="${cls.join(" ")}" data-p="${idx}" style="${st.join(";")}">${img && p.img.wrap !== "inline" ? img : ""}${marker}${img && p.img.wrap === "inline" ? img : ""}${inner || (marks ? "" : "​")}${pm}</div>`;
   }
@@ -58,9 +68,13 @@
     return `<span class="${cls.join(" ")}" style="${st.join(";")}">${m.src ? `<img src="${esc(m.src)}" alt="${esc(m.alt || "")}" draggable="false">` : m.svg || ""}</span>`;
   }
   function tableHtml(t, idx, marks) {
-    const cols = t.widths || t.rows[0].map(() => null);
+    const cols = t.widths || t.rows[t.rows.length - 1].map(() => null);
+    const pm = marks ? '<span class="pm">¤</span>' : "";
     return `<table class="wd-tbl${t.target ? " wd-target" : ""}" data-p="${idx}"><colgroup>${cols.map(w => `<col${w ? ` style="width:${w * CM}px"` : ""}>`).join("")}</colgroup>
-      ${t.rows.map((row, ri) => `<tr>${row.map(c => `<td style="${ri === 0 && t.headShade ? `background:${t.headShade};` : ""}${ri === 0 && t.headBold ? "font-weight:700;" : ""}">${esc(c)}${marks ? '<span class="pm">¤</span>' : ""}</td>`).join("")}</tr>`).join("")}</table>`;
+      ${t.rows.map((row, ri) => {
+        if (ri === 0 && t.merge0) return `<tr><td colspan="${cols.length}" style="text-align:${t.titleAlign || "left"};${t.headShade ? `background:${t.headShade};` : ""}${t.headBold ? "font-weight:700;" : ""}">${esc(row.filter(Boolean).join(" "))}${pm}</td></tr>`;
+        return `<tr>${row.map((c, ci) => `<td style="${ri === 0 && t.headShade ? `background:${t.headShade};` : ""}${(ri === 0 || (t.merge0 && ri === 1)) && t.headBold ? "font-weight:700;" : ""}${t.colAlign && ri >= (t.colAlign.fromRow || 1) && ci === t.colAlign.col ? `text-align:${t.colAlign.align};` : ""}">${esc(c)}${pm}</td>`).join("")}</tr>`;
+      }).join("")}</table>`;
   }
 
   function tocHtml(t, idx) {
@@ -69,15 +83,20 @@
   function pagesHtml(m) {
     const pg = Object.assign({}, PAGE, m.page || {}), marks = !!m.marks;
     const pages = [[]], notes = [[]]; let num = 0, fn = 0;
+    let colBuf = null, colN = 0;
+    const flush = () => { if (colBuf) { pages[pages.length - 1].push(`<div class="wd-cols${m.colRule ? " rule" : ""}" style="column-count:${colN}">${colBuf.join("")}</div>`); colBuf = null; } };
+    const out = { push: h => (colBuf || pages[pages.length - 1]).push(h) };
     (m.blocks || []).forEach((b, idx) => {
       if (b.hidden) return;
-      if (b.type === "break") { if (marks) pages[pages.length - 1].push(`<div class="wd-break">Oldaltörés</div>`); pages.push([]); notes.push([]); num = 0; return; }
-      if (b.type === "table") { pages[pages.length - 1].push(tableHtml(b, idx, marks)); num = 0; return; }
-      if (b.type === "toc") { pages[pages.length - 1].push(tocHtml(b, idx)); num = 0; return; }
+      if (b.cols >= 2) { if (colBuf && colN !== b.cols) flush(); if (!colBuf) { colBuf = []; colN = b.cols; } } else flush();
+      if (b.type === "break") { flush(); if (marks) pages[pages.length - 1].push(`<div class="wd-break">Oldaltörés</div>`); pages.push([]); notes.push([]); num = 0; return; }
+      if (b.type === "table") { out.push(tableHtml(b, idx, marks)); num = 0; return; }
+      if (b.type === "toc") { out.push(tocHtml(b, idx)); num = 0; return; }
       num = b.list === "number" ? num + 1 : 0;
       if (b.fn) { fn++; notes[notes.length - 1].push(`<div class="wd-fnt"><sup>${fn}</sup> ${esc(b.fn)}</div>`); }
-      pages[pages.length - 1].push(paraHtml(b, idx, num, marks, null, b.fn ? fn : 0));
+      out.push(paraHtml(b, idx, num, marks, null, b.fn ? fn : 0));
     });
+    flush();
     return pages.map((blocks, k) => `<div class="wd-pg${m.headerTarget ? " ht" : ""}${m.footerTarget ? " ft" : ""}${m.pageTarget ? " pt" : ""}" style="width:${pg.w * CM}px;min-height:${(m.pageH ?? pg.h) * CM}px;padding:${pg.top * CM}px ${pg.right * CM}px ${pg.bottom * CM}px ${pg.left * CM}px;--l:${pg.left * CM}px;--r:${pg.right * CM}px;--t:${pg.top * CM}px;--b:${pg.bottom * CM}px">
       ${m.showMargins ? `<span class="wd-mg" aria-hidden="true"></span>` : ""}
       ${m.header != null && !(m.titlePg && k === 0) ? `<div class="wd-hd${m.header ? "" : " empty"}">${esc(m.header || "Élőfej")}</div>` : ""}
