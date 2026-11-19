@@ -212,6 +212,35 @@
                 progress: { chapters: 6, keys: { en: "aurora-en-v1", hu: "aurora-hu-v1" } }
               }
             ]
+          },
+          {
+            id: "subqueries",
+            title: { hu: "Allekérdezések: SELECT a SELECT-ben", en: "Subqueries: a SELECT inside a SELECT" },
+            pages: [
+              {
+                id: "subqueries-intro",
+                kind: "theory",
+                minutes: 15,
+                title: { hu: "Allekérdezések – elmélet", en: "Subqueries – explainer" },
+                desc: {
+                  hu: "Két lépés egyben: = (SELECT MAX…), összehasonlítás az átlaggal, IN és NOT IN listákkal, allekérdezés a HAVING-ben, gyakori hibák.",
+                  en: "Two steps in one: = (SELECT MAX…), comparing with the average, IN and NOT IN with lists, a subquery in HAVING, common mistakes."
+                },
+                files: { en: "sql/subqueries/intro.html", hu: "sql/subqueries/intro-hu.html" }
+              },
+              {
+                id: "express",
+                kind: "story",
+                minutes: 35,
+                title: { hu: "A Holdfény Expressz", en: "The Moonlight Express" },
+                desc: {
+                  hu: "1937, éjszakai vonat Velencébe: Zágráb után eltűnik egy Stradivari. Allekérdezésekkel – kocsi, átlagos csomag, vörösbor, alibi – szűkítsd a kört a tolvajig.",
+                  en: "1937, a night train to Venice: after Zagreb a Stradivarius vanishes. Narrow it down with subqueries – the car, the average bag, red wine, the alibi – until only the thief is left."
+                },
+                files: { en: "sql/subqueries/express.html", hu: "sql/subqueries/express-hu.html" },
+                progress: { chapters: 5, keys: { en: "express-en-v1", hu: "express-hu-v1" } }
+              }
+            ]
           }
         ]
       },

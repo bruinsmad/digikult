@@ -1,0 +1,968 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>/* moving between pages: the old page drifts aside and fades, the new one glides in; the rail holds still */@view-transition{navigation:auto}.rail{view-transition-name:rail}::view-transition-group(root){animation:none}::view-transition-old(root){animation:dk-out .2s cubic-bezier(.4,0,1,1) both}::view-transition-new(root){animation:dk-in .38s cubic-bezier(.16,1,.3,1) .06s both}::view-transition-old(rail),::view-transition-new(rail){animation:none}@keyframes dk-out{to{opacity:0;transform:translateX(-18px)}}@keyframes dk-in{from{opacity:0;transform:translateX(26px)}}@media (prefers-reduced-motion:reduce){::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none!important}}</style>
+<title>The Moonlight Express</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@600;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<script src="https://cdn.jsdelivr.net/npm/sql.js@1.10.3/dist/sql-asm.js"></script>
+<style>
+/* Layout: a night train. A cream ticket header with the train badge, the chapter strip as carriages on a track,
+   then the case file beside the conductor's logbook (SQL). */
+:root{
+  --night:#07130f; --night-2:#0d211d; --ink:#f3ead2; --muted:#b9c4b2; --line:#2c4a43;
+  --pink:#e0607a; --cyan:#9be3cf; --lime:#b5d97a; --gold:#d9b061; --bad:#ff8a80; --bad-soft:#3e1715; --ok:#b5d97a; --ok-soft:#1d2a12;
+  --paper:#f3e6c6; --paper-ink:#1c1a14; --paper-muted:#7a6544; --paper-line:#e0cfa6;
+  --laptop:#06100d;
+  --f-display:"Josefin Sans", "Segoe UI", system-ui, sans-serif;
+  --f-body:"Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono:"JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+*,*::before,*::after{font-feature-settings:"calt" 0,"liga" 0}
+html,body{margin:0}
+body{color:var(--ink);font:16px/1.55 var(--f-body);min-height:100vh;
+  background:
+    radial-gradient(700px 380px at 8% -4%, rgba(217,176,97,.20), transparent 65%),
+    radial-gradient(700px 380px at 92% -4%, rgba(217,176,97,.16), transparent 65%),
+    radial-gradient(900px 520px at 50% 115%, rgba(184,50,58,.16), transparent 60%),
+    repeating-linear-gradient(0deg, rgba(0,0,0,.18) 0 2px, transparent 2px 46px),
+    repeating-linear-gradient(90deg, rgba(0,0,0,.12) 0 2px, transparent 2px 92px),
+    linear-gradient(var(--night), var(--night-2));
+  background-attachment:fixed;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));padding-block:18px 48px}
+.wrap{max-width:1280px;margin:0 auto;display:grid;gap:18px}
+.wrap{grid-template-columns:minmax(0,1fr)} .wrap>*{min-width:0}
+@media (max-width:640px){ .sign{flex-wrap:wrap} .sign .stamp{order:3} .sign h1{font-size:26px} .sign::before,.sign::after{display:none} }
+h1,h2,h3{font-family:var(--f-display);font-weight:700;margin:0;line-height:1.15;text-wrap:balance}
+code,pre,textarea{font-family:var(--f-mono)}
+:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.eyebrow{font:600 12px/1.2 var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.btn{font:700 15px var(--f-body);border:1px solid var(--line);background:#14322c;color:var(--ink);padding:9px 15px;border-radius:8px;cursor:pointer}
+.btn:hover{border-color:var(--gold)}
+.btn.primary{background:#8c1c3a;border-color:#8c1c3a;color:#fff7e6;box-shadow:0 3px 0 #560f22}
+.btn.small{padding:6px 10px;font-size:13px}
+.btn.danger{color:#ffb3a8}
+.btn.ghost{background:transparent}
+
+/* ---- header: cream ticket with the train badge ---- */
+header.top{position:relative;z-index:2;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px 20px}
+.sign{position:relative;display:flex;align-items:center;gap:16px;padding:14px 24px 14px 16px;max-width:100%;
+  background:radial-gradient(ellipse at 30% 20%, #fbf5e4, #ecd9ad 70%, #dcc28a);color:#1c1a14;border-radius:6px;
+  box-shadow:0 14px 34px rgba(0,0,0,.5), inset 0 0 0 2px #c9a55a, inset 0 0 0 5px #fbf5e4, inset 0 0 0 6px #c9a55a}
+.sign::before,.sign::after{content:"";position:absolute;bottom:-26px;width:20px;height:30px;background:#8c1c3a;clip-path:polygon(0 0,100% 0,100% 100%,50% 75%,0 100%);box-shadow:0 2px 4px rgba(0,0,0,.4)}
+.sign::before{left:34px}.sign::after{left:58px;background:#1f6b5c}
+.sign .hole{display:none}
+.sign h1{font-size:clamp(26px,3.6vw,40px);color:#3d0f1d;letter-spacing:.02em}
+.sign .eyebrow{color:#8a6a3a}
+.guitar{flex:none;width:58px;height:58px}
+.stamp{font:800 12px var(--f-mono);letter-spacing:.1em;text-transform:uppercase;color:#fff3e0;background:radial-gradient(circle at 35% 35%, #d9434c, #8e1f27);border-radius:999px;padding:7px 12px;transform:rotate(-6deg);box-shadow:0 2px 0 #5a1016, inset 0 0 0 2px rgba(255,255,255,.18)}
+.stamp.closed{background:radial-gradient(circle at 35% 35%, #4f9a55, #24572a);box-shadow:0 2px 0 #163a1a, inset 0 0 0 2px rgba(255,255,255,.18)}
+.meta{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px}
+.meta-item{display:flex;flex-direction:column;gap:2px}
+.meta-item .lbl{font:600 11px/1 var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.meta-item b{font:700 22px/1 var(--f-display)}
+
+/* ---- chapter strip: carriages on a track ---- */
+.field{position:relative;border-radius:10px;padding:16px 16px 18px;background:linear-gradient(#123029,#0a1a16);border:1px solid var(--line);box-shadow:inset 0 0 0 1px rgba(255,255,255,.03)}
+.field::after{content:"";position:absolute;left:0;right:0;bottom:0;height:10px;border-radius:0 0 10px 10px;background:repeating-linear-gradient(90deg,#3d5c52 0 26px,transparent 26px 40px);opacity:.9}
+.steps{display:flex;gap:6px;overflow-x:auto;padding-bottom:10px;scrollbar-width:thin}
+.step{flex:1 0 96px;min-width:96px;display:grid;justify-items:center;gap:6px;padding:10px 6px 8px;border-radius:10px 10px 40% 40% / 10px 10px 26% 26%;border:1px solid var(--line);background:#163a33;color:var(--ink);cursor:pointer;font:inherit;position:relative}
+.step .post{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:#14322c;border:2px solid var(--line);font:700 15px var(--f-display)}
+.step .t{font:600 12px/1.25 var(--f-body);text-align:center;color:var(--muted);text-wrap:balance}
+.step .who{height:18px;font-size:16px;line-height:18px}
+.step.done .post{background:var(--gold);border-color:var(--gold);color:#3a2408}
+.step.current{border-color:var(--gold);box-shadow:0 0 0 3px rgba(232,184,74,.25), 0 0 24px rgba(217,176,97,.28)}
+.step.current .t{color:var(--ink)}
+.step.locked{opacity:.45;cursor:not-allowed}
+.step.just .post{animation:pop .6s ease-out}
+@keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.35)}100%{transform:scale(1)}}
+.field.wave .step{animation:wave .9s ease-in-out}
+@keyframes wave{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
+.step-caption{font:600 14px var(--f-body);color:var(--muted);display:flex;gap:10px;align-items:baseline;padding:0 4px}
+.step-caption span{font:600 11px var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--gold)}
+
+/* ---- main ---- */
+main{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:18px;align-items:start}
+@media (max-width:980px){ main{grid-template-columns:minmax(0,1fr)} }
+.panel{border-radius:10px}
+.case{color:var(--paper-ink);padding:22px 24px 20px;box-shadow:0 14px 34px rgba(0,0,0,.5), inset 0 0 40px rgba(140,100,40,.25);
+  background:radial-gradient(ellipse at 20% 10%, #fbf5e4, transparent 60%), radial-gradient(ellipse at 90% 95%, #e2c991, transparent 55%), var(--paper)}
+.case .eyebrow{color:var(--paper-muted)}
+.case h2{font-size:clamp(23px,2.8vw,30px);margin:4px 0 10px;color:#3d0f1d}
+.case p{margin:.5em 0}
+.case mark{background:#f7d77a;color:#3a2b00;padding:0 4px;border-radius:3px}
+.case code{background:#ead7ac;color:#5a2410;padding:1px 5px;border-radius:4px;font-size:.92em}
+.case pre{background:var(--laptop);color:#f3ead2;padding:12px 14px;border-radius:8px;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;font-size:14px;line-height:1.5;margin:8px 0}
+.learn{margin-top:14px;padding:12px 14px;border-left:4px solid #1f6b5c;background:rgba(47,90,160,.09);border-radius:0 8px 8px 0}
+.learn h3,.task h3{font:700 14px var(--f-display);letter-spacing:.08em;text-transform:uppercase;color:#15584a;margin-bottom:4px}
+.links{margin-top:14px;padding:12px 14px 10px;border-radius:10px;border:1px solid var(--lk-border);background:var(--lk-bg)}
+.links h3{font-size:14px;letter-spacing:.08em;text-transform:uppercase;color:var(--lk-title);margin-bottom:2px}
+.lk-board{position:relative;display:flex;flex-wrap:nowrap;justify-content:center;align-items:flex-start;column-gap:46px;row-gap:30px;padding:16px 4px 8px}
+.lk-board.stack{flex-direction:column;align-items:flex-start;padding:10px 46px 8px 8px;width:max-content;max-width:100%;margin:0 auto}
+.lk-svg{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;overflow:visible;z-index:2}
+.lk-card{position:relative;z-index:1;flex:none;min-width:96px;border:2px solid var(--lk-head);border-radius:8px;background:var(--lk-card);font:13px/1.35 var(--f-mono);overflow:hidden;box-shadow:0 3px 0 rgba(0,0,0,.12)}
+.lk-board.stack .lk-card{min-width:170px}
+.lk-card .h{background:var(--lk-head);color:var(--lk-head-ink);padding:5px 8px;font-weight:700}
+.lk-card .r{padding:4px 8px;border-top:1px solid var(--paper-line);display:flex;gap:6px;align-items:center;color:var(--paper-ink)}
+.lk-card .r .ic{font-size:11px;width:14px;text-align:center;opacity:.75}
+.lk-card .r.k{font-weight:700}
+.lk-card .r.k, .lk-card .r[data-c$="_id"]{font-weight:700}
+.lk-card .r:not(.k):not([data-c$="_id"]){color:var(--paper-muted)}
+.lk-card .r.on{box-shadow:inset 5px 0 0 var(--c);font-weight:700;background:var(--lk-on)}
+.lk-card .r.more{color:var(--paper-muted);font:italic 12px var(--f-body);padding:3px 8px}
+.lk-end{font:700 14px var(--f-mono);paint-order:stroke;stroke:var(--lk-bg-solid);stroke-width:4px}
+.lk-mid{fill:var(--lk-bg-solid);stroke:var(--lk-loose);stroke-width:2}
+.lk-midt{font:700 14px var(--f-mono);fill:var(--lk-loose)}
+.lk-note{color:var(--paper-muted);font-size:14px;text-align:center;margin:2px 0 4px!important}
+.lk-rules{list-style:none;margin:6px 0 0;padding:0;display:grid;gap:5px;font-size:14px}
+.lk-rules li{display:flex;flex-wrap:wrap;gap:3px 10px;align-items:center}
+.lk-rules .sw{width:18px;height:4px;border-radius:2px;flex:none}
+.lk-rules .kind{color:var(--paper-muted)}
+@media (max-width:640px){ .links{padding:10px 8px} .lk-card{min-width:0;font-size:12px} .lk-card .r{padding:4px 8px} .lk-card .h{padding:5px 8px} }
+.links{--lk-bg:rgba(255,248,228,.75);--lk-bg-solid:#fbf5e4;--lk-border:#c9ab6a;--lk-title:#15584a;--lk-card:#fffaf0;--lk-head:#4a2a12;--lk-head-ink:#f5e6c0;--lk-on:#fbf0d4;--lk-loose:#8a7350;--lk1:#8c1c3a;--lk2:#1f6b5c;--lk3:#3d7a3a;--lk4:#7a3f8f;--lk5:#b07a10;--lk6:#2c4a43}
+.links h3{font:700 14px var(--f-display);letter-spacing:.08em}
+.task{margin-top:14px;padding:12px 14px;border-left:4px solid #8c1c3a;background:rgba(184,50,58,.09);border-radius:0 8px 8px 0}
+.task h3{color:#9a2028}
+.task p{font-weight:700;font-size:17px}
+.anatomy{display:grid;gap:4px;margin:8px 0}
+.anatomy [role=row]{display:grid;grid-template-columns:minmax(0,auto) 1fr;gap:10px;align-items:baseline}
+.anatomy code{white-space:nowrap}
+@media (max-width:520px){ .anatomy [role=row]{grid-template-columns:minmax(0,1fr);gap:2px;margin-bottom:4px} .anatomy code{white-space:normal} }
+.rules{margin:6px 0 0;padding-left:20px}
+.tries{display:grid;gap:6px;margin-top:8px}
+.try{text-align:left;font:600 13px var(--f-mono);background:var(--laptop);color:#f3ead2;border:1px solid #6b4a28;border-radius:6px;padding:8px 10px;cursor:pointer}
+.try:hover{border-color:var(--gold)}
+details.hint{margin-top:10px;border:1px dashed #b49a6a;border-radius:8px;padding:8px 12px;background:rgba(255,255,255,.35)}
+details.hint summary{cursor:pointer;font-weight:700;color:#5a3a14}
+.hint.locked{margin-top:10px;border:1px dashed #b49a6a;border-radius:8px;padding:8px 12px;color:var(--paper-muted);background:rgba(0,0,0,.04)}
+.answer{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.answer input{flex:1 1 180px;font:16px var(--f-body);padding:10px 12px;border:2px solid #c9ab6a;border-radius:8px;background:#fffaf0;color:var(--paper-ink)}
+.answer input:focus{border-color:#8c1c3a;outline:none}
+.verdict{margin-top:10px;padding:10px 12px;border-radius:8px;font-weight:700}
+.verdict.ok{background:#e3f0d2;color:#2c4a12}
+.verdict.bad{background:#f8dcd6;color:#8a1c1c}
+.verdict p{font-weight:400;margin:.3em 0 0}
+.navrow{display:flex;justify-content:space-between;gap:8px;margin-top:16px}
+.ending{margin-top:18px}
+.export{margin-top:14px;padding:12px 14px;border:2px solid #c9ab6a;border-radius:10px;background:#fffaf0}
+.export h3{font-size:16px;margin-bottom:6px}
+.export-steps{padding-left:20px;margin:6px 0 10px}
+.export label{display:block;font-weight:700;margin-bottom:4px}
+.export input{width:100%;font:16px var(--f-body);padding:10px 12px;border:2px solid #c9ab6a;border-radius:8px;background:#fff;color:var(--paper-ink);margin-bottom:10px}
+.export-btns{display:flex;gap:8px;flex-wrap:wrap}
+.export-note{min-height:1.4em;font-size:14px;color:#15584a;margin:8px 0 0}
+
+/* ---- conductor's logbook ---- */
+.board-frame{background:linear-gradient(#3a2a12,#24190b);padding:10px;border:1px solid #120c04;box-shadow:0 14px 34px rgba(0,0,0,.5), inset 0 0 0 3px rgba(232,184,74,.25)}
+.chalk{display:grid;gap:10px;padding:16px;border-radius:6px;background:var(--laptop);box-shadow:inset 0 0 0 1px #14322c, inset 0 0 60px rgba(217,176,97,.05);min-width:0}
+.chalk-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:6px 14px}
+.chalk h2{font-size:22px;color:var(--gold)}
+.rule{font-size:13px;color:var(--muted)}
+textarea#sql{width:100%;min-height:150px;resize:vertical;font-size:16px;line-height:1.5;padding:12px 14px;border:1px solid var(--line);border-radius:8px;background:#040a08;color:#f3ead2;caret-color:var(--gold)}
+.run-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.kbd{font:12px var(--f-mono);color:var(--muted)}
+.result-meta{font:600 13px var(--f-mono);color:var(--gold);margin-bottom:6px}
+.tablebox{overflow-x:auto;max-height:360px;overflow-y:auto;border:1px solid var(--line);border-radius:8px;background:rgba(255,255,255,.03)}
+table{border-collapse:collapse;width:100%;font-size:15px;font-variant-numeric:tabular-nums}
+th,td{text-align:left;padding:7px 12px;border-bottom:1px solid var(--line);white-space:nowrap}
+th{position:sticky;top:0;background:#0b1d19;font:600 13px var(--f-mono);color:var(--gold)}
+td.num{text-align:right}
+td.null{color:var(--muted);font-style:italic}
+tr:last-child td{border-bottom:none}
+.err{background:var(--bad-soft);color:var(--bad);border-radius:8px;padding:12px 14px;font-weight:700}
+.err p{margin:.3em 0 0;font-weight:400;color:var(--ink)}
+.note{color:var(--muted);font-style:italic;margin:0}
+.schema{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(250px,100%),1fr));gap:10px}
+.tbl{border:1px solid var(--line);border-radius:8px;padding:10px 12px;background:rgba(255,255,255,.03)}
+.tbl button{font:700 15px var(--f-mono);background:none;border:0;color:var(--gold);cursor:pointer;padding:0}
+.tbl button:hover{text-decoration:underline}
+.tbl ul{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:7px}
+.tbl li{display:grid;grid-template-columns:auto 1fr;align-items:baseline;column-gap:8px;row-gap:1px}
+.tbl li .k{font:600 13px var(--f-mono);color:var(--ink)}
+.tbl li .k.fk{color:var(--cyan)}
+.tbl li .ty{justify-self:start;font:600 10px var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);border:1px solid var(--line);border-radius:3px;padding:0 4px}
+.tbl li .d{grid-column:1/-1;font:13px/1.4 var(--f-body);color:var(--muted)}
+.tbl li .d code{color:var(--gold)}
+
+/* ---- celebrations ---- */
+#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:60}
+.plus{position:fixed;z-index:61;pointer-events:none;font:700 30px var(--f-display);color:var(--gold);text-shadow:0 2px 0 #000;animation:plus 1.2s ease-out forwards;transform:translate(-50%,-50%)}
+@keyframes plus{0%{opacity:0;transform:translate(-50%,-50%) scale(.6)}20%{opacity:1;transform:translate(-50%,-70%) scale(1.15)}100%{opacity:0;transform:translate(-50%,-160%) scale(1)}}
+.shake{animation:shake .45s}
+@keyframes shake{0%,100%{transform:translate(0)}20%{transform:translate(-5px,2px)}40%{transform:translate(5px,-2px)}60%{transform:translate(-4px,1px)}80%{transform:translate(4px,-1px)}}
+#finale{position:fixed;inset:0;z-index:55;display:grid;place-items:center;overflow:auto;
+  background:radial-gradient(ellipse at 50% 30%, #2c1020 0%, #0d211d 60%, #050d0b 100%)}
+#finale .beams{position:absolute;inset:-20%;background:
+  conic-gradient(from 0deg at 50% 0%, transparent 0 10deg, rgba(232,184,74,.20) 10deg 14deg, transparent 14deg 40deg, rgba(255,140,60,.16) 40deg 44deg, transparent 44deg 70deg, rgba(232,184,74,.18) 70deg 74deg, transparent 74deg 100deg, rgba(255,220,150,.14) 100deg 104deg, transparent 104deg 360deg);
+  animation:beams 6s linear infinite;transform-origin:50% 0}
+@keyframes beams{from{transform:rotate(-20deg)}50%{transform:rotate(20deg)}to{transform:rotate(-20deg)}}
+.finale-inner{position:relative;text-align:center;padding:28px 20px;max-width:760px}
+.big-stamp{display:inline-block;font:700 clamp(40px,8vw,88px)/1.05 var(--f-display);color:#fff4d6;
+  text-shadow:0 0 18px rgba(232,184,74,.9), 0 0 42px rgba(232,184,74,.5), 0 4px 0 #560f22;transform:rotate(-3deg);animation:stampin .6s cubic-bezier(.2,1.6,.3,1) both}
+@keyframes stampin{from{transform:rotate(-20deg) scale(3);opacity:0}to{transform:rotate(-3deg) scale(1);opacity:1}}
+.finale-sub{font-size:clamp(17px,2.4vw,22px);color:var(--ink);margin:16px auto 0;max-width:40ch}
+.finale-stats{display:flex;justify-content:center;gap:28px;margin-top:22px;flex-wrap:wrap}
+.finale-stats div{display:grid;gap:2px}
+.finale-stats span{font:600 11px var(--f-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.finale-stats b{font:700 28px var(--f-display);color:var(--gold)}
+.caught{margin-top:18px;display:inline-block;padding:8px 14px;border:2px dashed var(--gold);border-radius:8px;color:var(--gold);font:600 14px var(--f-mono)}
+.finale-btns{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:24px}
+.hero-guitar{width:150px;height:150px;margin:0 auto;animation:swing 1.8s ease-in-out infinite;transform-origin:50% 10%}
+@keyframes swing{0%,100%{transform:rotate(-5deg)}50%{transform:rotate(5deg)}}
+.flash{position:absolute;inset:0;background:#fff4d6;opacity:0;pointer-events:none;animation:flash .5s ease-out}
+@keyframes flash{0%{opacity:.9}100%{opacity:0}}
+@media (prefers-reduced-motion:reduce){ .big-stamp,.hero-guitar,.flash,#finale .beams,.step.just .post,.field.wave .step,.shake{animation:none} }
+
+/* ---- The Moonlight Express: bottle-green night, brass trim, cream tickets ---- */
+body{background:
+    radial-gradient(560px 300px at 85% -4%, rgba(243,227,181,.16), transparent 70%),
+    repeating-linear-gradient(90deg, rgba(217,176,97,.045) 0 1px, transparent 1px 64px),
+    linear-gradient(#0b1f1b, #06120f);background-attachment:fixed}
+.sign{background:linear-gradient(180deg,#fbf5e4,#efe2bf);color:#1c1a14;border-radius:6px;
+  box-shadow:0 0 0 2px #d9b061, 0 0 0 6px #0b1f1b, 0 0 0 8px #d9b061, 0 16px 36px rgba(0,0,0,.55)}
+.sign::before,.sign::after{display:none}
+.sign h1{color:#3d0f1d;letter-spacing:.06em;text-transform:uppercase}
+.sign .eyebrow{color:#1f6b5c;letter-spacing:.2em}
+.field{background:linear-gradient(#123029,#0a1a16);border-color:#2c4a43}
+.field::after{height:6px;bottom:4px;left:12px;right:12px;opacity:.9;
+  background:linear-gradient(#5b4a2c,#5b4a2c) 0 0/100% 2px no-repeat, linear-gradient(#5b4a2c,#5b4a2c) 0 100%/100% 2px no-repeat,
+  repeating-linear-gradient(90deg,#3a2a12 0 4px,transparent 4px 14px)}
+.step{border-radius:10px 10px 4px 4px}
+.step.current{border-color:#d9b061;box-shadow:0 0 0 3px rgba(217,176,97,.25), 0 0 22px rgba(217,176,97,.25)}
+.step.done .post{background:#d9b061;border-color:#d9b061;color:#1c1a14}
+.case{border-radius:6px;box-shadow:0 0 0 2px #d9b061, 0 16px 36px rgba(0,0,0,.5)}
+.hero-guitar{animation:sway 3s ease-in-out infinite;transform-origin:50% 90%}
+@keyframes sway{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(3deg)}}
+.lk-rules code.sub{background:#efe2bf}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="sign">
+            <svg class="guitar" viewBox="0 0 64 64" aria-hidden="true">
+        <circle cx="32" cy="32" r="30" fill="#0f2c27" stroke="#d9b061" stroke-width="2.5"/>
+        <path d="M44 14a14 14 0 1 0 6 20 11 11 0 1 1-6-20z" fill="#f3e3b5"/>
+        <path d="M10 46h44" stroke="#d9b061" stroke-width="2"/>
+        <rect x="14" y="34" width="26" height="11" rx="2" fill="#8c1c3a" stroke="#d9b061" stroke-width="1.5"/>
+        <rect x="40" y="30" width="10" height="15" rx="2" fill="#8c1c3a" stroke="#d9b061" stroke-width="1.5"/>
+        <rect x="17" y="37" width="5" height="4" fill="#ffe7a3"/><rect x="25" y="37" width="5" height="4" fill="#ffe7a3"/><rect x="33" y="37" width="5" height="4" fill="#ffe7a3"/>
+        <rect x="43" y="25" width="4" height="6" fill="#d9b061"/>
+        <circle cx="20" cy="47" r="2.6" fill="#d9b061"/><circle cx="34" cy="47" r="2.6" fill="#d9b061"/><circle cx="46" cy="47" r="2.6" fill="#d9b061"/>
+      </svg>
+      <div>
+        <div class="eyebrow">Budapest → Venice · night train · 1937</div>
+        <h1>The Moonlight Express</h1>
+      </div>
+      <span class="stamp" id="stamp">Thief on board</span>
+    </div>
+    <div class="meta">
+      <span class="meta-item"><span class="lbl">Time</span><b id="timer">00:00</b></span>
+      <span class="meta-item"><span class="lbl">Progress</span><b id="solvedCount">–</b></span>
+      <button class="btn small" id="soundToggle" type="button" aria-pressed="true">Sound: on</button>
+      <button class="btn small danger" id="resetProgress" type="button">Start over</button>
+    </div>
+  </header>
+
+  <div class="field" id="field">
+    <nav class="steps" id="steps" aria-label="Chapters"></nav>
+  </div>
+  <div class="step-caption" id="stepCaption" aria-hidden="true"></div>
+
+  <main>
+    <section class="panel case" id="case" aria-live="polite"></section>
+    <section class="panel board-frame">
+      <div class="chalk">
+        <div class="chalk-head">
+          <h2>Conductor's logbook</h2>
+          <span class="rule">A query in brackets runs first: = (SELECT …) for one value, IN (SELECT …) for a list</span>
+        </div>
+        <label for="sql" class="eyebrow">Your SQL query</label>
+        <textarea id="sql" spellcheck="false" autocapitalize="off" autocomplete="off"></textarea>
+        <div class="run-row">
+          <button class="btn primary" id="run" type="button">Run query</button>
+          <button class="btn" id="resetDb" type="button">Restore data</button>
+          <span class="kbd">Ctrl + Enter runs the query</span>
+        </div>
+        <div id="out"><p class="note">Opening the conductor's logbook…</p></div>
+        <div class="eyebrow">Tables and columns (click a table name to see everything in it)</div>
+        <div class="schema" id="schema"></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<canvas id="fx" aria-hidden="true"></canvas>
+<div id="finale" hidden role="dialog" aria-modal="true" aria-labelledby="finaleTitle">
+  <div class="beams" aria-hidden="true"></div>
+  <div class="finale-inner" id="finaleInner">
+    <div class="hero-guitar" id="heroGuitar" aria-hidden="true"></div>
+    <div class="big-stamp" id="finaleTitle">THIEF CAUGHT!</div>
+    <p class="finale-sub">The Stradivarius is safe. Venice can listen tonight.</p>
+    <div class="finale-stats">
+      <div><span>Time</span><b id="fTime">–</b></div>
+      <div><span>Queries run</span><b id="fQueries">–</b></div>
+      <div><span>Rank</span><b id="fRank">–</b></div>
+    </div>
+    <div class="caught">Bianka Kinga · the violin wrapped in a woollen shawl, at the bottom of her suitcase</div>
+    <div class="finale-btns">
+      <button class="btn" id="finaleClose" type="button">See bonus tasks</button>
+      <button class="btn ghost" id="finaleAgain" type="button">Encore!</button>
+      <button class="btn ghost" id="finaleSave" type="button">Save answers</button>
+    </div>
+  </div>
+  <div class="flash"></div>
+</div>
+
+<script>
+const SEED = `
+CREATE TABLE cars (id INTEGER PRIMARY KEY, name TEXT, class TEXT);
+CREATE TABLE passengers (id INTEGER PRIMARY KEY, name TEXT, car_id INTEGER, luggage INTEGER);
+CREATE TABLE orders (id INTEGER PRIMARY KEY, passenger_id INTEGER, item TEXT, stop TEXT);
+INSERT INTO cars VALUES (1,'Sleeper A','first');
+INSERT INTO cars VALUES (2,'Sleeper B','first');
+INSERT INTO cars VALUES (3,'Couchette','second');
+INSERT INTO cars VALUES (4,'Seats','second');
+INSERT INTO passengers VALUES (1,'Mária Éva',2,12);
+INSERT INTO passengers VALUES (2,'Zorka',4,12);
+INSERT INTO passengers VALUES (3,'Bence',4,5);
+INSERT INTO passengers VALUES (4,'Mihály',3,19);
+INSERT INTO passengers VALUES (5,'Luca',1,7);
+INSERT INTO passengers VALUES (6,'Lilianna',1,11);
+INSERT INTO passengers VALUES (7,'Viktor',3,16);
+INSERT INTO passengers VALUES (8,'Rozália',4,15);
+INSERT INTO passengers VALUES (9,'Réka',3,6);
+INSERT INTO passengers VALUES (10,'Ágnes Abigél',4,8);
+INSERT INTO passengers VALUES (11,'Fruzsina',1,22);
+INSERT INTO passengers VALUES (12,'Dániel',1,21);
+INSERT INTO passengers VALUES (13,'Petra Patrícia',2,10);
+INSERT INTO passengers VALUES (14,'Benjámin Ádám',2,18);
+INSERT INTO passengers VALUES (15,'Zalán Benedek',2,20);
+INSERT INTO passengers VALUES (16,'Laura',1,9);
+INSERT INTO passengers VALUES (17,'Nóra',3,11);
+INSERT INTO passengers VALUES (18,'Hanna',2,8);
+INSERT INTO passengers VALUES (19,'Bianka Kinga',1,26);
+INSERT INTO passengers VALUES (20,'Eliza',3,13);
+INSERT INTO passengers VALUES (21,'Anna Petra',4,9);
+INSERT INTO passengers VALUES (22,'Boglárka',4,10);
+INSERT INTO passengers VALUES (23,'Márk',1,24);
+INSERT INTO passengers VALUES (24,'Balázs',4,17);
+INSERT INTO passengers VALUES (25,'Jay',4,6);
+INSERT INTO orders VALUES (1,18,'red wine','Székesfehérvár');
+INSERT INTO orders VALUES (2,6,'tea','Székesfehérvár');
+INSERT INTO orders VALUES (3,2,'cake','Székesfehérvár');
+INSERT INTO orders VALUES (4,19,'red wine','Nagykanizsa');
+INSERT INTO orders VALUES (5,14,'goulash','Nagykanizsa');
+INSERT INTO orders VALUES (6,20,'tea','Nagykanizsa');
+INSERT INTO orders VALUES (7,23,'red wine','Zagreb');
+INSERT INTO orders VALUES (8,17,'red wine','Zagreb');
+INSERT INTO orders VALUES (9,12,'tea','Zagreb');
+INSERT INTO orders VALUES (10,11,'goulash','Zagreb');
+INSERT INTO orders VALUES (11,16,'cake','Zagreb');
+INSERT INTO orders VALUES (12,7,'coffee','Zagreb');
+INSERT INTO orders VALUES (13,3,'coffee','Zagreb');
+INSERT INTO orders VALUES (14,19,'red wine','Ljubljana');
+INSERT INTO orders VALUES (15,25,'coffee','Ljubljana');
+INSERT INTO orders VALUES (16,1,'cake','Ljubljana');
+`;
+const CHAPTERS = [
+ {
+  "refresher": true,
+  "title": "Quick refresher",
+  "story": "<p>Before boarding, a 3-minute reminder of what you already know:<\/p>\n  <div class=\"anatomy\" role=\"table\" aria-label=\"Parts of a query\">\n    <div role=\"row\"><code role=\"cell\">SELECT cars.name, COUNT(*)<\/code><span role=\"cell\">which <b>columns<\/b> to show<\/span><\/div>\n    <div role=\"row\"><code role=\"cell\">FROM passengers, cars<\/code><span role=\"cell\">which <b>tables<\/b> to read<\/span><\/div>\n    <div role=\"row\"><code role=\"cell\">WHERE passengers.car_id = cars.id<\/code><span role=\"cell\">the <b>matching rule<\/b>, and other conditions<\/span><\/div>\n    <div role=\"row\"><code role=\"cell\">GROUP BY cars.name<\/code><span role=\"cell\">one result row for each <b>group<\/b><\/span><\/div>\n    <div role=\"row\"><code role=\"cell\">HAVING COUNT(*) &gt; 5<\/code><span role=\"cell\">which <b>groups<\/b> to keep<\/span><\/div>\n    <div role=\"row\"><code role=\"cell\">ORDER BY COUNT(*) DESC<\/code><span role=\"cell\"><b>sort<\/b>: <code>DESC<\/code> = largest first<\/span><\/div>\n    <div role=\"row\"><code role=\"cell\">LIMIT 1;<\/code><span role=\"cell\">keep only the <b>first rows<\/b><\/span><\/div>\n  <\/div>\n  <ul class=\"rules\">\n    <li>Text goes in single quotes: <code>'Zagreb'<\/code>. A missing value is <code>NULL<\/code>: test it with <code>IS NULL<\/code>.<\/li>\n    <li>New in this lesson: a <code>SELECT<\/code> in brackets <b>inside<\/b> another query. It runs first, and its result takes its place.<\/li>\n  <\/ul>",
+  "learn": "<p>Click one to load and run it:<\/p>\n  <div class=\"tries\">\n    <button type=\"button\" class=\"try\" data-sql=\"SELECT * FROM cars;\">SELECT * FROM cars;<\/button>\n    <button type=\"button\" class=\"try\" data-sql=\"SELECT * FROM passengers ORDER BY luggage DESC;\">SELECT * FROM passengers ORDER BY luggage DESC;<\/button>\n    <button type=\"button\" class=\"try\" data-sql=\"SELECT stop, COUNT(*) FROM orders GROUP BY stop;\">SELECT stop, COUNT(*) FROM orders GROUP BY stop;<\/button>\n  <\/div>",
+  "task": "Warm-up: which car carries the most passengers?",
+  "hints": [
+   "Join passengers and cars, GROUP BY the car's name, sort by COUNT(*) largest first, keep one row.",
+   {
+    "sql": "SELECT cars.name, COUNT(*)\nFROM passengers, cars\nWHERE passengers.car_id = cars.id\nGROUP BY cars.name\nORDER BY COUNT(*) DESC\nLIMIT 1;"
+   }
+  ],
+  "answers": [
+   "seats",
+   "the seats"
+  ],
+  "placeholder": "car",
+  "traps": {
+   "sleeper a": "Sleeper A has 7 passengers. Count again, largest first: ORDER BY COUNT(*) DESC."
+  },
+  "success": "The Seats car, with 8 passengers. But the trouble tonight is in the sleeper cars.",
+  "starter": "SELECT * FROM cars;"
+ },
+ {
+  "title": "The empty case",
+  "story": "<p>1937, the <b>Moonlight Express<\/b>, the night train from Budapest to Venice. Just after the Zagreb stop, a scream from the sleeper car: the famous violinist <b>Lilianna<\/b> opens her case, and her <b>Stradivarius<\/b> is gone.<\/p>\n  <p>The conductor locks every door and finds you, the young detective in compartment 9. \"The sleeper cars are locked at night,\" he says. \"Only the passengers of that car have a key. Start with them.\"<\/p>",
+  "learn": "<p>By hand it takes two steps: first look up Lilianna's car, then everyone in that car.<\/p>\n  <pre>SELECT car_id FROM passengers WHERE name = 'Nóra';\n\nSELECT name FROM passengers WHERE car_id = 3;<\/pre>\n  <p>Instead, write the first query <b>in brackets<\/b> in place of the number. The inner query runs first, and its result takes its place:<\/p>\n  <pre>SELECT name\nFROM passengers\nWHERE car_id = (SELECT car_id FROM passengers WHERE name = 'Nóra');<\/pre>\n  <div class=\"tries\">\n    <button type=\"button\" class=\"try\" data-sql=\"SELECT car_id FROM passengers WHERE name = 'Nóra';\">SELECT car_id FROM passengers WHERE name = 'Nóra';<\/button>\n    <button type=\"button\" class=\"try\" data-sql=\"SELECT name FROM passengers WHERE car_id = (SELECT car_id FROM passengers WHERE name = 'Nóra');\">SELECT name FROM passengers WHERE car_id = (SELECT car_id FROM passengers WHERE name = 'Nóra');<\/button>\n  <\/div>",
+  "task": "How many passengers travel in Lilianna's car? Count Lilianna too.",
+  "hints": [
+   "The inner query finds Lilianna's car_id. The outer one keeps everyone with that car_id. Count them with COUNT(*).",
+   {
+    "sql": "SELECT COUNT(*)\nFROM passengers\nWHERE car_id = (SELECT car_id FROM passengers WHERE name = 'Lilianna');"
+   }
+  ],
+  "answers": [
+   "7",
+   "seven"
+  ],
+  "placeholder": "a number",
+  "traps": {
+   "1": "That's only Lilianna. Keep everyone whose car_id equals hers: car_id = (SELECT car_id FROM passengers WHERE name = 'Lilianna').",
+   "6": "The task asks you to count Lilianna too."
+  },
+  "success": "Seven passengers in Sleeper A, Lilianna among them. Six other people had a key to her corridor."
+ },
+ {
+  "title": "A heavy suitcase",
+  "story": "<p>A violin is small, but a Stradivarius doesn't travel bare: the thief wrapped it in something and hid it in a suitcase. The porter remembers every bag he lifted at Keleti station. \"To hide a violin you need a big one. Heavier than the average bag on this train, for sure.\"<\/p>",
+  "learn": "<p>The average comes from <code>AVG<\/code>. But <code>WHERE luggage &gt; AVG(luggage)<\/code> gives an error: <code>WHERE<\/code> looks at one row at a time, and a single row doesn't know the average. The average needs its own <code>SELECT<\/code>, in brackets:<\/p>\n  <pre>SELECT name, luggage\nFROM passengers\nWHERE luggage &gt; (SELECT AVG(luggage) FROM passengers);<\/pre>\n  <p>You can use more than one subquery in a <code>WHERE<\/code>, joined with <code>AND<\/code>.<\/p>\n  <div class=\"tries\">\n    <button type=\"button\" class=\"try\" data-sql=\"SELECT AVG(luggage) FROM passengers;\">SELECT AVG(luggage) FROM passengers;<\/button>\n    <button type=\"button\" class=\"try\" data-sql=\"SELECT name, luggage FROM passengers WHERE luggage &gt; AVG(luggage);\">SELECT name, luggage FROM passengers WHERE luggage &gt; AVG(luggage);<\/button>\n  <\/div>",
+  "task": "In Lilianna's car, how many passengers have luggage heavier than the train's average?",
+  "hints": [
+   "Two subqueries joined with AND: car_id = (… Lilianna's car …) AND luggage > (SELECT AVG(luggage) FROM passengers).",
+   {
+    "sql": "SELECT name, luggage\nFROM passengers\nWHERE car_id = (SELECT car_id FROM passengers WHERE name = 'Lilianna')\n  AND luggage > (SELECT AVG(luggage) FROM passengers);"
+   }
+  ],
+  "answers": [
+   "4",
+   "four"
+  ],
+  "placeholder": "a number",
+  "traps": {
+   "10": "That's the whole train. Keep only Lilianna's car too: AND car_id = (SELECT car_id …).",
+   "7": "That's everyone in her car. Keep only the bags heavier than the average: luggage > (SELECT AVG(luggage) FROM passengers)."
+  },
+  "success": "Four heavy bags in Sleeper A: Bianka Kinga, Márk, Dániel and Fruzsina. Lilianna's own bag is light: she keeps her violin in its case, not in a suitcase."
+ },
+ {
+  "title": "The red stain",
+  "story": "<p>On the lid of the empty violin case there is a fresh <mark>red wine stain<\/mark>. The thief had a glass in hand. The waiter of the dining car keeps an order book: the <code>orders<\/code> table.<\/p>",
+  "learn": "<p>The <code>orders<\/code> table only knows <code>passenger_id<\/code>. You could count the red wine orders, but if someone ordered twice, they'd be counted twice. Ask for the <b>passengers<\/b> instead: those whose <code>id<\/code> is in the list of red wine orders.<\/p>\n  <p>When the inner query gives a <b>list<\/b> (many rows), use <code>IN<\/code>, not <code>=<\/code>. The inner <code>SELECT<\/code> must give exactly one column:<\/p>\n  <pre>SELECT name\nFROM passengers\nWHERE id IN (SELECT passenger_id FROM orders WHERE item = 'tea');<\/pre>\n  <div class=\"tries\">\n    <button type=\"button\" class=\"try\" data-sql=\"SELECT passenger_id FROM orders WHERE item = 'tea';\">SELECT passenger_id FROM orders WHERE item = 'tea';<\/button>\n    <button type=\"button\" class=\"try\" data-sql=\"SELECT name FROM passengers WHERE id IN (SELECT passenger_id FROM orders WHERE item = 'tea');\">SELECT name FROM passengers WHERE id IN (SELECT passenger_id FROM orders WHERE item = 'tea');<\/button>\n  <\/div>",
+  "task": "How many passengers ordered red wine in the dining car?",
+  "hints": [
+   "Outer query on passengers, inner query on orders: id IN (SELECT passenger_id FROM orders WHERE item = 'red wine'). Count with COUNT(*).",
+   {
+    "sql": "SELECT COUNT(*)\nFROM passengers\nWHERE id IN (SELECT passenger_id FROM orders WHERE item = 'red wine');"
+   }
+  ],
+  "answers": [
+   "4",
+   "four"
+  ],
+  "placeholder": "a number",
+  "traps": {
+   "5": "That's the number of red wine orders. Someone ordered twice. Count passengers: SELECT COUNT(*) FROM passengers WHERE id IN (…).",
+   "1": "= takes only the first id from the list. A list needs IN."
+  },
+  "success": "Four people drank red wine tonight: Hanna, Bianka Kinga (twice!), Márk and Nóra."
+ },
+ {
+  "title": "Alibi in the dining car",
+  "story": "<p>The conductor is sure about the time. At Nagykanizsa he saw the violin through the compartment window. At Zagreb the train stood for twenty minutes with the corridor lights off, and after Zagreb the case was empty. Whoever was ordering in the dining car during the <b>Zagreb<\/b> stop has an <b>alibi<\/b>.<\/p>",
+  "learn": "<p><code>NOT IN<\/code> keeps the rows whose value is <b>not<\/b> in the list. This finds people who <i>didn't<\/i> do something, which a join can't do, because joining only gives the pairs that exist:<\/p>\n  <pre>SELECT name\nFROM passengers\nWHERE id NOT IN (SELECT passenger_id FROM orders);<\/pre>\n  <p>That lists everyone who ordered nothing all night.<\/p>\n  <div class=\"tries\">\n    <button type=\"button\" class=\"try\" data-sql=\"SELECT name FROM passengers WHERE id NOT IN (SELECT passenger_id FROM orders);\">SELECT name FROM passengers WHERE id NOT IN (SELECT passenger_id FROM orders);<\/button>\n    <button type=\"button\" class=\"try\" data-sql=\"SELECT COUNT(*) FROM orders WHERE stop = 'Zagreb';\">SELECT COUNT(*) FROM orders WHERE stop = 'Zagreb';<\/button>\n  <\/div>",
+  "task": "How many passengers have no alibi: they ordered nothing during the Zagreb stop?",
+  "hints": [
+   "id NOT IN (SELECT passenger_id FROM orders WHERE stop = 'Zagreb'). Count the passengers with COUNT(*).",
+   {
+    "sql": "SELECT COUNT(*)\nFROM passengers\nWHERE id NOT IN (SELECT passenger_id FROM orders WHERE stop = 'Zagreb');"
+   }
+  ],
+  "answers": [
+   "18",
+   "eighteen"
+  ],
+  "placeholder": "a number",
+  "traps": {
+   "7": "That's the passengers who have an alibi. You need the others: NOT IN.",
+   "9": "That's the orders placed at the other stops. You need passengers who are NOT in the Zagreb list: id NOT IN (SELECT passenger_id FROM orders WHERE stop = 'Zagreb')."
+  },
+  "success": "Eighteen people without an alibi. Seven were in the dining car at Zagreb, among them Márk, Dániel and Fruzsina from Sleeper A."
+ },
+ {
+  "title": "The thief",
+  "story": "<p>The lights of Venice are already on the horizon. One query has to put it all together: <b>Lilianna's car<\/b>, a bag <b>heavier than average<\/b>, <b>red wine<\/b>, and <b>no alibi<\/b> at Zagreb.<\/p>",
+  "learn": "<p>Every clue is its own subquery, and <code>AND<\/code> joins them:<\/p>\n  <pre>SELECT name\nFROM passengers\nWHERE car_id = (SELECT …)\n  AND luggage &gt; (SELECT …)\n  AND id IN (SELECT …)\n  AND id NOT IN (SELECT …);<\/pre>\n  <p>One value: <code>=<\/code>, <code>&gt;<\/code>, <code>&lt;<\/code>. A list: <code>IN<\/code>, <code>NOT IN<\/code>.<\/p>",
+  "task": "Who stole the Stradivarius?",
+  "hints": [
+   "Four conditions, four subqueries, joined with AND. The last one is NOT IN, with stop = 'Zagreb'.",
+   {
+    "sql": "SELECT name\nFROM passengers\nWHERE car_id = (SELECT car_id FROM passengers WHERE name = 'Lilianna')\n  AND luggage > (SELECT AVG(luggage) FROM passengers)\n  AND id IN (SELECT passenger_id FROM orders WHERE item = 'red wine')\n  AND id NOT IN (SELECT passenger_id FROM orders WHERE stop = 'Zagreb');"
+   }
+  ],
+  "answers": [
+   "bianka kinga",
+   "bianka",
+   "kinga bianka"
+  ],
+  "placeholder": "name",
+  "traps": {
+   "mark": "Márk ordered his wine during the Zagreb stop: he has an alibi. Add AND id NOT IN (… stop = 'Zagreb').",
+   "daniel": "Dániel was drinking tea in the dining car at Zagreb, and he didn't order red wine.",
+   "fruzsina": "Fruzsina was eating goulash in the dining car at Zagreb, and she didn't order red wine.",
+   "hanna": "Hanna travels in Sleeper B: she had no key to Lilianna's corridor.",
+   "nora": "Nóra travels in the Couchette car, and she was in the dining car at Zagreb.",
+   "lilianna": "Lilianna is the one who was robbed."
+  },
+  "success": "Bianka Kinga. Two glasses of red wine, no alibi at Zagreb, and the heaviest bag in Sleeper A. In it, wrapped in a woollen shawl, lies the Stradivarius. At dawn the train rolls into Venice, and that evening Lilianna plays at La Fenice as planned."
+ }
+];
+const BONUS = ["Whose luggage is the heaviest on the whole train? Use = (SELECT MAX(…) …).", "Which passengers didn't order anything all night?", "How many passengers travel in first class? Use car_id IN (SELECT id FROM cars WHERE class = 'first').", "In which cars do the passengers carry more luggage on average than the train's average? (passengers + cars, GROUP BY, HAVING with a subquery)", "Who ordered something at the same stop as Lilianna? (a subquery inside a subquery)"];
+const COLDOCS = {"cars": {"id": "Row number of the car.", "name": "<code>'Sleeper A'</code>, <code>'Sleeper B'</code>, <code>'Couchette'</code> or <code>'Seats'</code>.", "class": "<code>'first'</code> or <code>'second'</code>."}, "passengers": {"id": "Row number of the passenger.", "name": "The passenger's name.", "car_id": "Which car they travel in: the <code>id</code> of a row in <code>cars</code>.", "luggage": "How heavy their luggage is, in kg."}, "orders": {"id": "Row number of the order.", "passenger_id": "Who ordered: the <code>id</code> of a row in <code>passengers</code>.", "item": "What they ordered, e.g. <code>'tea'</code> or <code>'red wine'</code>.", "stop": "Where the train was: <code>'Székesfehérvár'</code>, <code>'Nagykanizsa'</code>, <code>'Zagreb'</code> or <code>'Ljubljana'</code>."}};
+const HAND_STEPS = ["Write your name below.", "Click <b>Save answers (.txt)</b>. The file goes to your Downloads folder.", "Open the assignment in <b>Google Classroom</b>, upload the file under <b>Add or create → File</b>, then press <b>Turn in</b>."];
+const RANKS = ["Chief Inspector", "Detective", "Conductor", "Porter"];
+const T = {
+  refresher:"Refresher", before:"Before boarding · about 3 minutes", chapter:(i,n)=>`Chapter ${i} of ${n}`, solved:(n,t)=>`${n} / ${t} chapters solved`, sealed:n=>`Clue 2 · sealed. It opens after ${n} more wrong answer${n===1?'':'s'}.`, rows:n=>`${n} row${n===1?'':'s'}`,
+  try_:"Try it", learn:"SQL for this step", task:"Your task", hint1:"Clue 1 · hint", hint2:"Clue 2 · a working query", answer:"Answer", check:"Check answer",
+  correct:"Correct.", wrong:"Not quite.", wrongTip:"Look at your result again. Is every subquery in brackets? = for one value, IN for a list? And does the task ask for a number or a name?", prev:"Previous chapter", next:"Next chapter", start:"Start the investigation", yourans:"Your answer",
+  ready:"The logbook is open. Write a query and press Run.", empty:"The query box is empty. Type a query first.", zero:"0 rows. No rows match all of your conditions. Check the spelling of text values and your matching rule.", sound:"Sound", reset:"Start over", reset2:"Click again to erase progress",
+  errGeneric:"Check spelling, commas, brackets and quotes. Text values need single quotes, like 'Zagreb'.", errCol:"That column name doesn't exist, or it's ambiguous. When two tables have a column with the same name (like id or name), write the table name in front: passengers.id.", errTab:"That table doesn't exist. The tables are: cars, passengers, orders.", errAmb:"Ambiguous column: both tables have a column with that name. Write the table name in front of it, like passengers.name.", sqlErr:"The query has an error.", engFail:"The SQL engine could not load.", engFail2:"Check the internet connection and reload the page.", engStart:"The SQL engine could not start.",
+  endH:"Arrival in Venice", endP:m=>`The thief is locked in the luggage van, the Stradivarius is back in its case, and the train rolls into Venice at dawn. You solved it in about <b>${m} minutes</b>: with subqueries you compared with a looked-up value, with the average, and with lists, using IN and NOT IN.`, endBonus:"Bonus tasks for fast detectives:", handH:"Hand in your answers", name:"Your name", namePh:"Write your name here", save:"Save answers (.txt)", copy:"Copy as text", replay:"Replay the celebration",
+  xNameFirst:"Write your name first.", xCopied:"Copied. Paste it into the assignment in Google Classroom as a private comment, then press Turn in.", xBlocked:"Copying is blocked here. Use Save answers instead.", xSaved:f=>`Saved as ${f}. Now upload it to the assignment in Google Classroom and press Turn in.`, xSaveBlocked:"Saving is blocked here. Use Copy as text instead.",
+  filePrefix:"moonlight-express", reportTitle:"THE MOONLIGHT EXPRESS - ANSWER SHEET", rName:"Name", rFinished:"Finished", rTime:"Time taken", rQueries:"Queries run", rDev:"NOTE: completed with the teacher code, so some answers may be missing.",
+  rTask:"Task", rAnswer:"Answer", rSkipped:"(skipped)", rUnsolved:"(not solved)", rWrong:"Wrong answers", rQuery:"Query", rNone:"(none saved)",
+  stampOpen:"Thief on board", stampDone:"Thief caught", plusReady:"Ready!", plusGood:"Well done!", num:"number", text:"text"
+};
+
+/* ---------- state ---------- */
+const KEY = "express-en-v1";
+let state = { solved: [], current: 0, start: Date.now(), end: null, drafts: {} };
+try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && Array.isArray(s.solved)) state = Object.assign(state, s); } catch(e){}
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(state)); } catch(e){} }
+const num = i => CHAPTERS[0].refresher ? i : i+1;
+const NCH = CHAPTERS.filter(c=>!c.refresher).length;
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const norm = s => s.normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().replace(/[^a-z0-9 ]/g," ").replace(/\s+/g," ").trim();
+const isUnlocked = i => i === 0 || state.solved.includes(i-1);
+const allDone = () => state.solved.length === CHAPTERS.length;
+const starterFor = i => CHAPTERS[i].starter || `-- ${CHAPTERS[i].refresher ? T.refresher : num(i)}: ${CHAPTERS[i].title}\n`;
+const crestSvg = () => document.querySelector(".guitar").outerHTML.replace('class="guitar"', 'width="100%" height="100%"');
+$("heroGuitar").innerHTML = crestSvg();
+
+/* ---------- line-up strip ---------- */
+/* chapter-strip markers: a guitar pick over the chapter you are on, nothing extra on solved ones (their post turns lime) */
+const WHO_CUR = "🚂"; const _unusedPick = `<svg viewBox="0 0 20 20" width="18" height="18"><path d="M10 18C5 13 2 9 2.5 5.5 3 2.5 6 1.5 10 1.5s7 1 7.5 4C18 9 15 13 10 18z" fill="var(--pink)" stroke="#7a1248" stroke-width="1.2"/><path d="M6 5.5c1.5-1 3-1.2 4-1.2" stroke="#fff" stroke-opacity=".6" stroke-width="1.3" stroke-linecap="round" fill="none"/></svg>`;
+const WHO_DONE = "🎻";
+function renderSteps(){
+  $("steps").innerHTML = CHAPTERS.map((c,i)=>{
+    const cls = ["step"];
+    if (state.solved.includes(i)) cls.push("done");
+    if (i === state.current) cls.push("current");
+    if (!isUnlocked(i)) cls.push("locked");
+    const who = i === state.current ? WHO_CUR : (state.solved.includes(i) ? WHO_DONE : "");
+    return `<button type="button" class="${cls.join(" ")}" data-i="${i}" ${isUnlocked(i)?"":"aria-disabled=\"true\""} title="${esc(c.title)}">
+      <span class="who" aria-hidden="true">${who}</span><span class="post">${c.refresher ? "R" : num(i)}</span><span class="t">${esc(c.title)}</span></button>`;
+  }).join("");
+  { const cc = CHAPTERS[state.current]; $("stepCaption").innerHTML = `<span>${cc.refresher ? T.refresher : T.chapter(num(state.current), NCH)}</span>${esc(cc.title)}`; }
+  $("solvedCount").textContent = T.solved(state.solved.filter(i=>!CHAPTERS[i].refresher).length, NCH);
+  const st = $("stamp"); st.textContent = allDone() ? T.stampDone : T.stampOpen; st.classList.toggle("closed", allDone());
+}
+$("steps").addEventListener("click", e=>{ const b = e.target.closest(".step"); if (!b) return; const i = +b.dataset.i; if (isUnlocked(i)) goTo(i); });
+$("case").addEventListener("click", e=>{ const b = e.target.closest("button.try"); if (!b) return; $("sql").value = b.dataset.sql; run(); });
+function goTo(i){ state.drafts[state.current] = $("sql").value; state.current = i; save(); renderSteps(); renderCase(); $("sql").value = state.drafts[i] ?? starterFor(i); }
+
+/* ---------- notebook ---------- */
+function renderCase(){
+  const i = state.current, c = CHAPTERS[i], solved = state.solved.includes(i);
+  const hints = c.hints.map(h=>{
+    if (typeof h === "string") return `<details class="hint"><summary>${T.hint1}</summary><p>${esc(h)}</p></details>`;
+    const tries = (state.wrong && state.wrong[i]) || 0;
+    if (!solved && tries < 3) return `<div class="hint locked">${T.sealed(3 - tries)}</div>`;
+    return `<details class="hint"><summary>${T.hint2}</summary><pre>${esc(h.sql)}</pre></details>`;
+  }).join("");
+  const last = i === CHAPTERS.length - 1;
+  $("case").innerHTML = `
+    <div class="eyebrow">${c.refresher ? T.before : T.chapter(num(i), NCH)}</div>
+    <h2>${esc(c.title)}</h2>
+    <div class="story">${c.story}</div>
+    <div class="learn"><h3>${c.refresher ? T.try_ : T.learn}</h3>${c.learn}</div>
+    <div class="links" id="links"></div>
+    <div class="task"><h3>${T.task}</h3><p>${esc(c.task)}</p></div>
+    ${hints}
+    <form class="answer" id="answerForm" autocomplete="off">
+      <input id="answer" type="text" placeholder="${T.answer}: ${esc(c.placeholder)}" aria-label="${T.yourans}" ${solved?"disabled":""}>
+      <button class="btn primary" type="submit" ${solved?"disabled":""}>${T.check}</button>
+    </form>
+    <div id="verdict">${solved ? `<div class="verdict ok">${T.correct}<p>${esc(c.success)}</p></div>` : ""}</div>
+    <div class="navrow">
+      <button class="btn" type="button" id="prev" ${i===0?"hidden":""}>${T.prev}</button>
+      <button class="btn primary" type="button" id="next" ${solved && !last ? "" : "hidden"}>${c.refresher ? T.start : T.next}</button>
+    </div>
+    ${allDone() && last ? endingHtml() : ""}`;
+  renderLinks();
+  $("answerForm").addEventListener("submit", e=>{ e.preventDefault(); check(); });
+  $("prev").onclick = ()=> goTo(i-1);
+  $("next").onclick = ()=> goTo(i+1);
+}
+/* ---------- connection map: which tables a chapter uses and how they plug together ---------- */
+const LT = document.documentElement.lang === "hu" ? {
+  h:"A fejezet táblái és kapcsolataik", hR:"Az adatbázis térképe · így kapcsolódnak a táblák",
+  noRule:"Még nincs párosítási szabály: minden sor minden sorral párosul.",
+  byHand:"Még nincs összekapcsolva: két külön lekérdezés, a számot kézzel viszed át.",
+  n1:(a,b)=>`N : 1 — ${az(a)} ${a} tábla sok sora mutathat ${az(b)} ${b} tábla egy sorára`,
+  one:(a,b)=>`1 : 1 — ${az(b)} ${b} tábla minden sorához pontosan egy sor tartozik ${az(a)} ${a} táblában`,
+  nn:(a,b,j)=>`${a} ↔ ${b}: N : N kapcsolat ${az(j)} ${j} táblán keresztül`, more:n=>`+${n} további`
+} : {
+  h:"Tables in this chapter and how they connect", hR:"Database map · how the tables connect",
+  noRule:"No matching rule yet: every row is paired with every row.",
+  byHand:"Not joined yet: two separate queries, and you carry the number across by hand.",
+  n1:(a,b)=>`N : 1 — many ${a} rows can point to the same ${b} row`,
+  one:(a,b)=>`1 : 1 — every ${b} row has exactly one ${a} row`,
+  nn:(a,b,j)=>`${a} ↔ ${b}: N : N, through the ${j} table`, more:n=>`+${n} more`
+};
+function az(w){ return /^[aáeéiíoóöőuúüű]/i.test(w) ? "az" : "a"; }
+const SCHEMA = (()=>{ const o = {}; for (const m of SEED.matchAll(/CREATE TABLE (\w+) \(([^)]*)\)/g)) o[m[1]] = m[2].split(",").map(x=>x.trim().split(/\s+/)[0]); return o; })();
+function chapterLinks(c){
+  const h = c.hints.find(x=>typeof x !== "string"); const sql = h ? h.sql : "";
+  const tables = [], froms = [];
+  for (const m of sql.matchAll(/FROM\s+([\w\s,]+?)(?=\s+WHERE|\s+GROUP|\s+ORDER|;|$)/gi)){
+    const list = m[1].split(",").map(x=>x.trim().split(/\s+/)[0]).filter(t=>SCHEMA[t]);
+    froms.push(list); list.forEach(t=>{ if (!tables.includes(t)) tables.push(t); });
+  }
+  const links = [];
+  for (const m of sql.matchAll(/(\w+)\.(\w+)\s*=\s*(\w+)\.(\w+)/g)){
+    let [ , ta, ca, tb, cb ] = m;
+    if (!SCHEMA[ta] || !SCHEMA[tb]) continue;
+    if (ca === "id" && cb !== "id") [ta, ca, tb, cb] = [tb, cb, ta, ca];   /* fk side first */
+    if (!links.some(l=>l.ft===ta && l.fc===ca && l.pt===tb)) links.push({ ft:ta, fc:ca, pt:tb, pc:cb });
+  }
+  for (const m of sql.matchAll(/(\w+)\s+(NOT\s+)?IN\s*\(\s*SELECT\s+(\w+)\s+FROM\s+(\w+)/gi)){   /* id IN (SELECT passenger_id FROM orders …) */
+    const [ , oc, not, ic, it ] = m, ot = tables.find(t=>t !== it && SCHEMA[t] && SCHEMA[t].includes(oc));
+    if (ot && SCHEMA[it] && !links.some(l=>l.ft===it && l.fc===ic && l.pt===ot && l.op===(not ? "NOT IN" : "IN"))) links.push({ ft:it, fc:ic, pt:ot, pc:oc, op:(not ? "NOT IN" : "IN") });
+  }
+  return { tables, links, joined: froms.some(f=>f.length > 1) };
+}
+function mapFor(i){
+  const c = CHAPTERS[i];
+  if (!c.refresher) return chapterLinks(c);
+  const names = Object.keys(SCHEMA), all = { tables:names.slice(), links:[], joined:true, map:true };
+  Object.entries(SCHEMA).forEach(([t, cols])=>cols.forEach(col=>{
+    const m = col.match(/^(.+)_id$/); if (!m) return;
+    const pt = names.find(x=>x !== t && x.startsWith(m[1])); if (pt) all.links.push({ ft:t, fc:col, pt, pc:"id" }); }));
+  return all;
+}
+function chainOrder(tables, links){          /* line the tables up along their links: A — B — C */
+  if (!links.length) return tables;
+  const nb = t => links.filter(l=>l.ft===t || l.pt===t).map(l=>l.ft===t ? l.pt : l.ft);
+  const ends = tables.filter(t=>nb(t).length <= 1);
+  const start = ends.find(t=>links.some(l=>l.ft===t)) || ends[0] || tables[0];
+  const out = [start];
+  while (out.length < tables.length){ const nxt = nb(out[out.length-1]).find(t=>!out.includes(t)) || tables.find(t=>!out.includes(t)); out.push(nxt); }
+  return out;
+}
+const uniqCache = {};
+function isUnique(t, col){
+  const k = t + "." + col; if (k in uniqCache) return uniqCache[k]; if (!db) return null;
+  try { const r = db.exec(`SELECT COUNT(${col}) = COUNT(DISTINCT ${col}) FROM ${t}`); return uniqCache[k] = !!r[0].values[0][0]; } catch(e){ return null; }
+}
+function lkColor(k){ return `var(--lk${k % 6 + 1})`; }
+function renderLinks(){
+  const box = $("links"); if (!box) return;
+  const spec = mapFor(state.current);
+  if (!spec.tables.length){ box.hidden = true; return; }
+  box.hidden = false;
+  const tables = chainOrder(spec.tables, spec.links);
+  const used = {}; spec.links.forEach((l,k)=>{ (used[l.ft+"."+l.fc] ??= k); (used[l.pt+"."+l.pc] ??= k); });
+  const cards = tables.map(t=>{
+    const cols = SCHEMA[t], show = cols, more = 0;      /* every column of the table */
+    return `<div class="lk-card" data-t="${t}"><div class="h">${t}</div>${show.map(c=>{
+      const k = used[t+"."+c];
+      return `<div class="r${c==="id"?" k":""}${k!==undefined?" on":""}" data-c="${c}"${k!==undefined?` style="--c:${lkColor(k)}"`:""}><span class="ic">${c==="id"?"🔑":(/_id$/.test(c)?"→":"")}</span>${c}</div>`;
+    }).join("")}${more ? `<div class="r more">${LT.more(more)}</div>` : ""}</div>`;
+  }).join("");
+  const rules = spec.links.map((l,k)=>{
+    const u = isUnique(l.ft, l.fc);
+    const kind = u === null ? "" : `<span class="kind">${u ? LT.one(l.ft, l.pt) : LT.n1(l.ft, l.pt)}</span>`;
+    if (l.op) return `<li><span class="sw" style="background:${lkColor(k)}"></span><code class="sub">${l.pt}.${l.pc} ${l.op} (SELECT ${l.fc} FROM ${l.ft} …)</code><span class="kind">linked by a subquery</span></li>`;
+    return `<li><span class="sw" style="background:${lkColor(k)}"></span><code>${l.ft}.${l.fc} = ${l.pt}.${l.pc}</code>${kind}</li>`;
+  });
+  let note = "";
+  if (!spec.links.length && tables.length > 1) note = `<p class="lk-note">${spec.joined ? LT.noRule : LT.byHand}</p>`;
+  box.innerHTML = `<h3>${spec.map ? LT.hR : LT.h}</h3><div class="lk-board"><svg class="lk-svg" aria-hidden="true"></svg>${cards}</div>${note}${rules.length ? `<ul class="lk-rules">${rules.join("")}</ul>` : ""}`;
+  box.dataset.spec = JSON.stringify({ links: spec.links, loose: !spec.links.length && tables.length > 1 ? [tables[0], tables[1], spec.joined ? "×" : "?"] : null });
+  requestAnimationFrame(drawLinks);
+}
+function drawLinks(){                        /* straight arrows: _id column → the id it points to */
+  const box = $("links"); if (!box || box.hidden || !box.dataset.spec) return;
+  const board = box.querySelector(".lk-board"), svg = box.querySelector(".lk-svg"); if (!board) return;
+  const spec = JSON.parse(box.dataset.spec);
+  const cardEls = [...board.querySelectorAll(".lk-card")];
+  board.classList.remove("stack");
+  const gap = parseFloat(getComputedStyle(board).columnGap) || 46;
+  const need = cardEls.reduce((s,c)=>s + c.getBoundingClientRect().width, 0) + gap * (cardEls.length - 1);
+  const stack = cardEls.length > 1 && need > board.clientWidth - 8;
+  board.classList.toggle("stack", stack);
+  const B = board.getBoundingClientRect(); if (!B.width) return;
+  svg.setAttribute("viewBox", `0 0 ${B.width} ${B.height}`);
+  const rel = el => { const r = el.getBoundingClientRect(); return { l:r.left-B.left, r:r.right-B.left, t:r.top-B.top, b:r.bottom-B.top, cy:(r.top+r.bottom)/2-B.top, cx:(r.left+r.right)/2-B.left }; };
+  const card = t => board.querySelector(`.lk-card[data-t="${t}"]`);
+  const head = (x, y, dx, dy, color)=>{ const L = 9, W = 5.5, px = -dy, py = dx;
+    return `<polygon points="${x},${y} ${x - dx*L + px*W},${y - dy*L + py*W} ${x - dx*L - px*W},${y - dy*L - py*W}" fill="${color}"/>`; };
+  const tag = (x, y, txt, color, anchor)=> txt ? `<text x="${x}" y="${y}" text-anchor="${anchor}" class="lk-end" fill="${color}">${txt}</text>` : "";
+  const right = Math.max(...cardEls.map(c=>rel(c).r));
+  let html = "";
+  spec.links.forEach((l,k)=>{
+    const A = card(l.ft), P = card(l.pt); if (!A || !P) return;
+    const a = rel(A.querySelector(`[data-c="${l.fc}"]`)), b = rel(P.querySelector(`[data-c="${l.pc}"]`)), ca = rel(A), cp = rel(P);
+    const color = lkColor(k), u = isUnique(l.ft, l.fc), la = u === null ? "" : (u ? "1" : "N"), lb = u === null ? "" : "1";
+    if (!stack){
+      const lr = ca.r <= cp.l, x1 = lr ? ca.r : ca.l, x2 = lr ? cp.l : cp.r, d = lr ? 1 : -1;
+      html += `<circle cx="${x1}" cy="${a.cy}" r="4" fill="${color}"/><line x1="${x1}" y1="${a.cy}" x2="${x2 - d*8}" y2="${b.cy}" stroke="${color}" stroke-width="3" stroke-linecap="round"/>`;
+      const len = Math.hypot(x2 - x1, b.cy - a.cy) || 1;
+      html += head(x2, b.cy, (x2 - x1)/len, (b.cy - a.cy)/len, color);
+      const up = b.cy < a.cy - 1;
+      html += tag(x1 + d*7, up ? a.cy + 18 : a.cy - 8, la, color, lr ? "start" : "end") + tag(x2 - d*12, up ? b.cy - 9 : b.cy + 19, lb, color, lr ? "end" : "start");
+    } else {
+      const X = right + 18;
+      html += `<circle cx="${ca.r}" cy="${a.cy}" r="4" fill="${color}"/><path d="M${ca.r},${a.cy} H${X} V${b.cy} H${cp.r + 8}" fill="none" stroke="${color}" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>`;
+      html += head(cp.r, b.cy, -1, 0, color);
+      html += tag(X + 6, a.cy + 5, la, color, "start") + tag(X + 6, b.cy + 5, lb, color, "start");
+    }
+  });
+  if (spec.loose){ const A = card(spec.loose[0]), P = card(spec.loose[1]);
+    if (A && P){ const ca = rel(A), cp = rel(P), ha = rel(A.querySelector(".h")), hp = rel(P.querySelector(".h"));
+      const [x1,y1,x2,y2] = stack ? [ca.cx, ca.b, cp.cx, cp.t] : [ca.r, ha.cy, cp.l, hp.cy], mx = (x1+x2)/2, my = (y1+y2)/2;
+      html += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="var(--lk-loose)" stroke-width="3" stroke-dasharray="6 6"/>`;
+      html += `<circle cx="${mx}" cy="${my}" r="11" class="lk-mid"/><text x="${mx}" y="${my+5}" text-anchor="middle" class="lk-midt">${spec.loose[2]}</text>`; } }
+  svg.innerHTML = html;
+}
+addEventListener("resize", ()=>requestAnimationFrame(drawLinks));
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(()=>drawLinks());
+function check(){
+  const i = state.current, c = CHAPTERS[i], v = norm($("answer").value);
+  if (!v) return;
+  if (devHash(v) === 2236979087){ devComplete(); return; }
+  if (c.answers.map(norm).includes(v)){
+    if (!state.solved.includes(i)){ state.answers = state.answers || {}; state.answers[i] = $("answer").value.trim(); state.solvedSql = state.solvedSql || {}; state.solvedSql[i] = $("sql").value; }
+    const r = document.querySelector("#answerForm button").getBoundingClientRect();
+    const first = !state.solved.includes(i);
+    if (first) state.solved.push(i);
+    const finished = first && allDone();
+    if (allDone() && !state.end) state.end = Date.now();
+    save(); renderSteps(); renderCase();
+    const n = $("next"); if (n && !n.hidden) n.focus();
+    if (finished) finale(); else if (first) chapterWin(r.left + r.width/2, r.top + r.height/2, i);
+  } else {
+    state.wrong = state.wrong || {}; state.wrong[i] = (state.wrong[i] || 0) + 1; save();
+    if (state.wrong[i] <= 2){ renderCase(); $("answer").focus(); }
+    const trap = c.traps && Object.keys(c.traps).find(k=>norm(k) === v);   /* a known mistake gets its own tip */
+    $("verdict").innerHTML = `<div class="verdict bad">${T.wrong}<p>${trap ? esc(c.traps[trap]) : T.wrongTip}</p></div>`;
+  }
+}
+/* teacher shortcut: a secret answer that solves every chapter (only its hash is stored here) */
+function devHash(s){ let x = 5381; for (const ch of s) x = ((x*33) ^ ch.charCodeAt(0)) >>> 0; return x; }
+function devComplete(){ state.dev = true; state.solved = CHAPTERS.map((_,k)=>k); state.current = CHAPTERS.length - 1; if (!state.end) state.end = Date.now(); save(); renderSteps(); renderCase(); $("sql").value = starterFor(state.current); finale(); }
+function endingHtml(){
+  const mins = Math.max(1, Math.round(((state.end||Date.now()) - state.start)/60000));
+  return `<div class="ending learn">
+    <h3>${T.endH}</h3><p>${T.endP(mins)}</p>
+    <p><b>${T.endBonus}</b></p><ol>${BONUS.map(b=>`<li>${esc(b)}</li>`).join("")}</ol>
+    <div class="export">
+      <h3>${T.handH}</h3>
+      <ol class="export-steps">${HAND_STEPS.map(s=>`<li>${s}</li>`).join("")}</ol>
+      <label for="studentName">${T.name}</label>
+      <input id="studentName" type="text" autocomplete="off" placeholder="${T.namePh}" value="${esc(state.student || "")}">
+      <div class="export-btns"><button class="btn primary" type="button" id="saveTxt">${T.save}</button><button class="btn" type="button" id="copyTxt">${T.copy}</button></div>
+      <p class="export-note" id="exportNote" aria-live="polite"></p>
+    </div>
+    <div><button class="btn" type="button" id="replayFinale">${T.replay}</button></div>
+  </div>`;
+}
+$("case").addEventListener("click", e=>{ if (e.target.id === "replayFinale") finale(); if (e.target.id === "saveTxt") exportAnswers("save"); if (e.target.id === "copyTxt") exportAnswers("copy"); });
+$("case").addEventListener("input", e=>{ if (e.target.id === "studentName"){ state.student = e.target.value; save(); } });
+
+/* ---------- answer sheet export ---------- */
+function fmtTime(ms){ const m = Math.floor(ms/60000), s = Math.floor(ms/1000)%60; return `${m}:${String(s).padStart(2,"0")}`; }
+function buildReport(){
+  const pad = n => String(n).padStart(2,"0"), d = new Date(state.end || Date.now()), L = [];
+  L.push(T.reportTitle); L.push("=".repeat(T.reportTitle.length));
+  L.push(`${T.rName}: ${(state.student || "").trim()}`);
+  L.push(`${T.rFinished}: ${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`);
+  L.push(`${T.rTime}: ${fmtTime((state.end || Date.now()) - state.start)}`);
+  L.push(`${T.rQueries}: ${state.queries || 0}`);
+  if (state.dev) L.push(T.rDev);
+  L.push("");
+  CHAPTERS.forEach((c,i)=>{
+    L.push(`${c.refresher ? T.refresher : T.chapter(num(i), NCH)}: ${c.title}`); L.push("-".repeat(40));
+    L.push(`${T.rTask}: ${c.task}`);
+    L.push(`${T.rAnswer}: ${(state.answers && state.answers[i]) || (state.solved.includes(i) ? T.rSkipped : T.rUnsolved)}`);
+    L.push(`${T.rWrong}: ${(state.wrong && state.wrong[i]) || 0}`);
+    const q = ((state.solvedSql && state.solvedSql[i]) || "").trim();
+    L.push(`${T.rQuery}:`); L.push(q ? q.split("\n").map(x=>"    " + x).join("\n") : "    " + T.rNone); L.push("");
+  });
+  return L.join("\r\n");
+}
+function exportAnswers(mode){
+  const note = $("exportNote"), nameEl = $("studentName"), name = (state.student || "").trim();
+  if (!name){ note.textContent = T.xNameFirst; nameEl.focus(); return; }
+  const text = buildReport();
+  if (mode === "copy"){
+    const done = ()=> note.textContent = T.xCopied;
+    const fallback = ()=>{ const t = document.createElement("textarea"); t.value = text; document.body.appendChild(t); t.select(); try { document.execCommand("copy"); done(); } catch(e){ note.textContent = T.xBlocked; } t.remove(); };
+    try { navigator.clipboard.writeText(text).then(done, fallback); } catch(e){ fallback(); }
+    return;
+  }
+  const slug = name.normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[^A-Za-z0-9]+/g,"-").replace(/^-|-$/g,"") || "student";
+  const file = `${T.filePrefix}-${slug}.txt`;
+  try {
+    const url = URL.createObjectURL(new Blob(["﻿" + text], {type:"text/plain;charset=utf-8"}));
+    const a = document.createElement("a"); a.href = url; a.download = file; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=> URL.revokeObjectURL(url), 2000);
+    note.textContent = T.xSaved(file);
+  } catch(e){ note.textContent = T.xSaveBlocked; }
+}
+
+/* ---------- timer + reset ---------- */
+function tick(){ const ms = (state.end || Date.now()) - state.start; const m = Math.floor(ms/60000), s = Math.floor(ms/1000)%60; $("timer").textContent = `${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`; }
+setInterval(tick, 1000); tick();
+let resetArmed = null;
+$("resetProgress").onclick = ()=>{
+  const b = $("resetProgress");
+  if (!resetArmed){ b.textContent = T.reset2; resetArmed = setTimeout(()=>{ b.textContent = T.reset; resetArmed = null; }, 3000); return; }
+  clearTimeout(resetArmed); resetArmed = null; b.textContent = T.reset;
+  state = { solved: [], current: 0, start: Date.now(), end: null, drafts: {} };
+  save(); renderSteps(); renderCase(); $("sql").value = starterFor(0); resetDb();
+};
+
+/* ---------- celebrations ---------- */
+const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const FXC = ["#d9b061","#8c1c3a","#f3e3b5","#3fa08a","#e0607a"];
+const fx = { c: $("fx"), ctx: $("fx").getContext("2d"), parts: [], raf: 0, w: 0, h: 0 };
+function fxSize(){ const d = devicePixelRatio || 1; fx.w = innerWidth; fx.h = innerHeight; fx.c.width = fx.w*d; fx.c.height = fx.h*d; fx.ctx.setTransform(d,0,0,d,0,0); }
+addEventListener("resize", fxSize); fxSize();
+const rnd = (a,b) => a + Math.random()*(b-a);
+function spawn(p){ fx.parts.push(p); if (!fx.raf) fx.raf = requestAnimationFrame(fxLoop); }
+function fxLoop(){
+  const g = fx.ctx; g.clearRect(0,0,fx.w,fx.h);
+  fx.parts = fx.parts.filter(p => p.life > 0 && p.y < fx.h + 60);
+  for (const p of fx.parts){
+    p.vx *= p.drag; p.vy = p.vy*p.drag + p.g; p.x += p.vx; p.y += p.vy; p.rot += p.vr; p.life--;
+    g.save(); g.globalAlpha = Math.min(1, p.life/30); g.translate(p.x, p.y); g.rotate(p.rot); g.fillStyle = p.color;
+    if (p.type === "confetti"){ g.scale(1, Math.cos(p.life*0.2)); g.fillRect(-p.s/2, -p.s/4, p.s, p.s/2); }
+    else if (p.type === "note"){ g.font = `${p.s*2}px serif`; g.textAlign = "center"; g.fillText("♪", 0, p.s); }
+    else { g.globalCompositeOperation = "lighter"; g.beginPath(); g.arc(0,0,p.s,0,6.283); g.fill(); }
+    g.restore();
+  }
+  fx.raf = fx.parts.length ? requestAnimationFrame(fxLoop) : 0;
+}
+function burst(x, y, n, power=9){
+  for (let k=0; k<n; k++){ const ang = rnd(0, Math.PI*2), sp = rnd(power*.3, power), note = Math.random() < .3;
+    spawn({ type: note ? "note" : "confetti", x, y, vx: Math.cos(ang)*sp, vy: Math.sin(ang)*sp - power*.5, g: .25, drag: .985, rot: rnd(0,6), vr: rnd(-.3,.3), s: rnd(7,13), color: FXC[k % FXC.length], life: rnd(70,120) }); }
+}
+function firework(x, y){
+  const col = FXC[Math.floor(rnd(0, 4))], n = 90;
+  for (let k=0; k<n; k++){ const ang = k/n*Math.PI*2, sp = rnd(3,7.5);
+    spawn({ type:"spark", x, y, vx: Math.cos(ang)*sp, vy: Math.sin(ang)*sp, g:.06, drag:.975, rot:0, vr:0, s: rnd(1.6,3.2), color: col, life: rnd(60,95) }); }
+  tone(rnd(90,160), .35, "sawtooth", .05, 40);
+}
+function rain(ms){
+  const end = performance.now() + ms;
+  (function drop(){ for (let k=0; k<6; k++){ const note = Math.random() < .35;
+      spawn({ type: note ? "note" : "confetti", x: rnd(0, fx.w), y: -20, vx: rnd(-1.5,1.5), vy: rnd(2,5), g:.05, drag:.995, rot: rnd(0,6), vr: rnd(-.2,.2), s: rnd(8,14), color: FXC[Math.floor(rnd(0,5))], life: 400 }); }
+    if (performance.now() < end) setTimeout(drop, 60); })();
+}
+function fireworkShow(count){ for (let k=0; k<count; k++) setTimeout(()=> firework(rnd(fx.w*.12, fx.w*.88), rnd(fx.h*.1, fx.h*.5)), 400 + k*rnd(280,420)); }
+
+let soundOn = true;
+try { soundOn = localStorage.getItem(KEY+"-sound") !== "off"; } catch(e){}
+const ONOFF = document.documentElement.lang === "hu" ? ["be", "ki"] : ["on", "off"];
+function paintSound(){ const b = $("soundToggle"); b.textContent = `${T.sound}: ${soundOn?ONOFF[0]:ONOFF[1]}`; b.setAttribute("aria-pressed", soundOn); }
+paintSound();
+$("soundToggle").onclick = ()=>{ soundOn = !soundOn; paintSound(); try { localStorage.setItem(KEY+"-sound", soundOn?"on":"off"); } catch(e){} };
+let actx = null;
+function tone(freq, dur, type="triangle", vol=.12, slideTo=null, delay=0){
+  if (!soundOn) return;
+  try { actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+    const t = actx.currentTime + delay, o = actx.createOscillator(), g = actx.createGain();
+    o.type = type; o.frequency.setValueAtTime(freq, t); if (slideTo) o.frequency.exponentialRampToValueAtTime(slideTo, t + dur);
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + .02); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(g).connect(actx.destination); o.start(t); o.stop(t + dur + .05); } catch(e){}
+}
+function riff(){ [392,523,659,523,784].forEach((f,k)=>{ tone(f, .17, "square", .045, null, k*.12); tone(f, .17, "triangle", .08, null, k*.12); }); }
+function powerChord(){ [196,247,294,392,494].forEach(f=>{ tone(f, 1.5, "triangle", .07, null, 0); tone(f, 1.5, "square", .025, null, 0); }); tone(70, .45, "sine", .25, 40, 0); tone(70, .45, "sine", .2, 40, .22); tone(70, .6, "sine", .25, 40, .44); }
+function fanfare(){ riff(); setTimeout(powerChord, 520); setTimeout(()=>{ [392,523,659,784,1047].forEach((f,k)=> tone(f, k===4?1.2:.2, "triangle", .12, null, k*.14)); }, 1400); }
+function chapterWin(x, y, i){
+  riff();
+  const el = document.createElement("div"); el.className = "plus"; el.textContent = CHAPTERS[i].refresher ? T.plusReady : T.plusGood;
+  el.style.left = x+"px"; el.style.top = (y-30)+"px"; document.body.appendChild(el); setTimeout(()=>el.remove(), 1300);
+  const s = document.querySelector(`.step[data-i="${i+1}"]`) || document.querySelector(`.step[data-i="${i}"]`); if (s) s.classList.add("just");
+  if (reduceMotion) return;
+  burst(x, y, 60);
+  const wrap = document.querySelector(".wrap"); wrap.classList.remove("shake"); void wrap.offsetWidth; wrap.classList.add("shake");
+}
+function rankFor(min){ return min <= 20 ? RANKS[0] : min <= 28 ? RANKS[1] : min <= 35 ? RANKS[2] : RANKS[3]; }
+function finale(){
+  const ms = (state.end || Date.now()) - state.start, mins = Math.floor(ms/60000), secs = Math.floor(ms/1000)%60;
+  $("fTime").textContent = `${mins}:${String(secs).padStart(2,"0")}`; $("fQueries").textContent = state.queries || 0; $("fRank").textContent = rankFor(ms/60000);
+  const f = $("finale"); f.hidden = true; void f.offsetWidth; f.hidden = false;
+  const inner = $("finaleInner"); inner.classList.remove("shake"); void inner.offsetWidth; inner.classList.add("shake");
+  fanfare(); $("finaleClose").focus();
+  if (reduceMotion) return;
+  setTimeout(()=>{ burst(fx.w/2, fx.h*.35, 160, 16); }, 950); setTimeout(()=> rain(5000), 1200); setTimeout(()=> fireworkShow(8), 1400);
+}
+function closeFinale(){
+  $("finale").hidden = true;
+  const st = $("field"); st.classList.remove("wave"); [...$("steps").children].forEach((b,k)=> b.style.animationDelay = (k*.08)+"s"); void st.offsetWidth; st.classList.add("wave");
+  const end = document.querySelector(".ending"); if (end) end.scrollIntoView({behavior: reduceMotion?"auto":"smooth", block:"center"});
+}
+$("finaleClose").onclick = closeFinale;
+$("finaleSave").onclick = ()=>{ closeFinale(); setTimeout(()=>{ const n = $("studentName"); if (n){ n.scrollIntoView({block:"center"}); n.focus(); } }, 400); };
+$("finaleAgain").onclick = ()=>{ powerChord(); if (reduceMotion) return; fireworkShow(6); rain(2500); };
+addEventListener("keydown", e=>{ if (e.key === "Escape" && !$("finale").hidden) closeFinale(); });
+
+/* ---------- database ---------- */
+let SQL = null, db = null;
+function resetDb(){ if (!SQL) return; if (db) db.close(); db = new SQL.Database(); db.run(SEED); $("out").innerHTML = `<p class="note">${T.ready}</p>`; renderSchema(); renderLinks(); }
+function renderSchema(){
+  const t = db.exec("SELECT name FROM sqlite_master WHERE type='table' ORDER BY rowid");
+  if (!t.length){ $("schema").innerHTML = ""; return; }
+  $("schema").innerHTML = t[0].values.map(([name])=>{
+    const cols = db.exec(`PRAGMA table_info("${name.replace(/"/g,'""')}")`), docs = COLDOCS[name] || {};
+    const lis = cols.length ? cols[0].values.map(r=>`<li><span class="k${/_id$/.test(r[1]) ? " fk" : ""}">${esc(r[1])}</span><span class="ty">${/INT|REAL/i.test(r[2]) ? T.num : T.text}</span>${docs[r[1]] ? `<span class="d">${docs[r[1]]}</span>` : ""}</li>`).join("") : "";
+    return `<div class="tbl"><button type="button" data-t="${esc(name)}">${esc(name)}</button><ul>${lis}</ul></div>`;
+  }).join("");
+}
+$("schema").addEventListener("click", e=>{ const b = e.target.closest("button[data-t]"); if (!b) return; $("sql").value = `SELECT * FROM ${b.dataset.t};`; run(); });
+function fmt(x){ return typeof x === "number" && !Number.isInteger(x) ? String(Math.round(x*1000)/1000) : String(x); }
+function run(){
+  if (!db) return;
+  const sql = $("sql").value;
+  state.drafts[state.current] = sql; state.queries = (state.queries||0) + 1; save();
+  const bare = sql.replace(/--[^\n]*/g," ").replace(/\/\*[\s\S]*?\*\//g," ").trim();
+  if (!bare){ $("out").innerHTML = `<p class="note">${T.empty}</p>`; return; }
+  try {
+    const res = db.exec(sql);
+    renderSchema();
+    if (!res.length){ $("out").innerHTML = `<p class="note">${T.zero}</p>`; return; }
+    $("out").innerHTML = res.map(r=>`<div class="result-meta">${T.rows(r.values.length)}</div>
+      <div class="tablebox"><table><thead><tr>${r.columns.map(c=>`<th>${esc(c)}</th>`).join("")}</tr></thead>
+      <tbody>${r.values.map(v=>`<tr>${v.map(x=> x===null ? `<td class="null">NULL</td>` : `<td${typeof x==="number"?' class="num"':""}>${esc(fmt(x))}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`).join("");
+  } catch(e){
+    let tip = T.errGeneric;
+    if (/no such column/i.test(e.message)) tip = T.errCol;
+    if (/ambiguous column/i.test(e.message)) tip = T.errAmb;
+    if (/no such table/i.test(e.message)) tip = T.errTab;
+    $("out").innerHTML = `<div class="err">${T.sqlErr}<p>${esc(e.message)}</p><p>${tip}</p></div>`;
+  }
+}
+$("run").onclick = run; $("resetDb").onclick = resetDb;
+$("sql").addEventListener("keydown", e=>{
+  if ((e.ctrlKey || e.metaKey) && e.key === "Enter"){ e.preventDefault(); run(); }
+  if (e.key === "Tab" && !e.shiftKey){ e.preventDefault(); const t = e.target, s = t.selectionStart; t.value = t.value.slice(0,s) + "  " + t.value.slice(t.selectionEnd); t.selectionStart = t.selectionEnd = s + 2; }
+});
+
+/* ---------- boot ---------- */
+if (state.current >= CHAPTERS.length || !isUnlocked(state.current)) state.current = 0;
+renderSteps(); renderCase();
+$("sql").value = state.drafts[state.current] ?? starterFor(state.current);
+if (typeof initSqlJs !== "function"){ $("out").innerHTML = `<div class="err">${T.engFail}<p>${T.engFail2}</p></div>`; }
+else { initSqlJs().then(s=>{ SQL = s; resetDb(); }).catch(e=>{ $("out").innerHTML = `<div class="err">${T.engStart}<p>${esc(e.message)}</p></div>`; }); }
+</script>
+<script src="../../nav.js?v=b140089e" defer></script>
+</body>
+</html>

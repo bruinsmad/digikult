@@ -6,7 +6,7 @@
    The file list below is written by tools/build-sw.py: run it before pushing. */
 
 /* FILES:BEGIN (written by tools/build-sw.py, don't edit by hand) */
-const VERSION = "7f03f93f06";
+const VERSION = "6b486ed73d";
 const CORE = [
 "./",
 "css/basics/first-steps.html",
@@ -171,6 +171,10 @@ const CORE = [
 "sql/joins/matchmaker.html",
 "sql/joins/pact-hu.html",
 "sql/joins/pact.html",
+"sql/subqueries/express-hu.html",
+"sql/subqueries/express.html",
+"sql/subqueries/intro-hu.html",
+"sql/subqueries/intro.html",
 "sql/summary/clauses-hu.html",
 "sql/summary/clauses.html",
 "sql/summary/practice-hu.html",
@@ -218,6 +222,7 @@ const EXTERNAL = [
 "https://fonts.googleapis.com/css2?family=Exo+2:wght@600;700;800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap",
 "https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Kalam:wght@700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap",
 "https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap",
+"https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@600;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap",
 "https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap",
 "https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;500&display=swap",
 "https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600;700&display=swap",
