@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>/* moving between pages: the old page drifts aside and fades, the new one glides in; the rail holds still */@view-transition{navigation:auto}.rail{view-transition-name:rail}::view-transition-group(root){animation:none}::view-transition-old(root){animation:dk-out .2s cubic-bezier(.4,0,1,1) both}::view-transition-new(root){animation:dk-in .38s cubic-bezier(.16,1,.3,1) .06s both}::view-transition-old(rail),::view-transition-new(rail){animation:none}@keyframes dk-out{to{opacity:0;transform:translateX(-18px)}}@keyframes dk-in{from{opacity:0;transform:translateX(26px)}}@media (prefers-reduced-motion:reduce){::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none!important}}</style>
+<title>UFO over the Pasture – GIMP</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap">
+<link rel="stylesheet" href="../mission.css?v=1">
+<style>:root{--accent:#9be3c9}</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+window.MISSION = {
+  "lang": "en",
+  "key": "gimp-ufo-v1",
+  "title": "UFO over the Pasture",
+  "story": "The village paper wants “proof” for its April Fools' issue: a UFO visited the pasture and took the cows. Nobody got a photo – but you've got GIMP.",
+  "file": "surname_ufo",
+  "bgFile": "pasture.jpg",
+  "files": "../files/ufo-source-files.zip",
+  "poster": "../img/ufo/poster.png",
+  "pdf": "../pdf/ufo-worksheet.pdf",
+  "teacherPdf": "../pdf/ufo-teacher.pdf",
+  "saveImg": "../img/ufo/save.png",
+  "bonusImg": "../img/ufo/bonus.png",
+  "elements": [
+    [
+      "Four pictures, four layers",
+      "pasture, UFO, cow, beam",
+      "Open as Layers"
+    ],
+    [
+      "UFO without its white box",
+      "alpha channel, magic wand, Clear",
+      "alpha channel"
+    ],
+    [
+      "Cow without its white box",
+      "the same again – on your own",
+      "alpha channel"
+    ],
+    [
+      "The UFO in the sky",
+      "order in the panel, shrink, drag",
+      "Scale + Move"
+    ],
+    [
+      "A floating, tilted cow",
+      "shrink, drag, tilt",
+      "Rotate"
+    ],
+    [
+      "A see-through cone of light",
+      "pulled apart at the bottom, half transparent",
+      "Perspective + Opacity"
+    ],
+    [
+      "A second cow",
+      "a copy of the layer, turned round",
+      "Duplicate Layer + Flip"
+    ]
+  ],
+  "steps": [
+    {
+      "title": "Four pictures, four layers",
+      "img": "../img/ufo/step1.png",
+      "alt": "Step 1: File ▸ Open as Layers: ufo.jpg, cow.jpg, beam.png; four layers in the Layers panel, the cow's and the beam's eye switched off",
+      "lead": "Open as Layers puts the new picture on top of the one that's already open – as a separate layer.",
+      "note": "Open one file at a time, so you always know which layer is which.",
+      "stuck": [
+        "The picture opened in its own tab: you used plain <span class='menu'>File ▸ Open…</span>. Close that tab and choose <span class='menu'>File ▸ Open as Layers…</span>.",
+        "You can't see the Layers panel: <span class='menu'>Windows ▸ Dockable Dialogs ▸ Layers</span>."
+      ]
+    },
+    {
+      "title": "Alpha channel: make the white vanish",
+      "img": "../img/ufo/step2.png",
+      "alt": "Step 2: the ufo.jpg layer selected, Layer ▸ Transparency ▸ Add Alpha Channel; magic wand on the white; Edit ▸ Clear, Select ▸ None – the pasture shows around the UFO",
+      "lead": "The alpha channel stores where a layer is transparent. A layer that came from a JPG doesn't have one – so you add it first.",
+      "note": "In the Layers panel, a grey checkerboard in the little picture marks the transparent part.",
+      "stuck": [
+        "The box is still white (or another colour) after Clear: the layer has no alpha channel. <span class='menu'>Edit ▸ Undo</span>, then <span class='menu'>Layer ▸ Transparency ▸ Add Alpha Channel</span>, and clear again.",
+        "“Add Alpha Channel” is greyed out: the layer already has an alpha channel – carry on.",
+        "The pasture vanished, or a piece of the UFO: the ufo.jpg layer wasn't active, or you didn't click the white. Undo, click the ufo.jpg layer, and click the wand in a white corner.",
+        "You can't find the magic wand: <span class='menu'>Tools ▸ Selection Tools ▸ Fuzzy Select</span>."
+      ]
+    },
+    {
+      "title": "The cow – on your own",
+      "img": "../img/ufo/step3.png",
+      "alt": "Step 3: the cow.jpg layer's eye back on, alpha channel and magic wand; after Clear the cow's white patches stay; the beam.png eye back on",
+      "lead": "The same four moves as for the UFO: alpha channel, magic wand, <span class='menu'>Edit ▸ Clear</span>, <span class='menu'>Select ▸ None</span>.",
+      "stuck": [
+        "Nothing happens to the cow: click the cow.jpg layer in the Layers panel first – commands always work on the active layer.",
+        "Later the tools behave strangely (only a piece moves): a selection is still there. <span class='menu'>Select ▸ None</span>."
+      ]
+    },
+    {
+      "title": "The UFO goes up",
+      "img": "../img/ufo/step4.png",
+      "alt": "Step 4: layer order in the panel: ufo.jpg, cow.jpg, beam.png, pasture.jpg; Scale with the chain closed, a corner dragged inwards; Move: the UFO in the sky",
+      "lead": "Layer order decides what covers what: whatever is higher in the panel is in front.",
+      "note": "No exact size needed: the UFO takes up roughly a third of the picture.",
+      "stuck": [
+        "The UFO is squashed or stretched: the chain was open. Undo, and click the chain in the Scale window so it closes.",
+        "You dragged the corner but nothing changed: you have to press the Scale button in the little window.",
+        "Something else is being scaled: click the ufo.jpg layer in the Layers panel first.",
+        "The pasture or the cow moved instead of the UFO: Move takes the layer you click on. <span class='menu'>Edit ▸ Undo</span>, and click exactly on the UFO, not next to it."
+      ]
+    },
+    {
+      "title": "The floating cow",
+      "img": "../img/ufo/step5.png",
+      "alt": "Step 5: Scale on the cow.jpg layer with the chain closed; Move under the UFO; Rotate: the cow tilts",
+      "lead": "Three transform tools in a row on the same layer: size, place, angle.",
+      "stuck": [
+        "Something else changes: click the cow.jpg layer first.",
+        "It got too small, and scaling it back up makes it blurry: the pixels are gone. Don't scale back up – <span class='menu'>Edit ▸ Undo</span> until it's sharp again.",
+        "The rotation didn't stick: press the Rotate button in the little window."
+      ]
+    },
+    {
+      "title": "The beam",
+      "img": "../img/ufo/step6.png",
+      "alt": "Step 6: Move the beam.png layer under the UFO; Perspective: the two bottom corners pulled apart, Transform button; Opacity at about half",
+      "lead": "Perspective moves each corner separately; Opacity makes the whole layer see-through.",
+      "note": "The beam's layer is below the cow in the panel, so the cow shows in front of the light.",
+      "stuck": [
+        "Opacity fades something else: the slider always works on the active layer. Click the beam.png layer.",
+        "The beam covers the cow: its layer ended up above the cow. Drag it below the cow in the panel.",
+        "You pulled the corners but nothing changed: press the Transform button."
+      ]
+    },
+    {
+      "title": "One more cow",
+      "img": "../img/ufo/step7.png",
+      "alt": "Step 7: Layer ▸ Duplicate Layer: cow.jpg copy; Move it further down the beam; Flip, then rotate and shrink",
+      "lead": "You can make as many copies of a layer as you like – each can be moved, rotated and flipped on its own.",
+      "note": "In newer GIMP the command is called Duplicate Layers. Same thing.",
+      "stuck": [
+        "Still only one cow after duplicating: the copy sits exactly on the original. Drag it away with Move.",
+        "Flip turns it upside down: in Tool Options set Direction to Horizontal."
+      ]
+    }
+  ],
+  "checklist": [
+    "The picture is built from four source pictures: pasture, UFO, cow, beam",
+    "No white box around the UFO or the cow (alpha channel)",
+    "The cow's white patches are still there",
+    "The UFO is smaller, in the sky, and not squashed (chain closed)",
+    "The cow is smaller than the UFO, floats in the beam and is tilted (Rotate)",
+    "The beam widens downwards (Perspective) and is see-through (Opacity)",
+    "Layer order: the UFO and the cows above the beam, the pasture at the bottom",
+    "There's a second, flipped cow (Duplicate Layer + Flip)",
+    "Both the XCF and the PNG are saved, with your surname in the file name"
+  ],
+  "bonus": [
+    [
+      "An alien on the hill",
+      "<span class='menu'>File ▸ Open as Layers…</span> alien.png – its background is already transparent. Scale it and stand it on the grass."
+    ],
+    [
+      "A distant UFO fleet",
+      "Duplicate the UFO layer a few times; shrink the copies and fade them with Opacity – what's far away is fainter."
+    ],
+    [
+      "Upside down",
+      "Rotate the cows almost upside down – or set Direction to Vertical in the Flip tool's Tool Options."
+    ],
+    [
+      "Headline",
+      "<span class='menu'>Tools ▸ Text</span>: UFO OVER THE PASTURE! – big yellow letters. The text becomes a layer of its own too."
+    ]
+  ]
+};
+</script>
+<script src="../mission.js?v=1"></script>
+<script src="../../nav.js?v=b8c9e299" defer></script>
+</body>
+</html>

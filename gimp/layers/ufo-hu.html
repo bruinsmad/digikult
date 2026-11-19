@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>/* moving between pages: the old page drifts aside and fades, the new one glides in; the rail holds still */@view-transition{navigation:auto}.rail{view-transition-name:rail}::view-transition-group(root){animation:none}::view-transition-old(root){animation:dk-out .2s cubic-bezier(.4,0,1,1) both}::view-transition-new(root){animation:dk-in .38s cubic-bezier(.16,1,.3,1) .06s both}::view-transition-old(rail),::view-transition-new(rail){animation:none}@keyframes dk-out{to{opacity:0;transform:translateX(-18px)}}@keyframes dk-in{from{opacity:0;transform:translateX(26px)}}@media (prefers-reduced-motion:reduce){::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none!important}}</style>
+<title>UFO a legelő felett – GIMP</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap">
+<link rel="stylesheet" href="../mission.css?v=1">
+<style>:root{--accent:#9be3c9}</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+window.MISSION = {
+  "lang": "hu",
+  "key": "gimp-ufo-v1",
+  "title": "UFO a legelő felett",
+  "story": "A falu újságja „bizonyítékot” kér az április elsejei számba: UFO járt a legelőn, és vitte a teheneket. Fénykép nincs róla – de neked van GIMP-ed.",
+  "file": "vezeteknev_ufo",
+  "bgFile": "legelo.jpg",
+  "files": "../files/ufo-forrasfajlok.zip",
+  "poster": "../img/ufo/hu/poster.png",
+  "pdf": "../pdf/ufo-feladatlap.pdf",
+  "teacherPdf": "../pdf/ufo-tanari.pdf",
+  "saveImg": "../img/ufo/hu/save.png",
+  "bonusImg": "../img/ufo/hu/bonus.png",
+  "elements": [
+    [
+      "Négy kép, négy réteg",
+      "legelő, UFO, tehén, fénysugár",
+      "Megnyitás rétegekként"
+    ],
+    [
+      "UFO fehér doboz nélkül",
+      "alfa csatorna, varázspálca, Törlés",
+      "alfa csatorna"
+    ],
+    [
+      "Tehén fehér doboz nélkül",
+      "ugyanaz még egyszer – egyedül",
+      "alfa csatorna"
+    ],
+    [
+      "Az UFO az égen",
+      "sorrend a panelen, kicsinyítés, húzás",
+      "Átméretezés + Áthelyezés"
+    ],
+    [
+      "Lebegő, megdőlt tehén",
+      "kicsinyítés, húzás, döntés",
+      "Forgatás"
+    ],
+    [
+      "Áttetsző fénykúp",
+      "alul széthúzva, félig átlátszó",
+      "Perspektíva + Átlátszatlanság"
+    ],
+    [
+      "Második tehén",
+      "a réteg másolata, megfordítva",
+      "Réteg kétszerezése + Tükrözés"
+    ]
+  ],
+  "steps": [
+    {
+      "title": "Négy kép, négy réteg",
+      "img": "../img/ufo/hu/step1.png",
+      "alt": "1. lépés: Fájl ▸ Megnyitás rétegekként: ufo.jpg, tehen.jpg, fenysugar.png; a Rétegek panelen négy réteg, a tehén és a fénysugár szeme kikapcsolva",
+      "lead": "A Megnyitás rétegekként a már megnyitott képre teszi rá az új képet – külön rétegként.",
+      "note": "Egyszerre egy fájlt nyiss meg, így biztosan tudod, melyik réteg melyik.",
+      "stuck": [
+        "Külön fülön nyílt meg a kép: a sima <span class='menu'>Fájl ▸ Megnyitás…</span> parancsot használtad. Zárd be azt a fület, és válaszd a <span class='menu'>Fájl ▸ Megnyitás rétegekként…</span> parancsot.",
+        "Nem látod a Rétegek panelt: <span class='menu'>Ablakok ▸ Dokkolható párbeszédablakok ▸ Rétegek</span>."
+      ]
+    },
+    {
+      "title": "Alfa csatorna: tűnjön el a fehér",
+      "img": "../img/ufo/hu/step2.png",
+      "alt": "2. lépés: az ufo.jpg réteg kijelölve, Réteg ▸ Átlátszóság ▸ Alfa csatorna hozzáadása; varázspálca a fehér részre; Szerkesztés ▸ Törlés, Kijelölés ▸ Semmit – az UFO körül látszik a legelő",
+      "lead": "Az alfa csatorna tárolja, hol átlátszó a réteg. A JPG-ből jött rétegnek nincs ilyenje – ezért előbb hozzá kell adni.",
+      "note": "A Rétegek panelen a kis képen szürke kockás minta jelzi az átlátszó részt.",
+      "stuck": [
+        "A Törlés után is fehér (vagy más színű) maradt a doboz: nincs alfa csatorna a rétegen. <span class='menu'>Szerkesztés ▸ Visszavonás</span>, aztán <span class='menu'>Réteg ▸ Átlátszóság ▸ Alfa csatorna hozzáadása</span>, és törölj újra.",
+        "Az „Alfa csatorna hozzáadása” szürke: a rétegnek már van alfa csatornája – mehetsz tovább.",
+        "A legelő tűnt el, vagy az UFO egy darabja: nem az ufo.jpg réteg volt aktív, vagy nem a fehérre kattintottál. Vonj vissza, kattints az ufo.jpg rétegre, és a varázspálcával a fehér sarokba kattints.",
+        "Nem találod a varázspálcát: <span class='menu'>Eszközök ▸ Kijelölőeszközök ▸ Varázspálca-kijelölés</span>."
+      ]
+    },
+    {
+      "title": "A tehén – most egyedül",
+      "img": "../img/ufo/hu/step3.png",
+      "alt": "3. lépés: a tehen.jpg réteg szeme visszakapcsolva, alfa csatorna és varázspálca; Törlés után a tehén fehér foltjai megmaradnak; a fenysugar.png szeme visszakapcsolva",
+      "lead": "Ugyanaz a négy mozdulat, mint az UFO-nál: alfa csatorna, varázspálca, <span class='menu'>Szerkesztés ▸ Törlés</span>, <span class='menu'>Kijelölés ▸ Semmit</span>.",
+      "stuck": [
+        "Semmi sem történik a tehénnel: előbb kattints a tehen.jpg rétegre a Rétegek panelen – a parancsok mindig az aktív rétegen dolgoznak.",
+        "Később furcsán viselkednek az eszközök (csak egy darab mozdul): maradt kijelölés. <span class='menu'>Kijelölés ▸ Semmit</span>."
+      ]
+    },
+    {
+      "title": "Az UFO az égre kerül",
+      "img": "../img/ufo/hu/step4.png",
+      "alt": "4. lépés: a rétegek sorrendje a panelen: ufo.jpg, tehen.jpg, fenysugar.png, legelo.jpg; Átméretezés zárt lánccal, a sarok befelé húzva; Áthelyezés: az UFO az égen",
+      "lead": "A rétegsorrend dönti el, mi takar mit: ami a panelen feljebb van, az van elöl.",
+      "note": "Nem kell pontos méret: az UFO nagyjából a kép harmadát foglalja el.",
+      "stuck": [
+        "Torzul az UFO (lapos vagy nyúlt lett): nyitva volt a lánc. Vonj vissza, és az Átméretezés ablakban kattints a láncra, hogy összezárjon.",
+        "Húztad a sarkot, mégsem változott semmi: a kis ablakban meg kell nyomni az Átméretezés gombot.",
+        "Nem az UFO méreteződik: előbb kattints az ufo.jpg rétegre a Rétegek panelen.",
+        "A legelő vagy a tehén mozdult el az UFO helyett: az Áthelyezés azt a réteget viszi, amelyikre kattintasz. <span class='menu'>Szerkesztés ▸ Visszavonás</span>, és pontosan az UFO-ra kattints, ne mellé."
+      ]
+    },
+    {
+      "title": "Lebegő tehén",
+      "img": "../img/ufo/hu/step5.png",
+      "alt": "5. lépés: a tehen.jpg réteg Átméretezése zárt lánccal; Áthelyezés az UFO alá; Forgatás: a tehén megdől",
+      "lead": "Három átalakítóeszköz egymás után ugyanazon a rétegen: méret, hely, szög.",
+      "stuck": [
+        "Nem a tehén változik: kattints előbb a tehen.jpg rétegre.",
+        "Túl kicsi lett, és visszanagyítva életlen: a pixelek elvesztek. Ne nagyítsd vissza – <span class='menu'>Szerkesztés ▸ Visszavonás</span> annyiszor, amíg újra éles.",
+        "A forgatás nem lett végleges: a kis ablakban nyomd meg a Forgatás gombot."
+      ]
+    },
+    {
+      "title": "A fénysugár",
+      "img": "../img/ufo/hu/step6.png",
+      "alt": "6. lépés: a fenysugar.png réteg Áthelyezése az UFO alá; Perspektíva: a két alsó sarok széthúzva, Átalakítás gomb; Átlátszatlanság nagyjából a felén",
+      "lead": "A Perspektíva a sarkokat külön mozgatja; az Átlátszatlanság az egész réteget teszi áttetszővé.",
+      "note": "A sugár rétege a tehén alatt van a panelen, ezért a tehén a fény előtt látszik.",
+      "stuck": [
+        "Az Átlátszatlanság mást halványít el: a csúszka mindig az aktív rétegre hat. Kattints a fenysugar.png rétegre.",
+        "A sugár eltakarja a tehenet: a rétege a tehén fölé került. Húzd a panelen a tehén alá.",
+        "Széthúztad a sarkokat, mégsem változott: nyomd meg az Átalakítás gombot."
+      ]
+    },
+    {
+      "title": "Még egy tehén",
+      "img": "../img/ufo/hu/step7.png",
+      "alt": "7. lépés: Réteg ▸ Réteg kétszerezése: tehen.jpg másolata; Áthelyezés lejjebb a sugárban; Tükrözés, majd forgatás és kicsinyítés",
+      "lead": "Egy rétegből akárhány másolat készülhet – mindegyik külön mozgatható, forgatható, tükrözhető.",
+      "note": "Újabb GIMP-ben a parancs neve: Rétegek kétszerezése. Ugyanaz.",
+      "stuck": [
+        "A kétszerezés után is csak egy tehenet látsz: a másolat pontosan az eredetin ül. Húzd el az Áthelyezéssel.",
+        "A Tükrözés a feje tetejére állítja: az Eszközbeállításoknál az Irány legyen Vízszintes."
+      ]
+    }
+  ],
+  "checklist": [
+    "A kép négy forrásképből áll: legelő, UFO, tehén, fénysugár",
+    "Az UFO és a tehén körül nincs fehér doboz (alfa csatorna)",
+    "A tehén fehér foltjai megmaradtak",
+    "Az UFO kisebb lett, az égen van, és nem torzult (zárt lánc)",
+    "A tehén kisebb az UFO-nál, a sugárban lebeg, és meg van döntve (Forgatás)",
+    "A fénysugár lefelé szélesedik (Perspektíva) és áttetsző (Átlátszatlanság)",
+    "Rétegsorrend: az UFO és a tehenek a fénysugár fölött, legalul a legelő",
+    "Van egy második, tükrözött tehén (Réteg kétszerezése + Tükrözés)",
+    "Az XCF és a PNG is elmentve, a fájlnévben a vezetékneveddel"
+  ],
+  "bonus": [
+    [
+      "Űrlény a dombon",
+      "<span class='menu'>Fájl ▸ Megnyitás rétegekként…</span> urleny.png – ennek már átlátszó a háttere. Méretezd át, és állítsd a fűre."
+    ],
+    [
+      "UFO-raj a távolban",
+      "Kétszerezd meg az UFO rétegét többször; a másolatokat kicsinyítsd le, és halványítsd az Átlátszatlansággal – ami messze van, halványabb."
+    ],
+    [
+      "Fejjel lefelé",
+      "Forgasd a teheneket majdnem fejjel lefelé – vagy a Tükrözés Eszközbeállításainál válaszd a Függőleges irányt."
+    ],
+    [
+      "Szalagcím",
+      "<span class='menu'>Eszközök ▸ Szöveg</span>: UFO A LEGELŐ FELETT! – nagy, sárga betűkkel. A szöveg is külön réteg lesz."
+    ]
+  ]
+};
+</script>
+<script src="../mission.js?v=1"></script>
+<script src="../../nav.js?v=b8c9e299" defer></script>
+</body>
+</html>

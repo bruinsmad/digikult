@@ -434,6 +434,36 @@
         ]
       },
       {
+        id: "gimp",
+        accent: "#9be3c9",
+        title: { hu: "Rasztergrafika – GIMP", en: "Raster graphics – GIMP" },
+        blurb: {
+          hu: "Rétegek, alfa csatorna és átalakítóeszközök – fotómontázs lépésről lépésre, menükkel.",
+          en: "Layers, the alpha channel and the transform tools – a photomontage step by step, using the menus."
+        },
+        lessons: [
+          {
+            id: "layers",
+            title: { hu: "Rétegek, alfa csatorna és átalakítás", en: "Layers, alpha channel and transforms" },
+            pages: [
+              {
+                id: "gimp-ufo",
+                kind: "story",
+                minutes: 35,
+                title: { hu: "UFO a legelő felett", en: "UFO over the Pasture" },
+                desc: {
+                  hu: "Hamis „bizonyíték” négy képből: fehér háttér eltüntetése alfa csatornával, rétegsorrend, átméretezés, forgatás, perspektíva, áttetsző fénysugár és egy megkétszerezett tehén.",
+                  en: "Fake “proof” from four pictures: removing a white background with an alpha channel, layer order, scaling, rotating, perspective, a see-through beam and a duplicated cow."
+                },
+                cover: "gimp/img/ufo/poster.png",
+                files: { en: "gimp/layers/ufo.html", hu: "gimp/layers/ufo-hu.html" },
+                progress: { chapters: 7, keys: { en: "gimp-ufo-v1", hu: "gimp-ufo-v1" } }
+              }
+            ]
+          }
+        ]
+      },
+      {
         id: "excel",
         accent: "#5cc98a",
         title: { hu: "Táblázatkezelés – Excel", en: "Spreadsheets – Excel" },

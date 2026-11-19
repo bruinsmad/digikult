@@ -6,7 +6,7 @@
    The file list below is written by tools/build-sw.py: run it before pushing. */
 
 /* FILES:BEGIN (written by tools/build-sw.py, don't edit by hand) */
-const VERSION = "ba65db3c43";
+const VERSION = "7f03f93f06";
 const CORE = [
 "./",
 "css/basics/first-steps.html",
@@ -56,6 +56,17 @@ const CORE = [
 "excel/sheet.css",
 "excel/sheet.js",
 "favicon.svg",
+"gimp/files/ufo-forrasfajlok.zip",
+"gimp/files/ufo-source-files.zip",
+"gimp/img/common/gimp-map.png",
+"gimp/img/common/hu/gimp-map.png",
+"gimp/img/common/hu/tools.png",
+"gimp/img/common/tools.png",
+"gimp/index.html",
+"gimp/layers/ufo-hu.html",
+"gimp/layers/ufo.html",
+"gimp/mission.css",
+"gimp/mission.js",
 "heist-hu.html",
 "heist.html",
 "html/basics/img/bodri.svg",
@@ -228,6 +239,30 @@ const PAGE_IMAGES = {
 ],
 "erettsegi/tablazat/omega-hu.html": [
 "erettsegi/tablazat/img/omega-minta.png"
+],
+"gimp/layers/ufo-hu.html": [
+"gimp/img/ufo/hu/bonus.png",
+"gimp/img/ufo/hu/poster.png",
+"gimp/img/ufo/hu/save.png",
+"gimp/img/ufo/hu/step1.png",
+"gimp/img/ufo/hu/step2.png",
+"gimp/img/ufo/hu/step3.png",
+"gimp/img/ufo/hu/step4.png",
+"gimp/img/ufo/hu/step5.png",
+"gimp/img/ufo/hu/step6.png",
+"gimp/img/ufo/hu/step7.png"
+],
+"gimp/layers/ufo.html": [
+"gimp/img/ufo/bonus.png",
+"gimp/img/ufo/poster.png",
+"gimp/img/ufo/save.png",
+"gimp/img/ufo/step1.png",
+"gimp/img/ufo/step2.png",
+"gimp/img/ufo/step3.png",
+"gimp/img/ufo/step4.png",
+"gimp/img/ufo/step5.png",
+"gimp/img/ufo/step6.png",
+"gimp/img/ufo/step7.png"
 ],
 "inkscape/path-ops/cheese-moon-hu.html": [
 "inkscape/img/cheese-moon/hu/bonus.png",

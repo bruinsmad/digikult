@@ -442,7 +442,7 @@ body.subject .hero{display:none}
   </div>
 </footer>
 
-<script src="nav.js?v=0f583215"></script>
+<script src="nav.js?v=b8c9e299"></script>
 <script>
 (function(){
   const D = window.DIGIKULT;
@@ -451,7 +451,7 @@ body.subject .hero{display:none}
 
   const TXT = {
     hu:{
-      tagline:"Nyomozz, terelj, építs weboldalt, rajzolj, számolj, szerkessz, animálj: minden küldetés egy történet, amit SQL-lel, HTML-lel és CSS-sel, Inkscape-pel, Excellel, Worddel vagy PowerPointtal oldasz meg.",
+      tagline:"Nyomozz, terelj, építs weboldalt, rajzolj, számolj, szerkessz, animálj: minden küldetés egy történet, amit SQL-lel, HTML-lel és CSS-sel, Inkscape-pel, GIMP-pel, Excellel, Worddel vagy PowerPointtal oldasz meg.",
       left:"Itt tartasz", start:"Kezdd itt", allDone:"Mindet megoldottad!",
       chapters:(d,n)=>`${d} / ${n} fejezet kész`, chaptersTotal:n=>`${n} fejezet`, min:n=>`kb. ${n} perc`,
       cont:"Folytatás", go:"Indítás", solved:"Megoldva ✓",
@@ -465,7 +465,7 @@ body.subject .hero{display:none}
       sticky:"Ctrl+S, ne felejtsd!"
     },
     en:{
-      tagline:"Solve a heist, herd a flock, build a web page, draw a poster, run the numbers, lay out a page, animate a slide: every mission is a story you crack with SQL, HTML and CSS, Inkscape, Excel, Word or PowerPoint.",
+      tagline:"Solve a heist, herd a flock, build a web page, draw a poster, run the numbers, lay out a page, animate a slide: every mission is a story you crack with SQL, HTML and CSS, Inkscape, GIMP, Excel, Word or PowerPoint.",
       left:"Where you left off", start:"Start here", allDone:"You've solved them all!",
       chapters:(d,n)=>`${d} of ${n} chapters done`, chaptersTotal:n=>`${n} chapters`, min:n=>`about ${n} min`,
       cont:"Continue", go:"Start", solved:"Solved ✓",
@@ -919,6 +919,11 @@ function puliSvg(){
       <rect x="20" y="18" width="76" height="60" rx="3" stroke="var(--c)" stroke-width="3.4"/>
       <rect x="34" y="30" width="48" height="36" rx="2" stroke="var(--chalk)" stroke-width="2.4"/>
       <path d="M124 26l-10 22 10 22M150 26l10 22-10 22" stroke="var(--c)" stroke-width="3.4"/><path d="M142 22l-10 52" stroke="var(--chalk)" stroke-width="2.4"/></svg>`,
+    gimp:`<svg viewBox="0 0 170 96" aria-hidden="true" fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M85 60l-62 18 62 16 62-16z" stroke="var(--chalk)" stroke-width="2.4" opacity=".9"/>
+      <path d="M85 38l-62 18 62 16 62-16z" stroke="var(--chalk)" stroke-width="2.4" stroke-dasharray="5 6" opacity=".9"/>
+      <path d="M85 4l-62 18 62 16 62-16z" stroke="var(--c)" stroke-width="3.4"/>
+      <ellipse cx="85" cy="22" rx="22" ry="6" stroke="var(--c)" stroke-width="2.6"/><path d="M73 19a12 9 0 0 1 24 0" stroke="var(--c)" stroke-width="2.6"/></svg>`,
     inkscape:`<svg viewBox="0 0 170 96" aria-hidden="true" fill="none" stroke-linecap="round" stroke-linejoin="round">
       <path d="M10 78C30 10 92 8 118 58" stroke="var(--c)" stroke-width="3.4"/>
       <path d="M10 78L34 22M118 58L96 18" stroke="var(--chalk)" stroke-width="2" stroke-dasharray="4 5" opacity=".8"/>

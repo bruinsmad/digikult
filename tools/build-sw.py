@@ -16,7 +16,7 @@ files = subprocess.run(["git", "ls-files"], capture_output=True, text=True, chec
 skip = lambda f: (f.startswith(("tools/", ".")) or f in ("sw.js",) or f.endswith((".md", ".src.js", ".pdf")))
 site = sorted(f for f in files if not skip(f) and os.path.exists(f))
 # screenshots wait until their mission is opened; the shared ones (Inkscape map, toolbox) are used everywhere, so they go up front
-core = [f for f in site if not f.endswith(".png") or f.startswith("inkscape/img/common/")]
+core = [f for f in site if not f.endswith(".png") or f.startswith(("inkscape/img/common/", "gimp/img/common/"))]
 
 external, page_images = set(), {}
 for f in site:
