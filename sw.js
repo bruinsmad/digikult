@@ -6,7 +6,7 @@
    The file list below is written by tools/build-sw.py: run it before pushing. */
 
 /* FILES:BEGIN (written by tools/build-sw.py, don't edit by hand) */
-const VERSION = "5df9b7483c";
+const VERSION = "f6c71ef621";
 const CORE = [
 "./",
 "css/basics/first-steps.html",
@@ -179,6 +179,8 @@ const CORE = [
 "sql/summary/clauses.html",
 "sql/summary/djinn-hu.html",
 "sql/summary/djinn.html",
+"sql/summary/exam-hu.html",
+"sql/summary/exam.html",
 "sql/summary/practice-hu.html",
 "sql/summary/practice.html",
 "sql/summary/test-hu.html",
@@ -216,6 +218,7 @@ const EXTERNAL = [
 "https://cdn.jsdelivr.net/npm/",
 "https://cdn.jsdelivr.net/npm/sql.js@1.10.3/dist/sql-asm.js",
 "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js",
+"https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600;700&display=swap",
 "https://fonts.googleapis.com/css2?family=Bree+Serif&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap",
 "https://fonts.googleapis.com/css2?family=Bree+Serif&family=Cabin+Sketch:wght@700&family=Kalam:wght@400;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap",
 "https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600..800&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap",

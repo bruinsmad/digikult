@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>/* moving between pages: the old page drifts aside and fades, the new one glides in; the rail holds still */@view-transition{navigation:auto}.rail{view-transition-name:rail}::view-transition-group(root){animation:none}::view-transition-old(root){animation:dk-out .2s cubic-bezier(.4,0,1,1) both}::view-transition-new(root){animation:dk-in .38s cubic-bezier(.16,1,.3,1) .06s both}::view-transition-old(rail),::view-transition-new(rail){animation:none}@keyframes dk-out{to{opacity:0;transform:translateX(-18px)}}@keyframes dk-in{from{opacity:0;transform:translateX(26px)}}@media (prefers-reduced-motion:reduce){::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none!important}}</style>
+<title>SQL dolgozat</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600;700&display=swap">
+<style>
+/* SQL exam: one part at a time, never back. Each student gets one random variant of every part, in a random order,
+   with shuffled options. Calm page: a header with the name, progress and the clock; the part below; tables on request. */
+:root{
+  --bg:#f3f1eb; --card:#fff; --ink:#1d2232; --muted:#646b7d; --line:#e2ddd0; --accent:#2b4c9a; --accent-2:#e8eefb;
+  --warn:#9a5b00; --warn-bg:#fdf1d8; --bad:#a3243b; --bad-bg:#fbe5e8; --good:#1f7a4a;
+  --code:#1e2235; --code-ink:#eef0fa;
+  --f-body:"Atkinson Hyperlegible", system-ui, sans-serif; --f-mono:"JetBrains Mono", ui-monospace, monospace;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.55 var(--f-body)}
+a{color:inherit}
+code,pre,textarea{font-family:var(--f-mono)}
+:focus-visible{outline:3px solid #f0b429;outline-offset:2px}
+button{font:inherit;cursor:pointer}
+[hidden]{display:none!important}
+
+.topline{display:flex;align-items:center;gap:12px;padding:10px max(16px,env(safe-area-inset-left));font-size:14px;color:var(--muted)}
+.crumb a{text-decoration:none}.crumb a:hover{text-decoration:underline;color:var(--ink)}
+.langlink{margin-left:auto;font:700 14px var(--f-body);color:var(--ink);border:1.5px solid var(--line);border-radius:4px;padding:3px 10px;text-decoration:none;background:#fff}
+
+.bar{position:sticky;top:0;z-index:10;background:rgba(255,255,255,.96);backdrop-filter:blur(6px);border-bottom:1px solid var(--line)}
+.bar-in{max-width:880px;margin:0 auto;display:flex;align-items:center;gap:14px;padding:10px 16px;flex-wrap:wrap}
+.bar h1{margin:0;font:700 17px var(--f-body);color:var(--accent)}
+.bar .who{color:var(--muted);font-size:14px}
+.bar .grow{flex:1}
+.prog{display:flex;gap:4px;align-items:center}
+.prog i{width:14px;height:6px;border-radius:3px;background:var(--line)}
+.prog i.done{background:var(--accent)}
+.prog i.cur{background:#f0b429}
+.prog span{font:700 13px var(--f-mono);color:var(--muted);margin-left:6px}
+.clock{font:700 18px var(--f-mono);padding:4px 10px;border-radius:8px;background:var(--accent-2);color:var(--accent);min-width:78px;text-align:center}
+.clock.low{background:var(--warn-bg);color:var(--warn)}
+.clock.crit{background:var(--bad-bg);color:var(--bad);animation:tick 1s steps(2) infinite}
+@keyframes tick{50%{opacity:.6}}
+.btn{display:inline-flex;align-items:center;gap:8px;border:0;border-radius:9px;padding:10px 18px;font:700 16px var(--f-body);background:var(--accent);color:#fff}
+.btn:hover{filter:brightness(1.1)}
+.btn.ghost{background:#fff;color:var(--accent);box-shadow:inset 0 0 0 1.5px #c9d3ea}
+.btn.small{padding:6px 12px;font-size:14px}
+.btn.warn{background:#c26a00}
+
+main{max-width:880px;margin:0 auto;padding:18px 16px 110px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 24px;box-shadow:0 2px 0 rgba(0,0,0,.03)}
+.card h2{margin:0 0 6px;font:700 28px/1.2 var(--f-body)}
+.kicker{font:700 12.5px var(--f-body);letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
+.rules{padding-left:22px;margin:12px 0 16px}
+.rules li{margin:5px 0}
+label.nm{display:block;font-weight:700;margin:12px 0 6px}
+input.nm{width:100%;max-width:380px;font:inherit;padding:10px 12px;border:1.5px solid #c9c2b0;border-radius:8px}
+.note{font-size:14px;color:var(--muted);margin:8px 0 0}
+.facts{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0 4px}
+.facts div{background:var(--accent-2);border-radius:10px;padding:8px 12px;font-size:14px}
+.facts b{display:block;font-size:20px;color:var(--accent)}
+
+.phead{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:4px}
+.pno{font:700 14px var(--f-mono);color:var(--muted)}
+.ptitle{font:700 14px var(--f-body);color:var(--accent);background:var(--accent-2);border-radius:999px;padding:2px 10px}
+.ppts{margin-left:auto;font:700 14px var(--f-body);color:var(--muted)}
+.qtext{font:700 19px/1.45 var(--f-body);margin:10px 0 14px}
+.qtext code,.opt code,.tf code{background:#efece3;padding:0 4px;border-radius:4px;font-size:.92em}
+pre.code{background:var(--code);color:var(--code-ink);border-radius:10px;padding:12px 14px;font-size:15px;line-height:1.55;overflow:auto;margin:0 0 14px}
+.code .k{color:#ffd27a;font-weight:700}.code .f{color:#ff9fd4}.code .s{color:#a6ebbd}.code .nm{color:#9fd0ff}
+.opts{display:grid;gap:8px}
+.opt{display:flex;align-items:center;gap:10px;border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;cursor:pointer;background:#fff}
+.opt:hover{border-color:#b8c4e4}
+.opt input{width:18px;height:18px;accent-color:var(--accent);flex:none}
+.opt:has(input:checked){border-color:var(--accent);background:var(--accent-2)}
+ol.order{list-style:none;padding:0;margin:0;display:grid;gap:6px}
+ol.order li{display:flex;align-items:center;gap:10px;background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:7px 10px;font:600 15px var(--f-mono)}
+ol.order .ix{color:var(--muted);width:22px;font-weight:400}
+ol.order .mv{margin-left:auto;display:flex;gap:4px}
+.mvb{width:34px;height:30px;border-radius:7px;border:1.5px solid #c9c2b0;background:#faf8f2;font-weight:700}
+.mvb[disabled]{opacity:.3}
+.num input{font:700 20px var(--f-mono);width:150px;padding:8px 12px;border:1.5px solid #c9c2b0;border-radius:8px}
+pre.code input{font:700 15px var(--f-mono);width:11ch;padding:1px 6px;border:0;border-bottom:2px dashed #ffd27a;background:#2e3350;color:#fff6d6;border-radius:4px}
+.lines{background:var(--code);border-radius:10px;padding:8px 6px;overflow:auto}
+.lines label{display:flex;align-items:center;gap:10px;padding:6px 8px;border-radius:7px;cursor:pointer;color:var(--code-ink);font:15px/1.5 var(--f-mono);white-space:pre}
+.lines label:hover{background:rgba(255,255,255,.06)}
+.lines input{accent-color:#ffd27a}
+.lines .ln{color:#8f95b0;width:18px;text-align:right}
+.lines label:has(input:checked){background:rgba(255,210,122,.16);outline:1.5px solid rgba(255,210,122,.6)}
+.lines .k{color:#ffd27a;font-weight:700}.lines .f{color:#ff9fd4}.lines .s{color:#a6ebbd}.lines .nm{color:#9fd0ff}
+.sqlbox textarea{width:100%;min-height:150px;font-size:15.5px;line-height:1.55;padding:12px 14px;border-radius:10px;border:1.5px solid #c9c2b0;background:#fffefb;color:var(--ink);resize:vertical}
+.row{display:flex;align-items:center;gap:10px;margin-top:10px;flex-wrap:wrap}
+.hint{font-size:13px;color:var(--muted)}
+.out{margin-top:10px}
+.out .meta{font:700 13px var(--f-mono);color:var(--muted);margin:6px 0}
+.out .err{background:var(--bad-bg);color:var(--bad);border-radius:8px;padding:8px 10px;font:14px var(--f-mono)}
+.tbl{overflow:auto;max-height:300px;border:1px solid var(--line);border-radius:8px;background:#fff}
+.tbl table{border-collapse:collapse;width:100%;font:14px var(--f-mono)}
+.tbl th{position:sticky;top:0;background:var(--accent-2);text-align:left;padding:5px 8px;color:var(--accent)}
+.tbl td{padding:4px 8px;border-top:1px solid #f0ece2;white-space:nowrap}
+.tbl td.n{text-align:right}
+.tbl td.null{color:#9a93b0;font-style:italic}
+details.schema{background:#faf8f3;border:1px solid var(--line);border-radius:10px;padding:8px 12px;margin:0 0 16px}
+details.schema summary{cursor:pointer;font-weight:700;color:var(--accent)}
+.sch{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-top:8px}
+.st{background:#fff;border:1px solid var(--line);border-radius:8px;padding:6px 9px}
+.st h5{margin:0 0 4px;font:700 14px var(--f-mono);color:var(--accent)}
+.st div{font-size:13px;line-height:1.35;margin:3px 0;color:#3b4152}
+.st b{font:700 13px var(--f-mono)}
+.st .fk b{color:#1d6fa5}
+.st code{background:#efece3;padding:0 3px;border-radius:3px}
+.lk{margin-top:8px;font-size:13.5px;display:flex;flex-wrap:wrap;gap:6px 16px;align-items:center}
+.lk code{color:#1d6fa5;background:#eaf3fa;padding:1px 5px;border-radius:4px}
+.lk .allrows{margin-left:auto;background:none;border:0;color:var(--accent);text-decoration:underline;font-size:13.5px;padding:0}
+.foot{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:18px;padding-top:14px;border-top:1px solid var(--line)}
+.foot .grow{flex:1}
+.foot #next{margin-left:auto}
+.foot .warnline{color:var(--warn);font-weight:700;font-size:14px}
+dialog#tables{border:0;border-radius:14px;padding:0;max-width:min(1040px,96vw);width:96vw;max-height:88vh;background:#fff;color:var(--ink);box-shadow:0 30px 80px rgba(0,0,0,.35)}
+dialog#tables::backdrop{background:rgba(20,22,35,.45)}
+.dlg-head{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--line);position:sticky;top:0;background:#fff;z-index:1}
+.dlg-head h2{margin:0;font:700 19px var(--f-body);color:var(--accent)}
+.dlg-head .btn{margin-left:auto}
+.dlg-body{padding:14px 18px 20px;display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+.dt h4{margin:0 0 6px;font:700 15px var(--f-mono);color:var(--accent);display:flex;justify-content:space-between}
+.dt h4 span{font:400 13px var(--f-body);color:var(--muted)}
+.result .big{font:700 clamp(46px,9vw,72px)/1 var(--f-body);color:var(--accent);text-align:center;margin-top:8px}
+.result .sub{text-align:center;color:var(--muted);margin:6px 0 16px}
+.export h3{font:700 18px var(--f-body);margin:16px 0 6px}
+.export ol{padding-left:22px;margin:6px 0 12px}
+.banner{background:var(--warn-bg);color:var(--warn);border-radius:10px;padding:10px 14px;font-weight:700;margin-bottom:12px}
+.err{background:var(--bad-bg);color:var(--bad);border-radius:10px;padding:14px}
+@media (max-width:600px){ .card{padding:16px} .bar-in{gap:8px;flex-wrap:nowrap} .bar h1{font-size:15px} .bar .who,.prog i{display:none} .clock{min-width:0;font-size:16px} .qtext{font-size:17.5px} }
+</style>
+</head>
+<body>
+<div class="topline"><span class="crumb"><a href="../../index.html#sql">Adatbázisok – SQL</a> › <a href="../../index.html#sql-summary">Összefoglaló</a></span><a class="langlink" href="exam.html" lang="en">English</a></div>
+<div class="bar" id="bar" hidden><div class="bar-in">
+  <h1 id="barTitle"></h1><span class="who" id="who"></span><span class="grow"></span>
+  <span class="prog" id="prog"></span><button type="button" class="btn ghost small" id="openTables"></button><span class="clock" id="clock" role="timer" aria-live="off">40:00</span>
+</div></div>
+<main id="main"></main>
+<dialog id="tables"><div class="dlg-head"><h2 id="tablesH"></h2><button type="button" class="btn ghost small" id="tablesClose">✕</button></div><div class="dlg-body" id="tablesBody"></div></dialog>
+
+<script src="https://cdn.jsdelivr.net/npm/sql.js@1.10.3/dist/sql-asm.js"></script>
+<script>
+const CFG = {"lang": "hu", "key": "sql-exam-hu-v1", "minutes": 40, "seed": "CREATE TABLE rendezok (id INTEGER PRIMARY KEY, nev TEXT, orszag TEXT);\nCREATE TABLE filmek (id INTEGER PRIMARY KEY, cim TEXT, mufaj TEXT, hossz INTEGER, ev INTEGER, ertekeles INTEGER, rendezo_id INTEGER);\nCREATE TABLE vetitesek (id INTEGER PRIMARY KEY, film_id INTEGER, nap TEXT, terem INTEGER, nezok INTEGER);\nINSERT INTO rendezok VALUES (1,'Kovács Lili','Magyarország');\nINSERT INTO rendezok VALUES (2,'Tom Archer','USA');\nINSERT INTO rendezok VALUES (3,'Marta Ruiz','Spanyolország');\nINSERT INTO rendezok VALUES (4,'Szabó Bence','Magyarország');\nINSERT INTO rendezok VALUES (5,'Yuki Tanaka','Japán');\nINSERT INTO rendezok VALUES (6,'Anna Berg','Svédország');\nINSERT INTO filmek VALUES (1,'Holdfény utca','dráma',112,2015,8,1);\nINSERT INTO filmek VALUES (2,'Kék hajnal','dráma',98,2008,7,3);\nINSERT INTO filmek VALUES (3,'Pizza és pánik','vígjáték',91,2019,6,2);\nINSERT INTO filmek VALUES (4,'Csillagvadász','akció',128,2021,7,2);\nINSERT INTO filmek VALUES (5,'Kis robot, nagy kaland','animáció',85,2017,9,5);\nINSERT INTO filmek VALUES (6,'Éjféli vendég','horror',102,2012,5,6);\nINSERT INTO filmek VALUES (7,'Nyári zűr','vígjáték',95,2022,NULL,4);\nINSERT INTO filmek VALUES (8,'Vihar a szigeten','akció',134,2010,6,3);\nINSERT INTO filmek VALUES (9,'A pék fia','dráma',120,2018,8,4);\nINSERT INTO filmek VALUES (10,'Pingvinparti','animáció',82,2023,NULL,5);\nINSERT INTO filmek VALUES (11,'Árnyékok háza','horror',99,2016,6,6);\nINSERT INTO filmek VALUES (12,'Gyors és vicces','vígjáték',88,2014,5,2);\nINSERT INTO filmek VALUES (13,'Az utolsó kör','akció',116,2024,NULL,1);\nINSERT INTO filmek VALUES (14,'Tavaszi levél','dráma',104,2005,7,1);\nINSERT INTO vetitesek VALUES (1,1,'csütörtök',1,42);\nINSERT INTO vetitesek VALUES (2,3,'csütörtök',2,35);\nINSERT INTO vetitesek VALUES (3,6,'csütörtök',3,28);\nINSERT INTO vetitesek VALUES (4,9,'csütörtök',1,51);\nINSERT INTO vetitesek VALUES (5,4,'péntek',1,88);\nINSERT INTO vetitesek VALUES (6,5,'péntek',2,64);\nINSERT INTO vetitesek VALUES (7,11,'péntek',3,47);\nINSERT INTO vetitesek VALUES (8,3,'péntek',2,59);\nINSERT INTO vetitesek VALUES (9,13,'péntek',1,93);\nINSERT INTO vetitesek VALUES (10,4,'szombat',1,97);\nINSERT INTO vetitesek VALUES (11,10,'szombat',2,81);\nINSERT INTO vetitesek VALUES (12,7,'szombat',2,76);\nINSERT INTO vetitesek VALUES (13,8,'szombat',3,54);\nINSERT INTO vetitesek VALUES (14,1,'szombat',1,70);\nINSERT INTO vetitesek VALUES (15,5,'vasárnap',2,90);\nINSERT INTO vetitesek VALUES (16,12,'vasárnap',3,33);\nINSERT INTO vetitesek VALUES (17,13,'vasárnap',1,NULL);\nINSERT INTO vetitesek VALUES (18,2,'vasárnap',3,25);\nINSERT INTO vetitesek VALUES (19,10,'vasárnap',2,NULL);\nINSERT INTO vetitesek VALUES (20,14,'vasárnap',1,40);", "sections": [{"id": "where", "title": "Feltételek: WHERE, AND, OR", "pts": 2, "variants": [{"type": "num", "q": "Hány sort ad ez a lekérdezés?", "code": "SELECT cim\nFROM filmek\nWHERE mufaj = 'dráma' AND ev > 2010;", "ok": 2, "id": "where1"}, {"type": "num", "q": "Hány sort ad ez a lekérdezés?", "code": "SELECT cim\nFROM filmek\nWHERE hossz < 100 AND mufaj = 'vígjáték';", "ok": 3, "id": "where2"}, {"type": "num", "q": "Hány sort ad ez a lekérdezés?", "code": "SELECT cim\nFROM filmek\nWHERE ev >= 2015 AND hossz > 100;", "ok": 4, "id": "where3"}, {"type": "num", "q": "Hány sort ad ez a lekérdezés?", "code": "SELECT cim\nFROM filmek\nWHERE mufaj = 'akció' OR mufaj = 'horror';", "ok": 5, "id": "where4"}, {"type": "num", "q": "Hány sort ad ez a lekérdezés?", "code": "SELECT cim\nFROM filmek\nWHERE ertekeles >= 7;", "ok": 6, "id": "where5"}, {"type": "num", "q": "Hány sort ad ez a lekérdezés?", "code": "SELECT cim\nFROM filmek\nWHERE hossz > 110;", "ok": 5, "id": "where6"}, {"type": "num", "q": "Hány sort ad ez a lekérdezés?", "code": "SELECT cim\nFROM filmek\nWHERE ev < 2012 AND hossz > 100;", "ok": 2, "id": "where7"}, {"type": "num", "q": "Hány sort ad ez a lekérdezés?", "code": "SELECT cim\nFROM filmek\nWHERE rendezo_id = 2 OR rendezo_id = 5;", "ok": 5, "id": "where8"}, {"type": "num", "q": "Hány sort ad ez a lekérdezés?", "code": "SELECT cim\nFROM filmek\nWHERE mufaj = 'animáció' AND ertekeles > 6;", "ok": 1, "id": "where9"}, {"type": "num", "q": "Hány sort ad ez a lekérdezés?", "code": "SELECT cim\nFROM filmek\nWHERE ev > 2018 AND hossz < 100;", "ok": 3, "id": "where10"}]}, {"id": "like", "title": "Minták: LIKE", "pts": 2, "variants": [{"type": "mc", "q": "Melyik feltétel adja azokat a filmeket, amelyeknek a címe ezzel <b>kezdődik<\/b>: „Kék”?", "opts": ["<code>cim LIKE 'Kék%'<\/code>", "<code>cim LIKE '%Kék'<\/code>", "<code>cim LIKE '%Kék%'<\/code>", "<code>cim = 'Kék'<\/code>"], "ok": 0, "id": "like1"}, {"type": "mc", "q": "Melyik feltétel adja azokat a filmeket, amelyeknek a címe ezzel <b>végződik<\/b>: „levél”?", "opts": ["<code>cim LIKE 'levél%'<\/code>", "<code>cim LIKE '%levél'<\/code>", "<code>cim LIKE '%levél%'<\/code>", "<code>cim = 'levél'<\/code>"], "ok": 1, "id": "like2"}, {"type": "mc", "q": "Melyik feltétel adja azokat a filmeket, amelyeknek a címében <b>bárhol<\/b> szerepel: „sziget”?", "opts": ["<code>cim LIKE 'sziget%'<\/code>", "<code>cim LIKE '%sziget'<\/code>", "<code>cim LIKE '%sziget%'<\/code>", "<code>cim = 'sziget'<\/code>"], "ok": 2, "id": "like3"}, {"type": "mc", "q": "Melyik feltétel adja azokat a filmeket, amelyeknek a címe ezzel <b>kezdődik<\/b>: „Pizza”?", "opts": ["<code>cim LIKE 'Pizza%'<\/code>", "<code>cim LIKE '%Pizza'<\/code>", "<code>cim LIKE '%Pizza%'<\/code>", "<code>cim = 'Pizza'<\/code>"], "ok": 0, "id": "like4"}, {"type": "mc", "q": "Melyik feltétel adja azokat a filmeket, amelyeknek a címében <b>bárhol<\/b> szerepel: „robot”?", "opts": ["<code>cim LIKE 'robot%'<\/code>", "<code>cim LIKE '%robot'<\/code>", "<code>cim LIKE '%robot%'<\/code>", "<code>cim = 'robot'<\/code>"], "ok": 2, "id": "like5"}, {"type": "mc", "q": "Melyik feltétel adja azokat a filmeket, amelyeknek a címe ezzel <b>végződik<\/b>: „kör”?", "opts": ["<code>cim LIKE 'kör%'<\/code>", "<code>cim LIKE '%kör'<\/code>", "<code>cim LIKE '%kör%'<\/code>", "<code>cim = 'kör'<\/code>"], "ok": 1, "id": "like6"}, {"type": "mc", "q": "Melyik feltétel adja azokat a filmeket, amelyeknek a címe ezzel <b>kezdődik<\/b>: „Éjféli”?", "opts": ["<code>cim LIKE 'Éjféli%'<\/code>", "<code>cim LIKE '%Éjféli'<\/code>", "<code>cim LIKE '%Éjféli%'<\/code>", "<code>cim = 'Éjféli'<\/code>"], "ok": 0, "id": "like7"}, {"type": "mc", "q": "Melyik feltétel adja azokat a filmeket, amelyeknek a címében <b>bárhol<\/b> szerepel: „vendég”?", "opts": ["<code>cim LIKE 'vendég%'<\/code>", "<code>cim LIKE '%vendég'<\/code>", "<code>cim LIKE '%vendég%'<\/code>", "<code>cim = 'vendég'<\/code>"], "ok": 2, "id": "like8"}, {"type": "mc", "q": "Melyik feltétel adja azokat a filmeket, amelyeknek a címe ezzel <b>végződik<\/b>: „parti”?", "opts": ["<code>cim LIKE 'parti%'<\/code>", "<code>cim LIKE '%parti'<\/code>", "<code>cim LIKE '%parti%'<\/code>", "<code>cim = 'parti'<\/code>"], "ok": 1, "id": "like9"}, {"type": "mc", "q": "Melyik feltétel adja azokat a filmeket, amelyeknek a címében <b>bárhol<\/b> szerepel: „Hold”?", "opts": ["<code>cim LIKE 'Hold%'<\/code>", "<code>cim LIKE '%Hold'<\/code>", "<code>cim LIKE '%Hold%'<\/code>", "<code>cim = 'Hold'<\/code>"], "ok": 2, "id": "like10"}]}, {"id": "null", "title": "Hiányzó érték: NULL", "pts": 2, "variants": [{"type": "mc", "q": "A még nem értékelt filmeknél az <code>ertekeles<\/code> mező üres. Melyik feltétel adja ezeket a filmeket?", "opts": ["<code>ertekeles = NULL<\/code>", "<code>ertekeles IS NULL<\/code>", "<code>ertekeles = 0<\/code>", "<code>ertekeles = ''<\/code>"], "ok": 1, "id": "null1"}, {"type": "mc", "q": "Melyik feltétel adja azokat a filmeket, amelyeknek <b>már van<\/b> értékelése?", "opts": ["<code>ertekeles != NULL<\/code>", "<code>ertekeles IS NOT NULL<\/code>", "<code>ertekeles = NOT NULL<\/code>", "<code>ertekeles NOT NULL = 1<\/code>"], "ok": 1, "id": "null2"}, {"type": "mc", "q": "Ha egy vetítés jegyeit még nem számolták össze, a <code>nezok<\/code> mező üres. Melyik feltétel adja ezeket a vetítéseket?", "opts": ["<code>nezok = NULL<\/code>", "<code>nezok IS NULL<\/code>", "<code>nezok = 0<\/code>", "<code>nezok = ''<\/code>"], "ok": 1, "id": "null3"}, {"type": "mc", "q": "Melyik feltétel adja azokat a vetítéseket, amelyeknek <b>ismert<\/b> a nézőszáma?", "opts": ["<code>nezok != NULL<\/code>", "<code>nezok IS NOT NULL<\/code>", "<code>nezok = NOT NULL<\/code>", "<code>nezok NOT NULL = 1<\/code>"], "ok": 1, "id": "null4"}, {"type": "mc", "q": "Hány sort ad ez a lekérdezés?", "code": "SELECT cim\nFROM filmek\nWHERE ertekeles = NULL;", "opts": ["0", "3", "11", "14"], "ok": 0, "id": "null5"}, {"type": "mc", "q": "Hány sort ad ez a lekérdezés?", "code": "SELECT cim\nFROM filmek\nWHERE ertekeles IS NULL;", "opts": ["0", "3", "11", "14"], "ok": 1, "id": "null6"}, {"type": "mc", "q": "Hány sort ad ez a lekérdezés?", "code": "SELECT id\nFROM vetitesek\nWHERE nezok = NULL;", "opts": ["0", "2", "18", "20"], "ok": 0, "id": "null7"}, {"type": "mc", "q": "Hány sort ad ez a lekérdezés?", "code": "SELECT id\nFROM vetitesek\nWHERE nezok IS NOT NULL;", "opts": ["0", "2", "18", "20"], "ok": 2, "id": "null8"}, {"type": "mc", "q": "Mit jelent a <code>NULL<\/code> egy mezőben?", "opts": ["Nincs benne érték", "A szám nulla", "Üres szöveg ('')", "Hibás adat"], "ok": 0, "id": "null9"}, {"type": "mc", "q": "Miért nem ad egy sort sem a <code>WHERE x = NULL<\/code>?", "opts": ["Mert a NULL semmivel sem egyenlő, ezért a feltétel soha nem igaz", "Mert a NULL-t idézőjelbe kell tenni", "Mert a NULL csak számoknál működik", "Mert hibát ad, és leáll"], "ok": 0, "id": "null10"}]}, {"id": "sort", "title": "Rendezés és LIMIT", "pts": 2, "variants": [{"type": "mc", "q": "Melyik film címét adja ez a lekérdezés?", "code": "SELECT cim\nFROM filmek\nORDER BY hossz DESC\nLIMIT 1;", "opts": ["Vihar a szigeten", "Pingvinparti", "Holdfény utca", "Kék hajnal"], "ok": 0, "id": "sort1"}, {"type": "mc", "q": "Melyik film címét adja ez a lekérdezés?", "code": "SELECT cim\nFROM filmek\nORDER BY hossz\nLIMIT 1;", "opts": ["Pingvinparti", "Vihar a szigeten", "Holdfény utca", "Kék hajnal"], "ok": 0, "id": "sort2"}, {"type": "mc", "q": "Melyik film címét adja ez a lekérdezés?", "code": "SELECT cim\nFROM filmek\nORDER BY ev DESC\nLIMIT 1;", "opts": ["Az utolsó kör", "Tavaszi levél", "Holdfény utca", "Kék hajnal"], "ok": 0, "id": "sort3"}, {"type": "mc", "q": "Melyik film címét adja ez a lekérdezés?", "code": "SELECT cim\nFROM filmek\nORDER BY ev\nLIMIT 1;", "opts": ["Tavaszi levél", "Az utolsó kör", "Holdfény utca", "Kék hajnal"], "ok": 0, "id": "sort4"}, {"type": "mc", "q": "Melyik film címét adja ez a lekérdezés?", "code": "SELECT cim\nFROM filmek\nWHERE mufaj = 'vígjáték'\nORDER BY hossz DESC\nLIMIT 1;", "opts": ["Nyári zűr", "Gyors és vicces", "Pizza és pánik", "Holdfény utca"], "ok": 0, "id": "sort5"}, {"type": "mc", "q": "Melyik film címét adja ez a lekérdezés?", "code": "SELECT cim\nFROM filmek\nWHERE mufaj = 'akció'\nORDER BY ev\nLIMIT 1;", "opts": ["Vihar a szigeten", "Az utolsó kör", "Csillagvadász", "Holdfény utca"], "ok": 0, "id": "sort6"}, {"type": "mc", "q": "Melyik film címét adja ez a lekérdezés?", "code": "SELECT cim\nFROM filmek\nWHERE mufaj = 'dráma'\nORDER BY hossz\nLIMIT 1;", "opts": ["Kék hajnal", "A pék fia", "Holdfény utca", "Tavaszi levél"], "ok": 0, "id": "sort7"}, {"type": "mc", "q": "Melyik film címét adja ez a lekérdezés?", "code": "SELECT cim\nFROM filmek\nWHERE mufaj = 'horror'\nORDER BY ev DESC\nLIMIT 1;", "opts": ["Árnyékok háza", "Éjféli vendég", "Holdfény utca", "Vihar a szigeten"], "ok": 0, "id": "sort8"}, {"type": "mc", "q": "Melyik film címét adja ez a lekérdezés?", "code": "SELECT cim\nFROM filmek\nWHERE ev < 2015\nORDER BY hossz DESC\nLIMIT 1;", "opts": ["Vihar a szigeten", "Gyors és vicces", "Kék hajnal", "Éjféli vendég"], "ok": 0, "id": "sort9"}, {"type": "mc", "q": "Melyik film címét adja ez a lekérdezés?", "code": "SELECT cim\nFROM filmek\nWHERE hossz > 100\nORDER BY ev\nLIMIT 1;", "opts": ["Tavaszi levél", "Az utolsó kör", "Holdfény utca", "Csillagvadász"], "ok": 0, "id": "sort10"}]}, {"id": "agg", "title": "Összesítő függvények", "pts": 2, "variants": [{"type": "num", "q": "Mennyi az eredmény?", "code": "SELECT COUNT(*)\nFROM filmek\nWHERE mufaj = 'dráma';", "ok": 4, "id": "agg1"}, {"type": "num", "q": "Mennyi az eredmény?", "code": "SELECT MAX(hossz)\nFROM filmek;", "ok": 134, "id": "agg2"}, {"type": "num", "q": "Mennyi az eredmény?", "code": "SELECT MIN(ev)\nFROM filmek;", "ok": 2005, "id": "agg3"}, {"type": "num", "q": "Mennyi az eredmény?", "code": "SELECT SUM(nezok)\nFROM vetitesek\nWHERE nap = 'csütörtök';", "ok": 156, "id": "agg4"}, {"type": "num", "q": "Mennyi az eredmény?", "code": "SELECT COUNT(*)\nFROM vetitesek\nWHERE terem = 3;", "ok": 5, "id": "agg5"}, {"type": "num", "q": "Mennyi az eredmény?", "code": "SELECT MAX(ertekeles)\nFROM filmek;", "ok": 9, "id": "agg6"}, {"type": "num", "q": "Mennyi az eredmény?", "code": "SELECT MIN(hossz)\nFROM filmek\nWHERE mufaj = 'akció';", "ok": 116, "id": "agg7"}, {"type": "num", "q": "Mennyi az eredmény?", "code": "SELECT SUM(hossz)\nFROM filmek\nWHERE mufaj = 'animáció';", "ok": 167, "id": "agg8"}, {"type": "num", "q": "Mennyi az eredmény?", "code": "SELECT COUNT(*)\nFROM vetitesek\nWHERE nezok > 80;", "ok": 5, "id": "agg9"}, {"type": "num", "q": "Mennyi az eredmény?", "code": "SELECT MAX(nezok)\nFROM vetitesek\nWHERE nap = 'péntek';", "ok": 93, "id": "agg10"}]}, {"id": "group", "title": "Csoportosítás: GROUP BY, HAVING", "pts": 2, "variants": [{"type": "multi", "q": "Mely csoportok jelennek meg az eredményben? Jelöld be mindet!", "code": "SELECT mufaj, COUNT(*)\nFROM filmek\nGROUP BY mufaj\nHAVING COUNT(*) >= 3;", "opts": ["akció", "animáció", "dráma", "horror", "vígjáték"], "ok": [0, 2, 4], "id": "group1"}, {"type": "multi", "q": "Mely csoportok jelennek meg az eredményben? Jelöld be mindet!", "code": "SELECT mufaj, COUNT(*)\nFROM filmek\nGROUP BY mufaj\nHAVING COUNT(*) > 3;", "opts": ["akció", "animáció", "dráma", "horror", "vígjáték"], "ok": [2], "id": "group2"}, {"type": "multi", "q": "Mely csoportok jelennek meg az eredményben? Jelöld be mindet!", "code": "SELECT mufaj, COUNT(*)\nFROM filmek\nGROUP BY mufaj\nHAVING COUNT(*) < 3;", "opts": ["akció", "animáció", "dráma", "horror", "vígjáték"], "ok": [1, 3], "id": "group3"}, {"type": "multi", "q": "Mely csoportok jelennek meg az eredményben? Jelöld be mindet!", "code": "SELECT nap, COUNT(*)\nFROM vetitesek\nGROUP BY nap\nHAVING COUNT(*) >= 5;", "opts": ["csütörtök", "péntek", "szombat", "vasárnap"], "ok": [1, 2, 3], "id": "group4"}, {"type": "multi", "q": "Mely csoportok jelennek meg az eredményben? Jelöld be mindet!", "code": "SELECT nap, SUM(nezok)\nFROM vetitesek\nGROUP BY nap\nHAVING SUM(nezok) > 300;", "opts": ["csütörtök", "péntek", "szombat", "vasárnap"], "ok": [1, 2], "id": "group5"}, {"type": "multi", "q": "Mely csoportok jelennek meg az eredményben? Jelöld be mindet!", "code": "SELECT terem, COUNT(*)\nFROM vetitesek\nGROUP BY terem\nHAVING COUNT(*) > 6;", "opts": ["1", "2", "3"], "ok": [0, 1], "id": "group6"}, {"type": "multi", "q": "Mely csoportok jelennek meg az eredményben? Jelöld be mindet!", "code": "SELECT mufaj, MAX(hossz)\nFROM filmek\nGROUP BY mufaj\nHAVING MAX(hossz) > 110;", "opts": ["akció", "animáció", "dráma", "horror", "vígjáték"], "ok": [0, 2], "id": "group7"}, {"type": "multi", "q": "Mely csoportok jelennek meg az eredményben? Jelöld be mindet!", "code": "SELECT mufaj, MIN(ev)\nFROM filmek\nGROUP BY mufaj\nHAVING MIN(ev) < 2013;", "opts": ["akció", "animáció", "dráma", "horror", "vígjáték"], "ok": [0, 2, 3], "id": "group8"}, {"type": "multi", "q": "Mely csoportok jelennek meg az eredményben? Jelöld be mindet!", "code": "SELECT nap, MAX(nezok)\nFROM vetitesek\nGROUP BY nap\nHAVING MAX(nezok) > 90;", "opts": ["csütörtök", "péntek", "szombat", "vasárnap"], "ok": [1, 2], "id": "group9"}, {"type": "multi", "q": "Mely csoportok jelennek meg az eredményben? Jelöld be mindet!", "code": "SELECT terem, SUM(nezok)\nFROM vetitesek\nGROUP BY terem\nHAVING SUM(nezok) > 400;", "opts": ["1", "2", "3"], "ok": [0, 1], "id": "group10"}]}, {"id": "wh", "title": "WHERE vagy HAVING?", "pts": 2, "variants": [{"type": "mc", "q": "Műfajonként megszámolod a filmeket, de csak azok a műfajok kellenek, amelyekből <b>kettőnél több<\/b> film van. Melyik záradékba kerül ez a feltétel?", "opts": ["<code>WHERE<\/code>", "<code>GROUP BY<\/code>", "<code>HAVING<\/code>", "<code>ORDER BY<\/code>"], "ok": 2, "id": "wh1"}, {"type": "mc", "q": "Műfajonként megszámolod a filmeket, de csak a <b>2010 után<\/b> készült filmeket. Melyik záradékba kerül ez a feltétel?", "opts": ["<code>WHERE<\/code>", "<code>GROUP BY<\/code>", "<code>HAVING<\/code>", "<code>ORDER BY<\/code>"], "ok": 0, "id": "wh2"}, {"type": "mc", "q": "Naponként összeadod a nézőket, de csak azok a napok kellenek, ahol <b>összesen több mint 200<\/b> néző volt. Melyik záradékba kerül ez a feltétel?", "opts": ["<code>WHERE<\/code>", "<code>GROUP BY<\/code>", "<code>HAVING<\/code>", "<code>ORDER BY<\/code>"], "ok": 2, "id": "wh3"}, {"type": "mc", "q": "Naponként összeadod a nézőket, de csak az <b>1-es terem<\/b> vetítéseit. Melyik záradékba kerül ez a feltétel?", "opts": ["<code>WHERE<\/code>", "<code>GROUP BY<\/code>", "<code>HAVING<\/code>", "<code>ORDER BY<\/code>"], "ok": 0, "id": "wh4"}, {"type": "mc", "q": "Filmenként megszámolod a vetítéseket, de csak azok a filmek kellenek, amelyeket <b>legalább kétszer<\/b> vetítettek. Melyik záradékba kerül ez a feltétel?", "opts": ["<code>WHERE<\/code>", "<code>GROUP BY<\/code>", "<code>HAVING<\/code>", "<code>ORDER BY<\/code>"], "ok": 2, "id": "wh5"}, {"type": "mc", "q": "Műfajonként megszámolod a filmeket, de csak azokat, amelyeknek az értékelése <b>legalább 7<\/b>. Melyik záradékba kerül ez a feltétel?", "opts": ["<code>WHERE<\/code>", "<code>GROUP BY<\/code>", "<code>HAVING<\/code>", "<code>ORDER BY<\/code>"], "ok": 0, "id": "wh6"}, {"type": "mc", "q": "Műfajonként megkeresed a leghosszabb filmet, de csak azok a műfajok kellenek, ahol <b>a leghosszabb film is 120 percnél rövidebb<\/b>. Melyik záradékba kerül ez a feltétel?", "opts": ["<code>WHERE<\/code>", "<code>GROUP BY<\/code>", "<code>HAVING<\/code>", "<code>ORDER BY<\/code>"], "ok": 2, "id": "wh7"}, {"type": "mc", "q": "Termenként megszámolod a vetítéseket, de csak a <b>szombati<\/b> vetítéseket. Melyik záradékba kerül ez a feltétel?", "opts": ["<code>WHERE<\/code>", "<code>GROUP BY<\/code>", "<code>HAVING<\/code>", "<code>ORDER BY<\/code>"], "ok": 0, "id": "wh8"}, {"type": "mc", "q": "Rendezőnként megszámolod a filmeket, de csak azok a rendezők kellenek, akiknek <b>legalább 3<\/b> filmjük van. Melyik záradékba kerül ez a feltétel?", "opts": ["<code>WHERE<\/code>", "<code>GROUP BY<\/code>", "<code>HAVING<\/code>", "<code>ORDER BY<\/code>"], "ok": 2, "id": "wh9"}, {"type": "mc", "q": "Műfajonként megszámolod a filmeket, de csak a <b>100 percnél rövidebb<\/b> filmeket. Melyik záradékba kerül ez a feltétel?", "opts": ["<code>WHERE<\/code>", "<code>GROUP BY<\/code>", "<code>HAVING<\/code>", "<code>ORDER BY<\/code>"], "ok": 0, "id": "wh10"}]}, {"id": "order", "title": "A záradékok sorrendje", "pts": 2, "variants": [{"type": "order", "q": "Tedd helyes sorrendbe a lekérdezés sorait! (a nyilakkal mozgathatod őket)", "items": ["SELECT mufaj, COUNT(*)", "FROM filmek", "WHERE ev > 2010", "GROUP BY mufaj", "HAVING COUNT(*) > 1", "ORDER BY COUNT(*) DESC", "LIMIT 3"], "id": "order1"}, {"type": "order", "q": "Tedd helyes sorrendbe a lekérdezés sorait! (a nyilakkal mozgathatod őket)", "items": ["SELECT cim, hossz", "FROM filmek", "WHERE mufaj = 'dráma'", "ORDER BY hossz DESC", "LIMIT 2"], "id": "order2"}, {"type": "order", "q": "Tedd helyes sorrendbe a lekérdezés sorait! (a nyilakkal mozgathatod őket)", "items": ["SELECT nap, SUM(nezok)", "FROM vetitesek", "WHERE terem = 1", "GROUP BY nap", "HAVING SUM(nezok) > 100", "ORDER BY SUM(nezok) DESC"], "id": "order3"}, {"type": "order", "q": "Tedd helyes sorrendbe a lekérdezés sorait! (a nyilakkal mozgathatod őket)", "items": ["SELECT terem, COUNT(*)", "FROM vetitesek", "WHERE nezok IS NOT NULL", "GROUP BY terem", "ORDER BY terem"], "id": "order4"}, {"type": "order", "q": "Tedd helyes sorrendbe a lekérdezés sorait! (a nyilakkal mozgathatod őket)", "items": ["SELECT cim, ev", "FROM filmek", "WHERE ertekeles >= 7", "ORDER BY ev", "LIMIT 5"], "id": "order5"}, {"type": "order", "q": "Tedd helyes sorrendbe a lekérdezés sorait! (a nyilakkal mozgathatod őket)", "items": ["SELECT mufaj, MAX(hossz)", "FROM filmek", "GROUP BY mufaj", "HAVING MAX(hossz) > 100", "ORDER BY MAX(hossz) DESC", "LIMIT 2"], "id": "order6"}, {"type": "order", "q": "Tedd helyes sorrendbe a lekérdezés sorait! (a nyilakkal mozgathatod őket)", "items": ["SELECT nap, COUNT(*)", "FROM vetitesek", "WHERE nezok > 50", "GROUP BY nap", "HAVING COUNT(*) >= 2"], "id": "order7"}, {"type": "order", "q": "Tedd helyes sorrendbe a lekérdezés sorait! (a nyilakkal mozgathatod őket)", "items": ["SELECT cim", "FROM filmek", "WHERE cim LIKE '%a%'", "ORDER BY cim", "LIMIT 4"], "id": "order8"}, {"type": "order", "q": "Tedd helyes sorrendbe a lekérdezés sorait! (a nyilakkal mozgathatod őket)", "items": ["SELECT rendezo_id, COUNT(*)", "FROM filmek", "WHERE ev >= 2010", "GROUP BY rendezo_id", "HAVING COUNT(*) > 1", "ORDER BY COUNT(*) DESC"], "id": "order9"}, {"type": "order", "q": "Tedd helyes sorrendbe a lekérdezés sorait! (a nyilakkal mozgathatod őket)", "items": ["SELECT mufaj, AVG(hossz)", "FROM filmek", "WHERE ertekeles IS NOT NULL", "GROUP BY mufaj", "ORDER BY AVG(hossz)", "LIMIT 3"], "id": "order10"}]}, {"id": "join", "title": "Táblák összekapcsolása", "pts": 2, "variants": [{"type": "blank", "q": "Írd be a hiányzó oszlopneveket, hogy minden sor a hozzá tartozó párt kapja!", "code": "SELECT filmek.cim, rendezok.nev\nFROM filmek, rendezok\nWHERE filmek.{0} = rendezok.{1};", "ok": [["rendezo_id"], ["id"]], "id": "join1"}, {"type": "blank", "q": "Írd be a hiányzó oszlopneveket, hogy minden sor a hozzá tartozó párt kapja!", "code": "SELECT filmek.cim, rendezok.nev\nFROM filmek, rendezok\nWHERE rendezok.{0} = filmek.{1};", "ok": [["id"], ["rendezo_id"]], "id": "join2"}, {"type": "blank", "q": "Írd be a hiányzó oszlopneveket, hogy minden sor a hozzá tartozó párt kapja!", "code": "SELECT vetitesek.nap, filmek.cim\nFROM vetitesek, filmek\nWHERE vetitesek.{0} = filmek.{1};", "ok": [["film_id"], ["id"]], "id": "join3"}, {"type": "blank", "q": "Írd be a hiányzó oszlopneveket, hogy minden sor a hozzá tartozó párt kapja!", "code": "SELECT vetitesek.nap, filmek.cim\nFROM vetitesek, filmek\nWHERE filmek.{0} = vetitesek.{1};", "ok": [["id"], ["film_id"]], "id": "join4"}, {"type": "blank", "q": "Írd be a hiányzó oszlopneveket, hogy minden sor a hozzá tartozó párt kapja!", "code": "SELECT filmek.cim\nFROM filmek, rendezok\nWHERE filmek.{0} = rendezok.{1}\n  AND rendezok.orszag = 'Japán';", "ok": [["rendezo_id"], ["id"]], "id": "join5"}, {"type": "blank", "q": "Írd be a hiányzó oszlopneveket, hogy minden sor a hozzá tartozó párt kapja!", "code": "SELECT filmek.cim, vetitesek.nezok\nFROM filmek, vetitesek\nWHERE vetitesek.{0} = filmek.{1}\n  AND vetitesek.nap = 'szombat';", "ok": [["film_id"], ["id"]], "id": "join6"}, {"type": "blank", "q": "Írd be a hiányzó oszlopneveket, hogy minden sor a hozzá tartozó párt kapja!", "code": "SELECT rendezok.nev, filmek.ev\nFROM rendezok, filmek\nWHERE rendezok.{0} = filmek.{1}\n  AND filmek.mufaj = 'vígjáték';", "ok": [["id"], ["rendezo_id"]], "id": "join7"}, {"type": "blank", "q": "Írd be a hiányzó oszlopneveket, hogy minden sor a hozzá tartozó párt kapja!", "code": "SELECT filmek.cim, vetitesek.terem\nFROM vetitesek, filmek\nWHERE filmek.{0} = vetitesek.{1}\n  AND vetitesek.terem = 3;", "ok": [["id"], ["film_id"]], "id": "join8"}, {"type": "blank", "q": "Írd be a hiányzó oszlopneveket, hogy minden sor a hozzá tartozó párt kapja!", "code": "SELECT rendezok.nev, filmek.cim\nFROM filmek, rendezok\nWHERE filmek.{0} = rendezok.{1}\n  AND filmek.ev > 2020;", "ok": [["rendezo_id"], ["id"]], "id": "join9"}, {"type": "blank", "q": "Írd be a hiányzó oszlopneveket, hogy minden sor a hozzá tartozó párt kapja!", "code": "SELECT vetitesek.nap, filmek.cim\nFROM filmek, vetitesek\nWHERE vetitesek.{0} = filmek.{1}\n  AND filmek.mufaj = 'animáció';", "ok": [["film_id"], ["id"]], "id": "join10"}]}, {"id": "bug", "title": "Keresd a hibát!", "pts": 2, "variants": [{"type": "bug", "q": "A filmek címét és a rendezőjük nevét kellene adnia. Melyik sor hibás?", "code": "SELECT filmek.cim, rendezok.nev\nFROM filmek, rendezok\nWHERE filmek.id = rendezok.id;", "ok": 2, "id": "bug1"}, {"type": "bug", "q": "A még nem értékelt filmeket kellene adnia. Melyik sor hibás?", "code": "SELECT cim\nFROM filmek\nWHERE ertekeles = NULL;", "ok": 2, "id": "bug2"}, {"type": "bug", "q": "Azokat a műfajokat kellene adnia, amelyekből kettőnél több film van. Melyik sor hibás?", "code": "SELECT mufaj, COUNT(*)\nFROM filmek\nWHERE COUNT(*) > 2\nGROUP BY mufaj;", "ok": 2, "id": "bug3"}, {"type": "bug", "q": "Azokat a filmeket kellene adnia, amelyeknek a címe „Kék”-kel kezdődik. Melyik sor hibás?", "code": "SELECT cim\nFROM filmek\nWHERE cim LIKE 'Kék';", "ok": 2, "id": "bug4"}, {"type": "bug", "q": "A leghosszabb film címét kellene adnia. Melyik sor hibás?", "code": "SELECT cim, hossz\nFROM filmek\nORDER BY hossz\nLIMIT 1;", "ok": 2, "id": "bug5"}, {"type": "bug", "q": "Azokat a műfajokat kellene adnia, amelyekből legalább 3 film van. Melyik sor hibás?", "code": "SELECT mufaj, COUNT(*)\nFROM filmek\nGROUP BY mufaj\nHAVING COUNT(*) > 3;", "ok": 3, "id": "bug6"}, {"type": "bug", "q": "Műfajonként a filmek számát kellene adnia. Melyik sor hibás?", "code": "SELECT mufaj, COUNT(*)\nFROM filmek\nGROUP BY ev;", "ok": 2, "id": "bug7"}, {"type": "bug", "q": "Minden vetítés mellé a film címét kellene adnia. Melyik sor hibás?", "code": "SELECT vetitesek.nap, filmek.cim\nFROM vetitesek, filmek\nWHERE vetitesek.film_id = filmek.rendezo_id;", "ok": 2, "id": "bug8"}, {"type": "bug", "q": "A drámák címét kellene adnia. Melyik sor hibás?", "code": "SELECT cim\nFROM filmek\nWHERE mufaj = dráma;", "ok": 2, "id": "bug9"}, {"type": "bug", "q": "A 3 legújabb film címét kellene adnia. Melyik sor hibás?", "code": "SELECT cim, ev\nFROM filmek\nORDER BY ev DESC\nLIMIT 1;", "ok": 3, "id": "bug10"}]}, {"id": "sql1", "title": "Lekérdezés írása: egy tábla", "pts": 3, "variants": [{"type": "sql", "q": "Írasd ki a vígjátékok címét és megjelenési évét, a legújabbal kezdve!", "expect": "SELECT cim, ev FROM filmek WHERE mufaj = 'vígjáték' ORDER BY ev DESC;", "ordered": 1, "id": "sql11"}, {"type": "sql", "q": "Írasd ki a 110 percnél hosszabb filmek címét és hosszát, a leghosszabbal kezdve!", "expect": "SELECT cim, hossz FROM filmek WHERE hossz > 110 ORDER BY hossz DESC;", "ordered": 1, "id": "sql12"}, {"type": "sql", "q": "Írasd ki a 2012 előtt készült filmek címét és évét, a legrégebbivel kezdve!", "expect": "SELECT cim, ev FROM filmek WHERE ev < 2012 ORDER BY ev;", "ordered": 1, "id": "sql13"}, {"type": "sql", "q": "Írasd ki azoknak a drámáknak a címét, amelyeknek az értékelése legalább 8!", "expect": "SELECT cim FROM filmek WHERE mufaj = 'dráma' AND ertekeles >= 8;", "ordered": null, "id": "sql14"}, {"type": "sql", "q": "Írasd ki azoknak a filmeknek a címét, amelyeknek még nincs értékelése!", "expect": "SELECT cim FROM filmek WHERE ertekeles IS NULL;", "ordered": null, "id": "sql15"}, {"type": "sql", "q": "Írasd ki a 3 legrövidebb film címét és hosszát, a legrövidebbel kezdve!", "expect": "SELECT cim, hossz FROM filmek ORDER BY hossz LIMIT 3;", "ordered": 1, "id": "sql16"}, {"type": "sql", "q": "Írasd ki a szombati vetítések film_id-jét és nézőszámát!", "expect": "SELECT film_id, nezok FROM vetitesek WHERE nap = 'szombat';", "ordered": null, "id": "sql17"}, {"type": "sql", "q": "Írasd ki a 2-es rendező filmjeinek címét és évét!", "expect": "SELECT cim, ev FROM filmek WHERE rendezo_id = 2;", "ordered": null, "id": "sql18"}, {"type": "sql", "q": "Írasd ki a 3-as terem vetítéseinek napját és nézőszámát, a legtöbb nézővel kezdve! (Csak az ismert nézőszámúak kellenek.)", "expect": "SELECT nap, nezok FROM vetitesek WHERE terem = 3 AND nezok IS NOT NULL ORDER BY nezok DESC;", "ordered": 1, "id": "sql19"}, {"type": "sql", "q": "Írasd ki azoknak a filmeknek a címét, amelyeknek a címében bárhol szerepel az „és” szó!", "expect": "SELECT cim FROM filmek WHERE cim LIKE '%és%';", "ordered": null, "id": "sql110"}]}, {"id": "sql2", "title": "Lekérdezés írása: csoportosítás", "pts": 3, "variants": [{"type": "sql", "q": "Műfajonként hány film van? (a műfaj és a darabszám)", "expect": "SELECT mufaj, COUNT(*) FROM filmek GROUP BY mufaj;", "ordered": null, "id": "sql21"}, {"type": "sql", "q": "Naponként hány vetítés van? (a nap és a darabszám)", "expect": "SELECT nap, COUNT(*) FROM vetitesek GROUP BY nap;", "ordered": null, "id": "sql22"}, {"type": "sql", "q": "Naponként összesen hány néző volt? (a nap és a nézők összege)", "expect": "SELECT nap, SUM(nezok) FROM vetitesek GROUP BY nap;", "ordered": null, "id": "sql23"}, {"type": "sql", "q": "Műfajonként milyen hosszú a leghosszabb film? (a műfaj és a legnagyobb hossz)", "expect": "SELECT mufaj, MAX(hossz) FROM filmek GROUP BY mufaj;", "ordered": null, "id": "sql24"}, {"type": "sql", "q": "Termenként hány vetítés van? (a terem és a darabszám)", "expect": "SELECT terem, COUNT(*) FROM vetitesek GROUP BY terem;", "ordered": null, "id": "sql25"}, {"type": "sql", "q": "Mely műfajokból van legalább 3 film? (a műfaj és a darabszám)", "expect": "SELECT mufaj, COUNT(*) FROM filmek GROUP BY mufaj HAVING COUNT(*) >= 3;", "ordered": null, "id": "sql26"}, {"type": "sql", "q": "Mely napokon volt összesen több mint 300 néző? (a nap és a nézők összege)", "expect": "SELECT nap, SUM(nezok) FROM vetitesek GROUP BY nap HAVING SUM(nezok) > 300;", "ordered": null, "id": "sql27"}, {"type": "sql", "q": "Rendezőnként (rendezo_id) hány film van? (a rendezo_id és a darabszám)", "expect": "SELECT rendezo_id, COUNT(*) FROM filmek GROUP BY rendezo_id;", "ordered": null, "id": "sql28"}, {"type": "sql", "q": "Műfajonként melyik évben készült a legújabb film? (a műfaj és a legnagyobb év)", "expect": "SELECT mufaj, MAX(ev) FROM filmek GROUP BY mufaj;", "ordered": null, "id": "sql29"}, {"type": "sql", "q": "Termenként összesen hány néző volt? (a terem és a nézők összege)", "expect": "SELECT terem, SUM(nezok) FROM vetitesek GROUP BY terem;", "ordered": null, "id": "sql210"}]}, {"id": "sql3", "title": "Lekérdezés írása: két tábla", "pts": 4, "variants": [{"type": "sql", "q": "Írasd ki minden film címét a rendezője nevével! (a cím és a rendező neve)", "expect": "SELECT filmek.cim, rendezok.nev FROM filmek, rendezok WHERE filmek.rendezo_id = rendezok.id;", "ordered": null, "id": "sql31"}, {"type": "sql", "q": "Írasd ki a magyar rendezők filmjeinek címét! (A rendező országa: 'Magyarország'.)", "expect": "SELECT filmek.cim FROM filmek, rendezok WHERE filmek.rendezo_id = rendezok.id AND rendezok.orszag = 'Magyarország';", "ordered": null, "id": "sql32"}, {"type": "sql", "q": "Írasd ki a szombati vetítések filmjeinek címét és a nézőszámot! (a cím és a nézők)", "expect": "SELECT filmek.cim, vetitesek.nezok FROM vetitesek, filmek WHERE vetitesek.film_id = filmek.id AND vetitesek.nap = 'szombat';", "ordered": null, "id": "sql33"}, {"type": "sql", "q": "Írasd ki Yuki Tanaka filmjeinek címét és évét!", "expect": "SELECT filmek.cim, filmek.ev FROM filmek, rendezok WHERE filmek.rendezo_id = rendezok.id AND rendezok.nev = 'Yuki Tanaka';", "ordered": null, "id": "sql34"}, {"type": "sql", "q": "Mely napokon és melyik teremben vetítették a „Csillagvadász” című filmet? (a nap és a terem)", "expect": "SELECT vetitesek.nap, vetitesek.terem FROM vetitesek, filmek WHERE vetitesek.film_id = filmek.id AND filmek.cim = 'Csillagvadász';", "ordered": null, "id": "sql35"}, {"type": "sql", "q": "Írasd ki az 1-es terem vetítéseit a film címével! (a cím és a nap)", "expect": "SELECT filmek.cim, vetitesek.nap FROM vetitesek, filmek WHERE vetitesek.film_id = filmek.id AND vetitesek.terem = 1;", "ordered": null, "id": "sql36"}, {"type": "sql", "q": "Írasd ki a spanyol rendezők filmjeinek címét és évét! (A rendező országa: 'Spanyolország'.)", "expect": "SELECT filmek.cim, filmek.ev FROM filmek, rendezok WHERE filmek.rendezo_id = rendezok.id AND rendezok.orszag = 'Spanyolország';", "ordered": null, "id": "sql37"}, {"type": "sql", "q": "Írasd ki azokat a vetítéseket, ahol több mint 80 néző volt: a film címe és a nézőszám!", "expect": "SELECT filmek.cim, vetitesek.nezok FROM vetitesek, filmek WHERE vetitesek.film_id = filmek.id AND vetitesek.nezok > 80;", "ordered": null, "id": "sql38"}, {"type": "sql", "q": "Írasd ki a horrorfilmek címét a rendezőjük nevével! (a cím és a rendező neve)", "expect": "SELECT filmek.cim, rendezok.nev FROM filmek, rendezok WHERE filmek.rendezo_id = rendezok.id AND filmek.mufaj = 'horror';", "ordered": null, "id": "sql39"}, {"type": "sql", "q": "Írasd ki a vasárnapi vetítések filmjeinek címét és a termet! (a cím és a terem)", "expect": "SELECT filmek.cim, vetitesek.terem FROM vetitesek, filmek WHERE vetitesek.film_id = filmek.id AND vetitesek.nap = 'vasárnap';", "ordered": null, "id": "sql310"}]}], "schema": {"tables": [{"name": "rendezok", "cols": [["id", "a rendező sorszáma", null], ["nev", "a rendező neve", null], ["orszag", "az ország, pl. <code>'Magyarország'<\/code>", null]]}, {"name": "filmek", "cols": [["id", "a film sorszáma", null], ["cim", "a film címe", null], ["mufaj", "pl. <code>'dráma'<\/code>, <code>'vígjáték'<\/code>, <code>'akció'<\/code>", null], ["hossz", "hossz percben", null], ["ev", "a megjelenés éve", null], ["ertekeles", "értékelés 1–10; <code>NULL<\/code> = még nincs", null], ["rendezo_id", "ki rendezte", "rendezok.id"]]}, {"name": "vetitesek", "cols": [["id", "a vetítés sorszáma", null], ["film_id", "melyik filmet vetítették", "filmek.id"], ["nap", "pl. <code>'szombat'<\/code>", null], ["terem", "a terem száma (1–3)", null], ["nezok", "nézők száma; <code>NULL<\/code> = még nincs összeszámolva", null]]}], "links": [["filmek.rendezo_id", "rendezok.id"], ["vetitesek.film_id", "filmek.id"]]}, "reportTitle": "SQL DOLGOZAT - VALASZLAP", "filePrefix": "sql-dolgozat","ui":{"kicker":"Dolgozat · 40 perc","title":"SQL dolgozat: a mozi adatbázisa","short":"SQL dolgozat","min":"perc","time":"munkaidő","parts":"feladat","oneEach":"mindenkinek más","pts":"pont","total":"összesen","rules":["Egyszerre <b>egy feladatot</b> látsz. Ha továbblépsz, <b>nem jöhetsz vissza</b>, ezért előbb nézd át a válaszod.", "Mindenki más feladatokat kap, más sorrendben. A táblák leírása minden feladatnál ott van, a teljes táblákat a <b>Táblák</b> gomb mutatja.", "A lekérdezéseket a <b>Futtatás</b> gombbal kipróbálhatod, amennyiszer csak akarod.", "Az óra 40 percről indul, és akkor is jár, ha bezárod az oldalt. Ha lejár, a dolgozat magától beadódik.", "Közben nem látod, mi jó és mi rossz: a pontszámot a beadás után kapod meg."],"name":"Neved","namePh":"Vezetéknév Keresztnév","nameFirst":"Előbb írd be a neved.","start":"Kezdés","partOf":(k,n)=>`${k}. feladat / ${n}`,"ptsN":p=>`${p} pont`,"next":"Következő →","handIn":"Beadás","confirm":"Biztos? Kattints újra","sureNext":"Továbblépés után ide nem jöhetsz vissza.","sureHand":"Ez az utolsó feladat. Beadás után nem módosíthatsz.","sureEmpty":"Erre még nem válaszoltál! Ide nem jöhetsz vissza.","up":"Feljebb","down":"Lejjebb","answer":"Válasz","number":"szám","blank":i=>`${i}. hiányzó rész`,"query":"Lekérdezés","run":"▶ Futtatás","runHint":"vagy Ctrl+Enter","empty":"Előbb írj egy lekérdezést.","sqlErr":"Hiba","rows":n=>`${n} sor`,"noRows":"Nincs egy sor sem.","schemaH":"A táblák és a kapcsolatok","links":"Kapcsolatok","allRows":"Az összes sor megnézése","tables":"Táblák","tablesH":"A mozi táblái","fiveLeft":"Még 5 perced van.","closed":"Beadva","handedIn":"Beadva","timeUp":"Lejárt az idő","scoreSub":(p,t)=>`${p}% · felhasznált idő: ${t}`,"handH":"A válaszlap leadása","handSteps":["Kattints a <b>Válaszok mentése (.txt)</b> gombra. A fájl a Letöltések mappába kerül.", "Nyisd meg a feladatot a <b>Google Classroomban</b>, töltsd fel a fájlt, majd kattints a <b>Beadás</b> gombra."],"save":"Válaszok mentése (.txt)","copy":"Másolás szövegként","saved":f=>`Elmentve: ${f}. Most töltsd fel a Classroomba.`,"saveBlocked":"Itt a mentés le van tiltva. Használd a Másolás gombot.","copied":"Kimásolva. Illeszd be a Classroom-feladathoz privát megjegyzésként.","copyBlocked":"Itt a másolás le van tiltva. Használd a Mentés gombot.","none":"(nincs válasz)","line":n=>`${n}. sor`,"rName":"Név","rStart":"Kezdés","rTime":"Felhasznált idő","rScore":"Pontszám","rAns":"Válasz","engFail":"Az SQL-motor nem töltődött be. Ellenőrizd az internetkapcsolatot, és töltsd újra az oldalt."}};
+const U = CFG.ui;
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const KEY = CFG.key, LIMIT = CFG.minutes * 60000, N = CFG.sections.length;
+let S = load(), SQL = null;
+function load(){ try { return JSON.parse(localStorage.getItem(KEY)); } catch(e){ return null; } }
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){} }
+
+/* ---------- randomness: one variant per part, parts in random order, options shuffled ---------- */
+function rnd(n){ const a = new Uint32Array(1); (self.crypto || window.msCrypto).getRandomValues(a); return a[0] % n; }
+function shuffled(n){ const p = [...Array(n).keys()]; for (let i = n - 1; i > 0; i--){ const j = rnd(i + 1); [p[i], p[j]] = [p[j], p[i]]; } return p; }
+function makePlan(){
+  return shuffled(N).map(si => {
+    const sec = CFG.sections[si], vi = rnd(sec.variants.length), q = sec.variants[vi], p = { s: si, v: vi };
+    if (q.type === "mc" || q.type === "multi") p.perm = shuffled(q.opts.length);
+    if (q.type === "order"){ let st; do { st = shuffled(q.items.length); } while (st.filter((x, i) => x === i).length > 1); p.start = st; }
+    return p;
+  });
+}
+const partOf = k => { const p = S.plan[k], sec = CFG.sections[p.s]; return { p, sec, q: sec.variants[p.v] }; };
+
+/* ---------- SQL ---------- */
+function freshDb(){ const db = new SQL.Database(); db.run(CFG.seed); return db; }
+function runQuery(q){ const db = freshDb(); try { const r = db.exec(q); return { res: r.length ? r[r.length - 1] : { columns: [], values: [] } }; } catch(e){ return { err: e.message }; } finally { db.close(); } }
+function hl(code){
+  return esc(code).replace(/('[^']*')|\b(COUNT|SUM|AVG|MIN|MAX)\b|\b(\d+)\b|\b(SELECT|FROM|WHERE|GROUP BY|HAVING|ORDER BY|LIMIT|AND|OR|NOT|LIKE|IS|NULL|ASC|DESC|AS)\b/g,
+    (m, s, f, n, k) => s ? `<span class="s">${s}</span>` : f ? `<span class="f">${f}</span>` : n ? `<span class="nm">${n}</span>` : `<span class="k">${k}</span>`);
+}
+function tableHtml(r){
+  if (!r.columns.length) return `<p class="note">${U.noRows}</p>`;
+  return `<div class="tbl"><table><thead><tr>${r.columns.map(c => `<th>${esc(c)}</th>`).join("")}</tr></thead><tbody>${r.values.map(row => "<tr>" + row.map(v =>
+    v === null ? `<td class="null">NULL</td>` : `<td class="${typeof v === "number" ? "n" : ""}">${esc(v)}</td>`).join("") + "</tr>").join("")}</tbody></table></div>`;
+}
+const normV = v => v === null ? "∅" : typeof v === "number" ? String(Math.round(v * 1000) / 1000) : String(v).trim().toLowerCase();
+function matchCols(got, exp){
+  if (!got || got.values.length !== exp.values.length) return null;
+  const col = (r, i) => r.values.map(row => normV(row[i])).sort().join("\u0001");
+  const have = got.columns.map((_, i) => col(got, i)), used = new Set(), map = [];
+  for (let i = 0; i < exp.columns.length; i++){ const w = col(exp, i), j = have.findIndex((h, k) => !used.has(k) && h === w); if (j < 0) return null; used.add(j); map.push(j); }
+  return map;
+}
+
+/* ---------- answers + grading (shown to nobody during the exam) ---------- */
+const nb = s => String(s || "").trim().replace(/\s+/g, " ").replace(/;$/, "").toUpperCase();
+const A = k => S.ans[k];
+function setA(k, v){ const n = load(); if (n && n.started === S.started && (n.pos !== k || n.finished)) return; S.ans[k] = v; save(); }
+function answered(k){
+  const { q } = partOf(k), a = A(k);
+  if (q.type === "order") return Array.isArray(a);
+  if (a == null || a === "") return false;
+  if (Array.isArray(a)) return q.type === "multi" ? a.length > 0 : a.every(x => String(x || "").trim() !== "");
+  return String(a).trim() !== "";
+}
+function grade(k){
+  const { p, sec, q } = partOf(k), a = A(k), P = sec.pts;
+  switch (q.type){
+    case "mc": case "bug": return a === q.ok ? P : 0;
+    case "multi": { if (!Array.isArray(a) || !a.length) return 0; const want = new Set(q.ok), got = new Set(a);
+      const diff = [...want].filter(x => !got.has(x)).length + [...got].filter(x => !want.has(x)).length; return diff === 0 ? P : diff === 1 ? P - 1 : 0; }
+    case "num": return a != null && String(a).trim() !== "" && Number(String(a).trim().replace(",", ".")) === q.ok ? P : 0;
+    case "blank": return Math.round(q.ok.reduce((s, alts, i) => s + (a && alts.some(x => nb(x) === nb(a[i])) ? 1 : 0), 0) * P / q.ok.length);
+    case "order": { const cur = a || p.start.map(i => q.items[i]); const right = cur.filter((x, i) => x === q.items[i]).length;
+      return right === q.items.length ? P : right >= q.items.length - 2 ? P - 1 : 0; }
+    case "sql": { if (!a || !a.trim()) return 0; const got = runQuery(a), exp = runQuery(q.expect); if (got.err) return 0;
+      const map = matchCols(got.res, exp.res); if (!map) return 0;
+      if (q.ordered != null){ const k2 = q.ordered; if (got.res.values.map(r => normV(r[map[k2]])).join("|") !== exp.res.values.map(r => normV(r[k2])).join("|")) return P - 1; }
+      return P; }
+  }
+  return 0;
+}
+const maxPts = () => CFG.sections.reduce((s, x) => s + x.pts, 0);
+
+/* ---------- rendering a part ---------- */
+function body(k){
+  const { p, q } = partOf(k), a = A(k);
+  switch (q.type){
+    case "mc": case "multi": {
+      const t = q.type === "mc" ? "radio" : "checkbox", sel = i => q.type === "mc" ? a === i : Array.isArray(a) && a.includes(i);
+      return `${q.code ? `<pre class="code">${hl(q.code)}</pre>` : ""}<div class="opts">${p.perm.map(i =>
+        `<label class="opt"><input type="${t}" name="o" value="${i}"${sel(i) ? " checked" : ""}><span>${q.type === "multi" ? esc(q.opts[i]) : q.opts[i]}</span></label>`).join("")}</div>`;
+    }
+    case "order": {
+      const cur = a || p.start.map(i => q.items[i]);
+      return `<ol class="order">${cur.map((it, i) => `<li><span class="ix">${i + 1}.</span>${esc(it)}<span class="mv">
+        <button type="button" class="mvb" data-i="${i}" data-d="-1" aria-label="${U.up}"${i === 0 ? " disabled" : ""}>↑</button>
+        <button type="button" class="mvb" data-i="${i}" data-d="1" aria-label="${U.down}"${i === cur.length - 1 ? " disabled" : ""}>↓</button></span></li>`).join("")}</ol>`;
+    }
+    case "num":
+      return `<pre class="code">${hl(q.code)}</pre><div class="num"><input type="text" inputmode="decimal" autocomplete="off" aria-label="${U.answer}" value="${a != null ? esc(a) : ""}" placeholder="${U.number}"></div>`;
+    case "blank": { let n = 0;
+      const code = hl(q.code.replace(/\{(\d)\}/g, (m, d) => "⟦" + "ABCDEFGHI"[d] + "⟧")).replace(/⟦[A-I]⟧/g, () => { const i = n++;
+        return `<input type="text" data-i="${i}" autocomplete="off" spellcheck="false" aria-label="${U.blank(i + 1)}" value="${a && a[i] ? esc(a[i]) : ""}">`; });
+      return `<pre class="code">${code}</pre>`; }
+    case "bug":
+      return `<div class="lines">${q.code.split("\n").map((ln, i) => `<label><input type="radio" name="o" value="${i}"${a === i ? " checked" : ""}><span class="ln">${i + 1}</span><span>${hl(ln)}</span></label>`).join("")}</div>`;
+    case "sql":
+      return `<div class="sqlbox"><textarea id="sql" spellcheck="false" aria-label="${U.query}" placeholder="SELECT …">${a ? esc(a) : ""}</textarea>
+        <div class="row"><button type="button" class="btn ghost" id="run">${U.run}</button><span class="hint">${U.runHint}</span></div><div class="out" id="out" aria-live="polite"></div></div>`;
+  }
+}
+function wire(k){
+  const { p, q } = partOf(k), el = $("qbody");
+  if (q.type === "mc" || q.type === "bug") el.querySelectorAll("input").forEach(x => x.onchange = () => setA(k, +x.value));
+  if (q.type === "multi") el.querySelectorAll("input").forEach(x => x.onchange = () => setA(k, [...el.querySelectorAll("input:checked")].map(y => +y.value)));
+  if (q.type === "order"){ if (!Array.isArray(A(k))) setA(k, p.start.map(i => q.items[i]));
+    el.querySelectorAll(".mvb").forEach(b => b.onclick = () => { const i = +b.dataset.i, d = +b.dataset.d, cur = A(k).slice();
+      [cur[i], cur[i + d]] = [cur[i + d], cur[i]]; setA(k, cur); el.innerHTML = body(k); wire(k);
+      (el.querySelector(`.mvb[data-i="${i + d}"][data-d="${d}"]`) || el.querySelector(`.mvb[data-i="${i + d}"]`))?.focus(); }); }
+  if (q.type === "num") el.querySelector("input").oninput = e => setA(k, e.target.value);
+  if (q.type === "blank") el.querySelectorAll("input").forEach(x => x.oninput = () => { const v = (A(k) || q.ok.map(() => "")).slice(); v[+x.dataset.i] = x.value; setA(k, v); });
+  if (q.type === "sql"){ const ta = $("sql");
+    ta.oninput = () => setA(k, ta.value);
+    const run = () => { if (!ta.value.trim()){ $("out").innerHTML = `<div class="err">${U.empty}</div>`; return; }
+      const r = runQuery(ta.value); $("out").innerHTML = r.err ? `<div class="err">${U.sqlErr}: ${esc(r.err)}</div>` : `<div class="meta">${U.rows(r.res.values.length)}</div>${tableHtml(r.res)}`; };
+    $("run").onclick = run; ta.onkeydown = e => { if ((e.ctrlKey || e.metaKey) && e.key === "Enter"){ e.preventDefault(); run(); } };
+    if (A(k)) run(); }
+  el.querySelectorAll("input[type=text]").forEach(x => x.onkeydown = e => { if (e.key === "Enter") e.preventDefault(); });
+}
+function schemaHtml(){
+  const sc = CFG.schema, open = S.schemaOpen != null ? S.schemaOpen : innerWidth >= 700;
+  const tbl = t => `<div class="st"><h5>${t.name}</h5>${t.cols.map(([c, d, fk]) => `<div class="${fk ? "fk" : ""}">${c === "id" ? "🔑 " : fk ? "→ " : ""}<b>${c}</b>: ${d}${fk ? ` (<code>${fk}</code>)` : ""}</div>`).join("")}</div>`;
+  return `<details class="schema" id="schema"${open ? " open" : ""}><summary>${U.schemaH}</summary><div class="sch">${sc.tables.map(tbl).join("")}</div>
+    <div class="lk"><span>${U.links}:</span>${sc.links.map(([a, b]) => `<code>${a} = ${b}</code>`).join("")}<button type="button" class="allrows" id="allRows">${U.allRows}</button></div></details>`;
+}
+
+/* ---------- screens ---------- */
+function startScreen(){
+  $("bar").hidden = true;
+  $("main").innerHTML = `<div class="card"><div class="kicker">${U.kicker}</div><h2>${U.title}</h2>
+    <div class="facts"><div><b>${CFG.minutes} ${U.min}</b>${U.time}</div><div><b>${N} ${U.parts}</b>${U.oneEach}</div><div><b>${maxPts()} ${U.pts}</b>${U.total}</div></div>
+    <ul class="rules">${U.rules.map(r => `<li>${r}</li>`).join("")}</ul>
+    <label class="nm" for="nm">${U.name}</label><input class="nm" id="nm" autocomplete="name" placeholder="${U.namePh}">
+    <div class="row" style="margin-top:14px"><button type="button" class="btn" id="go">${U.start}</button></div><p class="note" id="startNote" style="color:var(--bad)"></p></div>`;
+  $("go").onclick = () => { const n = $("nm").value.trim(); if (!n){ $("startNote").textContent = U.nameFirst; $("nm").focus(); return; }
+    S = { name: n, started: Date.now(), plan: makePlan(), pos: 0, ans: {}, finished: 0, timedOut: false, v: 1 }; save(); part(); clock(); };
+  $("nm").onkeydown = e => { if (e.key === "Enter") $("go").click(); };
+}
+let goT = 0;
+function part(){
+  goT = 0;
+  const k = S.pos, { sec, q } = partOf(k);
+  bar();
+  $("main").innerHTML = `<div class="card" id="pc">
+      <div class="phead"><span class="pno">${U.partOf(k + 1, N)}</span><span class="ptitle">${sec.title}</span><span class="ppts">${U.ptsN(sec.pts)}</span></div>
+      <div class="qtext">${q.q}</div>
+      ${schemaHtml()}
+      <div id="qbody">${body(k)}</div>
+      <div class="foot"><span class="warnline" id="goNote" aria-live="polite"></span><span class="grow"></span>
+        <button type="button" class="btn" id="next">${k === N - 1 ? U.handIn : U.next}</button></div>
+    </div>`;
+  wire(k);
+  $("schema").ontoggle = () => { S.schemaOpen = $("schema").open; save(); };
+  $("allRows").onclick = openTables;
+  $("next").onclick = () => {
+    if (Date.now() - goT > 5000){ goT = Date.now();
+      $("goNote").textContent = answered(k) ? (k === N - 1 ? U.sureHand : U.sureNext) : U.sureEmpty;
+      $("next").textContent = U.confirm; $("next").classList.add("warn"); return; }
+    goT = 0;
+    if (k === N - 1) return finish(false);
+    S.pos = k + 1; save(); part(); scrollTo({ top: 0 });
+  };
+  scrollTo({ top: 0 });
+}
+function bar(){
+  $("bar").hidden = false; $("barTitle").textContent = U.short; $("who").textContent = S.name; $("openTables").textContent = U.tables;
+  $("prog").innerHTML = S.plan.map((_, i) => `<i class="${i < S.pos || S.finished ? "done" : i === S.pos && !S.finished ? "cur" : ""}"></i>`).join("") + `<span>${Math.min(S.pos + 1, N)}/${N}</span>`;
+}
+let clockT = 0;
+function clock(){
+  clearInterval(clockT);
+  const tick = () => {
+    if (!S || !S.started || S.finished) return;
+    const left = S.started + LIMIT - Date.now(), c = $("clock");
+    if (left <= 0) return finish(true);
+    const s = Math.ceil(left / 1000);
+    c.textContent = `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
+    c.className = "clock" + (s <= 60 ? " crit" : s <= 300 ? " low" : "");
+    if (s === 300 && !S.warned){ S.warned = true; save(); const n = document.createElement("div"); n.className = "banner"; n.textContent = U.fiveLeft; $("main").prepend(n); }
+  };
+  tick(); clockT = setInterval(tick, 500);
+}
+function finish(timedOut){
+  if (S.finished) return;
+  S.finished = timedOut ? S.started + LIMIT : Date.now(); S.timedOut = timedOut;
+  S.score = S.plan.reduce((s, _, k) => s + grade(k), 0); save();
+  clearInterval(clockT); results();
+}
+
+/* ---------- after handing in: the score only, and the answer sheet ---------- */
+function results(){
+  bar(); $("clock").textContent = U.closed; $("clock").className = "clock";
+  const max = maxPts(), pct = Math.round(S.score / max * 100);
+  $("main").innerHTML = `<div class="card result"><div class="kicker">${S.timedOut ? U.timeUp : U.handedIn}</div><h2>${esc(S.name)}</h2>
+    <div class="big">${S.score} / ${max}</div><div class="sub">${U.scoreSub(pct, mmss(S.finished - S.started))}</div>
+    <div class="export"><h3>${U.handH}</h3><ol>${U.handSteps.map(s => `<li>${s}</li>`).join("")}</ol>
+      <div class="row"><button type="button" class="btn" id="saveTxt">${U.save}</button><button type="button" class="btn ghost" id="copyTxt">${U.copy}</button></div>
+      <p class="note" id="exNote" aria-live="polite"></p></div></div>`;
+  $("saveTxt").onclick = saveTxt; $("copyTxt").onclick = copyTxt;
+}
+const mmss = ms => { const s = Math.max(0, Math.round(ms / 1000)); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`; };
+const plain = s => String(s).replace(/<[^>]+>/g, "").replace(/&gt;/g, ">").replace(/&lt;/g, "<").replace(/&amp;/g, "&").replace(/&quot;/g, '"');
+function answerText(k){
+  const { p, q } = partOf(k), a = A(k);
+  if (q.type !== "order" && (a == null || a === "" || (Array.isArray(a) && !a.length))) return U.none;
+  switch (q.type){
+    case "mc": return plain(q.opts[a]);
+    case "multi": return a.map(i => q.opts[i]).join(", ");
+    case "order": return (a || p.start.map(i => q.items[i])).join(" | ");
+    case "num": return String(a).trim();
+    case "blank": return a.map(x => x || "-").join(" | ");
+    case "bug": return U.line(a + 1);
+    case "sql": return "\n      " + a.trim().replace(/\n/g, "\n      ");
+  }
+}
+function report(){
+  const L = [CFG.reportTitle, "", `${U.rName}: ${S.name}`, `${U.rStart}: ${new Date(S.started).toLocaleString(CFG.lang === "hu" ? "hu-HU" : "en-GB")}`,
+    `${U.rTime}: ${mmss(S.finished - S.started)}${S.timedOut ? " (" + U.timeUp + ")" : ""}`, `${U.rScore}: ${S.score} / ${maxPts()}`, ""];
+  S.plan.forEach((pl, k) => { const { sec, q } = partOf(k);
+    L.push(`${k + 1}. ${plain(sec.title)} [${q.id}] ${grade(k)}/${sec.pts}`, `   ${plain(q.q)}`, `   ${U.rAns}: ${answerText(k)}`, ""); });
+  return L.join("\n");
+}
+function fileName(){ return `${CFG.filePrefix}-${S.name.normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^A-Za-z0-9]+/g, "-").replace(/^-|-$/g, "").toLowerCase() || "valasz"}.txt`; }
+function saveTxt(){
+  try { const b = new Blob([report()], { type: "text/plain;charset=utf-8" }), u = URL.createObjectURL(b), a = document.createElement("a");
+    a.href = u; a.download = fileName(); document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(u), 1500);
+    $("exNote").textContent = U.saved(fileName()); } catch(e){ $("exNote").textContent = U.saveBlocked; }
+}
+function copyTxt(){ navigator.clipboard.writeText(report()).then(() => $("exNote").textContent = U.copied, () => $("exNote").textContent = U.copyBlocked); }
+
+/* ---------- tables ---------- */
+function openTables(){
+  const db = freshDb(); $("tablesH").textContent = U.tablesH;
+  $("tablesBody").innerHTML = CFG.schema.tables.map(t => { const r = db.exec(`SELECT * FROM ${t.name}`)[0];
+    return `<div class="dt"><h4>${t.name}<span>${U.rows(r.values.length)}</span></h4>${tableHtml(r)}</div>`; }).join("");
+  db.close(); $("tables").showModal();
+}
+$("openTables").onclick = openTables;
+$("tablesClose").onclick = () => $("tables").close();
+$("tables").addEventListener("click", e => { if (e.target === $("tables")) $("tables").close(); });
+
+/* ---------- boot ---------- */
+if (typeof initSqlJs !== "function") $("main").innerHTML = `<div class="err">${U.engFail}</div>`;
+else initSqlJs().then(s => { SQL = s;
+  if (!S || !S.started || !S.plan) return startScreen();
+  if (S.finished) return results();
+  if (Date.now() - S.started >= LIMIT) return finish(true);
+  part(); clock();
+}).catch(() => { $("main").innerHTML = `<div class="err">${U.engFail}</div>`; });
+/* a second tab must not become a way back: follow whatever the other tab saved */
+addEventListener("storage", e => { if (e.key !== KEY || !SQL) return; const n = load(); if (!n || !n.started) return;
+  const moved = !S || !S.started || n.pos !== S.pos || (n.finished && !S.finished); S = n;
+  if (!moved) return; if (S.finished){ clearInterval(clockT); results(); } else { part(); clock(); } });
+</script>
+<script src="../../nav.js" defer></script>
+</body>
+</html>
