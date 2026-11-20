@@ -200,6 +200,17 @@
                 files: { en: "sql/summary/practice.html", hu: "sql/summary/practice-hu.html" }
               },
               {
+                id: "djinn",
+                kind: "practice",
+                minutes: 40,
+                title: { hu: "A dzsinn húsz kérdése", en: "The Djinn's Twenty Riddles" },
+                desc: {
+                  hu: "Egy gonosz dzsinn húsz kérdése a kincstára adatbázisáról: HAVING, NULL, rendezés és LIMIT, záradéksorrend, összekötő oszlop, LIKE, három tábla. Minden jó válasz egy pecsét a lámpáján.",
+                  en: "A wicked djinn's twenty riddles about his treasure vault's database: HAVING, NULL, sorting and LIMIT, clause order, the linking column, LIKE, three tables. Every right answer is a seal on his lamp."
+                },
+                files: { en: "sql/summary/djinn.html", hu: "sql/summary/djinn-hu.html" }
+              },
+              {
                 id: "valve",
                 kind: "story",
                 minutes: 35,
