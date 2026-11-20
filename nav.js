@@ -203,10 +203,10 @@
                 id: "djinn",
                 kind: "practice",
                 minutes: 40,
-                title: { hu: "A dzsinn húsz kérdése", en: "The Djinn's Twenty Riddles" },
+                title: { hu: "A dzsinn tizennégy kérdése", en: "The Djinn's Fourteen Riddles" },
                 desc: {
-                  hu: "Egy gonosz dzsinn húsz kérdése a kincstára adatbázisáról: HAVING, NULL, rendezés és LIMIT, záradéksorrend, összekötő oszlop, LIKE, három tábla. Minden jó válasz egy pecsét a lámpáján.",
-                  en: "A wicked djinn's twenty riddles about his treasure vault's database: HAVING, NULL, sorting and LIMIT, clause order, the linking column, LIKE, three tables. Every right answer is a seal on his lamp."
+                  hu: "Csak lekérdezések: egy óriási, gonosz dzsinn 14 feladata a kincstára adatbázisáról – NULL, LIKE, rendezés és LIMIT, WHERE vagy HAVING, összekötő oszlop, csoportok két és három táblán. Rossz lekérdezésnél célzott tipp.",
+                  en: "Queries only: a giant, wicked djinn's 14 tasks about his treasure vault's database – NULL, LIKE, sorting and LIMIT, WHERE or HAVING, the linking column, groups across two and three tables. A targeted tip for every wrong query."
                 },
                 files: { en: "sql/summary/djinn.html", hu: "sql/summary/djinn-hu.html" }
               },

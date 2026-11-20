@@ -4,423 +4,330 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <style>/* moving between pages: the old page drifts aside and fades, the new one glides in; the rail holds still */@view-transition{navigation:auto}.rail{view-transition-name:rail}::view-transition-group(root){animation:none}::view-transition-old(root){animation:dk-out .2s cubic-bezier(.4,0,1,1) both}::view-transition-new(root){animation:dk-in .38s cubic-bezier(.16,1,.3,1) .06s both}::view-transition-old(rail),::view-transition-new(rail){animation:none}@keyframes dk-out{to{opacity:0;transform:translateX(-18px)}}@keyframes dk-in{from{opacity:0;transform:translateX(26px)}}@media (prefers-reduced-motion:reduce){::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none!important}}</style>
-<title>A dzsinn húsz kérdése</title>
+<title>A dzsinn tizennégy kérdése</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600;700&display=swap">
 <style>
-/* The Djinn's riddles: a practice sheet shown one riddle at a time. A big, always-moving djinn rises from his lamp
-   (left, sticky on wide screens; on top on phones), the riddle card sits beside him. Right answers burn seals onto the
-   lamp and hurt him, wrong ones make him laugh; twenty seals pull him back into the lamp. */
+/* The Djinn's riddles: query-writing practice. A giant djinn (head, shoulders, chest) fills the screen behind the
+   task card and is always alive: breathing, smoke rising off him, burning eyes, glowing runes on his chest.
+   He flares up when he asks, recoils when a query is right, laughs when it's wrong, and finally burns away. */
 :root{
-  --night:#0b0719; --night-2:#1a0f38; --violet:#6b3fd6; --violet-2:#3a1f86; --gold:#f2c14e; --gold-2:#ffe08a; --ember:#ff6a2b;
-  --ink:#f4ecff; --muted:#b8a8dc; --card:#fbf6ea; --card-ink:#231742; --card-muted:#6a5c86; --line:#e3d8bf;
-  --good:#1f7a4a; --good-bg:#e2f3e8; --bad:#a3243b; --bad-bg:#fbe3e6; --part:#8a5a00; --part-bg:#fdf0d2;
+  --night:#05040c; --ink:#ece6ff; --muted:#a49cc4; --gold:#e9b949; --gold-2:#ffe39a;
+  --card:rgba(12,9,26,.93); --card-line:rgba(233,185,73,.38); --field:#07060f;
+  --good:#3ecf8e; --good-bg:rgba(30,120,80,.22); --bad:#ff6d6d; --bad-bg:rgba(150,30,40,.26); --part:#ffc35a; --part-bg:rgba(150,100,10,.22);
   --f-body:"Atkinson Hyperlegible", system-ui, sans-serif; --f-disp:"Cinzel", Georgia, serif; --f-mono:"JetBrains Mono", ui-monospace, monospace;
   --power:1;
 }
 *{box-sizing:border-box}
-html{-webkit-text-size-adjust:100%}
-body{margin:0;min-height:100vh;color:var(--ink);font:17px/1.55 var(--f-body);
-  background:radial-gradient(900px 600px at 20% 10%, #2a1660 0%, transparent 60%), radial-gradient(700px 500px at 90% 90%, #3a0f3a 0%, transparent 60%), linear-gradient(var(--night-2), var(--night));
-  background-attachment:fixed}
+html{-webkit-text-size-adjust:100%;background:var(--night)}
+body{margin:0;min-height:100vh;color:var(--ink);font:17px/1.55 var(--f-body);background:var(--night)}
 a{color:inherit}
 code,pre,textarea{font-family:var(--f-mono)}
 :focus-visible{outline:3px solid var(--gold);outline-offset:2px}
 button{font:inherit;cursor:pointer}
 [hidden]{display:none!important}
 
-.topline{display:flex;align-items:center;gap:12px;padding:12px max(16px,env(safe-area-inset-left));font-size:14px;color:var(--muted);position:relative;z-index:5}
-.crumb a{text-decoration:none}.crumb a:hover{color:#fff;text-decoration:underline}
-.langlink{margin-left:auto;font:700 14px var(--f-body);color:#fff;border:1.5px solid rgba(255,255,255,.4);border-radius:4px;padding:4px 10px;text-decoration:none}
-
-.app{display:grid;grid-template-columns:1fr;gap:0}
-@media (min-width:980px){
-  .app{grid-template-columns:minmax(440px,1.08fr) minmax(440px,1fr);align-items:start}
-  .stage{position:sticky;top:0;height:100vh}
-  .topline{position:absolute;left:0;right:0;top:0}
-  .panel{padding-top:64px!important}
-  .sealcount{top:52px!important}
-}
-
-/* ---------- the stage ---------- */
-.stage{position:relative;height:min(64vh,520px);min-height:380px;overflow:hidden;isolation:isolate}
-@media (min-width:980px){.stage{height:100vh;min-height:560px}}
-#fx{position:absolute;inset:0;width:100%;height:100%;z-index:3;pointer-events:none}
-.aura{position:absolute;left:50%;top:44%;width:min(88%,560px);aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;z-index:0;
-  background:radial-gradient(circle, rgba(255,90,60,calc(.30*var(--power))) 0%, rgba(140,60,230,calc(.32*var(--power))) 38%, rgba(60,20,140,0) 70%);
-  animation:auraPulse 4.2s ease-in-out infinite;transition:background 1.2s}
-@keyframes auraPulse{0%,100%{transform:translate(-50%,-50%) scale(.94);opacity:.85}50%{transform:translate(-50%,-50%) scale(1.06);opacity:1}}
-.rays{position:absolute;left:50%;top:78%;width:180vmax;height:180vmax;transform:translate(-50%,-50%) scale(.2);z-index:1;opacity:0;pointer-events:none;border-radius:50%;
-  background:repeating-conic-gradient(from 0deg, rgba(255,224,138,.55) 0deg 7deg, rgba(255,224,138,0) 7deg 18deg);
-  -webkit-mask:radial-gradient(circle, #000 0%, rgba(0,0,0,.6) 30%, transparent 62%);mask:radial-gradient(circle, #000 0%, rgba(0,0,0,.6) 30%, transparent 62%)}
-.stage.sealed .rays{opacity:1;transform:translate(-50%,-50%) scale(1);transition:opacity 1.2s, transform 1.6s cubic-bezier(.2,.8,.2,1);animation:raySpin 26s linear infinite}
+/* ---------- the stage: fixed behind everything ---------- */
+.stage{position:fixed;inset:0;overflow:hidden;z-index:0;background:radial-gradient(70vmax 50vmax at 50% 20%, #1c1240 0%, #0b0820 45%, #05040c 80%)}
+.stage::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(120vmax 90vmax at 50% 35%, transparent 40%, rgba(0,0,0,.75) 85%);z-index:3}
+.stage.rage::before{content:"";position:absolute;inset:0;z-index:3;pointer-events:none;background:radial-gradient(80vmax 60vmax at 50% 30%, transparent 30%, rgba(170,0,0,.45));animation:rage 1.4s ease-out forwards}
+@keyframes rage{0%{opacity:0}20%{opacity:1}100%{opacity:0}}
+.backglow{position:absolute;left:50%;top:22%;width:min(130vw,1300px);aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;z-index:0;
+  background:radial-gradient(circle, rgba(255,90,20,calc(.22*var(--power))) 0%, rgba(110,40,200,calc(.25*var(--power))) 35%, transparent 65%);animation:glow 6s ease-in-out infinite}
+@keyframes glow{0%,100%{opacity:.75;transform:translate(-50%,-50%) scale(.95)}50%{opacity:1;transform:translate(-50%,-50%) scale(1.05)}}
+.rays{position:absolute;left:50%;top:26%;width:220vmax;height:220vmax;transform:translate(-50%,-50%) scale(.2);z-index:1;opacity:0;pointer-events:none;border-radius:50%;
+  background:repeating-conic-gradient(from 0deg, rgba(255,227,154,.5) 0deg 6deg, rgba(255,227,154,0) 6deg 17deg);
+  -webkit-mask:radial-gradient(circle, #000 0%, rgba(0,0,0,.5) 28%, transparent 60%);mask:radial-gradient(circle, #000 0%, rgba(0,0,0,.5) 28%, transparent 60%)}
+.stage.freed .rays{opacity:1;transform:translate(-50%,-50%) scale(1);transition:opacity 1.4s, transform 2s cubic-bezier(.2,.8,.2,1);animation:raySpin 30s linear infinite}
 @keyframes raySpin{to{rotate:360deg}}
+#fx{position:absolute;inset:0;width:100%;height:100%;z-index:4;pointer-events:none}
 
-#djinn{position:absolute;left:50%;bottom:58px;height:calc(100% - 92px);max-height:640px;aspect-ratio:400/500;transform:translateX(-50%);z-index:2;overflow:visible}
-@media (max-width:979px){#djinn{bottom:64px;height:calc(100% - 84px)} .rune{width:21px;height:21px;font-size:10px} .runes{gap:3px;bottom:8px}}
+#djinn{position:absolute;left:50%;top:-12.5vh;width:min(1400px,168vw,140vh);height:auto;transform:translateX(-50%);z-index:2;overflow:visible}
+@media (max-width:759px),(max-height:619px){#djinn{top:-4vh;width:max(168vw,560px)}}
 
-/* idle life: floating, breathing, swaying arms, waving topknot, blinking, glowing eyes, glowing orb */
-#whole{transform-box:view-box;transform-origin:200px 470px;transition:transform 1.6s cubic-bezier(.6,-.2,.7,1), opacity 1.4s}
-#floater{animation:float 4.6s ease-in-out infinite}
-@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
-#torso{transform-box:view-box;transform-origin:200px 300px;animation:breathe 3.4s ease-in-out infinite}
-@keyframes breathe{0%,100%{transform:scale(1,1)}50%{transform:scale(1.025,1.035)}}
-#armL{transform-box:view-box;transform-origin:130px 214px;animation:swayL 5.2s ease-in-out infinite;transition:transform .5s}
-@keyframes swayL{0%,100%{rotate:0deg}50%{rotate:-5deg}}
-#armR{transform-box:view-box;transform-origin:270px 214px;animation:swayR 6s ease-in-out infinite}
-@keyframes swayR{0%,100%{rotate:0deg}50%{rotate:3deg}}
-#head{transform-box:view-box;transform-origin:200px 185px;animation:headIdle 7s ease-in-out infinite}
-@keyframes headIdle{0%,100%{rotate:0deg}30%{rotate:-2.5deg}70%{rotate:2deg}}
-.eye{transform-box:fill-box;transform-origin:center;animation:blink 5.3s infinite}
-@keyframes blink{0%,93%,100%{transform:scaleY(1)}95.5%{transform:scaleY(.08)}}
-#eyeGlow{animation:glowPulse 2.2s ease-in-out infinite}
-@keyframes glowPulse{0%,100%{opacity:.55}50%{opacity:1}}
-#orb{transform-box:fill-box;transform-origin:center;animation:orbPulse 1.8s ease-in-out infinite}
-@keyframes orbPulse{0%,100%{transform:scale(.92)}50%{transform:scale(1.08)}}
-#orbSwirl{transform-box:fill-box;transform-origin:center;animation:spin 3s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-#brows{transform-box:view-box;transform-origin:200px 115px;transition:transform .3s}
-.mouth{opacity:0;transition:opacity .15s}
-#mGrin{opacity:1}
-#lamp{transform-box:view-box;transform-origin:210px 480px}
-#lid{transform-box:view-box;transform-origin:236px 428px;transition:transform .4s}
-#lampShine{animation:shine 3.6s ease-in-out infinite}
-@keyframes shine{0%,100%{opacity:.25}50%{opacity:.65}}
+/* idle life */
+#giant{transform-box:view-box;transform-origin:500px 900px;animation:breathe 6s ease-in-out infinite;transition:opacity 2.2s, filter 2.2s}
+@keyframes breathe{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-6px) scale(1.012)}}
+#head{transform-box:view-box;transform-origin:500px 430px;transition:transform 1.2s cubic-bezier(.3,.7,.3,1)}
+#headIdle{transform-box:view-box;transform-origin:500px 430px;animation:headIdle 11s ease-in-out infinite;transition:translate .8s ease-out}
+@keyframes headIdle{0%,100%{transform:rotate(0)}25%{transform:rotate(-1.4deg)}60%{transform:rotate(1.1deg)}}
+#eyes{transform-box:fill-box;transform-origin:center;animation:blink 9s infinite;transition:translate .5s ease-out}
+@keyframes blink{0%,96%,100%{transform:scaleY(1)}97.5%{transform:scaleY(.1)}}
+#eyeGlow{animation:eyePulse 3.2s ease-in-out infinite}
+@keyframes eyePulse{0%,100%{opacity:.6}50%{opacity:1}}
+#runes{animation:runes 4.5s ease-in-out infinite}
+@keyframes runes{0%,100%{opacity:.35}50%{opacity:.95}}
+#gem{animation:eyePulse 2.4s ease-in-out infinite}
+.mouth{opacity:0;transition:opacity .12s}
+#mStern{opacity:1}
+#cracks path{stroke-dasharray:900;stroke-dashoffset:900}
 
-/* asking: he swells, raises the orb, his eyes flare */
-#djinn.ask #whole{animation:askSwell 1.1s cubic-bezier(.3,1.6,.5,1)}
-@keyframes askSwell{0%{transform:scale(1)}40%{transform:scale(1.07)}100%{transform:scale(1)}}
-#djinn.ask #armL{animation:raise 1.1s ease-in-out}
-@keyframes raise{0%,100%{rotate:0deg}40%{rotate:14deg}}
-#djinn.ask #eyeGlow{animation:flare 1.1s ease-out}
-@keyframes flare{0%{opacity:1}30%{opacity:1;filter:brightness(2)}100%{opacity:.6}}
-/* hurt (a right answer): flash, recoil, shake, grimace */
-#djinn.hurt #floater{animation:recoil .9s cubic-bezier(.3,.7,.4,1)}
-@keyframes recoil{0%{transform:translate(0,0) rotate(0)}10%{transform:translate(-10px,4px) rotate(-4deg)}20%{transform:translate(9px,-2px) rotate(3deg)}30%{transform:translate(-7px,3px) rotate(-2deg)}45%{transform:translate(5px,0) rotate(1deg)}60%{transform:translate(-3px,1px)}100%{transform:translate(0,0)}}
-#djinn.hurt #body{animation:flash .7s ease-out}
-@keyframes flash{0%{filter:brightness(2.4) saturate(.3)}100%{filter:none}}
-#djinn.hurt #mGrin,#djinn.laugh #mGrin,#djinn.sealing #mGrin{opacity:0}
-#djinn.hurt #mHurt,#djinn.sealing #mHurt{opacity:1}
-#djinn.hurt #brows{transform:translateY(-4px) scaleY(.85)}
-#djinn.hurt .eye{animation:squint .9s ease-out}
-@keyframes squint{0%,100%{transform:scaleY(1)}20%,70%{transform:scaleY(.35)}}
-/* laughing (a wrong answer): head back, mouth open, shoulders shaking */
+#djinn.dormant #giant{filter:brightness(.4) saturate(.6)}
+#djinn.dormant #eyes,#djinn.dormant #eyeGlow,#djinn.dormant #runes{opacity:0;animation:none}
+#djinn.waking #giant{transition:filter 1.6s}
+#djinn.ask #head{transform:scale(1.035) translateY(6px)}
+#djinn.ask #eyeGlow,#djinn.ask #runes{animation:flare 1.3s ease-out}
+@keyframes flare{0%{opacity:1}25%{opacity:1;filter:brightness(2.2)}100%{opacity:.7}}
+.stage.rumble #djinn{animation:rumble .5s linear}
+@keyframes rumble{0%,100%{transform:translateX(-50%)}20%{transform:translateX(calc(-50% - 4px)) translateY(2px)}40%{transform:translateX(calc(-50% + 4px))}60%{transform:translateX(calc(-50% - 3px)) translateY(-1px)}80%{transform:translateX(calc(-50% + 2px))}}
+#djinn.hurt #giant{animation:flash .8s ease-out}
+@keyframes flash{0%{filter:brightness(2.6) saturate(.2)}100%{filter:none}}
+#djinn.hurt #head{transform:rotate(-3deg) translateY(-14px) scale(.98)}
+#djinn.hurt #eyes{animation:flicker .8s steps(2) 1}
+@keyframes flicker{0%,40%,80%{opacity:.15}20%,60%,100%{opacity:1}}
+#djinn.hurt #mStern,#djinn.laugh #mStern,#djinn.dying #mStern{opacity:0}
+#djinn.hurt #mClench,#djinn.dying #mClench{opacity:1}
 #djinn.laugh #mLaugh{opacity:1}
-#djinn.laugh #head{animation:laughHead .32s ease-in-out 4}
-@keyframes laughHead{0%,100%{rotate:-4deg;translate:0 0}50%{rotate:-7deg;translate:0 -4px}}
-#djinn.laugh #torso{animation:laughBody .32s ease-in-out 4}
-@keyframes laughBody{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px) scale(1.02)}}
-#djinn.laugh #armR{animation:laughArm .32s ease-in-out 4}
-@keyframes laughArm{0%,100%{rotate:0deg}50%{rotate:-8deg}}
-#djinn.laugh #eyeGlow{opacity:1}
-/* sealing: he struggles, then spirals down into the spout */
-#djinn.sealing #floater{animation:struggle .12s linear infinite}
-@keyframes struggle{0%{transform:translate(-3px,1px)}50%{transform:translate(3px,-1px)}100%{transform:translate(-3px,1px)}}
-#djinn.gone #whole{transform:translate(-92px,-10px) scale(.02) rotate(-720deg);opacity:0}
-#djinn.gone #lid{transform:translateY(-14px) rotate(-18deg)}
-#djinn.shut #lid{transform:none;transition:transform .25s cubic-bezier(.5,2,.5,1)}
-#djinn.shut #lamp{animation:lampJolt .6s ease-out}
-@keyframes lampJolt{0%{transform:translateY(0)}20%{transform:translateY(6px) scale(1.04,.95)}45%{transform:translateY(-10px) rotate(-3deg)}70%{transform:translateY(2px) rotate(2deg)}100%{transform:none}}
-#djinn.asleep #whole{transform:translate(-92px,-10px) scale(.02);opacity:0;transition:none}
-#djinn.emerge #whole{transition:transform 1.5s cubic-bezier(.2,1.3,.4,1), opacity .5s}
-#djinn.sealed-glow #lamp{filter:drop-shadow(0 0 16px rgba(255,224,138,.9)) drop-shadow(0 0 40px rgba(255,190,80,.6))}
+#djinn.laugh #head{transform:rotate(2deg) translateY(-12px) scale(1.02)}
+#djinn.laugh #body{animation:shake .26s ease-in-out 5}
+@keyframes shake{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+#djinn.laugh #eyeGlow{opacity:1;filter:hue-rotate(-18deg) brightness(1.4)}
+#djinn.dying #cracks path{stroke-dashoffset:0;transition:stroke-dashoffset 1.8s ease-in}
+#djinn.dying #giant{animation:dyingShake .1s linear infinite}
+@keyframes dyingShake{0%{transform:translate(-3px,1px)}50%{transform:translate(3px,-1px)}100%{transform:translate(-3px,1px)}}
+#djinn.dying #eyes path{fill:#fff}
+#djinn.dying #eyeGlow{filter:brightness(2.5)}
+#djinn.gone #giant{opacity:0;filter:blur(18px) brightness(3);transform:scale(1.08) translateY(-40px);animation:none}
 
-/* speech bubble */
-.bubble{position:absolute;z-index:4;left:50%;top:14px;transform:translateX(-50%);width:min(92%,460px);background:rgba(20,10,46,.86);border:1.5px solid rgba(242,193,78,.55);
-  border-radius:16px;padding:12px 16px 12px;box-shadow:0 10px 40px rgba(0,0,0,.5), inset 0 0 30px rgba(107,63,214,.25);backdrop-filter:blur(4px);
-  font:700 clamp(16px,1.9vw,19px)/1.4 var(--f-disp);color:var(--gold-2);letter-spacing:.01em;text-align:center;min-height:52px;
-  transition:opacity .3s, transform .35s cubic-bezier(.3,1.6,.5,1)}
+/* speech */
+.bubble{position:fixed;z-index:6;left:calc(50% + 235px);top:12vh;width:min(340px,calc(50vw - 260px));background:rgba(10,6,24,.84);border:1.5px solid rgba(233,185,73,.55);
+  border-radius:14px;padding:12px 16px;box-shadow:0 12px 40px rgba(0,0,0,.6), inset 0 0 30px rgba(120,40,200,.25);
+  font:700 clamp(15px,1.5vw,18px)/1.42 var(--f-disp);color:var(--gold-2);transition:opacity .3s}
 .bubble.pop{animation:pop .45s cubic-bezier(.3,1.6,.5,1)}
-@keyframes pop{0%{transform:translateX(-50%) scale(.7);opacity:0}100%{transform:translateX(-50%) scale(1);opacity:1}}
-.bubble.hide{opacity:0;transform:translateX(-50%) scale(.9)}
-.bubble i{font-style:normal;color:#fff}
-.bubble.bad{border-color:rgba(255,106,43,.8);color:#ffc2a6}
-.bubble.good{border-color:rgba(120,230,170,.8);color:#c9f5dc}
-.bubble.muffled{font:italic 400 15px/1.4 var(--f-body);color:var(--muted);border-style:dashed;top:34%;bottom:auto;width:min(80%,340px)}
-@media (min-width:980px){.bubble.muffled{top:auto;bottom:170px;right:5%} .bubble.muffled::after{display:none}
-  .bubble{top:max(54px,7%);left:auto;right:3%;transform:none;width:min(44%,330px);text-align:left}
-  .bubble.pop{animation:popR .45s cubic-bezier(.3,1.6,.5,1)} @keyframes popR{0%{transform:scale(.7);opacity:0}100%{transform:scale(1);opacity:1}}
-  .bubble.hide{transform:scale(.9)}
-  .bubble::after{content:"";position:absolute;left:34px;bottom:-13px;border:13px solid transparent;border-top-color:rgba(242,193,78,.55);border-bottom:0}}
-.taunt{position:absolute;z-index:4;font:900 34px var(--f-disp);color:#ff8a4a;text-shadow:0 0 16px rgba(255,90,40,.8);pointer-events:none;animation:taunt 1.5s ease-out forwards}
-@keyframes taunt{0%{opacity:0;transform:translateY(10px) scale(.6) rotate(var(--r))}20%{opacity:1;transform:translateY(0) scale(1.15) rotate(var(--r))}100%{opacity:0;transform:translateY(-70px) scale(1) rotate(var(--r))}}
-
-/* the seals: one per riddle */
-.runes{position:absolute;z-index:4;left:0;right:0;bottom:12px;display:flex;flex-wrap:wrap;justify-content:center;gap:4px;padding:0 14px 0 64px}
-.rune{width:24px;height:24px;border:0;background:none;padding:0;position:relative;color:#8f7fb8;font:700 11px var(--f-mono)}
-.rune::before{content:"";position:absolute;inset:3px;transform:rotate(45deg);border:1.5px solid #5a4a8c;background:#160c30;border-radius:3px;transition:all .4s}
-.rune span{position:relative}
-.rune.first::before{background:radial-gradient(#fff3b8,#f2c14e 60%,#b07a10);border-color:#ffe9a0;box-shadow:0 0 12px rgba(255,210,100,.85)}
-.rune.first{color:#3a2400}
-.rune.later::before{background:radial-gradient(#ffffff,#c9d3e6 60%,#7d8aa6);border-color:#eef3ff;box-shadow:0 0 9px rgba(200,215,255,.6)}
-.rune.later{color:#1d2540}
-.rune.rev::before{background:#5a3b1e;border-color:#9a6a32}
-.rune.rev{color:#f3d7a8}
-.rune.cur::before{border-color:var(--gold);box-shadow:0 0 0 2px rgba(242,193,78,.35);animation:runeCur 1.4s ease-in-out infinite}
-@keyframes runeCur{50%{box-shadow:0 0 0 5px rgba(242,193,78,.12)}}
-.rune.ignite::before{animation:ignite .9s ease-out}
-@keyframes ignite{0%{transform:rotate(45deg) scale(1)}35%{transform:rotate(225deg) scale(1.9);filter:brightness(2.2)}100%{transform:rotate(405deg) scale(1)}}
-.runes[aria-disabled="true"] .rune{cursor:default}
-.sealcount{position:absolute;z-index:4;left:14px;top:12px;font:700 13px var(--f-disp);color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
-.sealcount b{color:var(--gold-2);font-size:17px}
-@media (max-width:979px){.sealcount{display:none}}
-.finale{position:absolute;z-index:5;left:50%;top:22%;transform:translate(-50%,-50%);text-align:center;pointer-events:none;width:92%}
-.finale h2{margin:0;font:900 clamp(30px,5vw,58px)/1.05 var(--f-disp);color:#fff4c8;letter-spacing:.04em;text-shadow:0 0 18px rgba(255,200,90,.9), 0 0 50px rgba(255,140,40,.6)}
-.finale h2 span{display:inline-block;opacity:0;transform:translateY(30px) scale(.4);animation:letter .7s cubic-bezier(.3,1.7,.5,1) forwards}
+@keyframes pop{0%{transform:scale(.75);opacity:0}100%{transform:scale(1);opacity:1}}
+.bubble.hide{opacity:0;pointer-events:none}
+.bubble.bad{border-color:rgba(255,80,40,.8);color:#ffb59a}
+.bubble.good{border-color:rgba(90,220,160,.75);color:#c7f5df}
+.bubble::before{content:"";position:absolute;left:-13px;top:26px;border:13px solid transparent;border-right-color:rgba(233,185,73,.55);border-left:0}
+@media (max-width:1000px){.bubble{left:50%;transform:translateX(-50%);top:46px;width:min(94vw,460px);text-align:center;font-size:15px;padding:9px 14px}
+  .bubble.pop{animation:popC .45s cubic-bezier(.3,1.6,.5,1)} @keyframes popC{0%{transform:translateX(-50%) scale(.75);opacity:0}100%{transform:translateX(-50%) scale(1);opacity:1}}
+  .bubble::before{display:none}}
+.finale{position:fixed;z-index:6;left:50%;top:22vh;transform:translate(-50%,-50%);text-align:center;pointer-events:none;width:94%}
+.finale h2{margin:0;font:900 clamp(30px,6vw,72px)/1.05 var(--f-disp);color:#fff4c8;letter-spacing:.05em;text-shadow:0 0 18px rgba(255,200,90,.9), 0 0 60px rgba(255,130,30,.7)}
+.finale h2 span{display:inline-block;opacity:0;transform:translateY(40px) scale(.3);animation:letter .8s cubic-bezier(.3,1.7,.5,1) forwards}
 @keyframes letter{to{opacity:1;transform:none}}
-.finale p{margin:10px 0 0;font:700 clamp(15px,2vw,19px) var(--f-body);color:#ffe7b0;opacity:0;animation:fadeUp .8s 1.2s forwards}
+.finale p{margin:12px 0 0;font:700 clamp(15px,2vw,20px) var(--f-body);color:#ffe7b0;opacity:0;animation:fadeUp .9s 1.3s forwards}
 @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 
-/* ---------- the panel ---------- */
-.panel{padding:18px max(16px,env(safe-area-inset-left)) 90px;position:relative;z-index:2}
-@media (min-width:980px){.panel{padding:22px 34px 90px 10px}}
-.card{background:var(--card);color:var(--card-ink);border-radius:14px;padding:20px 22px 22px;box-shadow:0 18px 50px rgba(0,0,0,.45), 0 0 0 1px rgba(242,193,78,.35);max-width:720px;margin:0 auto}
-.card h1{font:900 clamp(26px,3.6vw,38px)/1.1 var(--f-disp);margin:0 0 8px;color:#3a1170}
-.kicker{font:700 13px var(--f-disp);letter-spacing:.14em;text-transform:uppercase;color:#8a5a00}
-.story{font-size:17.5px}
+/* ---------- foreground ---------- */
+.topline{position:relative;z-index:7;display:flex;align-items:center;gap:12px;padding:12px max(16px,env(safe-area-inset-left));font-size:14px;color:var(--muted)}
+.crumb a{text-decoration:none}.crumb a:hover{color:#fff;text-decoration:underline}
+.langlink{margin-left:auto;font:700 14px var(--f-body);color:#fff;border:1.5px solid rgba(255,255,255,.35);border-radius:4px;padding:4px 10px;text-decoration:none;background:rgba(0,0,0,.35)}
+.panel{position:fixed;z-index:5;left:50%;top:47vh;bottom:12px;transform:translateX(-50%);width:min(820px,94vw);overflow:auto;overscroll-behavior:contain;
+  padding:0 0 12px;scrollbar-width:thin;scrollbar-color:rgba(233,185,73,.4) transparent;border-radius:16px}
+@media (max-width:759px),(max-height:619px){.panel{position:relative;left:auto;top:auto;bottom:auto;transform:none;width:auto;overflow:visible;padding:calc(42vh - 46px) 12px 110px}}
+.card{max-width:820px;margin:0 auto;background:var(--card);border:1.5px solid var(--card-line);border-radius:16px;padding:20px 22px 22px;
+  box-shadow:0 30px 80px rgba(0,0,0,.7), 0 0 60px rgba(120,40,200,.18);backdrop-filter:blur(6px)}
+.card h1{font:900 clamp(26px,3.6vw,40px)/1.1 var(--f-disp);margin:0 0 8px;color:var(--gold-2);letter-spacing:.02em}
+.kicker{font:700 12.5px var(--f-disp);letter-spacing:.16em;text-transform:uppercase;color:var(--gold)}
 .story p{margin:.5em 0}
-.rules{padding-left:20px;margin:10px 0 16px;color:#3b2f58}
+.rules{padding-left:20px;margin:10px 0 16px;color:#d6cdf3}
 .rules li{margin:4px 0}
 label.nm{display:block;font-weight:700;margin:10px 0 6px}
-input.nm{width:100%;max-width:380px;font:inherit;padding:10px 12px;border:2px solid #cdbf9e;border-radius:8px;background:#fff}
-.btn{display:inline-flex;align-items:center;gap:8px;border:0;border-radius:10px;padding:10px 18px;font:700 16px var(--f-body);background:#3a1170;color:#fff;box-shadow:0 3px 0 #1d0840}
-.btn:hover{filter:brightness(1.12)}
-.btn:active{transform:translateY(2px);box-shadow:0 1px 0 #1d0840}
-.btn.gold{background:linear-gradient(#ffd877,#e0a92c);color:#2a1800;box-shadow:0 3px 0 #8a5a0c}
+input.nm{width:100%;max-width:380px;font:inherit;padding:10px 12px;border:1.5px solid rgba(233,185,73,.5);border-radius:8px;background:var(--field);color:#fff}
+.btn{display:inline-flex;align-items:center;gap:8px;border:0;border-radius:10px;padding:10px 18px;font:700 16px var(--f-body);background:#2a1d55;color:#fff;box-shadow:inset 0 0 0 1.5px rgba(200,180,255,.35)}
+.btn:hover{filter:brightness(1.2)}
+.btn:active{transform:translateY(1px)}
+.btn.gold{background:linear-gradient(#ffd877,#d9a02a);color:#241500;box-shadow:0 3px 0 #7a4c08}
 .btn.big{font-size:18px;padding:13px 24px}
-.btn.ghost{background:transparent;color:#3a1170;box-shadow:inset 0 0 0 2px #b9a7da}
-.btn[disabled]{opacity:.45;cursor:default;filter:none}
-.note{font-size:14px;color:var(--card-muted);margin:8px 0 0}
-.qtop{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:6px}
-.qno{font:900 15px var(--f-disp);color:#8a5a00;letter-spacing:.06em}
-.chip{font:700 12.5px var(--f-body);background:#efe4ff;color:#3a1170;border-radius:999px;padding:3px 10px}
+.btn.ghost{background:transparent;color:#e3dbff}
+.note{font-size:14px;color:var(--muted);margin:8px 0 0}
+.qtop{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.qno{font:900 15px var(--f-disp);color:var(--gold);letter-spacing:.06em}
+.chip{font:700 12.5px var(--f-body);background:rgba(120,80,230,.25);color:#d9ccff;border-radius:999px;padding:3px 10px}
 .qnav{margin-left:auto;display:flex;gap:6px}
-.qnav button{width:34px;height:34px;border-radius:8px;border:1.5px solid #cdbf9e;background:#fff;color:#3a1170;font-weight:700}
-.qnav button[disabled]{opacity:.35}
-.qtext{font:700 19px/1.4 var(--f-body);margin:6px 0 12px}
-details.remind{background:#f3ecff;border-left:4px solid #6b3fd6;border-radius:8px;padding:8px 12px;margin:0 0 14px;color:#2d1d55}
-details.remind summary{cursor:pointer;font-weight:700;color:#4a23a0}
-details.remind .t{display:none}
+.qnav button{width:34px;height:34px;border-radius:8px;border:1.5px solid rgba(200,180,255,.3);background:rgba(0,0,0,.3);color:#e3dbff;font-weight:700}
+.qnav button[disabled]{opacity:.3}
+.seals{display:flex;flex-wrap:wrap;gap:5px;margin:0 0 14px}
+.seal{width:26px;height:26px;border:0;padding:0;position:relative;background:none;color:#8a80ad;font:700 11px var(--f-mono)}
+.seal::before{content:"";position:absolute;inset:3px;transform:rotate(45deg);border:1.5px solid #4a3f7a;background:#0d0a1d;border-radius:3px;transition:all .4s}
+.seal span{position:relative}
+.seal.first::before{background:radial-gradient(#fff3b8,#e9b949 60%,#a06a08);border-color:#ffe9a0;box-shadow:0 0 12px rgba(255,210,100,.85)}
+.seal.first{color:#2e1d00}
+.seal.later::before{background:radial-gradient(#fff,#c4cde2 60%,#7480a0);border-color:#eef3ff;box-shadow:0 0 9px rgba(200,215,255,.55)}
+.seal.later{color:#1b2238}
+.seal.rev::before{background:#4a3018;border-color:#8f6430}
+.seal.rev{color:#f0d3a2}
+.seal.cur::before{border-color:var(--gold);box-shadow:0 0 0 3px rgba(233,185,73,.28)}
+.seal.ignite::before{animation:ignite .9s ease-out}
+@keyframes ignite{0%{transform:rotate(45deg) scale(1)}35%{transform:rotate(225deg) scale(1.9);filter:brightness(2.2)}100%{transform:rotate(405deg) scale(1)}}
+.qtext{font:700 19px/1.42 var(--f-body);margin:4px 0 12px;color:#fff}
+details.schema{background:rgba(0,0,0,.28);border:1px solid rgba(233,185,73,.22);border-radius:10px;padding:8px 12px;margin:0 0 14px}
+details.schema summary{cursor:pointer;font-weight:700;color:var(--gold-2)}
+.sch{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-top:8px}
+.st{background:rgba(255,255,255,.035);border:1px solid rgba(200,180,255,.15);border-radius:8px;padding:6px 9px}
+.st h5{margin:0 0 4px;font:700 14px var(--f-mono);color:var(--gold-2)}
+.st div{font-size:13px;line-height:1.35;margin:3px 0;color:#cfc6ec}
+.st b{font:700 13px var(--f-mono);color:#fff}
+.st .fk b{color:#7fe3ff}
+.st .k{color:var(--gold)}
+.lk{margin-top:8px;font-size:13.5px;color:#cfc6ec;display:flex;flex-wrap:wrap;gap:6px 16px;align-items:center}
+.lk code{color:#7fe3ff}
+.lk .allrows{margin-left:auto;background:none;border:0;color:var(--gold-2);text-decoration:underline;font-size:13px;padding:0}
+details.remind{background:rgba(110,70,220,.14);border-left:3px solid #7a52e6;border-radius:8px;padding:8px 12px;margin:0 0 14px;color:#ddd3ff}
+details.remind summary{cursor:pointer;font-weight:700;color:#c7b4ff}
 details.remind p{margin:.4em 0}
-details.remind pre{background:#e8ddff;padding:8px 10px;border-radius:6px;font-size:14px;overflow:auto}
-details.remind code{background:#e8ddff;padding:0 4px;border-radius:4px;font-size:.92em}
-pre.code{background:#1b1233;color:#efe8ff;border-radius:10px;padding:12px 14px;font-size:15px;line-height:1.5;overflow:auto;margin:0 0 12px}
-.code .k{color:#ffcf6a;font-weight:700}.code .f{color:#ff9bd2}.code .s{color:#9fe6b5}.code .nm{color:#9fd0ff}
-.opts{display:grid;gap:8px}
-.opt{display:flex;align-items:center;gap:10px;border:2px solid var(--line);background:#fff;border-radius:10px;padding:9px 12px;cursor:pointer;transition:border-color .15s, background .15s}
-.opt:hover{border-color:#b9a7da}
-.opt input{width:18px;height:18px;accent-color:#6b3fd6;flex:none}
-.opt:has(input:checked){border-color:#6b3fd6;background:#f3ecff}
-.opt code,.qtext code,.fb code,.tf code{background:#efe6d2;padding:0 4px;border-radius:4px;font-size:.92em}
-.tf{display:flex;align-items:center;gap:12px;justify-content:space-between;border-bottom:1px dashed var(--line);padding:8px 0}
-.seg{display:inline-flex;border:2px solid var(--line);border-radius:999px;overflow:hidden;flex:none}
-.seg label{padding:5px 12px;cursor:pointer;font-weight:700;font-size:15px}
-.seg input{position:absolute;opacity:0;pointer-events:none}
-.seg label:has(input:checked){background:#6b3fd6;color:#fff}
-ol.order{list-style:none;padding:0;margin:0;display:grid;gap:6px}
-ol.order li{display:flex;align-items:center;gap:10px;background:#fff;border:2px solid var(--line);border-radius:10px;padding:7px 10px;font:700 15px var(--f-mono)}
-ol.order .ix{color:var(--card-muted);width:22px}
-ol.order .mv{margin-left:auto;display:flex;gap:4px}
-.mvb{width:32px;height:30px;border-radius:7px;border:1.5px solid #cdbf9e;background:#faf6ec;font-weight:700}
-.mvb[disabled]{opacity:.3}
-.num input{font:700 20px var(--f-mono);width:140px;padding:8px 12px;border:2px solid #cdbf9e;border-radius:8px}
-pre.code input{font:700 15px var(--f-mono);width:9.5ch;padding:1px 6px;border:0;border-bottom:2px dashed var(--gold);background:#2c1f50;color:#fff3c4;border-radius:4px}
-.lines{background:#1b1233;border-radius:10px;padding:8px 6px;margin-bottom:6px;overflow:auto}
-.lines label{display:flex;align-items:center;gap:10px;padding:5px 8px;border-radius:7px;cursor:pointer;color:#efe8ff;font:15px/1.5 var(--f-mono);white-space:pre}
-.lines label:hover{background:rgba(255,255,255,.06)}
-.lines input{accent-color:var(--gold)}
-.lines .ln{color:#8f7fb8;width:18px;text-align:right}
-.lines label:has(input:checked){background:rgba(242,193,78,.18);outline:1.5px solid rgba(242,193,78,.6)}
-.lines .k{color:#ffcf6a;font-weight:700}.lines .f{color:#ff9bd2}.lines .s{color:#9fe6b5}.lines .nm{color:#9fd0ff}
-.sqlbox textarea{width:100%;min-height:150px;font-size:15px;line-height:1.5;padding:10px 12px;border-radius:10px;border:2px solid #3a2a66;background:#1b1233;color:#f4ecff;resize:vertical}
-.sqlbox .row{display:flex;align-items:center;gap:10px;margin:8px 0;flex-wrap:wrap}
-.hint{font-size:13px;color:var(--card-muted)}
-.out .meta{font:700 13px var(--f-mono);color:var(--card-muted);margin:6px 0}
-.out .err{background:var(--bad-bg);color:var(--bad);border-radius:8px;padding:8px 10px;font:14px var(--f-mono)}
-.tbl{overflow:auto;max-height:300px;border:1.5px solid var(--line);border-radius:8px;background:#fff}
+details.remind pre{background:rgba(0,0,0,.35);padding:8px 10px;border-radius:6px;font-size:14px;overflow:auto}
+code{background:rgba(255,255,255,.08);padding:0 4px;border-radius:4px;font-size:.92em;color:#ffe8b8}
+.sqlbox textarea{width:100%;min-height:170px;font-size:15.5px;line-height:1.55;padding:12px 14px;border-radius:10px;border:1.5px solid rgba(233,185,73,.4);background:var(--field);color:#f4efff;resize:vertical;caret-color:var(--gold)}
+.sqlbox textarea:focus{border-color:var(--gold);outline:none;box-shadow:0 0 0 3px rgba(233,185,73,.2)}
+.row{display:flex;align-items:center;gap:10px;margin:10px 0 0;flex-wrap:wrap}
+.hint{font-size:13px;color:var(--muted)}
+.out{margin-top:10px}
+.out .meta{font:700 13px var(--f-mono);color:var(--muted);margin:6px 0}
+.out .err{background:var(--bad-bg);color:#ffc6c6;border-radius:8px;padding:8px 10px;font:14px var(--f-mono)}
+.tbl{overflow:auto;max-height:300px;border:1px solid rgba(200,180,255,.2);border-radius:8px;background:rgba(0,0,0,.35)}
 .tbl table{border-collapse:collapse;width:100%;font:14px var(--f-mono)}
-.tbl th{position:sticky;top:0;background:#efe4ff;text-align:left;padding:5px 8px;color:#3a1170}
-.tbl td{padding:4px 8px;border-top:1px solid #f0eadb;white-space:nowrap}
+.tbl th{position:sticky;top:0;background:#1d1540;text-align:left;padding:5px 8px;color:var(--gold-2)}
+.tbl td{padding:4px 8px;border-top:1px solid rgba(255,255,255,.06);white-space:nowrap}
 .tbl td.n{text-align:right}
-.tbl td.null{color:#a08cc8;font-style:italic}
-.chk{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;align-items:center}
-.fb{margin-top:12px;border-radius:10px;padding:0;font-size:16px}
+.tbl td.null{color:#8f84b8;font-style:italic}
+.fb{margin-top:12px;border-radius:10px;font-size:16px}
 .fb:empty{display:none}
-.fb.ok{background:var(--good-bg);color:#0f4a2b;padding:10px 14px;border-left:4px solid var(--good)}
-.fb.bad{background:var(--bad-bg);color:#5c0f1e;padding:10px 14px;border-left:4px solid var(--bad);animation:nudge .4s}
-.fb.part{background:var(--part-bg);color:#5a3900;padding:10px 14px;border-left:4px solid var(--part)}
+.fb.ok{background:var(--good-bg);color:#c9f7df;padding:10px 14px;border-left:4px solid var(--good)}
+.fb.bad{background:var(--bad-bg);color:#ffd6d6;padding:10px 14px;border-left:4px solid var(--bad);animation:nudge .4s}
+.fb.part{background:var(--part-bg);color:#ffe7b5;padding:10px 14px;border-left:4px solid var(--part)}
 @keyframes nudge{0%,100%{transform:none}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
 .fb p{margin:.4em 0 0}
-.fb .sol{margin-top:6px}
-.fb .sol pre{background:#fff7e2;padding:8px 10px;border-radius:6px;font-size:14px;overflow:auto;margin:0}
-.done-lock input,.done-lock select,.done-lock textarea,.done-lock .mvb{pointer-events:none}
-.tablesBtn{margin-top:18px;text-align:center}
-.foot{max-width:720px;margin:16px auto 0;display:flex;align-items:center;gap:12px;flex-wrap:wrap;color:var(--muted);font-size:14px}
-.foot .btn.ghost{color:#e8dcff;box-shadow:inset 0 0 0 2px rgba(232,220,255,.4)}
+.fb pre{background:rgba(0,0,0,.35);padding:8px 10px;border-radius:6px;font-size:14px;overflow:auto;margin:6px 0 0;color:#fff2cf;white-space:pre-wrap}
+.locked textarea{opacity:.75}
+.foot{max-width:820px;margin:12px auto 0;display:flex;align-items:center;gap:12px;flex-wrap:wrap;color:var(--muted);font-size:14px}
 .foot .grow{flex:1}
-
-/* tables drawer */
-dialog#tables{border:0;border-radius:14px;padding:0;max-width:min(980px,96vw);width:96vw;max-height:88vh;background:var(--card);color:var(--card-ink);box-shadow:0 30px 80px rgba(0,0,0,.6)}
-dialog#tables::backdrop{background:rgba(8,4,20,.7);backdrop-filter:blur(3px)}
-.dlg-head{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--card);z-index:1}
-.dlg-head h2{margin:0;font:900 20px var(--f-disp);color:#3a1170}
+.foot .btn{background:rgba(10,6,24,.8)}
+dialog#tables{border:1.5px solid var(--card-line);border-radius:14px;padding:0;max-width:min(1000px,96vw);width:96vw;max-height:88vh;background:#0e0a20;color:var(--ink);box-shadow:0 30px 80px rgba(0,0,0,.7)}
+dialog#tables::backdrop{background:rgba(3,2,10,.75);backdrop-filter:blur(3px)}
+.dlg-head{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid rgba(255,255,255,.08);position:sticky;top:0;background:#0e0a20;z-index:1}
+.dlg-head h2{margin:0;font:900 20px var(--f-disp);color:var(--gold-2)}
 .dlg-head .btn{margin-left:auto}
-.dlg-body{padding:14px 18px 20px;display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
-.dt h4{margin:0 0 6px;font:700 15px var(--f-mono);color:#3a1170;display:flex;justify-content:space-between}
-.dt h4 span{font:400 13px var(--f-body);color:var(--card-muted)}
-
-/* results */
-.result .big{font:900 clamp(46px,8vw,72px)/1 var(--f-disp);color:#3a1170;text-align:center}
-.result .sub{text-align:center;color:var(--card-muted);margin:6px 0 14px}
+.dlg-body{padding:14px 18px 20px;display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(270px,1fr))}
+.dt h4{margin:0 0 6px;font:700 15px var(--f-mono);color:var(--gold-2);display:flex;justify-content:space-between}
+.dt h4 span{font:400 13px var(--f-body);color:var(--muted)}
+.result .big{font:900 clamp(46px,8vw,76px)/1 var(--f-disp);color:var(--gold-2);text-align:center;text-shadow:0 0 30px rgba(255,180,60,.4)}
+.result .sub{text-align:center;color:var(--muted);margin:6px 0 14px}
 .sumtbl{width:100%;border-collapse:collapse;margin:8px 0 16px}
-.sumtbl td,.sumtbl th{padding:6px 8px;border-bottom:1px solid var(--line);text-align:left}
+.sumtbl td,.sumtbl th{padding:6px 8px;border-bottom:1px solid rgba(255,255,255,.08);text-align:left}
 .sumtbl td.n{text-align:right;font-family:var(--f-mono)}
-.export h3{font:900 18px var(--f-disp);color:#3a1170;margin:14px 0 6px}
+.export h3{font:900 18px var(--f-disp);color:var(--gold-2);margin:14px 0 6px}
 .export ol{padding-left:20px;margin:6px 0 12px}
-.export .row{display:flex;gap:10px;flex-wrap:wrap}
-.err{background:var(--bad-bg);color:var(--bad);border-radius:10px;padding:14px}
-
+.err{background:var(--bad-bg);color:#ffd6d6;border-radius:10px;padding:14px}
 @media (prefers-reduced-motion:reduce){
-  #floater,#torso,#armL,#armR,#head,.aura,#orb,#orbSwirl,#lampShine{animation:none!important}
-  #djinn.hurt #floater,#djinn.laugh #head,#djinn.laugh #torso,#djinn.sealing #floater{animation:none!important}
-  .stage.sealed .rays{animation:none}
+  #giant,#headIdle,#eyes,#runes,.backglow,#gem{animation:none!important}
+  .stage.rumble #djinn,#djinn.laugh #body,#djinn.dying #giant,#djinn.hurt #giant{animation:none!important}
+  .stage.freed .rays{animation:none}
 }
 </style>
 </head>
 <body>
+<div class="stage" id="stage" aria-hidden="true">
+  <div class="backglow"></div>
+  <div class="rays"></div>
+  <svg id="djinn" class="dormant" viewBox="0 0 1000 900">
+    <defs>
+      <linearGradient id="gSkin" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#34407e"/><stop offset=".45" stop-color="#1d2552"/><stop offset="1" stop-color="#0a0d24"/></linearGradient>
+      <linearGradient id="gSide" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#03040d" stop-opacity=".85"/><stop offset=".28" stop-color="#03040d" stop-opacity="0"/><stop offset=".72" stop-color="#03040d" stop-opacity="0"/><stop offset="1" stop-color="#03040d" stop-opacity=".85"/></linearGradient>
+      <linearGradient id="gFace" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3b4891"/><stop offset=".6" stop-color="#232c63"/><stop offset="1" stop-color="#141a40"/></linearGradient>
+      <linearGradient id="gHorn" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#0c0a16"/><stop offset=".7" stop-color="#2a2338"/><stop offset="1" stop-color="#6d6280"/></linearGradient>
+      <linearGradient id="gGold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff0b0"/><stop offset=".4" stop-color="#e3ad3a"/><stop offset="1" stop-color="#5e3a05"/></linearGradient>
+      <linearGradient id="gGoldH" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#6a4306"/><stop offset=".35" stop-color="#ffe39a"/><stop offset=".6" stop-color="#d89b25"/><stop offset="1" stop-color="#5a3604"/></linearGradient>
+      <linearGradient id="gSmoke" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#05040c" stop-opacity="0"/><stop offset=".6" stop-color="#05040c" stop-opacity=".85"/><stop offset="1" stop-color="#05040c"/></linearGradient>
+      <radialGradient id="gEye" cx=".5" cy=".5" r=".6"><stop offset="0" stop-color="#ffffff"/><stop offset=".3" stop-color="#fff0a0"/><stop offset=".7" stop-color="#ffa21a"/><stop offset="1" stop-color="#ff3c00"/></radialGradient>
+      <radialGradient id="gEyeGlow" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ff8a1a" stop-opacity=".95"/><stop offset=".5" stop-color="#ff4a00" stop-opacity=".4"/><stop offset="1" stop-color="#ff2a00" stop-opacity="0"/></radialGradient>
+      <radialGradient id="gChestGlow" cx=".5" cy=".4" r=".5"><stop offset="0" stop-color="#6fe3ff" stop-opacity=".22"/><stop offset="1" stop-color="#6fe3ff" stop-opacity="0"/></radialGradient>
+      <filter id="fBlur" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="9"/></filter>
+      <filter id="fGlow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+      <filter id="fSmoke" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="14"/></filter>
+    </defs>
+    <g id="giant">
+      <!-- smoke rising behind the shoulders -->
+      <g opacity=".55" filter="url(#fSmoke)">
+        <path fill="#2a2160" d="M80,700 C60,560 160,520 140,420 C130,360 180,330 210,300 C200,380 260,420 240,520 C230,600 280,640 260,720 Z">
+          <animate attributeName="d" dur="7s" repeatCount="indefinite" values="M80,700 C60,560 160,520 140,420 C130,360 180,330 210,300 C200,380 260,420 240,520 C230,600 280,640 260,720 Z;M80,700 C40,560 190,510 150,410 C120,350 200,310 230,280 C210,380 280,420 250,520 C230,600 290,650 260,720 Z;M80,700 C60,560 160,520 140,420 C130,360 180,330 210,300 C200,380 260,420 240,520 C230,600 280,640 260,720 Z"/>
+        </path>
+        <path fill="#2a2160" d="M920,700 C940,560 840,520 860,420 C870,360 820,330 790,300 C800,380 740,420 760,520 C770,600 720,640 740,720 Z">
+          <animate attributeName="d" dur="8s" repeatCount="indefinite" values="M920,700 C940,560 840,520 860,420 C870,360 820,330 790,300 C800,380 740,420 760,520 C770,600 720,640 740,720 Z;M920,700 C960,560 810,510 850,410 C880,350 800,310 770,280 C790,380 720,420 750,520 C770,600 710,650 740,720 Z;M920,700 C940,560 840,520 860,420 C870,360 820,330 790,300 C800,380 740,420 760,520 C770,600 720,640 740,720 Z"/>
+        </path>
+      </g>
+      <g id="body">
+        <path fill="url(#gSkin)" d="M418,430 C380,470 300,482 210,500 C118,520 46,585 36,690 L22,900 L978,900 L964,690 C954,585 882,520 790,500 C700,482 620,470 582,430 Z"/>
+        <path fill="url(#gSide)" d="M418,430 C380,470 300,482 210,500 C118,520 46,585 36,690 L22,900 L978,900 L964,690 C954,585 882,520 790,500 C700,482 620,470 582,430 Z"/>
+        <path fill="#05061a" opacity=".75" d="M196,600 C232,660 246,760 240,900 L212,900 C214,780 204,680 170,610 Z"/>
+        <path fill="#05061a" opacity=".75" d="M804,600 C768,660 754,760 760,900 L788,900 C786,780 796,680 830,610 Z"/>
+        <path d="M60,640 C80,560 150,520 230,505" stroke="#6fe3ff" stroke-opacity=".16" stroke-width="5" fill="none" filter="url(#fGlow)"/>
+        <path d="M940,640 C920,560 850,520 770,505" stroke="#6fe3ff" stroke-opacity=".16" stroke-width="5" fill="none" filter="url(#fGlow)"/>
+        <path fill="#141b44" d="M292,610 C350,560 470,566 494,612 C504,664 474,712 400,716 C336,716 292,676 292,610 Z"/>
+        <path fill="#141b44" d="M708,610 C650,560 530,566 506,612 C496,664 526,712 600,716 C664,716 708,676 708,610 Z"/>
+        <path d="M300,612 C350,575 460,578 490,612" stroke="#4a5aa8" stroke-opacity=".5" stroke-width="3" fill="none"/>
+        <path d="M700,612 C650,575 540,578 510,612" stroke="#4a5aa8" stroke-opacity=".5" stroke-width="3" fill="none"/>
+        <path d="M500,600 L500,900 M440,760 Q470,770 498,762 M560,760 Q530,770 502,762 M446,830 Q472,838 498,832 M554,830 Q528,838 502,832" stroke="#05061a" stroke-opacity=".6" stroke-width="4" fill="none"/>
+        <ellipse cx="500" cy="680" rx="260" ry="200" fill="url(#gChestGlow)"/>
+        <g id="runes" stroke="#6fe3ff" stroke-width="3.2" fill="none" stroke-linecap="round" filter="url(#fGlow)">
+          <path d="M360,628 L380,600 L400,628 L380,656 Z M380,600 L380,580 M352,664 L408,664"/>
+          <path d="M640,628 L620,600 L600,628 L620,656 Z M620,600 L620,580 M592,664 L648,664"/>
+          <path d="M500,640 L500,700 M478,660 L522,660 M486,700 L514,700 M470,740 Q500,722 530,740"/>
+          <path d="M140,720 l16,-22 l16,22 M156,698 l0,40 M790,720 l16,-22 l16,22 M806,698 l0,40"/>
+        </g>
+        <path fill="url(#gGold)" d="M346,452 C410,530 590,530 654,452 L690,486 C612,592 388,592 310,486 Z"/>
+        <path d="M330,478 C410,560 590,560 670,478" stroke="#5e3a05" stroke-width="3" fill="none"/>
+        <path d="M356,500 l-10,28 M400,526 l-6,30 M450,540 l-3,31 M550,540 l3,31 M600,526 l6,30 M644,500 l10,28" stroke="#5e3a05" stroke-width="2.5"/>
+        <g id="gem"><path fill="#e01040" stroke="#ffe39a" stroke-width="3" d="M500,540 L516,560 L500,582 L484,560 Z"/><circle cx="500" cy="560" r="22" fill="#ff2a50" opacity=".35" filter="url(#fBlur)"/></g>
+        <path fill="url(#gGoldH)" d="M44,780 C90,770 170,772 222,786 L224,818 C170,804 92,802 40,812 Z"/>
+        <path fill="url(#gGoldH)" d="M956,780 C910,770 830,772 778,786 L776,818 C830,804 908,802 960,812 Z"/>
+        <rect x="0" y="760" width="1000" height="140" fill="url(#gSmoke)"/>
+      </g>
+      <g id="head"><g id="headIdle">
+        <path fill="#1a2150" d="M436,370 L564,370 L586,474 L414,474 Z"/>
+        <path fill="#05061a" opacity=".55" d="M436,370 L470,370 L452,474 L414,474 Z M564,370 L530,370 L548,474 L586,474 Z"/>
+        <path fill="url(#gHorn)" d="M432,196 C376,160 320,112 300,30 C296,6 306,-14 318,-26 C326,46 378,104 458,154 Z"/>
+        <path fill="url(#gHorn)" d="M568,196 C624,160 680,112 700,30 C704,6 694,-14 682,-26 C674,46 622,104 542,154 Z"/>
+        <path d="M318,60 l24,-6 M330,96 l26,-4 M352,128 l24,0 M682,60 l-24,-6 M670,96 l-26,-4 M648,128 l-24,0" stroke="#0a0812" stroke-opacity=".6" stroke-width="3"/>
+        <path d="M318,-20 C326,46 378,104 452,152 M682,-20 C674,46 622,104 548,152" stroke="#9a8fb4" stroke-opacity=".3" stroke-width="3" fill="none"/>
+        <path fill="#11163a" d="M406,262 C390,250 372,240 356,234 C368,254 386,280 404,298 Z"/><path fill="#11163a" d="M594,262 C610,250 628,240 644,234 C632,254 614,280 596,298 Z"/>
+        <path fill="url(#gGoldH)" d="M372,246 l7,-3 l8,17 l-7,3 Z M628,246 l-7,-3 l-8,17 l7,3 Z"/>
+        <path fill="url(#gFace)" d="M500,136 C450,136 408,166 402,228 C398,276 404,314 418,344 L440,384 C458,406 480,418 500,422 C520,418 542,406 560,384 L582,344 C596,314 602,276 598,228 C592,166 550,136 500,136 Z"/>
+        <path fill="url(#gSide)" d="M500,136 C450,136 408,166 402,228 C398,276 404,314 418,344 L440,384 C458,406 480,418 500,422 C520,418 542,406 560,384 L582,344 C596,314 602,276 598,228 C592,166 550,136 500,136 Z"/>
+        <path fill="#070a22" opacity=".8" d="M412,296 C440,312 460,330 470,364 C450,356 430,340 418,322 Z"/><path fill="#070a22" opacity=".8" d="M588,296 C560,312 540,330 530,364 C550,356 570,340 582,322 Z"/>
+        <path d="M500,150 C500,180 500,210 500,240" stroke="#5566b8" stroke-opacity=".35" stroke-width="10" stroke-linecap="round" fill="none" filter="url(#fGlow)"/>
+        <path d="M430,300 C448,292 466,292 478,298 M570,300 C552,292 534,292 522,298" stroke="#4a5aa8" stroke-opacity=".45" stroke-width="3" fill="none"/>
+        <path fill="url(#gGold)" d="M414,204 C450,180 550,180 586,204 L584,218 C550,196 450,196 416,218 Z"/>
+        <path fill="#e01040" stroke="#ffe39a" stroke-width="2" d="M500,180 L510,194 L500,208 L490,194 Z"/>
+        <path fill="#04050f" d="M430,252 C450,244 486,250 496,266 C490,286 444,286 432,272 Z M570,252 C550,244 514,250 504,266 C510,286 556,286 568,272 Z"/>
+        <g id="eyeGlow"><ellipse cx="462" cy="268" rx="42" ry="20" fill="url(#gEyeGlow)" filter="url(#fBlur)"/><ellipse cx="538" cy="268" rx="42" ry="20" fill="url(#gEyeGlow)" filter="url(#fBlur)"/></g>
+        <g id="eyes"><path fill="url(#gEye)" d="M438,262 L490,270 L484,279 L444,274 Z"/><path fill="url(#gEye)" d="M562,262 L510,270 L516,279 L556,274 Z"/></g>
+        <path fill="#080a1e" d="M420,236 C448,222 486,230 500,250 C514,230 552,222 580,236 L578,252 C552,242 520,246 500,266 C480,246 448,242 422,252 Z"/>
+        <path d="M478,226 L492,240 M522,226 L508,240 M488,218 L500,232 L512,218" stroke="#080a1e" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+        <path fill="#3b4a96" opacity=".5" d="M498,262 L492,326 L500,330 Z"/><path fill="#0b1032" d="M502,262 L510,326 L500,334 Z"/>
+        <path d="M488,330 q12,8 24,0" stroke="#05061a" stroke-width="3" fill="none"/>
+        <g class="mouth" id="mStern"><path fill="#02030a" d="M462,368 C480,360 520,360 538,368 C520,366 480,366 462,368 Z"/><path d="M458,374 Q464,370 470,368 M542,374 Q536,370 530,368" stroke="#02030a" stroke-width="3" fill="none"/></g>
+        <g class="mouth" id="mLaugh"><path fill="#140006" d="M458,360 C480,350 520,350 542,360 C536,404 464,404 458,360 Z"/><path fill="#f2ead8" d="M468,362 L476,384 L484,362 Z M532,362 L524,384 L516,362 Z"/><path fill="#ffcf9a" opacity=".35" d="M470,386 C490,396 510,396 530,386 C516,394 484,394 470,386 Z"/></g>
+        <g class="mouth" id="mClench"><path fill="#02030a" d="M460,360 C480,354 520,354 540,360 L536,380 C516,386 484,386 464,380 Z"/><path fill="#e8e0cc" d="M468,362 L532,362 L530,376 L470,376 Z"/><path d="M480,362 v14 M492,362 v14 M504,362 v14 M516,362 v14" stroke="#4a4030" stroke-width="2"/></g>
+        <path fill="#05050f" d="M420,346 C430,380 452,410 478,420 L500,426 L522,420 C548,410 570,380 580,346 C574,370 556,392 536,398 C520,402 512,392 500,392 C488,392 480,402 464,398 C444,392 426,370 420,346 Z"/>
+        <path fill="#03030a" d="M500,344 C484,346 468,352 458,366 C452,374 446,380 440,382 C456,384 468,374 478,364 C486,357 494,354 500,354 C506,354 514,357 522,364 C532,374 544,384 560,382 C554,380 548,374 542,366 C532,352 516,346 500,344 Z"/>
+        <path fill="#05050f" d="M474,400 C482,444 492,520 500,600 C508,520 518,444 526,400 C514,410 486,410 474,400 Z"/>
+        <path fill="url(#gGoldH)" d="M482,468 L518,468 L515,486 L485,486 Z M488,526 L512,526 L510,542 L490,542 Z"/>
+      </g></g>
+      <g id="cracks" stroke="#ffe39a" stroke-width="4" fill="none" stroke-linecap="round" filter="url(#fGlow)">
+        <path d="M500,420 L486,470 L512,520 L494,580 L520,650 L500,720 L540,800 L520,900"/>
+        <path d="M486,470 L420,520 L380,600 L300,640 L220,620 L130,680 L60,700"/>
+        <path d="M512,520 L600,560 L660,620 L760,640 L860,700 L940,690"/>
+        <path d="M500,262 L470,200 L440,160 M500,262 L530,190 L560,150 M470,330 L430,300 L414,250 M530,330 L570,300 L588,250"/>
+        <path d="M300,640 L280,760 L250,900 M760,640 L790,770 L770,900 M380,600 L400,720 M660,620 L640,740"/>
+      </g>
+    </g>
+  </svg>
+  <canvas id="fx"></canvas>
+</div>
+<div class="bubble hide" id="bubble" aria-live="polite"></div>
 <div class="topline">
   <span class="crumb"><a href="../../index.html#sql">Adatbázisok – SQL</a> › <a href="../../index.html#sql-summary">Összefoglaló</a></span>
   <a class="langlink" href="djinn.html" lang="en">English</a>
 </div>
-<div class="app">
-  <section class="stage" id="stage" aria-label="Djinn">
-    <div class="aura"></div>
-    <div class="rays"></div>
-    <div class="sealcount" id="sealcount"></div>
-    <svg id="djinn" class="asleep" viewBox="0 0 400 500" role="img" aria-hidden="true">
-      <defs>
-        <linearGradient id="gSkin" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7d55e6"/><stop offset=".55" stop-color="#5233b4"/><stop offset="1" stop-color="#2c1572"/></linearGradient>
-        <linearGradient id="gSkinSide" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#2c1572" stop-opacity=".55"/><stop offset=".35" stop-color="#2c1572" stop-opacity="0"/><stop offset=".7" stop-color="#2c1572" stop-opacity="0"/><stop offset="1" stop-color="#2c1572" stop-opacity=".6"/></linearGradient>
-        <linearGradient id="gArm" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7a52e2"/><stop offset="1" stop-color="#3d2196"/></linearGradient>
-        <linearGradient id="gTail" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4a2aa8"/><stop offset=".45" stop-color="#7f5fe6" stop-opacity=".9"/><stop offset=".85" stop-color="#b9a3ff" stop-opacity=".55"/><stop offset="1" stop-color="#e6dcff" stop-opacity=".25"/></linearGradient>
-        <linearGradient id="gGold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff2b0"/><stop offset=".45" stop-color="#f2c14e"/><stop offset="1" stop-color="#8a5a0c"/></linearGradient>
-        <linearGradient id="gGoldH" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#9a660f"/><stop offset=".35" stop-color="#ffe9a0"/><stop offset=".6" stop-color="#e8b23a"/><stop offset="1" stop-color="#7a4c08"/></linearGradient>
-        <linearGradient id="gVest" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8a1438"/><stop offset="1" stop-color="#4a0820"/></linearGradient>
-        <radialGradient id="gEye" cx=".5" cy=".5" r=".6"><stop offset="0" stop-color="#fffbe0"/><stop offset=".35" stop-color="#ffd23a"/><stop offset=".75" stop-color="#ff6a1a"/><stop offset="1" stop-color="#c2200a"/></radialGradient>
-        <radialGradient id="gOrb" cx=".4" cy=".35" r=".7"><stop offset="0" stop-color="#ffffff"/><stop offset=".3" stop-color="#ffd3ff"/><stop offset=".65" stop-color="#d04cff"/><stop offset="1" stop-color="#5a1aa8"/></radialGradient>
-        <radialGradient id="gGlow" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ff7a2a" stop-opacity=".9"/><stop offset="1" stop-color="#ff3a00" stop-opacity="0"/></radialGradient>
-        <radialGradient id="gLampGlow" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ffd27a" stop-opacity=".7"/><stop offset="1" stop-color="#ffd27a" stop-opacity="0"/></radialGradient>
-        <filter id="fBlur" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="4"/></filter>
-        <filter id="fSoft" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="1.4"/></filter>
-      </defs>
-      <ellipse cx="210" cy="486" rx="120" ry="16" fill="url(#gLampGlow)"/>
-      <g id="whole">
-        <g id="floater">
-          <!-- the smoke tail: from the waist down into the lamp's spout, always moving -->
-          <g id="tail">
-            <path fill="url(#gTail)" filter="url(#fSoft)" d="M166,298 C150,340 212,358 192,390 C176,412 128,404 104,426 C134,420 176,428 206,402 C242,372 202,340 236,298 Z">
-              <animate attributeName="d" dur="3.2s" repeatCount="indefinite" calcMode="spline" keySplines=".45 0 .55 1;.45 0 .55 1;.45 0 .55 1"
-                values="M166,298 C150,340 212,358 192,390 C176,412 128,404 104,426 C134,420 176,428 206,402 C242,372 202,340 236,298 Z;
-                        M166,298 C140,344 222,352 200,392 C182,416 124,410 104,426 C140,416 186,430 214,398 C252,364 196,338 236,298 Z;
-                        M166,298 C158,336 202,364 186,392 C170,410 132,400 104,426 C130,424 170,426 198,404 C232,380 210,342 236,298 Z;
-                        M166,298 C150,340 212,358 192,390 C176,412 128,404 104,426 C134,420 176,428 206,402 C242,372 202,340 236,298 Z"/>
-            </path>
-            <path fill="none" stroke="#c9b6ff" stroke-opacity=".35" stroke-width="3" stroke-linecap="round" d="M190,320 C175,350 215,360 196,388 C182,406 150,410 128,420">
-              <animate attributeName="d" dur="3.2s" repeatCount="indefinite"
-                values="M190,320 C175,350 215,360 196,388 C182,406 150,410 128,420;M192,322 C168,352 224,358 204,390 C186,410 148,414 128,420;M188,320 C182,348 206,364 190,390 C178,404 152,408 128,420;M190,320 C175,350 215,360 196,388 C182,406 150,410 128,420"/>
-            </path>
-          </g>
-          <g id="body">
-            <!-- right arm (his left), fist on the hip -->
-            <g id="armR">
-              <path d="M270,214 Q314,236 318,262" stroke="url(#gArm)" stroke-width="31" stroke-linecap="round" fill="none"/>
-              <path d="M318,262 Q300,292 262,298" stroke="url(#gArm)" stroke-width="25" stroke-linecap="round" fill="none"/>
-              <path d="M300,284 L292,268" stroke="url(#gGoldH)" stroke-width="9" stroke-linecap="round"/>
-              <circle cx="258" cy="297" r="14" fill="#5a38c8"/>
-              <path d="M250,290 q8,-4 16,2" stroke="#2c1572" stroke-width="2" fill="none"/>
-            </g>
-            <g id="torso">
-              <path fill="url(#gSkin)" d="M118,216 C122,198 160,190 186,189 L214,189 C240,190 278,198 282,216 C292,242 276,266 262,274 C250,286 242,296 236,306 L164,306 C158,296 150,286 138,274 C124,266 108,242 118,216 Z"/>
-              <path fill="url(#gSkinSide)" d="M118,216 C122,198 160,190 186,189 L214,189 C240,190 278,198 282,216 C292,242 276,266 262,274 C250,286 242,296 236,306 L164,306 C158,296 150,286 138,274 C124,266 108,242 118,216 Z"/>
-              <path d="M170,232 Q186,246 200,236 Q214,246 230,232" stroke="#2c1572" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-              <path d="M200,240 L200,290 M186,258 q14,5 28,0 M188,274 q12,4 24,0" stroke="#2c1572" stroke-opacity=".6" stroke-width="2" fill="none" stroke-linecap="round"/>
-              <!-- open vest -->
-              <path fill="url(#gVest)" stroke="url(#gGoldH)" stroke-width="3" d="M126,212 C134,200 152,194 170,192 C164,214 170,252 176,306 L164,306 C156,292 146,280 136,272 C124,262 116,240 126,212 Z"/>
-              <path fill="url(#gVest)" stroke="url(#gGoldH)" stroke-width="3" d="M274,212 C266,200 248,194 230,192 C236,214 230,252 224,306 L236,306 C244,292 254,280 264,272 C276,262 284,240 274,212 Z"/>
-              <path d="M134,232 l8,10 M140,256 l8,8 M266,232 l-8,10 M260,256 l-8,8" stroke="#f2c14e" stroke-opacity=".7" stroke-width="2"/>
-              <!-- sash -->
-              <path fill="url(#gGold)" d="M160,292 Q200,302 240,292 L242,312 Q200,322 158,312 Z"/>
-              <path fill="#7a0f2a" d="M196,300 l8,0 l3,12 l-14,0 Z"/>
-              <circle cx="200" cy="304" r="5.5" fill="#ff2a5a" stroke="#ffe9a0" stroke-width="1.5"/>
-            </g>
-            <!-- left arm (his right), raised, a magic orb above the hand -->
-            <g id="armL">
-              <path d="M130,214 Q90,206 80,170" stroke="url(#gArm)" stroke-width="31" stroke-linecap="round" fill="none"/>
-              <path d="M80,170 Q78,138 96,112" stroke="url(#gArm)" stroke-width="25" stroke-linecap="round" fill="none"/>
-              <path d="M84,138 L98,141" stroke="url(#gGoldH)" stroke-width="9" stroke-linecap="round"/>
-              <path d="M88,112 q-6,-12 2,-20 M96,106 q-2,-14 8,-20 M104,108 q4,-12 14,-14" stroke="#5a38c8" stroke-width="8" stroke-linecap="round" fill="none"/>
-              <circle cx="97" cy="110" r="13" fill="#5a38c8"/>
-              <circle cx="104" cy="66" r="30" fill="url(#gGlow)" opacity=".5" filter="url(#fBlur)"/>
-              <g id="orb"><circle cx="104" cy="66" r="17" fill="url(#gOrb)"/>
-                <g id="orbSwirl"><path d="M92,64 q12,-14 24,0 M96,72 q8,8 16,-2" stroke="#fff" stroke-opacity=".7" stroke-width="2" fill="none" stroke-linecap="round"/></g></g>
-            </g>
-            <g id="head">
-              <path d="M188,170 L212,170 L214,196 L186,196 Z" fill="#4a2ca8"/>
-              <!-- topknot, waving -->
-              <path fill="#140726" d="M195,82 C188,44 226,30 252,10 C246,42 228,58 207,82 Z">
-                <animate attributeName="d" dur="2.6s" repeatCount="indefinite"
-                  values="M195,82 C188,44 226,30 252,10 C246,42 228,58 207,82 Z;M195,82 C192,46 236,40 262,22 C250,50 230,62 207,82 Z;M195,82 C186,42 218,26 244,4 C242,38 226,56 207,82 Z;M195,82 C188,44 226,30 252,10 C246,42 228,58 207,82 Z"/>
-              </path>
-              <ellipse cx="201" cy="80" rx="10" ry="5" fill="url(#gGoldH)"/>
-              <!-- horns -->
-              <path fill="#24103f" d="M176,94 C160,82 156,62 164,48 C168,64 176,76 186,86 Z"/>
-              <path fill="#24103f" d="M224,94 C240,82 244,62 236,48 C232,64 224,76 214,86 Z"/>
-              <path d="M166,56 C168,68 174,78 182,86 M234,56 C232,68 226,78 218,86" stroke="#6a4ab8" stroke-width="1.5" fill="none"/>
-              <!-- ears + earrings -->
-              <path fill="#5233b4" d="M168,116 L142,94 L166,140 Z"/><path fill="#5233b4" d="M232,116 L258,94 L234,140 Z"/>
-              <circle cx="160" cy="142" r="6.5" fill="none" stroke="url(#gGoldH)" stroke-width="2.6"/><circle cx="240" cy="142" r="6.5" fill="none" stroke="url(#gGoldH)" stroke-width="2.6"/>
-              <!-- face -->
-              <path fill="url(#gSkin)" d="M164,120 C164,92 182,78 200,78 C218,78 236,92 236,120 C236,150 226,172 200,184 C174,172 164,150 164,120 Z"/>
-              <path d="M172,148 q6,12 14,16 M228,148 q-6,12 -14,16" stroke="#2c1572" stroke-opacity=".5" stroke-width="2" fill="none"/>
-              <g id="eyeGlow"><ellipse cx="186" cy="124" rx="16" ry="9" fill="url(#gGlow)" filter="url(#fBlur)"/><ellipse cx="214" cy="124" rx="16" ry="9" fill="url(#gGlow)" filter="url(#fBlur)"/></g>
-              <g class="eye"><path d="M175,124 Q186,114 197,125 Q186,132 175,124 Z" fill="url(#gEye)"/><g class="pupil"><ellipse cx="186" cy="124.5" rx="1.8" ry="4.6" fill="#2a0400"/></g></g>
-              <g class="eye"><path d="M203,125 Q214,114 225,124 Q214,132 203,125 Z" fill="url(#gEye)"/><g class="pupil"><ellipse cx="214" cy="124.5" rx="1.8" ry="4.6" fill="#2a0400"/></g></g>
-              <g id="brows"><path fill="#12061f" d="M170,106 L197,115 L195,121 L171,113 Z"/><path fill="#12061f" d="M230,106 L203,115 L205,121 L229,113 Z"/></g>
-              <path d="M199,128 L195,146 L203,147" stroke="#2c1572" stroke-width="2" fill="none" stroke-linejoin="round"/>
-              <!-- mouths: grin (idle), laugh (wrong answer), grimace (right answer) -->
-              <g class="mouth" id="mGrin"><path d="M181,158 Q200,174 219,158 Q200,166 181,158 Z" fill="#1a0010"/><path d="M185,160 Q200,167 215,160 Q200,163 185,160 Z" fill="#fff6e0"/></g>
-              <g class="mouth" id="mLaugh"><path d="M180,156 Q200,192 220,156 Q200,162 180,156 Z" fill="#1a0010"/><path d="M184,158 Q200,163 216,158 L214,163 Q200,167 186,163 Z" fill="#fff6e0"/><ellipse cx="200" cy="177" rx="8" ry="5" fill="#c2304a"/></g>
-              <g class="mouth" id="mHurt"><path d="M182,166 Q187,159 192,166 Q197,159 202,166 Q207,159 212,166 Q216,161 219,165" stroke="#1a0010" stroke-width="3.2" fill="none" stroke-linecap="round"/></g>
-              <path fill="#12061f" d="M200,151 C192,147 182,149 176,156 C172,160 166,159 164,152 C167,163 178,164 186,158 C192,155 197,155 200,156 C203,155 208,155 214,158 C222,164 233,163 236,152 C234,159 228,160 224,156 C218,149 208,147 200,151 Z"/>
-              <path fill="#12061f" d="M191,176 L200,206 L209,176 Q200,182 191,176 Z"/>
-            </g>
-          </g>
-        </g>
-      </g>
-      <!-- the lamp -->
-      <g id="lamp">
-        <path fill="url(#gGold)" d="M140,449 C120,446 106,436 98,424 C112,427 126,433 152,437 Z"/>
-        <ellipse cx="212" cy="487" rx="42" ry="9" fill="url(#gGoldH)"/>
-        <path fill="url(#gGold)" d="M134,450 C140,425 284,425 288,450 C286,472 252,483 212,483 C172,483 136,472 134,450 Z"/>
-        <path d="M150,448 C170,458 254,458 274,448" stroke="#8a5a0c" stroke-width="2.5" fill="none"/>
-        <path d="M284,446 C318,440 322,472 286,468" stroke="url(#gGoldH)" stroke-width="8" fill="none" stroke-linecap="round"/>
-        <path id="lampShine" d="M160,438 C180,430 214,429 232,432" stroke="#fffbe0" stroke-width="4" stroke-linecap="round" fill="none"/>
-        <g id="lid"><path fill="url(#gGold)" d="M210,431 C210,410 262,410 262,431 Z"/><circle cx="236" cy="407" r="6" fill="url(#gGoldH)"/></g>
-        <circle cx="212" cy="458" r="5" fill="#ff2a5a" stroke="#ffe9a0" stroke-width="1.4"/>
-      </g>
-    </svg>
-    <canvas id="fx"></canvas>
-    <div class="bubble hide" id="bubble" aria-live="polite"></div>
-    <div class="runes" id="runes" role="list"></div>
-  </section>
-  <section class="panel" id="panel"></section>
-</div>
+<main class="panel" id="panel"></main>
 <dialog id="tables"><div class="dlg-head"><h2 id="tablesH"></h2><button type="button" class="btn ghost" id="tablesClose">✕</button></div><div class="dlg-body" id="tablesBody"></div></dialog>
 
 <script src="https://cdn.jsdelivr.net/npm/sql.js@1.10.3/dist/sql-asm.js"></script>
 <script>
-const CFG = {"lang": "hu", "key": "djinn-hu-v1", "seed": "CREATE TABLE kamrak (id INTEGER PRIMARY KEY, nev TEXT, melyseg INTEGER);\nCREATE TABLE kincsek (id INTEGER PRIMARY KEY, nev TEXT, fajta TEXT, ertek INTEGER, kamra_id INTEGER);\nCREATE TABLE atkok (id INTEGER PRIMARY KEY, kincs_id INTEGER, nev TEXT, ero INTEGER);\nINSERT INTO kamrak VALUES (1,'Tükörterem',1);\nINSERT INTO kamrak VALUES (2,'Kígyóterem',2);\nINSERT INTO kamrak VALUES (3,'Homokkamra',2);\nINSERT INTO kamrak VALUES (4,'Csillagterem',3);\nINSERT INTO kamrak VALUES (5,'Mélység',4);\nINSERT INTO kincsek VALUES (1,'Aranykorona','arany',900,1);\nINSERT INTO kincsek VALUES (2,'Rubinszem','ékszer',1200,2);\nINSERT INTO kincsek VALUES (3,'Szelek tekercse','tekercs',NULL,4);\nINSERT INTO kincsek VALUES (4,'Ezüstlámpa','lámpa',400,1);\nINSERT INTO kincsek VALUES (5,'Smaragdkígyó','ékszer',1500,2);\nINSERT INTO kincsek VALUES (6,'Napérme','arany',150,3);\nINSERT INTO kincsek VALUES (7,'Holdgyöngy','ékszer',800,4);\nINSERT INTO kincsek VALUES (8,'Tűz tekercse','tekercs',300,3);\nINSERT INTO kincsek VALUES (9,'Rézlámpa','lámpa',90,3);\nINSERT INTO kincsek VALUES (10,'Szultánlánc','arany',600,2);\nINSERT INTO kincsek VALUES (11,'Csillagtérkép','tekercs',NULL,4);\nINSERT INTO kincsek VALUES (12,'Zafírgyűrű','ékszer',700,1);\nINSERT INTO kincsek VALUES (13,'Fekete lámpa','lámpa',NULL,5);\nINSERT INTO kincsek VALUES (14,'Aranyskarabeusz','arany',450,1);\nINSERT INTO atkok VALUES (1,2,'Vakság',7);\nINSERT INTO atkok VALUES (2,5,'Méreg',9);\nINSERT INTO atkok VALUES (3,5,'Kőátok',6);\nINSERT INTO atkok VALUES (4,1,'Kapzsiság',4);\nINSERT INTO atkok VALUES (5,3,'Vihar',8);\nINSERT INTO atkok VALUES (6,13,'Árnyék',10);\nINSERT INTO atkok VALUES (7,7,'Álom',3);\nINSERT INTO atkok VALUES (8,2,'Tűz',5);\nINSERT INTO atkok VALUES (9,10,'Bilincs',6);\nINSERT INTO atkok VALUES (10,13,'Némaság',7);\nINSERT INTO atkok VALUES (11,5,'Félelem',5);", "tables": ["kamrak", "kincsek", "atkok"], "sections": [{"id": "wh", "title": "WHERE vagy HAVING?", "intro": "<b class=\"t\">A lámpa súgja<\/b><p>A <code>WHERE<\/code> az egyes <b>sorokat<\/b> szűri, a csoportosítás előtt. A <code>GROUP BY<\/code> csak csoportosít. A <code>HAVING<\/code> a kész <b>csoportokat<\/b> szűri, ezért csak ott állhat <code>COUNT<\/code>, <code>SUM<\/code>, <code>AVG<\/code>.<\/p>", "questions": [{"id": "r1", "type": "mc", "pts": 1, "say": "Az első kérdésem gyerekjáték. Vagy mégsem?", "q": "Csak azokat a fajtákat akarom látni, amelyekből <b>háromnál több<\/b> kincsem van. Melyik záradékba kerül ez a feltétel?", "opts": ["<code>WHERE<\/code>", "<code>GROUP BY<\/code>", "<code>HAVING<\/code>", "<code>ORDER BY<\/code>"], "ok": 2, "fbs": {"0": "A <code>WHERE<\/code> egyenként nézi a sorokat. Egy kincs nem tudja, hány társa van.", "1": "A <code>GROUP BY<\/code> csak csoportokat képez, nem dob ki semmit.", "3": "Az <code>ORDER BY<\/code> csak sorba rendez."}, "why": "A „háromnál több” az egész csoportról szól: <code>HAVING COUNT(*) &gt; 3<\/code>."}, {"id": "r2", "type": "mc", "pts": 1, "say": "Hmm. Lássuk, tudod-e, mikor <i>nem<\/i> kell a HAVING.", "q": "Fajtánként akarom megszámolni a kincseimet, de csak az 500 aranynál értékesebbeket. Hová kerül a <code>ertek &gt; 500<\/code>?", "opts": ["<code>WHERE<\/code>", "<code>GROUP BY<\/code>", "<code>HAVING<\/code>", "<code>ORDER BY<\/code>"], "ok": 0, "fbs": {"2": "Az érték egy-egy kincs adata, nem a csoporté. Az egyes sorokat a <code>WHERE<\/code> szűri, még a csoportosítás előtt.", "1": "A <code>GROUP BY<\/code> után oszlopnév jön, nem feltétel.", "3": "Az <code>ORDER BY<\/code> nem szűr."}, "why": "Egy sorra vonatkozó feltétel a <code>WHERE<\/code>-be kerül."}, {"id": "r3", "type": "sql", "pts": 2, "say": "Most írd meg magad, halandó!", "q": "Fajtánként hány kincsem van? Csak azok a fajták kellenek, amelyekből legalább 4 van. (a fajta és a darabszám)", "expect": "SELECT fajta, COUNT(*) FROM kincsek GROUP BY fajta HAVING COUNT(*) >= 4;", "hint": "<code>GROUP BY fajta<\/code>, aztán <code>HAVING COUNT(*) &gt;= 4<\/code>.", "why": "Az arany és az ékszer marad, mindkettőből 4 van."}]}, {"id": "read", "title": "Mit ad a HAVING?", "intro": "<b class=\"t\">A lámpa súgja<\/b><p>Csoportosíts fejben: melyik érték hányszor szerepel? Írd a csoportok mellé a számot, és húzd ki, amelyikre a feltétel nem igaz. A <code>&gt; 1<\/code> az 1-et már nem engedi át. A <code>SUM<\/code> kihagyja a <code>NULL<\/code> értékeket.<\/p>", "questions": [{"id": "r4", "type": "multi", "pts": 1, "say": "Az átkaim! Melyik kincsemen ül több is?", "q": "Mely kincsek jelennek meg az eredményben? Jelöld be mindet!", "code": "SELECT kincsek.nev, COUNT(*)\nFROM atkok, kincsek\nWHERE atkok.kincs_id = kincsek.id\nGROUP BY kincsek.nev\nHAVING COUNT(*) > 1;", "opts": ["Aranykorona", "Rubinszem", "Smaragdkígyó", "Holdgyöngy", "Fekete lámpa"], "ok": [1, 2, 4], "traps": {"2": "A Smaragdkígyón 3 átok ül, de a Rubinszemen és a Fekete lámpán is kettő-kettő. A 2 is nagyobb 1-nél.", "0,1,2,3,4": "Az Aranykoronán és a Holdgyöngyön csak egy-egy átok van, és az 1 nem nagyobb 1-nél."}, "hint": "Számold meg az <code>atkok<\/code> táblában, melyik <code>kincs_id<\/code> hányszor szerepel.", "why": "Rubinszem 2, Smaragdkígyó 3, Fekete lámpa 2 átok. Az Aranykoronán és a Holdgyöngyön csak 1-1."}, {"id": "r5", "type": "num", "pts": 1, "say": "Számolj, halandó. Az aranyat szeretem számolni.", "q": "Hány sora lesz az eredménynek?", "code": "SELECT kamra_id, SUM(ertek)\nFROM kincsek\nGROUP BY kamra_id\nHAVING SUM(ertek) > 1000;", "ok": 2, "traps": {"5": "Öt kamra van, de a <code>HAVING<\/code> a kis összegű kamrákat kiszűri.", "3": "Nézd meg a 4-es kamrát: a <code>NULL<\/code> értékek kimaradnak, csak a Holdgyöngy 800-a marad, ez nem több 1000-nél.", "14": "Ennyi kincs van, de a <code>GROUP BY<\/code> után kamránként egy sor marad."}, "hint": "Add össze kamránként az értékeket. Az ismeretlen (NULL) értékeket a SUM kihagyja.", "why": "1-es kamra 2450, 2-es 3300: ezek maradnak. A 3-as 540, a 4-es 800, az 5-ösben csak NULL van."}]}, {"id": "null", "title": "Ismeretlen érték: NULL", "intro": "<b class=\"t\">A lámpa súgja<\/b><p>A <code>NULL<\/code> azt jelenti: <b>nincs érték<\/b>. Nem 0, és semmivel sem egyenlő, ezért a <code>= NULL<\/code> soha nem igaz. Helyesen: <code>IS NULL<\/code>, <code>IS NOT NULL<\/code>.<\/p>", "questions": [{"id": "r6", "type": "mc", "pts": 1, "say": "Néhány kincsemnek még senki sem merte megbecsülni az értékét…", "q": "Melyik feltétel adja azokat a kincseket, amelyeknek az értéke ismeretlen (<code>NULL<\/code>)?", "opts": ["<code>ertek = NULL<\/code>", "<code>ertek = 0<\/code>", "<code>ertek IS NULL<\/code>", "<code>ertek = ''<\/code>"], "ok": 2, "fbs": {"0": "Az <code>= NULL<\/code> soha nem igaz: 0 sort kapsz, hibaüzenet nélkül.", "1": "A 0 egy szám: azt jelentené, hogy a kincs semmit sem ér.", "3": "Az <code>''<\/code> üres szöveg, nem hiányzó érték."}, "why": "Hiányzó értéket csak az <code>IS NULL<\/code> talál meg."}, {"id": "r7", "type": "num", "pts": 1, "say": "Ezt a csapdát sokan nem veszik észre. Hehehe.", "q": "Hány sort ad ez a lekérdezés?", "code": "SELECT *\nFROM kincsek\nWHERE ertek = NULL;", "ok": 0, "traps": {"3": "Három kincs értéke valóban ismeretlen, de az <code>= NULL<\/code> soha nem igaz. Ehhez <code>IS NULL<\/code> kellene."}, "hint": "Igaz lehet-e valaha, hogy valami egyenlő a NULL-lal?", "why": "0 sor, és hibaüzenet sincs: ezért alattomos."}, {"id": "r8", "type": "sql", "pts": 2, "say": "Mutasd meg a felbecsülhetetlen kincseimet!", "q": "Melyik kincsek értéke ismeretlen? (a kincs neve)", "expect": "SELECT nev FROM kincsek WHERE ertek IS NULL;", "hint": "<code>WHERE ertek IS NULL<\/code>", "why": "Három: a Szelek tekercse, a Csillagtérkép és a Fekete lámpa."}]}, {"id": "sort", "title": "Rendezés és LIMIT", "intro": "<b class=\"t\">A lámpa súgja<\/b><p>Az <code>ORDER BY<\/code> magában <b>növekvő<\/b> (<code>ASC<\/code>): kicsitől a nagyig. <code>DESC<\/code> = csökkenő. A <code>LIMIT n<\/code> az első n sort tartja meg. Vigyázz: növekvő rendezésnél a <code>NULL<\/code> kerül előre.<\/p>", "questions": [{"id": "r9", "type": "mc", "pts": 1, "say": "A kamráim mélyre nyúlnak. Nagyon mélyre.", "q": "Melyik kamra lesz az első sorban?", "code": "SELECT nev, melyseg\nFROM kamrak\nORDER BY melyseg;", "opts": ["A legsekélyebb", "A legmélyebb", "Amelyik elöl áll a táblában", "Véletlenszerű"], "ok": 0, "fbs": {"1": "Ez a <code>DESC<\/code> lenne. Magában az <code>ORDER BY<\/code> a kisebbel kezd.", "2": "Az <code>ORDER BY<\/code> átrendezi a sorokat.", "3": "A rendezés mindig ugyanazt adja."}, "why": "Növekvő sorrend: a Tükörterem (1-es mélység) kerül előre."}, {"id": "r10", "type": "blank", "say": "A legdrágább kincseim… csak hármat mutatok.", "q": "A 3 legértékesebb kincs, a legértékesebbel kezdve.", "code": "SELECT nev, ertek\nFROM kincsek\nORDER BY ertek {0}\n{1} 3;", "ok": [["DESC"], ["LIMIT"]], "traps": {"ASC|LIMIT": "Az <code>ASC<\/code> a legkisebbel kezdene, ráadásul a <code>NULL<\/code>-okkal. A legnagyobb érték elöl: <code>DESC<\/code>."}, "hint": "Melyik irányba rendezz, hogy a legnagyobb érték legyen elöl? És mi vágja le a végét?"}, {"id": "r11", "type": "sql", "pts": 2, "say": "És most a legolcsóbb. De vigyázz, a lámpa trükközik…", "q": "Melyik a legolcsóbb kincs, amelynek ismert az értéke? (a neve és az értéke, egyetlen sor)", "expect": "SELECT nev, ertek FROM kincsek WHERE ertek IS NOT NULL ORDER BY ertek LIMIT 1;", "hint": "Növekvő rendezésnél a <code>NULL<\/code> kerül előre, ezért előbb szűrd ki: <code>WHERE ertek IS NOT NULL ORDER BY ertek LIMIT 1<\/code>.", "why": "A Rézlámpa, 90 aranyért. <code>IS NOT NULL<\/code> nélkül egy ismeretlen értékű tekercs kerülne előre."}]}, {"id": "order", "title": "A záradékok sorrendje", "intro": "<b class=\"t\">A lámpa súgja<\/b><p><code>SELECT<\/code> → <code>FROM<\/code> → <code>WHERE<\/code> → <code>GROUP BY<\/code> → <code>HAVING<\/code> → <code>ORDER BY<\/code> → <code>LIMIT<\/code><\/p><p><b>S<\/b>ok <b>F<\/b>inom <b>W<\/b>afflit <b>G<\/b>yorsan <b>H<\/b>absolt <b>O<\/b>lga <b>L<\/b>ánya.<\/p>", "questions": [{"id": "r12", "type": "order", "pts": 2, "say": "Összekevertem a varázsigéimet. Rakd őket rendbe!", "q": "Tedd sorba mind a hét záradékot! (a nyilakkal mozgathatod őket)", "items": ["SELECT", "FROM", "WHERE", "GROUP BY", "HAVING", "ORDER BY", "LIMIT"], "start": [5, 0, 6, 2, 4, 1, 3], "hint": "Sok Finom Wafflit…"}, {"id": "r13", "type": "bug", "pts": 1, "say": "Ebben a varázsigében egy sor rossz helyen áll. Melyik?", "q": "Egyetlen sor áll rossz helyen. Melyik az?", "code": "SELECT fajta, COUNT(*)\nFROM kincsek\nORDER BY COUNT(*) DESC\nWHERE ertek > 100\nGROUP BY fajta;", "ok": 2, "fbs": {"3": "A <code>WHERE<\/code> jó helyen van, közvetlenül a <code>FROM<\/code> után. Mi áll előtte, ami nem oda való?", "4": "A <code>GROUP BY<\/code> a <code>WHERE<\/code> után jó helyen van. Melyik sor tartozik a legvégére?"}, "why": "Az <code>ORDER BY<\/code> a végére tartozik: előbb szűrünk és csoportosítunk, a rendezés jön utoljára."}]}, {"id": "link", "title": "A táblákat összekötő oszlop", "intro": "<b class=\"t\">A lámpa súgja<\/b><p>A kapcsolat a <b>hivatkozó oszlop<\/b>: a <code>atkok.kincs_id<\/code> a <code>kincsek.id<\/code>-re, a <code>kincsek.kamra_id<\/code> a <code>kamrak.id<\/code>-re mutat. A szabály: <b>hivatkozó oszlop = a másik tábla id-je<\/b>. Az <code>id = id<\/code> rossz párokat ad.<\/p>", "questions": [{"id": "r14", "type": "blank", "say": "Melyik átok melyik kincsemen ül? Kösd össze, ha tudod!", "q": "Minden átok mellé annak a kincsnek a neve, amelyiken ül.", "code": "SELECT atkok.nev, kincsek.nev\nFROM atkok, kincsek\nWHERE atkok.{0} = kincsek.{1};", "ok": [["kincs_id"], ["id"]], "traps": {"ID|ID": "Az <code>id = id<\/code> az 1-es átkot az 1-es kincshez rakná, nem ahhoz, amelyiken ül. Az átok a <code>kincs_id<\/code> oszlopban mondja meg, melyik kincsről van szó."}, "hint": "Melyik oszlop mondja meg az <code>atkok<\/code> táblában, melyik kincsen ül az átok?"}, {"id": "r15", "type": "bug", "pts": 1, "say": "Ez a lekérdezés lefut, és mégis hazudik. Hahaha!", "q": "A lekérdezés rossz kamrába teszi a kincseket. Melyik sor hibás?", "code": "SELECT kincsek.nev, kamrak.nev\nFROM kincsek, kamrak\nWHERE kamrak.melyseg > 1\nAND kincsek.id = kamrak.id;", "ok": 3, "fbs": {"2": "A mélységes feltétel csak szűr, az rendben van. A párosítás a hibás."}, "why": "Helyesen: <code>AND kincsek.kamra_id = kamrak.id<\/code>."}, {"id": "r16", "type": "num", "pts": 1, "say": "Ha párosítási szabály nélkül kérdezel, a kincstáram megsokszorozza magát…", "q": "Mennyi az eredmény?", "code": "SELECT COUNT(*)\nFROM kamrak, atkok;", "ok": 55, "traps": {"16": "Ez 5 + 11. Szabály nélkül minden kamra minden átokkal párba áll: szorzás.", "11": "Ez csak az átkok száma. Mindegyik mind az 5 kamrával párba áll.", "5": "Ez csak a kamrák száma. Mindegyik mind a 11 átokkal párba áll."}, "hint": "Hány kamra és hány átok van? Szabály nélkül mindegyik mindegyikkel párba áll.", "why": "5 kamra × 11 átok = 55 pár."}]}, {"id": "text", "title": "Minták és idézőjelek", "intro": "<b class=\"t\">A lámpa súgja<\/b><p><code>LIKE<\/code>: a <code>%<\/code> bármennyi karakter (akár nulla), a <code>_<\/code> pontosan egy. A szöveg <b>egyszeres<\/b> idézőjelbe kerül: <code>'arany'<\/code>.<\/p>", "questions": [{"id": "r17", "type": "mc", "pts": 1, "say": "A lámpáimat keresed? Én is lámpában lakom, tudod.", "q": "Melyik feltétel adja az összes kincset, amelynek a nevében <b>bárhol<\/b> szerepel a „lámpa” szó?", "opts": ["<code>nev = 'lámpa'<\/code>", "<code>nev LIKE 'lámpa%'<\/code>", "<code>nev LIKE '%lámpa%'<\/code>", "<code>nev LIKE '_lámpa_'<\/code>"], "ok": 2, "fbs": {"0": "Az <code>=<\/code> csak a pontosan egyező nevet találja meg.", "1": "Ez csak a „lámpa” szóval <b>kezdődő<\/b> neveket találja meg. A lámpák neve viszont így végződik.", "3": "A <code>_<\/code> pontosan egy karaktert jelent, nem többet."}, "why": "<code>%<\/code> mindkét oldalon: előtte és utána is bármi állhat. Három lámpa jön ki."}, {"id": "r18", "type": "mc", "pts": 1, "say": "Az idézőjeleimet is tiszteld, halandó!", "q": "Melyik feltétel helyes?", "opts": ["<code>fajta = arany<\/code>", "<code>fajta = \"arany\"<\/code>", "<code>fajta = 'arany'<\/code>", "<code>'fajta' = 'arany'<\/code>"], "ok": 2, "fbs": {"0": "Idézőjel nélkül az SQL a <code>arany<\/code> szót oszlopnévnek hiszi.", "1": "A szabványos SQL-ben a dupla idézőjel oszlopnevet jelent. Szöveghez egyszeres idézőjel kell.", "3": "Így a <code>'fajta'<\/code> is szöveg lesz, nem oszlop. Két különböző szöveg sosem egyenlő."}, "why": "Az oszlopnév idézőjel nélkül, a szöveg egyszeres idézőjelben."}]}, {"id": "all", "title": "Három tábla, csoportokkal", "intro": "<b class=\"t\">A lámpa súgja<\/b><p>Átok → kincs → kamra: két párosítási szabály kell, <code>AND<\/code>-del:<\/p><pre>WHERE atkok.kincs_id = kincsek.id\n  AND kincsek.kamra_id = kamrak.id<\/pre><p>Utána jöhet a <code>GROUP BY<\/code> és a <code>HAVING<\/code>.<\/p>", "questions": [{"id": "r19", "type": "blank", "say": "Az utolsó előtti… Érzem, ahogy a lámpa húz befelé. Nem! Még nem!", "q": "Kamránként hány átok van? Csak a legalább két átkot rejtő kamrák kellenek.", "code": "SELECT kamrak.nev, COUNT(*)\nFROM atkok, kincsek, kamrak\nWHERE atkok.{0} = kincsek.id\n  AND kincsek.{1} = kamrak.id\nGROUP BY kamrak.nev\n{2} COUNT(*) >= 2;", "ok": [["kincs_id"], ["kamra_id"], ["HAVING"]], "traps": {"ID|ID|HAVING": "Az <code>id<\/code> nem hivatkozás. Melyik oszlop mondja meg, melyik kincsen ül az átok, és melyik kamrában van a kincs?"}, "hint": "Nézd meg a fenti két szabályt. A csoportok szűrése pedig…"}, {"id": "r20", "type": "sql", "pts": 3, "say": "Az utolsó kérdésem. Ha erre is tudod a választ… nem, ez lehetetlen!", "q": "Kamránként mennyi az átkok erejének összege? Csak azok a kamrák kellenek, ahol ez több mint 10. (a kamra neve és az összeg)", "expect": "SELECT kamrak.nev, SUM(atkok.ero) FROM atkok, kincsek, kamrak WHERE atkok.kincs_id = kincsek.id AND kincsek.kamra_id = kamrak.id GROUP BY kamrak.nev HAVING SUM(atkok.ero) > 10;", "hint": "Három tábla, két szabály, <code>GROUP BY kamrak.nev<\/code>, és <code>HAVING SUM(atkok.ero) &gt; 10<\/code>.", "why": "Kígyóterem 38, Mélység 17, Csillagterem 11. A Tükörterem 4-gyel kimarad."}]}], "reportTitle": "A DZSINN HUSZ KERDESE - VALASZOK", "filePrefix": "dzsinn","ui":{"kicker":"SQL, gyakorló feladatlap","title":"A dzsinn húsz kérdése","story":"<p>Rossz lámpát dörzsöltél meg. A füstből egy ősi, gonosz <b>dzsinn</b> emelkedik ki, és esze ágában sincs kívánságokat teljesíteni.</p><p>„Halandó, a kincstáramban állsz. Felelj a húsz kérdésemre a kincstáram adatbázisáról! Minden helyes válasz egy <b>pecsétet</b> éget a lámpámra. Húsz pecsét, és vissza kell bújnom a lámpába. Ha nem sikerül… örökké az aranyamat számolod.”</p>","rules":["Minden kérdésnél nyomd meg az <b>Ellenőrzés</b> gombot: rögtön kiderül, jó-e. Ha nem, a dzsinn kinevet, de kapsz egy tippet.", "A kérdések fölött a <b>lámpa súgja</b> a szabályt, amire szükséged lesz. A kincstár tábláit a <b>Táblák</b> gombbal bármikor megnézheted.", "Két rossz próba után megnézheted a megoldást, de akkor a pecsét halvány marad. Az elsőre jó válasz aranypecsétet ad.", "A válaszaid mentődnek, ha bezárod a lapot. A végén a válaszlapot töltsd fel a Classroomba."],"name":"A neved","namePh":"Vezetéknév Keresztnév","nameFirst":"Előbb írd be a neved.","start":"Dörzsöld meg a lámpát","sleeping":"(tompa horkolás a lámpából) Zzz… ki zavar…?","intro":"KI MERTE MEGDÖRZSÖLNI A LÁMPÁMAT?!","welcomeBack":"Visszajöttél, halandó? Folytassuk!","already":"Erre a kérdésre már feleltél. Ne kérkedj!","impatient":"Válaszolj már, halandó! Nincs egész éjszakám… illetve van.","hurts":["Grrr… helyes.", "Lehetetlen! …jó, ez stimmel.", "Szerencséd volt, halandó!", "Áááh! Újabb pecsét a lámpámon!", "Remeg a lámpám… helyes.", "Ezt honnan tudtad?!", "Legközelebb nem leszel ilyen okos!"],"laughs":["Hahaha! Tévedtél, halandó!", "Muhaha! Még csak közel sem jártál!", "Rossz! Próbáld újra… ha mered.", "Hahaha! Még egy órával tovább maradsz a kincstáramban!", "Tévedés! Imádom a tévedéseket!"],"ha":"HA!","gloat":"Na jó, elárulom… de a pecsét halvány marad! Hehehe.","noo":"NEEEM! A húsz pecsét… a lámpa… HÚZ BEFELÉ!","finaleTitle":"BEZÁRTAD A DZSINNT!","finaleSub":"Mind a húsz pecsét ég. A kincstár kapuja kinyílik előtted.","muffled":"(tompán, a lámpa belsejéből) Engedj ki… legközelebb nehezebb kérdéseket hozok…","leftEarly":"Hahaha! Elmenekülsz? A lámpám még nincs lepecsételve!","sealedK":"A dzsinn a lámpában","escapedK":"A dzsinn még szabad","seals":"Pecsétek","qOf":(i,n)=>`${i}. kérdés / ${n}`,"remind":"A lámpa súgja","prev":"Előző kérdés","next":"Következő kérdés","check":"Ellenőrzés","reveal":"Mutasd a megoldást","nextRiddle":"Következő kérdés →","toEnd":"Az eredményhez →","answerFirst":"Előbb válaszolj.","notYet":"Még nem jó.","partly":(g,m)=>`Részben jó (${g}/${m}).`,"tryAgain":"Olvasd el újra, mit súg a lámpa, és próbáld újra.","rightFirst":"Elsőre jó! Aranypecsét.","right":"Most már jó! Ezüstpecsét.","solutionH":"A megoldás:","finish":"Befejezés","finishSure":"Biztosan? Kattints még egyszer!","confirm":m=>m ? `Még ${m} kérdés vár. Ha így is befejezed, kattints még egyszer.` : 'Kattints még egyszer.',"tables":"Táblák","tablesH":"A kincstár táblái","rows":n=>n+' sor',"noRows":"Nincs eredmény.","t":"Igaz","f":"Hamis","up":"Feljebb","down":"Lejjebb","answer":"Válasz","number":"szám","blank":i=>i+'. hiányzó szó',"query":"SQL-lekérdezés","run":"Futtatás","runHint":"Ctrl + Enter is futtatja","empty":"Üres a lekérdezés.","sqlErr":"Hiba","line":n=>n+'. sor',"pracSub":(f,l,r,s)=>`aranypecsét (elsőre jó) · ${l} ezüst · ${r} megoldást megnézted · ${s} kimaradt`,"firstTry":"elsőre jó","handH":"Add be a válaszlapot","handSteps":["Kattints a <b>Válaszok mentése (.txt)</b> gombra. A fájl a Letöltések mappába kerül.", "Nyisd meg a feladatot a <b>Google Classroomban</b>, töltsd fel a fájlt, majd nyomd meg a <b>Beadás</b> gombot."],"save":"Válaszok mentése (.txt)","copy":"Másolás szövegként","replay":"Még egyszer a nagy jelenet","saved":f=>`Mentve: ${f}. Most töltsd fel a Classroomba.`,"saveBlocked":"A mentés itt le van tiltva. Használd a másolást.","copied":"Kimásolva. Illeszd be a Classroom-feladathoz privát megjegyzésként.","copyBlocked":"A másolás itt le van tiltva. Használd a mentést.","none":"(nincs válasz)","rName":"Név","rDate":"Befejezve","rTime":"Eltelt idő","rFirst":"Elsőre jó","status":(k,t)=>k==='first'?'elsőre jó':k==='later'?t+'. próbára jó':k==='rev'?'megoldást megnézte':'kimaradt',"engFail":"Az SQL-motor nem töltődött be. Ellenőrizd az internetkapcsolatot, és töltsd újra az oldalt."}};
+const CFG = {"lang": "hu", "key": "djinn-hu-v2", "seed": "CREATE TABLE kamrak (id INTEGER PRIMARY KEY, nev TEXT, melyseg INTEGER);\nCREATE TABLE kincsek (id INTEGER PRIMARY KEY, nev TEXT, fajta TEXT, ertek INTEGER, kamra_id INTEGER);\nCREATE TABLE atkok (id INTEGER PRIMARY KEY, kincs_id INTEGER, nev TEXT, ero INTEGER);\nINSERT INTO kamrak VALUES (1,'Tükörterem',1);\nINSERT INTO kamrak VALUES (2,'Kígyóterem',2);\nINSERT INTO kamrak VALUES (3,'Homokkamra',2);\nINSERT INTO kamrak VALUES (4,'Csillagterem',3);\nINSERT INTO kamrak VALUES (5,'Mélység',4);\nINSERT INTO kincsek VALUES (1,'Aranykorona','arany',900,1);\nINSERT INTO kincsek VALUES (2,'Rubinszem','ékszer',1200,2);\nINSERT INTO kincsek VALUES (3,'Szelek tekercse','tekercs',NULL,4);\nINSERT INTO kincsek VALUES (4,'Ezüstlámpa','lámpa',400,1);\nINSERT INTO kincsek VALUES (5,'Smaragdkígyó','ékszer',1500,2);\nINSERT INTO kincsek VALUES (6,'Napérme','arany',150,3);\nINSERT INTO kincsek VALUES (7,'Holdgyöngy','ékszer',800,4);\nINSERT INTO kincsek VALUES (8,'Tűz tekercse','tekercs',300,3);\nINSERT INTO kincsek VALUES (9,'Rézlámpa','lámpa',90,3);\nINSERT INTO kincsek VALUES (10,'Szultánlánc','arany',600,2);\nINSERT INTO kincsek VALUES (11,'Csillagtérkép','tekercs',NULL,4);\nINSERT INTO kincsek VALUES (12,'Zafírgyűrű','ékszer',700,1);\nINSERT INTO kincsek VALUES (13,'Fekete lámpa','lámpa',NULL,5);\nINSERT INTO kincsek VALUES (14,'Aranyskarabeusz','arany',450,1);\nINSERT INTO atkok VALUES (1,2,'Vakság',7);\nINSERT INTO atkok VALUES (2,5,'Méreg',9);\nINSERT INTO atkok VALUES (3,5,'Kőátok',6);\nINSERT INTO atkok VALUES (4,1,'Kapzsiság',4);\nINSERT INTO atkok VALUES (5,3,'Vihar',8);\nINSERT INTO atkok VALUES (6,13,'Árnyék',10);\nINSERT INTO atkok VALUES (7,7,'Álom',3);\nINSERT INTO atkok VALUES (8,2,'Tűz',5);\nINSERT INTO atkok VALUES (9,10,'Bilincs',6);\nINSERT INTO atkok VALUES (10,13,'Némaság',7);\nINSERT INTO atkok VALUES (11,5,'Félelem',5);", "tables": ["kamrak", "kincsek", "atkok"], "sections": [{"id": "null", "title": "Hiányzó érték: NULL", "intro": "<p>A <code>NULL<\/code> azt jelenti: <b>nincs érték<\/b>. Semmivel sem egyenlő, ezért a <code>= NULL<\/code> soha nem igaz, és hibát sem jelez. Helyesen: <code>IS NULL<\/code>, <code>IS NOT NULL<\/code>.<\/p>", "questions": [{"id": "q1", "say": "Egyes kincseimet senki sem merte felbecsülni. Mutasd meg őket.", "q": "Melyik kincsek értéke ismeretlen? (a kincs neve)", "expect": "SELECT nev FROM kincsek WHERE ertek IS NULL;", "hint": "<code>WHERE ertek IS NULL<\/code>", "why": "Három ilyen van: Szelek tekercse, Csillagtérkép, Fekete lámpa."}]}, {"id": "like", "title": "Minták: LIKE", "intro": "<p>A <code>LIKE<\/code> mintához hasonlít: a <code>%<\/code> bármennyi karakter (akár nulla), a <code>_<\/code> pontosan egy. <code>'%szó%'<\/code> = bárhol benne van. A szöveg <b>egyszeres<\/b> idézőjelbe kerül.<\/p>", "questions": [{"id": "q2", "say": "Én magam is lámpában lakom. Keresd meg az összes lámpámat!", "q": "Melyik kincsek nevében szerepel <b>bárhol<\/b> a „lámpa” szó? (a kincs neve)", "expect": "SELECT nev FROM kincsek WHERE nev LIKE '%lámpa%';", "traps": [["LIKE\\s*'lámpa%'", "Ez csak a „lámpa” szóval <b>kezdődő<\/b> neveket találja meg. Kell egy <code>%<\/code> az elejére is."], ["=\\s*'%", "Az <code>=<\/code> nem ismeri a <code>%<\/code>-ot: szó szerint keres. Mintához <code>LIKE<\/code> kell."]], "hint": "<code>WHERE nev LIKE '%lámpa%'<\/code>", "why": "Ezüstlámpa, Rézlámpa, Fekete lámpa."}]}, {"id": "sort", "title": "Rendezés és LIMIT", "intro": "<p>Az <code>ORDER BY<\/code> magában <b>növekvő<\/b> (<code>ASC<\/code>): kicsitől a nagyig. A legnagyobb elöl: <code>DESC<\/code>. A <code>LIMIT n<\/code> csak az első n sort tartja meg. Növekvő rendezésnél a <code>NULL<\/code> kerül előre.<\/p>", "questions": [{"id": "q3", "say": "A három legdrágább kincsem. Csak hármat mutatok, halandó.", "q": "Melyik a 3 legértékesebb kincs, a legértékesebbel kezdve? (a neve és az értéke)", "expect": "SELECT nev, ertek FROM kincsek ORDER BY ertek DESC LIMIT 3;", "ordered": true, "hint": "<code>ORDER BY ertek DESC LIMIT 3<\/code>", "why": "Smaragdkígyó 1500, Rubinszem 1200, Aranykorona 900."}, {"id": "q4", "say": "Most a legolcsóbb. Vigyázz, a kincstáram trükközik…", "q": "Melyik a legolcsóbb kincs, amelynek <b>ismert<\/b> az értéke? (a neve és az értéke, egyetlen sor)", "expect": "SELECT nev, ertek FROM kincsek WHERE ertek IS NOT NULL ORDER BY ertek LIMIT 1;", "hint": "Növekvő rendezésnél a <code>NULL<\/code> kerül előre, ezért előbb szűrd ki: <code>WHERE ertek IS NOT NULL ORDER BY ertek LIMIT 1<\/code>.", "why": "A Rézlámpa, 90 aranyért."}, {"id": "q5", "say": "Az átkaimat erősség szerint akarom látni. A legszörnyűbbel kezdd!", "q": "Írasd ki az összes átkot erő szerint, a legerősebbel kezdve! (az átok neve és ereje)", "expect": "SELECT nev, ero FROM atkok ORDER BY ero DESC;", "ordered": true, "hint": "<code>ORDER BY ero DESC<\/code>", "why": "Az Árnyék (10) az első, az Álom (3) az utolsó."}]}, {"id": "wh", "title": "WHERE vagy HAVING?", "intro": "<p>A <code>WHERE<\/code> az egyes <b>sorokat<\/b> szűri, még a csoportosítás előtt. A <code>HAVING<\/code> a kész <b>csoportokat<\/b> szűri, ezért csak ott állhat <code>COUNT<\/code>, <code>SUM<\/code>, <code>AVG<\/code>. Sorrend: <b>WHERE → GROUP BY → HAVING<\/b>.<\/p>", "questions": [{"id": "q6", "say": "Mely fajtából gyűjtöttem a legtöbbet? Csak azokat mondd, amelyekből háromnál több van!", "q": "Fajtánként hány kincs van? Csak azok a fajták kellenek, amelyekből <b>háromnál több<\/b> van. (a fajta és a darabszám)", "expect": "SELECT fajta, COUNT(*) FROM kincsek GROUP BY fajta HAVING COUNT(*) > 3;", "traps": [[">=\\s*3", "A <code>&gt;= 3<\/code> a 3-at is átengedi. Háromnál több: <code>&gt; 3<\/code>."]], "hint": "<code>GROUP BY fajta HAVING COUNT(*) &gt; 3<\/code>", "why": "Az arany és az ékszer marad, 4-4 kinccsel."}, {"id": "q7", "say": "Most csak az értékes kincseimet számold. Az 500 arany alattiak szemetek.", "q": "Fajtánként hány olyan kincs van, amely <b>500 aranynál többet<\/b> ér? (a fajta és a darabszám)", "expect": "SELECT fajta, COUNT(*) FROM kincsek WHERE ertek > 500 GROUP BY fajta;", "traps": [["HAVING\\s+(\\w+\\.)?ertek", "Az érték egy-egy kincs adata, nem a csoporté. Egy sorra vonatkozó feltétel a <code>WHERE<\/code>-be kerül, a <code>GROUP BY<\/code> elé."], ["HAVING\\s+COUNT", "A feladat nem a csoportok méretét szűri, hanem az egyes kincseket: <code>WHERE … &gt; 500<\/code>."]], "hint": "<code>WHERE ertek &gt; 500 GROUP BY fajta<\/code>", "why": "Arany 2, ékszer 4. A tekercsek és a lámpák mind olcsóbbak (vagy ismeretlen értékűek), ezért ki sem jönnek."}]}, {"id": "link", "title": "A táblákat összekötő oszlop", "intro": "<p>A <code>atkok.kincs_id<\/code> a <code>kincsek.id<\/code>-re, a <code>kincsek.kamra_id<\/code> a <code>kamrak.id<\/code>-re mutat. Ha két tábla áll a <code>FROM<\/code>-ban, kell a párosítási szabály: <b>hivatkozó oszlop = a másik tábla id-je<\/b>. Nélküle minden sor minden sorral párba áll. Az <code>id = id<\/code> rossz párokat ad.<\/p>", "questions": [{"id": "q8", "say": "Melyik átkom melyik kincsen ül? Kösd össze őket, ha tudod!", "q": "Minden átok mellé annak a kincsnek a neve, amelyiken ül. (az átok neve és a kincs neve)", "expect": "SELECT atkok.nev, kincsek.nev FROM atkok, kincsek WHERE atkok.kincs_id = kincsek.id;", "hint": "<code>FROM atkok, kincsek WHERE atkok.kincs_id = kincsek.id<\/code>", "why": "11 átok, 11 sor: minden átokhoz pontosan egy kincs tartozik."}, {"id": "q9", "say": "A Kígyóteremben őrzöm a legféltettebb kincseimet. A szám nem érdekel, a nevét használd!", "q": "Melyik kincsek vannak a <b>Kígyóteremben<\/b>? A kamra <b>nevét<\/b> használd, ne a számát! (a kincs neve)", "expect": "SELECT kincsek.nev FROM kincsek, kamrak WHERE kincsek.kamra_id = kamrak.id AND kamrak.nev = 'Kígyóterem';", "hint": "<code>WHERE kincsek.kamra_id = kamrak.id AND kamrak.nev = 'Kígyóterem'<\/code>", "why": "Rubinszem, Smaragdkígyó, Szultánlánc."}]}, {"id": "groups", "title": "Csoportok két táblán", "intro": "<p>Előbb a párosítási szabály a <code>WHERE<\/code>-ben, aztán <code>GROUP BY<\/code> a név szerint, végül a <code>HAVING<\/code> szűri a csoportokat. A <code>SUM<\/code> kihagyja a <code>NULL<\/code> értékeket.<\/p>", "questions": [{"id": "q10", "say": "Vannak kincseim, amelyeken több átok is ül. Melyek azok?", "q": "Melyik kincseken ül <b>legalább két<\/b> átok? (a kincs neve és az átkok száma)", "expect": "SELECT kincsek.nev, COUNT(*) FROM atkok, kincsek WHERE atkok.kincs_id = kincsek.id GROUP BY kincsek.nev HAVING COUNT(*) >= 2;", "traps": [["COUNT\\(\\*\\)\\s*>\\s*2", "A <code>&gt; 2<\/code> a kettőt már nem engedi át. Legalább kettő: <code>&gt;= 2<\/code>."]], "hint": "<code>GROUP BY kincsek.nev HAVING COUNT(*) &gt;= 2<\/code>", "why": "Rubinszem 2, Smaragdkígyó 3, Fekete lámpa 2."}, {"id": "q11", "say": "Melyik kamrám a leggazdagabb? Az ezer arany alattiak nem érdekelnek.", "q": "Kamránként mennyi a kincsek értékének összege? Csak azok a kamrák kellenek, ahol ez <b>több mint 1000<\/b>. (a kamra neve és az összeg)", "expect": "SELECT kamrak.nev, SUM(kincsek.ertek) FROM kincsek, kamrak WHERE kincsek.kamra_id = kamrak.id GROUP BY kamrak.nev HAVING SUM(kincsek.ertek) > 1000;", "hint": "<code>GROUP BY kamrak.nev HAVING SUM(kincsek.ertek) &gt; 1000<\/code>", "why": "Kígyóterem 3300, Tükörterem 2450. A Csillagteremben csak a Holdgyöngy 800-a számít, a NULL kimarad."}]}, {"id": "three", "title": "Három tábla", "intro": "<p>Átok → kincs → kamra: három táblához két párosítási szabály kell, <code>AND<\/code>-del:<\/p><pre>WHERE atkok.kincs_id = kincsek.id\n  AND kincsek.kamra_id = kamrak.id<\/pre><p>Utána jöhet a többi feltétel, a <code>GROUP BY<\/code>, a <code>HAVING<\/code> és az <code>ORDER BY<\/code>.<\/p>", "questions": [{"id": "q12", "say": "A Mélységben alszanak a legsötétebb átkaim. Hányan vannak?", "q": "Hány átok van a <b>Mélység<\/b> nevű kamrában? (egyetlen szám)", "expect": "SELECT COUNT(*) FROM atkok, kincsek, kamrak WHERE atkok.kincs_id = kincsek.id AND kincsek.kamra_id = kamrak.id AND kamrak.nev = 'Mélység';", "hint": "Három tábla, két szabály, és <code>AND kamrak.nev = 'Mélység'<\/code>. A <code>COUNT(*)<\/code> számol.", "why": "Kettő: az Árnyék és a Némaság, mindkettő a Fekete lámpán."}, {"id": "q13", "say": "Az utolsó előtti… Melyik kamrámban rejtőzik legalább két átok?", "q": "Kamránként hány átok van? Csak azok a kamrák kellenek, ahol <b>legalább kettő<\/b>. (a kamra neve és a darabszám)", "expect": "SELECT kamrak.nev, COUNT(*) FROM atkok, kincsek, kamrak WHERE atkok.kincs_id = kincsek.id AND kincsek.kamra_id = kamrak.id GROUP BY kamrak.nev HAVING COUNT(*) >= 2;", "traps": [["COUNT\\(\\*\\)\\s*>\\s*2", "A <code>&gt; 2<\/code> a kettőt már nem engedi át. Legalább kettő: <code>&gt;= 2<\/code>."]], "hint": "Két szabály, <code>GROUP BY kamrak.nev<\/code>, <code>HAVING COUNT(*) &gt;= 2<\/code>.", "why": "Kígyóterem 6, Csillagterem 2, Mélység 2."}, {"id": "q14", "say": "Az utolsó kérdésem. Erre nem tudhatod a választ… NEM TUDHATOD!", "q": "Kamránként mennyi az átkok erejének összege? Csak azok a kamrák kellenek, ahol ez <b>több mint 10<\/b>, a legerősebbel kezdve. (a kamra neve és az összeg)", "expect": "SELECT kamrak.nev, SUM(atkok.ero) FROM atkok, kincsek, kamrak WHERE atkok.kincs_id = kincsek.id AND kincsek.kamra_id = kamrak.id GROUP BY kamrak.nev HAVING SUM(atkok.ero) > 10 ORDER BY SUM(atkok.ero) DESC;", "ordered": true, "hint": "Két szabály, <code>GROUP BY kamrak.nev<\/code>, <code>HAVING SUM(atkok.ero) &gt; 10<\/code>, végül <code>ORDER BY SUM(atkok.ero) DESC<\/code>.", "why": "Kígyóterem 38, Mélység 17, Csillagterem 11."}]}], "schema": {"tables": [{"name": "kamrak", "cols": [["id", "a kamra sorszáma", null], ["nev", "a kamra neve, pl. <code>'Kígyóterem'<\/code>", null], ["melyseg", "milyen mélyen van (1–4)", null]]}, {"name": "kincsek", "cols": [["id", "a kincs sorszáma", null], ["nev", "a kincs neve", null], ["fajta", "<code>'arany'<\/code>, <code>'ékszer'<\/code>, <code>'tekercs'<\/code> vagy <code>'lámpa'<\/code>", null], ["ertek", "értéke aranyban; <code>NULL<\/code> = ismeretlen", null], ["kamra_id", "melyik kamrában van", "kamrak.id"]]}, {"name": "atkok", "cols": [["id", "az átok sorszáma", null], ["kincs_id", "melyik kincsen ül", "kincsek.id"], ["nev", "az átok neve", null], ["ero", "az átok ereje (1–10)", null]]}], "links": [["atkok.kincs_id", "kincsek.id"], ["kincsek.kamra_id", "kamrak.id"]]}, "reportTitle": "A DZSINN TIZENNEGY KERDESE - VALASZOK", "filePrefix": "dzsinn","ui":{"kicker":"SQL, gyakorló feladatlap","title":"A dzsinn tizennégy kérdése","story":"<p>A kincstár mélyén egy ősi, gonosz <b>dzsinn</b> ébred. Óriási, mint egy hegy, és a szeme izzik, mint a parázs.</p><p>„Halandó, a kincstáramba tévedtél. Innen csak az jut ki, aki a kincstáram adatbázisából válaszol a kérdéseimre. Minden helyes lekérdezés egy <b>pecsétet</b> éget a hatalmamba. Tizennégy pecsét, és elporladok. Egyetlen rossz válasz… és nevetni fogok.”</p>","rules":["Minden feladatra <b>SQL-lekérdezést</b> írsz. A <b>Futtatás</b> megmutatja az eredményt, az <b>Ellenőrzés</b> megmondja, jó-e.", "Ha nem jó, a dzsinn kinevet, de kapsz egy tippet arról, mi csúszott el a lekérdezésedben.", "A feladat fölött a <b>„Mit kell tudnod”</b> doboz emlékeztet a szabályra, alatta pedig minden feladatnál ott vannak a <b>táblák, az oszlopaik és a kapcsolataik</b>. A sorokat a <b>Táblák</b> gombbal nézheted meg.", "Két rossz próba után megnézheted a megoldást, de akkor a pecsét halvány marad. A válaszaid mentődnek, ha bezárod a lapot."],"name":"A neved","namePh":"Vezetéknév Keresztnév","nameFirst":"Előbb írd be a neved.","start":"Ébreszd fel a dzsinnt","intro":"KI MERÉSZEL A KINCSTÁRAMBAN JÁRNI?!","welcomeBack":"Visszatértél, halandó. Folytassuk.","already":"Erre már feleltél. Ne kérkedj előttem.","impatient":"Írj valamit, halandó! A türelmem véges.","hurts":["Grrr… helyes.", "Lehetetlen…!", "Egy újabb pecsét… ÉRZEM!", "Ezt honnan tudtad?!", "Hrrr… ez fájt.", "Még nem győztél le, halandó!"],"laughs":["HAHAHA! Tévedtél!", "Ostoba halandó! Nézd meg újra!", "Muhaha… a kincstáram foglya maradsz.", "Rossz! Imádom a tévedéseket.", "HAHA! Ennyi tellett tőled?"],"gloat":"Elárulom a választ… de a pecsét halvány marad. Hahaha.","noo":"NEEEEM! A PECSÉTEK… ÉGNEK…!","finaleTitle":"LEGYŐZTED A DZSINNT!","finaleSub":"Mind a tizennégy pecsét ég. A dzsinn hamuvá porladt, a kincstár kapuja kinyílik.","leftEarly":"Elmenekülsz? Hahaha! A pecsétjeim még nem teljesek!","freedK":"A dzsinn elporladt","escapedK":"A dzsinn még ébren van","qOf":(i,n)=>`${i}. feladat / ${n}`,"remind":"Mit kell tudnod","prev":"Előző feladat","next":"Következő feladat","run":"Futtatás","check":"Ellenőrzés","reveal":"Mutasd a megoldást","nextRiddle":"Következő feladat →","toEnd":"Az eredményhez →","runHint":"Ctrl + Enter: futtatás","answerFirst":"Előbb írd meg a lekérdezést.","notYet":"Még nem jó.","tryAgain":"Futtasd le, nézd meg az eredményt, és vesd össze a feladattal.","hintLabel":"Segítség:","rightFirst":"Elsőre jó! Aranypecsét.","right":"Most már jó! Ezüstpecsét.","solutionH":"Egy jó megoldás:","finish":"Befejezés","finishSure":"Biztosan? Kattints még egyszer!","confirm":m=>m ? `Még ${m} feladat vár. Ha így is befejezed, kattints még egyszer.` : 'Kattints még egyszer.',"schemaH":"Táblák és kapcsolatok","links":"Kapcsolatok","allRows":"Az összes sor megtekintése","tables":"Táblák","tablesH":"A kincstár táblái","rows":n=>n+' sor',"noRows":"Nincs eredmény.","query":"SQL-lekérdezés","empty":"Üres a lekérdezés.","sqlErr":"Hiba","dqNote":"Az SQLite elfogadta a dupla idézőjelet, de a szabványos SQL-ben (és a témazárón) a szöveg <b>egyszeres</b> idézőjelbe kerül: <code>'Kígyóterem'</code>.","mNull":"A <code>= NULL</code> soha nem igaz, ezért nem talál semmit (és hibát sem jelez). Hiányzó értékre: <code>IS NULL</code> vagy <code>IS NOT NULL</code>.","mAgg":"Összesítő függvény (<code>COUNT</code>, <code>SUM</code>…) nem állhat a <code>WHERE</code>-ben: a <code>WHERE</code> egyes sorokat néz. A csoportok szűrése a <code>HAVING</code> dolga, a <code>GROUP BY</code> után.","mAmb":"Ez az oszlopnév több táblában is szerepel. Írd elé a tábla nevét, pl. <code>kincsek.nev</code>.","mDquote":"A dupla idézőjel oszlopnevet jelent. Szöveget mindig <b>egyszeres</b> idézőjelbe tegyél: <code>'arany'</code>.","mCol":w=>`Nincs <code>${w}</code> nevű oszlop. Ha ez egy szöveg, tedd egyszeres idézőjelbe; ha oszlop, nézd meg a pontos nevét a Táblák között.`,"mTable":"Nincs ilyen nevű tábla. A táblák: <code>kamrak</code>, <code>kincsek</code>, <code>atkok</code>.","mSyntax":"A lekérdezés hibás. Nézd meg a záradékok sorrendjét: <code>SELECT → FROM → WHERE → GROUP BY → HAVING → ORDER BY → LIMIT</code>, és hogy minden szöveg egyszeres idézőjelben van-e.","mIdId":"Az <code>id = id</code> rossz párokat ad: az 1-es átkot az 1-es kincshez rakja, nem ahhoz, amelyiken ül. A párosítás: <b>hivatkozó oszlop = a másik tábla id-je</b>, pl. <code>atkok.kincs_id = kincsek.id</code>.","mCart":n=>`${n} tábla áll a FROM-ban, de nincs meg mindegyik párosítási szabály (${n - 1} kell). Szabály nélkül minden sor minden sorral párba áll, ezért kapsz ilyen sok sort.`,"mLikeNoPct":"A <code>LIKE</code> minta <code>%</code> nélkül csak a pontosan egyező szöveget találja meg. Írj <code>%</code>-ot oda, ahol bármi állhat.","mEqPct":"Az <code>=</code> nem ismeri a <code>%</code>-ot: szó szerint keres. Mintához <code>LIKE</code> kell.","mOrder":"A sorok jók, de rossz a sorrendjük. Magában az <code>ORDER BY</code> a legkisebbel kezd; a legnagyobb elöl: <code>DESC</code>.","mNullRows":"Az eredményben <code>NULL</code> is van. Növekvő rendezésnél a <code>NULL</code> kerül előre: szűrd ki <code>IS NOT NULL</code>-lal.","mDesc":"Magában az <code>ORDER BY</code> a legkisebbel kezd (<code>ASC</code>). Ha a legnagyobb kell elöl, írd mögé: <code>DESC</code>.","mLimit":"Túl sok sort kaptál. A <code>LIMIT n</code> csak az első n sort tartja meg.","mHaving":"Csoportosítottál, de a csoportokat nem szűrted. A csoportokra vonatkozó feltétel a <code>HAVING</code>-be kerül.","mGroup":"Összesítő függvényt használsz, de nincs <code>GROUP BY</code>: így az egész táblából egyetlen sor lesz. Csoportosíts!","mRows":(g,e)=>`A lekérdezésed ${g} sort adott, a jó válasz ${e} sorból áll. Nézd meg a feltételeket.`,"mCols":"A sorok száma stimmel, de az értékek nem. Nézd meg, a kért oszlopokat íratod-e ki, és jók-e a feltételek.","pracSub":(f,l,r,s)=>`aranypecsét (elsőre jó) · ${l} ezüst · ${r} megoldást megnézted · ${s} kimaradt`,"firstTry":"elsőre jó","handH":"Add be a válaszlapot","handSteps":["Kattints a <b>Válaszok mentése (.txt)</b> gombra. A fájl a Letöltések mappába kerül.", "Nyisd meg a feladatot a <b>Google Classroomban</b>, töltsd fel a fájlt, majd nyomd meg a <b>Beadás</b> gombot."],"save":"Válaszok mentése (.txt)","copy":"Másolás szövegként","replay":"Még egyszer a nagy jelenet","saved":f=>`Mentve: ${f}. Most töltsd fel a Classroomba.`,"saveBlocked":"A mentés itt le van tiltva. Használd a másolást.","copied":"Kimásolva. Illeszd be a Classroom-feladathoz privát megjegyzésként.","copyBlocked":"A másolás itt le van tiltva. Használd a mentést.","none":"(nincs válasz)","rName":"Név","rDate":"Befejezve","rTime":"Eltelt idő","rFirst":"Elsőre jó","status":(k,t)=>k==='first'?'elsőre jó':k==='later'?t+'. próbára jó':k==='rev'?'megoldást megnézte':'kimaradt',"engFail":"Az SQL-motor nem töltődött be. Ellenőrizd az internetkapcsolatot, és töltsd újra az oldalt."}};
 const U = CFG.ui;
 const $ = id => document.getElementById(id);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
@@ -439,10 +346,6 @@ function runQuery(q){
   catch(e){ return { err: e.message }; }
   finally { db.close(); }
 }
-function hl(code){
-  return esc(code).replace(/('[^']*')|\b(COUNT|SUM|AVG|MIN|MAX|ROUND)\b|\b(\d+)\b|\b(SELECT|FROM|WHERE|GROUP BY|HAVING|ORDER BY|LIMIT|AND|OR|NOT|LIKE|IS|NULL|ASC|DESC|DISTINCT|AS|IN)\b/g,
-    (m, s, f, n, k) => s ? `<span class="s">${s}</span>` : f ? `<span class="f">${f}</span>` : n ? `<span class="nm">${n}</span>` : `<span class="k">${k}</span>`);
-}
 function tableHtml(r){
   if (!r.columns.length) return `<p class="note">${U.noRows}</p>`;
   const head = r.columns.map(c => `<th>${esc(c)}</th>`).join("");
@@ -450,103 +353,67 @@ function tableHtml(r){
   return `<div class="tbl"><table><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></div>`;
 }
 const normV = v => v === null ? "∅" : typeof v === "number" ? String(Math.round(v * 1000) / 1000) : String(v).trim().toLowerCase();
-/* right if it has as many rows as the expected result and every expected column is among the student's columns (order free) */
-function sameResult(got, exp){
-  if (!got || got.values.length !== exp.values.length) return false;
+/* the expected columns must be found among the student's columns (as multisets, extra columns allowed): returns the mapping or null */
+function matchCols(got, exp){
+  if (!got || got.values.length !== exp.values.length) return null;
   const col = (r, i) => r.values.map(row => normV(row[i])).sort().join("\u0001");
-  const have = got.columns.map((_, i) => col(got, i)), used = new Set();
+  const have = got.columns.map((_, i) => col(got, i)), used = new Set(), map = [];
   for (let i = 0; i < exp.columns.length; i++){
     const want = col(exp, i), j = have.findIndex((h, k) => !used.has(k) && h === want);
-    if (j < 0) return false; used.add(j);
+    if (j < 0) return null; used.add(j); map.push(j);
   }
-  return true;
+  return map;
 }
+/* ordered tasks: the sorted column (the expected 2nd column) must come in the same sequence; ties may be in any order */
+function sameOrder(got, exp, map, k){ return got.values.map(r => normV(r[map[k]])).join("\u0001") === exp.values.map(r => normV(r[k])).join("\u0001"); }
 
-/* ---------- questions ---------- */
+/* ---------- tasks ---------- */
 const QS = [];
 CFG.sections.forEach(sec => sec.questions.forEach(q => { q.sec = sec; QS.push(q); }));
 const N = QS.length;
-const maxOf = q => q.type === "tf" ? q.items.length : q.type === "blank" ? q.ok.length : q.pts;
-const ans = id => S.ans[id];
-function setAns(id, v){ S.ans[id] = v; save(); }
+const EXP = {};
 const D = q => S.done[q.id] || (S.done[q.id] = { tries: 0 });
 const isDone = q => { const d = S.done[q.id]; return !!(d && (d.ok || d.rev)); };
 const doneCount = () => QS.filter(isDone).length;
 function status(q){ const d = S.done[q.id]; return !d || !(d.ok || d.rev) ? "skip" : d.rev ? "rev" : d.tries === 1 ? "first" : "later"; }
-const nb = s => String(s || "").trim().replace(/\s+/g, " ").replace(/;$/, "").toUpperCase();
-function answered(q){
-  const a = ans(q.id);
-  if (q.type === "order") return true;
-  if (a == null || a === "") return false;
-  if (Array.isArray(a)) return q.type === "multi" ? a.length > 0 : a.every(x => x !== null && x !== "" && x !== undefined);
-  return String(a).trim() !== "";
+function exp(q){ return EXP[q.id] || (EXP[q.id] = runQuery(q.expect).res); }
+function judge(q, sql){
+  const r = runQuery(sql);
+  if (r.err) return { ok: false, err: r.err };
+  const e = exp(q), map = matchCols(r.res, e);
+  if (!map) return { ok: false, res: r.res };
+  if (q.ordered && !sameOrder(r.res, e, map, 1)) return { ok: false, res: r.res, order: true };
+  return { ok: true, res: r.res };
 }
-function grade(q){
-  const a = ans(q.id);
-  switch (q.type){
-    case "mc": case "bug": return a === q.ok ? q.pts : 0;
-    case "multi": return Array.isArray(a) && a.slice().sort().join() === q.ok.slice().sort().join() ? q.pts : 0;
-    case "tf": return q.items.reduce((s, it, i) => s + (a && a[i] === it[1] ? 1 : 0), 0);
-    case "order": return (a || q.start.map(i => q.items[i])).join("|") === q.items.join("|") ? q.pts : 0;
-    case "num": return a != null && String(a).trim() !== "" && Number(String(a).trim().replace(",", ".")) === q.ok ? q.pts : 0;
-    case "blank": return q.ok.reduce((s, alts, i) => s + (a && alts.some(x => nb(x) === nb(a[i])) ? 1 : 0), 0);
-    case "sql": { if (!a || !a.trim()) return 0; const got = runQuery(a), exp = runQuery(q.expect); return !got.err && sameResult(got.res, exp.res) ? q.pts : 0; }
+/* a targeted tip for a wrong query: the task's own traps first, then the typical mistakes from the test */
+function diagnose(q, sql, j){
+  const s = sql.replace(/\s+/g, " ");
+  for (const [re, tip] of (q.traps || [])) if (new RegExp(re, "i").test(s)) return tip;
+  const e = exp(q), err = (j.err || "").toLowerCase();
+  if (/=\s*null\b/i.test(s)) return U.mNull;
+  if (err.includes("misuse of aggregate")) return U.mAgg;
+  if (err.includes("ambiguous column")) return U.mAmb;
+  if (/"[^"]*"/.test(s) && err.includes("no such column")) return U.mDquote;
+  if (err.includes("no such column")) return U.mCol((j.err.match(/no such column: (\S+)/i) || [])[1] || "");
+  if (err.includes("no such table")) return U.mTable;
+  if (err) return U.mSyntax;
+  const from = (s.match(/\bFROM\s+(.+?)(?=\s+(WHERE|GROUP|ORDER|HAVING|LIMIT)\b|;|$)/i) || [])[1] || "";
+  const nTables = from.split(",").filter(x => x.trim()).length;
+  if (/\b\w+\.id\s*=\s*\w+\.id\b/i.test(s)) return U.mIdId;
+  if (nTables >= 2 && (s.match(/\w+\.\w+\s*=\s*\w+\.\w+/g) || []).length < nTables - 1) return U.mCart(nTables);
+  if (/\bLIKE\s*'[^'%_]*'/i.test(s)) return U.mLikeNoPct;
+  if (/=\s*'[^']*%[^']*'/.test(s)) return U.mEqPct;
+  if (j.order) return U.mOrder;
+  if (/\bDESC\b/i.test(q.expect) && !/\bDESC\b/i.test(s) && /\bORDER\s+BY\b/i.test(s)) return U.mDesc;
+  if (j.res){
+    if (/\bLIMIT\b/i.test(q.expect) && !/\bLIMIT\b/i.test(s)) return U.mLimit;
+    if (j.res.values.some(r => r.some(v => v === null)) && !e.values.some(r => r.some(v => v === null))) return U.mNullRows;
+    if (/\bHAVING\b/i.test(q.expect) && !/\bHAVING\b/i.test(s) && /\bGROUP\s+BY\b/i.test(s)) return U.mHaving;
+    if (/\bGROUP\s+BY\b/i.test(q.expect) && !/\bGROUP\s+BY\b/i.test(s) && /\b(COUNT|SUM|AVG)\s*\(/i.test(s)) return U.mGroup;
+    if (j.res.values.length !== e.values.length) return U.mRows(j.res.values.length, e.values.length);
+    return U.mCols;
   }
-  return 0;
-}
-function tipFor(q){
-  const a = ans(q.id), t = q.traps || {};
-  if ((q.type === "mc" || q.type === "bug") && q.fbs && q.fbs[a]) return q.fbs[a];
-  if (q.type === "num") return t[String(a).trim().replace(",", ".")];
-  if (q.type === "multi") return t[(a || []).slice().sort().join(",")];
-  if (q.type === "blank") return t[(a || []).map(nb).join("|")] || null;
   return null;
-}
-function solutionOf(q){
-  switch (q.type){
-    case "mc": return q.opts[q.ok];
-    case "multi": return q.ok.map(i => q.opts[i]).join(", ");
-    case "tf": return q.items.map((it, i) => `${i + 1}. ${it[1] ? U.t : U.f}`).join(" · ");
-    case "order": return q.items.map(esc).join(" → ");
-    case "num": return String(q.ok);
-    case "blank": return `<pre>${esc(q.code.replace(/\{(\d)\}/g, (m, d) => q.ok[d][0]))}</pre>`;
-    case "bug": return U.line(q.ok + 1);
-    case "sql": return `<pre>${esc(q.expect)}</pre>`;
-  }
-}
-function inner(q){
-  const id = q.id, a = ans(id);
-  switch (q.type){
-    case "mc": case "multi": {
-      const t = q.type === "mc" ? "radio" : "checkbox", sel = i => q.type === "mc" ? a === i : Array.isArray(a) && a.includes(i);
-      return `${q.code ? `<pre class="code">${hl(q.code)}</pre>` : ""}<div class="opts">${q.opts.map((o, i) =>
-        `<label class="opt"><input type="${t}" name="${id}" value="${i}"${sel(i) ? " checked" : ""}><span>${o}</span></label>`).join("")}</div>`;
-    }
-    case "tf":
-      return q.items.map((it, i) => `<div class="tf"><span>${it[0]}</span><span class="seg" role="radiogroup">
-        <label><input type="radio" name="${id}-${i}" value="1"${a && a[i] === true ? " checked" : ""}>${U.t}</label>
-        <label><input type="radio" name="${id}-${i}" value="0"${a && a[i] === false ? " checked" : ""}>${U.f}</label></span></div>`).join("");
-    case "order": {
-      const cur = a || q.start.map(i => q.items[i]);
-      return `<ol class="order">${cur.map((it, i) => `<li><span class="ix">${i + 1}.</span>${esc(it)}<span class="mv">
-        <button type="button" class="mvb" data-i="${i}" data-d="-1" aria-label="${U.up}"${i === 0 ? " disabled" : ""}>↑</button>
-        <button type="button" class="mvb" data-i="${i}" data-d="1" aria-label="${U.down}"${i === cur.length - 1 ? " disabled" : ""}>↓</button></span></li>`).join("")}</ol>`;
-    }
-    case "num":
-      return `${q.code ? `<pre class="code">${hl(q.code)}</pre>` : ""}<div class="num"><input type="text" inputmode="numeric" autocomplete="off" aria-label="${U.answer}" value="${a != null ? esc(a) : ""}" placeholder="${U.number}"></div>`;
-    case "blank": {
-      let k = 0;
-      const code = hl(q.code.replace(/\{(\d)\}/g, (m, d) => "⟦" + "ABCDEFGHI"[d] + "⟧")).replace(/⟦[A-I]⟧/g, () => { const i = k++;
-        return `<input type="text" data-i="${i}" autocomplete="off" spellcheck="false" aria-label="${U.blank(i + 1)}" value="${a && a[i] ? esc(a[i]) : ""}">`; });
-      return `<pre class="code">${code}</pre>`;
-    }
-    case "bug":
-      return `<div class="lines">${q.code.split("\n").map((ln, i) =>
-        `<label><input type="radio" name="${id}" value="${i}"${a === i ? " checked" : ""}><span class="ln">${i + 1}</span><span>${hl(ln)}</span></label>`).join("")}</div>`;
-    case "sql":
-      return `<div class="sqlbox"><textarea spellcheck="false" aria-label="${U.query}" placeholder="SELECT …">${a ? esc(a) : ""}</textarea>
-        <div class="row"><button type="button" class="btn ghost run">${U.run}</button><span class="hint">${U.runHint}</span></div><div class="out" aria-live="polite"></div></div>`;
-  }
 }
 
 /* ---------- the djinn ---------- */
@@ -556,85 +423,59 @@ function mood(cls, ms){
   DJ.classList.remove("ask", "hurt", "laugh"); void DJ.getBoundingClientRect();
   DJ.classList.add(cls); clearTimeout(djT); djT = setTimeout(() => DJ.classList.remove(cls), ms);
 }
+function rumble(){ STAGE.classList.remove("rumble"); void STAGE.offsetWidth; STAGE.classList.add("rumble"); }
+function rage(){ STAGE.classList.remove("rage"); void STAGE.offsetWidth; STAGE.classList.add("rage"); }
 function say(html, kind){
   clearInterval(typeT);
   BUB.className = "bubble" + (kind ? " " + kind : ""); void BUB.offsetWidth; BUB.classList.add("pop");
   const plain = html.replace(/<[^>]+>/g, "");
-  if (reduced || !plain){ BUB.innerHTML = html; return; }
+  if (reduced){ BUB.innerHTML = html; clearTimeout(say.t); if (innerWidth <= 1000) say.t = setTimeout(hush, 5000); return; }
   let i = 0; BUB.textContent = "";
-  typeT = setInterval(() => { i += 2; BUB.textContent = plain.slice(0, i); if (i >= plain.length){ clearInterval(typeT); BUB.innerHTML = html; } }, 22);
+  typeT = setInterval(() => { i += 2; BUB.textContent = plain.slice(0, i); if (i >= plain.length){ clearInterval(typeT); BUB.innerHTML = html; } }, 24);
+  clearTimeout(say.t); if (innerWidth <= 1000) say.t = setTimeout(hush, 5000);   /* on small screens the bubble covers the card: let it go */
 }
 function hush(){ clearInterval(typeT); BUB.className = "bubble hide"; }
 const pick = a => a[Math.floor(Math.random() * a.length)];
-function setPower(){ STAGE.style.setProperty("--power", (1 - .65 * doneCount() / N).toFixed(3)); }
-function taunt(text, n){
-  const r = STAGE.getBoundingClientRect(), h = svgToStage(200, 130);
-  for (let k = 0; k < n; k++) setTimeout(() => {
-    const t = document.createElement("div"); t.className = "taunt"; t.textContent = text;
-    t.style.left = (h.x - 60 + (k % 2 ? 70 : -40) + Math.random() * 30) + "px"; t.style.top = (h.y - 30 - k * 14) + "px";
-    t.style.setProperty("--r", (k % 2 ? 10 : -12) + "deg"); STAGE.appendChild(t); setTimeout(() => t.remove(), 1600);
-  }, k * 260);
+function setPower(){ STAGE.style.setProperty("--power", (1 - .7 * doneCount() / N).toFixed(3)); }
+function svgPt(x, y){
+  const m = DJ.getScreenCTM(); if (!m) return { x: innerWidth / 2, y: innerHeight / 3 };
+  const p = new DOMPoint(x, y).matrixTransform(m); return { x: p.x, y: p.y };
 }
-/* the eyes follow the pointer, and glance around on their own when nobody moves */
-const pupils = [...DJ.querySelectorAll(".pupil")];
-let look = { x: 0, y: 0 }, lookT = 0;
-function lookAt(px, py){
-  const c = svgToStage(200, 124), r = STAGE.getBoundingClientRect();
-  const dx = px - (r.left + c.x), dy = py - (r.top + c.y), d = Math.hypot(dx, dy) || 1;
-  look = { x: dx / d * Math.min(4, d / 40), y: dy / d * Math.min(2, d / 60) };
-  pupils.forEach(p => p.setAttribute("transform", `translate(${look.x.toFixed(2)} ${look.y.toFixed(2)})`));
-  clearTimeout(lookT); lookT = setTimeout(wander, 3500);
-}
-function wander(){
-  look = { x: (Math.random() - .5) * 7, y: (Math.random() - .5) * 3 };
-  pupils.forEach(p => p.setAttribute("transform", `translate(${look.x.toFixed(2)} ${look.y.toFixed(2)})`));
-  lookT = setTimeout(wander, 1800 + Math.random() * 2500);
-}
-addEventListener("pointermove", e => lookAt(e.clientX, e.clientY), { passive: true });
-function svgToStage(x, y){
-  const m = DJ.getScreenCTM(), r = STAGE.getBoundingClientRect();
-  if (!m) return { x: r.width / 2, y: r.height / 2 };
-  const p = new DOMPoint(x, y).matrixTransform(m);
-  return { x: p.x - r.left, y: p.y - r.top };
-}
+/* he turns his head a little toward the pointer */
+addEventListener("pointermove", e => {
+  const c = svgPt(500, 270), dx = (e.clientX - c.x) / innerWidth, dy = (e.clientY - c.y) / innerHeight;
+  $("headIdle").style.translate = `${(dx * 14).toFixed(1)}px ${(dy * 6).toFixed(1)}px`;
+  $("eyes").style.translate = `${(dx * 6).toFixed(1)}px ${(dy * 3).toFixed(1)}px`;
+}, { passive: true });
 
-/* ---------- particles: ambient sparks, bursts, the sealing vortex, the finale ---------- */
+/* ---------- particles: embers, bursts, burning away, fireworks ---------- */
 const CV = $("fx"), G = CV.getContext("2d");
-let P = [], W = 0, H = 0, DPR = 1, vortex = 0, ambient = true;
-function fit(){ const r = STAGE.getBoundingClientRect(); DPR = Math.min(2, devicePixelRatio || 1); W = r.width; H = r.height; CV.width = W * DPR; CV.height = H * DPR; G.setTransform(DPR, 0, 0, DPR, 0, 0); }
+let P = [], W = 0, H = 0, dissolve = 0;
+function fit(){ const dpr = Math.min(2, devicePixelRatio || 1); W = innerWidth; H = innerHeight; CV.width = W * dpr; CV.height = H * dpr; G.setTransform(dpr, 0, 0, dpr, 0, 0); }
 addEventListener("resize", fit);
 function spark(x, y, o){ P.push(Object.assign({ x, y, vx: 0, vy: 0, g: 0, life: 0, max: 60, s: 2, c: "#ffd27a", kind: "dot", rot: 0, vr: 0, drag: .985 }, o)); }
-function burst(x, y, n, colors, speed, o){
-  for (let i = 0; i < n; i++){ const a = Math.random() * Math.PI * 2, v = speed * (.35 + Math.random() * .65);
-    spark(x, y, Object.assign({ vx: Math.cos(a) * v, vy: Math.sin(a) * v, max: 50 + Math.random() * 40, s: 1.5 + Math.random() * 3, c: pick(colors) }, o)); }
+function burst(x, y, n, colors, speed){
+  for (let i = 0; i < n; i++){ const a = Math.random() * Math.PI * 2, v = speed * (.3 + Math.random() * .7);
+    spark(x, y, { vx: Math.cos(a) * v, vy: Math.sin(a) * v, max: 45 + Math.random() * 45, s: 1.4 + Math.random() * 3, c: pick(colors) }); }
 }
-function ring(x, y, color){ spark(x, y, { kind: "ring", max: 40, s: 10, c: color, drag: 1 }); }
+function ring(x, y, color, size){ spark(x, y, { kind: "ring", max: 45, s: 12, c: color, drag: 1, big: size || 160 }); }
 function confetti(n){
-  const cols = ["#ffe08a", "#f2c14e", "#ffffff", "#c9b6ff", "#ff9bd2", "#9fe6b5"];
-  for (let i = 0; i < n; i++) spark(Math.random() * W, -20 - Math.random() * H * .5, { kind: "conf", vx: (Math.random() - .5) * 2, vy: 1 + Math.random() * 2.5, g: .04, max: 260, s: 5 + Math.random() * 5, c: pick(cols), rot: Math.random() * 6, vr: (Math.random() - .5) * .3, drag: .995 });
+  const cols = ["#ffe39a", "#e9b949", "#ffffff", "#c9b6ff", "#ff9bd2", "#7fe3ff"];
+  for (let i = 0; i < n; i++) spark(Math.random() * W, -20 - Math.random() * H * .5, { kind: "conf", vx: (Math.random() - .5) * 2, vy: 1 + Math.random() * 2.5, g: .04, max: 300, s: 6 + Math.random() * 6, c: pick(cols), rot: Math.random() * 6, vr: (Math.random() - .5) * .3, drag: .995 });
 }
 function tick(){
   G.clearRect(0, 0, W, H);
-  if (ambient && !reduced && Math.random() < .5){
-    const sp = svgToStage(104 + Math.random() * 120, 300 + Math.random() * 130);
-    spark(sp.x, sp.y, { vx: (Math.random() - .5) * .4, vy: -.4 - Math.random() * .8, max: 70 + Math.random() * 60, s: .8 + Math.random() * 1.8, c: pick(["#c9b6ff", "#ffd27a", "#9f7bff", "#ff9a6a"]) });
-  }
-  if (vortex){
-    const sp = svgToStage(100, 424);
-    for (let k = 0; k < 6; k++){ const a = Math.random() * Math.PI * 2, R = 120 + Math.random() * Math.max(W, H) * .45;
-      spark(sp.x + Math.cos(a) * R, sp.y + Math.sin(a) * R, { kind: "vortex", tx: sp.x, ty: sp.y, ang: a, rad: R, max: 120, s: 1.5 + Math.random() * 2.5, c: pick(["#c9b6ff", "#9f7bff", "#ffd27a", "#ffffff"]) }); }
-  }
+  if (!reduced && Math.random() < .55)
+    spark(Math.random() * W, H + 10, { vx: (Math.random() - .5) * .5, vy: -.6 - Math.random() * 1.4, max: 160 + Math.random() * 120, s: .7 + Math.random() * 1.8, c: pick(["#ff7a2a", "#ffb04a", "#ff4a1a", "#9f7bff"]) });
+  if (dissolve) for (let k = 0; k < 14; k++){ const p = svgPt(80 + Math.random() * 840, 40 + Math.random() * 820);
+    spark(p.x, p.y, { vx: (Math.random() - .5) * 1.5, vy: -1 - Math.random() * 3.5, max: 70 + Math.random() * 60, s: 1.2 + Math.random() * 3, c: pick(["#ffe39a", "#ff9a3a", "#6fe3ff", "#c9b6ff", "#ffffff"]) }); }
   G.globalCompositeOperation = "lighter";
   P = P.filter(p => {
-    p.life++;
-    const t = p.life / p.max; if (t >= 1) return false;
-    if (p.kind === "vortex"){ p.ang += .09 + (1 - p.rad / 600) * .06; p.rad *= .955; p.x = p.tx + Math.cos(p.ang) * p.rad; p.y = p.ty + Math.sin(p.ang) * p.rad * .7; if (p.rad < 4) return false; }
-    else { p.vx *= p.drag; p.vy = p.vy * p.drag + p.g; p.x += p.vx; p.y += p.vy; p.rot += p.vr; }
-    const alpha = p.kind === "conf" ? Math.min(1, (1 - t) * 3) : 1 - t;
-    G.globalAlpha = Math.max(0, alpha);
-    if (p.kind === "ring"){ G.strokeStyle = p.c; G.lineWidth = 3 * (1 - t); G.beginPath(); G.arc(p.x, p.y, p.s + t * 120, 0, 7); G.stroke(); }
+    p.life++; const t = p.life / p.max; if (t >= 1) return false;
+    p.vx *= p.drag; p.vy = p.vy * p.drag + p.g; p.x += p.vx; p.y += p.vy; p.rot += p.vr;
+    G.globalAlpha = Math.max(0, p.kind === "conf" ? Math.min(1, (1 - t) * 3) : 1 - t);
+    if (p.kind === "ring"){ G.strokeStyle = p.c; G.lineWidth = 4 * (1 - t); G.beginPath(); G.arc(p.x, p.y, p.s + t * p.big, 0, 7); G.stroke(); }
     else if (p.kind === "conf"){ G.globalCompositeOperation = "source-over"; G.save(); G.translate(p.x, p.y); G.rotate(p.rot); G.fillStyle = p.c; G.fillRect(-p.s / 2, -p.s / 4, p.s, p.s / 2); G.restore(); G.globalCompositeOperation = "lighter"; }
-    else if (p.kind === "star"){ G.fillStyle = p.c; G.save(); G.translate(p.x, p.y); G.rotate(p.rot); G.beginPath(); for (let i = 0; i < 10; i++){ const r = i % 2 ? p.s * .4 : p.s; G.lineTo(Math.cos(i * Math.PI / 5) * r, Math.sin(i * Math.PI / 5) * r); } G.fill(); G.restore(); }
     else { G.fillStyle = p.c; G.beginPath(); G.arc(p.x, p.y, p.s * (1 - t * .5), 0, 7); G.fill(); }
     return true;
   });
@@ -642,220 +483,185 @@ function tick(){
   requestAnimationFrame(tick);
 }
 
-/* ---------- the seals ---------- */
-function runes(){
-  $("runes").innerHTML = QS.map((q, i) => `<button type="button" class="rune ${status(q) === "skip" ? "" : status(q)}${i === S.cur && !S.finished ? " cur" : ""}" data-i="${i}" aria-label="${U.qOf(i + 1, N)}" role="listitem"><span>${i + 1}</span></button>`).join("");
-  $("runes").setAttribute("aria-disabled", S.finished ? "true" : "false");
-  $("runes").querySelectorAll(".rune").forEach(b => b.onclick = () => { if (!S.finished) go(+b.dataset.i); });
-  $("sealcount").innerHTML = `${U.seals} <b>${doneCount()}</b> / ${N}`;
-  setPower();
+function topView(){ const p = $("panel"); if (getComputedStyle(p).position === "fixed") p.scrollTo({ top: 0, behavior: reduced ? "auto" : "smooth" }); else scrollTo({ top: 0, behavior: reduced ? "auto" : "smooth" }); }
+function schemaHtml(){
+  const sc = CFG.schema, open = S.schemaOpen !== false;
+  const tbl = t => `<div class="st"><h5>${t.name}</h5>${t.cols.map(([c, d, fk]) => `<div class="${fk ? "fk" : ""}">${c === "id" ? '<span class="k">🔑</span> ' : fk ? "→ " : ""}<b>${c}</b>: ${d}${fk ? ` (<code>${fk}</code>)` : ""}</div>`).join("")}</div>`;
+  return `<details class="schema" id="schema"${open ? " open" : ""}><summary>${U.schemaH}</summary><div class="sch">${sc.tables.map(tbl).join("")}</div>
+    <div class="lk"><span>${U.links}:</span>${sc.links.map(([a, b]) => `<code>${a} = ${b}</code>`).join("")}<button type="button" class="allrows" id="allRows">${U.allRows}</button></div></details>`;
 }
-function igniteRune(i, colors){
-  const b = $("runes").children[i]; if (!b) return;
-  b.classList.add("ignite");
-  const r = b.getBoundingClientRect(), s = STAGE.getBoundingClientRect();
-  burst(r.left - s.left + r.width / 2, r.top - s.top + r.height / 2, 22, colors, 3.2);
-}
-
 /* ---------- screens ---------- */
+function sealsHtml(){
+  return `<div class="seals" id="seals" role="list">${QS.map((q, i) => `<button type="button" class="seal ${status(q) === "skip" ? "" : status(q)}${i === S.cur && !S.finished ? " cur" : ""}" data-i="${i}" role="listitem" aria-label="${U.qOf(i + 1, N)}"><span>${i + 1}</span></button>`).join("")}</div>`;
+}
 function startScreen(){
-  DJ.setAttribute("class", "asleep"); hush();
+  DJ.setAttribute("class", "dormant"); hush(); setPower();
   $("panel").innerHTML = `<div class="card"><div class="kicker">${U.kicker}</div><h1>${U.title}</h1><div class="story">${U.story}</div>
     <ul class="rules">${U.rules.map(r => `<li>${r}</li>`).join("")}</ul>
     <label class="nm" for="nm">${U.name}</label><input class="nm" id="nm" autocomplete="name" placeholder="${U.namePh}" value="${esc(S.name)}">
-    <div style="margin-top:14px"><button type="button" class="btn gold big" id="rub">${U.start}</button></div><p class="note" id="startNote" style="color:var(--bad)"></p></div>`;
-  runes();
-  $("rub").onclick = () => { const n = $("nm").value.trim(); if (!n){ $("startNote").textContent = U.nameFirst; $("nm").focus(); return; }
-    S = { name: n, started: Date.now(), ans: {}, done: {}, cur: 0, finished: 0 }; save(); emerge(() => go(0, U.intro)); };
-  $("nm").onkeydown = e => { if (e.key === "Enter") $("rub").click(); };
-  setTimeout(() => say(U.sleeping, "muffled"), 600);
+    <div style="margin-top:14px"><button type="button" class="btn gold big" id="wake">${U.start}</button></div><p class="note" id="startNote" style="color:var(--bad)"></p></div>`;
+  $("wake").onclick = () => { const n = $("nm").value.trim(); if (!n){ $("startNote").textContent = U.nameFirst; $("nm").focus(); return; }
+    S = { name: n, started: Date.now(), ans: {}, done: {}, cur: 0, finished: 0 }; save(); wake(() => go(0, U.intro)); };
+  $("nm").onkeydown = e => { if (e.key === "Enter") $("wake").click(); };
 }
-function emerge(then){
-  hush();
-  DJ.setAttribute("class", "asleep"); void DJ.getBoundingClientRect();
-  const sp = svgToStage(100, 424);
-  DJ.classList.add("emerge"); DJ.classList.remove("asleep");
-  burst(sp.x, sp.y, 70, ["#c9b6ff", "#9f7bff", "#ffd27a", "#ffffff"], 5); ring(sp.x, sp.y, "#c9b6ff");
-  setTimeout(() => { DJ.classList.remove("emerge"); then && then(); }, reduced ? 50 : 1300);
+function wake(then){
+  DJ.setAttribute("class", "dormant waking"); void DJ.getBoundingClientRect();
+  DJ.classList.remove("dormant"); rumble();
+  const e = svgPt(500, 270); burst(e.x, e.y, 60, ["#ffb04a", "#ff6a1a", "#ffe39a"], 6); ring(e.x, e.y, "#ff8a3a", 260);
+  topView();
+  setTimeout(() => { DJ.classList.remove("waking"); then && then(); }, reduced ? 50 : 900);
 }
 function go(i, opening){
   if (S.finished) return;
   S.cur = Math.max(0, Math.min(N - 1, i)); save();
-  const q = QS[S.cur], first = q.sec.questions[0] === q;
-  runes(); card(q, first || status(q) === "skip" && (D(q).tries || 0) >= 1);
+  const q = QS[S.cur];
+  card(q);
   if (!isDone(q)){
-    mood("ask", 1150);
-    const c = svgToStage(104, 66); ring(c.x, c.y, "#e6b3ff"); burst(c.x, c.y, 18, ["#ffd3ff", "#d04cff", "#ffffff"], 2.5);
-    say((opening ? `<i>${opening}</i> ` : "") + (q.say || ""));
+    mood("ask", 1300); rumble();
+    const e = svgPt(500, 270); ring(e.x, e.y, "rgba(255,140,60,.9)", 220);
+    say((opening ? opening + " " : "") + q.say);
   } else say(U.already);
 }
-function card(q, openRemind){
-  const i = QS.indexOf(q), done = isDone(q), d = S.done[q.id] || { tries: 0 };
-  $("panel").innerHTML = `<div class="card${done ? " done-lock" : ""}" id="qc">
+function card(q){
+  const i = QS.indexOf(q), done = isDone(q), d = S.done[q.id] || { tries: 0 }, a = S.ans[q.id] || "";
+  $("panel").innerHTML = `<div class="card${done ? " locked" : ""}" id="qc">
       <div class="qtop"><span class="qno">${U.qOf(i + 1, N)}</span><span class="chip">${q.sec.title}</span>
         <span class="qnav"><button type="button" id="prevQ" aria-label="${U.prev}"${i === 0 ? " disabled" : ""}>←</button><button type="button" id="nextQ" aria-label="${U.next}"${i === N - 1 ? " disabled" : ""}>→</button></span></div>
-      <details class="remind"${openRemind ? " open" : ""}><summary>${U.remind}</summary>${q.sec.intro}</details>
+      ${sealsHtml()}
+      <details class="remind"${q.sec.questions[0] === q && !done ? " open" : ""}><summary>${U.remind}</summary>${q.sec.intro}</details>
       <div class="qtext">${q.q}</div>
-      <div id="qbody">${inner(q)}</div>
-      <div class="chk"><button type="button" class="btn gold" id="checkBtn"${done ? " hidden" : ""}>${U.check}</button>
-        <button type="button" class="btn ghost" id="revealBtn"${done || d.tries < 2 ? " hidden" : ""}>${U.reveal}</button>
-        <button type="button" class="btn" id="goNext"${done ? "" : " hidden"}>${doneCount() === N ? U.toEnd : U.nextRiddle}</button></div>
-      <div class="fb" id="fb" aria-live="polite"></div>
+      ${schemaHtml()}
+      <div class="sqlbox"><textarea id="sql" spellcheck="false" aria-label="${U.query}" placeholder="SELECT …"${done ? " readonly" : ""}>${esc(a)}</textarea>
+        <div class="row"><button type="button" class="btn" id="run">${U.run}</button>
+          <button type="button" class="btn gold" id="checkBtn"${done ? " hidden" : ""}>${U.check}</button>
+          <button type="button" class="btn ghost" id="revealBtn"${done || d.tries < 2 ? " hidden" : ""}>${U.reveal}</button>
+          <button type="button" class="btn gold" id="goNext"${done ? "" : " hidden"}>${doneCount() === N ? U.toEnd : U.nextRiddle}</button>
+          <span class="hint">${U.runHint}</span></div>
+        <div class="fb" id="fb" aria-live="polite"></div>
+        <div class="out" id="out" aria-live="polite"></div></div>
     </div>
-    <div class="foot"><button type="button" class="btn ghost" id="openTables">${U.tables}</button><span class="grow"></span><span id="finNote"></span><button type="button" class="btn ghost" id="finish">${U.finish}</button></div>`;
-  wire(q);
-  if (done) showDone(q, false);
+    <div class="foot"><button type="button" class="btn" id="openTables">${U.tables}</button><span class="grow"></span><span id="finNote"></span><button type="button" class="btn" id="finish">${U.finish}</button></div>`;
+  const ta = $("sql");
+  ta.oninput = () => { S.ans[q.id] = ta.value; save(); };
+  ta.onkeydown = e => { if ((e.ctrlKey || e.metaKey) && e.key === "Enter"){ e.preventDefault(); run(); } };
+  $("run").onclick = run;
+  $("checkBtn").onclick = () => check(q); $("revealBtn").onclick = () => reveal(q); $("goNext").onclick = nextOpen;
   $("prevQ").onclick = () => go(i - 1); $("nextQ").onclick = () => go(i + 1);
-  $("checkBtn").onclick = () => check(q); $("revealBtn").onclick = () => reveal(q);
-  $("goNext").onclick = nextOpen;
   $("openTables").onclick = openTables; $("finish").onclick = askFinish;
+  $("seals").querySelectorAll(".seal").forEach(b => b.onclick = () => go(+b.dataset.i));
+  $("schema").ontoggle = () => { S.schemaOpen = $("schema").open; save(); };
+  $("allRows").onclick = openTables;
+  if (done) showDone(q, false); else if (a) run();
 }
-function wire(q){
-  const el = $("qbody");
-  if (q.type === "mc" || q.type === "bug") el.querySelectorAll("input").forEach(x => x.onchange = () => setAns(q.id, +x.value));
-  if (q.type === "multi") el.querySelectorAll("input").forEach(x => x.onchange = () => setAns(q.id, [...el.querySelectorAll("input:checked")].map(y => +y.value)));
-  if (q.type === "tf") el.querySelectorAll("input").forEach(x => x.onchange = () => { const v = (ans(q.id) || q.items.map(() => null)).slice(); v[+x.name.split("-").pop()] = x.value === "1"; setAns(q.id, v); });
-  if (q.type === "order") el.querySelectorAll(".mvb").forEach(b => b.onclick = () => {
-    const i = +b.dataset.i, d = +b.dataset.d, cur = (ans(q.id) || q.start.map(k => q.items[k])).slice();
-    [cur[i], cur[i + d]] = [cur[i + d], cur[i]]; setAns(q.id, cur); el.innerHTML = inner(q); wire(q);
-    el.querySelector(`.mvb[data-i="${i + d}"][data-d="${d}"]`)?.focus() || el.querySelector(`.mvb[data-i="${i + d}"]`)?.focus(); });
-  if (q.type === "num") el.querySelector("input").oninput = e => setAns(q.id, e.target.value);
-  if (q.type === "blank") el.querySelectorAll("input").forEach(x => x.oninput = () => { const v = (ans(q.id) || q.ok.map(() => "")).slice(); v[+x.dataset.i] = x.value; setAns(q.id, v); });
-  if (q.type === "sql"){
-    const ta = el.querySelector("textarea"), out = el.querySelector(".out");
-    ta.oninput = () => setAns(q.id, ta.value);
-    const run = () => { if (!ta.value.trim()){ out.innerHTML = `<div class="err">${U.empty}</div>`; return; }
-      const r = runQuery(ta.value); out.innerHTML = r.err ? `<div class="err">${U.sqlErr}: ${esc(r.err)}</div>` : `<div class="meta">${U.rows(r.res.values.length)}</div>${tableHtml(r.res)}`; };
-    el.querySelector(".run").onclick = run;
-    ta.onkeydown = e => { if ((e.ctrlKey || e.metaKey) && e.key === "Enter"){ e.preventDefault(); run(); } };
-    if (ans(q.id)) run();
-  }
-  el.querySelectorAll("input[type=text]").forEach(x => x.onkeydown = e => { if (e.key === "Enter"){ e.preventDefault(); $("checkBtn").click(); } });
+function run(){
+  const sql = $("sql").value;
+  if (!sql.trim()){ $("out").innerHTML = `<div class="err">${U.empty}</div>`; return; }
+  const r = runQuery(sql);
+  $("out").innerHTML = r.err ? `<div class="err">${U.sqlErr}: ${esc(r.err)}</div>` : `<div class="meta">${U.rows(r.res.values.length)}</div>${tableHtml(r.res)}`;
 }
 function fb(k, html){ const f = $("fb"); f.className = "fb " + k; f.innerHTML = html; }
 function check(q){
   if (S.finished || isDone(q)) return;
-  if (!answered(q)){ fb("bad", U.answerFirst); say(U.impatient); return; }
+  const sql = $("sql").value;
+  if (!sql.trim()){ fb("bad", U.answerFirst); say(U.impatient, "bad"); return; }
+  run();
   const d = D(q); d.tries++;
-  if (q.type === "sql") $("qbody").querySelector(".run").click();
-  const g = grade(q), m = maxOf(q);
-  if (g === m){ d.ok = true; save(); win(q); }
-  else {
-    save();
-    fb(g ? "part" : "bad", `<b>${g ? U.partly(g, m) : U.notYet}</b> ${tipFor(q) || q.hint || U.tryAgain}`);
-    if (d.tries >= 2) $("revealBtn").hidden = false;
-    mood("laugh", 1400); say(pick(U.laughs), "bad"); taunt(U.ha, 3);
-    if (innerWidth < 980) STAGE.scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "start" });
-  }
+  const j = judge(q, sql);
+  if (j.ok){ d.ok = true; save(); win(q); return; }
+  save();
+  fb("bad", `<b>${U.notYet}</b> ${diagnose(q, sql, j) || U.tryAgain}${d.tries >= 2 ? `<p>${U.hintLabel} ${q.hint}</p>` : ""}`);
+  if (d.tries >= 2) $("revealBtn").hidden = false;
+  mood("laugh", 1500); rage(); say(pick(U.laughs), "bad");
 }
 function reveal(q){
   if (S.finished || isDone(q)) return;
   D(q).rev = true; save();
-  mood("laugh", 1400); say(U.gloat, "bad");
-  showDone(q, true); runes(); igniteRune(QS.indexOf(q), ["#9a6a32", "#f3d7a8"]);
+  mood("laugh", 1500); say(U.gloat, "bad");
+  showDone(q, true);
   if (doneCount() === N) setTimeout(finale, 1600);
 }
 function win(q){
-  showDone(q, true); runes();
-  const i = QS.indexOf(q), c = svgToStage(200, 240);
-  mood("hurt", 1000); say(pick(U.hurts), "good");
-  burst(c.x, c.y, 60, ["#ffe08a", "#f2c14e", "#ffffff", "#ffb84a"], 7); ring(c.x, c.y, "#ffe08a");
-  for (let k = 0; k < 8; k++) spark(c.x, c.y, { kind: "star", vx: (Math.random() - .5) * 8, vy: -2 - Math.random() * 5, g: .12, max: 70, s: 6 + Math.random() * 5, c: "#ffe08a", vr: .1 });
-  igniteRune(i, status(q) === "first" ? ["#ffe08a", "#ffffff", "#f2c14e"] : ["#ffffff", "#c9d3e6"]);
-  if (innerWidth < 980) STAGE.scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "start" });
-  if (doneCount() === N) setTimeout(finale, 1500);
+  showDone(q, true);
+  if (/"[^"]*"/.test(S.ans[q.id] || "")) $("fb").insertAdjacentHTML("beforeend", `<p>${U.dqNote}</p>`);   /* SQLite forgives "text", the test didn't */
+  mood("hurt", 1200); rumble(); say(pick(U.hurts), "good");
+  const c = svgPt(500, 560), e = svgPt(500, 270);
+  burst(c.x, c.y, 90, ["#ffe39a", "#e9b949", "#ffffff", "#ffb84a"], 9); ring(c.x, c.y, "#ffe39a", 260);
+  burst(e.x, e.y, 30, ["#ffffff", "#ffe39a"], 5);
+  const b = $("seals").children[QS.indexOf(q)]; if (b){ b.classList.add("ignite"); const r = b.getBoundingClientRect(); burst(r.left + r.width / 2, r.top + r.height / 2, 20, ["#ffe39a", "#ffffff"], 3); }
+  setPower();
+  if (doneCount() === N) setTimeout(finale, 1700);
 }
 function showDone(q, fresh){
   const d = S.done[q.id];
-  $("qc").classList.add("done-lock");
-  $("qbody").querySelectorAll("input,select,textarea,button.mvb").forEach(x => x.disabled = true);
+  $("qc").classList.add("locked"); $("sql").readOnly = true;
   $("checkBtn").hidden = true; $("revealBtn").hidden = true;
+  const s = $("seals").children[QS.indexOf(q)]; if (s) s.className = "seal " + status(q) + (s.classList.contains("ignite") ? " ignite" : "");
   const head = d.rev ? U.solutionH : d.tries === 1 ? U.rightFirst : U.right;
-  fb(d.rev ? "part" : "ok", `<b>${head}</b>${d.rev ? `<div class="sol">${solutionOf(q)}</div>` : ""}${q.why ? `<p>${q.why}</p>` : ""}`);
+  fb(d.rev ? "part" : "ok", `<b>${head}</b>${d.rev ? `<pre>${esc(q.expect)}</pre>` : ""}${q.why ? `<p>${q.why}</p>` : ""}`);
   const nx = $("goNext"); nx.hidden = doneCount() === N && fresh; nx.textContent = doneCount() === N ? U.toEnd : U.nextRiddle;
   if (fresh && doneCount() < N) setTimeout(() => nx.focus({ preventScroll: true }), 50);
 }
 function nextOpen(){
   if (doneCount() === N) return results();
-  for (let k = 1; k <= N; k++){ const j = (S.cur + k) % N; if (!isDone(QS[j])) return go(j); }
+  for (let k = 1; k <= N; k++){ const j = (S.cur + k) % N; if (!isDone(QS[j])){ go(j); topView(); return; } }
 }
 let finT = 0;
 function askFinish(){
   const missing = N - doneCount();
   if (Date.now() - finT > 4000){ finT = Date.now(); $("finNote").textContent = U.confirm(missing); $("finish").textContent = U.finishSure; return; }
   S.finished = Date.now(); save();
-  if (doneCount() === N) finale(); else { mood("laugh", 1600); say(U.leftEarly, "bad"); taunt(U.ha, 4); results(); }
+  if (doneCount() === N) finale(); else { mood("laugh", 1800); rage(); say(U.leftEarly, "bad"); results(); }
 }
 
-/* ---------- the finale: twenty seals pull him back into the lamp ---------- */
+/* ---------- the end: the seals burn him away ---------- */
 function finale(){
   if (!S.finished){ S.finished = Date.now(); save(); }
-  runes(); hush();
+  topView();
   $("panel").innerHTML = "";
-  if (innerWidth < 980) STAGE.scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "start" });
-  const T = reduced ? [0, 50, 100, 150, 200] : [0, 1300, 3000, 3350, 5200];
+  const T = reduced ? [0, 50, 100, 150] : [0, 1900, 3600, 5600];
   say(U.noo, "bad");
-  DJ.classList.remove("ask", "hurt", "laugh"); DJ.classList.add("sealing");
-  setTimeout(() => { vortex = 1; hush(); }, T[1] - 500);
-  setTimeout(() => { DJ.classList.add("gone"); }, T[1]);
-  setTimeout(() => { vortex = 0; DJ.classList.remove("sealing"); DJ.classList.add("shut");
-    const sp = svgToStage(212, 450); burst(sp.x, sp.y, 160, ["#ffe08a", "#ffffff", "#f2c14e", "#ffb84a", "#c9b6ff"], 11); ring(sp.x, sp.y, "#ffffff"); ring(sp.x, sp.y, "#ffe08a");
-    for (let k = 0; k < 30; k++) spark(sp.x, sp.y, { kind: "star", vx: (Math.random() - .5) * 14, vy: -4 - Math.random() * 9, g: .14, max: 110, s: 6 + Math.random() * 7, c: pick(["#ffe08a", "#ffffff"]), vr: .12 });
-  }, T[2]);
-  setTimeout(() => {
-    STAGE.classList.add("sealed"); DJ.classList.add("sealed-glow");
-    QS.forEach((q, i) => setTimeout(() => igniteRune(i, ["#ffe08a", "#ffffff"]), i * 70));
+  DJ.classList.remove("ask", "hurt", "laugh"); DJ.classList.add("dying"); rumble();
+  setTimeout(() => { dissolve = 1; hush(); DJ.classList.add("gone"); }, T[1]);
+  setTimeout(() => { dissolve = 0;
+    const c = svgPt(500, 330);
+    burst(c.x, c.y, 220, ["#ffe39a", "#ffffff", "#e9b949", "#ffb84a", "#c9b6ff"], 13); ring(c.x, c.y, "#ffffff", 500); ring(c.x, c.y, "#ffe39a", 380);
+    STAGE.classList.add("freed"); STAGE.style.setProperty("--power", 0);
     const f = document.createElement("div"); f.className = "finale"; f.id = "finaleBox";
     f.innerHTML = `<h2>${[...U.finaleTitle].map((ch, i) => `<span style="animation-delay:${(i * .05).toFixed(2)}s">${ch === " " ? "&nbsp;" : esc(ch)}</span>`).join("")}</h2><p>${U.finaleSub}</p>`;
-    $("finaleBox")?.remove(); STAGE.appendChild(f);
-    confetti(reduced ? 0 : 160);
-    const fw = setInterval(() => { if (reduced) return clearInterval(fw); const x = W * (.15 + Math.random() * .7), y = H * (.12 + Math.random() * .4);
-      burst(x, y, 50, pick([["#ffe08a", "#ffffff"], ["#c9b6ff", "#ffffff"], ["#ff9bd2", "#ffe08a"], ["#9fe6b5", "#ffffff"]]), 6); }, 420);
-    setTimeout(() => clearInterval(fw), 4200);
-  }, T[3]);
-  setTimeout(() => { results(); setTimeout(() => say(U.muffled, "muffled"), 600); }, T[4]);
+    $("finaleBox")?.remove(); document.body.appendChild(f);
+    confetti(reduced ? 0 : 180);
+    const fw = setInterval(() => { if (reduced) return clearInterval(fw);
+      burst(W * (.12 + Math.random() * .76), H * (.1 + Math.random() * .45), 60, pick([["#ffe39a", "#ffffff"], ["#c9b6ff", "#ffffff"], ["#ff9bd2", "#ffe39a"], ["#7fe3ff", "#ffffff"]]), 7); }, 380);
+    setTimeout(() => clearInterval(fw), 5000);
+  }, T[2]);
+  setTimeout(results, T[3]);
 }
-function sealedState(){
-  DJ.setAttribute("class", "gone shut sealed-glow"); STAGE.classList.add("sealed"); hush(); setTimeout(() => say(U.muffled, "muffled"), 400);
-}
+function freedState(){ DJ.setAttribute("class", "gone"); STAGE.classList.add("freed"); STAGE.style.setProperty("--power", 0); hush(); }
 
 /* ---------- results + export ---------- */
 function results(){
-  runes();
   const cnt = k => QS.filter(q => status(q) === k).length;
   const rows = CFG.sections.map(sec => `<tr><td>${sec.title}</td><td class="n">${sec.questions.filter(q => status(q) === "first").length} / ${sec.questions.length}</td></tr>`).join("");
-  $("panel").innerHTML = `<div class="card result"><div class="kicker">${doneCount() === N ? U.sealedK : U.escapedK}</div>
+  $("panel").innerHTML = `<div class="card result"><div class="kicker">${doneCount() === N ? U.freedK : U.escapedK}</div>
     <div class="big">${cnt("first")} / ${N}</div><div class="sub">${U.pracSub(cnt("first"), cnt("later"), cnt("rev"), cnt("skip"))}</div>
     <table class="sumtbl"><thead><tr><th></th><th>${U.firstTry}</th></tr></thead><tbody>${rows}</tbody></table>
     <div class="export"><h3>${U.handH}</h3><ol>${U.handSteps.map(s => `<li>${s}</li>`).join("")}</ol>
-    <div class="row"><button type="button" class="btn gold" id="saveTxt">${U.save}</button><button type="button" class="btn ghost" id="copyTxt">${U.copy}</button>
+    <div class="row"><button type="button" class="btn gold" id="saveTxt">${U.save}</button><button type="button" class="btn" id="copyTxt">${U.copy}</button>
     ${doneCount() === N ? `<button type="button" class="btn ghost" id="replay">${U.replay}</button>` : ""}</div><p class="note" id="exNote" aria-live="polite"></p></div></div>`;
   $("saveTxt").onclick = saveTxt; $("copyTxt").onclick = copyTxt;
-  if ($("replay")) $("replay").onclick = () => { STAGE.classList.remove("sealed"); $("finaleBox")?.remove(); DJ.setAttribute("class", "asleep"); P = [];
-    emerge(() => { say(U.intro); setTimeout(finale, 1600); }); };
+  if ($("replay")) $("replay").onclick = () => { STAGE.classList.remove("freed"); $("finaleBox")?.remove(); P = []; setPower();
+    DJ.setAttribute("class", "dormant"); wake(() => { say(U.intro); setTimeout(finale, 1500); }); };
 }
 const mmss = ms => { const s = Math.max(0, Math.round(ms / 1000)); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`; };
 const plain = s => String(s).replace(/<[^>]+>/g, "").replace(/&gt;/g, ">").replace(/&lt;/g, "<").replace(/&amp;/g, "&");
-function answerText(q){
-  const a = ans(q.id);
-  if (q.type !== "order" && (a == null || a === "" || (Array.isArray(a) && !a.length))) return U.none;
-  switch (q.type){
-    case "mc": return plain(q.opts[a]);
-    case "multi": return a.map(i => plain(q.opts[i])).join(", ");
-    case "tf": return q.items.map((_, i) => a[i] === true ? U.t : a[i] === false ? U.f : "-").join(", ");
-    case "order": return (a || q.start.map(i => q.items[i])).join(" → ");
-    case "num": return String(a).trim();
-    case "blank": return a.map(x => x || "-").join(" | ");
-    case "bug": return U.line(a + 1);
-    case "sql": return "\n    " + a.trim().replace(/\n/g, "\n    ");
-  }
-}
 function report(){
   const end = S.finished || Date.now();
   const L = [CFG.reportTitle, "", `${U.rName}: ${S.name}`, `${U.rDate}: ${new Date(end).toLocaleString(CFG.lang === "hu" ? "hu-HU" : "en-GB")}`,
-    `${U.rTime}: ${mmss(end - S.started)}`, `${U.rFirst}: ${QS.filter(q => status(q) === "first").length} / ${N}`, `${U.seals}: ${doneCount()} / ${N}`, ""];
+    `${U.rTime}: ${mmss(end - S.started)}`, `${U.rFirst}: ${QS.filter(q => status(q) === "first").length} / ${N}`, ""];
   CFG.sections.forEach(sec => { L.push("== " + plain(sec.title));
-    sec.questions.forEach(q => L.push(`${QS.indexOf(q) + 1}. [${U.status(status(q), (S.done[q.id] || {}).tries || 0)}] ${answerText(q)}`)); L.push(""); });
+    sec.questions.forEach(q => { const a = (S.ans[q.id] || "").trim();
+      L.push(`${QS.indexOf(q) + 1}. [${U.status(status(q), (S.done[q.id] || {}).tries || 0)}]` + (a ? "\n    " + a.replace(/\n/g, "\n    ") : " " + U.none)); });
+    L.push(""); });
   return L.join("\n");
 }
 function fileName(){ return `${CFG.filePrefix}-${S.name.normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^A-Za-z0-9]+/g, "-").replace(/^-|-$/g, "").toLowerCase() || "valasz"}.txt`; }
@@ -879,16 +685,16 @@ $("tables").addEventListener("click", e => { if (e.target === $("tables")) $("ta
 
 /* ---------- boot ---------- */
 function boot(){
-  fit(); requestAnimationFrame(tick); wander();
+  fit(); requestAnimationFrame(tick);
   if (typeof initSqlJs !== "function"){ $("panel").innerHTML = `<div class="err">${U.engFail}</div>`; return; }
-  initSqlJs().then(s => { SQL = s;
+  initSqlJs().then(s => { SQL = s; setPower();
     if (!S.started) return startScreen();
-    if (S.finished){ runes(); if (doneCount() === N) sealedState(); else { DJ.setAttribute("class", ""); say(U.leftEarly, "bad"); } return results(); }
-    emerge(() => go(S.cur, U.welcomeBack));
+    if (S.finished){ if (doneCount() === N) freedState(); else { DJ.setAttribute("class", ""); say(U.leftEarly, "bad"); } return results(); }
+    wake(() => go(S.cur, U.welcomeBack));
   }).catch(() => { $("panel").innerHTML = `<div class="err">${U.engFail}</div>`; });
 }
 boot();
 </script>
-<script src="../../nav.js?v=021184b6" defer></script>
+<script src="../../nav.js?v=89f2d4cf" defer></script>
 </body>
 </html>
