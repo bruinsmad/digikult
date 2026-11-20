@@ -105,16 +105,17 @@ pre.code input{font:700 15px var(--f-mono);width:11ch;padding:1px 6px;border:0;b
 .tbl td.null{color:#9a93b0;font-style:italic}
 details.schema{background:#faf8f3;border:1px solid var(--line);border-radius:10px;padding:8px 12px;margin:0 0 16px}
 details.schema summary{cursor:pointer;font-weight:700;color:var(--accent)}
-.sch{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-top:8px}
-.st{background:#fff;border:1px solid var(--line);border-radius:8px;padding:6px 9px}
-.st h5{margin:0 0 4px;font:700 14px var(--f-mono);color:var(--accent)}
-.st div{font-size:13px;line-height:1.35;margin:3px 0;color:#3b4152}
-.st b{font:700 13px var(--f-mono)}
-.st .fk b{color:#1d6fa5}
-.st code{background:#efece3;padding:0 3px;border-radius:3px}
-.lk{margin-top:8px;font-size:13.5px;display:flex;flex-wrap:wrap;gap:6px 16px;align-items:center}
-.lk code{color:#1d6fa5;background:#eaf3fa;padding:1px 5px;border-radius:4px}
-.lk .allrows{margin-left:auto;background:none;border:0;color:var(--accent);text-decoration:underline;font-size:13.5px;padding:0}
+.erd{display:block;width:100%;height:auto;margin:10px auto 4px;max-width:820px}
+.erd.tall{display:none;max-width:340px}
+@media (max-width:640px){ .erd.wide{display:none} .erd.tall{display:block} }
+.erd text{font-family:var(--f-mono)}
+.notes{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:4px 18px;margin-top:6px;font-size:13px;line-height:1.4;color:#3b4152}
+.notes div{margin:2px 0}
+.notes b{font:700 13px var(--f-mono)}
+.notes h5{margin:4px 0 2px;font:700 13.5px var(--f-mono);color:var(--accent)}
+.notes code{background:#efece3;padding:0 3px;border-radius:3px}
+.lk{margin-top:8px;font-size:13.5px;display:flex;justify-content:flex-end}
+.lk .allrows{background:none;border:0;color:var(--accent);text-decoration:underline;font-size:13.5px;padding:0}
 .foot{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:18px;padding-top:14px;border-top:1px solid var(--line)}
 .foot .grow{flex:1}
 .foot #next{margin-left:auto}
@@ -266,11 +267,38 @@ function wire(k){
     if (A(k)) run(); }
   el.querySelectorAll("input[type=text]").forEach(x => x.onkeydown = e => { if (e.key === "Enter") e.preventDefault(); });
 }
+/* the tables and their links as a picture: boxes with the columns, lines from each linking column to the id it points to */
+function erd(tall){
+  const sc = CFG.schema, W = tall ? 196 : 176, HH = 30, RH = 25, GAP = tall ? 46 : 84, M = tall ? 62 : 10;
+  const ht = t => HH + t.cols.length * RH + 6, hs = sc.tables.map(ht), maxH = Math.max(...hs);
+  const pos = sc.tables.map((t, i) => tall ? [M, 10 + hs.slice(0, i).reduce((a, b) => a + b + GAP, 0)] : [M + i * (W + GAP), 10 + (i === 0 ? Math.round((maxH - hs[0]) * .7) : 0)]);
+  const vw = tall ? W + 2 * M : M * 2 + sc.tables.length * W + (sc.tables.length - 1) * GAP;
+  const vh = tall ? pos[pos.length - 1][1] + hs[hs.length - 1] + 10 : maxH + 20;
+  const rowY = (ti, ri) => pos[ti][1] + HH + ri * RH + RH / 2;
+  const find = ref => { const [tn, cn] = ref.split("."); const ti = sc.tables.findIndex(t => t.name === tn); return [ti, sc.tables[ti].cols.findIndex(c => c[0] === cn)]; };
+  let g = "";
+  sc.tables.forEach((t, ti) => { const [x, y] = pos[ti];
+    g += `<rect x="${x}" y="${y}" width="${W}" height="${hs[ti]}" rx="9" fill="#fff" stroke="#c3cde6" stroke-width="1.5"/>
+      <path d="M${x} ${y + 9}a9 9 0 0 1 9-9h${W - 18}a9 9 0 0 1 9 9v${HH - 9}h-${W}z" fill="#2b4c9a"/>
+      <text x="${x + W / 2}" y="${y + 20}" text-anchor="middle" font-size="14.5" font-weight="700" fill="#fff">${t.name}</text>`;
+    t.cols.forEach(([c, , fk], ri) => { const cy = rowY(ti, ri), pk = c === "id";
+      if (pk || fk) g += `<rect x="${x + 4}" y="${cy - RH / 2 + 2}" width="${W - 8}" height="${RH - 4}" rx="5" fill="${pk ? "#fff4d6" : "#e3f0fa"}"/>`;
+      g += `<text x="${x + 12}" y="${cy + 4.5}" font-size="13.5" font-weight="${pk || fk ? 700 : 400}" fill="${fk ? "#1d6fa5" : pk ? "#7a5600" : "#2a3042"}">${pk ? "🔑 " : fk ? "🔗 " : ""}${c}</text>`; }); });
+  sc.links.forEach(([from, to], li) => { const [fa, fr] = find(from), [ta, tr] = find(to), y1 = rowY(fa, fr), y2 = rowY(ta, tr);
+    let d, x1, x2;
+    if (tall){ const right = li % 2 === 1, ex = right ? M + W : M, k = right ? 1 : -1, bend = 44 * k; x1 = x2 = ex;
+      d = `M${ex} ${y1}C${ex + bend} ${y1} ${ex + bend} ${y2} ${ex} ${y2}`; }
+    else { const leftward = pos[fa][0] > pos[ta][0]; x1 = leftward ? pos[fa][0] : pos[fa][0] + W; x2 = leftward ? pos[ta][0] + W : pos[ta][0];
+      const mx = (x1 + x2) / 2; d = `M${x1} ${y1}C${mx} ${y1} ${mx} ${y2} ${x2} ${y2}`; }
+    g += `<path d="${d}" fill="none" stroke="#1d6fa5" stroke-width="2.6"/><circle cx="${x1}" cy="${y1}" r="4.5" fill="#1d6fa5"/><circle cx="${x2}" cy="${y2}" r="4.5" fill="#fff" stroke="#1d6fa5" stroke-width="2.6"/>`; });
+  const label = sc.tables.map(t => t.name + " (" + t.cols.map(c => c[0]).join(", ") + ")").join("; ") + ". " + U.links + ": " + sc.links.map(([a, b]) => a + " = " + b).join(", ");
+  return `<svg class="erd ${tall ? "tall" : "wide"}" viewBox="0 0 ${vw} ${vh}" role="img" aria-label="${esc(label)}">${g}</svg>`;
+}
 function schemaHtml(){
   const sc = CFG.schema, open = S.schemaOpen != null ? S.schemaOpen : innerWidth >= 700;
-  const tbl = t => `<div class="st"><h5>${t.name}</h5>${t.cols.map(([c, d, fk]) => `<div class="${fk ? "fk" : ""}">${c === "id" ? "🔑 " : fk ? "→ " : ""}<b>${c}</b>: ${d}${fk ? ` (<code>${fk}</code>)` : ""}</div>`).join("")}</div>`;
-  return `<details class="schema" id="schema"${open ? " open" : ""}><summary>${U.schemaH}</summary><div class="sch">${sc.tables.map(tbl).join("")}</div>
-    <div class="lk"><span>${U.links}:</span>${sc.links.map(([a, b]) => `<code>${a} = ${b}</code>`).join("")}<button type="button" class="allrows" id="allRows">${U.allRows}</button></div></details>`;
+  const notes = sc.tables.map(t => `<div><h5>${t.name}</h5>${t.cols.filter(c => c[0] !== "id" && !c[2]).map(([c, d]) => `<div><b>${c}</b>: ${d}</div>`).join("")}</div>`).join("");
+  return `<details class="schema" id="schema"${open ? " open" : ""}><summary>${U.schemaH}</summary>${erd(false)}${erd(true)}<div class="notes">${notes}</div>
+    <div class="lk"><button type="button" class="allrows" id="allRows">${U.allRows}</button></div></details>`;
 }
 
 /* ---------- screens ---------- */
