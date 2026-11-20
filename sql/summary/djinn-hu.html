@@ -43,7 +43,7 @@ button{font:inherit;cursor:pointer}
 @keyframes raySpin{to{rotate:360deg}}
 #fx{position:absolute;inset:0;width:100%;height:100%;z-index:4;pointer-events:none}
 
-#djinn{position:absolute;left:50%;top:-12.5vh;width:min(1400px,168vw,140vh);height:auto;transform:translateX(-50%);z-index:2;overflow:visible}
+#djinn{position:absolute;left:50%;top:-12.5vh;width:min(1700px,168vw,140vh);height:auto;transform:translateX(-50%);z-index:2;overflow:visible}
 @media (max-width:759px),(max-height:619px){#djinn{top:-4vh;width:max(168vw,560px)}}
 
 /* idle life */
@@ -61,7 +61,9 @@ button{font:inherit;cursor:pointer}
 #gem{animation:eyePulse 2.4s ease-in-out infinite}
 .mouth{opacity:0;transition:opacity .12s}
 #mStern{opacity:1}
+#cracks{opacity:0}
 #cracks path{stroke-dasharray:900;stroke-dashoffset:900}
+#djinn.dying #cracks,#djinn.gone #cracks{opacity:1}
 
 #djinn.dormant #giant{filter:brightness(.4) saturate(.6)}
 #djinn.dormant #eyes,#djinn.dormant #eyeGlow,#djinn.dormant #runes{opacity:0;animation:none}
@@ -71,8 +73,8 @@ button{font:inherit;cursor:pointer}
 @keyframes flare{0%{opacity:1}25%{opacity:1;filter:brightness(2.2)}100%{opacity:.7}}
 .stage.rumble #djinn{animation:rumble .5s linear}
 @keyframes rumble{0%,100%{transform:translateX(-50%)}20%{transform:translateX(calc(-50% - 4px)) translateY(2px)}40%{transform:translateX(calc(-50% + 4px))}60%{transform:translateX(calc(-50% - 3px)) translateY(-1px)}80%{transform:translateX(calc(-50% + 2px))}}
-#djinn.hurt #giant{animation:flash .8s ease-out}
-@keyframes flash{0%{filter:brightness(2.6) saturate(.2)}100%{filter:none}}
+#djinn.hurt #giant{animation:flash .55s ease-out}
+@keyframes flash{0%{filter:brightness(1.9) saturate(.7) sepia(.25)}100%{filter:none}}
 #djinn.hurt #head{transform:rotate(-3deg) translateY(-14px) scale(.98)}
 #djinn.hurt #eyes{animation:flicker .8s steps(2) 1}
 @keyframes flicker{0%,40%,80%{opacity:.15}20%,60%,100%{opacity:1}}
@@ -95,13 +97,25 @@ button{font:inherit;cursor:pointer}
   border-radius:14px;padding:12px 16px;box-shadow:0 12px 40px rgba(0,0,0,.6), inset 0 0 30px rgba(120,40,200,.25);
   font:700 clamp(15px,1.5vw,18px)/1.42 var(--f-disp);color:var(--gold-2);transition:opacity .3s}
 .bubble.pop{animation:pop .45s cubic-bezier(.3,1.6,.5,1)}
-@keyframes pop{0%{transform:scale(.75);opacity:0}100%{transform:scale(1);opacity:1}}
+.mini-wrap{display:none}
+.mini{width:58px;height:58px;flex:none;border-radius:50%;background:radial-gradient(circle at 50% 40%, #2a1a5a, #0a0718);border:1.5px solid rgba(233,185,73,.5);overflow:hidden}
+.mini .mouth{opacity:0}.mini .m-stern{opacity:1}
+.mini.laugh .m-stern,.mini.hurt .m-stern{opacity:0}.mini.laugh .m-laugh{opacity:1}.mini.hurt .m-clench{opacity:1}
+.mini.laugh{animation:miniLaugh .26s ease-in-out 5}
+@keyframes miniLaugh{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-3px) rotate(-4deg)}}
+.mini.hurt{animation:miniHurt .6s ease-out}
+@keyframes miniHurt{0%{filter:brightness(2)}20%{transform:translateX(-4px)}40%{transform:translateX(4px)}60%{transform:translateX(-2px)}100%{transform:none;filter:none}}
+.mini.ask{animation:miniAsk .9s ease-out}
+@keyframes miniAsk{0%{transform:scale(.8)}40%{transform:scale(1.12)}100%{transform:scale(1)}}
+@keyframes pop{0%{transform:scale(.75);opacity:0}25%{opacity:1}100%{transform:scale(1);opacity:1}}
 .bubble.hide{opacity:0;pointer-events:none}
 .bubble.bad{border-color:rgba(255,80,40,.8);color:#ffb59a}
 .bubble.good{border-color:rgba(90,220,160,.75);color:#c7f5df}
 .bubble::before{content:"";position:absolute;left:-13px;top:26px;border:13px solid transparent;border-right-color:rgba(233,185,73,.55);border-left:0}
-@media (max-width:1000px){.bubble{left:50%;transform:translateX(-50%);top:46px;width:min(94vw,460px);text-align:center;font-size:15px;padding:9px 14px}
-  .bubble.pop{animation:popC .45s cubic-bezier(.3,1.6,.5,1)} @keyframes popC{0%{transform:translateX(-50%) scale(.75);opacity:0}100%{transform:translateX(-50%) scale(1);opacity:1}}
+@media (max-width:1000px) and (min-width:760px) and (min-height:620px){.bubble{top:calc(47vh - 70px)!important}.bubble .mini-wrap{display:none!important}}
+@media (max-width:1000px){.bubble{left:50%;transform:translateX(-50%);top:46px;width:min(94vw,460px);text-align:left;font-size:15px;padding:8px 12px;background:#0d0820;backdrop-filter:none;display:flex;align-items:center;gap:10px}
+  .mini-wrap{display:block}
+  .bubble.pop{animation:popC .45s cubic-bezier(.3,1.6,.5,1)} @keyframes popC{0%{transform:translateX(-50%) scale(.75);opacity:0}25%{opacity:1}100%{transform:translateX(-50%) scale(1);opacity:1}}
   .bubble::before{display:none}}
 .finale{position:fixed;z-index:6;left:50%;top:22vh;transform:translate(-50%,-50%);text-align:center;pointer-events:none;width:94%}
 .finale h2{margin:0;font:900 clamp(30px,6vw,72px)/1.05 var(--f-disp);color:#fff4c8;letter-spacing:.05em;text-shadow:0 0 18px rgba(255,200,90,.9), 0 0 60px rgba(255,130,30,.7)}
@@ -265,7 +279,7 @@ dialog#tables::backdrop{background:rgba(3,2,10,.75);backdrop-filter:blur(3px)}
           <path d="M360,628 L380,600 L400,628 L380,656 Z M380,600 L380,580 M352,664 L408,664"/>
           <path d="M640,628 L620,600 L600,628 L620,656 Z M620,600 L620,580 M592,664 L648,664"/>
           <path d="M500,640 L500,700 M478,660 L522,660 M486,700 L514,700 M470,740 Q500,722 530,740"/>
-          <path d="M140,720 l16,-22 l16,22 M156,698 l0,40 M790,720 l16,-22 l16,22 M806,698 l0,40"/>
+          <path d="M148,694 l16,14 l-16,14 l16,14 M136,742 l40,0 M836,694 l-16,14 l16,14 l-16,14 M824,742 l40,0"/>
         </g>
         <path fill="url(#gGold)" d="M346,452 C410,530 590,530 654,452 L690,486 C612,592 388,592 310,486 Z"/>
         <path d="M330,478 C410,560 590,560 670,478" stroke="#5e3a05" stroke-width="3" fill="none"/>
@@ -298,9 +312,9 @@ dialog#tables::backdrop{background:rgba(3,2,10,.75);backdrop-filter:blur(3px)}
         <path d="M478,226 L492,240 M522,226 L508,240 M488,218 L500,232 L512,218" stroke="#080a1e" stroke-width="3.5" stroke-linecap="round" fill="none"/>
         <path fill="#3b4a96" opacity=".5" d="M498,262 L492,326 L500,330 Z"/><path fill="#0b1032" d="M502,262 L510,326 L500,334 Z"/>
         <path d="M488,330 q12,8 24,0" stroke="#05061a" stroke-width="3" fill="none"/>
-        <g class="mouth" id="mStern"><path fill="#02030a" d="M462,368 C480,360 520,360 538,368 C520,366 480,366 462,368 Z"/><path d="M458,374 Q464,370 470,368 M542,374 Q536,370 530,368" stroke="#02030a" stroke-width="3" fill="none"/></g>
-        <g class="mouth" id="mLaugh"><path fill="#140006" d="M458,360 C480,350 520,350 542,360 C536,404 464,404 458,360 Z"/><path fill="#f2ead8" d="M468,362 L476,384 L484,362 Z M532,362 L524,384 L516,362 Z"/><path fill="#ffcf9a" opacity=".35" d="M470,386 C490,396 510,396 530,386 C516,394 484,394 470,386 Z"/></g>
-        <g class="mouth" id="mClench"><path fill="#02030a" d="M460,360 C480,354 520,354 540,360 L536,380 C516,386 484,386 464,380 Z"/><path fill="#e8e0cc" d="M468,362 L532,362 L530,376 L470,376 Z"/><path d="M480,362 v14 M492,362 v14 M504,362 v14 M516,362 v14" stroke="#4a4030" stroke-width="2"/></g>
+        <g class="mouth m-stern" id="mStern"><path fill="#02030a" d="M462,368 C480,360 520,360 538,368 C520,366 480,366 462,368 Z"/><path d="M458,374 Q464,370 470,368 M542,374 Q536,370 530,368" stroke="#02030a" stroke-width="3" fill="none"/></g>
+        <g class="mouth m-laugh" id="mLaugh"><path fill="#140006" d="M458,360 C480,350 520,350 542,360 C536,404 464,404 458,360 Z"/><path fill="#f2ead8" d="M468,362 L476,384 L484,362 Z M532,362 L524,384 L516,362 Z"/><path fill="#ffcf9a" opacity=".35" d="M470,386 C490,396 510,396 530,386 C516,394 484,394 470,386 Z"/></g>
+        <g class="mouth m-clench" id="mClench"><path fill="#02030a" d="M460,360 C480,354 520,354 540,360 L536,380 C516,386 484,386 464,380 Z"/><path fill="#e8e0cc" d="M468,362 L532,362 L530,376 L470,376 Z"/><path d="M480,362 v14 M492,362 v14 M504,362 v14 M516,362 v14" stroke="#4a4030" stroke-width="2"/></g>
         <path fill="#05050f" d="M420,346 C430,380 452,410 478,420 L500,426 L522,420 C548,410 570,380 580,346 C574,370 556,392 536,398 C520,402 512,392 500,392 C488,392 480,402 464,398 C444,392 426,370 420,346 Z"/>
         <path fill="#03030a" d="M500,344 C484,346 468,352 458,366 C452,374 446,380 440,382 C456,384 468,374 478,364 C486,357 494,354 500,354 C506,354 514,357 522,364 C532,374 544,384 560,382 C554,380 548,374 542,366 C532,352 516,346 500,344 Z"/>
         <path fill="#05050f" d="M474,400 C482,444 492,520 500,600 C508,520 518,444 526,400 C514,410 486,410 474,400 Z"/>
@@ -317,7 +331,7 @@ dialog#tables::backdrop{background:rgba(3,2,10,.75);backdrop-filter:blur(3px)}
   </svg>
   <canvas id="fx"></canvas>
 </div>
-<div class="bubble hide" id="bubble" aria-live="polite"></div>
+<div class="bubble hide" id="bubble"><span class="mini-wrap" id="miniWrap" aria-hidden="true"></span><span class="btxt" id="btxt" aria-live="polite"></span></div>
 <div class="topline">
   <span class="crumb"><a href="../../index.html#sql">Adatbázisok – SQL</a> › <a href="../../index.html#sql-summary">Összefoglaló</a></span>
   <a class="langlink" href="djinn.html" lang="en">English</a>
@@ -422,16 +436,25 @@ let djT = 0, typeT = 0;
 function mood(cls, ms){
   DJ.classList.remove("ask", "hurt", "laugh"); void DJ.getBoundingClientRect();
   DJ.classList.add(cls); clearTimeout(djT); djT = setTimeout(() => DJ.classList.remove(cls), ms);
+  miniMood(cls, ms);
 }
 function rumble(){ STAGE.classList.remove("rumble"); void STAGE.offsetWidth; STAGE.classList.add("rumble"); }
 function rage(){ STAGE.classList.remove("rage"); void STAGE.offsetWidth; STAGE.classList.add("rage"); }
+const BT = $("btxt"), MINI = (() => {
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.setAttribute("viewBox", "350 120 300 300"); svg.setAttribute("class", "mini");
+  const h = $("headIdle").cloneNode(true); h.removeAttribute("id"); h.querySelectorAll("[id]").forEach(e => e.removeAttribute("id"));
+  svg.appendChild(h); $("miniWrap").appendChild(svg); return svg;
+})();
+let miniT = 0;
+function miniMood(cls, ms){ MINI.setAttribute("class", "mini"); void MINI.getBoundingClientRect(); MINI.setAttribute("class", "mini " + cls); clearTimeout(miniT); miniT = setTimeout(() => MINI.setAttribute("class", "mini"), ms); }
 function say(html, kind){
   clearInterval(typeT);
   BUB.className = "bubble" + (kind ? " " + kind : ""); void BUB.offsetWidth; BUB.classList.add("pop");
   const plain = html.replace(/<[^>]+>/g, "");
-  if (reduced){ BUB.innerHTML = html; clearTimeout(say.t); if (innerWidth <= 1000) say.t = setTimeout(hush, 5000); return; }
-  let i = 0; BUB.textContent = "";
-  typeT = setInterval(() => { i += 2; BUB.textContent = plain.slice(0, i); if (i >= plain.length){ clearInterval(typeT); BUB.innerHTML = html; } }, 24);
+  if (reduced){ BT.innerHTML = html; clearTimeout(say.t); if (innerWidth <= 1000) say.t = setTimeout(hush, 5000); return; }
+  let i = 0; BT.textContent = "";
+  typeT = setInterval(() => { i += 2; BT.textContent = plain.slice(0, i); if (i >= plain.length){ clearInterval(typeT); BT.innerHTML = html; } }, 24);
   clearTimeout(say.t); if (innerWidth <= 1000) say.t = setTimeout(hush, 5000);   /* on small screens the bubble covers the card: let it go */
 }
 function hush(){ clearInterval(typeT); BUB.className = "bubble hide"; }
@@ -507,7 +530,7 @@ function startScreen(){
 function wake(then){
   DJ.setAttribute("class", "dormant waking"); void DJ.getBoundingClientRect();
   DJ.classList.remove("dormant"); rumble();
-  const e = svgPt(500, 270); burst(e.x, e.y, 60, ["#ffb04a", "#ff6a1a", "#ffe39a"], 6); ring(e.x, e.y, "#ff8a3a", 260);
+  for (const x of [462, 538]){ const e = svgPt(x, 270); burst(e.x, e.y, 26, ["#ffb04a", "#ff6a1a", "#ffe39a"], 3.2); }
   topView();
   setTimeout(() => { DJ.classList.remove("waking"); then && then(); }, reduced ? 50 : 900);
 }
@@ -518,7 +541,7 @@ function go(i, opening){
   card(q);
   if (!isDone(q)){
     mood("ask", 1300); rumble();
-    const e = svgPt(500, 270); ring(e.x, e.y, "rgba(255,140,60,.9)", 220);
+    const e = svgPt(500, 270); for (let k = 0; k < 2; k++) burst(e.x + (k ? 38 : -38), e.y, 14, ["#ffb04a", "#ff6a1a", "#ffe39a"], 2.2);
     say((opening ? opening + " " : "") + q.say);
   } else say(U.already);
 }
@@ -584,9 +607,9 @@ function win(q){
   showDone(q, true);
   if (/"[^"]*"/.test(S.ans[q.id] || "")) $("fb").insertAdjacentHTML("beforeend", `<p>${U.dqNote}</p>`);   /* SQLite forgives "text", the test didn't */
   mood("hurt", 1200); rumble(); say(pick(U.hurts), "good");
-  const c = svgPt(500, 560), e = svgPt(500, 270);
-  burst(c.x, c.y, 90, ["#ffe39a", "#e9b949", "#ffffff", "#ffb84a"], 9); ring(c.x, c.y, "#ffe39a", 260);
-  burst(e.x, e.y, 30, ["#ffffff", "#ffe39a"], 5);
+  /* golden sparks tear off his horns and shoulders, his face stays visible */
+  for (const [x, y] of [[330, 60], [670, 60], [250, 520], [750, 520]]){ const e = svgPt(x, y), top = $("panel").getBoundingClientRect().top;
+    if (e.y < top - 10 || getComputedStyle($("panel")).position !== "fixed") burst(e.x, Math.max(20, e.y), 34, ["#ffe39a", "#e9b949", "#ffffff", "#ffb84a"], 6); }
   const b = $("seals").children[QS.indexOf(q)]; if (b){ b.classList.add("ignite"); const r = b.getBoundingClientRect(); burst(r.left + r.width / 2, r.top + r.height / 2, 20, ["#ffe39a", "#ffffff"], 3); }
   setPower();
   if (doneCount() === N) setTimeout(finale, 1700);
