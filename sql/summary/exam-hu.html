@@ -208,8 +208,8 @@ function grade(k){
     case "mc": case "bug": return a === q.ok ? P : 0;
     case "multi": { if (!Array.isArray(a) || !a.length) return 0; const want = new Set(q.ok), got = new Set(a);
       const diff = [...want].filter(x => !got.has(x)).length + [...got].filter(x => !want.has(x)).length; return diff === 0 ? P : diff === 1 ? P - 1 : 0; }
-    case "num": return a != null && String(a).trim() !== "" && Number(String(a).trim().replace(",", ".")) === q.ok ? P : 0;
-    case "blank": return Math.round(q.ok.reduce((s, alts, i) => s + (a && alts.some(x => nb(x) === nb(a[i])) ? 1 : 0), 0) * P / q.ok.length);
+    case "num": { const m = String(a == null ? "" : a).replace(",", ".").match(/-?\d+(\.\d+)?/); return m && Number(m[0]) === q.ok ? P : 0; }
+    case "blank": return Math.round(q.ok.reduce((s, alts, i) => s + (a && alts.some(x => nb(x) === nb(String(a[i] || "").replace(/^.*\./, ""))) ? 1 : 0), 0) * P / q.ok.length);
     case "order": { const cur = a || p.start.map(i => q.items[i]); const right = cur.filter((x, i) => x === q.items[i]).length;
       return right === q.items.length ? P : right >= q.items.length - 2 ? P - 1 : 0; }
     case "sql": { if (!a || !a.trim()) return 0; const got = runQuery(a), exp = runQuery(q.expect); if (got.err) return 0;
@@ -309,13 +309,14 @@ function startScreen(){
     <ul class="rules">${U.rules.map(r => `<li>${r}</li>`).join("")}</ul>
     <label class="nm" for="nm">${U.name}</label><input class="nm" id="nm" autocomplete="name" placeholder="${U.namePh}">
     <div class="row" style="margin-top:14px"><button type="button" class="btn" id="go">${U.start}</button></div><p class="note" id="startNote" style="color:var(--bad)"></p></div>`;
-  $("go").onclick = () => { const n = $("nm").value.trim(); if (!n){ $("startNote").textContent = U.nameFirst; $("nm").focus(); return; }
+  $("go").onclick = () => { const ex = load(); if (ex && ex.started && ex.plan){ S = ex; return S.finished ? results() : (part(), clock()); }
+    const n = $("nm").value.trim(); if (!n){ $("startNote").textContent = U.nameFirst; $("nm").focus(); return; }
     S = { name: n, started: Date.now(), plan: makePlan(), pos: 0, ans: {}, finished: 0, timedOut: false, v: 1 }; save(); part(); clock(); };
   $("nm").onkeydown = e => { if (e.key === "Enter") $("go").click(); };
 }
-let goT = 0;
+let armed = false;
 function part(){
-  goT = 0;
+  armed = false;
   const k = S.pos, { sec, q } = partOf(k);
   bar();
   $("main").innerHTML = `<div class="card" id="pc">
@@ -330,16 +331,16 @@ function part(){
   $("schema").ontoggle = () => { S.schemaOpen = $("schema").open; save(); };
   $("allRows").onclick = openTables;
   $("next").onclick = () => {
-    if (Date.now() - goT > 5000){ goT = Date.now();
+    if (!armed){ armed = true;
       $("goNote").textContent = answered(k) ? (k === N - 1 ? U.sureHand : U.sureNext) : U.sureEmpty;
       $("next").textContent = U.confirm; $("next").classList.add("warn"); return; }
-    goT = 0;
     if (k === N - 1) return finish();
     S.pos = k + 1; save(); part(); scrollTo({ top: 0 });
   };
   scrollTo({ top: 0 });
 }
 function bar(){
+  document.querySelector(".langlink")?.setAttribute("hidden", "");
   $("bar").hidden = false; $("barTitle").textContent = U.short; $("who").textContent = S.name; $("openTables").textContent = U.tables;
   $("prog").innerHTML = S.plan.map((_, i) => `<i class="${i < S.pos || S.finished ? "done" : i === S.pos && !S.finished ? "cur" : ""}"></i>`).join("") + `<span>${Math.min(S.pos + 1, N)}/${N}</span>`;
 }
@@ -414,7 +415,7 @@ else initSqlJs().then(s => { SQL = s;
 }).catch(() => { $("main").innerHTML = `<div class="err">${U.engFail}</div>`; });
 /* a second tab must not become a way back: follow whatever the other tab saved */
 addEventListener("storage", e => { if (e.key !== KEY || !SQL) return; const n = load(); if (!n || !n.started) return;
-  const moved = !S || !S.started || n.pos !== S.pos || (n.finished && !S.finished); S = n;
+  const moved = !S || !S.started || n.started !== S.started || n.pos !== S.pos || (n.finished && !S.finished); S = n;
   if (!moved) return; if (S.finished){ clearInterval(clockT); results(); } else { part(); clock(); } });
 </script>
 <script src="../../nav.js" defer></script>
