@@ -403,6 +403,6 @@ addEventListener("storage", e => { if (e.key !== KEY || !SQL) return; const n = 
   const moved = !S || !S.started || n.pos !== S.pos || (n.finished && !S.finished); S = n;
   if (!moved) return; if (S.finished){ clearInterval(clockT); results(); } else { part(); clock(); } });
 </script>
-<script src="../../nav.js" defer></script>
+<script src="../../nav.js?v=9681d08c" defer></script>
 </body>
 </html>

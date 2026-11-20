@@ -189,17 +189,6 @@
                 files: { en: "sql/summary/test.html", hu: "sql/summary/test-hu.html" }
               },
               {
-                id: "sql-exam",
-                kind: "quiz",
-                minutes: 40,
-                title: { hu: "SQL dolgozat", en: "SQL exam" },
-                desc: {
-                  hu: "40 perc, 13 feladat, 30 pont, egy mozi táblái: mindenki más változatot kap, más sorrendben. Feleletválasztás, kimenet, sorrend, kiegészítés, hibakeresés és három saját lekérdezés. Visszalépni nem lehet; a pontszám a beadás után látszik.",
-                  en: "40 minutes, 13 tasks, 30 points, a cinema's tables: everyone gets different versions, in a different order. Multiple choice, predicting, ordering, gap-filling, finding mistakes and three queries to write. No going back; the score shows after handing in."
-                },
-                files: { en: "sql/summary/exam.html", hu: "sql/summary/exam-hu.html" }
-              },
-              {
                 id: "sql-practice",
                 kind: "practice",
                 minutes: 40,
