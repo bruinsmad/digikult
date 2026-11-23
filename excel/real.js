@@ -88,9 +88,26 @@
         <div id="verdict" aria-live="polite"></div>
       </div>
       <div id="won">${solved ? wonHtml(i) : ""}</div>`;
+    linkCells();
     const rep = (state.reports || {})[i] || (!c.bonus && state.report);
     if (c.upload && rep) showReport(rep);
   }
+  /* cell addresses in the steps and questions can be clicked: the preview jumps to that cell, so the student sees where it is */
+  const CELL = /^[A-Z]{1,2}\d{1,3}$/;
+  function linkCells() {
+    document.querySelectorAll("#case .ask label").forEach(l => { l.innerHTML = l.innerHTML.replace(/\(([A-Z]{1,2}\d{1,3})\)/g, "(<b>$1</b>)"); });
+    document.querySelectorAll("#case .howto b, #case .ask label b").forEach(b => {
+      if (!CELL.test(b.textContent.trim())) return;
+      b.classList.add("cellref"); b.tabIndex = 0; b.setAttribute("role", "button"); b.title = "Megmutatom az előnézetben";
+    });
+  }
+  function showCell(a) {
+    preview.select(a);
+    const box = $("sheet"); box.classList.remove("pulse"); void box.offsetWidth; box.classList.add("pulse");
+    if (innerWidth < 1000) box.scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+  $("case").addEventListener("click", e => { const c = e.target.closest(".cellref"); if (c) { e.preventDefault(); showCell(c.textContent.trim()); } });
+  $("case").addEventListener("keydown", e => { const c = e.target.closest(".cellref"); if (c && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); showCell(c.textContent.trim()); } });
   function wonHtml(i) {
     const c = CH[i], toEnd = i === LAST_MAIN || (c.bonus && !(CH[i + 1] && CH[i + 1].bonus));
     return `<div class="verdict ok"><b>${c.refresher ? "Rendben, mehetünk!" : c.bonus ? "Bónusz kész!" : "Stimmel!"}</b><p>${c.success}</p></div>

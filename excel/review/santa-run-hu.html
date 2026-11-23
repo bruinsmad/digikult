@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>/* moving between pages: the old page drifts aside and fades, the new one glides in; the rail holds still */@view-transition{navigation:auto}.rail{view-transition-name:rail}::view-transition-group(root){animation:none}::view-transition-old(root){animation:dk-out .2s cubic-bezier(.4,0,1,1) both}::view-transition-new(root){animation:dk-in .38s cubic-bezier(.16,1,.3,1) .06s both}::view-transition-old(rail),::view-transition-new(rail){animation:none}@keyframes dk-out{to{opacity:0;transform:translateX(-18px)}}@keyframes dk-in{from{opacity:0;transform:translateX(26px)}}@media (prefers-reduced-motion:reduce){::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none!important}}</style>
+<title>Mikulás-futás – Excel-küldetés</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600;700&display=swap">
+<link rel="stylesheet" href="../sheet.css">
+<link rel="stylesheet" href="../mission.css">
+<style>:root{--m:#b8323c;--m-soft:#fbe8ea;--m-ink:#86202a}</style>
+</head>
+<body>
+<header class="rail"><div class="in">
+  <a class="home" href="../../index.html">Digitális kultúra</a>
+  <span class="crumb"><a href="../../index.html#excel">Táblázatkezelés – Excel</a> › <a href="../../index.html#excel-review">3. lecke</a></span>
+</div></header>
+<div class="top">
+  <span class="art" aria-hidden="true"><svg viewBox="0 0 96 96"><ellipse cx="48" cy="88" rx="30" ry="5" fill="#000" opacity=".25"/>
+<path d="M22 46c0-18 12-30 28-30 8 0 16 4 20 10l-6 4c8 4 12 10 12 16z" fill="#d6313a"/>
+<circle cx="76" cy="48" r="7" fill="#fff"/><rect x="18" y="44" width="58" height="11" rx="5.5" fill="#fff"/>
+<path d="M26 58c4 14 14 22 24 22s20-8 22-22z" fill="#f6d2b8"/><circle cx="40" cy="66" r="2.4" fill="#1d2622"/><circle cx="58" cy="66" r="2.4" fill="#1d2622"/>
+<path d="M30 70c4 12 12 16 20 16s16-4 20-16c-6 4-12 5-20 5s-14-1-20-5z" fill="#fff"/>
+<g transform="translate(64 66) rotate(-12)"><rect x="0" y="0" width="26" height="15" rx="3" fill="#2f6fa0"/><text x="13" y="11" text-anchor="middle" font-family="Atkinson Hyperlegible,sans-serif" font-weight="700" font-size="9" fill="#fff">5 km</text></g></svg></span>
+  <div><div class="kicker">Excel, 3. lecke: összefoglaló küldetés</div><h1>Mikulás-futás</h1></div>
+  <div class="meta"><span>Haladás <b id="solvedCount">–</b></span><span>Idő <b id="timer">0:00</b></span><button type="button" class="mbtn" id="soundBtn">Hang: be</button><button type="button" id="resetBtn" title="Az egész küldetés újrakezdése">Újrakezdés</button></div>
+</div>
+<nav class="steps" id="steps" aria-label="Fejezetek"></nav>
+<div id="game"><main>
+  <article class="card" id="case" aria-live="polite"></article>
+  <section class="work" aria-label="Munkalap"><div class="card">
+    <div class="dlcard"><svg class="ic" viewBox="0 0 40 46" aria-hidden="true"><path d="M4 2h22l10 10v32H4z" fill="#fff" stroke="#107c41" stroke-width="2"/><path d="M26 2v10h10" fill="#d9efe2" stroke="#107c41" stroke-width="2"/><rect x="0" y="18" width="24" height="20" rx="2" fill="#107c41"/><path d="M6 23l12 10M18 23L6 33" stroke="#fff" stroke-width="3" stroke-linecap="round"/></svg><p><b>mikulas-futas.xlsx</b><br>Ebben a fájlban dolgozol, az Excelben.</p><a class="btn primary" href="mikulas-futas.xlsx" download>Letöltés</a></div>
+    <div class="work-head"><h2>Előnézet</h2><p>Így kell kinéznie a fájlodnak. A sárga cellák tartoznak a mostani feladathoz.</p></div>
+    <div id="sheet"></div>
+    <p class="preview-note">Ez csak előnézet, ide nem lehet írni. Ahogy haladsz, itt is megjelennek a jó képletek: a <b>Képletek</b> gombbal megnézheted őket.</p>
+  </div></section>
+</main></div>
+<section id="endPanel" hidden></section>
+<footer class="end">Digitális kultúra. A haladásod a böngésződben marad: ha bezárod az oldalt, legközelebb innen folytathatod. A feltöltött fájlt az oldal csak megnézi, nem küldi el sehová.</footer>
+<canvas id="fx" aria-hidden="true"></canvas>
+<script src="../sheet.js"></script>
+<script>
+
+window.MISSION = {
+  key: "santa-run-hu-v1", title: "Mikulás-futás", sheetName: "Mikulás-futás", saveAs: "mikulas-futas-Kovacs-Anna.xlsx",
+  confetti: ["#b8323c", "#ffffff", "#2f7a3a", "#f2d264", "#7fa7ff", "#f0a3b8"],
+  sheet: {"cols": 10, "rows": 29, "widths": [92, 58, 62, 62, 62, 72, 62, 70, 86, 66], "select": "A1", "cells": {"A1": "Név", "B1": "Osztály", "C1": "1. edzés (km)", "D1": "2. edzés (km)", "E1": "3. edzés (km)", "F1": "Összesen (km)", "G1": "Átlag (km)", "H1": "Edzések száma", "I1": "Támogatás (Ft)", "J1": "Oklevél", "A2": "Anna", "B2": "8.A", "C2": 3, "D2": 4, "E2": 4, "A3": "Bálint", "B3": "8.A", "C3": 5, "E3": 6, "A4": "Dorka", "B4": "8.A", "C4": 2, "D4": 3, "A5": "Erik", "B5": "8.A", "C5": 6, "D5": 5, "E5": 6, "A6": "Flóra", "B6": "8.A", "C6": 4, "D6": 4, "E6": 5, "A7": "Hunor", "B7": "8.A", "D7": 2, "E7": 3, "A8": "Ivett", "B8": "8.A", "C8": 3, "D8": 3, "E8": 3, "A9": "Jakab", "B9": "8.B", "C9": 4, "D9": 5, "E9": 5, "A10": "Kitti", "B10": "8.B", "C10": 2, "A11": "Levente", "B11": "8.B", "C11": 6, "D11": 6, "E11": 7, "A12": "Mira", "B12": "8.B", "C12": 3, "D12": 4, "A13": "Noel", "B13": "8.B", "C13": 5, "D13": 4, "E13": 6, "A14": "Réka", "B14": "8.B", "C14": 4, "E14": 4, "A15": "Soma", "B15": "8.B", "C15": 1, "D15": 2, "E15": 2, "A16": "Összesen", "A17": "Ennyien voltak ott", "A19": "A legtöbb kilométer egy futótól", "A20": "A legkevesebb kilométer egy futótól", "A21": "Átlagosan ennyit futott egy diák (km)", "A22": "Arany oklevelek száma", "A23": "Mindhárom edzésen ott volt (fő)", "A24": "15 km-nél többet futott (fő)", "A25": "Megvan a cél (60 000 Ft)?", "A27": "Bónusz: a 8.A támogatása (Ft)", "A28": "Bónusz: a 8.B támogatása (Ft)", "A29": "Bónusz: melyik osztály gyűjtött többet?"}, "formats": {"I2:I16": "ft", "F27:F28": "ft"}, "styles": {"A1:J1": "head headsm", "A16:J16": "total", "A17": "label", "A19:A25": "label", "F19:F25": "sum", "A27:A29": "label", "F27:F29": "sum"}},
+  chapters: [
+    { refresher: true, title: "Rajt előtt", select: "D5",
+      story: `<p>December elején az iskola <b>Mikulás-futást</b> rendez. Aki fut, minden lefutott kilométerrel <b>500 Ft-ot</b> gyűjt a közeli gyermekotthonban élő gyerekek karácsonyára: ennyit fizetnek a szülők és a támogatók kilométerenként.</p>
+        <p>A 8. évfolyam három edzést tartott. <span class="who">Szilvi néni</span>, a testnevelő tanár, beírta egy Excel-táblázatba, ki melyik edzésen hány kilométert futott. Ahol üres a cella, ott a diák nem volt ott. A te feladatod, hogy a táblázat mindent magától kiszámoljon.</p>
+        <p>Ebben a küldetésben <b>mindent</b> használni fogsz, amit eddig az Excelről tanultunk. Ha valamit elfelejtettél, a <b>Segítség</b> gomb megmutatja.</p>`,
+      learn: `<ul><li>A cella címe: előbb az oszlop betűje, aztán a sor száma, pl. <code>D5</code>.</li><li>Minden képlet <code>=</code> jellel kezdődik, és a végén <kbd>Enter</kbd>.</li><li>A képletbe cellacímet írj, ne számot: így ha az adat megváltozik, az eredmény is vele változik.</li></ul>`,
+      steps: [
+        `Töltsd le a fájlt: <br><a class="btn primary" href="mikulas-futas.xlsx" download>mikulas-futas.xlsx letöltése</a>`,
+        `Nyisd meg az Excelben. Ha felül egy sárga sávban azt látod, hogy <span class=ui>Védett nézet</span>, kattints a <span class=ui>Szerkesztés engedélyezése</span> gombra.`,
+        `Mentsd el úgy, hogy a fájl nevében benne legyen a neved: <span class=ui>Fájl</span> › <span class=ui>Mentés másként</span> (vagy <kbd>F12</kbd>), például <code>mikulas-futas-Kovacs-Anna</code>.`,
+        `Nézd meg a táblázatot: minden sorban egy diák adatai vannak, a C, D és E oszlopban az edzéseken lefutott kilométerek. A <b>sárga</b> cellákba fogsz dolgozni, a <b>kék</b> cellák a bónuszfeladatokhoz tartoznak.`
+      ],
+      asks: [{ q: "Hány kilométert futott <b>Erik</b> a 2. edzésen? (D5)", cell: "D5", traps: { "6": "Erik sora jó, de nézd meg az oszlopot: a 2. edzés a D oszlop." } }],
+      hints: ["Erik az 5. sorban van, a 2. edzés a D oszlopban. A keresett cella tehát a <b>D5</b>."],
+      success: "Úgy van, a D5-ben 5 áll. Indulhat a számolás!" },
+
+    { title: "Ki mennyit futott?", select: "F2", isNew: false,
+      story: `<p>Először azt kell tudni, hogy <b>ki hány kilométert futott összesen</b> a három edzésen. Tizennégy diák van, de elég egyetlen képletet megírnod.</p>`,
+      learn: `<p>A <b>SZUM</b> összeadja a tartomány számait. A <code>C2:E2</code> azt jelenti: C2-től E2-ig. Az üres cellát egyszerűen kihagyja.</p><pre>=<span class="fn">SZUM</span>(<span class="rf">C2:E2</span>)</pre>
+        <p>A <b>kitöltőjel</b> a kijelölt cella jobb alsó sarkában lévő kis négyzet. Ha lehúzod, az Excel minden sorba lemásolja a képletet, és közben átírja a sorszámot.</p>`,
+      steps: [
+        `Kattints az <b>F2</b> cellára, és írd be: <code>=SZUM(</code>`,
+        `Az egérrel jelöld ki a <b>C2</b>–<b>E2</b> cellákat, írd be a <code>)</code> jelet, és nyomd meg az <kbd>Enter</kbd> billentyűt.`,
+        `Kattints vissza az <b>F2</b>-re, és húzd le a kitöltőjelet az <b>F15</b>-ig. (Ha duplán kattintasz a kitöltőjelre, az Excel magától lemásolja a táblázat aljáig.)`
+      ],
+      goals: [{ label: "F2–F15: összesen (SZUM)", range: "F2:F15", ref: "=SZUM(C2:E2)", fn: "SZUM" }],
+      asks: [{ q: "Hány kilométert futott összesen <b>Levente</b>? (F11)", cell: "F11" }],
+      hints: ["F2: <code>=SZUM(C2:E2)</code>, aztán a kitöltőjellel le az F15-ig.", "Levente a 11. sorban van: 6 + 6 + 7."],
+      success: "19 km. A kitöltőjel minden sorban átírta a sorszámot, így mindenki a saját kilométereit kapta." },
+
+    { title: "Edzésenként összesen", select: "C16", isNew: false,
+      story: `<p>Szilvi néni arra is kíváncsi, hogy <b>egy-egy edzésen összesen hány kilométert</b> futott az évfolyam. Erre való a 16. sor.</p>`,
+      learn: `<p>A kitöltőjelet <b>jobbra</b> is húzhatod. Ilyenkor nem a sorszám, hanem az oszlop betűje változik: a <code>C2:C15</code>-ből a D oszlopban <code>D2:D15</code> lesz.</p>`,
+      steps: [
+        `Kattints a <b>C16</b> cellára, és írd be: <code>=SZUM(C2:C15)</code>, majd nyomd meg az <kbd>Enter</kbd> billentyűt.`,
+        `Kattints vissza a <b>C16</b>-ra, és a kitöltőjelet most húzd <b>jobbra</b>, az <b>F16</b>-ig.`,
+        `Kattints az <b>F16</b>-ra, és nézd meg a szerkesztőlécen (fent, az <i>fx</i> mellett), mi lett a képlete.`
+      ],
+      goals: [{ label: "C16–F16: összesen (SZUM, jobbra húzva)", range: "C16:F16", ref: "=SZUM(C2:C15)", fn: "SZUM" }],
+      asks: [{ q: "Hány kilométert futottak összesen a <b>3. edzésen</b>? (E16)", cell: "E16" }],
+      hints: ["C16: <code>=SZUM(C2:C15)</code>, aztán a kitöltőjellel jobbra az F16-ig.", "A 3. edzés az E oszlop."],
+      success: "51 km a 3. edzésen. Az F16-ban pedig az egész évfolyam összes kilométere áll: 141 km." },
+
+    { title: "Ki hány edzésen volt ott?", select: "H2", isNew: false,
+      story: `<p>Szilvi néni szeretné tudni, <b>ki hány edzésen volt ott</b>, és <b>egy-egy edzésen hányan voltak</b>. Ahol a cella üres, ott a diák nem volt ott.</p>`,
+      learn: `<p>A <b>DARAB</b> megszámolja, hány cellában van <b>szám</b>. Az üres cellákat kihagyja.</p><pre>=<span class="fn">DARAB</span>(<span class="rf">C2:E2</span>)</pre>`,
+      steps: [
+        `<b>H2</b>: <code>=DARAB(C2:E2)</code>, aztán húzd le a <b>H15</b>-ig.`,
+        `<b>C17</b>: <code>=DARAB(C2:C15)</code>, aztán húzd jobbra az <b>E17</b>-ig.`
+      ],
+      goals: [{ label: "H2–H15: edzések száma (DARAB)", range: "H2:H15", ref: "=DARAB(C2:E2)", fn: "DARAB" }, { label: "C17–E17: ennyien voltak ott (DARAB)", range: "C17:E17", ref: "=DARAB(C2:C15)", fn: "DARAB" }],
+      asks: [{ q: "Hány edzésen volt ott <b>Kitti</b>? (H10)", cell: "H10", traps: { "3": "Kittinél két cella üres. Biztos DARAB-ot használtál, és a tartomány C10:E10?" } },
+             { q: "Hányan voltak ott az <b>1. edzésen</b>? (C17)", cell: "C17", traps: { "14": "14 diák van, de az 1. edzésen nem mindenki volt ott. A DARAB az üres cellát nem számolja: biztos DARAB-ot használtál?", "48": "Ez a kilométerek összege (C16). Itt azt kell megszámolni, hány szám van a C oszlopban: DARAB." } }],
+      hints: ["H2: <code>=DARAB(C2:E2)</code>, le a H15-ig. C17: <code>=DARAB(C2:C15)</code>, jobbra az E17-ig.", "Kitti a 10. sorban van, és csak az 1. edzésen futott."],
+      success: "Kitti csak egy edzésen volt ott, az 1. edzésen pedig 13-an futottak: csak Hunor hiányzott." },
+
+    { title: "Átlag, kerekítve", select: "G2",
+      story: `<p>Ki milyen hosszú távot fut általában? Ehhez az <b>átlag</b> kell: egy edzésen átlagosan hány kilométert futott valaki. A hosszú tizedestörteket egy tizedesjegyre kerekítjük.</p>`,
+      learn: `<p>Az <b>ÁTLAG</b> csak a számokat nézi: aki két edzésen volt ott, annál kettővel oszt, nem hárommal. A <b>KEREKÍTÉS</b> két részből áll: <i>mit</i> kerekítsen, és <i>hány tizedesjegyre</i>. Az ÁTLAG és a KEREKÍTÉS egy képletbe is írható:</p><pre>=<span class="fn">KEREKÍTÉS</span>(<span class="fn">ÁTLAG</span>(<span class="rf">C2:E2</span>);1)</pre>
+        <p>Az Excel belülről kifelé számol: előbb az átlag, aztán a kerekítés. A részek közé <b>pontosvessző</b> kell, mert a vessző a tizedesjel.</p>`,
+      steps: [
+        `Kattints a <b>G2</b> cellára, és írd be: <code>=KEREKÍTÉS(ÁTLAG(C2:E2);1)</code>, majd nyomd meg az <kbd>Enter</kbd> billentyűt.`,
+        `Húzd le a kitöltőjelet a <b>G15</b>-ig.`
+      ],
+      goals: [{ label: "G2–G15: átlag, egy tizedesjegyre (KEREKÍTÉS és ÁTLAG)", range: "G2:G15", ref: "=KEREKÍTÉS(ÁTLAG(C2:E2);1)", fn: "KEREKÍTÉS" }],
+      asks: [{ q: "Mennyi <b>Anna</b> átlaga? (G2)", cell: "G2", traps: { "3.666666667": "Ez a kerekítetlen átlag. Írd az ÁTLAG-ot a KEREKÍTÉS zárójelébe: =KEREKÍTÉS(ÁTLAG(C2:E2);1)", "3.67": "Ez két tizedesjegy. A KEREKÍTÉS második része 1 legyen.", "4": "Ez egészre kerekítve. A KEREKÍTÉS második része 1 legyen, nem 0." } }],
+      hints: ["G2: <code>=KEREKÍTÉS(ÁTLAG(C2:E2);1)</code>", "Ha #NÉV? jön ki, nézd meg az ékezeteket: ÁTLAG, KEREKÍTÉS."],
+      success: "Anna átlaga 3,7 km. Bálint csak két edzésen volt ott, az ő átlaga 5,5 km: az ÁTLAG kettővel osztott, mert az üres cellát kihagyta." },
+
+    { title: "Mennyi pénz gyűlt össze?", select: "I2", isNew: false,
+      story: `<p>Most jön a lényeg: minden lefutott kilométer <b>500 Ft</b> a gyermekotthonnak. Mennyit gyűjtött egy-egy diák, és mennyit az egész évfolyam?</p>`,
+      learn: `<p>Szorozni a <code>*</code> jellel kell. Az 500 Ft minden kilométerre ugyanannyi, ezért most beírhatod a képletbe:</p><pre>=<span class="rf">F2</span>*500</pre>`,
+      steps: [
+        `<b>I2</b>: <code>=F2*500</code>, aztán húzd le az <b>I15</b>-ig.`,
+        `<b>I16</b>: a teljes összeg: <code>=SZUM(I2:I15)</code>`
+      ],
+      goals: [{ label: "I2–I15: támogatás (F × 500)", range: "I2:I15", ref: "=F2*500" }, { label: "I16: összesen (SZUM)", range: "I16", ref: "=SZUM(I2:I15)", fn: "SZUM" }],
+      asks: [{ q: "Mennyi pénz gyűlt össze összesen? (I16)", cell: "I16", traps: { "141": "Ez a kilométerek száma. Itt a forintok összege kell: az I oszlopot add össze." } }],
+      hints: ["I2: <code>=F2*500</code>, le az I15-ig.", "I16: <code>=SZUM(I2:I15)</code>"],
+      success: "70 500 Ft gyűlt össze! Ebből már jó sok ajándék kitelik." },
+
+    { title: "Csúcsok és átlag", select: "F19", isNew: false,
+      story: `<p>Az eredményhirdetésen Szilvi néni három számot szeretne kihirdetni: a <b>legtöbb</b> és a <b>legkevesebb</b> lefutott kilométert, és azt, hogy <b>átlagosan</b> mennyit futott egy diák.</p>`,
+      learn: `<p>A <b>MAX</b> a legnagyobb, a <b>MIN</b> a legkisebb számot adja. A tartomány mindhárom képletben az <b>F2:F15</b>. Vigyázz, a 16. sor (az összesen) ne legyen benne!</p>`,
+      steps: [
+        `<b>F19</b>: <code>=MAX(F2:F15)</code>`,
+        `<b>F20</b>: <code>=MIN(F2:F15)</code>`,
+        `<b>F21</b>: az átlag egy tizedesjegyre: <code>=KEREKÍTÉS(ÁTLAG(F2:F15);1)</code>`
+      ],
+      goals: [{ label: "F19: legtöbb (MAX)", range: "F19", ref: "=MAX(F2:F15)", fn: "MAX" }, { label: "F20: legkevesebb (MIN)", range: "F20", ref: "=MIN(F2:F15)", fn: "MIN" },
+              { label: "F21: átlag (KEREKÍTÉS és ÁTLAG)", range: "F21", ref: "=KEREKÍTÉS(ÁTLAG(F2:F15);1)", fn: "KEREKÍTÉS" }],
+      asks: [{ q: "Mennyi a legtöbb kilométer? (F19)", cell: "F19", traps: { "141": "Ez az összesen (F16). A tartomány csak az F2:F15 legyen." } },
+             { q: "Átlagosan hány kilométert futott egy diák? (F21)", cell: "F21", traps: { "10.07142857": "Ez a kerekítetlen átlag. Egy tizedesjegyre kerekíts.", "10": "Ez egészre kerekítve. A KEREKÍTÉS második része 1 legyen.", "18.8": "Úgy tűnik, az F16 (az összesen) is belekerült a tartományba. Az átlag csak az F2:F15-ből számoljon." } }],
+      hints: ["F19: <code>=MAX(F2:F15)</code>, F20: <code>=MIN(F2:F15)</code>", "F21: <code>=KEREKÍTÉS(ÁTLAG(F2:F15);1)</code>"],
+      success: "Levente futott a legtöbbet (19 km), Kitti a legkevesebbet (2 km), átlagosan pedig 10,1 km jutott egy diákra." },
+
+    { title: "Oklevelek", select: "J2",
+      story: `<p>Minden futó oklevelet kap. Aki összesen <b>legalább 10 km-t</b> futott, az <b>arany</b> oklevelet kap, a többiek <b>ezüstöt</b>. Írja ki a táblázat magától!</p>`,
+      learn: `<p>A <b>HA</b> függvény dönt. Három része van: a <b>feltétel</b>, amit akkor ír ki, ha <b>igaz</b>, és amit akkor, ha <b>hamis</b>.</p><pre>=<span class="fn">HA</span>(<span class="rf">F2</span>&gt;=10;<span class="st">&quot;arany&quot;</span>;<span class="st">&quot;ezüst&quot;</span>)</pre>
+        <p>A <code>&gt;=</code> azt jelenti: <b>legalább</b>. A szöveget idézőjelbe kell tenni. Az idézőjel a magyar billentyűzeten: <kbd>Shift</kbd>+<kbd>2</kbd>.</p>`,
+      steps: [
+        `Kattints a <b>J2</b> cellára, és írd be: <code>=HA(F2&gt;=10;"arany";"ezüst")</code>, majd nyomd meg az <kbd>Enter</kbd> billentyűt.`,
+        `Húzd le a kitöltőjelet a <b>J15</b>-ig.`,
+        `Ha <code>#NÉV?</code> jelenik meg, lemaradt egy idézőjel. Kattints a cellára, és javítsd ki a szerkesztőlécen.`
+      ],
+      goals: [{ label: "J2–J15: oklevél (HA)", range: "J2:J15", ref: '=HA(F2>=10;"arany";"ezüst")', fn: "HA" }],
+      asks: [{ q: "Milyen oklevelet kap <b>Noel</b>? (J13)", text: ["arany"], traps: { "ezüst": "Noel 15 km-t futott, ez legalább 10. Nézd meg, jó-e a feltétel: F2>=10." }, wrong: "Nézd meg a J13 cellát: „arany” vagy „ezüst” áll benne?" },
+             { q: "És <b>Ivett</b>? (J8)", text: ["ezüst"], traps: { "arany": "Ivett 9 km-t futott, ez kevesebb 10-nél. Nézd meg, jó-e a feltétel: F2>=10." }, wrong: "Nézd meg a J8 cellát." }],
+      hints: ['J2: <code>=HA(F2&gt;=10;"arany";"ezüst")</code>, aztán le a J15-ig.', "Noel a 13. sorban, Ivett a 8. sorban van."],
+      success: "Noel arany, Ivett ezüst oklevelet kap. Ha valaki még fut egy kört, és Szilvi néni beírja, a táblázatban az oklevele is magától megváltozik." },
+
+    { title: "Számoljuk meg!", select: "F22",
+      story: `<p>Szilvi néni megrendeli az okleveleket, és néhány érdekességre is kíváncsi. Most <b>megszámoljuk</b>, hány cella felel meg egy-egy feltételnek.</p>`,
+      learn: `<p>A <b>DARABTELI</b> két részből áll: <i>hol számoljon</i> (tartomány), és <i>mit</i> (kritérium). A kritérium lehet szöveg, szám vagy összehasonlítás:</p><pre>=<span class="fn">DARABTELI</span>(<span class="rf">J2:J15</span>;<span class="st">&quot;arany&quot;</span>)
+=<span class="fn">DARABTELI</span>(<span class="rf">H2:H15</span>;3)
+=<span class="fn">DARABTELI</span>(<span class="rf">F2:F15</span>;<span class="st">&quot;&gt;15&quot;</span>)</pre>
+        <p>Ha jel is van a kritériumban, a jel és a szám <b>együtt</b> kerül idézőjelbe: <code>"&gt;15"</code>.</p>`,
+      steps: [
+        `<b>F22</b>: hány arany oklevél kell? <code>=DARABTELI(J2:J15;"arany")</code>`,
+        `<b>F23</b>: hányan voltak ott mindhárom edzésen? <code>=DARABTELI(H2:H15;3)</code>`,
+        `<b>F24</b>: hányan futottak 15 km-nél többet? <code>=DARABTELI(F2:F15;"&gt;15")</code>`
+      ],
+      goals: [{ label: "F22: arany oklevelek (DARABTELI)", range: "F22", ref: '=DARABTELI(J2:J15;"arany")', fn: "DARABTELI" },
+              { label: "F23: mindhárom edzésen ott volt (DARABTELI)", range: "F23", ref: "=DARABTELI(H2:H15;3)", fn: "DARABTELI" },
+              { label: "F24: 15 km-nél többet futott (DARABTELI)", range: "F24", ref: '=DARABTELI(F2:F15;">15")', fn: "DARABTELI" }],
+      asks: [{ q: "Hány arany oklevél kell? (F22)", cell: "F22" },
+             { q: "Hányan voltak ott mindhárom edzésen? (F23)", cell: "F23" },
+             { q: "Hányan futottak 15 km-nél többet? (F24)", cell: "F24", traps: { "3": "3 jött ki? Akkor a >= jel került a képletbe, ami azt jelenti: legalább 15. Itt a > kell: több mint 15. (Noel pont 15 km-t futott.)" } }],
+      hints: ['F22: <code>=DARABTELI(J2:J15;"arany")</code>, F23: <code>=DARABTELI(H2:H15;3)</code>', 'F24: <code>=DARABTELI(F2:F15;"&gt;15")</code>'],
+      success: "7 arany oklevél kell, nyolcan voltak ott mindhárom edzésen, és csak ketten futottak 15 km-nél többet: Erik és Levente." },
+
+    { title: "Megvan a cél?", select: "F25", isNew: false,
+      story: `<p>Az évfolyam azt tűzte ki célul, hogy <b>legalább 60 000 Ft</b> gyűljön össze. Sikerült? Mondja meg a táblázat!</p>`,
+      learn: `<p>A HA feltételében egy másik cellát is megvizsgálhatsz. Az összeg az I16-ban van:</p><pre>=<span class="fn">HA</span>(<span class="rf">I16</span>&gt;=60000;<span class="st">&quot;Igen!&quot;</span>;<span class="st">&quot;Még nem&quot;</span>)</pre>`,
+      steps: [
+        `Kattints az <b>F25</b> cellára, és írd be: <code>=HA(I16&gt;=60000;"Igen!";"Még nem")</code>, majd nyomd meg az <kbd>Enter</kbd> billentyűt.`
+      ],
+      goals: [{ label: "F25: megvan a cél? (HA)", range: "F25", ref: '=HA(I16>=60000;"Igen!";"Még nem")', fn: "HA" }],
+      asks: [{ q: "Mit ír ki az F25?", text: ["Igen!", "igen"], traps: { "Még nem": "70 500 Ft gyűlt össze, ez legalább 60 000, tehát a feltétel igaz. Nézd meg, jó sorrendben van-e a két szöveg." }, wrong: "Nézd meg, mit ír ki az F25 cella." }],
+      hints: ['F25: <code>=HA(I16&gt;=60000;"Igen!";"Még nem")</code>', "A képletbe a 60 000-et szóköz nélkül írd: 60000."],
+      success: "Igen! A cél teljesült, a gyermekotthonban idén bőséges lesz a karácsony." },
+
+    { title: "Beadás", upload: true,
+      story: `<p>Kész a táblázat! Mielőtt beadod, az oldal <b>megnézi a fájlodat</b>: mindenhol képlet van-e, jó függvényt használtál-e, és jó-e az eredmény.</p>`,
+      steps: [
+        `Mentsd el a fájlt az Excelben: <kbd>Ctrl</kbd>+<kbd>S</kbd>.`,
+        `Húzd a fájlt az alábbi mezőbe (vagy kattints rá, és válaszd ki). A fájlt az oldal csak itt a böngészőben nézi meg, nem küldi el sehová.`,
+        `Ha valami piros, javítsd ki az Excelben, mentsd el, és húzd ide újra.`
+      ],
+      success: "Minden képlet a helyén, minden eredmény stimmel. Ezt a táblázatot Szilvi néni bátran viheti az eredményhirdetésre!" },
+
+    { bonus: true, title: "Osztályok versenye", select: "F27",
+      story: `<p>A 8.A és a 8.B között kis verseny is folyik: <b>melyik osztály gyűjtött több pénzt</b>?</p>`,
+      learn: `<p>A <b>SZUMHA</b> csak azokat a számokat adja össze, amelyeknek a sora megfelel a feltételnek. Három része van: <i>hol nézze a feltételt</i>, <i>mi a feltétel</i>, és <i>mit adjon össze</i>:</p><pre>=<span class="fn">SZUMHA</span>(<span class="rf">B2:B15</span>;<span class="st">&quot;8.A&quot;</span>;<span class="rf">I2:I15</span>)</pre>`,
+      steps: [
+        `<b>F27</b>: a 8.A támogatása: <code>=SZUMHA(B2:B15;"8.A";I2:I15)</code>`,
+        `<b>F28</b>: ugyanez a 8.B-re.`,
+        `<b>F29</b>: írja ki a táblázat, melyik osztály gyűjtött többet: <code>=HA(F27&gt;F28;"8.A";"8.B")</code>`
+      ],
+      goals: [{ label: "F27: a 8.A támogatása (SZUMHA)", range: "F27", ref: '=SZUMHA(B2:B15;"8.A";I2:I15)', fn: "SZUMHA" },
+              { label: "F28: a 8.B támogatása (SZUMHA)", range: "F28", ref: '=SZUMHA(B2:B15;"8.B";I2:I15)', fn: "SZUMHA" },
+              { label: "F29: melyik osztály gyűjtött többet? (HA)", range: "F29", ref: '=HA(F27>F28;"8.A";"8.B")', fn: "HA" }],
+      asks: [{ q: "Mennyit gyűjtött a <b>8.A</b>? (F27)", cell: "F27" }, { q: "Melyik osztály gyűjtött többet?", text: ["8.A", "8a"], traps: { "8.B": "A 8.B 35 000 Ft-ot gyűjtött. Nézd meg az F27-et: a 8.A-nál ez több vagy kevesebb?" }, wrong: "Nézd meg, mit ír ki az F29 cella." }],
+      hints: ['F27: <code>=SZUMHA(B2:B15;"8.A";I2:I15)</code>, F28: <code>=SZUMHA(B2:B15;"8.B";I2:I15)</code>', 'F29: <code>=HA(F27&gt;F28;"8.A";"8.B")</code>'],
+      success: "A 8.A 35 500 Ft-ot, a 8.B 35 000 Ft-ot gyűjtött. Hajszálnyi győzelem: 500 Ft a különbség, vagyis pont egy kilométer!" },
+
+    { bonus: true, title: "Bónusz beadás", upload: true,
+      story: `<p>Ha a bónuszt is megcsináltad, az oldal ellenőrzi a <b>bónusz cellákat</b> is (F27–F29).</p>`,
+      steps: [
+        `Mentsd el a fájlt az Excelben: <kbd>Ctrl</kbd>+<kbd>S</kbd>.`,
+        `Húzd a fájlt az alábbi mezőbe, vagy kattints rá, és válaszd ki.`,
+        `Ha a Classroomban már beadtad a fájlt, vond vissza a beadást, töltsd fel az újat, és add be újra.`
+      ],
+      success: "A bónusz is kész, minden képlet stimmel. Igazi Excel-bajnok vagy!" }
+  ],
+  ending: {
+    title: "Célba értél!",
+    text: `<p>70 500 Ft gyűlt össze a gyermekotthonnak, és a táblázatod mindent magától számol: az összegeket, az átlagokat, az okleveleket és azt is, hogy megvan-e a cél.</p>
+      <p>Ebben az egy táblázatban mindent használtál, amit az Excelről eddig tanultunk: képleteket, kitöltőjelet, SZUM, ÁTLAG, MIN, MAX, DARAB, KEREKÍTÉS, HA és DARABTELI függvényt. Szép munka!</p>`,
+    rank: (min, hints) => hints === 0 ? "Rang: Excel-mester. Egyetlen segítség nélkül!" : hints <= 4 ? "Rang: Profi szervező" : "Rang: Kitartó futó. Legközelebb kevesebb segítséggel is menni fog!"
+  }
+};
+</script>
+<script src="../cats.js"></script>
+<script src="../real.js"></script>
+<script src="../../nav.js?v=334fdffc" defer></script>
+</body>
+</html>

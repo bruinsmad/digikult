@@ -581,6 +581,24 @@
                 progress: { chapters: 6, keys: { hu: "class-trip-xlsx-hu-v1" } }
               }
             ]
+          },
+          {
+            id: "review",
+            title: { hu: "Összefoglalás: minden, amit eddig tanultunk", en: "Review: everything so far" },
+            pages: [
+              {
+                id: "santa-run",
+                kind: "story",
+                minutes: 45,
+                title: { hu: "Mikulás-futás", en: "The Santa Run" },
+                desc: {
+                  hu: "Minden lefutott kilométer 500 Ft a gyermekotthonnak. Letöltöd a fájlt, és az Excelben számolod ki a jótékonysági futás eredményét: SZUM, ÁTLAG, MIN, MAX, DARAB, KEREKÍTÉS, HA és DARABTELI egy táblázatban. A végén az oldal ellenőrzi a mentett fájlodat.",
+                  en: "Every kilometre run is 500 Ft for the children's home. Download the file and work out the charity run's results in Excel: SZUM, ÁTLAG, MIN, MAX, DARAB, KEREKÍTÉS, HA and DARABTELI in one sheet. At the end the page checks your saved file."
+                },
+                files: { hu: "excel/review/santa-run-hu.html" },
+                progress: { chapters: 10, keys: { hu: "santa-run-hu-v1" } }
+              }
+            ]
           }
         ]
       },

@@ -176,3 +176,10 @@ code,pre,.fparts,.mini,.xl-tip,.goals .sol{-webkit-user-select:none;user-select:
 #resetBtn::before,.btn.reset::before{content:"↺";font-size:17px;line-height:1}
 #resetBtn:hover,.btn.reset:hover{background:#ffe48a;border-color:#ffe48a}
 #resetBtn.armed,.btn.reset.armed{background:#d9483b;border-color:#d9483b;color:#fff}
+
+/* clickable cell addresses in the steps: they show the cell in the preview */
+.cellref{cursor:pointer;border-bottom:2px dotted var(--m);border-radius:2px;padding:0 1px;transition:background .15s}
+.cellref:hover,.cellref:focus-visible{background:var(--m-soft);outline:none}
+.xl.pulse .xl-sel{animation:cellpulse .45s ease-in-out 3}
+@keyframes cellpulse{50%{box-shadow:0 0 0 5px rgba(16,124,65,.35)}}
+@media (prefers-reduced-motion:reduce){ .xl.pulse .xl-sel{animation:none} }
