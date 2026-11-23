@@ -1,4 +1,4 @@
-/* digikult — a tiny PowerPoint-style animation player for SVG slides, and its "Animációs munkaablak".
+/* digikult — a tiny PowerPoint-style animation player for SVG slides, and its "Animáció munkaablak".
    A step: { el: "#id" (inside the stage), name, cls: "entr"|"emph"|"exit"|"path",
              fx: "appear"|"fade"|"fly"|"zoom"|"wipe" (entr) | "spin"|"grow"|"pulse"|"fadeto" (emph) | "vanish"|"fadeout"|"flyout"|"shrink" (exit) | "path",
              dir: "top"|"bottom"|"left"|"right", start: "click"|"with"|"after", dur, delay (ms), dx, dy (path), label (effect name) }
@@ -9,7 +9,7 @@
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
   const reduced = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
   const STAR = { entr: "#2f9e44", emph: "#e0a800", exit: "#d6336c", path: "#5b6660" };
-  const KIND = { entr: "Megjelenés", emph: "Kiemelés", exit: "Eltűnés", path: "Mozgásvonal" };
+  const KIND = { entr: "Belépés", emph: "Kiemelés", exit: "Kilépés", path: "Mozgásvonal" };
 
   const T = el => { el.style.transformBox = "fill-box"; el.style.transformOrigin = "center"; return el; };
   function keyframes(s) {

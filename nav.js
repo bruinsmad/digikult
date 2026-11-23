@@ -800,7 +800,7 @@
         accent: "#ff9e6b",
         title: { hu: "Bemutatókészítés – PowerPoint", en: "Presentations – PowerPoint" },
         blurb: {
-          hu: "Rajzolás alakzatokból, aztán animációk: Robi, a robot megszületik, és a Holdra repül – a PowerPointban.",
+          hu: "Rajzolás alakzatokból, aztán animációk: megszületik Robi, a robot, felrepül a Holdra, és megérkezik a Mikulás is – a PowerPointban.",
           en: "Drawing with shapes, then animations: Robi the robot is built and flies to the Moon – in real PowerPoint."
         },
         lessons: [
@@ -835,7 +835,7 @@
           },
           {
             id: "animation",
-            title: { hu: "Animációk: megjelenés, kiemelés, eltűnés, mozgásvonal", en: "Animations: entrance, emphasis, exit, motion path" },
+            title: { hu: "Animációk: belépés, kiemelés, kilépés, mozgásvonal", en: "Animations: entrance, emphasis, exit, motion path" },
             pages: [
               {
                 id: "animation-intro",
@@ -843,7 +843,7 @@
                 minutes: 15,
                 title: { hu: "Animációk – elmélet", en: "Animations – explainer" },
                 desc: {
-                  hu: "A négy fajta animáció, irány és második animáció, indítás, időtartam, késleltetés és az Animációs munkaablak. Lejátszható gyakorlókkal.",
+                  hu: "A négy fajta animáció, irány és második animáció, indítás, időtartam, késleltetés és az Animáció munkaablak. Lejátszható gyakorlókkal.",
                   en: "The four kinds of animation, direction and a second effect, start, duration, delay and the Animation Pane. With playable practice windows."
                 },
                 files: { hu: "powerpoint/animation/intro-hu.html" }

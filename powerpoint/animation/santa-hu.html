@@ -21,7 +21,7 @@
 <path d="M88 22C74 18 66 30 56 40" fill="none" stroke="#f2d264" stroke-width="2" stroke-dasharray="3 3"/><circle cx="88" cy="22" r="3" fill="#2f9e44"/>
 <g transform="translate(58 18)"><ellipse cx="6" cy="10" rx="7" ry="4" fill="#8b5a2b"/><circle cx="0" cy="6" r="3" fill="#8b5a2b"/><circle cx="-2" cy="6" r="1.2" fill="#e03131"/><rect x="14" y="8" width="16" height="7" rx="2" fill="#e03131"/><circle cx="20" cy="4" r="3.6" fill="#f5d0b0"/><path d="M16.4 3a3.6 3.6 0 0 1 7.2 0z" fill="#e03131"/></g>
 <g fill="#fff"><circle cx="20" cy="30" r="1.6"/><circle cx="34" cy="20" r="1.4"/><circle cx="76" cy="50" r="1.4"/><circle cx="16" cy="50" r="1.2"/></g></svg></span>
-  <div><div class="kicker">PowerPoint, 2. lecke: küldetés a PowerPointban</div><h1>Jön a Mikulás!</h1></div>
+  <div><div class="kicker">PowerPoint, 2. lecke: küldetés</div><h1>Jön a Mikulás!</h1></div>
   <div class="meta"><span>Haladás <b id="solvedCount">–</b></span><span>Idő <b id="timer">0:00</b></span><button type="button" class="mbtn" id="soundBtn">Hang: be</button><button type="button" id="resetBtn" title="Az egész küldetés újrakezdése">Újrakezdés</button></div>
 </div>
 <nav class="steps" id="steps" aria-label="Fejezetek"></nav>
@@ -32,7 +32,7 @@
     <div class="work-head"><h2>Így működjön a diád</h2><p>A <b>Lejátszás</b> gombbal megnézheted, mit kell tudnia eddig.</p></div>
     <div class="slidebox" id="slide" tabindex="0"></div>
     <div class="playrow"><button type="button" class="btn primary" id="playBtn">▶ Lejátszás</button><p>Lejátszás közben ott, ahol egér van a listában, kattints a diára, mint diavetítéskor.</p></div>
-    <div class="mission-pane"><h3>Animációs munkaablak (minta)</h3><div class="ap-list" id="pane"></div></div>
+    <div class="mission-pane"><h3>Animáció munkaablak (minta)</h3><div class="ap-list" id="pane"></div></div>
     <div class="ap-hint" id="clickHint" hidden>🖱 Kattints a diára!</div>
   </div></section>
 </main></div>
@@ -54,8 +54,8 @@ function animOf(d, name, cls) {
   const a = list.find(x => x.cls === cls);
   return { a, list, sl, err: null };
 }
-const CLS = { entr: "megjelenési (zöld) effektus", emph: "kiemelési (sárga) effektus", exit: "eltűnési (piros) effektus", path: "mozgásvonal" };
-const CLS_ACC = { entr: "megjelenési (zöld) effektust", emph: "kiemelési (sárga) effektust", exit: "eltűnési (piros) effektust", path: "mozgásvonalat" };
+const CLS = { entr: "belépési (zöld) effektus", emph: "kiemelési (sárga) effektus", exit: "kilépési (piros) effektus", path: "mozgásvonal" };
+const CLS_ACC = { entr: "belépési (zöld) effektust", emph: "kiemelési (sárga) effektust", exit: "kilépési (piros) effektust", path: "mozgásvonalat" };
 function need(d, name, cls, start, extra) {
   const r = animOf(d, name, cls); if (r.err) return r.err;
   if (!r.a) return r.list.length ? `${name}: van animációja, de nem ${CLS[cls]}. Jelöld ki, és cseréld le.` : `${name}: még nincs animációja. Jelöld ki, és adj neki egy ${CLS_ACC[cls]}.`;
@@ -111,7 +111,7 @@ window.MISSION = {
         `Töltsd le a fájlt: <br><a class="btn primary" href="mikulas.pptx" download>mikulas.pptx letöltése</a>`,
         `Nyisd meg a PowerPointban. Ha felül sárga sávban azt látod: <span class="ui">Védett nézet</span>, kattints a <span class="ui">Szerkesztés engedélyezése</span> gombra.`,
         `Mentsd el a neveddel: <span class="ui">Fájl</span> › <span class="ui">Mentés másként</span>, például <code>mikulas-Kovacs-Anna</code>.`,
-        `<span class="ui">Animációk</span> › <span class="ui">Animációs munkaablak</span>. Nézd meg a listát!`
+        `<span class="ui">Animációk</span> › <span class="ui">Animáció munkaablak</span>. Nézd meg a listát!`
       ],
       asks: [{ q: "Hány animáció van <b>már most</b> a munkaablak listájában?", num: 1, traps: { "0": "Nézd meg jobban: a lista nem üres. Van benne egy sor." } }],
       hints: ["Egy sor van a listában: a Holdé."],
@@ -125,7 +125,7 @@ window.MISSION = {
         `A munkaablakban kattints a Hold sorára.`,
         `Nyomd meg a <kbd>Delete</kbd> billentyűt. A lista üres lett, a Hold mellől eltűnt a kis szám.`
       ],
-      asks: [{ q: "Melyik billentyűvel törölted az animációt?", text: ["delete", "del", "delete billentyű", "deletet", "deletevel", "eltávolítás"], traps: { "backspace": "A munkaablakban a <kbd>Delete</kbd> billentyű a biztos. Melyik az?", "esc": "Az Esc a diavetítésből lép ki. A törléshez másik billentyű kell." } }],
+      asks: [{ q: "Melyik billentyűvel törölted az animációt?", text: ["delete", "del", "delete billentyű", "deletet", "deletevel", "eltávolítás", "backspace"], traps: { "esc": "Az Esc a diavetítésből lép ki. A törléshez másik billentyű kell." } }],
       hints: ["Ugyanaz a billentyű, amivel egy kijelölt alakzatot is törölsz: <kbd>Delete</kbd> (a billentyűzeten gyakran <kbd>Del</kbd>)."],
       success: "Delete: a Hold megnyugodott. Most jöhetnek a jó animációk!" },
 
@@ -134,11 +134,11 @@ window.MISSION = {
       learn: `<p>Ha a <b>legelső</b> animáció <span class="ui">Együtt az előzővel</span> indul, akkor rögtön elindul, amikor a dia megjelenik. Az <span class="ui">Időtartam</span> pedig azt mondja meg, milyen lassan: a nagyobb szám lassabb.</p>`,
       steps: [
         `Kattints az egyik hópehelyre. Mivel csoportba vannak foglalva, az összes kijelölődik.`,
-        `${GREEN} Megjelenés: <span class="ui">Beúszás</span>, aztán <span class="ui">Effektus beállításai</span> › <span class="ui">Felülről</span>.`,
+        `${GREEN} Belépés: <span class="ui">Beúszás</span>, aztán <span class="ui">Effektus beállításai</span> › <span class="ui">Felülről</span>.`,
         `<span class="ui">Indítás</span> › <span class="ui">Együtt az előzővel</span>.`,
         `Nézd meg, mennyi most az <span class="ui">Időtartam</span>! Aztán írd át <b>2</b>-re, és nyomd meg az <kbd>Enter</kbd> billentyűt.`
       ],
-      asks: [{ q: "Mennyi volt az <b>Időtartam</b>, mielőtt átírtad? (másodpercben)", num: 0.5, traps: { "2": "Az már az új érték. Mennyi volt előtte? Ha már átírtad, válassz egy új effektust, és nézd meg.", "500": "Majdnem: másodpercben kérdezzük. Hány másodperc az 00,50?", "50": "Az 00,50 nem ötven, hanem nulla egész öt tized: fél másodperc." } }],
+      asks: [{ q: "Mennyi volt az <b>Időtartam</b>, mielőtt átírtad? (másodpercben)", num: 0.5, traps: { "2": "Az már az új érték. Mennyi volt előtte? Ha nem emlékszel, nyomj <kbd>Ctrl</kbd>+<kbd>Z</kbd>-t, és nézd meg újra.", "500": "Majdnem: másodpercben kérdezzük. Hány másodperc az 00,50?", "50": "Az 00,50 nem ötven, hanem nulla egész öt tized: fél másodperc." } }],
       hints: ["A PowerPoint így írja: 00,50. Ez fél másodperc, vagyis 0,5."],
       success: "Fél másodperc volt, most 2: a hó szépen, lassan hull." },
 
@@ -159,13 +159,13 @@ window.MISSION = {
     { title: "Kigyullad a fény",
       story: `<p>Amikor a szán megérkezik, a házban <b>felkapcsolják a villanyt</b>: magától, kattintás nélkül.</p>`,
       isNew: false,
-      learn: `<p>Az <span class="ui">Az előző után</span> indítás megvárja, hogy az előző animáció befejeződjön, aztán magától indul. A munkaablakban ilyenkor egy kis <b>óra</b> áll a sor előtt.</p>`,
+      learn: `<p>Ha az <span class="ui">Indítás</span> <span class="ui">Az előző után</span>, akkor az animáció megvárja, hogy az előző befejeződjön, aztán magától indul. A munkaablakban ilyenkor egy kis <b>óra</b> áll a sor előtt.</p>`,
       steps: [
         `Kattints a sárga ablakra (ez a <i>Fény</i>; ne a csizmára kattints!).`,
-        `${GREEN} Megjelenés: <span class="ui">Fokozatos megjelenés</span>.`,
+        `${GREEN} Belépés: <span class="ui">Fokozatos megjelenés</span>.`,
         `<span class="ui">Indítás</span> › <span class="ui">Az előző után</span>.`
       ],
-      asks: [{ q: "Milyen jel áll a Fény sora előtt a munkaablakban? (Írd be: <i>szám</i>, <i>óra</i> vagy <i>semmi</i>.)", text: ["óra", "órát", "egy óra", "kis óra", "óra jel"], traps: { "szám": "Akkor a Fény még kattintásra indul. Állítsd: Indítás › Az előző után!", "semmi": "Az az Együtt az előzővel jele. A Fény Az előző után indul?" } }],
+      asks: [{ q: "Milyen jel áll a Fény sora előtt a munkaablakban? (Írd be: <i>szám</i>, <i>óra</i> vagy <i>semmi</i>.)", text: ["óra", "órát", "egy óra", "kis óra", "óra jel"], traps: { "szám": "Akkor a Fény még kattintásra indul. Állítsd: Indítás › Az előző után!", "semmi": "Üres hely akkor van, ha az Indítás <i>Együtt az előzővel</i>. A Fénynél <i>Az előző után</i> kell." } }],
       hints: ["Az előző után = várakozás: a jele egy kis óra."],
       success: "Óra: a fény magától kigyullad, amikor a szán megérkezett." },
 
@@ -174,7 +174,7 @@ window.MISSION = {
       learn: `<p>Egy dolognak <b>több animációja</b> is lehet. De vigyázz: ha a nagy effektuslistából választasz, az <b>lecseréli</b> a régit! A másodikat az <span class="ui">Animáció hozzáadása</span> gombbal add hozzá: így új sor kerül a munkaablakba.</p>`,
       steps: [
         `Kattints a zöld csomagra.`,
-        `${GREEN} Megjelenés: <span class="ui">Nagyítás</span>. <span class="ui">Indítás</span> › <span class="ui">Az előző után</span>, <span class="ui">Késleltetés</span>: <b>1</b>.`,
+        `${GREEN} Belépés: <span class="ui">Nagyítás</span>. <span class="ui">Indítás</span> › <span class="ui">Az előző után</span>, <span class="ui">Késleltetés</span>: <b>1</b>.`,
         `A csomag még ki van jelölve. Most <b>ne</b> a nagy listából válassz! Kattints az <span class="ui">Animáció hozzáadása</span> gombra, és ott ${YELLOW} Kiemelés: <span class="ui">Növekedés/kicsinyítés</span>.`,
         `Ennek is: <span class="ui">Indítás</span> › <span class="ui">Az előző után</span>.`
       ],
@@ -184,15 +184,15 @@ window.MISSION = {
 
     { title: "Tovább repül a szán",
       story: `<p>A Mikulásnak még sok csizmához el kell jutnia. A következő kattintásra a szán <b>felfelé kiúszik</b> a diáról.</p>`,
-      learn: `<p>Az ${RED} <b>eltűnési</b> effektus után a dolog nem látszik többé. A szánnak már van egy mozgásvonala: ezt a második animációt is az <span class="ui">Animáció hozzáadása</span> gombbal adod hozzá, különben elveszne a mozgásvonal!</p>`,
+      learn: `<p>Az ${RED} <b>kilépési</b> effektus után a dolog nem látszik többé. A szánnak már van egy mozgásvonala: ezt a második animációt is az <span class="ui">Animáció hozzáadása</span> gombbal adod hozzá, különben elveszne a mozgásvonal!</p>`,
       steps: [
         `Kattints a szánra.`,
-        `<span class="ui">Animáció hozzáadása</span> › ${RED} Eltűnés: <span class="ui">Kiúszás</span>.`,
+        `<span class="ui">Animáció hozzáadása</span> › ${RED} Kilépés: <span class="ui">Kiúszás</span>.`,
         `<span class="ui">Effektus beállításai</span> › válaszd azt az irányt, amelyik <b>felfelé</b> visz. Az <span class="ui">Indítás</span> maradjon <span class="ui">Kattintásra</span>.`,
         `Nézd meg az egészet <kbd>F5</kbd>-tel, és mentsd el: <kbd>Ctrl</kbd>+<kbd>S</kbd>.`
       ],
       asks: [{ q: "Diavetítésben hányszor kell kattintanod, hogy minden animáció lejátszódjon?", num: 2,
-        traps: { "6": "Nem mindegyik indul kattintásra! Számold meg a munkaablakban a számokat (a 0 nem kattintás).", "3": "A 0 előtti hópelyhek nem kellenek kattintás: rögtön indulnak. Hány szám van még?", "1": "A szán érkezése és a szán távozása is kattintásra indul." } }],
+        traps: { "6": "Nem mindegyik indul kattintásra! Számold meg a munkaablakban a számokat (a 0 nem kattintás).", "3": "A 0-s sorhoz (a hópelyhekhez) nem kell kattintani: azok rögtön indulnak. Hány szám van még?", "1": "A szán érkezése és a szán távozása is kattintásra indul." } }],
       hints: ["Az első kattintás hozza a szánt, a második viszi el. Minden más magától megy."],
       success: "Kétszer: egyszer jön, egyszer megy a Mikulás." },
 
@@ -207,31 +207,31 @@ window.MISSION = {
   ],
   checks: [
     { label: "Hold: nincs animációja", test: d => { const r = animOf(d, "Hold", "emph"); if (r.err) return r.err; return !r.list.length || "A Holdnak még van animációja. A munkaablakban jelöld ki a sorát, és nyomd meg a Delete billentyűt."; } },
-    { label: "Hópelyhek: megjelenés, legelöl, kattintás nélkül, 2 mp", test: d => need(d, "Hópelyhek", "entr", null, a => {
+    { label: "Hópelyhek: belépés, legelöl, kattintás nélkül, 2 mp", test: d => need(d, "Hópelyhek", "entr", null, a => {
         const sl = sceneOf(d);
-        if (sl.anims[0] !== a) return "A Hópelyhek animációja még nem a lista legtetején van. Jelöld ki, és <i>Áthelyezés korábbra</i>.";
+        if (sl.anims[0] !== a) return "A Hópelyhek animációja még nem a lista legtetején van. Jelöld ki, és <i>Korábbra helyezés</i>.";
         if (a.start === "click") return "Hópelyhek: az <i>Indítás</i> most „Kattintásra”, de „Együtt az előzővel” kellene.";
         return Math.abs(a.dur - 2000) <= 60 || `Hópelyhek: az időtartam most ${(a.dur / 1000).toLocaleString("hu-HU")} mp, de 2 mp kellene.`; }) },
     { label: "Szán: mozgásvonal balra, kattintásra, 3 mp", test: d => need(d, "Szán", "path", "click", a => {
         const e = PPTX.pathEnd(a.motion);
         if (!(e && e[0] < -0.15)) return "Szán: a mozgásvonal nem vezet elég messzire balra. Húzd a piros jelet a kémény mellé!";
         return Math.abs(a.dur - 3000) <= 60 || `Szán: az időtartam most ${(a.dur / 1000).toLocaleString("hu-HU")} mp, de 3 mp kellene.`; }) },
-    { label: "Fény: megjelenés, az előző után", test: d => need(d, "Fény", "entr", "after") },
-    { label: "Csomag: megjelenés, az előző után, 1 mp késleltetéssel", test: d => need(d, "Csomag", "entr", "after", a => Math.abs(a.delay - 1000) <= 30 || `Csomag: a késleltetés most ${(a.delay / 1000).toLocaleString("hu-HU")} mp, de 1 mp kellene.`) },
+    { label: "Fény: belépés, az előző után", test: d => need(d, "Fény", "entr", "after") },
+    { label: "Csomag: belépés, az előző után, 1 mp késleltetéssel", test: d => need(d, "Csomag", "entr", "after", a => Math.abs(a.delay - 1000) <= 30 || `Csomag: a késleltetés most ${(a.delay / 1000).toLocaleString("hu-HU")} mp, de 1 mp kellene.`) },
     { label: "Csomag: második animáció, kiemelés, az előző után", test: d => {
         const r = animOf(d, "Csomag", "emph"); if (r.err) return r.err;
         if (!r.a && r.list.length) return "Csomag: hiányzik a második animáció. Jelöld ki a csomagot, és <i>Animáció hozzáadása › Kiemelés › Növekedés/kicsinyítés</i>.";
         return need(d, "Csomag", "emph", "after"); } },
-    { label: "Szán: második animáció, eltűnés, kattintásra", test: d => {
+    { label: "Szán: második animáció, kilépés, kattintásra", test: d => {
         const r = animOf(d, "Szán", "exit"); if (r.err) return r.err;
-        if (r.a && !r.list.some(a => a.cls === "path")) return "A szánnak már nincs mozgásvonala: az eltűnés lecserélte. A mozgásvonalat add vissza, az eltűnést pedig az <i>Animáció hozzáadása</i> gombbal!";
-        if (!r.a && r.list.length) return "Szán: hiányzik a második animáció. Jelöld ki a szánt, és <i>Animáció hozzáadása › Eltűnés › Kiúszás</i>.";
+        if (r.a && !r.list.some(a => a.cls === "path")) return "A szánnak már nincs mozgásvonala: a kilépés lecserélte. A mozgásvonalat add vissza, a kilépést pedig az <i>Animáció hozzáadása</i> gombbal!";
+        if (!r.a && r.list.length) return "Szán: hiányzik a második animáció. Jelöld ki a szánt, és <i>Animáció hozzáadása › Kilépés › Kiúszás</i>.";
         return need(d, "Szán", "exit", "click"); } },
     { label: "Jó sorrend: hó → szán érkezik → fény → csomag → csomag nő → szán elmegy", test: d => {
         const sl = sceneOf(d), want = [["Hópelyhek", "entr"], ["Szán", "path"], ["Fény", "entr"], ["Csomag", "entr"], ["Csomag", "emph"], ["Szán", "exit"]];
         const pos = want.map(([n, c]) => { const sh = PPTX.byName(sl, n); return sh ? sl.anims.findIndex(a => a.cls === c && a.shape && PPTX.inside(a.shape, sh)) : -1; });
         if (pos.some(p => p < 0)) return "Még nincs meg mind a hat animáció.";
-        const label = ([n, c]) => n + ({ entr: " (megjelenés)", emph: " (kiemelés)", exit: " (eltűnés)", path: " (mozgásvonal)" })[c];
+        const label = ([n, c]) => n + ({ entr: " (belépés)", emph: " (kiemelés)", exit: " (kilépés)", path: " (mozgásvonal)" })[c];
         for (let k = 1; k < pos.length; k++) if (pos[k] < pos[k - 1]) return `${label(want[k])} a ${label(want[k - 1])} előtt van. Rendezd át a munkaablakban!`;
         return true; } }
   ],
@@ -244,6 +244,6 @@ window.MISSION = {
 };
 </script>
 <script src="../real.js"></script>
-<script src="../../nav.js?v=9681d08c" defer></script>
+<script src="../../nav.js?v=e1b4e4e8" defer></script>
 </body>
 </html>

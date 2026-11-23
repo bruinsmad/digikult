@@ -11,11 +11,11 @@
   const W = 960, H = 540;
 
   const KINDS = {
-    rect: "Téglalap", roundRect: "Téglalap: lekerekített sarkú", ellipse: "Ellipszis", triangle: "Egyenlő szárú háromszög",
-    star5: "Csillag: 5 ágú", heart: "Szív", rightArrow: "Nyíl: jobbra", callout: "Szövegbuborék: téglalap", cloud: "Gondolatbuborék: felhő"
+    rect: "Téglalap", roundRect: "Lekerekített sarkú téglalap", ellipse: "Ellipszis", triangle: "Egyenlő szárú háromszög",
+    star5: "Ötágú csillag", heart: "Szív", rightArrow: "Jobbra mutató nyíl", callout: "Téglalap alakú szövegbuborék", cloud: "Felhő alakú gondolatbuborék"
   };
-  const GALLERY = [["Téglalapok", ["rect", "roundRect"]], ["Alapalakzatok", ["ellipse", "triangle", "heart"]], ["Széles nyilak", ["rightArrow"]],
-    ["Csillagok és szalagok", ["star5"]], ["Feliratok", ["callout", "cloud"]]];
+  const GALLERY = [["Téglalapok", ["rect", "roundRect"]], ["Egyszerű alakzatok", ["ellipse", "triangle", "heart"]], ["Tömbös nyílfejek", ["rightArrow"]],
+    ["Csillagok és szalagok", ["star5"]], ["Ábrafeliratok", ["callout", "cloud"]]];
   const COLORS = [["#ffffff", "Fehér"], ["#000000", "Fekete"], ["#7f7f7f", "Szürke"], ["#c00000", "Sötétvörös"], ["#ff0000", "Piros"], ["#ffc000", "Narancs"], ["#ffff00", "Sárga"],
     ["#92d050", "Világoszöld"], ["#00b050", "Zöld"], ["#00b0f0", "Világoskék"], ["#0070c0", "Kék"], ["#002060", "Sötétkék"], ["#7030a0", "Lila"], ["#f4b6c9", "Rózsaszín"], ["#8b5a2b", "Barna"]];
   const BLUE = "#4472c4", BLUE_LINE = "#2f528f";
@@ -28,7 +28,7 @@
       case "roundRect": { const r = Math.min(w, h) * .17; return `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${r}"/>`; }
       case "ellipse": return `<ellipse cx="0" cy="0" rx="${w / 2}" ry="${h / 2}"/>`;
       case "triangle": return `<path d="M0 ${y}L${-x} ${-y}L${x} ${-y}Z"/>`;
-      case "star5": { let d = ""; for (let k = 0; k < 10; k++) { const a = -Math.PI / 2 + k * Math.PI / 5, r = k % 2 ? .38 : .5; d += (k ? "L" : "M") + (Math.cos(a) * r * w).toFixed(1) + " " + (Math.sin(a) * r * h * 1.05 + h * .04).toFixed(1); } return `<path d="${d}Z"/>`; }
+      case "star5": { let d = ""; for (let k = 0; k < 10; k++) { const a = -Math.PI / 2 + k * Math.PI / 5, r = k % 2 ? .21 : .5; d += (k ? "L" : "M") + (Math.cos(a) * r * w).toFixed(1) + " " + (Math.sin(a) * r * h * 1.05 + h * .04).toFixed(1); } return `<path d="${d}Z"/>`; }
       case "heart": return `<path d="M0 ${y + h * .28}C${x + w * .1} ${y - h * .12} ${x - w * .12} ${y + h * .42} 0 ${-y}C${-x + w * .12} ${y + h * .42} ${-x - w * .1} ${y - h * .12} 0 ${y + h * .28}Z"/>`;
       case "rightArrow": return `<path d="M${x} ${y + h * .25}H${-x - w * .35}V${y}L${-x} 0L${-x - w * .35} ${-y}V${-y - h * .25}H${x}Z"/>`;
       case "callout": return `<path d="M${x} ${y}H${-x}V${-y - h * .22}H${x + w * .42}L${x + w * .12} ${-y + h * .08}L${x + w * .24} ${-y - h * .22}H${x}Z"/>`;
@@ -42,16 +42,16 @@
     ellipse: { text: "Rajzolj egy <b>ellipszist</b> húzással.", test: L => L.shapes.some(s => s.type === "ellipse" && !s.pre) },
     circle: { text: "Rajzolj egy <b>szabályos kört</b>: húzás közben tartsd lenyomva a <kbd>Shift</kbd> billentyűt.", test: L => L.shapes.some(s => s.type === "ellipse" && !s.pre && Math.abs(s.w - s.h) < 2 && s.w > 20) },
     move: { text: "Fogd meg az egyik alakzatot a közepénél, és vidd máshová.", test: L => L.flags.moved },
-    resize: { text: "Méretezd át egy alakzatot a <b>fehér karikák</b> egyikével.", test: L => L.flags.resized },
-    fill: { text: "Változtasd meg egy alakzat színét: <b>Alakzat formátuma › Alakzat kitöltése</b>.", test: L => L.shapes.some(s => s.fill !== s.fill0) },
+    resize: { text: "Méretezz át egy alakzatot a <b>fehér karikák</b> egyikével.", test: L => L.flags.resized },
+    fill: { text: "Változtasd meg egy alakzat színét: <b>Alakzatformátum › Alakzat kitöltése</b>.", test: L => L.shapes.some(s => s.fill !== s.fill0) },
     nofill: { text: "Vedd el egy alakzat kitöltését: <b>Alakzat kitöltése › Nincs kitöltés</b>.", test: L => L.shapes.some(s => s.fill === "none") },
-    line: { text: "Állítsd egy alakzat körvonalát <b>6 pt</b> vastagra: <b>Alakzat körvonala › Vastagság</b>.", test: L => L.shapes.some(s => s.lw >= 6 && s.line !== "none") },
+    line: { text: "Állítsd egy alakzat körvonalát <b>6 pt</b> vastagra: <b>Alakzat körvonala › Vastagság</b> (újabb PowerPointban: <b>Súly</b>).", test: L => L.shapes.some(s => s.lw >= 6 && s.line !== "none") },
     noline: { text: "Vedd el egy alakzat körvonalát: <b>Alakzat körvonala › Nincs körvonal</b>.", test: L => L.shapes.some(s => s.line === "none") },
     linecolor: { text: "Adj egy alakzatnak más színű körvonalat.", test: L => L.shapes.some(s => s.line !== "none" && s.line !== s.line0) },
-    rotate: { text: "Forgasd el egy alakzatot a fölötte lévő <b>kerek nyíllal</b>.", test: L => L.shapes.some(s => Math.abs(s.rot % 360) > 3) },
+    rotate: { text: "Forgass el egy alakzatot a fölötte lévő <b>kerek nyíllal</b>.", test: L => L.shapes.some(s => Math.abs(s.rot % 360) > 3) },
     text: { text: "Írj szöveget egy alakzatba: jelöld ki, és kezdj el gépelni.", test: L => L.shapes.some(s => s.text.trim().length >= 2) },
-    front: { text: "Hozd előre a hátsó alakzatot: jelöld ki, aztán <b>Előrehozás</b>.", test: L => L.flags.front },
-    back: { text: "Küldj hátra egy alakzatot: <b>Hátraküldés</b>.", test: L => L.flags.back },
+    front: { text: "Hozd előre a hátsó alakzatot: jelöld ki, aztán kattints az <b>Előbbre hozás</b> gombra.", test: L => L.flags.front },
+    back: { text: "Küldd vissza hátra: jelöld ki, aztán kattints a <b>Hátrébb küldés</b> gombra.", test: L => L.flags.back },
     group: { text: "Jelölj ki több alakzatot (<kbd>Shift</kbd> + kattintás), és foglald csoportba: <b>Csoportosítás › Csoportosítás</b>.", test: L => L.shapes.some(s => s.g) },
     groupmove: { text: "Mozgasd el a csoportot egyben.", test: L => L.flags.groupMoved }
   };
@@ -135,7 +135,7 @@
     function drawTabs() {
       const has = L.sel.length > 0;
       if (!has && L.tab === "format") L.tab = "insert";
-      const tabs = [["file", "Fájl"], ["home", "Kezdőlap"], ["insert", "Beszúrás"], ["anim", "Animációk"]].concat(has ? [["format", "Alakzat formátuma"]] : []);
+      const tabs = [["file", "Fájl"], ["home", "Kezdőlap"], ["insert", "Beszúrás"], ["anim", "Animációk"]].concat(has ? [["format", "Alakzatformátum"]] : []);
       tabsEl.innerHTML = tabs.map(([id, t]) => `<button type="button" role="tab" class="pp-tab${id === "format" ? " ctx" : ""}" data-tab="${id}" aria-selected="${L.tab === id}">${t}</button>`).join("");
       drawRibbon();
     }
@@ -150,16 +150,16 @@
     };
     function drawRibbon() {
       const one = selShapes()[0];
-      if (L.tab === "insert") rib.innerHTML = `<div class="pp-grp"><button type="button" class="pp-big" data-menu="shapes" aria-haspopup="true">${ico.shapes}<span>Alakzatok ▾</span></button><span class="pp-gl">Illusztrációk</span></div>
+      if (L.tab === "insert") rib.innerHTML = `<div class="pp-grp"><button type="button" class="pp-big" data-menu="shapes" aria-haspopup="true">${ico.shapes}<span>Alakzatok ▾</span></button><span class="pp-gl">Ábrák</span></div>
         <p class="pp-tip">${L.tool ? `Most kattints vagy húzz a dián: ${esc(KINDS[L.tool])}` : "Válassz egy alakzatot, aztán rajzold meg a dián."}</p>`;
-      else if (L.tab === "format") rib.innerHTML = `<div class="pp-grp"><button type="button" class="pp-big" data-menu="shapes">${ico.shapes}<span>Alakzatok ▾</span></button><span class="pp-gl">Alakzat beszúrása</span></div>
+      else if (L.tab === "format") rib.innerHTML = `<div class="pp-grp"><button type="button" class="pp-big" data-menu="shapes">${ico.shapes}<span>Alakzatok ▾</span></button><span class="pp-gl">Alakzatok beszúrása</span></div>
         <div class="pp-grp"><div class="pp-col"><button type="button" class="pp-sm" data-menu="fill">${ico.fill(one && one.fill !== "none" ? one.fill : "#fff")}<span>Alakzat kitöltése ▾</span></button>
           <button type="button" class="pp-sm" data-menu="line">${ico.line(one && one.line !== "none" ? one.line : "#fff")}<span>Alakzat körvonala ▾</span></button></div><span class="pp-gl">Alakzatstílusok</span></div>
-        <div class="pp-grp"><div class="pp-col"><button type="button" class="pp-sm" data-act="front">${ico.front}<span>Előrehozás</span></button>
-          <button type="button" class="pp-sm" data-act="back">${ico.back}<span>Hátraküldés</span></button></div>
+        <div class="pp-grp"><div class="pp-col"><button type="button" class="pp-sm" data-act="front">${ico.front}<span>Előbbre hozás</span></button>
+          <button type="button" class="pp-sm" data-act="back">${ico.back}<span>Hátrébb küldés</span></button></div>
           <div class="pp-col"><button type="button" class="pp-sm" data-menu="group">${ico.group}<span>Csoportosítás ▾</span></button>
           <button type="button" class="pp-sm" data-menu="rotate">${ico.rotate}<span>Elforgatás ▾</span></button></div><span class="pp-gl">Elrendezés</span></div>`;
-      else rib.innerHTML = `<p class="pp-tip">${L.tab === "anim" ? "Az animációkról a következő leckében lesz szó." : "Ebben a gyakorlóban a <b>Beszúrás</b> lap működik, és ha kijelölsz egy alakzatot, az <b>Alakzat formátuma</b> lap."}</p>`;
+      else rib.innerHTML = `<p class="pp-tip">${L.tab === "anim" ? "Az animációkról a következő leckében lesz szó." : "Ebben a gyakorlóban a <b>Beszúrás</b> lap működik, és ha kijelölsz egy alakzatot, az <b>Alakzatformátum</b> lap."}</p>`;
       if (L.menu) openMenu(L.menu);
     }
     function openMenu(which) {
@@ -289,7 +289,7 @@
       if (d.mode === "draw") {
         if (d.s.w < 8 || d.s.h < 8) { const sq = ["ellipse", "star5", "heart"].includes(d.s.type); Object.assign(d.s, { w: sq ? 110 : 150, h: sq ? 110 : 100, cx: clamp(d.x0, 80, W - 80), cy: clamp(d.y0, 60, H - 60) }); }
         L.flags.inserted = true; L.tab = "format";
-        say(`Beszúrtad: <b>${esc(KINDS[d.s.type])}</b>. Fent megjelent az <b>Alakzat formátuma</b> lap.`);
+        say(`Beszúrtad: <b>${esc(KINDS[d.s.type])}</b>. Fent megjelent az <b>Alakzatformátum</b> lap.`);
         drawShapes(); drawTabs();
       }
       if (d.mode === "move" && d.moved) { L.flags.moved = true; if (d.list.some(o => o.s.g)) L.flags.groupMoved = true; }

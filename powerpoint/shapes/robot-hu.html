@@ -22,7 +22,7 @@
 <rect x="18" y="52" width="10" height="26" rx="5" fill="#7f7f7f" transform="rotate(30 23 52)"/><rect x="68" y="50" width="10" height="26" rx="5" fill="#7f7f7f" transform="rotate(-150 73 52)"/>
 <rect x="36" y="74" width="9" height="14" fill="#7f7f7f"/><rect x="51" y="74" width="9" height="14" fill="#7f7f7f"/>
 <rect x="22" y="48" width="52" height="30" rx="8" fill="#00b0f0" stroke="#002060" stroke-width="3"/><path d="M48 58c-3-4-9-1-6 4l6 5 6-5c3-5-3-8-6-4z" fill="#ff0000"/></svg></span>
-  <div><div class="kicker">PowerPoint, 1. lecke: küldetés a PowerPointban</div><h1>Robi, a robot</h1></div>
+  <div><div class="kicker">PowerPoint, 1. lecke: küldetés</div><h1>Robi, a robot</h1></div>
   <div class="meta"><span>Haladás <b id="solvedCount">–</b></span><span>Idő <b id="timer">0:00</b></span><button type="button" class="mbtn" id="soundBtn">Hang: be</button><button type="button" id="resetBtn" title="Az egész küldetés újrakezdése">Újrakezdés</button></div>
 </div>
 <nav class="steps" id="steps" aria-label="Fejezetek"></nav>
@@ -74,22 +74,22 @@ window.MISSION = {
     { refresher: true, title: "Nyisd meg a PowerPointot",
       story: `<p>Az informatikateremnek <b>kabala</b> kell! Az osztály megszavazta: egy robot lesz, és <b>Robinak</b> hívják. A tanárotok kitenné a terem ajtajára, de előbb valakinek meg kell rajzolnia. Ez leszel te!</p>
         <p>Robit a <b>PowerPointban</b> rajzolod meg, csupa alakzatból. Ez az oldal megmutatja, mit csinálj, a végén pedig megnézi a kész fájlodat.</p>`,
-      learn: `<ul><li>Az alakzatokat a <span class="ui">Beszúrás</span> › <span class="ui">Alakzatok</span> gombbal rajzolod.</li><li>Ha valamit elrontasz: <kbd>Ctrl</kbd>+<kbd>Z</kbd>, és visszavonja.</li><li>Az elméletet <a href="intro-hu.html">itt</a> olvashatod el újra.</li></ul>`,
+      learn: `<ul><li>Az alakzatokat a <span class="ui">Beszúrás</span> › <span class="ui">Alakzatok</span> gombbal rajzolod.</li><li>Ha valamit elrontasz, a <kbd>Ctrl</kbd>+<kbd>Z</kbd> visszavonja.</li><li>Az elméletet <a href="intro-hu.html">itt</a> olvashatod el újra.</li></ul>`,
       steps: [
         `Nyisd meg a PowerPointot, és válaszd az <span class="ui">Üres bemutató</span> lehetőséget.`,
         `Az első dián két üres doboz van („Kattintson ide…”). Ezekre most nincs szükség: <span class="ui">Kezdőlap</span> › <span class="ui">Elrendezés</span> › <span class="ui">Üres</span>.`,
         `Mentsd el a neveddel: <span class="ui">Fájl</span> › <span class="ui">Mentés másként</span>. A fájl neve legyen például <code>robi-Kovacs-Anna</code>.`,
         `Kattints fent a <span class="ui">Beszúrás</span> lapra, aztán az <span class="ui">Alakzatok</span> gombra. Nézd meg a listát: ha egy alakzat fölé viszed az egeret, kiírja a nevét. Még ne válassz semmit (az <kbd>Esc</kbd> bezárja a listát).`
       ],
-      asks: [{ q: "Az Alakzatok listában melyik csoportban van a <b>szív</b>? (A csoport neve a sora fölött áll.)", text: ["alapalakzatok", "alap alakzatok", "alapalakzat"], wrong: "Keresd meg a szívet a listában, és nézd meg, melyik cím alatt van. A cím a sor fölött áll." }],
-      hints: ["A szív a körrel és a háromszöggel van egy csoportban, a lista elején. A csoport neve „Alap…” kezdetű."],
-      success: "Alapalakzatok: itt van a kör, a háromszög és a szív is. Kezdjük Robi testével!" },
+      asks: [{ q: "Az Alakzatok listában melyik csoportban van a <b>szív</b>? (A csoport neve a sora fölött áll.)", text: ["egyszerű alakzatok", "egyszerű alakzat", "egyszerűalakzatok"], wrong: "Keresd meg a szívet a listában, és nézd meg, melyik cím alatt van. A cím a sor fölött áll." }],
+      hints: ["A szív a körrel és a háromszöggel van egy csoportban, a lista elején. A csoport neve „Egyszerű…” kezdetű."],
+      success: "Egyszerű alakzatok: itt van a kör, a háromszög és a szív is. Kezdjük Robi testével!" },
 
     { title: "Robi teste",
       story: `<p>Minden robotnak kell egy erős <b>test</b>. Robié egy nagy, lekerekített sarkú téglalap.</p>`,
       learn: `<p>Ha egy alakzatra kattintasz, <b>kijelölöd</b>. Körülötte fehér karikák jelennek meg: ezekkel <b>méretezed</b>. Fölötte egy <b>kerek nyíl</b> van: azzal <b>forgatod</b>.</p><p>A lekerekített téglalapnak van egy <b>sárga pöttye</b> is: azzal állíthatod, mennyire legyen kerek a sarka.</p>`,
       steps: [
-        `<span class="ui">Beszúrás</span> › <span class="ui">Alakzatok</span> › a <i>Téglalapok</i> csoportban a második: <span class="ui">Téglalap: lekerekített sarkú</span>.`,
+        `<span class="ui">Beszúrás</span> › <span class="ui">Alakzatok</span>, és a <i>Téglalapok</i> csoportban válaszd a másodikat: a <b>lekerekített sarkú téglalapot</b>.`,
         `Húzz egy nagy téglalapot a dia közepén, kicsit lejjebb. (Hagyj fölötte helyet a fejnek!)`,
         `Kattints rá, ha nincs kijelölve. Húzd a sárga pöttyöt, és nézd, mi változik. Aztán állítsd be, hogy kicsit kerek legyen a sarka.`
       ],
@@ -102,8 +102,8 @@ window.MISSION = {
       story: `<p>Most jöhet a <b>fej</b> és két kerek <b>szem</b>. A szemnek tényleg kerek, szabályos körnek kell lennie, nem tojásnak.</p>`,
       learn: `<p>Ha húzás közben nyomva tartod a <kbd>Shift</kbd> billentyűt, az alakzat <b>szabályos</b> lesz: az ellipszisből kör, a téglalapból négyzet. Előbb az egeret engedd el, aztán a Shiftet.</p><p>A második szemet nem kell újra megrajzolni: <b>másold le</b> az elsőt (<kbd>Ctrl</kbd>+<kbd>C</kbd>, <kbd>Ctrl</kbd>+<kbd>V</kbd>), és húzd a helyére.</p>`,
       steps: [
-        `A fej: rajzolj egy újabb <span class="ui">Téglalap: lekerekített sarkú</span> alakzatot a test fölé, kicsit keskenyebbet, mint a test.`,
-        `Az első szem: <span class="ui">Beszúrás</span> › <span class="ui">Alakzatok</span> › <i>Alapalakzatok</i> › <span class="ui">Ellipszis</span>. Tartsd nyomva a <kbd>Shift</kbd>-et, és úgy húzd meg a kört a fejen.`,
+        `A fej: rajzolj egy újabb lekerekített sarkú téglalapot a test fölé, kicsit keskenyebbet, mint a test.`,
+        `Az első szem: <span class="ui">Beszúrás</span> › <span class="ui">Alakzatok</span> › <i>Egyszerű alakzatok</i> › <span class="ui">Ellipszis</span>. Húzd meg a fejen, és húzás közben tartsd nyomva a <kbd>Shift</kbd> billentyűt: így kör lesz.`,
         `Jelöld ki a szemet, nyomd meg: <kbd>Ctrl</kbd>+<kbd>C</kbd>, aztán <kbd>Ctrl</kbd>+<kbd>V</kbd>. Az új szemet húzd a másik mellé.`
       ],
       asks: [{ q: "Melyik billentyűt tartottad nyomva, hogy szabályos kör legyen?", text: ["shift", "shift billentyű", "shiftet"], traps: { ctrl: "A Ctrl a másoláshoz kell. A szabályos körhöz egy másik billentyű kell: a nagybetűs írásnál is ezt használod.", alt: "Nem az Alt. A nagybetűs írásnál is ezt a billentyűt használod." } }],
@@ -112,25 +112,25 @@ window.MISSION = {
 
     { title: "Színek és körvonal",
       story: `<p>Robi most még ugyanolyan kék, mint minden új alakzat. Ideje kiszínezni! A mintán világoskék, de te választhatsz más színt is.</p>`,
-      learn: `<p>Ha kijelölsz egy alakzatot, fent megjelenik az <span class="ui">Alakzat formátuma</span> lap. Itt van:</p><ul><li><span class="ui">Alakzat kitöltése</span>: a belseje színe,</li><li><span class="ui">Alakzat körvonala</span>: a széle színe, és alatta a <span class="ui">Vastagság</span>.</li></ul><p>Ha több alakzatot jelölsz ki egyszerre (<kbd>Shift</kbd> + kattintás), egyszerre színezheted őket.</p>`,
+      learn: `<p>Ha kijelölsz egy alakzatot, fent megjelenik az <span class="ui">Alakzatformátum</span> lap. Itt van:</p><ul><li><span class="ui">Alakzat kitöltése</span>: a belseje színe,</li><li><span class="ui">Alakzat körvonala</span>: a széle színe, és alatta a <span class="ui">Vastagság</span>.</li></ul><p>Ha több alakzatot jelölsz ki egyszerre (<kbd>Shift</kbd> + kattintás), egyszerre színezheted őket.</p>`,
       steps: [
-        `Jelöld ki a testet, aztán <kbd>Shift</kbd>-tel a fejet is. <span class="ui">Alakzat formátuma</span> › <span class="ui">Alakzat kitöltése</span>: válassz egy színt (a mintán <i>Világoskék</i>).`,
-        `Még mindig ki vannak jelölve: <span class="ui">Alakzat körvonala</span> › válassz sötét színt (pl. <i>Sötétkék</i>), aztán <span class="ui">Alakzat körvonala</span> › <span class="ui">Vastagság</span> › <b>3 pt</b> (vagy vastagabb).`,
+        `Jelöld ki a testet, aztán <kbd>Shift</kbd>-tel a fejet is. <span class="ui">Alakzatformátum</span> › <span class="ui">Alakzat kitöltése</span>: válassz egy színt (a mintán <i>Világoskék</i>).`,
+        `Még mindig ki vannak jelölve: <span class="ui">Alakzat körvonala</span> › válassz sötét színt (pl. <i>Sötétkék</i>), aztán <span class="ui">Alakzat körvonala</span> › <span class="ui">Vastagság</span> (újabb PowerPointban: <span class="ui">Súly</span>) › <b>3 pt</b> vagy vastagabb.`,
         `A két szem legyen <b>fehér</b>. Mindkettőre rajzolj egy kisebb <b>fekete</b> kört: ez a pupilla.`,
-        `Kap még egy <b>szájat</b> (egy vékony téglalap) és a test közepére egy piros <span class="ui">Szív</span> alakzatot (<i>Alapalakzatok</i>).`
+        `Robi kap még egy <b>szájat</b> (egy vékony, sötét téglalapot), a test közepére pedig egy piros <b>szívet</b> (<i>Egyszerű alakzatok</i> › <span class="ui">Szív</span>).`
       ],
       asks: [{ q: "Mi a neve annak a lapnak, amelyik csak akkor jelenik meg, ha kijelölsz egy alakzatot?", text: ["alakzat formátuma", "alakzatformátum", "formátum", "alakzat formátum"], traps: { "beszúrás": "A Beszúrás lap mindig ott van. Kattints egy alakzatra, és figyeld, milyen <b>új</b> lap jelenik meg a sor végén!", "kezdőlap": "A Kezdőlap mindig ott van. Kattints egy alakzatra, és figyeld, milyen <b>új</b> lap jelenik meg!" } }],
       hints: ["Kattints egy alakzatra, és nézd meg a lapok sorát fent: a sor végén megjelenik egy új. Ha rákattintasz egy üres helyre, eltűnik."],
-      success: "Alakzat formátuma: itt laknak a színek és a körvonalak. Robi már igazán színes!" },
+      success: "Alakzatformátum: itt laknak a színek és a körvonalak. Robi már igazán színes!" },
 
     { title: "Karok, lábak, antenna",
       story: `<p>Robi most egy fej egy dobozon. Kell neki két <b>kar</b>, két <b>láb</b> és egy <b>antenna</b> csillaggal a tetején. Az egyik karjával <b>integessen</b>!</p>`,
-      learn: `<p>A kijelölt alakzat fölötti <b>kerek nyíllal</b> forgatsz: fogd meg, és húzd körbe. Ha közben nyomva tartod a <kbd>Shift</kbd>-et, szép kerek fokonként ugrik.</p>`,
+      learn: `<p>A kijelölt alakzat fölötti <b>kerek nyíllal</b> forgatsz: fogd meg, és húzd körbe. Ha közben nyomva tartod a <kbd>Shift</kbd> billentyűt, nem folyamatosan forog, hanem ugrálva.</p>`,
       steps: [
-        `Egy kar: egy hosszú, keskeny <span class="ui">Téglalap: lekerekített sarkú</span>. Színezd szürkére, adj neki ugyanolyan körvonalat, mint a testnek.`,
+        `Egy kar: egy hosszú, keskeny lekerekített sarkú téglalap. Színezd szürkére, és adj neki ugyanolyan körvonalat, mint a testnek.`,
         `Másold le (<kbd>Ctrl</kbd>+<kbd>C</kbd>, <kbd>Ctrl</kbd>+<kbd>V</kbd>), és tedd a két kart a test két oldalára.`,
         `Az integető kart forgasd el a kerek nyíllal. Próbáld ki, mi történik, ha közben nyomva tartod a <kbd>Shift</kbd>-et!`,
-        `Két láb: két téglalap a test alá. Az antenna: egy vékony téglalap a fej tetejére, és rá egy sárga <span class="ui">Csillag: 5 ágú</span> (<i>Csillagok és szalagok</i>).`
+        `Két láb: két téglalap a test alá. Az antenna: egy vékony téglalap a fej tetejére, és rá egy sárga ötágú csillag (a <i>Csillagok és szalagok</i> csoportban).`
       ],
       asks: [{ q: "Ha forgatás közben nyomva tartod a <kbd>Shift</kbd>-et, hány fokonként ugrik az alakzat?", num: 15,
         traps: { "45": "Nézd meg újra, lassan forgatva: a 45 fok is megvan, de közben több állása is van.", "90": "A 90 fok is megvan, de közben több állása is van. Forgasd lassan, és figyeld!", "1": "Az a Shift nélkül van így. Tartsd nyomva a Shiftet forgatás közben!" } }],
@@ -139,21 +139,21 @@ window.MISSION = {
 
     { title: "Előre és hátra",
       story: `<p>Valami nem stimmel: Robi karjai és lábai a teste <b>előtt</b> vannak, mintha rá lennének ragasztva. Azért, mert később rajzoltad őket, és ami később jön, az van felül.</p>`,
-      learn: `<p>Az alakzatok úgy vannak egymáson, mint a papírlapok. Az <span class="ui">Alakzat formátuma</span> lapon:</p><ul><li><span class="ui">Előrehozás</span>: egy szinttel feljebb (mellette a nyíllal: <i>Legelőre hozás</i>),</li><li><span class="ui">Hátraküldés</span>: egy szinttel lejjebb (<i>Leghátra küldés</i>).</li></ul>`,
+      learn: `<p>Az alakzatok úgy vannak egymáson, mint a papírlapok. Az <span class="ui">Alakzatformátum</span> lapon:</p><ul><li><span class="ui">Előbbre hozás</span>: egy szinttel előrébb (a mellette lévő kis nyílnál: <i>Előrehozás</i>, vagyis legelőre),</li><li><span class="ui">Hátrébb küldés</span>: egy szinttel hátrébb (a kis nyílnál: <i>Hátraküldés</i>, vagyis leghátra).</li></ul>`,
       steps: [
         `Húzd a karokat és a lábakat úgy, hogy egy kicsit belelógjanak a testbe.`,
-        `Jelöld ki mind a négyet (<kbd>Shift</kbd> + kattintás), és küldd őket a test mögé: <span class="ui">Alakzat formátuma</span> › a <span class="ui">Hátraküldés</span> melletti kis nyíl › <span class="ui">Leghátra küldés</span>.`,
-        `Most a test takarja a karok és a lábak végét. Így már igazinak tűnnek!`
+        `Jelöld ki mind a négyet (<kbd>Shift</kbd> + kattintás), és küldd őket a test mögé: <span class="ui">Alakzatformátum</span> › a <span class="ui">Hátrébb küldés</span> melletti kis nyíl › <span class="ui">Hátraküldés</span>.`,
+        `Most a test takarja a karok és a lábak végét. Így már sokkal jobban néz ki!`
       ],
-      asks: [{ q: "Melyik gombbal kerül egy alakzat a többi <b>mögé</b>?", text: ["hátraküldés", "leghátra küldés", "hátra küldés", "hátraküldés leghátra küldés"], traps: { "előrehozás": "Az Előrehozás éppen előre hozza. Mi a párja?" } }],
-      hints: ["Az Alakzat formátuma lapon, az <i>Elrendezés</i> csoportban két gomb van egymás alatt: Előrehozás és…"],
-      success: "Hátraküldés. Most Robi karjai a teste mögül nőnek ki!" },
+      asks: [{ q: "Melyik gombbal kerül egy alakzat a többi <b>mögé</b>?", text: ["hátrébb küldés", "hátraküldés", "hátrébbküldés", "hátra küldés"], traps: { "előbbre hozás": "Az Előbbre hozás éppen előre hozza. Mi a párja?", "előrehozás": "Az Előrehozás éppen legelőre hozza. Mi a párja?" } }],
+      hints: ["Az Alakzatformátum lapon, az <i>Elrendezés</i> csoportban két gomb van egymás mellett: Előbbre hozás és…"],
+      success: "Hátrébb küldés. Most Robi karjai a teste mögül nőnek ki!" },
 
     { title: "Szövegbuborék",
       story: `<p>Robi szeretne bemutatkozni. Kap egy <b>szövegbuborékot</b>, mint a képregényekben.</p>`,
       learn: `<p>Szinte minden alakzatba írhatsz: jelöld ki, és kezdj el gépelni. A buborék „csücskét” a <b>sárga pöttyel</b> húzhatod oda, ahol Robi szája van.</p><p>Vigyázz: az alakzatba írt szöveg alapból <b>fehér</b>. Fehér buborékon nem fog látszani!</p>`,
       steps: [
-        `<span class="ui">Beszúrás</span> › <span class="ui">Alakzatok</span> › <i>Feliratok</i> › <span class="ui">Szövegbuborék: téglalap</span> (vagy a felhő alakú). Rajzold Robi feje mellé.`,
+        `<span class="ui">Beszúrás</span> › <span class="ui">Alakzatok</span>, és az <i>Ábrafeliratok</i> csoportban válaszd a téglalap alakú szövegbuborékot (vagy a felhő alakút). Rajzold Robi feje mellé.`,
         `Színezd fehérre, és adj neki fekete körvonalat.`,
         `A buborék ki van jelölve: gépeld be, hogy <b>Szia! Robi vagyok.</b> (Nem látod? Olvasd tovább!)`,
         `Jelöld ki a buborékot, és a <span class="ui">Kezdőlap</span> lapon a <span class="ui">Betűszín</span> gombbal (piros vonalas <b>A</b>) válassz feketét. Itt nagyobbra is állíthatod a betűt.`,
@@ -167,8 +167,8 @@ window.MISSION = {
       story: `<p>Kész Robi! A tanárotok viszont azt kéri, hogy tedd egy kicsit balra. Ha most elkezded húzni, darabjaira esik… Kössük össze a részeit!</p>`,
       learn: `<p>A <b>csoportosítás</b> egyetlen egésszé köti össze a kijelölt alakzatokat: együtt mozognak, együtt méretezhetők. Ha később egy darabot javítanod kell: <span class="ui">Csoportosítás</span> › <span class="ui">Csoportbontás</span>.</p>`,
       steps: [
-        `Jelöld ki Robi összes részét: kattints a dián egy üres helyre Robi bal felső sarka fölött, és húzz egy nagy téglalapot egész Robi köré. (A buborékot nem kell bevenni.)`,
-        `<span class="ui">Alakzat formátuma</span> › <span class="ui">Csoportosítás</span> › <span class="ui">Csoportosítás</span>.`,
+        `Jelöld ki Robi összes részét: kattints egy üres helyre Robi bal felső sarka fölött, és az egérgombot nyomva tartva húzz egy keretet egész Robi köré. Csak az kerül bele, amit a keret <b>teljesen</b> körbevesz! (A buborék maradhat kívül.)`,
+        `<span class="ui">Alakzatformátum</span> › <span class="ui">Csoportosítás</span> › <span class="ui">Csoportosítás</span>.`,
         `Húzd Robit kicsit balra. Most egyben mozog!`,
         `Mentsd el: <kbd>Ctrl</kbd>+<kbd>S</kbd>.`
       ],
@@ -187,17 +187,17 @@ window.MISSION = {
   ],
   checks: [
     { label: "Legalább 10 alakzat a dián", test: d => { const n = shapesOf(d).length; return n >= 10 || `Most ${n} alakzatot találtam. Robihoz kell test, fej, két szem, két pupilla, száj, karok, lábak, antenna és csillag.`; } },
-    { label: "Lekerekített sarkú téglalap (a test vagy a fej)", test: d => shapesOf(d).some(s => s.prst === "roundRect") || "Nem találok <i>Téglalap: lekerekített sarkú</i> alakzatot. A testet ezzel rajzold!" },
-    { label: "Két szabályos kör (a szemek)", test: d => { const n = shapesOf(d).filter(isCircle).length; return n >= 2 || (shapesOf(d).some(PPTX.isEllipse) ? "Van ellipszised, de nem szabályos kör. Rajzold újra húzás közben nyomva tartott <kbd>Shift</kbd>-tel!" : "Nem találok kört. <i>Alapalakzatok › Ellipszis</i>, Shifttel."); } },
-    { label: "Saját színek: legalább 3 különböző kitöltés", test: d => { const c = new Set(shapesOf(d).filter(s => s.fill.type === "solid").map(s => s.fill.color)); return c.size >= 3 || `${c.size} saját színt találtam. Színezz át több részt: <i>Alakzat formátuma › Alakzat kitöltése</i>.`; } },
-    { label: "Vastagabb körvonal (legalább 3 pt)", test: d => shapesOf(d).some(s => s.line.set && !s.line.none && s.line.w >= 2.9) || "Nincs 3 pt-s vagy vastagabb körvonal. <i>Alakzat körvonala › Vastagság › 3 pt</i>." },
+    { label: "Lekerekített sarkú téglalap (a test vagy a fej)", test: d => shapesOf(d).some(s => s.prst === "roundRect") || "Nem találok lekerekített sarkú téglalapot. A testet ezzel rajzold (<i>Alakzatok › Téglalapok</i>, a második)!" },
+    { label: "Két szabályos kör (a szemek)", test: d => { const n = shapesOf(d).filter(isCircle).length; return n >= 2 || (shapesOf(d).some(PPTX.isEllipse) ? "Van ellipszised, de nem szabályos kör. Rajzold újra, és húzás közben tartsd nyomva a <kbd>Shift</kbd> billentyűt!" : "Nem találok kört. <i>Beszúrás › Alakzatok › Egyszerű alakzatok › Ellipszis</i>, húzás közben <kbd>Shift</kbd>."); } },
+    { label: "Saját színek: legalább 3 különböző kitöltés", test: d => { const c = new Set(shapesOf(d).filter(s => s.fill.type === "solid").map(s => s.fill.color)); return c.size >= 3 || `${c.size} saját színt találtam. Színezz át több részt: <i>Alakzatformátum › Alakzat kitöltése</i>.`; } },
+    { label: "Vastagabb körvonal (legalább 3 pt)", test: d => shapesOf(d).some(s => s.line.set && !s.line.none && s.line.w >= 2.9) || "Nincs 3 pt-s vagy vastagabb körvonal. <i>Alakzat körvonala › Vastagság (Súly) › 3 pt</i>." },
     { label: "Elforgatott alakzat (az integető kar)", test: d => shapesOf(d).some(s => { const r = ((s.rot % 360) + 360) % 360; return r > 2 && r < 358 && Math.abs(r - 180) > 2; }) || "Nincs elforgatott alakzat. Forgasd el az integető kart a kerek nyíllal!" },
-    { label: "Szövegbuborék szöveggel", test: d => { const b = shapesOf(d).filter(isCallout); return b.some(s => s.text.length >= 3) || (b.length ? "Van buborékod, de üres. Jelöld ki, és írd bele: Szia! Robi vagyok." : "Nem találok szövegbuborékot. <i>Beszúrás › Alakzatok › Feliratok</i>."); } },
+    { label: "Szövegbuborék szöveggel", test: d => { const b = shapesOf(d).filter(isCallout); return b.some(s => s.text.length >= 3) || (b.length ? "Van buborékod, de üres. Jelöld ki, és írd bele: Szia! Robi vagyok." : "Nem találok szövegbuborékot. <i>Beszúrás › Alakzatok › Ábrafeliratok</i>."); } },
     { label: "Robi csoportba foglalva (legalább 5 rész egy csoportban)", test: d => {
         const g = robiSlide(d).shapes.filter(s => s.kind === "grp");
         const count = s => s.kids.reduce((n, k) => n + (k.kind === "grp" ? count(k) : 1), 0);
         const best = Math.max(0, ...g.map(count));
-        return best >= 5 || (g.length ? `A csoportodban csak ${best} alakzat van. Jelöld ki egész Robit, és úgy csoportosítsd.` : "Nincs csoport a dián. Jelöld ki Robi részeit, és <i>Alakzat formátuma › Csoportosítás › Csoportosítás</i>."); } }
+        return best >= 5 || (g.length ? `A csoportodban csak ${best} alakzat van. Jelöld ki egész Robit, és úgy csoportosítsd.` : "Nincs csoport a dián. Jelöld ki Robi részeit, és <i>Alakzatformátum › Csoportosítás › Csoportosítás</i>."); } }
   ],
   ending: {
     title: "Robi elkészült!",
@@ -208,6 +208,6 @@ window.MISSION = {
 };
 </script>
 <script src="../real.js"></script>
-<script src="../../nav.js?v=9681d08c" defer></script>
+<script src="../../nav.js?v=e1b4e4e8" defer></script>
 </body>
 </html>
