@@ -955,9 +955,9 @@
                 id: "python-gyakorlo",
                 kind: "practice",
                 minutes: 90,
-                title: { hu: "Python alapok: 14 kis feladat", en: "Python basics: 14 small tasks" },
+                title: { hu: "Python alapok: 14 rövid feladat", en: "Python basics: 14 small tasks" },
                 desc: {
-                  hu: "Az összefoglaló minden témaköréhez egy 5–10 perces feladat: változók, input, elágazás, ciklusok, listák, programozási tételek, mátrix, függvény, fájlkezelés, osztály. Az oldal más adatokkal is ellenőriz.",
+                  hu: "Az összefoglaló minden témaköréhez egy 5–10 perces feladat: változók, input, elágazás, ciklusok, listák, programozási tételek, mátrix, függvény, fájlkezelés, osztály. Az ellenőrzés más adatokkal is lefuttatja a programot.",
                   en: "One 5–10 minute task for every topic of the summary notebook: variables, input, branching, loops, lists, the standard algorithms, matrices, functions, files, classes."
                 },
                 files: { hu: "python/fakt/gyakorlo-hu.html" },
@@ -967,9 +967,9 @@
                 id: "python-hazi-1",
                 kind: "practice",
                 minutes: 120,
-                title: { hu: "Házi: érettségi feladatok kicsiben", en: "Homework: exam tasks in miniature" },
+                title: { hu: "Házi: érettségi feladatok kicsinyítve", en: "Homework: exam tasks in miniature" },
                 desc: {
-                  hu: "13 feladat a csütörtöki órák anyagából: osztályok, a futas.txt beolvasása, és kicsiben az Ötszáz, a Kerítés, a Sorozatok és a Sudoku. Feladatonként ellenőrzés, a végén hazi.py letöltése.",
+                  hu: "13 feladat a csütörtöki órák anyagából: osztályok, a futas.txt beolvasása, valamint az Ötszáz, a Kerítés, a Sorozatok és a Sudoku kicsinyített változata. Az oldal feladatonként ellenőriz, a végén letöltheted a hazi.py-t.",
                   en: "13 tasks from the Thursday lessons: classes, reading futas.txt, and small versions of past exam tasks. Checked task by task; download hazi.py at the end."
                 },
                 files: { hu: "python/fakt/hazi-1-hu.html" },

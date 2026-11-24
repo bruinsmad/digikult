@@ -34,7 +34,10 @@ const first = (...msgs) => msgs.find(Boolean) || "";
 const pv = (run, i) => run.probes[i] && run.probes[i].ok ? run.probes[i].value : undefined;
 const pe = (run, i) => run.probes[i] && !run.probes[i].ok ? run.probes[i].err : "";
 const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
-const noMark = n => `Nem találom a kimenetben a „${n}. feladat” sort. Írd ki: print("${n}. feladat")`;
+/* Hungarian article before a number: "az 1.", "az 5.", "a 3." */
+const art = n => { const s = String(n); return (s === "1" || s[0] === "5" || (s.length === 4 && s[0] === "1")) ? "az" : "a"; };
+const Art = n => art(n) === "az" ? "Az" : "A";
+const noMark = n => `Nem találom a kimenetben ${art(n)} „${n}. feladat” sort. Írd ki: print("${n}. feladat")`;
 /* swap the value of `name = [...]` in the student's code (for a second run on other data) */
 function replaceAssign(code, name, newSrc) {
   const m = new RegExp("^" + name + "\\s*=\\s*\\[", "m").exec(code);
@@ -50,7 +53,7 @@ function replaceAssign(code, name, newSrc) {
   if (depth !== 0) return null;
   return code.slice(0, m.index) + name + " = " + newSrc + code.slice(i + 1);
 }
-window.PYLAB_UTIL = { norm, has, nums, num, lines, lineWith, need, first, pv, pe, same, noMark, replaceAssign };
+window.PYLAB_UTIL = { norm, has, nums, num, lines, lineWith, need, first, pv, pe, same, noMark, replaceAssign, art, Art };
 
 /* split the output into tasks by the "N. feladat" lines */
 function splitTasks(out) {
@@ -74,19 +77,19 @@ class _NoInput(Exception):
     pass
 
 HU = {
-    "NameError": "Ismeretlen név: olyat használsz, amit nem hoztál létre. Elírás? Kis- és nagybetű?",
-    "TypeError": "Típushiba: nem megfelelő típusú adattal dolgozol (pl. szöveg + szám, hiányzó int() vagy float()).",
-    "ValueError": "Értékhiba: pl. olyan szöveget alakítasz számmá, ami nem szám.",
-    "IndexError": "Túlindexelés: a listában nincs ilyen sorszámú elem.",
+    "NameError": "Ismeretlen név: olyan változót vagy függvényt használsz, amelyet még nem hoztál létre. Elírtad? Figyelj a kis- és nagybetűkre!",
+    "TypeError": "Típushiba: nem megfelelő típusú adattal dolgozol, pl. szöveget adsz össze számmal. Hiányzik egy int() vagy float()?",
+    "ValueError": "Értékhiba: például olyan szöveget alakítasz számmá, amely nem szám.",
+    "IndexError": "Túlindexelés: a listának nincs ilyen indexű eleme.",
     "KeyError": "Nincs ilyen kulcs a szótárban.",
     "ZeroDivisionError": "Nullával osztás.",
     "AttributeError": "Az objektumnak nincs ilyen adattagja vagy metódusa. Elírás?",
-    "FileNotFoundError": "Nem találom a fájlt. Pontosan így írtad a nevét?",
-    "IndentationError": "Behúzási hiba: a sorok eleje nincs jól igazítva.",
-    "TabError": "Behúzási hiba: keverted a tabulátort és a szóközt.",
-    "SyntaxError": "Szintaktikai hiba: elírás, hiányzó kettőspont, zárójel vagy idézőjel.",
-    "UnboundLocalError": "Egy változót előbb használsz a függvényben, mint hogy értéket adnál neki.",
-    "RecursionError": "Túl mély (végtelen?) rekurzió.",
+    "FileNotFoundError": "A fájl nem található. Pontosan így írtad a nevét?",
+    "IndentationError": "Behúzási hiba: valamelyik sor rosszul van behúzva.",
+    "TabError": "Behúzási hiba: vegyesen használsz tabulátort és szóközt.",
+    "SyntaxError": "Szintaktikai hiba: elírás, vagy hiányzik egy kettőspont, zárójel, idézőjel?",
+    "UnboundLocalError": "A függvényben egy változót előbb használsz, mint hogy értéket adnál neki.",
+    "RecursionError": "Túl mély, talán végtelen rekurzió.",
 }
 
 def _reset(files):
@@ -234,7 +237,7 @@ const Runner = (() => {
   const pending = new Map();
   const setStat = (cls, txt) => { const el = $("#pyStat"); if (!el) return; el.className = "pystat " + cls; $("#pyStatTxt").textContent = txt; };
   function start() {
-    setStat("", "Python töltődik…");
+    setStat("", "A Python betöltése…");
     worker = new Worker(URL.createObjectURL(new Blob([WORKER], { type: "text/javascript" })), { type: "module" });
     ready = new Promise((res, rej) => {
       worker.onmessage = e => {
@@ -257,7 +260,7 @@ const Runner = (() => {
   const fail = (type, msg, hint) => ({ out: "", error: { type, msg, line: null, hint: hint || "" }, noinput: false, probes: [], written: {} });
   async function run(job) {
     if (!worker) start();
-    try { await ready; } catch (e) { return fail("Betöltési hiba", "A Python nem töltődött be. Van internet? Frissítsd az oldalt."); }
+    try { await ready; } catch (e) { return fail("Betöltési hiba", "A Python nem töltődött be. Van internetkapcsolat? Töltsd újra az oldalt."); }
     const id = ++seq;
     return new Promise(res => {
       const timer = setTimeout(() => {
@@ -320,7 +323,7 @@ function buildSections() {
     root.querySelector('[data-act="run"]').addEventListener("click", () => runSection(S));
     root.querySelector('[data-act="check"]').addEventListener("click", () => checkSection(S));
     root.querySelector('[data-act="reset"]').addEventListener("click", () => {
-      if (!confirm("Visszaállítod a kezdőkódot? A mostani kódod elveszik.")) return;
+      if (!confirm("Biztosan visszaállítod a kezdőkódot? A mostani kódod elvész.")) return;
       ta.value = S.starter; delete state.code[S.id]; save(); paintGutter(S);
     });
   });
@@ -375,16 +378,16 @@ function editorKeys(e, S) {
 function busy(S, on) { S.el.root.querySelectorAll(".btns .btn").forEach(b => { b.disabled = on; }); }
 function showResult(S, r) {
   let h = r.out ? esc(r.out) : "";
-  if (r.noinput) h += `<span class="warn">A program bemenetet kért (input()), de a Bemenet mező sorai elfogytak. Írd a Bemenet mezőbe, amit begépelnél, soronként egyet.</span>`;
+  if (r.noinput) h += `<span class="warn">A program adatot kért (input()), de a Bemenet mezőben nincs több sor. Írd be oda, amit begépelnél, soronként egyet.</span>`;
   if (r.error) {
     const e = r.error;
-    h += `<span class="err"><b>${e.line ? `Hiba a(z) ${e.line}. sorban` : "Hiba"}</b> – ${esc(e.type)}: ${esc(e.msg)}${e.hint ? "\n" + esc(e.hint) : ""}</span>`;
+    h += `<span class="err"><b>${e.line ? `Hiba ${art(e.line)} ${e.line}. sorban` : "Hiba"}</b> – ${esc(e.type)}: ${esc(e.msg)}${e.hint ? "\n" + esc(e.hint) : ""}</span>`;
   }
   S.el.out.innerHTML = h || '<span class="muted">(A program nem írt ki semmit.)</span>';
   paintGutter(S, r.error && r.error.line);
   S.el.files.innerHTML = Object.keys(r.written || {}).map(n => {
     const url = URL.createObjectURL(new Blob([r.written[n]], { type: "text/plain;charset=utf-8" }));
-    return `<details><summary>A program létrehozta: ${esc(n)}</summary><pre>${esc(r.written[n]) || "(üres fájl)"}</pre><a href="${url}" download="${esc(n)}">Letöltés</a></details>`;
+    return `<details><summary>A program által létrehozott fájl: ${esc(n)}</summary><pre>${esc(r.written[n]) || "(üres fájl)"}</pre><a href="${url}" download="${esc(n)}">Letöltés</a></details>`;
   }).join("");
 }
 async function runSection(S) {
@@ -398,7 +401,7 @@ async function runSection(S) {
 }
 async function checkSection(S) {
   busy(S, true);
-  S.el.out.innerHTML = '<span class="muted">Ellenőrzés: a program lefut több bemenettel…</span>';
+  S.el.out.innerHTML = '<span class="muted">Ellenőrzés: a program többféle bemenettel is lefut…</span>';
   const R = [];
   let renamed = "";
   for (const run of S.runs) {
@@ -425,8 +428,8 @@ async function checkSection(S) {
     if (R.some(r => r.timeout)) msg = "A program nem fejeződött be (végtelen ciklus?), ezért nem tudtam ellenőrizni.";
     else try { msg = renamed || S.check[t.n](R); } catch (e) { msg = "Ezt most nem tudtam ellenőrizni: " + e.message; }
     const e0 = R[0].error;
-    if (msg && e0 && /^(SyntaxError|IndentationError|TabError)$/.test(e0.type)) msg = `A program el sem indult: ${e0.line ? `a(z) ${e0.line}. sorban ` : ""}szintaktikai hiba van (lásd a kimenet alatt).`;
-    else if (msg && e0 && msg.startsWith("Nem találom a kimenetben")) msg += ` A program ${e0.line ? `a(z) ${e0.line}. sorban ` : ""}hibával leállt, mielőtt ideért.`;
+    if (msg && e0 && /^(SyntaxError|IndentationError|TabError)$/.test(e0.type)) msg = `A program el sem indult, mert ${e0.line ? `${art(e0.line)} ${e0.line}. sorban ` : ""}szintaktikai hiba van (lásd a kimenetnél).`;
+    else if (msg && e0 && msg.startsWith("Nem találom a kimenetben")) msg += ` A program ${e0.line ? `${art(e0.line)} ${e0.line}. sorban ` : ""}hibával leállt, mielőtt ideért volna.`;
     const li = document.getElementById("t" + t.n), fb = li.querySelector(".fb");
     li.classList.toggle("ok", !msg); li.classList.toggle("bad", !!msg);
     fb.hidden = false;
@@ -436,7 +439,7 @@ async function checkSection(S) {
   }
   S.el.sum.hidden = false;
   S.el.sum.className = "sum" + (okN === S.tasks.length ? " ok" : "");
-  S.el.sum.textContent = S.tasks.length === 1 ? (okN ? "Kész!" : "Még nem jó, lásd a feladat alatt.") : `${okN} / ${S.tasks.length} feladat jó.`;
+  S.el.sum.textContent = S.tasks.length === 1 ? (okN ? "Kész!" : "Még nem jó, a hibát a feladat alatt látod.") : `${okN} / ${S.tasks.length} feladat jó.`;
   state.solved.sort((a, b) => a - b);
   state.end = mainTasks.every(n => state.solved.includes(n));
   save();
@@ -475,7 +478,7 @@ nameIn.addEventListener("input", e => { state.name = e.target.value.trim(); save
 (P.downloads || []).forEach(d => { const a = document.getElementById(d.id); if (a) a.href = URL.createObjectURL(new Blob([d.text], { type: "text/plain;charset=utf-8" })); });
 document.querySelectorAll("[data-download-all]").forEach(b => b.addEventListener("click", downloadAll));
 $("#resetBtn").addEventListener("click", () => {
-  if (!confirm("Minden kódot és eredményt törölsz ebben a böngészőben?")) return;
+  if (!confirm("Biztosan törlöd az összes kódodat és eredményedet ebből a böngészőből?")) return;
   try { localStorage.removeItem(P.key); } catch (e) {}
   location.reload();
 });
