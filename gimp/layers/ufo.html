@@ -18,7 +18,7 @@ window.MISSION = {
   "lang": "en",
   "key": "gimp-ufo-v1",
   "title": "UFO over the Pasture",
-  "story": "The village paper wants “proof” for its April Fools' issue: a UFO visited the pasture at night and took the cows. Nobody got a photo – but you've got GIMP.",
+  "story": "The village paper wants “proof” for its April Fools' issue: a UFO visited the pasture and took the cows. Nobody got a photo – but you've got GIMP.",
   "file": "surname_ufo",
   "bgFile": "pasture.jpg",
   "files": "../files/ufo-source-files.zip",
@@ -26,7 +26,7 @@ window.MISSION = {
   "pdf": "../pdf/ufo-worksheet.pdf",
   "teacherPdf": "../pdf/ufo-teacher.pdf",
   "saveImg": "../img/ufo/save.png",
-  "bonusImg": "../img/ufo/bonus.jpg",
+  "bonusImg": "../img/ufo/bonus.png",
   "elements": [
     [
       "Four pictures, four layers",
@@ -67,7 +67,7 @@ window.MISSION = {
   "steps": [
     {
       "title": "Four pictures, four layers",
-      "img": "../img/ufo/step1.jpg",
+      "img": "../img/ufo/step1.png",
       "alt": "Step 1: File ▸ Open as Layers: ufo.jpg, cow.jpg, beam.png; four layers in the Layers panel, the cow's and the beam's eye switched off",
       "lead": "Open as Layers puts the new picture on top of the one that's already open – as a separate layer.",
       "note": "Open one file at a time, so you always know which layer is which.",
@@ -78,7 +78,7 @@ window.MISSION = {
     },
     {
       "title": "Alpha channel: make the green vanish",
-      "img": "../img/ufo/step2.jpg",
+      "img": "../img/ufo/step2.png",
       "alt": "Step 2: the ufo.jpg layer selected, Layer ▸ Transparency ▸ Add Alpha Channel; magic wand on the green; Edit ▸ Clear, Select ▸ None – the pasture shows around the UFO",
       "lead": "The alpha channel stores where a layer is transparent. A layer that came from a JPG doesn't have one – so you add it first.",
       "note": "In the Layers panel, a grey checkerboard in the little picture marks the transparent part.",
@@ -91,7 +91,7 @@ window.MISSION = {
     },
     {
       "title": "The cow – on your own",
-      "img": "../img/ufo/step3.jpg",
+      "img": "../img/ufo/step3.png",
       "alt": "Step 3: the cow.jpg layer's eye back on, alpha channel and magic wand; after Clear only the cow is left; the beam.png eye back on",
       "lead": "The same four moves as for the UFO: alpha channel, magic wand, <span class='menu'>Edit ▸ Clear</span>, <span class='menu'>Select ▸ None</span>.",
       "stuck": [
@@ -101,7 +101,7 @@ window.MISSION = {
     },
     {
       "title": "The UFO goes up",
-      "img": "../img/ufo/step4.jpg",
+      "img": "../img/ufo/step4.png",
       "alt": "Step 4: layer order in the panel: ufo.jpg, cow.jpg, beam.png, pasture.jpg; Scale with the chain closed, a corner dragged inwards; Move: the UFO in the sky",
       "lead": "Layer order decides what covers what: whatever is higher in the panel is in front.",
       "note": "No exact size needed: the UFO takes up roughly a third of the picture.",
@@ -114,7 +114,7 @@ window.MISSION = {
     },
     {
       "title": "The floating cow",
-      "img": "../img/ufo/step5.jpg",
+      "img": "../img/ufo/step5.png",
       "alt": "Step 5: Scale on the cow.jpg layer with the chain closed; Move under the UFO; Rotate: the cow tilts",
       "lead": "Three transform tools in a row on the same layer: size, place, angle.",
       "stuck": [
@@ -125,7 +125,7 @@ window.MISSION = {
     },
     {
       "title": "The beam",
-      "img": "../img/ufo/step6.jpg",
+      "img": "../img/ufo/step6.png",
       "alt": "Step 6: Move the beam.png layer under the UFO; Perspective: the two bottom corners pulled apart, Transform button; Opacity at about half",
       "lead": "Perspective moves each corner separately; Opacity makes the whole layer see-through.",
       "note": "The beam's layer is below the cow in the panel, so the cow shows in front of the light.",
@@ -137,7 +137,7 @@ window.MISSION = {
     },
     {
       "title": "One more cow",
-      "img": "../img/ufo/step7.jpg",
+      "img": "../img/ufo/step7.png",
       "alt": "Step 7: Layer ▸ Duplicate Layer: cow.jpg copy; Move it further down the beam; Flip, then rotate and shrink",
       "lead": "You can make as many copies of a layer as you like – each can be moved, rotated and flipped on its own.",
       "note": "In newer GIMP the command is called Duplicate Layers. Same thing.",
@@ -178,7 +178,7 @@ window.MISSION = {
   ]
 };
 </script>
-<script src="../mission.js?v=2"></script>
+<script src="../mission.js?v=1"></script>
 <script src="../../nav.js?v=979fd825" defer></script>
 </body>
 </html>

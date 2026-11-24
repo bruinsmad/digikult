@@ -133,7 +133,7 @@ const DEFAULT_RULES_HU = [
         <h3>${U.find}</h3>
         <p class="lead">${U.findLead}</p>
         <div class="start-grid">
-          ${shot(U.img + "gimp-map.jpg", U.mapAlt)}
+          ${shot(U.img + "gimp-map.png", U.mapAlt)}
           <div><p class="lead" style="margin:6px 0 8px">${U.tools}</p>
           ${shot(U.img + "tools.png", U.toolsAlt)}</div>
           <div><p class="lead" style="margin:6px 0 8px">${U.first(esc(M.file), M)}</p></div>
