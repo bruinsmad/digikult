@@ -967,9 +967,9 @@
                 id: "python-hazi-1",
                 kind: "practice",
                 minutes: 120,
-                title: { hu: "Házi: érettségi feladatok kicsinyítve", en: "Homework: exam tasks in miniature" },
+                title: { hu: "Házi: rövidített érettségi feladatok", en: "Homework: exam tasks in miniature" },
                 desc: {
-                  hu: "13 feladat a csütörtöki órák anyagából: osztályok, a futas.txt beolvasása, valamint az Ötszáz, a Kerítés, a Sorozatok és a Sudoku kicsinyített változata. Az oldal feladatonként ellenőriz, a végén letöltheted a hazi.py-t.",
+                  hu: "13 feladat a csütörtöki órák anyagából: osztályok, a futas.txt beolvasása, valamint az Ötszáz, a Kerítés, a Sorozatok és a Sudoku rövidített változata. Az oldal feladatonként ellenőriz, a végén letölthető a hazi.py.",
                   en: "13 tasks from the Thursday lessons: classes, reading futas.txt, and small versions of past exam tasks. Checked task by task; download hazi.py at the end."
                 },
                 files: { hu: "python/fakt/hazi-1-hu.html" },

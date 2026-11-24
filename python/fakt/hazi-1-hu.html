@@ -31,7 +31,7 @@
 
 <section class="intro"><div class="card">
   <p class="chap">Így működik</p>
-  <p>Négy részben 13 rövid feladat vár az eddigi csütörtöki órák anyagából: osztályok, fájlbeolvasás, valamint az érettségi feladatok (Céges autók, Meteorológiai jelentés, Kerítés, Sorozatok, Ötszáz, Sudoku) kicsinyített változatai. A programot itt az oldalon írod és futtatod, a Python a böngésződben fut.</p>
+  <p>Négy részben 13 rövid feladat vár rád az eddigi csütörtöki órák anyagából: osztályok, fájlbeolvasás, valamint az órán megoldott érettségi feladatok (Céges autók, Meteorológiai jelentés, Kerítés, Sorozatok, Ötszáz, Sudoku) ötletei, rövidebb formában. A programot itt az oldalon írod és futtatod, a Python a böngésződben fut.</p>
   <p><b>Futtatás</b> (<kbd>Ctrl</kbd>+<kbd>Enter</kbd>): lefut a programod, az <code>input()</code> pedig sorban megkapja a <i>Bemenet</i> mező sorait. <b>Ellenőrzés</b>: az oldal többféle bemenettel is lefuttatja a programodat, és feladatonként megmondja, jó-e. Minden feladat előtt írd ki a sorszámát, pl. <code>print("4. feladat")</code>, mert az ellenőrzés ez alapján találja meg az eredményt. A kódodat a böngésző automatikusan elmenti.</p>
   <div class="row"><label for="nameIn">Neved:</label><input type="text" id="nameIn" autocomplete="name" placeholder="Vezetéknév Keresztnév"><a class="btn" id="futasDl" href="#" download="futas.txt">futas.txt letöltése</a></div>
 </div></section>
@@ -153,9 +153,9 @@ PYLAB_START({
     lead: "A <code>konyvek</code> lista (cím, szerző, megjelenés éve, oldalszám) már benne van a kezdőkódban.",
     input: "Jókai Mór",
     tasks: [
-      { n: 1, step: "Konyv osztály", html: "Hozz létre egy <code>Konyv</code> osztályt, és a lista elemeit tedd át egy új listába <code>Konyv</code> típusú objektumként! Írd ki, hány könyv jelent meg 1950 előtt!" },
-      { n: 2, step: "Leghosszabb", html: "Melyik a leghosszabb könyv? Írd ki a címét, a szerzőjét és az oldalszámát! Írd ki az átlagos oldalszámot is egészre kerekítve!" },
-      { n: 3, step: "Szerző keresése", html: "Kérd be egy szerző nevét, és írd ki az összes könyvét a megjelenés évével! Ha nincs ilyen szerző, írd ki: „Nincs ilyen szerző a listában.”" }
+      { n: 1, step: "Konyv osztály", html: "Hozz létre egy <code>Konyv</code> osztályt, majd a <code>konyvek</code> lista elemeiből készíts <code>Konyv</code> típusú objektumokat, és tárold őket egy új listában! Írd ki, hány könyv jelent meg 1950 előtt!" },
+      { n: 2, step: "Leghosszabb", html: "Határozd meg, melyik a leghosszabb könyv, és írd ki a címét, a szerzőjét és az oldalszámát! Írd ki a könyvek átlagos oldalszámát is, egészre kerekítve!" },
+      { n: 3, step: "Szerző keresése", html: "Kérd be egy szerző nevét, és írd ki az összes könyvét a megjelenésük évével együtt! Ha nincs ilyen szerző a listában, ezt írd ki: „Nincs ilyen szerző a listában.”" }
     ],
     runs: [
       { inputs: ["Jókai Mór"], probes: ["__dk_objs('Konyv')"] },
@@ -182,16 +182,16 @@ PYLAB_START({
   },
   {
     id: "B", chap: "B rész", starter: STARTER.B, title: "Fájlbeolvasás: futas.txt",
-    lead: "A <code>futas.txt</code> egy futó októberi edzésnaplója, a program mappájában található. Soronként szóközzel elválasztva: dátum, táv (km), idő (<code>pp:mm</code> vagy <code>ó:pp:mm</code>), helyszín.",
+    lead: "A program mappájában található <code>futas.txt</code> egy futó októberi edzésnaplóját tartalmazza. Minden sorban szóközzel elválasztva szerepel a futás dátuma, a táv (km), az idő (<code>pp:mm</code> vagy <code>ó:pp:mm</code> alakban) és a helyszín.",
     data: FUTAS.split("\n").slice(0, 4).join("\n") + "\n…",
     files: { "futas.txt": FUTAS },
     input: "Normafa",
     tasks: [
-      { n: 4, step: "Beolvasás", html: "Olvasd be a fájlt egy <code>Futas</code> osztályú objektumokból álló listába! Írd ki, hány futás van a fájlban, és mennyi az összes táv egy tizedesjegyre!" },
-      { n: 5, step: "masodperc()", html: "Készíts egy <code>masodperc(ido)</code> függvényt, amely az időt másodpercekre váltja át (<code>\"27:41\"</code> → 1661, <code>\"1:08:45\"</code> → 4125)! Ennek segítségével írd ki az összes futásidőt <code>ó:pp:mm</code> alakban!" },
-      { n: 6, step: "Leggyorsabb", html: "Melyik futás volt a leggyorsabb, azaz hol a legkisebb az egy kilométerre jutó idő (tempó)? Írd ki a dátumát, a helyszínét és a tempót <code>p:mm/km</code> alakban!" },
-      { n: 7, step: "Szótár, fájl", html: "Számold meg szótárral, melyik helyszínen hányszor futott, és írd ki a képernyőre! Írd ki a <code>helyszinek.txt</code> fájlba is soronként: helyszín, futások száma, összes km (egy tizedesjegy), pontosvesszővel elválasztva, pl. <code>Margitsziget;5;26.8</code>" },
-      { n: 8, step: "Utolsó futás", html: "Kérj be egy helyszínt, és írd ki, mikor futott ott utoljára! Ha ott nem futott, írd ki: „Ezen a helyszínen nem volt futás.” Ezután döntsd el, volt-e 10 km-nél hosszabb futás, és ha igen, írd ki az első ilyen futás dátumát!" }
+      { n: 4, step: "Beolvasás", html: "Olvasd be a fájl tartalmát egy <code>Futas</code> osztályú objektumokból álló listába! Írd ki, hány futás adata szerepel a fájlban, és hány kilométert futott összesen, egy tizedesjegyre kerekítve!" },
+      { n: 5, step: "masodperc()", html: "Készíts egy <code>masodperc(ido)</code> függvényt, amely a paraméterként kapott időt másodpercekre váltja át (<code>\"27:41\"</code> → 1661, <code>\"1:08:45\"</code> → 4125)! A függvény segítségével határozd meg, mennyi időt futott összesen, és írd ki <code>ó:pp:mm</code> alakban!" },
+      { n: 6, step: "Leggyorsabb", html: "Melyik futás volt a leggyorsabb, vagyis melyiknél volt a legkisebb az egy kilométerre jutó idő (a tempó)? Írd ki a futás dátumát, helyszínét és a tempót <code>p:mm/km</code> alakban, egész másodpercre kerekítve!" },
+      { n: 7, step: "Szótár, fájl", html: "Egy szótár segítségével határozd meg, melyik helyszínen hányszor futott, és írd ki az eredményt a képernyőre! Az adatokat írd ki a <code>helyszinek.txt</code> fájlba is: soronként a helyszínt, az ottani futások számát és az ott futott kilométerek összegét (egy tizedesjegyre), pontosvesszővel elválasztva, például: <code>Margitsziget;5;26.8</code>" },
+      { n: 8, step: "Utolsó futás", html: "Kérj be egy helyszínt, és írd ki, mikor futott ott utoljára! Ha ott egyszer sem futott, ezt írd ki: „Ezen a helyszínen nem volt futás.” Ezután döntsd el, volt-e 10 km-nél hosszabb futása, és ha igen, írd ki az első ilyen futás dátumát!" }
     ],
     runs: [
       { inputs: ["Normafa"], probes: ["__dk_objs('Futas')", "masodperc('27:41')", "masodperc('1:08:45')", "masodperc('0:59')", "masodperc('2:00:00')"] },
@@ -232,13 +232,13 @@ PYLAB_START({
     }
   },
   {
-    id: "C", chap: "C rész", starter: STARTER.C, noInput: true, title: "Érettségi feladatok kicsinyítve",
-    lead: "A három feladat adatai a kezdőkódban vannak. Mindhárom egy-egy csütörtöki órán megoldott érettségi feladat ötletére épül.",
+    id: "C", chap: "C rész", starter: STARTER.C, noInput: true, title: "Rövidített érettségi feladatok",
+    lead: "A három feladat adatai a kezdőkódban találhatók. Mindegyik egy-egy csütörtöki órán megoldott érettségi feladat ötletére épül.",
     input: "",
     tasks: [
-      { n: 9, step: "Ötszáz", tag: "Ötszáz", html: "Az iskolai büfében akció van: egy vásárláson belül ugyanabból a termékből az 1. darab 300 Ft, a 2. darab 250 Ft, minden további 200 Ft. Készíts egy <code>ertek(darab)</code> függvényt, amely megadja, mennyit kell fizetni <code>darab</code> db azonos termékért! Dolgozd fel a <code>kosar</code> listát: írd ki, hányféle termék van benne, termékenként a darabszámot és az árat, végül a fizetendő összeget!" },
-      { n: 10, step: "Kerítés", tag: "Kerítés", html: "Egy utca páratlan oldalán a telkek sorban az 1, 3, 5, … házszámot kapják. A <code>szinek</code> lista a kerítések színét adja meg (<code>:</code> = még nincs lefestve, <code>#</code> = nincs kerítés), a <code>szelessegek</code> a telkek szélességét méterben. Írd ki minden telek házszámát és kerítésszínét! Hány olyan szomszédos telekpár van, amelynek kerítése azonos színű (a <code>:</code> és a <code>#</code> nem szín)? Hány méterre kezdődik az utca elejétől a 7-es telek?" },
-      { n: 11, step: "Sorozatok", tag: "Sorozatok", html: "Az epizódkód alakja <code>SxxEyy</code>, ahol <code>xx</code> az évad, <code>yy</code> a rész száma. Írd ki minden részt így: <code>Dark: 1. évad 1. rész</code> (vezető nullák nélkül)! Melyik sorozatnak van a listában a legmagasabb évadszámú része? Mennyi az összes nézési idő <code>x óra y perc</code> alakban?" }
+      { n: 9, step: "Ötszáz", tag: "Ötszáz", html: "Az iskolai büfében akció van: egy vásárlás során ugyanabból a termékből az első darab 300 Ft, a második 250 Ft, minden további pedig 200 Ft. Készíts egy <code>ertek(darab)</code> függvényt, amely a darabszám alapján visszaadja, mennyit kell fizetni az azonos termékekért! Dolgozd fel a <code>kosar</code> lista tartalmát: írd ki, hányféle termék van a kosárban, termékenként a darabszámot és a fizetendő összeget, végül a teljes végösszeget!" },
+      { n: 10, step: "Kerítés", tag: "Kerítés", html: "Egy utca páratlan oldalán a telkek sorban az 1, 3, 5, … házszámot kapják. A <code>szinek</code> lista a kerítések színét tartalmazza (<code>:</code> = a kerítés még nincs lefestve, <code>#</code> = a telken nincs kerítés), a <code>szelessegek</code> lista pedig a telkek szélességét méterben. Írd ki minden telek házszámát és kerítésének színét! Határozd meg, hány olyan szomszédos telekpár van, amelyeknek azonos színű a kerítése (a <code>:</code> és a <code>#</code> nem számít színnek)! Hány méterre kezdődik az utca elejétől a 7-es számú telek?" },
+      { n: 11, step: "Sorozatok", tag: "Sorozatok", html: "A <code>reszek</code> lista elemei: a sorozat címe, az epizódkód és a rész hossza percben. Az epizódkód <code>SxxEyy</code> alakú, ahol <code>xx</code> az évad, <code>yy</code> a rész sorszáma. Írd ki minden részt a következő alakban: <code>Dark: 1. évad 1. rész</code> (a számokat vezető nullák nélkül)! Melyik sorozatnak van a listában a legmagasabb évadszámú része? Mennyi a részek együttes hossza <code>x óra y perc</code> alakban?" }
     ],
     runs: [
       { inputs: [], probes: ["ertek(1)", "ertek(2)", "ertek(3)", "ertek(4)", "ertek(5)"] }
@@ -269,11 +269,11 @@ PYLAB_START({
   },
   {
     id: "D", chap: "D rész", starter: STARTER.D, title: "Kétdimenziós lista: Sudoku",
-    lead: "A tábla 9×9-es, a 0 üres mezőt jelöl. A 3×3-as résztáblák számozása balról jobbra, fentről lefelé halad (bal felső = 1., jobb alsó = 9.).",
+    lead: "A <code>tabla</code> lista egy 9×9-es Sudoku-táblát tárol, a 0 az üres mezőt jelöli. A 3×3-as résztáblákat balról jobbra, majd fentről lefelé számozzuk: a bal felső az 1., a jobb alsó a 9.",
     input: "5\n8",
     tasks: [
-      { n: 12, step: "Sudoku", html: "Kérj be egy sor- és egy oszlopszámot (1–9)! Írd ki a mezőben lévő értéket, vagy ha 0, akkor: „Ez a hely még üres.” Írd ki azt is, hányadik résztáblához tartozik a mező! Végül írd ki egy tizedesjegyre, hogy a tábla hány százaléka üres!" },
-      { n: 13, step: "lepes()", opt: true, html: "Készíts egy <code>lepes(szam, sor, oszlop)</code> függvényt, amely a tábla módosítása nélkül megmondja, beírható-e a szám az adott helyre! A válasz a következők egyike legyen: „A hely már foglalt.”, „Az adott sorban már szerepel a szám.”, „Az adott oszlopban már szerepel a szám.”, „Az adott résztáblázatban már szerepel a szám.”, „A lépés megtehető.” Próbáld ki a <code>lepesek</code> lista öt lépésére (szám, sor, oszlop)! Az ellenőrzés további lépéseket is kipróbál." }
+      { n: 12, step: "Sudoku", html: "Kérj be egy sor- és egy oszlopszámot (1–9)! Írd ki az adott mezőben lévő értéket, vagy ha a mező üres, ezt: „Ez a hely még üres.” Írd ki azt is, hányadik résztáblához tartozik a mező! Végül írd ki egy tizedesjegyre kerekítve, hogy a tábla hány százaléka üres!" },
+      { n: 13, step: "lepes()", opt: true, html: "Készíts egy <code>lepes(szam, sor, oszlop)</code> függvényt, amely a tábla módosítása nélkül megállapítja, hogy a szám beírható-e a megadott helyre! A függvény válasza a következők egyike legyen: „A hely már foglalt.”, „Az adott sorban már szerepel a szám.”, „Az adott oszlopban már szerepel a szám.”, „Az adott résztáblázatban már szerepel a szám.”, „A lépés megtehető.” Próbáld ki a függvényt a <code>lepesek</code> lista öt lépésére (szám, sor, oszlop)! Az ellenőrzés további lépésekkel is kipróbálja." }
     ],
     runs: [
       { inputs: ["5", "8"], probes: SUDOKU_TESTS.map(([a, b, c]) => `lepes(${a}, ${b}, ${c})`).concat(["tabla"]) },

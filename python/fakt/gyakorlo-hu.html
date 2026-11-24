@@ -30,7 +30,7 @@
 
 <section class="intro"><div class="card">
   <p class="chap">Így működik</p>
-  <p>Az összefoglaló minden témaköréhez tartozik egy rövid feladat, ebben a sorrendben: kiírás és változók, bekérés, elágazás, while és for ciklus, beágyazott ciklus, listák, programozási tételek, mátrix, függvény, fájlkezelés, osztály. Egy feladat kb. 5–10 perc alatt megoldható. Ha elakadsz, minden feladat mellett találsz egy emlékeztetőt.</p>
+  <p>Az összefoglaló minden témaköréhez tartozik egy rövid feladat, a következő sorrendben: kiírás és változók, bekérés, elágazás, while és for ciklus, beágyazott ciklus, listák, programozási tételek, mátrix, függvény, fájlkezelés, osztály. Egy feladat kb. 5–10 perc alatt megoldható. Ha elakadsz, minden feladat mellett találsz egy emlékeztetőt.</p>
   <p><b>Futtatás</b> (<kbd>Ctrl</kbd>+<kbd>Enter</kbd>): lefut a programod, az <code>input()</code> pedig sorban megkapja a <i>Bemenet</i> mező sorait. <b>Ellenőrzés</b>: az oldal más bemenetekkel és más adatokkal is lefuttatja a programodat, így nem elég kézzel beírni a jó eredményt, a programnak kell kiszámolnia. A kódodat a böngésző automatikusan elmenti.</p>
   <div class="row"><label for="nameIn">Neved:</label><input type="text" id="nameIn" autocomplete="name" placeholder="Vezetéknév Keresztnév"><a class="btn" id="tanulokDl" href="#" download="tanulok.txt">tanulok.txt letöltése</a></div>
 </div></section>
@@ -86,8 +86,8 @@ magassag = 1.78
 
 # Írd ki: Bence 16 éves, 1.78 m magas.
 `,
-    tasks: [{ n: 1, step: "Változók", html: "A három változót már létrehoztuk. Írd ki <b>a változók segítségével</b> egy sorban: <code>Bence 16 éves, 1.78 m magas.</code> Utána írd ki külön sorokban a három változó típusát a <code>type()</code> függvénnyel!" }],
-    tip: `<p>A <code>print()</code> több, vesszővel elválasztott értéket is kiírhat, és ezek közé szóközt tesz.</p>${pre('print("Név:", nev, "Kor:", kor)\nprint(type(kor))   # <class \'int\'>')}`,
+    tasks: [{ n: 1, step: "Változók", html: "A kezdőkódban már szerepel három változó. <b>A változók felhasználásával</b> írd ki egy sorba a következőt: <code>Bence 16 éves, 1.78 m magas.</code> Ezután a <code>type()</code> függvénnyel írasd ki külön-külön sorba mindhárom változó típusát!" }],
+    tip: `<p>A <code>print()</code> egyszerre több értéket is kiírhat: ezeket vesszővel kell elválasztani, a kiírásban pedig szóköz kerül közéjük.</p>${pre('print("Név:", nev, "Kor:", kor)\nprint(type(kor))   # <class \'int\'>')}`,
     runs: [
       { probes: [] },
       { probes: [], renamed: "A nev, kor és magassag változókat ne nevezd át.",
@@ -103,8 +103,8 @@ magassag = 1.78
   { id: "s2", chap: "2. feladat · Bekérés, típusátalakítás", title: "Összeg és szorzat", height: 200, input: "5\n7",
     starter: `# Kérj be két egész számot!
 `,
-    tasks: [{ n: 2, step: "input()", html: "Kérj be két egész számot, és írd ki az összegüket és a szorzatukat így: <code>Összeg: 12</code> és <code>Szorzat: 35</code> (5 és 7 esetén)." }],
-    tip: `<p>Az <code>input()</code> mindig <b>szöveget</b> ad vissza. Számolni csak akkor tudsz vele, ha számmá alakítod: <code>int()</code>.</p>${pre('a = int(input("Első szám: "))')}`,
+    tasks: [{ n: 2, step: "input()", html: "Kérj be a felhasználótól két egész számot, majd írd ki az összegüket és a szorzatukat! Az 5 és a 7 esetén a kiírás: <code>Összeg: 12</code>, illetve <code>Szorzat: 35</code>." }],
+    tip: `<p>Az <code>input()</code> mindig <b>szöveget</b> ad vissza. Számolni csak akkor tudsz vele, ha előbb számmá alakítod az <code>int()</code> függvénnyel.</p>${pre('a = int(input("Első szám: "))')}`,
     runs: [{ inputs: ["5", "7"] }, { inputs: ["10", "-3"] }],
     check: { 2: R => first(
       need(R[0].inputsUsed, "Kérd be a két számot az input() függvénnyel."),
@@ -119,8 +119,8 @@ magassag = 1.78
 
 # if / elif / else
 `,
-    tasks: [{ n: 3, step: "if, elif", html: "A program bekér egy pontszámot (0–100). Írd ki a jegyet számként: 0–39: 1, 40–54: 2, 55–69: 3, 70–84: 4, 85–100: 5. Pl. <code>Jegy: 4</code>" }],
-    tip: `<p>Az <code>elif</code> ág csak akkor fut le, ha az előző feltételek mind hamisak voltak, ezért elég csak a felső határt vizsgálni.</p>${pre('if kor < 13:\n    print("Gyerek vagy")\nelif kor < 20:\n    print("Tinédzser vagy")\nelse:\n    print("Felnőtt vagy")')}`,
+    tasks: [{ n: 3, step: "if, elif", html: "A program bekér egy 0 és 100 közötti pontszámot. Írd ki a neki megfelelő érdemjegyet a következő ponthatárok alapján: 0–39: 1, 40–54: 2, 55–69: 3, 70–84: 4, 85–100: 5. Például: <code>Jegy: 4</code>" }],
+    tip: `<p>Az <code>elif</code> ág csak akkor fut le, ha az előző feltételek mind hamisak voltak, ezért elég a ponthatárok felső értékét vizsgálni.</p>${pre('if kor < 13:\n    print("Gyerek vagy")\nelif kor < 20:\n    print("Tinédzser vagy")\nelse:\n    print("Felnőtt vagy")')}`,
     runs: [["39", 1], ["40", 2], ["54", 2], ["55", 3], ["69", 3], ["70", 4], ["84", 4], ["85", 5], ["100", 5], ["0", 1]].map(([p, j]) => ({ inputs: [p], want: j })),
     check: { 3: R => {
       if (!R[0].inputsUsed) return "Kérd be a pontszámot az input() függvénnyel.";
@@ -138,8 +138,8 @@ magassag = 1.78
 
 # while ciklus: addig felezd, amíg 1 nem lesz
 `,
-    tasks: [{ n: 4, step: "while", html: "A program bekér egy pozitív egész számot. <b>While ciklussal</b> addig felezd egész osztással (<code>//</code>), amíg 1 nem lesz, és írd ki a számokat egy sorban, szóközzel elválasztva! Pl. 20 esetén: <code>20 10 5 2 1</code>. A következő sorba írd ki, hány felezés kellett: <code>Felezések: 4</code>" }],
-    tip: `<p>A while addig ismétel, amíg a feltétele igaz. Ne felejtsd el a ciklusban változtatni a ciklusváltozót, különben végtelen ciklus lesz belőle.</p>${pre('index = 1\nwhile index <= 5:\n    print(index, end=" ")\n    index += 1')}`,
+    tasks: [{ n: 4, step: "while", html: "A program bekér egy pozitív egész számot. Egy <b>while ciklussal</b> felezd a számot egész osztással (<code>//</code>), amíg 1 nem lesz belőle! A kiinduló számot és az összes közbülső értéket írd ki egy sorba, szóközzel elválasztva; 20 esetén például: <code>20 10 5 2 1</code>. A következő sorba írd ki, hány felezésre volt szükség: <code>Felezések: 4</code>" }],
+    tip: `<p>A while ciklus addig ismétli a ciklusmagot, amíg a feltétele igaz. Ne felejtsd el a ciklusmagban megváltoztatni a ciklusváltozót, különben végtelen ciklust kapsz.</p>${pre('index = 1\nwhile index <= 5:\n    print(index, end=" ")\n    index += 1')}`,
     runs: [{ inputs: ["20"] }, { inputs: ["100"] }, { inputs: ["1"] }],
     check: { 4: R => first(
       need(codeHas(R, /\bwhile\b/), "Ehhez a feladathoz while ciklust használj."),
@@ -152,8 +152,8 @@ magassag = 1.78
   { id: "s5", chap: "5. feladat · For ciklus, range()", title: "Számsorok", height: 200, noInput: true,
     starter: `# for ciklus range()-dzsel
 `,
-    tasks: [{ n: 5, step: "for, range", html: "Írd ki egy sorba, szóközzel elválasztva a 3 többszöröseit 3-tól 30-ig, a következő sorba pedig visszafelé a számokat 10-től 1-ig! Mindkettőt <code>for</code> ciklussal és a <code>range()</code> lépésközével (a harmadik paraméterével) oldd meg." }],
-    tip: `<p><code>range(mettől, meddig, lépés)</code>: a <i>meddig</i> már nincs benne. Visszafelé negatív lépésköz kell. Így írhatsz egy sorba: <code>print(i, end=" ")</code>; új sort pedig így kezdesz: <code>print()</code>.</p>${pre('for i in range(1, 10, 2):\n    print(i, end=" ")   # 1 3 5 7 9')}`,
+    tasks: [{ n: 5, step: "for, range", html: "Írd ki egy sorba, szóközzel elválasztva a 3 többszöröseit 3-tól 30-ig, a következő sorba pedig a számokat 10-től 1-ig, csökkenő sorrendben! Mindkét sort <code>for</code> ciklussal oldd meg, a <code>range()</code> harmadik paraméterének, a lépésköznek a felhasználásával." }],
+    tip: `<p><code>range(mettől, meddig, lépés)</code>: a <i>meddig</i> érték már nem kerül bele. Csökkenő sorrendhez negatív lépésköz kell. Egy sorba így írhatsz: <code>print(i, end=" ")</code>; új sort a <code>print()</code> kezd.</p>${pre('for i in range(1, 10, 2):\n    print(i, end=" ")   # 1 3 5 7 9')}`,
     runs: [{}],
     check: { 5: R => first(
       need(exact(R, 0, "3 6 9 12 15 18 21 24 27 30"), "Az első sor ez legyen: 3 6 9 12 15 18 21 24 27 30"),
@@ -166,8 +166,8 @@ magassag = 1.78
 
 # két egymásba ágyazott for ciklus
 `,
-    tasks: [{ n: 6, step: "Beágyazott", html: "A program bekér egy <code>n</code> számot. Írd ki az n×n-es szorzótáblát: n sor, az i. sorban az <code>i*1, i*2, …, i*n</code> számok szóközzel elválasztva. Pl. n = 3: <code>1 2 3</code> / <code>2 4 6</code> / <code>3 6 9</code>" }],
-    tip: `<p>A külső ciklus minden lépésében a belső végigfut. A belső ciklus után egy üres <code>print()</code> zárja le a sort.</p>${pre('for i in range(1, 4):\n    for j in range(1, 4):\n        print(i, j)')}`,
+    tasks: [{ n: 6, step: "Beágyazott", html: "A program bekér egy <code>n</code> egész számot. Írd ki az n×n-es szorzótáblát! A tábla n sorból áll; az i. sorban az <code>i*1, i*2, …, i*n</code> szorzatok szerepelnek, szóközzel elválasztva. Például n = 3 esetén: <code>1 2 3</code> / <code>2 4 6</code> / <code>3 6 9</code>" }],
+    tip: `<p>A külső ciklus minden egyes lépésében a belső ciklus elejétől a végéig lefut. A belső ciklus után egy üres <code>print()</code> zárja le a sort.</p>${pre('for i in range(1, 4):\n    for j in range(1, 4):\n        print(i, j)')}`,
     runs: [{ inputs: ["5"] }, { inputs: ["3"] }, { inputs: ["1"] }],
     check: { 6: R => {
       if (!R[0].inputsUsed) return "Kérd be n-t az input() függvénnyel.";
@@ -186,7 +186,7 @@ magassag = 1.78
     starter: `jegyek = [4, 5, 3, 5, 2, 4]
 
 `,
-    tasks: [{ n: 7, step: "Listák", html: "Fűzz a lista végére egy 5-öst (<code>append</code>), cseréld az első elemét 3-ra, töröld belőle a 2-est (<code>remove</code>), majd írd ki a listát! Utána írd ki: <code>Hossz: …</code>, <code>Legkisebb: …</code>, <code>Legnagyobb: …</code>, <code>Összeg: …</code> (<code>len</code>, <code>min</code>, <code>max</code>, <code>sum</code>)." }],
+    tasks: [{ n: 7, step: "Listák", html: "Végezd el a <code>jegyek</code> listán a következő módosításokat: fűzz a végére egy 5-öst (<code>append</code>), az első elemét írd át 3-ra, majd töröld belőle a 2-est (<code>remove</code>)! Írd ki a módosított listát, utána pedig külön sorokba a lista hosszát, legkisebb és legnagyobb elemét, valamint az elemek összegét: <code>Hossz: …</code>, <code>Legkisebb: …</code>, <code>Legnagyobb: …</code>, <code>Összeg: …</code> (<code>len</code>, <code>min</code>, <code>max</code>, <code>sum</code>)." }],
     tip: `<p>Az első elem indexe 0. Az <code>append</code> a lista végére fűz, a <code>remove</code> pedig a megadott értékű elemek közül az elsőt törli.</p>${pre('gyumolcs = ["alma", "korte"]\ngyumolcs.append("szilva")\ngyumolcs[0] = "barack"\nprint(len(gyumolcs), max([10, 40, 20]))')}`,
     runs: [
       { probes: ["jegyek"] },
@@ -204,8 +204,8 @@ magassag = 1.78
     starter: `lepesek = [8200, 12500, 6400, 10100, 15000, 4300, 9800]
 
 `,
-    tasks: [{ n: 8, step: "Összegzés", html: "Egy hét lépésszámai. <b>Ciklussal</b>, a <code>sum()</code> nélkül számold ki, hány lépés volt összesen, és számold meg, hány napon volt legalább 10 000 lépés! Ezt írd ki: <code>Összesen: …</code> és <code>Aktív napok: …</code>" }],
-    tip: `<p>Összegzés: a gyűjtő változó 0-ról indul, és minden elemet hozzáadsz. Megszámolás: a darabszám 0-ról indul, és ha teljesül a feltétel, növeled.</p>${pre('osszeg = 0\nfor szam in szamok:\n    osszeg += szam\n\ndarab = 0\nfor szam in szamok:\n    if szam == 2:\n        darab += 1')}`,
+    tasks: [{ n: 8, step: "Összegzés", html: "A <code>lepesek</code> lista egy hét napi lépésszámait tartalmazza. <b>Ciklussal</b>, a <code>sum()</code> használata nélkül számold ki, összesen hány lépés volt a héten, és számold meg, hány napon volt legalább 10 000 lépés! A kiírás formája: <code>Összesen: …</code> és <code>Aktív napok: …</code>" }],
+    tip: `<p>Összegzés: a gyűjtőváltozó kezdőértéke 0, és a ciklusban minden elemet hozzáadsz. Megszámolás: a darabszám kezdőértéke 0, és ha az elemre teljesül a feltétel, eggyel növeled.</p>${pre('osszeg = 0\nfor szam in szamok:\n    osszeg += szam\n\ndarab = 0\nfor szam in szamok:\n    if szam == 2:\n        darab += 1')}`,
     runs: [
       {},
       { transform: c => replaceAssign(c, "lepesek", "[10000, 9999, 20000]"), renamed: "A lepesek listát ne nevezd át." }
@@ -221,8 +221,8 @@ magassag = 1.78
     starter: `homersekletek = [3, -2, 5, 0, -4, 7, 1]
 
 `,
-    tasks: [{ n: 9, step: "Eldöntés", html: "Egy hét reggeli hőmérsékletei °C-ban. Döntsd el, volt-e fagy (0 alatti érték), és írd ki: <code>Volt fagy.</code> vagy <code>Nem volt fagy.</code> Utána válogasd ki egy új listába a fagyos értékeket, és írd ki a listát!" }],
-    tip: `<p>Eldöntés: egy logikai változó <code>False</code> értékkel indul, és ha találsz megfelelő elemet, <code>True</code> lesz (utána jöhet a <code>break</code>). Kiválogatás: egy üres listához adod hozzá az elemeket az <code>append</code>-del.</p>${pre('paros = []\nfor szam in szamok:\n    if szam % 2 == 0:\n        paros.append(szam)')}`,
+    tasks: [{ n: 9, step: "Eldöntés", html: "A <code>homersekletek</code> lista egy hét reggeli hőmérsékleteit tartalmazza °C-ban. Döntsd el, volt-e a héten fagy (0 °C alatti érték), és írd ki: <code>Volt fagy.</code> vagy <code>Nem volt fagy.</code> Ezután válogasd ki egy új listába a fagypont alatti értékeket, és írd ki ezt a listát!" }],
+    tip: `<p>Eldöntés: egy logikai változó kezdőértéke <code>False</code>; ha találsz megfelelő elemet, <code>True</code> lesz, és a <code>break</code>-kel kiléphetsz a ciklusból. Kiválogatás: egy üres listába az <code>append</code>-del gyűjtöd a feltételnek megfelelő elemeket.</p>${pre('paros = []\nfor szam in szamok:\n    if szam % 2 == 0:\n        paros.append(szam)')}`,
     runs: [
       {},
       { transform: c => replaceAssign(c, "homersekletek", "[3, 5, 0, 1]"), renamed: "A homersekletek listát ne nevezd át." }
@@ -238,8 +238,8 @@ magassag = 1.78
 pontok = [78, 92, 85, 92, 60]
 
 `,
-    tasks: [{ n: 10, step: "Maximum", html: "A két lista összetartozik: <code>nevek[i]</code> pontszáma <code>pontok[i]</code>. A <code>max()</code> nélkül, maximumkiválasztással írd ki a legjobbat (holtversenyben az elsőt): <code>Legjobb: Bence 92</code>. Írd ki az első és az utolsó 80 pont alatti tanuló nevét is: <code>Első 80 alatti: …</code>, <code>Utolsó 80 alatti: …</code>" }],
-    tip: `<p>Maximum: az első elemből indulsz, és csak a nagyobbra cserélsz (<code>&gt;</code>, nem <code>&gt;=</code>). Itt érdemes az <b>indexet</b> megjegyezni, abból a név is megvan.</p>${pre('legjobb = 0\nfor i in range(len(pontok)):\n    if pontok[i] > pontok[legjobb]:\n        legjobb = i')}`,
+    tasks: [{ n: 10, step: "Maximum", html: "A két lista összetartozik: a <code>nevek[i]</code> nevű tanuló pontszáma <code>pontok[i]</code>. A <code>max()</code> használata nélkül, maximumkiválasztással határozd meg, ki érte el a legtöbb pontot, és írd ki a nevét és a pontszámát (holtverseny esetén az elsőt): <code>Legjobb: Bence 92</code>. Ezután írd ki az első, illetve az utolsó olyan tanuló nevét, akinek 80-nál kevesebb pontja van: <code>Első 80 alatti: …</code>, <code>Utolsó 80 alatti: …</code>" }],
+    tip: `<p>Maximumkiválasztás: kezdetben az első elemet tekinted a legnagyobbnak, és csak akkor cseréled, ha nagyobbat találsz (<code>&gt;</code>, nem <code>&gt;=</code>). Itt érdemes az <b>indexet</b> megjegyezni, mert abból a név is megkapható.</p>${pre('legjobb = 0\nfor i in range(len(pontok)):\n    if pontok[i] > pontok[legjobb]:\n        legjobb = i')}`,
     runs: [
       {},
       { transform: c => replaceAssign(c, "pontok", "[88, 70, 95, 65, 90]"), renamed: "A pontok listát ne nevezd át." }
@@ -260,7 +260,7 @@ pontok = [78, 92, 85, 92, 60]
 ]
 # 1 = foglalt, 0 = szabad
 `,
-    tasks: [{ n: 11, step: "Mátrix", html: "A terem ülésrendje: 3 sor, soronként 4 hely. Írd ki, a 2. sor 3. helye foglalt-e: <code>A 2. sor 3. helye: foglalt</code> (vagy <code>szabad</code>). Számold meg a foglalt helyeket: <code>Foglalt helyek: …</code>. Végül soronként írd ki a szabad helyek számát: <code>1. sor: 1 szabad</code>, <code>2. sor: …</code>" }],
+    tasks: [{ n: 11, step: "Mátrix", html: "A <code>terem</code> lista egy terem ülésrendjét tárolja: 3 sor van, soronként 4 hellyel (1 = foglalt, 0 = szabad). Írd ki, hogy a 2. sor 3. helye foglalt-e: <code>A 2. sor 3. helye: foglalt</code> (vagy <code>szabad</code>). Számold meg a foglalt helyeket: <code>Foglalt helyek: …</code> Végül soronként írd ki, hány szabad hely van: <code>1. sor: 1 szabad</code>, <code>2. sor: … szabad</code> stb." }],
     tip: `<p>A 2. sor 3. eleme <code>terem[1][2]</code>, mert az indexelés 0-tól kezdődik. A bejáráshoz két egymásba ágyazott ciklus kell.</p>${pre('for sor in matrix:\n    for elem in sor:\n        print(elem, end=" ")\n    print()')}`,
     runs: [
       {},
@@ -284,8 +284,8 @@ pontok = [78, 92, 85, 92, 60]
 
 print(atlag([2, 4, 9]))
 `,
-    tasks: [{ n: 12, step: "Függvények", html: "Írj egy <code>atlag(lista)</code> függvényt, amely <b>visszaadja</b> (<code>return</code>) a lista elemeinek átlagát, és egy <code>paros_db(lista)</code> függvényt, amely visszaadja, hány páros szám van a listában! Próbáld ki: <code>print(atlag([2, 4, 9]))</code> → 5.0, <code>print(paros_db([1, 2, 3, 4, 6]))</code> → 3" }],
-    tip: `<p>A <code>return</code> visszaadja az értéket a hívónak, és befejezi a függvényt. A <code>print</code> csak kiírja, a hívó kód nem kapja meg az értéket!</p>${pre('def osszeg(a, b):\n    return a + b\n\nprint(osszeg(5, 8))')}`,
+    tasks: [{ n: 12, step: "Függvények", html: "Írj egy <code>atlag(lista)</code> függvényt, amely <b>visszaadja</b> (<code>return</code>) a lista elemeinek átlagát, és egy <code>paros_db(lista)</code> függvényt, amely visszaadja, hány páros szám van a listában! Próbáld ki őket: a <code>print(atlag([2, 4, 9]))</code> eredménye 5.0, a <code>print(paros_db([1, 2, 3, 4, 6]))</code> eredménye 3." }],
+    tip: `<p>A <code>return</code> visszaadja az értéket a hívás helyére, és befejezi a függvény futását. A <code>print</code> csak kiírja az értéket, a hívó kód nem kapja meg!</p>${pre('def osszeg(a, b):\n    return a + b\n\nprint(osszeg(5, 8))')}`,
     runs: [{ probes: ["atlag([2, 4, 9])", "atlag([1, 2])", "atlag([10])", "paros_db([1, 2, 3, 4, 6])", "paros_db([1, 3, 5])", "paros_db([])"] }],
     check: { 12: R => {
       const t = [["atlag([2, 4, 9])", 5], ["atlag([1, 2])", 1.5], ["atlag([10])", 10], ["paros_db([1, 2, 3, 4, 6])", 3], ["paros_db([1, 3, 5])", 0], ["paros_db([])", 0]];
@@ -307,8 +307,8 @@ print(atlag([2, 4, 9]))
     starter: `f = open("tanulok.txt", "r", encoding="utf-8")
 
 `,
-    tasks: [{ n: 13, step: "Fájl, split", html: "Olvasd be a fájlt egy listába úgy, hogy minden eleme egy <code>[név, osztály, pontszám]</code> lista legyen, a pontszám egész szám (<code>int</code>)! Írd ki, hány tanuló van (<code>Tanulók száma: …</code>), és a 10.b osztály átlagát egy tizedesjegyre (<code>10.b átlaga: …</code>)." }],
-    tip: `<p>Olvasd be soronként, vágd le a sorvégi <code>\\n</code>-t (<code>strip()</code>), majd a <code>split(";")</code> feldarabolja a sort. A pontszámot <code>int()</code>-tel alakítsd számmá.</p>${pre('adatok = []\nfor sor in f:\n    resz = sor.strip().split(";")\n    adatok.append([resz[0], resz[1], int(resz[2])])\nf.close()')}`,
+    tasks: [{ n: 13, step: "Fájl, split", html: "Olvasd be a fájl tartalmát egy listába úgy, hogy minden eleme egy <code>[név, osztály, pontszám]</code> alakú lista legyen, a pontszámot egész számként (<code>int</code>) tárolva! Írd ki, hány tanuló adata szerepel a fájlban (<code>Tanulók száma: …</code>), majd a 10.b osztályos tanulók pontszámainak átlagát egy tizedesjegyre kerekítve (<code>10.b átlaga: …</code>)!" }],
+    tip: `<p>A fájlt soronként olvasd be, a <code>strip()</code>-pel vágd le a sorvégi <code>\\n</code>-t, majd a <code>split(";")</code> feldarabolja a sort. A pontszámot az <code>int()</code> alakítja számmá.</p>${pre('adatok = []\nfor sor in f:\n    resz = sor.strip().split(";")\n    adatok.append([resz[0], resz[1], int(resz[2])])\nf.close()')}`,
     runs: [{ probes: ["__dk_rows(7)"] }, { files: { "tanulok.txt": TANULOK2 }, probes: ["__dk_rows(5)"] }],
     check: { 13: R => first(
       need(pv(R[0], 0) === true, "Kell egy lista, amelyben mind a 7 tanuló [név, osztály, pontszám] alakban van, a pontszám int."),
@@ -331,8 +331,8 @@ class Suti:
         pass
 
 `,
-    tasks: [{ n: 14, step: "Osztályok", html: "Fejezd be a <code>Suti</code> osztályt (adattagjai: <code>nev</code>, <code>ar</code>, <code>csokis</code>), majd az <code>adatok</code> alapján hozd létre az objektumokat, és tedd őket egy <code>sutik</code> nevű listába! Írd ki a csokis sütik nevét (soronként egyet), majd a legolcsóbbat: <code>Legolcsóbb: Pogácsa 250 Ft</code>" }],
-    tip: `<p>Az <code>__init__</code> az objektum létrehozásakor fut; a <code>self.nev = nev</code> sor menti el az adatot az objektumban.</p>${pre('class Suti:\n    def __init__(self, nev, csokiszoras):\n        self.nev = nev\n        self.csokiszoras = csokiszoras\n\nmuffin = Suti("Muffin", True)\nprint(muffin.nev)')}`,
+    tasks: [{ n: 14, step: "Osztályok", html: "Fejezd be a <code>Suti</code> osztályt (adattagjai: <code>nev</code>, <code>ar</code>, <code>csokis</code>), majd az <code>adatok</code> alapján hozd létre az objektumokat, és tedd őket egy <code>sutik</code> nevű listába! Írd ki a csokis sütik nevét, soronként egyet, végül a legolcsóbb süti nevét és árát: <code>Legolcsóbb: Pogácsa 250 Ft</code>" }],
+    tip: `<p>Az <code>__init__</code> metódus az objektum létrehozásakor fut le; a <code>self.nev = nev</code> utasítás tárolja el az adatot az objektumban.</p>${pre('class Suti:\n    def __init__(self, nev, csokiszoras):\n        self.nev = nev\n        self.csokiszoras = csokiszoras\n\nmuffin = Suti("Muffin", True)\nprint(muffin.nev)')}`,
     runs: [
       { probes: ["len(sutik)", "all(isinstance(s, Suti) for s in sutik)", "[[s.nev, s.ar, s.csokis] for s in sutik]"] },
       { probes: [], transform: c => replaceAssign(c, "adatok", '[["Linzer", 300, False], ["Mignon", 280, True], ["Rétes", 410, False]]'), renamed: "Az adatok listát ne nevezd át." }
