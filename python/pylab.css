@@ -1,0 +1,68 @@
+/* digikult — Python practice pages: editor, runner output, task list. Loaded after excel/mission.css. */
+:root{--py:#3b6fb6;--py-ink:#24497d;--py-soft:#e8f0fb}
+.chap{color:var(--py)}
+.steps{grid-template-columns:repeat(auto-fit,minmax(78px,1fr))}
+.pystat{display:inline-flex;align-items:center;gap:7px}
+.pystat i{width:10px;height:10px;border-radius:50%;background:#e0b84a;box-shadow:0 0 0 3px rgba(224,184,74,.25)}
+.pystat.ok i{background:#7fdc8a;box-shadow:0 0 0 3px rgba(127,220,138,.22)}
+.pystat.bad i{background:#ef7d6f;box-shadow:0 0 0 3px rgba(239,125,111,.25)}
+
+.intro{max-width:1320px;margin:0 auto;padding:0 18px 18px}
+.intro .card p{margin:0 0 .6em;max-width:90ch}
+.intro .card p:last-child{margin:0}
+.intro .row{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;margin-top:10px}
+.intro label{font-weight:700}
+.intro input[type=text]{font:16px var(--f-body);padding:7px 10px;border:1.5px solid #bdb9a9;border-radius:4px;min-width:240px}
+
+.sec{max-width:1320px;margin:0 auto;padding:0 18px 34px;display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:18px;align-items:start;scroll-margin-top:64px}
+@media (max-width:1000px){ .sec{grid-template-columns:minmax(0,1fr)} }
+.sec .ed-card{position:sticky;top:66px}
+@media (max-width:1000px){ .sec .ed-card{position:static} }
+.data{margin:10px 0 0;background:#1f2a26;color:#e9efe9;border-radius:4px;padding:8px 12px;font:13.5px/1.5 var(--f-mono);white-space:pre;overflow:auto;max-height:220px}
+.goals li{display:block;padding:10px 12px 10px 42px;position:relative;scroll-margin-top:70px}
+.goals li::before{position:absolute;left:12px;top:11px}
+.goals li.bad{background:var(--bad-bg);border-color:#e4aaa2}
+.goals li .tn{font:700 15px var(--f-body);color:var(--py-ink)}
+.goals li .fb{margin:6px 0 0;font-size:14.5px;color:#6e1f1a}
+.goals li.ok .fb{color:#1f4f26}
+.goals li .opt{font:700 12px var(--f-body);text-transform:uppercase;letter-spacing:.05em;color:#7a5a00;background:#fff3c4;border-radius:3px;padding:1px 6px;margin-left:6px}
+.goals li p{margin:4px 0 0}
+
+.ed-card{padding:12px 12px 14px}
+.ed-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:4px 12px;margin:0 2px 8px}
+.ed-head h3{margin:0;font:700 17px var(--f-body)}
+.ed-head span{font-size:13.5px;color:var(--muted)}
+.editor{display:grid;grid-template-columns:auto 1fr;border:1.5px solid #2c3a35;border-radius:5px;background:#1b2421;overflow:hidden;height:360px;resize:vertical;min-height:180px}
+.gutter{margin:0;padding:10px 8px 10px 10px;font:14px/1.55 var(--f-mono);color:#6f8178;text-align:right;user-select:none;overflow:hidden;background:#17201d;border-right:1px solid #2c3a35;white-space:pre}
+.gutter b{display:block;font-weight:400}
+.gutter b.err{color:#fff;background:#b3362f;border-radius:2px;margin:0 -4px;padding:0 4px}
+.code{margin:0;border:0;outline:none;resize:none;padding:10px 12px;font:14px/1.55 var(--f-mono);color:#e9efe9;background:transparent;white-space:pre;overflow:auto;tab-size:4;caret-color:#f2d264;width:100%;height:100%}
+.code:focus-visible{outline:none;box-shadow:inset 0 0 0 2px var(--yellow)}
+.io{display:grid;grid-template-columns:minmax(0,1fr);gap:4px;margin-top:10px}
+.io label{font:700 13.5px var(--f-body);color:var(--muted)}
+.io textarea{font:14px/1.5 var(--f-mono);border:1.5px solid #bdb9a9;border-radius:4px;padding:6px 9px;height:58px;resize:vertical;background:#fff}
+.ed-card .btns{margin-top:10px}
+.btn.py{background:var(--py);border-color:var(--py);color:#fff}
+.btn.py:hover{background:var(--py-ink);border-color:var(--py-ink)}
+.btn[disabled]{opacity:.5;cursor:wait}
+.out{margin:10px 0 0;min-height:90px;max-height:340px;overflow:auto;background:#101714;color:#d8e6dc;border-radius:5px;padding:10px 12px;font:13.5px/1.5 var(--f-mono);white-space:pre-wrap;overflow-wrap:anywhere}
+.out .muted{color:#7d8f86;font-style:italic}
+.out .err{display:block;margin-top:8px;padding:8px 10px;border-radius:4px;background:#3a1714;color:#ffd7d1;white-space:pre-wrap}
+.out .err b{color:#fff}
+.out .warn{display:block;margin-top:8px;padding:8px 10px;border-radius:4px;background:#3b3212;color:#ffeeb0}
+.files{margin-top:8px;display:grid;gap:6px}
+.files details{background:#f6f4ec;border:1.5px solid var(--line);border-radius:4px;padding:6px 10px}
+.files summary{cursor:pointer;font-weight:700}
+.files pre{margin:6px 0 2px;font:13px/1.45 var(--f-mono);white-space:pre-wrap;max-height:200px;overflow:auto}
+.files a{font-size:13.5px}
+.sum{margin-top:10px;font-weight:700}
+.sum.ok{color:var(--ok)}
+
+#endPanel{max-width:1320px;margin:0 auto;padding:0 18px 40px}
+#endPanel .card{display:grid;gap:8px}
+#endPanel h2{margin:0}
+.score{font:700 44px/1 var(--f-chalk);color:var(--py-ink)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chips span{font:700 13.5px var(--f-mono);border-radius:4px;padding:3px 8px;background:#eee;color:#666}
+.chips span.ok{background:var(--ok-bg);color:var(--ok)}
+footer.end{max-width:1320px;margin:0 auto;padding:10px 18px 40px;color:var(--chalk-dim);font-size:14px}

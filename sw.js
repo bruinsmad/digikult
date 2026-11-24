@@ -6,7 +6,7 @@
    The file list below is written by tools/build-sw.py: run it before pushing. */
 
 /* FILES:BEGIN (written by tools/build-sw.py, don't edit by hand) */
-const VERSION = "2819274594";
+const VERSION = "b254f9a036";
 const CORE = [
 "./",
 "css/basics/first-steps.html",
@@ -166,6 +166,10 @@ const CORE = [
 "powerpoint/shape-lab.js",
 "powerpoint/shapes/intro-hu.html",
 "powerpoint/shapes/robot-hu.html",
+"python/fakt/gyakorlo-hu.html",
+"python/fakt/hazi-1-hu.html",
+"python/pylab.css",
+"python/pylab.js",
 "round-up.html",
 "sql/group-by/intro-hu.html",
 "sql/group-by/intro.html",
@@ -227,6 +231,7 @@ const CORE = [
 ];
 const EXTERNAL = [
 "https://cdn.jsdelivr.net/npm/",
+"https://cdn.jsdelivr.net/npm/pyodide@314.0.8/pyodide.mjs",
 "https://cdn.jsdelivr.net/npm/sql.js@1.10.3/dist/sql-asm.js",
 "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js",
 "https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600;700&display=swap",

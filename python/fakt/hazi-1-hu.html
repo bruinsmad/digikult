@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>/* moving between pages: the old page drifts aside and fades, the new one glides in; the rail holds still */@view-transition{navigation:auto}.rail{view-transition-name:rail}::view-transition-group(root){animation:none}::view-transition-old(root){animation:dk-out .2s cubic-bezier(.4,0,1,1) both}::view-transition-new(root){animation:dk-in .38s cubic-bezier(.16,1,.3,1) .06s both}::view-transition-old(rail),::view-transition-new(rail){animation:none}@keyframes dk-out{to{opacity:0;transform:translateX(-18px)}}@keyframes dk-in{from{opacity:0;transform:translateX(26px)}}@media (prefers-reduced-motion:reduce){::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none!important}}</style>
+<title>Python gyakorló sor – Fakt házi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600;700&display=swap">
+<link rel="stylesheet" href="../../excel/mission.css">
+<link rel="stylesheet" href="../pylab.css">
+</head>
+<body>
+<header class="rail"><div class="in">
+  <a class="home" href="../../index.html">Digitális kultúra</a>
+  <span class="crumb"><a href="../../index.html#python">Programozás – Python</a> › <a href="../../index.html#python-fakt">Fakt</a></span>
+</div></header>
+<div class="top">
+  <span class="art" aria-hidden="true"><svg viewBox="0 0 96 96"><ellipse cx="48" cy="88" rx="30" ry="5" fill="#000" opacity=".25"/>
+<rect x="10" y="16" width="76" height="60" rx="6" fill="#1b2421" stroke="#8a5532" stroke-width="4"/>
+<rect x="10" y="16" width="76" height="11" rx="5" fill="#8a5532"/><circle cx="19" cy="21.5" r="2.3" fill="#ef7d6f"/><circle cx="26" cy="21.5" r="2.3" fill="#f2d264"/><circle cx="33" cy="21.5" r="2.3" fill="#7fdc8a"/>
+<path d="M20 40l8 6-8 6" fill="none" stroke="#f2d264" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M33 52h16" stroke="#efeee6" stroke-width="3.4" stroke-linecap="round"/>
+<path d="M20 64h12M37 64h22" stroke="#7da7de" stroke-width="3" stroke-linecap="round"/>
+<path d="M60 44l5 5 10-11" fill="none" stroke="#7fdc8a" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+  <div><div class="kicker">Házi feladat · Fakt, csütörtöki órák</div><h1>Python gyakorló sor</h1></div>
+  <div class="meta"><span class="pystat" id="pyStat"><i></i><span id="pyStatTxt">Python töltődik…</span></span><span>Kész <b id="solvedCount">0 / 13</b></span><button type="button" class="mbtn" data-download-all>hazi.py letöltése</button><button type="button" class="mbtn" id="resetBtn" title="Minden kód és eredmény törlése ebben a böngészőben">Újrakezdés</button></div>
+</div>
+<nav class="steps" id="steps" aria-label="Feladatok"></nav>
+
+<section class="intro"><div class="card">
+  <p class="chap">Így működik</p>
+  <p>Négy részben 13 rövid feladat vár az eddigi csütörtöki órák anyagából: osztályok, fájlbeolvasás, és kicsiben az érettségi feladatok (Céges autók, Meteorológiai jelentés, Kerítés, Sorozatok, Ötszáz, Sudoku). A programot itt az oldalon írod és futtatod, a Python a böngésződben fut.</p>
+  <p><b>Futtatás</b> (<kbd>Ctrl</kbd>+<kbd>Enter</kbd>): lefut a programod, az <code>input()</code> a <i>Bemenet</i> mező sorait kapja. <b>Ellenőrzés</b>: az oldal többféle bemenettel is lefuttatja, és feladatonként megmondja, jó-e. Minden feladat előtt írd ki a sorszámát, pl. <code>print("4. feladat")</code>, mert az ellenőrzés ez alapján találja meg az eredményt. A kódod a böngészőben mentődik.</p>
+  <div class="row"><label for="nameIn">Neved:</label><input type="text" id="nameIn" autocomplete="name" placeholder="Vezetéknév Keresztnév"><a class="btn" id="futasDl" href="#" download="futas.txt">futas.txt letöltése</a></div>
+</div></section>
+
+<div id="sections"></div>
+
+<section id="endPanel"><div class="card">
+  <p class="chap">Beadás</p>
+  <h2 id="endName">Eredmény</h2>
+  <div class="score" id="endScore">0 / 12</div>
+  <div class="chips" id="endChips"></div>
+  <p>Ha végeztél, töltsd le a <b>hazi.py</b> fájlt (benne mind a négy rész), és add be a Classroomban. Mellé tölts fel egy képernyőképet erről a dobozról. A 13. feladat szorgalmi, nem számít bele a 12 pontba.</p>
+  <div class="btns"><button type="button" class="btn py" data-download-all>hazi.py letöltése</button></div>
+</div></section>
+<footer class="end">Digitális kultúra · Fakt. A Python a böngésződben fut (Pyodide); a kódodat az oldal nem küldi el sehová, csak ebben a böngészőben menti.</footer>
+
+<script src="../pylab.js"></script>
+<script>
+(() => {
+"use strict";
+const { norm, has, num, lines, lineWith, need, first, pv, pe, noMark } = PYLAB_UTIL;
+const sec = (run, n) => run.tasks[n];
+/* ---------------- data ---------------- */
+const FUTAS = `2026.10.01 5.2 27:41 Margitsziget
+2026.10.03 8.0 44:10 Normafa
+2026.10.05 5.4 28:02 Margitsziget
+2026.10.08 3.0 14:55 Varosliget
+2026.10.10 10.5 58:30 Normafa
+2026.10.12 5.4 27:12 Margitsziget
+2026.10.15 6.1 33:40 Hajogyari
+2026.10.17 3.0 14:20 Varosliget
+2026.10.19 12.0 1:08:45 Normafa
+2026.10.22 5.4 26:58 Margitsziget
+2026.10.24 7.3 39:05 Hajogyari
+2026.10.26 4.0 19:48 Varosliget
+2026.10.29 5.4 26:31 Margitsziget
+2026.10.31 15.2 1:29:10 Normafa
+`;
+const TABLA = [
+  [5, 3, 0, 0, 7, 0, 0, 0, 0], [6, 0, 0, 1, 9, 5, 0, 0, 0], [0, 9, 8, 0, 0, 0, 0, 6, 0],
+  [8, 0, 0, 0, 6, 0, 0, 0, 3], [4, 0, 0, 8, 0, 3, 0, 0, 1], [7, 0, 0, 0, 2, 0, 0, 0, 6],
+  [0, 6, 0, 0, 0, 0, 2, 8, 0], [0, 0, 0, 4, 1, 9, 0, 0, 5], [0, 0, 0, 0, 8, 0, 0, 7, 9]
+];
+const tablaSrc = "tabla = [\n" + TABLA.map(r => "    [" + r.join(", ") + "],").join("\n") + "\n]\n";
+
+const STARTER = {
+A: `konyvek = [
+    ["Egri csillagok", "Gárdonyi Géza", 1899, 512],
+    ["A Pál utcai fiúk", "Molnár Ferenc", 1906, 192],
+    ["Légy jó mindhalálig", "Móricz Zsigmond", 1920, 352],
+    ["Abigél", "Szabó Magda", 1970, 384],
+    ["Az ajtó", "Szabó Magda", 1987, 264],
+    ["Tüskevár", "Fekete István", 1957, 320],
+    ["Az arany ember", "Jókai Mór", 1872, 560],
+    ["A kőszívű ember fiai", "Jókai Mór", 1869, 608],
+    ["Vuk", "Fekete István", 1965, 128],
+    ["Kincskereső kisködmön", "Móra Ferenc", 1918, 224],
+]
+
+# Ide jön a Konyv osztály és a megoldás.
+# Minden feladat előtt írd ki a sorszámát:
+print("1. feladat")
+`,
+B: `# A futas.txt ugyanabban a mappában van, mint a program.
+# Egy sor: dátum táv(km) idő helyszín, pl. 2026.10.01 5.2 27:41 Margitsziget
+
+print("4. feladat")
+`,
+C: `# 9. feladat adatai
+kosar = ["kifli", "kakao", "kifli", "pogacsa", "kifli", "kakao"]
+
+# 10. feladat adatai
+szinek = ["P", "P", "K", ":", "Z", "Z", "Z", "#", "K", "K"]
+szelessegek = [10, 12, 8, 15, 10, 10, 9, 14, 11, 12]
+
+# 11. feladat adatai
+reszek = [
+    ("Dark", "S01E01", 52),
+    ("Dark", "S01E02", 48),
+    ("Wednesday", "S01E05", 50),
+    ("Dark", "S03E01", 55),
+    ("Arcane", "S01E09", 41),
+    ("Wednesday", "S02E01", 58),
+    ("Arcane", "S02E02", 43),
+]
+
+print("9. feladat")
+`,
+D: tablaSrc + `
+lepesek = [(5, 1, 1), (7, 1, 3), (4, 3, 1), (8, 2, 2), (1, 1, 3)]
+
+print("12. feladat")
+`
+};
+
+const SUDOKU_TESTS = [
+  [5, 1, 1, "F"], [7, 1, 3, "S"], [4, 3, 1, "O"], [8, 2, 2, "R"], [1, 1, 3, "OK"],
+  [9, 9, 1, "S"], [6, 9, 1, "O"], [2, 9, 2, "OK"], [6, 8, 3, "R"]
+];
+function sudokuKind(text) {
+  const t = norm(text);
+  if (t.includes("foglalt")) return "F";
+  if (t.includes("oszlop")) return "O";
+  if (t.includes("rész") || t.includes("blokk") || t.includes("3x3") || t.includes("3×3")) return "R";
+  if (t.includes("sor")) return "S";
+  if (t.includes("megtehet") || t.includes("lehetséges") || t.includes("beírható")) return "OK";
+  return "?";
+}
+const KIND_TXT = { F: "a hely foglalt", S: "már szerepel a sorban", O: "már szerepel az oszlopban", R: "már szerepel a résztáblázatban", OK: "a lépés megtehető" };
+
+PYLAB_START({
+  key: "python-fakt-hazi1-hu-v1",
+  title: "Házi feladat – Python gyakorló sor (Fakt)",
+  file: "hazi.py",
+  downloads: [{ id: "futasDl", text: FUTAS }],
+  sections: [
+  {
+    id: "A", chap: "A rész", starter: STARTER.A, title: "Osztályok, objektumok listája",
+    lead: "A <code>konyvek</code> lista (cím, szerző, megjelenés éve, oldalszám) már benne van a kezdőkódban.",
+    input: "Jókai Mór",
+    tasks: [
+      { n: 1, step: "Konyv osztály", html: "Hozz létre egy <code>Konyv</code> osztályt, és a lista elemeit tedd át egy új listába <code>Konyv</code> típusú objektumként! Írd ki, hány könyv jelent meg 1950 előtt!" },
+      { n: 2, step: "Leghosszabb", html: "Melyik a leghosszabb könyv? Írd ki a címét, a szerzőjét és az oldalszámát! Írd ki az átlagos oldalszámot is egészre kerekítve!" },
+      { n: 3, step: "Szerző keresése", html: "Kérd be egy szerző nevét, és írd ki az összes könyvét a megjelenés évével! Ha nincs ilyen szerző, írd ki: „Nincs ilyen szerző a listában.”" }
+    ],
+    runs: [
+      { inputs: ["Jókai Mór"], probes: ["__dk_objs('Konyv')"] },
+      { inputs: ["Petőfi Sándor"], probes: [] }
+    ],
+    check: {
+      1: R => { const s = sec(R[0], 1); if (s == null) return noMark(1);
+        const o = pv(R[0], 0);
+        return first(need(o !== -1, "Nincs Konyv nevű osztály."),
+                     need(o === 10, "Kell egy lista, amelyben mind a 10 könyv Konyv objektumként van."),
+                     need(num(s, 6), "Az 1950 előtti könyvek száma nem jó (vagy nincs kiírva)."), need(!num(s, 4), "Az 1950 előtti könyvek száma nem jó.")); },
+      2: R => { const s = sec(R[0], 2); if (s == null) return noMark(2);
+        return first(need(has(s, "a kőszívű ember fiai"), "Nem a leghosszabb könyv címe szerepel."),
+                     need(has(s, "jókai mór"), "Hiányzik a leghosszabb könyv szerzője."),
+                     need(num(s, 608), "Hiányzik a leghosszabb könyv oldalszáma."),
+                     need(num(s, 354), "Az átlagos oldalszám nem jó, vagy nincs egészre kerekítve.")); },
+      3: R => { const s = sec(R[0], 3), s2 = sec(R[1], 3); if (s == null) return noMark(3);
+        return first(need(R[0].inputsUsed, "A 3. feladatban kérd be a szerző nevét az input() függvénnyel."),
+                     need(has(s, "az arany ember") && has(s, "a kőszívű ember fiai"), "„Jókai Mór” bemenetre nem jelenik meg mindkét könyve."),
+                     need(num(s, 1872) && num(s, 1869), "A könyvek mellől hiányzik a megjelenés éve."),
+                     need(!has(s, "egri csillagok") && !has(s, "abigél"), "Más szerzők könyvei is megjelennek."),
+                     need(s2 != null && has(s2, "nincs ilyen szerző"), "Ismeretlen szerzőre (pl. „Petőfi Sándor”) írd ki: Nincs ilyen szerző a listában.")); }
+    }
+  },
+  {
+    id: "B", chap: "B rész", starter: STARTER.B, title: "Fájlbeolvasás: futas.txt",
+    lead: "A <code>futas.txt</code> egy futó októberi edzésnaplója, a program mellett van. Soronként szóközzel elválasztva: dátum, táv (km), idő (<code>pp:mm</code> vagy <code>ó:pp:mm</code>), helyszín.",
+    data: FUTAS.split("\n").slice(0, 4).join("\n") + "\n…",
+    files: { "futas.txt": FUTAS },
+    input: "Normafa",
+    tasks: [
+      { n: 4, step: "Beolvasás", html: "Olvasd be a fájlt egy <code>Futas</code> osztályú objektumokból álló listába! Írd ki, hány futás van a fájlban, és mennyi az összes táv egy tizedesjegyre!" },
+      { n: 5, step: "masodperc()", html: "Készíts egy <code>masodperc(ido)</code> függvényt, amely az időt másodpercre váltja (<code>\"27:41\"</code> → 1661, <code>\"1:08:45\"</code> → 4125)! Ennek segítségével írd ki az összes futásidőt <code>ó:pp:mm</code> alakban!" },
+      { n: 6, step: "Leggyorsabb", html: "Melyik futás volt a leggyorsabb, azaz hol a legkisebb az egy kilométerre jutó idő (tempó)? Írd ki a dátumát, a helyszínét és a tempót <code>p:mm/km</code> alakban!" },
+      { n: 7, step: "Szótár, fájl", html: "Számold meg szótárral, melyik helyszínen hányszor futott, és írd ki a képernyőre! Írd ki a <code>helyszinek.txt</code> fájlba is soronként: helyszín, futások száma, összes km (egy tizedesjegy), pontosvesszővel elválasztva, pl. <code>Margitsziget;5;26.8</code>" },
+      { n: 8, step: "Utolsó futás", html: "Kérj be egy helyszínt, és írd ki, mikor futott ott utoljára! Ha ott nem futott, írd ki: „Ezen a helyszínen nem volt futás.” Ezután döntsd el, volt-e 10 km-nél hosszabb futás, és ha igen, írd ki az első dátumát!" }
+    ],
+    runs: [
+      { inputs: ["Normafa"], probes: ["__dk_objs('Futas')", "masodperc('27:41')", "masodperc('1:08:45')", "masodperc('0:59')", "masodperc('2:00:00')"] },
+      { inputs: ["Balaton"], probes: [] }
+    ],
+    check: {
+      4: R => { const s = sec(R[0], 4); if (s == null) return noMark(4);
+        const o = pv(R[0], 0);
+        return first(need(o !== -1, "Nincs Futas nevű osztály."),
+                     need(o === 14, "Kell egy lista, amelyben mind a 14 futás Futas objektumként van."),
+                     need(num(s, 14), "A futások száma nem jó (vagy nincs kiírva)."),
+                     need(num(s, 95.9), "Az összes táv nem jó, vagy nem egy tizedesjegyre kerekítetted.")); },
+      5: R => { const s = sec(R[0], 5); if (s == null) return noMark(5);
+        const want = [1661, 4125, 59, 7200], args = ["27:41", "1:08:45", "0:59", "2:00:00"];
+        if (/NameError/.test(pe(R[0], 1))) return "Nincs masodperc nevű függvény.";
+        for (let i = 0; i < 4; i++) {
+          const v = pv(R[0], i + 1);
+          if (v !== want[i]) return `masodperc("${args[i]}") eredménye ${v === undefined ? "hiba: " + pe(R[0], i + 1) : JSON.stringify(v)}, de ${want[i]} kellene (egész számként).`;
+        }
+        return need(has(s, "8:38:47"), "Az összes futásidő nem jó, vagy nem ó:pp:mm alakú (a perc és a másodperc két jegyű legyen)."); },
+      6: R => { const s = sec(R[0], 6); if (s == null) return noMark(6);
+        return first(need(has(s, "2026.10.17") && has(s, "varosliget"), "Nem a leggyorsabb futás dátuma és helyszíne szerepel."),
+                     need(has(s, "4:47"), "A tempó nem jó, vagy nem p:mm/km alakú (kerekíts egész másodpercre).")); },
+      7: R => { const s = sec(R[0], 7); if (s == null) return noMark(7);
+        const exp = [["margitsziget", 5, 26.8], ["normafa", 4, 45.7], ["varosliget", 3, 10.0], ["hajogyari", 2, 13.4]];
+        for (const [h, d] of exp) if (!lineWith(s, h, d)) return `A képernyőn nem látom, hogy ${h[0].toUpperCase() + h.slice(1)}: ${d} futás.`;
+        const f = R[0].written["helyszinek.txt"];
+        if (f == null) return "Nem jött létre a helyszinek.txt fájl.";
+        const got = norm(f).split("\n").map(l => l.replace(/\s+/g, "")).filter(Boolean).sort();
+        const want = exp.map(([h, d, k]) => `${h};${d};${k.toFixed(1)}`).sort();
+        return need(JSON.stringify(got) === JSON.stringify(want), "A helyszinek.txt tartalma nem jó. Minden sor: helyszín;darab;km egy tizedesjeggyel, pl. Margitsziget;5;26.8"); },
+      8: R => { const s = sec(R[0], 8), s2 = sec(R[1], 8); if (s == null) return noMark(8);
+        return first(need(R[0].inputsUsed, "A 8. feladatban kérd be a helyszínt az input() függvénnyel."),
+                     need(has(s, "2026.10.31"), "„Normafa” bemenetre nem az utolsó futás dátuma jelenik meg."),
+                     need(!has(s, "nem volt futás"), "„Normafa” bemenetre azt írja, hogy nem volt futás."),
+                     need(s2 != null && has(s2, "nem volt futás"), "Ismeretlen helyszínre (pl. „Balaton”) írd ki: Ezen a helyszínen nem volt futás."),
+                     need(has(s, "2026.10.10"), "A 10 km-nél hosszabb első futás dátuma nem jó (vagy hiányzik).")); }
+    }
+  },
+  {
+    id: "C", chap: "C rész", starter: STARTER.C, noInput: true, title: "Érettségi feladatok kicsiben",
+    lead: "A három feladat adatai a kezdőkódban vannak. Mindhárom egy-egy csütörtöki érettségi feladat ötletét ismétli.",
+    input: "",
+    tasks: [
+      { n: 9, step: "Ötszáz", tag: "Ötszáz", html: "Az iskolai büfében akció van: egy vásárláson belül ugyanabból a termékből az 1. darab 300 Ft, a 2. darab 250 Ft, minden további 200 Ft. Készíts egy <code>ertek(darab)</code> függvényt, amely megadja, mennyit kell fizetni <code>darab</code> db azonos termékért! Dolgozd fel a <code>kosar</code> listát: írd ki, hányféle termék van benne, termékenként a darabszámot és az árat, végül a fizetendő összeget!" },
+      { n: 10, step: "Kerítés", tag: "Kerítés", html: "Egy utca páratlan oldalán a telkek sorban az 1, 3, 5, … házszámot kapják. A <code>szinek</code> lista a kerítések színét adja meg (<code>:</code> = még nincs lefestve, <code>#</code> = nincs kerítés), a <code>szelessegek</code> a telkek szélességét méterben. Írd ki minden telek házszámát és kerítésszínét! Hány olyan szomszédos telekpár van, amelynek kerítése azonos színű (a <code>:</code> és a <code>#</code> nem szín)? Hány méterre kezdődik az utca elejétől a 7-es telek?" },
+      { n: 11, step: "Sorozatok", tag: "Sorozatok", html: "Az epizódkód alakja <code>SxxEyy</code>, ahol <code>xx</code> az évad, <code>yy</code> a rész száma. Írd ki minden részt így: <code>Dark: 1. évad 1. rész</code> (vezető nullák nélkül)! Melyik sorozatból látunk részt a legmagasabb évadszámmal? Mennyi az összes nézési idő <code>x óra y perc</code> alakban?" }
+    ],
+    runs: [
+      { inputs: [], probes: ["ertek(1)", "ertek(2)", "ertek(3)", "ertek(4)", "ertek(5)"] }
+    ],
+    check: {
+      9: R => { const s = sec(R[0], 9); if (s == null) return noMark(9);
+        if (/NameError/.test(pe(R[0], 0))) return "Nincs ertek nevű függvény.";
+        const want = [300, 550, 750, 950, 1150];
+        for (let i = 0; i < 5; i++) { const v = pv(R[0], i);
+          if (v !== want[i]) return `ertek(${i + 1}) eredménye ${v === undefined ? "hiba: " + pe(R[0], i) : JSON.stringify(v)}, de ${want[i]} kellene.`; }
+        return first(need(lineWith(s, "kifli", 3, 750), "A kifli sorában nem látom: 3 db, 750 Ft."),
+                     need(lineWith(s, "kakao", 2, 550), "A kakaó sorában nem látom: 2 db, 550 Ft."),
+                     need(lineWith(s, "pogacsa", 1, 300), "A pogácsa sorában nem látom: 1 db, 300 Ft."),
+                     need(num(s, 1600), "A fizetendő összeg nem jó (vagy hiányzik)."),
+                     need(num(s, 3), "Hiányzik, hányféle termék van a kosárban.")); },
+      10: R => { const s = sec(R[0], 10); if (s == null) return noMark(10);
+        for (let h = 1; h <= 19; h += 2) if (!lineWith(s, h)) return `A ${h}. ház nem szerepel a kiírásban.`;
+        return first(need(lineWith(s, 19, "k") && lineWith(s, 9, "z") && lineWith(s, 15, "#"), "A házszámok mellett nem a jó kerítésszín áll."),
+                     need(num(s, 4), "Az azonos színű szomszédos párok száma nem jó (4 kellene? számold újra, a : és a # nem szín)."),
+                     need(num(s, 30), "A 7-es telek kezdete nem jó: az előtte lévő telkek szélességét kell összeadni.")); },
+      11: R => { const s = sec(R[0], 11); if (s == null) return noMark(11);
+        const exp = ["dark: 1. évad 1. rész", "dark: 1. évad 2. rész", "wednesday: 1. évad 5. rész", "dark: 3. évad 1. rész", "arcane: 1. évad 9. rész", "wednesday: 2. évad 1. rész", "arcane: 2. évad 2. rész"];
+        for (const e of exp) if (!has(s, e)) return `Hiányzik vagy más alakú ez a sor: ${e.replace(/^\w/, c => c.toUpperCase())}`;
+        const mx = lines(s).some(l => l.includes("dark") && num(l, 3) && !l.includes("rész"));
+        return first(need(mx, "Nem látom külön sorban, melyik sorozat évadszáma a legmagasabb (Dark, 3)."),
+                     need(has(s, "5 óra 47 perc"), "Az összes nézési idő nem jó, vagy nem „x óra y perc” alakú.")); }
+    }
+  },
+  {
+    id: "D", chap: "D rész", starter: STARTER.D, title: "Kétdimenziós lista: Sudoku",
+    lead: "A tábla 9×9-es, a 0 üres mezőt jelöl. A 3×3-as résztáblák számozása balról jobbra, fentről lefelé halad (bal felső = 1., jobb alsó = 9.).",
+    input: "5\n8",
+    tasks: [
+      { n: 12, step: "Sudoku", html: "Kérj be egy sor- és egy oszlopszámot (1–9)! Írd ki a mezőben lévő értéket, vagy ha 0, akkor: „Ez a hely még üres.” Írd ki azt is, hányadik résztáblához tartozik a mező! Végül add meg, a tábla hány százaléka üres, egy tizedesjegyre." },
+      { n: 13, step: "lepes()", opt: true, html: "Készíts egy <code>lepes(szam, sor, oszlop)</code> függvényt, amely a tábla módosítása nélkül megmondja, beírható-e a szám az adott helyre! A válasz egyike legyen: „A hely már foglalt.”, „Az adott sorban már szerepel a szám.”, „Az adott oszlopban már szerepel a szám.”, „Az adott résztáblázatban már szerepel a szám.”, „A lépés megtehető.” Próbáld ki a <code>lepesek</code> lista öt lépésére (szám, sor, oszlop)! Az ellenőrzés további lépéseket is kipróbál." }
+    ],
+    runs: [
+      { inputs: ["5", "8"], probes: SUDOKU_TESTS.map(([a, b, c]) => `lepes(${a}, ${b}, ${c})`).concat(["tabla"]) },
+      { inputs: ["1", "2"], probes: [] },
+      { inputs: ["2", "5"], probes: [] }
+    ],
+    check: {
+      12: R => { const s = sec(R[0], 12), s1 = sec(R[1], 12), s2 = sec(R[2], 12); if (s == null) return noMark(12);
+        return first(need(R[0].inputsUsed, "A 12. feladatban kérd be a sor- és az oszlopszámot az input() függvénnyel."),
+                     need(has(s, "még üres"), "Üres mezőre (5. sor, 8. oszlop) írd ki: Ez a hely még üres."),
+                     need(num(s, 6), "Az 5. sor 8. oszlopa a 6. résztáblához tartozik, ez nem jelenik meg."),
+                     need(s1 != null && num(s1, 3) && num(s1, 1) && !has(s1, "még üres"), "Az 1. sor 2. oszlopára 3-at és az 1. résztáblát kellene kiírni."),
+                     need(s2 != null && num(s2, 9) && num(s2, 2), "A 2. sor 5. oszlopára 9-et és a 2. résztáblát kellene kiírni."),
+                     need(has(s, "63.0"), "Az üres mezők aránya nem jó, vagy nem egy tizedesjegyre kerekítetted (pl. 12.0).")); },
+      13: R => {
+        if (/NameError/.test(pe(R[0], 0))) return "Nincs lepes nevű függvény.";
+        for (let i = 0; i < SUDOKU_TESTS.length; i++) {
+          const [a, b, c, k] = SUDOKU_TESTS[i], p = R[0].probes[i];
+          if (!p) return "A lepes függvényt nem sikerült kipróbálni.";
+          if (!p.ok) return `lepes(${a}, ${b}, ${c}) hibát adott: ${p.err}`;
+          const text = (p.value == null ? "" : String(p.value)) + " " + p.out;
+          const got = sudokuKind(text);
+          if (got !== k) return `lepes(${a}, ${b}, ${c}): azt kellene mondania, hogy ${KIND_TXT[k]}${got === "?" ? ", de nem értem a válaszát." : `, de azt mondja: ${KIND_TXT[got]}.`}`;
+        }
+        const t = pv(R[0], SUDOKU_TESTS.length);
+        return need(JSON.stringify(t) === JSON.stringify(TABLA), "A lepes függvény megváltoztatta a táblát, pedig nem szabad.");
+      }
+    }
+  }
+]
+});
+})();
+</script>
+<script src="../../nav.js?v=2c8ccf1b" defer></script>
+</body>
+</html>

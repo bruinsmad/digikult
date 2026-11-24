@@ -1,0 +1,358 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>/* moving between pages: the old page drifts aside and fades, the new one glides in; the rail holds still */@view-transition{navigation:auto}.rail{view-transition-name:rail}::view-transition-group(root){animation:none}::view-transition-old(root){animation:dk-out .2s cubic-bezier(.4,0,1,1) both}::view-transition-new(root){animation:dk-in .38s cubic-bezier(.16,1,.3,1) .06s both}::view-transition-old(rail),::view-transition-new(rail){animation:none}@keyframes dk-out{to{opacity:0;transform:translateX(-18px)}}@keyframes dk-in{from{opacity:0;transform:translateX(26px)}}@media (prefers-reduced-motion:reduce){::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none!important}}</style>
+<title>Python alapok – 14 kis feladat</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600;700&display=swap">
+<link rel="stylesheet" href="../../excel/mission.css">
+<link rel="stylesheet" href="../pylab.css">
+</head>
+<body>
+<header class="rail"><div class="in">
+  <a class="home" href="../../index.html">Digitális kultúra</a>
+  <span class="crumb"><a href="../../index.html#python">Programozás – Python</a> › <a href="../../index.html#python-fakt">Fakt</a></span>
+</div></header>
+<div class="top">
+  <span class="art" aria-hidden="true"><svg viewBox="0 0 96 96"><ellipse cx="48" cy="88" rx="30" ry="5" fill="#000" opacity=".25"/>
+<rect x="12" y="14" width="72" height="64" rx="4" fill="#fffdf6"/><rect x="12" y="14" width="72" height="12" rx="4" fill="#3b6fb6"/>
+<g fill="none" stroke-linecap="round" stroke-width="3"><path d="M22 38h6M22 50h6M22 62h6" stroke="#3b6fb6"/><path d="M34 38h30M34 50h22M34 62h26" stroke="#b9b5a4"/></g>
+<path d="M66 34l3 3 6-7M66 46l3 3 6-7" fill="none" stroke="#2f7a3a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="70" cy="62" r="4" fill="none" stroke="#e0b84a" stroke-width="3"/>
+<text x="20" y="23.5" font-family="JetBrains Mono,monospace" font-weight="700" font-size="8.5" fill="#fff">&gt;&gt;&gt; 5–10 perc</text></svg></span>
+  <div><div class="kicker">Gyakorló · Fakt</div><h1>Python alapok: 14 kis feladat</h1></div>
+  <div class="meta"><span class="pystat" id="pyStat"><i></i><span id="pyStatTxt">Python töltődik…</span></span><span>Kész <b id="solvedCount">0 / 14</b></span><button type="button" class="mbtn" data-download-all>gyakorlo.py letöltése</button><button type="button" class="mbtn" id="resetBtn" title="Minden kód és eredmény törlése ebben a böngészőben">Újrakezdés</button></div>
+</div>
+<nav class="steps" id="steps" aria-label="Feladatok"></nav>
+
+<section class="intro"><div class="card">
+  <p class="chap">Így működik</p>
+  <p>Az összefoglaló minden témaköréhez egy kis feladat, sorban: kiírás és változók, bekérés, elágazás, while és for ciklus, beágyazott ciklus, listák, a programozási tételek, mátrix, függvény, fájlkezelés, osztály. Egy feladat 5–10 perc. Minden feladat mellett ott az emlékeztető, ha elakadsz.</p>
+  <p><b>Futtatás</b> (<kbd>Ctrl</kbd>+<kbd>Enter</kbd>): lefut a programod, az <code>input()</code> a <i>Bemenet</i> mező sorait kapja. <b>Ellenőrzés</b>: az oldal más bemenettel és más adatokkal is lefuttatja, tehát a jó eredményt nem elég „beírni”, ki kell számolni. A kódod a böngészőben mentődik.</p>
+  <div class="row"><label for="nameIn">Neved:</label><input type="text" id="nameIn" autocomplete="name" placeholder="Vezetéknév Keresztnév"><a class="btn" id="tanulokDl" href="#" download="tanulok.txt">tanulok.txt letöltése</a></div>
+</div></section>
+
+<div id="sections"></div>
+
+<section id="endPanel"><div class="card">
+  <p class="chap">Eredmény</p>
+  <h2 id="endName">Eredmény</h2>
+  <div class="score" id="endScore">0 / 14</div>
+  <div class="chips" id="endChips"></div>
+  <p>Ha végeztél, töltsd le a <b>gyakorlo.py</b> fájlt (benne mind a 14 megoldás), és add be a Classroomban egy képernyőképpel erről a dobozról.</p>
+  <div class="btns"><button type="button" class="btn py" data-download-all>gyakorlo.py letöltése</button></div>
+</div></section>
+<footer class="end">Digitális kultúra · Fakt. A Python a böngésződben fut (Pyodide); a kódodat az oldal nem küldi el sehová, csak ebben a böngészőben menti.</footer>
+
+<script src="../pylab.js"></script>
+<script>
+(() => {
+"use strict";
+const { norm, has, num, lines, lineWith, need, first, pv, pe, same, replaceAssign } = PYLAB_UTIL;
+const out = (R, i = 0) => R[i].out;
+const exact = (R, i, s) => lines(out(R, i)).some(l => l.replace(/[,;]/g, " ").replace(/\s+/g, " ").trim() === s);
+const codeHas = (R, re) => re.test(R[0].code.replace(/#.*$/gm, ""));
+
+const TANULOK = `Kiss Anna;10.b;87
+Nagy Péter;10.a;72
+Tóth Lili;10.b;95
+Szabó Máté;10.a;64
+Varga Zoé;10.b;78
+Kovács Ádám;10.a;88
+Horváth Emma;10.b;70
+`;
+const TANULOK2 = `Fekete Bori;10.b;90
+Fehér Ádám;10.a;55
+Lakatos Ida;10.b;81
+Pintér Olivér;10.a;99
+Bodnár Réka;10.b;60
+`;
+const pre = s => `<pre>${s.replace(/&/g, "&amp;").replace(/</g, "&lt;")}</pre>`;
+
+PYLAB_START({
+  key: "python-fakt-gyakorlo-hu-v1",
+  title: "Python alapok – 14 kis feladat (Fakt)",
+  file: "gyakorlo.py",
+  downloads: [{ id: "tanulokDl", text: TANULOK }],
+  sections: [
+  /* ---------- 1. print, változók, típusok ---------- */
+  { id: "s1", chap: "1. feladat · Kiírás, változók, típusok", title: "Bemutatkozás", height: 220, noInput: true,
+    starter: `nev = "Bence"
+kor = 16
+magassag = 1.78
+
+# Írd ki: Bence 16 éves, 1.78 m magas.
+`,
+    tasks: [{ n: 1, step: "Változók", html: "A három változó már megvan. Írd ki <b>a változók segítségével</b> egy sorban: <code>Bence 16 éves, 1.78 m magas.</code> Utána írd ki külön sorokban a három változó típusát a <code>type()</code> függvénnyel!" }],
+    tip: `<p>A <code>print()</code> több értéket is kiír, vesszővel elválasztva, közéjük szóközt tesz.</p>${pre('print("Név:", nev, "Kor:", kor)\nprint(type(kor))   # <class \'int\'>')}`,
+    runs: [
+      { probes: [] },
+      { probes: [], renamed: "A nev, kor és magassag változókat ne nevezd át.",
+        transform: c => { const r = [[/^nev\s*=.*$/m, 'nev = "Zita"'], [/^kor\s*=.*$/m, "kor = 17"], [/^magassag\s*=.*$/m, "magassag = 1.65"]];
+          for (const [re, v] of r) { if (!re.test(c)) return null; c = c.replace(re, v); } return c; } }
+    ],
+    check: { 1: R => first(
+      need(has(out(R), "bence 16 éves, 1.78 m magas"), "Nem látom ezt a sort: Bence 16 éves, 1.78 m magas."),
+      need(has(out(R), "<class 'str'>") && has(out(R), "<class 'int'>") && has(out(R), "<class 'float'>"), "Írd ki mindhárom változó típusát: print(type(nev)) …"),
+      need(has(out(R, 1), "zita 17 éves, 1.65 m magas"), "A mondatot a változókból rakd össze, ne írd be kézzel a „Bence” és a számokat: ha a változók értéke más, a kiírásnak is változnia kell.")) }
+  },
+  /* ---------- 2. input, típusátalakítás ---------- */
+  { id: "s2", chap: "2. feladat · Bekérés, típusátalakítás", title: "Összeg és szorzat", height: 200, input: "5\n7",
+    starter: `# Kérj be két egész számot!
+`,
+    tasks: [{ n: 2, step: "input()", html: "Kérj be két egész számot, és írd ki az összegüket és a szorzatukat így: <code>Összeg: 12</code> és <code>Szorzat: 35</code> (5 és 7 esetén)." }],
+    tip: `<p>Az <code>input()</code> mindig <b>szöveget</b> ad vissza. Számolni csak akkor tudsz vele, ha átalakítod: <code>int()</code>.</p>${pre('a = int(input("Első szám: "))')}`,
+    runs: [{ inputs: ["5", "7"] }, { inputs: ["10", "-3"] }],
+    check: { 2: R => first(
+      need(R[0].inputsUsed, "Kérd be a két számot az input() függvénnyel."),
+      need(!lineWith(out(R), "összeg", 57), "Az összeg 57 lett: a két szöveget fűzted össze. Alakítsd számmá: int(input(…))"),
+      need(lineWith(out(R), "összeg", 12), "5 és 7 esetén nem látom: Összeg: 12"),
+      need(lineWith(out(R), "szorzat", 35), "5 és 7 esetén nem látom: Szorzat: 35"),
+      need(lineWith(out(R, 1), "összeg", 7) && lineWith(out(R, 1), "szorzat", -30), "10 és -3 esetén az összeg 7, a szorzat -30 kellene.")) }
+  },
+  /* ---------- 3. elágazások ---------- */
+  { id: "s3", chap: "3. feladat · Elágazások", title: "Pontszámból jegy", height: 260, input: "70",
+    starter: `pont = int(input("Pontszám (0-100): "))
+
+# if / elif / else
+`,
+    tasks: [{ n: 3, step: "if, elif", html: "A program bekér egy pontszámot (0–100). Írd ki a jegyet számmal: 0–39: 1, 40–54: 2, 55–69: 3, 70–84: 4, 85–100: 5. Pl. <code>Jegy: 4</code>" }],
+    tip: `<p>Az <code>elif</code> ága csak akkor fut, ha az előző feltételek hamisak voltak, ezért elég a felső határt vizsgálni.</p>${pre('if kor < 13:\n    print("Gyerek vagy")\nelif kor < 20:\n    print("Tinédzser vagy")\nelse:\n    print("Felnőtt vagy")')}`,
+    runs: [["39", 1], ["40", 2], ["54", 2], ["55", 3], ["69", 3], ["70", 4], ["84", 4], ["85", 5], ["100", 5], ["0", 1]].map(([p, j]) => ({ inputs: [p], want: j })),
+    check: { 3: R => {
+      if (!R[0].inputsUsed) return "Kérd be a pontszámot az input() függvénnyel.";
+      const want = [1, 2, 2, 3, 3, 4, 4, 5, 5, 1], pts = [39, 40, 54, 55, 69, 70, 84, 85, 100, 0];
+      for (let i = 0; i < R.length; i++) {
+        const o = out(R, i).replace(new RegExp("\\b" + pts[i] + "\\b", "g"), " ");
+        const bad = [1, 2, 3, 4, 5].filter(j => j !== want[i] && num(o, j));
+        if (!num(o, want[i]) || bad.length) return `${pts[i]} pontra ${want[i]}-es jegy kellene.`;
+      }
+      return ""; } }
+  },
+  /* ---------- 4. while ---------- */
+  { id: "s4", chap: "4. feladat · While ciklus", title: "Felezgetés", height: 240, input: "20",
+    starter: `n = int(input("Szám: "))
+
+# while ciklus: addig felezd, amíg 1 nem lesz
+`,
+    tasks: [{ n: 4, step: "while", html: "A program bekér egy pozitív egész számot. <b>While ciklussal</b> addig felezd egész osztással (<code>//</code>), amíg 1 nem lesz, és írd ki a számokat egy sorban, szóközzel elválasztva! Pl. 20 esetén: <code>20 10 5 2 1</code>. A következő sorba írd ki, hány felezés kellett: <code>Felezések: 4</code>" }],
+    tip: `<p>A while addig ismétel, amíg a feltétele igaz. Ne felejtsd el változtatni a ciklusváltozót, különben végtelen ciklus lesz.</p>${pre('index = 1\nwhile index <= 5:\n    print(index, end=" ")\n    index += 1')}`,
+    runs: [{ inputs: ["20"] }, { inputs: ["100"] }, { inputs: ["1"] }],
+    check: { 4: R => first(
+      need(codeHas(R, /\bwhile\b/), "Ehhez a feladathoz while ciklust használj."),
+      need(exact(R, 0, "20 10 5 2 1"), "20 esetén ezt a sort várom: 20 10 5 2 1"),
+      need(lineWith(out(R), "felez", 4), "20 esetén 4 felezés kell: Felezések: 4"),
+      need(exact(R, 1, "100 50 25 12 6 3 1") && lineWith(out(R, 1), "felez", 6), "100 esetén: 100 50 25 12 6 3 1, és 6 felezés."),
+      need(exact(R, 2, "1") && lineWith(out(R, 2), "felez", 0), "1 esetén csak az 1 jelenik meg, és 0 felezés kell.")) }
+  },
+  /* ---------- 5. for, range ---------- */
+  { id: "s5", chap: "5. feladat · For ciklus, range()", title: "Számsorok", height: 200, noInput: true,
+    starter: `# for ciklus range()-dzsel
+`,
+    tasks: [{ n: 5, step: "for, range", html: "Írd ki egy sorba, szóközzel elválasztva a 3 többszöröseit 3-tól 30-ig, a következő sorba pedig visszafelé a számokat 10-től 1-ig! Mindkettőt <code>for</code> ciklussal és a <code>range()</code> lépésközével (harmadik paraméter) oldd meg." }],
+    tip: `<p><code>range(mettől, meddig, lépés)</code>: a <i>meddig</i> már nincs benne. Visszafelé negatív lépésköz kell. Egy sorba így írsz: <code>print(i, end=" ")</code>, sortörés: <code>print()</code>.</p>${pre('for i in range(1, 10, 2):\n    print(i, end=" ")   # 1 3 5 7 9')}`,
+    runs: [{}],
+    check: { 5: R => first(
+      need(exact(R, 0, "3 6 9 12 15 18 21 24 27 30"), "Az első sor ez legyen: 3 6 9 12 15 18 21 24 27 30"),
+      need(exact(R, 0, "10 9 8 7 6 5 4 3 2 1"), "A második sor ez legyen: 10 9 8 7 6 5 4 3 2 1"),
+      need((R[0].code.match(/range\s*\([^()]*,[^()]*,[^()]*\)/g) || []).length >= 2, "Mindkét sorhoz a range() lépésközét használd, pl. range(3, 31, 3).")) }
+  },
+  /* ---------- 6. beágyazott ciklus ---------- */
+  { id: "s6", chap: "6. feladat · Beágyazott ciklus", title: "Szorzótábla", height: 220, input: "5",
+    starter: `n = int(input("Mekkora legyen a tábla? "))
+
+# két egymásba ágyazott for ciklus
+`,
+    tasks: [{ n: 6, step: "Beágyazott", html: "A program bekér egy <code>n</code> számot. Írd ki az n×n-es szorzótáblát: n sor, az i. sorban az <code>i*1, i*2, …, i*n</code> számok szóközzel elválasztva. Pl. n = 3: <code>1 2 3</code> / <code>2 4 6</code> / <code>3 6 9</code>" }],
+    tip: `<p>A külső ciklus minden lépésében a belső végigfut. A belső után egy üres <code>print()</code> zárja a sort.</p>${pre('for i in range(1, 4):\n    for j in range(1, 4):\n        print(i, j)')}`,
+    runs: [{ inputs: ["5"] }, { inputs: ["3"] }, { inputs: ["1"] }],
+    check: { 6: R => {
+      if (!R[0].inputsUsed) return "Kérd be n-t az input() függvénnyel.";
+      if ((R[0].code.match(/\bfor\b/g) || []).length < 2) return "Két egymásba ágyazott for ciklussal oldd meg.";
+      for (const [i, n] of [[0, 5], [1, 3], [2, 1]]) {
+        for (let r = 1; r <= n; r++) {
+          const row = Array.from({ length: n }, (_, k) => r * (k + 1)).join(" ");
+          if (!exact(R, i, row)) return `n = ${n} esetén hiányzik ez a sor: ${row}`;
+        }
+        if (n === 3 && exact(R, 1, "4 8 12")) return "n = 3 esetén csak 3 sor kell.";
+      }
+      return ""; } }
+  },
+  /* ---------- 7. listák ---------- */
+  { id: "s7", chap: "7. feladat · Listák", title: "Jegyek listája", height: 260, noInput: true,
+    starter: `jegyek = [4, 5, 3, 5, 2, 4]
+
+`,
+    tasks: [{ n: 7, step: "Listák", html: "Fűzz a lista végére egy 5-öst (<code>append</code>), cseréld az első elemét 3-ra, töröld belőle a 2-est (<code>remove</code>), majd írd ki a listát! Utána írd ki: <code>Hossz: …</code>, <code>Legkisebb: …</code>, <code>Legnagyobb: …</code>, <code>Összeg: …</code> (<code>len</code>, <code>min</code>, <code>max</code>, <code>sum</code>)." }],
+    tip: `<p>Az első elem indexe 0. Az <code>append</code> a végére tesz, a <code>remove</code> az első ilyen értékű elemet veszi ki.</p>${pre('gyumolcs = ["alma", "korte"]\ngyumolcs.append("szilva")\ngyumolcs[0] = "barack"\nprint(len(gyumolcs), max([10, 40, 20]))')}`,
+    runs: [
+      { probes: ["jegyek"] },
+      { probes: ["jegyek"], transform: c => replaceAssign(c, "jegyek", "[2, 2, 4, 1, 5]"), renamed: "A jegyek listát ne nevezd át." }
+    ],
+    check: { 7: R => first(
+      need(same(pv(R[0], 0), [3, 5, 3, 5, 4, 5]), `A lista a végén [3, 5, 3, 5, 4, 5] kellene legyen, de ${JSON.stringify(pv(R[0], 0))} lett.`),
+      need(codeHas(R, /\.append\s*\(/) && codeHas(R, /\.remove\s*\(/), "Használd az append() és a remove() metódust."),
+      need(has(out(R), "[3, 5, 3, 5, 4, 5]"), "Írd ki a módosított listát: print(jegyek)"),
+      need(lineWith(out(R), "hossz", 6) && lineWith(out(R), "legkisebb", 3) && lineWith(out(R), "legnagyobb", 5) && lineWith(out(R), "összeg", 25), "Nem látom mind a négy sort: Hossz: 6, Legkisebb: 3, Legnagyobb: 5, Összeg: 25"),
+      need(lineWith(out(R, 1), "hossz", 5) && lineWith(out(R, 1), "legkisebb", 1) && lineWith(out(R, 1), "összeg", 18), "Más kezdőlistával nem jó az eredmény: a len, min, max, sum függvényeket a listára hívd, ne írd be kézzel a számokat.")) }
+  },
+  /* ---------- 8. összegzés, megszámolás ---------- */
+  { id: "s8", chap: "8. feladat · Tételek: összegzés, megszámolás", title: "Lépésszámláló", height: 240, noInput: true,
+    starter: `lepesek = [8200, 12500, 6400, 10100, 15000, 4300, 9800]
+
+`,
+    tasks: [{ n: 8, step: "Összegzés", html: "Egy hét lépésszámai. <b>Ciklussal</b>, a <code>sum()</code> nélkül számold ki, hány lépés volt összesen, és számold meg, hány napon volt legalább 10 000 lépés! Kiírás: <code>Összesen: …</code> és <code>Aktív napok: …</code>" }],
+    tip: `<p>Összegzés: a gyűjtő változó 0-ról indul, és minden elemet hozzáadsz. Megszámolás: a darab 0-ról indul, és feltételesen növeled.</p>${pre('osszeg = 0\nfor szam in szamok:\n    osszeg += szam\n\ndarab = 0\nfor szam in szamok:\n    if szam == 2:\n        darab += 1')}`,
+    runs: [
+      {},
+      { transform: c => replaceAssign(c, "lepesek", "[10000, 9999, 20000]"), renamed: "A lepesek listát ne nevezd át." }
+    ],
+    check: { 8: R => first(
+      need(!codeHas(R, /\bsum\s*\(/) && !codeHas(R, /\.count\s*\(/), "Most a sum() és a count() nélkül, ciklussal számolj."),
+      need(lineWith(out(R), "összesen", 66300), "Az összes lépés nem jó (66300 kellene)."),
+      need(lineWith(out(R), "aktív", 3), "Az aktív napok száma nem jó. A 10 000 is számít!"),
+      need(lineWith(out(R, 1), "összesen", 39999) && lineWith(out(R, 1), "aktív", 2), "Más adatokkal nem jó: a pontosan 10 000 lépés is aktív nap, és ne írd be kézzel az eredményt.")) }
+  },
+  /* ---------- 9. eldöntés, kiválogatás ---------- */
+  { id: "s9", chap: "9. feladat · Tételek: eldöntés, kiválogatás", title: "Volt-e fagy?", height: 240, noInput: true,
+    starter: `homersekletek = [3, -2, 5, 0, -4, 7, 1]
+
+`,
+    tasks: [{ n: 9, step: "Eldöntés", html: "Egy hét reggeli hőmérsékletei (°C). Döntsd el, volt-e fagy (0 alatti érték), és írd ki: <code>Volt fagy.</code> vagy <code>Nem volt fagy.</code> Utána válogasd ki egy új listába a fagyos értékeket, és írd ki a listát!" }],
+    tip: `<p>Eldöntés: egy logikai változó <code>False</code>-ról indul, és ha találsz megfelelőt, <code>True</code> lesz (<code>break</code>). Kiválogatás: üres listába <code>append</code>-elsz.</p>${pre('paros = []\nfor szam in szamok:\n    if szam % 2 == 0:\n        paros.append(szam)')}`,
+    runs: [
+      {},
+      { transform: c => replaceAssign(c, "homersekletek", "[3, 5, 0, 1]"), renamed: "A homersekletek listát ne nevezd át." }
+    ],
+    check: { 9: R => first(
+      need(has(out(R), "volt fagy") && !has(out(R), "nem volt fagy"), "Ezen a héten volt fagy, ezt írd ki: Volt fagy."),
+      need(has(out(R), "[-2, -4]"), "A fagyos napok listája [-2, -4] kellene legyen (a 0 nem fagy)."),
+      need(has(out(R, 1), "nem volt fagy") && has(out(R, 1), "[]"), "Ha nincs 0 alatti érték, írd ki: Nem volt fagy., és a lista üres: []")) }
+  },
+  /* ---------- 10. maximum, első és utolsó keresése ---------- */
+  { id: "s10", chap: "10. feladat · Tételek: maximum, keresés", title: "Dolgozatpontok", height: 260, noInput: true,
+    starter: `nevek = ["Anna", "Bence", "Csilla", "Dani", "Emese"]
+pontok = [78, 92, 85, 92, 60]
+
+`,
+    tasks: [{ n: 10, step: "Maximum", html: "A két lista összetartozik: <code>nevek[i]</code> pontszáma <code>pontok[i]</code>. A <code>max()</code> nélkül, maximumkiválasztással írd ki a legjobbat (holtversenyben az elsőt): <code>Legjobb: Bence 92</code>. Írd ki az első és az utolsó 80 pont alatti tanuló nevét is: <code>Első 80 alatti: …</code>, <code>Utolsó 80 alatti: …</code>" }],
+    tip: `<p>Maximum: az első elemből indulsz, és csak a nagyobbra cserélsz (<code>&gt;</code>, nem <code>&gt;=</code>). Itt a <b>sorszámot</b> érdemes megjegyezni, abból megvan a név is.</p>${pre('legjobb = 0\nfor i in range(len(pontok)):\n    if pontok[i] > pontok[legjobb]:\n        legjobb = i')}`,
+    runs: [
+      {},
+      { transform: c => replaceAssign(c, "pontok", "[88, 70, 95, 65, 90]"), renamed: "A pontok listát ne nevezd át." }
+    ],
+    check: { 10: R => first(
+      need(!codeHas(R, /\bmax\s*\(/), "Most a max() nélkül, maximumkiválasztással dolgozz."),
+      need(lineWith(out(R), "legjobb", "bence", 92), "Nem látom: Legjobb: Bence 92 (holtversenyben az első)."),
+      need(lineWith(out(R), "első", "anna"), "Az első 80 alatti Anna."),
+      need(lineWith(out(R), "utolsó", "emese"), "Az utolsó 80 alatti Emese."),
+      need(lineWith(out(R, 1), "legjobb", "csilla", 95) && lineWith(out(R, 1), "első", "bence") && lineWith(out(R, 1), "utolsó", "dani"), "Más pontszámokkal nem jó: ne írd be kézzel a neveket, a listákból számold ki.")) }
+  },
+  /* ---------- 11. mátrix ---------- */
+  { id: "s11", chap: "11. feladat · Mátrixok (2D lista)", title: "Ülésrend", height: 260, noInput: true,
+    starter: `terem = [
+    [1, 0, 1, 1],
+    [0, 0, 1, 0],
+    [1, 1, 1, 1],
+]
+# 1 = foglalt, 0 = szabad
+`,
+    tasks: [{ n: 11, step: "Mátrix", html: "A terem ülésrendje: 3 sor, soronként 4 hely. Írd ki, a 2. sor 3. helye foglalt-e: <code>A 2. sor 3. helye: foglalt</code> (vagy <code>szabad</code>). Számold meg a foglalt helyeket: <code>Foglalt helyek: …</code>. Végül soronként írd ki a szabad helyek számát: <code>1. sor: 1 szabad</code>, <code>2. sor: …</code>" }],
+    tip: `<p>A 2. sor 3. eleme <code>terem[1][2]</code>, mert 0-tól számolunk. A bejáráshoz két ciklus kell.</p>${pre('for sor in matrix:\n    for elem in sor:\n        print(elem, end=" ")\n    print()')}`,
+    runs: [
+      {},
+      { transform: c => replaceAssign(c, "terem", "[[0, 0, 1, 0], [1, 1, 0, 1], [0, 1, 0, 0]]"), renamed: "A terem listát ne nevezd át." }
+    ],
+    check: { 11: R => {
+      const row = (i, k, n) => lines(out(R, i)).some(l => l.startsWith(k + ". sor") && !l.includes("hely") && l.includes("szabad") && num(l.slice(String(k).length + 5), n));
+      return first(
+        need(lineWith(out(R), "3. helye", "foglalt"), "A 2. sor 3. helye foglalt (terem[1][2])."),
+        need(lineWith(out(R), "foglalt helyek", 8), "A foglalt helyek száma nem jó (8 kellene)."),
+        need(row(0, 1, 1) && row(0, 2, 3) && row(0, 3, 0), "A soronkénti szabad helyek: 1. sor: 1 szabad, 2. sor: 3 szabad, 3. sor: 0 szabad"),
+        need(lineWith(out(R, 1), "3. helye", "szabad") && lineWith(out(R, 1), "foglalt helyek", 5) && row(1, 1, 3) && row(1, 2, 1) && row(1, 3, 3), "Más ülésrenddel nem jó: mindent a terem listából számolj."));
+    } }
+  },
+  /* ---------- 12. függvények ---------- */
+  { id: "s12", chap: "12. feladat · Függvények", title: "Saját függvények", height: 240, noInput: true,
+    starter: `def atlag(lista):
+    # számold ki, és add vissza (return)
+    pass
+
+
+print(atlag([2, 4, 9]))
+`,
+    tasks: [{ n: 12, step: "Függvények", html: "Írj egy <code>atlag(lista)</code> függvényt, amely <b>visszaadja</b> (<code>return</code>) a lista elemeinek átlagát, és egy <code>paros_db(lista)</code> függvényt, amely visszaadja, hány páros szám van a listában! Próbáld ki: <code>print(atlag([2, 4, 9]))</code> → 5.0, <code>print(paros_db([1, 2, 3, 4, 6]))</code> → 3" }],
+    tip: `<p>A <code>return</code> visszaadja az értéket a hívónak, és befejezi a függvényt. A <code>print</code> csak kiírja, a hívó nem kapja meg!</p>${pre('def osszeg(a, b):\n    return a + b\n\nprint(osszeg(5, 8))')}`,
+    runs: [{ probes: ["atlag([2, 4, 9])", "atlag([1, 2])", "atlag([10])", "paros_db([1, 2, 3, 4, 6])", "paros_db([1, 3, 5])", "paros_db([])"] }],
+    check: { 12: R => {
+      const t = [["atlag([2, 4, 9])", 5], ["atlag([1, 2])", 1.5], ["atlag([10])", 10], ["paros_db([1, 2, 3, 4, 6])", 3], ["paros_db([1, 3, 5])", 0], ["paros_db([])", 0]];
+      for (let i = 0; i < t.length; i++) {
+        const e = pe(R[0], i);
+        if (/NameError/.test(e)) return `Nincs ${t[i][0].split("(")[0]} nevű függvény.`;
+        if (e) return `${t[i][0]} hibát adott: ${e}`;
+        const v = pv(R[0], i);
+        if (v === null && R[0].probes[i].out) return `${t[i][0]} kiírja az eredményt, de nem adja vissza: print helyett return kell.`;
+        if (typeof v !== "number" || Math.abs(v - t[i][1]) > 1e-9) return `${t[i][0]} eredménye ${JSON.stringify(v)}, de ${t[i][1]} kellene.`;
+      }
+      return ""; } }
+  },
+  /* ---------- 13. fájlkezelés ---------- */
+  { id: "s13", chap: "13. feladat · Fájlkezelés", title: "Tanulók pontjai", height: 260, noInput: true,
+    files: { "tanulok.txt": TANULOK },
+    lead: "A <code>tanulok.txt</code> a program mellett van. Soronként: név;osztály;pontszám.",
+    data: TANULOK.split("\n").slice(0, 3).join("\n") + "\n…",
+    starter: `f = open("tanulok.txt", "r", encoding="utf-8")
+
+`,
+    tasks: [{ n: 13, step: "Fájl, split", html: "Olvasd be a fájlt egy listába úgy, hogy minden eleme egy <code>[név, osztály, pontszám]</code> lista legyen, a pontszám egész szám (<code>int</code>)! Írd ki, hány tanuló van (<code>Tanulók száma: …</code>), és a 10.b osztály átlagát egy tizedesjegyre (<code>10.b átlaga: …</code>)." }],
+    tip: `<p>Soronként olvasol, levágod a sorvégi <code>\\n</code>-t, és a <code>split(";")</code> darabolja a sort. A számot <code>int()</code>-tel alakítsd át.</p>${pre('adatok = []\nfor sor in f:\n    resz = sor.strip().split(";")\n    adatok.append([resz[0], resz[1], int(resz[2])])\nf.close()')}`,
+    runs: [{ probes: ["__dk_rows(7)"] }, { files: { "tanulok.txt": TANULOK2 }, probes: ["__dk_rows(5)"] }],
+    check: { 13: R => first(
+      need(pv(R[0], 0) === true, "Kell egy lista, amelyben mind a 7 tanuló [név, osztály, pontszám] alakban van, a pontszám int."),
+      need(lineWith(out(R), "tanulók", 7), "Nem látom: Tanulók száma: 7"),
+      need(has(out(R), "82.5"), "A 10.b átlaga 82.5 kellene."),
+      need(lineWith(out(R, 1), "tanulók", 5) && has(out(R, 1), "77.0"), "Más fájllal nem jó (5 tanuló, a 10.b átlaga 77.0): mindent a fájlból számolj, és egy tizedesjegyre kerekíts.")) }
+  },
+  /* ---------- 14. osztályok ---------- */
+  { id: "s14", chap: "14. feladat · Osztályok", title: "Cukrászda", height: 280, noInput: true,
+    starter: `adatok = [
+    ["Muffin", 450, True],
+    ["Fánk", 350, False],
+    ["Brownie", 520, True],
+    ["Pogácsa", 250, False],
+    ["Kakaós csiga", 390, True],
+]
+
+class Suti:
+    def __init__(self, nev, ar, csokis):
+        pass
+
+`,
+    tasks: [{ n: 14, step: "Osztályok", html: "Fejezd be a <code>Suti</code> osztályt (<code>nev</code>, <code>ar</code>, <code>csokis</code> adattag), és az <code>adatok</code> alapján tedd az objektumokat egy <code>sutik</code> listába! Írd ki a csokis sütik nevét (soronként egyet), majd a legolcsóbbat: <code>Legolcsóbb: Pogácsa 250 Ft</code>" }],
+    tip: `<p>Az <code>__init__</code> az objektum létrehozásakor fut; a <code>self.nev = nev</code> sor menti el az adatot az objektumba.</p>${pre('class Suti:\n    def __init__(self, nev, csokiszoras):\n        self.nev = nev\n        self.csokiszoras = csokiszoras\n\nmuffin = Suti("Muffin", True)\nprint(muffin.nev)')}`,
+    runs: [
+      { probes: ["len(sutik)", "all(isinstance(s, Suti) for s in sutik)", "[[s.nev, s.ar, s.csokis] for s in sutik]"] },
+      { probes: [], transform: c => replaceAssign(c, "adatok", '[["Linzer", 300, False], ["Mignon", 280, True], ["Rétes", 410, False]]'), renamed: "Az adatok listát ne nevezd át." }
+    ],
+    check: { 14: R => {
+      const o = out(R), rest = lines(o).filter(l => !l.includes("legolcsóbb")).join("\n");
+      const o2 = out(R, 1), rest2 = lines(o2).filter(l => !l.includes("legolcsóbb")).join("\n");
+      return first(
+        need(!/NameError/.test(pe(R[0], 0)), "Nincs sutik nevű lista."),
+        need(pv(R[0], 0) === 5 && pv(R[0], 1) === true, "A sutik listában mind az 5 süti Suti objektumként legyen."),
+        need(same(pv(R[0], 2), [["Muffin", 450, true], ["Fánk", 350, false], ["Brownie", 520, true], ["Pogácsa", 250, false], ["Kakaós csiga", 390, true]]), "Az objektumok nev, ar, csokis adattagja nem jó (pl. self.nev = nev hiányzik?)."),
+        need(has(rest, "muffin") && has(rest, "brownie") && has(rest, "kakaós csiga") && !has(rest, "fánk") && !has(rest, "pogácsa"), "A csokis sütik: Muffin, Brownie, Kakaós csiga (a többi ne jelenjen meg)."),
+        need(lineWith(o, "legolcsóbb", "pogácsa", 250), "Nem látom: Legolcsóbb: Pogácsa 250 Ft"),
+        need(has(rest2, "mignon") && !has(rest2, "linzer") && lineWith(o2, "legolcsóbb", "mignon", 280), "Más adatokkal nem jó: mindent a sutik listából számolj."));
+    } }
+  }
+  ]
+});
+})();
+</script>
+<script src="../../nav.js?v=2c8ccf1b" defer></script>
+</body>
+</html>

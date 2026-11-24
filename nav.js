@@ -937,6 +937,47 @@
             ]
           }
         ]
+      },
+      {
+        id: "python",
+        accent: "#7da7de",
+        title: { hu: "Programozás – Python", en: "Programming – Python" },
+        blurb: {
+          hu: "Python a böngészőben: megírod, lefuttatod, és az oldal rögtön ellenőrzi a megoldásodat.",
+          en: "Python in the browser: write it, run it, and the page checks your solution right away."
+        },
+        lessons: [
+          {
+            id: "fakt",
+            title: { hu: "Fakt: programozás az emelt szintű érettségire", en: "Advanced group: programming for the exam" },
+            pages: [
+              {
+                id: "python-gyakorlo",
+                kind: "practice",
+                minutes: 90,
+                title: { hu: "Python alapok: 14 kis feladat", en: "Python basics: 14 small tasks" },
+                desc: {
+                  hu: "Az összefoglaló minden témaköréhez egy 5–10 perces feladat: változók, input, elágazás, ciklusok, listák, programozási tételek, mátrix, függvény, fájlkezelés, osztály. Az oldal más adatokkal is ellenőriz.",
+                  en: "One 5–10 minute task for every topic of the summary notebook: variables, input, branching, loops, lists, the standard algorithms, matrices, functions, files, classes."
+                },
+                files: { hu: "python/fakt/gyakorlo-hu.html" },
+                progress: { chapters: 14, keys: { hu: "python-fakt-gyakorlo-hu-v1" } }
+              },
+              {
+                id: "python-hazi-1",
+                kind: "practice",
+                minutes: 120,
+                title: { hu: "Házi: érettségi feladatok kicsiben", en: "Homework: exam tasks in miniature" },
+                desc: {
+                  hu: "13 feladat a csütörtöki órák anyagából: osztályok, a futas.txt beolvasása, és kicsiben az Ötszáz, a Kerítés, a Sorozatok és a Sudoku. Feladatonként ellenőrzés, a végén hazi.py letöltése.",
+                  en: "13 tasks from the Thursday lessons: classes, reading futas.txt, and small versions of past exam tasks. Checked task by task; download hazi.py at the end."
+                },
+                files: { hu: "python/fakt/hazi-1-hu.html" },
+                progress: { chapters: 13, keys: { hu: "python-fakt-hazi1-hu-v1" } }
+              }
+            ]
+          }
+        ]
       }
     ]
   };
