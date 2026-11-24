@@ -6,7 +6,7 @@
    The file list below is written by tools/build-sw.py: run it before pushing. */
 
 /* FILES:BEGIN (written by tools/build-sw.py, don't edit by hand) */
-const VERSION = "42b91c568b";
+const VERSION = "5515e8cc0a";
 const CORE = [
 "./",
 "css/basics/first-steps.html",
@@ -53,6 +53,8 @@ const CORE = [
 "excel/mission.css",
 "excel/mission.js",
 "excel/real.js",
+"excel/review/mikulas-futas.xlsx",
+"excel/review/santa-run-hu.html",
 "excel/sheet.css",
 "excel/sheet.js",
 "favicon.svg",

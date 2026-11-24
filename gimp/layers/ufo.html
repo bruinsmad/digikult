@@ -34,12 +34,12 @@ window.MISSION = {
       "Open as Layers"
     ],
     [
-      "UFO without its white box",
+      "UFO without its green background",
       "alpha channel, magic wand, Clear",
       "alpha channel"
     ],
     [
-      "Cow without its white box",
+      "Cow without its green background",
       "the same again – on your own",
       "alpha channel"
     ],
@@ -77,22 +77,22 @@ window.MISSION = {
       ]
     },
     {
-      "title": "Alpha channel: make the white vanish",
+      "title": "Alpha channel: make the green vanish",
       "img": "../img/ufo/step2.png",
-      "alt": "Step 2: the ufo.jpg layer selected, Layer ▸ Transparency ▸ Add Alpha Channel; magic wand on the white; Edit ▸ Clear, Select ▸ None – the pasture shows around the UFO",
+      "alt": "Step 2: the ufo.jpg layer selected, Layer ▸ Transparency ▸ Add Alpha Channel; magic wand on the green; Edit ▸ Clear, Select ▸ None – the pasture shows around the UFO",
       "lead": "The alpha channel stores where a layer is transparent. A layer that came from a JPG doesn't have one – so you add it first.",
       "note": "In the Layers panel, a grey checkerboard in the little picture marks the transparent part.",
       "stuck": [
-        "The box is still white (or another colour) after Clear: the layer has no alpha channel. <span class='menu'>Edit ▸ Undo</span>, then <span class='menu'>Layer ▸ Transparency ▸ Add Alpha Channel</span>, and clear again.",
+        "After Clear the green turned white (or another colour) instead of transparent: the layer has no alpha channel. <span class='menu'>Edit ▸ Undo</span>, then <span class='menu'>Layer ▸ Transparency ▸ Add Alpha Channel</span>, and clear again.",
         "“Add Alpha Channel” is greyed out: the layer already has an alpha channel – carry on.",
-        "The pasture vanished, or a piece of the UFO: the ufo.jpg layer wasn't active, or you didn't click the white. Undo, click the ufo.jpg layer, and click the wand in a white corner.",
+        "The pasture vanished, or a piece of the UFO: the ufo.jpg layer wasn't active, or you didn't click the green. Undo, click the ufo.jpg layer, and click the wand in a green corner.",
         "You can't find the magic wand: <span class='menu'>Tools ▸ Selection Tools ▸ Fuzzy Select</span>."
       ]
     },
     {
       "title": "The cow – on your own",
       "img": "../img/ufo/step3.png",
-      "alt": "Step 3: the cow.jpg layer's eye back on, alpha channel and magic wand; after Clear the cow's white patches stay; the beam.png eye back on",
+      "alt": "Step 3: the cow.jpg layer's eye back on, alpha channel and magic wand; after Clear only the cow is left; the beam.png eye back on",
       "lead": "The same four moves as for the UFO: alpha channel, magic wand, <span class='menu'>Edit ▸ Clear</span>, <span class='menu'>Select ▸ None</span>.",
       "stuck": [
         "Nothing happens to the cow: click the cow.jpg layer in the Layers panel first – commands always work on the active layer.",
@@ -149,8 +149,8 @@ window.MISSION = {
   ],
   "checklist": [
     "The picture is built from four source pictures: pasture, UFO, cow, beam",
-    "No white box around the UFO or the cow (alpha channel)",
-    "The cow's white patches are still there",
+    "No green background around the UFO or the cow (alpha channel)",
+    "No green patch left, not even between the cow's legs",
     "The UFO is smaller, in the sky, and not squashed (chain closed)",
     "The cow is smaller than the UFO, floats in the beam and is tilted (Rotate)",
     "The beam widens downwards (Perspective) and is see-through (Opacity)",
@@ -160,8 +160,8 @@ window.MISSION = {
   ],
   "bonus": [
     [
-      "An alien on the hill",
-      "<span class='menu'>File ▸ Open as Layers…</span> alien.png – its background is already transparent. Scale it and stand it on the grass."
+      "A cow far away",
+      "Duplicate the cow's layer once more, scale it right down and put it on the field near the barn – what's far away is smaller."
     ],
     [
       "A distant UFO fleet",
@@ -179,6 +179,6 @@ window.MISSION = {
 };
 </script>
 <script src="../mission.js?v=1"></script>
-<script src="../../nav.js?v=334fdffc" defer></script>
+<script src="../../nav.js?v=979fd825" defer></script>
 </body>
 </html>
