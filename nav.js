@@ -359,16 +359,16 @@
                 files: { en: "css/summary/test.html", hu: "css/summary/test-hu.html" }
               },
               {
-                id: "bogre",
+                id: "menedek",
                 kind: "story",
                 minutes: 45,
-                title: { hu: "A Bögre Kávézó honlapja", en: "The Bögre Café website" },
+                title: { hu: "Menedék 7", en: "Shelter 7" },
                 desc: {
-                  hu: "Ismétlő küldetés a témazáró után: Bence elrontott kávézós oldalát kell rendbe tenni. Váz, címek, lista, táblázat, kép és link, majd CSS: hibás szabályok javítása, saját stílus, osztály és táblázatkeret. Nincs kész megoldás, amit csak be kell másolni.",
-                  en: "A review mission after the test (Hungarian only): fix Bence's broken café page, from the skeleton to lists, tables, images, links and CSS classes."
+                  hu: "Zombiapokalipszis van, és a túlélők bázisának honlapja romokban hever. Ismétlő küldetés a témazáró után: váz, címsorok, lista, táblázat, kép és link, majd CSS: hibás szabályok javítása, sötét üzemmód, vészjelző osztály és táblázatkeret. Nincs kész megoldás, amit csak be kell másolni.",
+                  en: "A review mission after the test (Hungarian only): the zombie survivors' base needs its broken website fixed, from the skeleton to lists, tables, images, links and CSS classes."
                 },
-                files: { hu: "css/summary/bogre-hu.html" },
-                progress: { chapters: 8, keys: { hu: "bogre-hu-v1" } }
+                files: { hu: "css/summary/menedek-hu.html" },
+                progress: { chapters: 8, keys: { hu: "menedek-hu-v1" } }
               }
             ]
           }

@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 300" width="480" height="300">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0f1a24"/><stop offset="1" stop-color="#2c3b3a"/></linearGradient>
+    <linearGradient id="beam" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#fff6c8" stop-opacity=".55"/><stop offset="1" stop-color="#fff6c8" stop-opacity="0"/></linearGradient>
+    <radialGradient id="win"><stop offset="0" stop-color="#ffe9a6"/><stop offset="1" stop-color="#f2b84b"/></radialGradient>
+  </defs>
+  <rect width="480" height="300" fill="url(#sky)"/>
+  <g fill="#e8e4d8"><circle cx="40" cy="30" r="1.4"/><circle cx="120" cy="54" r="1"/><circle cx="210" cy="22" r="1.3"/><circle cx="300" cy="44" r="1"/><circle cx="350" cy="18" r="1.4"/><circle cx="450" cy="62" r="1.1"/><circle cx="82" cy="84" r="1"/><circle cx="260" cy="70" r="1.1"/></g>
+  <circle cx="398" cy="56" r="26" fill="#f4eccb"/><circle cx="388" cy="48" r="5" fill="#ddd3ae"/><circle cx="406" cy="66" r="3.5" fill="#ddd3ae"/>
+  <path d="M138 128L20 0h70z" fill="url(#beam)"/>
+  <path d="M0 196c60-14 110-10 170-18s120 4 180-6 100-4 130 2v126H0z" fill="#1c2621"/>
+  <!-- the school gym -->
+  <rect x="120" y="112" width="250" height="102" fill="#55615a"/>
+  <path d="M110 116l135-36 135 36z" fill="#3d4741"/>
+  <rect x="120" y="112" width="250" height="8" fill="#3d4741"/>
+  <rect x="190" y="126" width="110" height="20" rx="2" fill="#e8e4d8"/>
+  <text x="245" y="141" text-anchor="middle" font-family="Arial Black,Arial,sans-serif" font-weight="900" font-size="13" fill="#1f2420" letter-spacing="1">TORNATEREM</text>
+  <g fill="url(#win)"><rect x="140" y="132" width="34" height="26"/><rect x="316" y="132" width="34" height="26"/></g>
+  <g stroke="#3d4741" stroke-width="3"><path d="M157 132v26M140 145h34M333 132v26M316 145h34"/></g>
+  <g stroke="#8a6a44" stroke-width="5"><path d="M138 150l38-14M314 136l38 14"/></g>
+  <rect x="222" y="160" width="46" height="54" fill="#2b3324"/>
+  <rect x="238" y="98" width="14" height="14" fill="#ffd23f"/><text x="245" y="109" text-anchor="middle" font-family="Arial Black,Arial,sans-serif" font-weight="900" font-size="11" fill="#1f2420">7</text>
+  <!-- radio mast -->
+  <path d="M330 108l10-54 10 54" fill="none" stroke="#8b958e" stroke-width="3"/><path d="M333 92h14M336 76h8" stroke="#8b958e" stroke-width="2"/>
+  <circle cx="340" cy="52" r="3.5" fill="#e2483d"/>
+  <g fill="none" stroke="#e2483d" stroke-width="2" stroke-linecap="round" opacity=".8"><path d="M330 44a12 12 0 0 0 0 16M350 44a12 12 0 0 1 0 16"/><path d="M324 38a20 20 0 0 0 0 28M356 38a20 20 0 0 1 0 28"/></g>
+  <!-- searchlight on the roof -->
+  <path d="M130 112l8-14 10 4-6 12z" fill="#8b958e"/>
+  <!-- sandbags -->
+  <g fill="#a88f62" stroke="#6e5b3c" stroke-width="2"><rect x="166" y="202" width="30" height="14" rx="7"/><rect x="194" y="202" width="30" height="14" rx="7"/><rect x="266" y="202" width="30" height="14" rx="7"/><rect x="294" y="202" width="30" height="14" rx="7"/><rect x="180" y="190" width="30" height="14" rx="7"/><rect x="280" y="190" width="30" height="14" rx="7"/></g>
+  <!-- fence with barbed wire -->
+  <g stroke="#9aa39c" stroke-width="3"><path d="M0 222h480M0 252h480"/></g>
+  <g stroke="#6f7872" stroke-width="5"><path d="M20 210v60M80 210v60M140 210v60M340 210v60M400 210v60M460 210v60"/></g>
+  <path d="M0 214q10-8 20 0t20 0 20 0 20 0 20 0 20 0 20 0 20 0 20 0" fill="none" stroke="#c5ccc6" stroke-width="1.6"/>
+  <path d="M340 214q10-8 20 0t20 0 20 0 20 0 20 0 20 0 20 0" fill="none" stroke="#c5ccc6" stroke-width="1.6"/>
+  <g fill="none" stroke="#9aa39c" stroke-width="2.4"><path d="M140 222l200 30M140 252l200-30"/></g>
+  <rect x="200" y="214" width="80" height="26" rx="3" fill="#ffd23f"/>
+  <text x="240" y="232" text-anchor="middle" font-family="Arial Black,Arial,sans-serif" font-weight="900" font-size="11" fill="#1f2420">KAPU 8–16</text>
+  <!-- shambling figures far away -->
+  <g fill="#0e1512" opacity=".85">
+    <g transform="translate(36 176)"><circle cx="6" cy="0" r="4.5"/><path d="M2 4h8l2 14-3 1-2-9-1 18H3l-1-10-4-6z"/><path d="M8 6l12 3-1 3-11-2z"/></g>
+    <g transform="translate(436 180) scale(-1 1)"><circle cx="6" cy="0" r="4"/><path d="M2 4h8l2 12-3 1-2-8-1 16H3l-1-9-4-5z"/><path d="M8 6l11 4-1 3-10-3z"/></g>
+    <g transform="translate(70 186) scale(.75)"><circle cx="6" cy="0" r="4.5"/><path d="M2 4h8l2 14-3 1-2-9-1 18H3l-1-10-4-6z"/><path d="M8 6l12 3-1 3-11-2z"/></g>
+  </g>
+  <rect y="270" width="480" height="30" fill="#141c18"/>
+</svg>
