@@ -16,6 +16,7 @@
 .paper .intro p.noind{text-indent:0}
 .paper ul.rules{margin:.2em 0 .6em;padding-left:1.6em;font-style:italic}
 .paper ul.rules li{margin:.15em 0}
+.fn{font-family:"Courier New",Courier,monospace;font-style:italic;font-size:.95em}
 .paper .item{display:flex;gap:.5em;margin:.35em 0}
 .paper .item .no{flex:none;min-width:1.4em}
 .paper .item .tx{flex:1;min-width:0}

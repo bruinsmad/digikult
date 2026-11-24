@@ -1,0 +1,459 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>/* moving between pages: the old page drifts aside and fades, the new one glides in; the rail holds still */@view-transition{navigation:auto}.rail{view-transition-name:rail}::view-transition-group(root){animation:none}::view-transition-old(root){animation:dk-out .2s cubic-bezier(.4,0,1,1) both}::view-transition-new(root){animation:dk-in .38s cubic-bezier(.16,1,.3,1) .06s both}::view-transition-old(rail),::view-transition-new(rail){animation:none}@keyframes dk-out{to{opacity:0;transform:translateX(-18px)}}@keyframes dk-in{from{opacity:0;transform:translateX(26px)}}@media (prefers-reduced-motion:reduce){::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none!important}}</style>
+<title>Padel – érettségi feladat</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600;700&display=swap">
+<link rel="stylesheet" href="../../excel/mission.css">
+<link rel="stylesheet" href="../exam.css">
+</head>
+<body>
+<header class="rail"><div class="in">
+  <a class="home" href="../../index.html">Digitális kultúra</a>
+  <span class="crumb"><a href="../../index.html#erettsegi">Érettségi</a> › <a href="../../index.html#erettsegi-szoveg">Szövegszerkesztés</a></span>
+</div></header>
+<div class="top">
+  <span class="art" aria-hidden="true"><svg viewBox="0 0 96 96"><ellipse cx="48" cy="88" rx="30" ry="5" fill="#000" opacity=".25"/>
+<path d="M18 10h40l12 12v60H18z" fill="#fffdf6"/><path d="M58 10v12h12" fill="#e4e1d4"/>
+<text x="24" y="26" font-family="Times New Roman,serif" font-weight="700" font-size="11" fill="#1f3c7a">1.</text>
+<g stroke="#b9b5a4" stroke-width="2"><path d="M24 34h40M24 40h40M42 46h22M42 52h22M42 58h22M24 66h40M24 72h40"/></g>
+<rect x="24" y="44" width="15" height="16" fill="#cfd8ea"/>
+<circle cx="72" cy="66" r="13" fill="#2f3b4a"/><g fill="#9aa6b5"><circle cx="68" cy="61" r="1.6"/><circle cx="73" cy="59" r="1.6"/><circle cx="77" cy="63" r="1.6"/><circle cx="69" cy="67" r="1.6"/><circle cx="74" cy="66" r="1.6"/><circle cx="71" cy="72" r="1.6"/><circle cx="76" cy="70" r="1.6"/></g>
+<path d="M63 77l-8 9 3 3 9-8z" fill="#f2c230"/><circle cx="84" cy="82" r="5" fill="#d9f05a"/></svg></span>
+  <div><div class="kicker">Érettségi feladat · Digitális kultúra, középszint, 2026. május</div><h1>Padel</h1></div>
+  <div class="meta"><button type="button" class="mbtn" id="sheetBtn">Feladatlap</button><span>Haladás <b id="solvedCount">–</b></span><span>Idő <b id="timer">0:00</b></span><button type="button" class="mbtn" id="soundBtn">Hang: be</button><button type="button" id="resetBtn" title="Az egész feladat újrakezdése">Újrakezdés</button></div>
+</div>
+<nav class="steps" id="steps" aria-label="Részfeladatok"></nav>
+<div id="game"><main>
+  <article class="card" id="case" aria-live="polite"></article>
+  <section class="work" aria-label="Minta"><div class="card">
+    <div id="dlBox"></div>
+    <div class="work-head"><h2>Minta</h2><p>A hivatalos feladatlap mintája. Kattints rá a nagyításhoz.</p></div>
+    <div id="mintaBox"></div>
+  </div></section>
+</main></div>
+<section id="endPanel" hidden></section>
+<footer class="end">Digitális kultúra. A feladat szövege, a minta és a forrásfájlok az Oktatási Hivatal hivatalos érettségi feladatlapjáról valók. A haladásod a böngésződben marad; a feltöltött fájlt az oldal csak megnézi, nem küldi el sehová.</footer>
+<div id="sheetView" hidden role="dialog" aria-label="A teljes feladatlap"></div>
+<div id="lightbox" hidden></div>
+<canvas id="fx" aria-hidden="true"></canvas>
+<script>
+window.EXAM = {
+ "key": "erettsegi-padel-hu-v1",
+ "title": "Padel",
+ "number": 1,
+ "subject": "Digitális kultúra",
+ "level": "középszint",
+ "date": "2026. május 11.",
+ "code": "K2612",
+ "points": 25,
+ "saveAs": "padel.docx",
+ "files": [
+  {
+   "name": "forras.txt",
+   "href": "forras/padel/forras.txt",
+   "note": "A hivatalos forrásfájl: a dokumentum szövege."
+  },
+  {
+   "name": "k_digkultfor_26maj_fl.zip",
+   "href": "https://dload-oktatas.educatio.hu/erettsegi/feladatok_2026tavasz_kozep/k_digkultfor_26maj_fl.zip",
+   "note": "A hivatalos forrásfájl-csomag az Oktatási Hivatal oldaláról. A képek (<i>corcuera.png</i>, <i>palya.png</i>, <i>uto.png</i>) a <i>Forras/1_Padel</i> mappában vannak."
+  }
+ ],
+ "minta": [
+  {
+   "src": "img/padel-minta-1.png",
+   "caption": "<b>Minta a Padel feladathoz:</b>",
+   "label": "1. oldal",
+   "alt": "Minta: a dokumentum első oldala"
+  },
+  {
+   "src": "img/padel-minta-2.png",
+   "label": "2. oldal",
+   "alt": "Minta: a dokumentum második oldala"
+  }
+ ],
+ "introFirst": true,
+ "intro": "<div class=\"intro\"><p>A padel elsősorban egy ütősport, de emellett szórakoztató, közösségi élmény. Érdekes keveréke a fallabdának és a tenisznek. Ebben a feladatban a játékot bemutató leírást kell elkészítenie. A dokumentum elkészítéséhez használja fel a <span class=\"fn\">forras.txt</span> UTF-8 kódolású szövegállományt és a <span class=\"fn\">corcuera.png</span>, a <span class=\"fn\">palya.png</span> és az <span class=\"fn\">uto.png</span> képfájlokat!</p></div>",
+ "lead": "",
+ "rules": [],
+ "tasks": [
+  {
+   "n": 1,
+   "title": "A padel dokumentum",
+   "text": "<p>Hozza létre szövegszerkesztő program segítségével a <span class=\"fn\">padel</span> nevű dokumentumot a program alapértelmezett formátumában a <span class=\"fn\">forras.txt</span> felhasználásával! Az elkészített dokumentum ne tartalmazzon felesleges szóközöket és üres bekezdéseket!</p>",
+   "tips": [
+    "Nyisd meg a <i>forras.txt</i>-t a Wordben (<span class=ui>Fájl</span> › <span class=ui>Megnyitás</span>, fájltípus: <span class=ui>Minden fájl</span>; ha rákérdez, a kódolás: <span class=ui>Unicode (UTF-8)</span>). Aztán <span class=ui>Mentés másként</span>, típus: <span class=ui>Word-dokumentum (*.docx)</span>, név: <i>padel</i>.",
+    "Kapcsold be a rejtett jeleket (<span class=ui>Kezdőlap</span> › <b>¶</b> gomb): így látod a szóközöket (·) és az üres bekezdéseket (egy ¶ egymagában)."
+   ],
+   "hints": [
+    "A szövegben két üres bekezdés van (a <i>Padelütő</i> és a <i>Padellabda</i> alcím előtt), és az utolsó rész három sora szóközökkel kezdődik. Ezeket kell kitörölni.",
+    "Kattints az üres sor ¶ jelére, és nyomj <kbd>Delete</kbd>-et. A sorok eleji szóközöket jelöld ki, és töröld. Ellenőrzésnek: <span class=ui>Kezdőlap</span> › <span class=ui>Csere</span> (<kbd>Ctrl</kbd>+<kbd>H</kbd>), keresett szöveg: két szóköz; ha nem talál semmit, jó."
+   ],
+   "done": "A teljes szöveg megvan, felesleges szóköz és üres bekezdés nélkül."
+  },
+  {
+   "n": 2,
+   "title": "Oldalbeállítás",
+   "text": "<p>Legyen a dokumentum álló tájolású és A4-es lapméretű! A bal és jobb oldali margót állítsa 2,3 cm-re, míg az alsó és felső margót 2 cm-re (ha a használt szövegszerkesztő programban az élőfej és az élőláb a szövegtükörből veszi el a területet, akkor a felső és alsó margó legyen 1 cm, az élőfej és élőláb magassága 1 cm és azoktól a szöveg távolsága 0 cm)!</p>",
+   "tips": [
+    "A Wordben az élőfej nem a szövegtükörből veszi el a helyet, ezért itt a 2 cm-es felső és alsó margó a jó."
+   ],
+   "hints": [
+    "<span class=ui>Elrendezés</span> › <span class=ui>Margók</span> › <span class=ui>Egyéni margók…</span>: Felső 2, Alsó 2, Bal 2,3, Jobb 2,3 cm; Tájolás: <span class=ui>Álló</span>. A <span class=ui>Papír</span> fülön a méret: A4."
+   ],
+   "done": null
+  },
+  {
+   "n": 3,
+   "title": "Alapbeállítások",
+   "text": "<p>A dokumentumban alkalmazza a következő beállításokat, ahol a feladat nem kér mást!</p><ol class=\"sub\"><li>Állítson be EB Garamond betűtípust a teljes dokumentumban, a szövegtörzsben 12 pontos betűmérettel!</li><li>A bekezdések sorkizárt igazításúak legyenek!</li><li>A bekezdések előtt 0, utánuk 6 pontos térköz legyen, és a bekezdések sorközét állítsa egyszeresre!</li><li>A teljes dokumentumban alkalmazzon automatikus elválasztást!</li></ol>",
+   "tips": [
+    "Mindent egyszerre: <kbd>Ctrl</kbd>+<kbd>A</kbd>, aztán betűtípus, betűméret, igazítás, térköz. A cím és az alcímek a következő részfeladatban kapnak saját beállítást.",
+    "Ha a gépeden nincs EB Garamond, a betűtípus mezőbe akkor is beírhatod a nevét: a Word megjegyzi, és a fájlban az lesz a betűtípus."
+   ],
+   "hints": [
+    "Térköz és sorköz: <span class=ui>Kezdőlap</span> › a <span class=ui>Bekezdés</span> csoport sarkában lévő kis nyíl › Térköz előtte: 0 pt, utána: 6 pt, Sorköz: <span class=ui>Egyszeres</span>. Sorkizárás: <kbd>Ctrl</kbd>+<kbd>J</kbd>.",
+    "Elválasztás: <span class=ui>Elrendezés</span> › <span class=ui>Elválasztás</span> › <span class=ui>Automatikus</span>."
+   ],
+   "done": null
+  },
+  {
+   "n": 4,
+   "title": "Cím és alcímek",
+   "text": "<p>A cím és az alcímek formázását a következőképpen készítse el!</p><ol class=\"sub\"><li>A cím legyen 16 pontos betűméretű és félkövér betűstílusú! A cím előtt 6 pontos, utána 12 pontos térközt állítson be!</li><li>Az alcímek 13 pontos betűméretűek, félkövér betűstílusúak legyenek, illetve állítson be előttük és utánuk 6 pontos térközt!</li></ol>",
+   "tips": [
+    "A cím az első sor (<i>Padel: Az ütősport, ami meghódítja a világot</i>). Alcím minden rövid, egysoros bekezdés a szövegben: a mintán félkövérek. Tíz van belőlük."
+   ],
+   "hints": [
+    "Az alcímek: A padel története, A padel eszközei, Padelütő, Padellabda, Padelpálya, A padel szabályai, Játékosok és pontozás, Adogatás, Játék a falakkal, Egyéb fontos szabályok.",
+    "Az elsőt formázd meg, aztán a <span class=ui>Formátummásoló</span> ecsetjére kattints duplán, és vidd rá a többi alcímre (a végén <kbd>Esc</kbd>)."
+   ],
+   "done": null
+  },
+  {
+   "n": 5,
+   "title": "A kitaláló neve",
+   "text": "<p>A padel játék kitalálója nevének első előfordulását emelje ki félkövér betűstílussal „<b><i>A padel története</i></b>” részben!</p>",
+   "hints": [
+    "A kitaláló Enrique Corcuera. Csak az első előfordulást, csak a nevet jelöld ki (a vezetéknév utáni szóköz nélkül), és <kbd>Ctrl</kbd>+<kbd>B</kbd>."
+   ],
+   "done": null
+  },
+  {
+   "n": 6,
+   "title": "A corcuera.png kép",
+   "text": "<p>Szúrja be balra igazítva a <span class=\"fn\">corcuera.png</span> képet „<b><i>A padel története</i></b>” alcímhez tartozó részbe! A kép szélességét az arányok megtartásával állítsa 5 cm-re! A képnek állítson be tetszőleges külső árnyékot, ahol a távolságérték 5 pontnál (0,18 cm) ne legyen nagyobb! Állítsa be a szöveg távolságát a képtől mindegyik oldalon 0,2 cm-re!</p>",
+   "tips": [
+    "A mintán a szöveg körbefolyja a képet: a kép nem a szöveg sorában áll, hanem körbefuttatott (négyzetes)."
+   ],
+   "hints": [
+    "Kattints a rész első bekezdésébe › <span class=ui>Beszúrás</span> › <span class=ui>Képek</span>. Méret: <span class=ui>Képformátum</span> › Szélesség: 5 cm (a méretarány zárolva marad, a magasság magától változik).",
+    "Jobb klikk a képen › <span class=ui>Szöveg körbefuttatása</span> › <span class=ui>További elrendezési beállítások…</span>: a <span class=ui>Szöveg körbefuttatása</span> fülön <span class=ui>Négyzetes</span>, és a távolság a szövegtől mind a négy oldalon 0,2 cm; a <span class=ui>Pozíció</span> fülön vízszintesen <span class=ui>Igazítás: Balra</span>, viszonyítva: <span class=ui>Margó</span>.",
+    "Árnyék: <span class=ui>Képformátum</span> › <span class=ui>Képeffektusok</span> › <span class=ui>Árnyék</span> › egy <span class=ui>Külső</span> minta. Aztán <span class=ui>Árnyékbeállítások…</span>: a Távolság legfeljebb 5 pt legyen."
+   ],
+   "done": null
+  },
+  {
+   "n": 7,
+   "title": "Két hasáb",
+   "text": "<p>A „<b><i>Padelütő</i></b>” és a „<b><i>Padellabda</i></b>” alcímekhez tartozó bekezdéseket tördelje kéthasábos formába! A két hasábban lévő szöveg megjelenését a minta szerint alakítsa ki!</p>",
+   "tips": [
+    "A mintán a <i>Padelütő</i> a bal, a <i>Padellabda</i> a jobb hasáb tetején kezdődik. Ehhez hasábtörés kell a <i>Padellabda</i> alcím elé."
+   ],
+   "hints": [
+    "Jelöld ki a négy bekezdést (Padelütő, a szövege, Padellabda, a szövege) › <span class=ui>Elrendezés</span> › <span class=ui>Hasábok</span> › <span class=ui>Kettő</span>. A Word a kijelölés elé és mögé folyamatos szakasztörést tesz.",
+    "Kattints a <i>Padellabda</i> szó elé › <span class=ui>Elrendezés</span> › <span class=ui>Törések</span> › <span class=ui>Hasábtörés</span> (<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Enter</kbd>)."
+   ],
+   "done": null
+  },
+  {
+   "n": 8,
+   "title": "Az uto.png kép",
+   "text": "<p>A padelütőt és -labdát bemutató rész alá szúrja be középre igazítva az <span class=\"fn\">uto.png</span> képet! A kép szélessége a méretarányok megtartása mellett legyen 6 cm! A képnek állítson be az előző képpel megegyező külső árnyékot!</p>",
+   "tips": [
+    "A kép a kéthasábos rész alá kerül, egysoros (egyhasábos) területre: a második szakasztörés utáni bekezdésbe."
+   ],
+   "hints": [
+    "Kattints a kéthasábos rész utáni szakasztörés mögé, nyomj <kbd>Enter</kbd>-t, hogy legyen egy saját bekezdése, és oda szúrd be a képet. Szélesség: 6 cm; a bekezdés legyen középre igazított (<kbd>Ctrl</kbd>+<kbd>E</kbd>).",
+    "Ugyanaz az árnyék: kattints az első képre › <span class=ui>Formátummásoló</span> › kattints az <i>uto.png</i> képre. Vagy válaszd ugyanazt a mintát, és állítsd be ugyanazokat az értékeket az <span class=ui>Árnyékbeállítások</span>ban."
+   ],
+   "done": null
+  },
+  {
+   "n": 9,
+   "title": "Padelpálya",
+   "text": "<p>A „<b><i>Padelpálya</i></b>” alcím a második oldal tetején legyen és az ehhez tartozó bekezdésbe szúrja be a <span class=\"fn\">palya.png</span> képet! A kép szélességét a méretarányok megtartásával állítsa 8 cm-re! A képet helyezze el a bekezdésben a minta szerint!</p>",
+   "tips": [
+    "Az új oldalt oldaltörés adja, ne üres sorok: kattints a <i>Padelpálya</i> szó elé, és <kbd>Ctrl</kbd>+<kbd>Enter</kbd>.",
+    "A mintán a kép a bekezdés jobb oldalán van, a szöveg körbefolyja."
+   ],
+   "hints": [
+    "Kattints a Padelpálya alatti bekezdésbe › <span class=ui>Beszúrás</span> › <span class=ui>Képek</span>. Szélesség 8 cm. Körbefuttatás: <span class=ui>Négyzetes</span>.",
+    "<span class=ui>További elrendezési beállítások…</span> › <span class=ui>Pozíció</span>: vízszintesen <span class=ui>Igazítás: Jobbra</span>, viszonyítva: <span class=ui>Margó</span>."
+   ],
+   "done": null
+  },
+  {
+   "n": 10,
+   "title": "Felsorolás",
+   "text": "<p>Az utolsó alcím alatti három bekezdést alakítsa felsorolássá! A felsorolás jele a „–” legyen!</p>",
+   "hints": [
+    "Jelöld ki a három bekezdést › <span class=ui>Kezdőlap</span> › a <span class=ui>Felsorolás</span> gomb nyila › <span class=ui>Új felsorolásjel definiálása…</span> › <span class=ui>Szimbólum…</span>: keresd meg a nagykötőjelet (–, karakterkód: 2013)."
+   ],
+   "done": null
+  },
+  {
+   "n": 11,
+   "title": "Élőfej és élőláb",
+   "text": "<p>A dokumentum élőfejét és élőlábát az alábbiak szerint készítse el!</p><ol class=\"sub\"><li>A betűtípus EB Garamond legyen, a betűméret pedig 10 pont!</li><li>Az élőfejben a szöveg legyen a dokumentum címe, félkövér és dőlt betűstílussal kiemelve, valamint jobbra igazítva!</li><li>Az élőlábban az oldalszámot jelenítse meg középre igazítva!</li><li>Az élőfejben a szöveg alá, az élőlábban pedig az oldalszám fölé szúrjon be vékony vonalat a szövegtükör szélességében!</li></ol>",
+   "tips": [
+    "A vonal a legegyszerűbben bekezdésszegély: az élőfej bekezdésének alsó, az élőláb bekezdésének felső szegélye. Így pont a szövegtükör szélességében lesz."
+   ],
+   "hints": [
+    "Élőfej: kattints duplán az oldal tetejére, másold be a címet, <kbd>Ctrl</kbd>+<kbd>B</kbd>, <kbd>Ctrl</kbd>+<kbd>I</kbd>, <kbd>Ctrl</kbd>+<kbd>R</kbd>, EB Garamond 10. Aztán <span class=ui>Kezdőlap</span> › <span class=ui>Szegélyek</span> › <span class=ui>Alsó szegély</span>.",
+    "Élőláb: <span class=ui>Beszúrás</span> › <span class=ui>Oldalszám</span> › <span class=ui>Lap alja</span> › a középre igazított egyszerű szám. EB Garamond 10, és <span class=ui>Szegélyek</span> › <span class=ui>Felső szegély</span>."
+   ],
+   "done": null
+  }
+ ],
+ "ending": "<p>Szövegimport, margók, elválasztás, címek, körbefuttatott képek árnyékkal, két hasáb hasábtöréssel, felsorolás és élőfej–élőláb: ez volt a 2026-os májusi középszintű érettségi szövegszerkesztési feladata.</p>",
+ "next": {
+  "href": "../tablazat/gazfutes-hu.html",
+  "text": "Következő: Gázfűtés (táblázatkezelés)"
+ }
+};
+window.EXAM.checks = (() => {
+  /* the official text, paragraph by paragraph (forras.txt without its empty lines and leading spaces) */
+  const SRC = ["Padel: Az ütősport, ami meghódítja a világot", "A padel egy gyors tempójú, izgalmas ütősport, amely a tenisz, a fallabda és a tollaslabda elemeit ötvözi. Népszerűsége az elmúlt években robbanásszerűen megnőtt, és világszerte egyre többen fedezik fel ennek a dinamikus játéknak az örömeit. Ebben a dokumentumban bemutatjuk a padel történetét, eszközeit és alapvető szabályait.", "A padel története", "A padel története egészen 1969-ig nyúlik vissza, amikor Enrique Corcuera mexikói üzletember Acapulcóban megépítette az első padelpályát a háza udvarán. Corcuera eredetileg squashpályát szeretett volna, de a rendelkezésre álló terület korlátozott volt. Ezért egy kisebb pályát alakított ki, amit fallabda-szerű falakkal vett körül, hogy a labda ne repüljön ki a szomszédos területekre. A labdákat fával ütötték. Ez a kezdetleges pálya adta az alapját a mai padelnek.", "A sport hamar népszerűvé vált Mexikóban, majd Spanyolországba is eljutott, köszönhetően Corcuera barátjának, Alfonso de Hohenlohe hercegnek, aki az 1970-es években Spanyolországban építette fel az első európai padelpályákat Marbellában. A játék azóta Dél-Amerikában (különösen Argentínában), Spanyolországban, majd fokozatosan egész Európában és a világ más részein is elterjedt.", "A padel eszközei", "A padelhez viszonylag kevés speciális felszerelésre van szükség, ami hozzájárul a sport könnyű elérhetőségéhez.", "Padelütő", "A padelütő (vagy „pala”) különbözik a tenisz- vagy squashütőktől. Tömör anyagból készül, általában üvegszálból, karbonból vagy ezek kombinációjából. Az ütőfej felülete perforált, ami csökkenti a légellenállást és segít a labda kontrollálásában. Nincsenek húrok rajta, mint a teniszütőn. Az ütő súlya és formája változhat, de alapvetően lapos felülettel rendelkezik.", "Padellabda", "A padellabda méretét és nyomását tekintve nagyon hasonlít a teniszlabdához, de általában kissé alacsonyabb nyomású. Ezáltal a labda lassabban pattan és könnyebben irányítható, ami hozzájárul a játék dinamikájához.", "Padelpálya", "A padelpálya az egyik legkülönlegesebb eleme a sportnak. A pálya mérete 10 méter széles és 20 méter hosszú. Üveg- és/vagy drótháló falakkal van körülvéve, amelyek elválaszthatatlan részét képezik a játéknak, mivel a labda pattanhat róluk. A pálya közepén háló van, hasonlóan a teniszpályához. A felület anyaga általában műfű vagy beton.", "A padel szabályai", "A padel szabályai viszonylag egyszerűek, ami megkönnyíti a kezdők számára a játék elsajátítását.", "Játékosok és pontozás", "A padelt jellemzően párosban játsszák (két játékos a háló egyik oldalán, két játékos a másikon). A pontozás rendszere megegyezik a teniszével (15, 30, 40, játék, szett, mérkőzés). A mérkőzés általában két nyert szettig tart.", "Adogatás", "Az adogatás a padel egyik kulcsfontosságú eleme. Az adogatónak a saját adogatómezőjében kell állnia, és a labdát a derékvonal alatt kell elütnie, miután egyszer lepattant a földön. A labdának át kell mennie a háló felett, és az ellenfél adogatómezőjében kell lepattannia. Ha a labda lepattan a falról az ellenfél térfelén, az érvényes, de ha az ellenfél térfelén direktben falba csapódik, az hiba.", "Játék a falakkal", "Ez az, ami igazán különlegessé teszi a padelt: a falak aktívan részt vesznek a játékban. Miután a labda lepattant a pályán, pattanhat a falról, mielőtt visszaütnék. Ez hosszabb labdameneteket és izgalmas stratégiai lehetőségeket eredményez. A labda kétszer pattanhat le a földön, mielőtt visszaütnék, de ha egyszer lepattant a földön, és utána a falról pattanva a pályán belül másodszor is lepattan, az már pontvesztés.", "Egyéb fontos szabályok", "A labda csak egyszer pattanhat le a saját térfélen.", "A játékosok elüthetik a labdát, mielőtt az a falról lepattanna (röptézés), kivéve az adogatásnál.", "Ha a labda a saját térfél falán pattan le, mielőtt az ellenfél térfelén lepattanna, az hiba.", "A padel egy rendkívül szórakoztató és kihívásokkal teli sport, amely kiválóan alkalmas barátokkal vagy családdal való kikapcsolódásra. Könnyen tanulható, de a benne rejlő taktikai mélység hosszú távon is fenntartja az érdeklődést. Ha még nem próbáltad, érdemes belevágni!"];
+  const TITLE = SRC[0], FONT = "EB Garamond";
+  const SUBS = ["A padel története", "A padel eszközei", "Padelütő", "Padellabda", "Padelpálya", "A padel szabályai", "Játékosok és pontozás", "Adogatás", "Játék a falakkal", "Egyéb fontos szabályok"];
+  const BULLETS = SRC.slice(SRC.indexOf("Egyéb fontos szabályok") + 1, SRC.indexOf("Egyéb fontos szabályok") + 4);
+  /* the three pictures, told apart by their shape (pixel width : height) */
+  const PICS = { corcuera: { file: "corcuera.png", r: 329 / 320, w: 5 }, uto: { file: "uto.png", r: 700 / 500, w: 6 }, palya: { file: "palya.png", r: 1600 / 900, w: 8 } };
+  const N = s => String(s).replace(/\s+/g, " ").trim();
+  const ok = { ok: true }, no = msg => ({ ok: false, msg });
+  const num = (x, d = 2) => String(Math.round(x * 10 ** d) / 10 ** d).replace(".", ",");
+  const near = (a, b, t) => Math.abs(a - b) <= t;
+  const short = s => { s = N(s); return s.length > 30 ? s.slice(0, 28).trim() + "…" : s; };
+
+  /* paragraphs of the main text that hold text, in order */
+  const textParas = F => F.paras.filter(p => !p.inTable && !p.isToc && N(p.text));
+  const para = (F, t) => F.paras.findIndex(p => !p.inTable && N(p.text) === t);
+  const need = (F, t) => { const i = para(F, t); return i < 0 ? { err: no(`Nem találom ezt a bekezdést: „${short(t)}”. Nem törölted vagy írtad át véletlenül?`) } : { i, p: F.paras[i] }; };
+  const isHead = p => { const t = N(p.text); return t === TITLE || SUBS.includes(t); };
+  const body = F => textParas(F).filter(p => !isHead(p));
+  const runsOf = p => p.runs.filter(r => r.text.trim());
+  const fontOk = r => String(r.font || "").trim().toLowerCase() === FONT.toLowerCase();
+
+  /* the pictures: which is which, by shape */
+  const ratio = im => im.px && im.px.w && im.px.h ? im.px.w / im.px.h : (im.heightCm ? im.widthCm / im.heightCm : 0);
+  const pic = (F, key) => { const want = PICS[key].r; return F.images.filter(im => im.para >= 0).find(im => Math.abs(ratio(im) - want) / want < 0.02) || null; };
+  const findPic = (F, key) => { const im = pic(F, key); return im ? { im } : { err: no(`Nem találom a ${PICS[key].file} képet a dokumentumban.`) }; };
+  const sizeOk = (im, key) => {
+    const w = PICS[key].w;
+    if (!near(im.widthCm, w, 0.06)) return no(`A ${PICS[key].file} kép most ${num(im.widthCm)} cm széles, de ${w} cm kell.`);
+    if (im.heightCm && Math.abs(im.widthCm / im.heightCm - PICS[key].r) / PICS[key].r > 0.015) return no(`A ${PICS[key].file} kép torzult: nem az eredeti arányaiban van. Állítsd vissza (Képformátum › Kép alaphelyzetbe állítása › …és a méretét is), és csak a szélességet írd át, zárolt méretaránnyal.`);
+    return ok;
+  };
+  const shadowOk = (im, file) => !im.shadow ? no(`A ${file} képnek még nincs külső árnyéka (Képformátum › Képeffektusok › Árnyék).`)
+    : im.shadow.dist > 5.05 ? no(`A ${file} kép árnyékának távolsága ${num(im.shadow.dist, 1)} pt, de legfeljebb 5 pt lehet (Árnyékbeállítások › Távolság).`) : ok;
+  const textWidth = F => F.page.width - F.page.left - F.page.right;
+  /* where the picture sits across the line: "left" / "center" / "right" / null */
+  const hPos = (F, im) => {
+    if (!im.anchor) return F.paras[im.para] ? F.paras[im.para].align : null;
+    const h = im.posH || {}, tw = textWidth(F);
+    if (h.align) return /^(left|inside)$/.test(h.align) ? "left" : /^(right|outside)$/.test(h.align) ? "right" : h.align === "center" ? "center" : null;
+    if (h.off === null || h.off === undefined) return null;
+    const off = h.rel === "page" ? h.off - F.page.left : h.rel === "margin" || h.rel === "column" ? h.off : null;
+    if (off === null) return null;
+    if (near(off, 0, 0.1)) return "left";
+    if (near(off + im.widthCm, tw, 0.15)) return "right";
+    if (near(off + im.widthCm / 2, tw / 2, 0.15)) return "center";
+    return null;
+  };
+  const wrapped = im => im.anchor && /^(square|tight|through)$/.test(im.wrap);
+  const between = (F, im, from, to) => { const a = para(F, from), b = para(F, to); return a >= 0 && b >= 0 && im.para >= a && im.para < b; };
+
+  return [
+    /* 1 */
+    { task: 1, label: "A teljes szöveg megvan, a forrás sorrendjében", run: F => {
+        const got = textParas(F).map(p => N(p.text));
+        for (let k = 0; k < SRC.length; k++) {
+          if (got[k] === SRC[k]) continue;
+          if (!got.includes(SRC[k])) return no(`Hiányzik ez a bekezdés: „${short(SRC[k])}”. Ha kitörölted, a Visszavonás (Ctrl+Z) visszahozza, vagy másold be újra a forras.txt-ből.`);
+          return no(`A ${k + 1}. bekezdésnek „${short(SRC[k])}” kellene lennie, de ez áll ott: „${short(got[k] || "")}”. Nem keveredett össze vagy nincs kettétörve valamelyik bekezdés?`);
+        }
+        return got.length > SRC.length ? no(`A szöveg végén van még valami, ami nincs a forrásban: „${short(got[SRC.length])}”.`) : ok; } },
+    { task: 1, label: "Nincs felesleges szóköz", run: F => {
+        const p = F.paras.find(p => !p.inTable && p.text.trim() && (/^[ \t\u00a0]|[ \t\u00a0]$/.test(p.text) || /[ \u00a0]{2,}|\t/.test(p.text)));
+        if (!p) return ok;
+        return /^[ \t\u00a0]/.test(p.text) ? no(`„${short(p.text)}”: a bekezdés elején szóközök vannak. Töröld ki őket!`) : /[ \t\u00a0]$/.test(p.text) ? no(`„${short(p.text)}”: a bekezdés végén szóköz van.`) : no(`„${short(p.text)}”: ebben a bekezdésben két szóköz (vagy tabulátor) áll egymás mellett.`); } },
+    { task: 1, label: "Nincs üres bekezdés", run: F => {
+        const empty = F.paras.filter(p => !p.inTable && !p.text.trim() && !p.drawings && !p.pageBreak && !p.colBreak && !p.hasSect && !p.last);
+        return empty.length ? no(`Még ${empty.length} üres bekezdés van a dokumentumban (egy ¶ jel egymagában egy sorban). Töröld ki${empty.length > 1 ? " őket" : ""}!`) : ok; } },
+    /* 2 */
+    { task: 2, label: "A4-es, álló lap", run: F => {
+        const bad = F.sections.find(s => !(near(s.width, 21, 0.1) && near(s.height, 29.7, 0.1)));
+        return bad ? no(bad.width > bad.height ? "Az oldal fekvő. Álló tájolás kell (Elrendezés › Tájolás › Álló)." : `A lap mérete ${num(bad.width, 1)} × ${num(bad.height, 1)} cm. A4 kell (21 × 29,7 cm): Elrendezés › Méret › A4.`) : ok; } },
+    { task: 2, label: "Margók: bal és jobb 2,3 cm, felső és alsó 2 cm", run: F => {
+        const HU = { top: "felső", bottom: "alsó", left: "bal", right: "jobb" };
+        for (const s of F.sections) {
+          for (const k of ["left", "right"]) if (!near(s[k], 2.3, 0.03)) return no(`A ${HU[k]} margó ${num(s[k])} cm, de 2,3 cm kell.${F.sections.length > 1 ? " (A dokumentum minden szakaszában!)" : ""}`);
+          for (const k of ["top", "bottom"]) if (!near(s[k], 2, 0.03) && !(near(s[k], 1, 0.03) && near(s[k === "top" ? "header" : "footer"], 1, 0.03)))
+            return no(`${k === "top" ? "A felső" : "Az alsó"} margó ${num(s[k])} cm, de 2 cm kell.${F.sections.length > 1 ? " (A dokumentum minden szakaszában!)" : ""}`);
+        }
+        return ok; } },
+    /* 3 */
+    { task: 3, label: "a. EB Garamond a teljes dokumentumban, a szövegtörzs 12 pontos", run: F => {
+        for (const p of textParas(F)) for (const r of runsOf(p)) if (!fontOk(r)) return no(`„${short(p.text)}”: a betűtípus ${r.font ? `„${r.font}”` : "nem EB Garamond"}. Jelöld ki az egészet (Ctrl+A), és írd be: EB Garamond.`);
+        for (const p of body(F)) for (const r of runsOf(p)) if (!near(r.sz, 12, 0.01)) return no(`„${short(p.text)}”: a betűméret ${num(r.sz, 1)} pont, de a szövegtörzsben 12 kell.`);
+        return ok; } },
+    { task: 3, label: "b. A bekezdések sorkizártak", run: F => {
+        const p = body(F).find(p => p.align !== "both");
+        return p ? no(`„${short(p.text)}”: a bekezdés nem sorkizárt (Ctrl+J).`) : ok; } },
+    { task: 3, label: "c. Térköz előtte 0, utána 6 pont, egyszeres sorköz", run: F => {
+        for (const p of body(F)) {
+          const inList = BULLETS.includes(N(p.text)) && p.list;
+          if (!near(p.before, 0, 0.3)) return no(`„${short(p.text)}”: előtte ${num(p.before, 1)} pont a térköz, de 0 kell.`);
+          if (!near(p.after, 6, 0.3) && !(inList && near(p.after, 0, 0.3))) return no(`„${short(p.text)}”: utána ${num(p.after, 1)} pont a térköz, de 6 kell.`);
+          if (p.lineRule !== "auto" || !near(p.line, 1, 0.02)) return no(`„${short(p.text)}”: a sorköz nem egyszeres (Bekezdés › Sorköz: Egyszeres).`);
+        }
+        return ok; } },
+    { task: 3, label: "d. Automatikus elválasztás", run: F => F.autoHyphenation ? ok : no("Az automatikus elválasztás még nincs bekapcsolva: Elrendezés › Elválasztás › Automatikus.") },
+    /* 4 */
+    { task: 4, label: "a. A cím 16 pontos, félkövér, előtte 6, utána 12 pont térköz", run: F => {
+        const { p, err } = need(F, TITLE); if (err) return err;
+        const rs = runsOf(p);
+        if (!rs.every(r => near(r.sz, 16, 0.01))) return no(`A cím betűmérete ${num(rs.find(r => !near(r.sz, 16, 0.01)).sz, 1)} pont, de 16 kell.`);
+        if (!rs.every(r => r.b)) return no("A cím (vagy egy része) még nem félkövér.");
+        if (!near(p.before, 6, 0.3)) return no(`A cím előtt ${num(p.before, 1)} pont a térköz, de 6 kell.`);
+        if (!near(p.after, 12, 0.3)) return no(`A cím után ${num(p.after, 1)} pont a térköz, de 12 kell.`);
+        return ok; } },
+    { task: 4, label: "b. Az alcímek 13 pontosak, félkövérek, előttük és utánuk 6 pont térköz", run: F => {
+        let done = 0, msg = null;
+        for (const s of SUBS) {
+          const { p, err } = need(F, s); let m = err ? err.msg : null;
+          if (!m) { const rs = runsOf(p);
+            if (!rs.every(r => near(r.sz, 13, 0.01))) m = `„${s}”: a betűméret ${num(rs.find(r => !near(r.sz, 13, 0.01)).sz, 1)} pont, de 13 kell.`;
+            else if (!rs.every(r => r.b)) m = `„${s}”: az alcím még nem félkövér.`;
+            else if (!near(p.before, 6, 0.3) || !near(p.after, 6, 0.3)) m = `„${s}”: a térköz előtte ${num(p.before, 1)}, utána ${num(p.after, 1)} pont, de mindkettő 6 kell.`; }
+          if (m) { if (!msg) msg = m; } else done++;
+        }
+        return { ok: done === SUBS.length, done, total: SUBS.length, msg }; } },
+    /* 5 */
+    { task: 5, label: "Enrique Corcuera neve félkövér (az első előfordulás)", run: F => {
+        const { p, err } = need(F, SRC[3]); if (err) return err;
+        const name = "Enrique Corcuera", at = p.text.indexOf(name);
+        if (at < 0) return no("Nem találom a nevet: Enrique Corcuera.");
+        const bold = []; p.runs.forEach(r => { for (const ch of r.text) bold.push(r.b); });
+        const nameBold = bold.slice(at, at + name.length).every(Boolean);
+        if (!nameBold) return no(bold.slice(at, at + name.length).some(Boolean) ? "A névnek csak egy része félkövér. Jelöld ki az egész nevet: Enrique Corcuera." : "Az „Enrique Corcuera” név még nem félkövér.");
+        const rest = bold.filter((b, k) => b && (k < at || k >= at + name.length) && p.text[k].trim());
+        return rest.length ? no("A bekezdésben a néven kívül más is félkövér lett. Csak a nevet emeld ki!") : ok; } },
+    /* 6 */
+    { task: 6, label: "A corcuera.png „A padel története” részben, 5 cm széles, az arányai megmaradtak", run: F => {
+        const { im, err } = findPic(F, "corcuera"); if (err) return err;
+        if (!between(F, im, "A padel története", "A padel eszközei")) return no("A corcuera.png kép nem „A padel története” részben van. Húzd (vagy vágd ki és szúrd be) a rész második bekezdésébe.");
+        return sizeOk(im, "corcuera"); } },
+    { task: 6, label: "Balra igazítva, a szöveg körbefuttatja, mindenhol 0,2 cm távolsággal", run: F => {
+        const { im, err } = findPic(F, "corcuera"); if (err) return err;
+        if (!wrapped(im)) return no("A kép még a szöveg sorában áll. A mintán a szöveg körbefuttatja: Szöveg körbefuttatása › Négyzetes.");
+        if (hPos(F, im) !== "left") return no("A kép nincs balra igazítva. További elrendezési beállítások › Pozíció: vízszintesen Igazítás: Balra, viszonyítva: Margó.");
+        const d = im.dist, bad = ["t", "b", "l", "r"].find(k => !near(d[k], 0.2, 0.02));
+        return bad ? no(`A szöveg távolsága a képtől ${{ t: "fent", b: "lent", l: "balra", r: "jobbra" }[bad]} ${num(d[bad])} cm. Mind a négy oldalon 0,2 cm kell (Szöveg körbefuttatása fül › Távolság a szövegtől).`) : ok; } },
+    { task: 6, label: "Külső árnyék, legfeljebb 5 pont távolsággal", run: F => { const { im, err } = findPic(F, "corcuera"); return err || shadowOk(im, "corcuera.png"); } },
+    /* 7 */
+    { task: 7, label: "Csak a Padelütő és a Padellabda rész két hasábos", run: F => {
+        const four = ["Padelütő", SRC[8], "Padellabda", SRC[10]];
+        const two = textParas(F).filter(p => p.cols === 2).map(p => N(p.text));
+        if (!two.length) return no("Még nincs két hasábos rész. Jelöld ki a négy bekezdést › Elrendezés › Hasábok › Kettő.");
+        const extra = two.find(t => !four.includes(t)); if (extra) return no(`Ez a bekezdés is két hasábba került, pedig nem kellene: „${short(extra)}”. Csak a Padelütő és a Padellabda rész legyen két hasábos.`);
+        const miss = four.find(t => !two.includes(t)); return miss ? no(`Ez a bekezdés még nincs a két hasábos részben: „${short(miss)}”.`) : ok; } },
+    { task: 7, label: "A Padelütő a bal, a Padellabda a jobb hasáb tetején kezdődik", run: F => {
+        const a = need(F, SRC[8]), b = need(F, "Padellabda"); if (a.err) return a.err; if (b.err) return b.err;
+        let br = b.p.colBreakStart || a.p.colBreakEnd;
+        for (let k = a.i + 1; k < b.i && !br; k++) br = F.paras[k].colBreak && !N(F.paras[k].text);
+        return br ? ok : no("A Padellabda még nem a jobb hasáb tetején kezdődik. Kattints a Padellabda szó elé › Elrendezés › Törések › Hasábtörés."); } },
+    /* 8 */
+    { task: 8, label: "Az uto.png a két hasábos rész alatt, 6 cm széles, az arányai megmaradtak", run: F => {
+        const { im, err } = findPic(F, "uto"); if (err) return err;
+        if (!between(F, im, SRC[10], "Padelpálya")) return no("Az uto.png kép nem a Padelütő és a Padellabda rész alatt van (a Padelpálya alcím előtt).");
+        if (F.paras[im.para] && F.paras[im.para].cols === 2) return no("Az uto.png kép a két hasábos részben van. A kép a két hasábos rész alá kerüljön, a szakasztörés utáni bekezdésbe.");
+        return sizeOk(im, "uto"); } },
+    { task: 8, label: "Középre igazítva", run: F => { const { im, err } = findPic(F, "uto"); if (err) return err;
+        return hPos(F, im) === "center" ? ok : no(im.anchor ? "A kép nincs középen. További elrendezési beállítások › Pozíció: vízszintesen Igazítás: Középre, viszonyítva: Margó." : "A kép bekezdése nincs középre igazítva (Ctrl+E)."); } },
+    { task: 8, label: "Ugyanolyan külső árnyék, mint az első képen", run: F => {
+        const { im, err } = findPic(F, "uto"); if (err) return err;
+        const first = pic(F, "corcuera");
+        if (!first || !first.shadow) return shadowOk(im, "uto.png");
+        if (!im.shadow) return no("Az uto.png képnek még nincs árnyéka. Az első kép árnyékát a Formátummásolóval viheted át.");
+        return im.shadow.sig === first.shadow.sig ? ok : no(`Az uto.png árnyéka nem egyezik az első képével (távolság: ${num(im.shadow.dist, 1)} és ${num(first.shadow.dist, 1)} pt, elmosás: ${num(im.shadow.blur, 1)} és ${num(first.shadow.blur, 1)} pt). Vidd át a Formátummásolóval.`); } },
+    /* 9 */
+    { task: 9, label: "A Padelpálya alcím a második oldal tetején", run: F => {
+        const h = need(F, "Padelpálya"); if (h.err) return h.err;
+        if (h.p.pageBreakBefore || h.p.pageBreakStart || h.p.renderedPageStart) return ok;
+        let k = h.i - 1; while (k >= 0 && !N(F.paras[k].text) && !F.paras[k].pageBreak && !F.paras[k].sectBreak) k--;
+        for (let j = Math.max(k, 0); j < h.i; j++) { const q = F.paras[j]; if ((j === k ? q.pageBreakEnd : q.pageBreak) || q.sectBreak) return ok; }
+        return no("A Padelpálya alcím még nem új oldalon kezdődik. Kattints a szó elé, és Ctrl+Enter (oldaltörés). Üres sorokkal ne told le!"); } },
+    { task: 9, label: "A palya.png a Padelpálya bekezdésében, 8 cm széles, az arányai megmaradtak", run: F => {
+        const { im, err } = findPic(F, "palya"); if (err) return err;
+        const h = para(F, "Padelpálya"), b = para(F, SRC[12]);
+        if (!(im.para === b || im.para === h)) return no("A palya.png kép nem a Padelpálya alcím alatti bekezdésben van.");
+        return sizeOk(im, "palya"); } },
+    { task: 9, label: "A kép a minta szerint: a bekezdés jobb oldalán, a szöveg körbefuttatja", run: F => {
+        const { im, err } = findPic(F, "palya"); if (err) return err;
+        if (!wrapped(im)) return no("A kép még a szöveg sorában áll. A mintán a szöveg körbefuttatja: Szöveg körbefuttatása › Négyzetes.");
+        return hPos(F, im) === "right" ? ok : no("A kép nincs a bekezdés jobb oldalán. További elrendezési beállítások › Pozíció: vízszintesen Igazítás: Jobbra, viszonyítva: Margó."); } },
+    /* 10 */
+    { task: 10, label: "Az utolsó alcím alatti három bekezdés felsorolás", run: F => {
+        for (const t of BULLETS) { const { p, err } = need(F, t); if (err) return err; if (p.list !== "bullet") return no(`„${short(t)}”: ${p.list ? "számozott lista lett, de felsorolás kell" : "még nem felsorolás"}.`); }
+        const more = textParas(F).find(p => p.list && !BULLETS.includes(N(p.text)));
+        return more ? no(`Ez a bekezdés is lista lett, pedig nem kell: „${short(more.text)}”. Csak a három szabály legyen felsorolás.`) : ok; } },
+    { task: 10, label: "A felsorolás jele a „–”", run: F => {
+        for (const t of BULLETS) { const { p, err } = need(F, t); if (err) return err;
+          const b = String(p.bullet || "");
+          /* the en dash; a Word or LibreOffice dash from the Symbol font (U+F02D) and the minus sign look the same */
+          if (!["–", "\u2212", "\uf02d"].includes(b)) return no(`A felsorolás jele most ${b ? `„${/[\uf000-\uf8ff]/.test(b) ? "egy szimbólum (pl. pötty)" : b}”` : "nem „–”"}. Új felsorolásjel definiálása › Szimbólum: a nagykötőjel (–, karakterkód: 2013).`); }
+        return ok; } },
+    /* 11 */
+    { task: 11, label: "a. Élőfej és élőláb: EB Garamond, 10 pont", run: F => {
+        for (const [part, name] of [[F.header, "élőfej"], [F.footer, "élőláb"]]) {
+          const rs = part.paras.flatMap(runsOf);
+          if (!rs.length) return no(`Az ${name} még üres.`);
+          const f = rs.find(r => !fontOk(r)); if (f) return no(`Az ${name} betűtípusa ${f.font ? `„${f.font}”` : "nem EB Garamond"}. EB Garamond kell.`);
+          const s = rs.find(r => !near(r.sz, 10, 0.01)); if (s) return no(`Az ${name} betűmérete ${num(s.sz, 1)} pont, de 10 kell.`);
+        }
+        return ok; } },
+    { task: 11, label: "b. Az élőfejben a cím, félkövér, dőlt, jobbra igazítva", run: F => {
+        const p = F.header.paras.find(p => N(p.text));
+        if (!p) return no("Még nincs élőfej. Kattints duplán az oldal tetejére, vagy: Beszúrás › Élőfej.");
+        if (N(p.text) !== TITLE) return no(`Az élőfejben ez áll: „${short(p.text)}”. A dokumentum címe kell bele: ${TITLE}`);
+        const rs = runsOf(p);
+        if (!rs.every(r => r.b)) return no("Az élőfej szövege még nem félkövér.");
+        if (!rs.every(r => r.i)) return no("Az élőfej szövege még nem dőlt.");
+        return p.align === "right" ? ok : no("Az élőfej szövege nincs jobbra igazítva (Ctrl+R)."); } },
+    { task: 11, label: "c. Az élőlábban oldalszám, középre igazítva", run: F => {
+        if (!F.footer.page) return no(/\d/.test(F.footer.text) ? "Az élőlábban egy beírt szám van, nem oldalszám. Beszúrás › Oldalszám › Lap alja: így minden oldalon magától változik." : "Az élőlábban még nincs oldalszám. Beszúrás › Oldalszám › Lap alja.");
+        const p = F.footer.paras.find(p => N(p.text) || p.fields.some(f => /\bPAGE\b/.test(f)));
+        return p && p.align === "center" ? ok : no("Az oldalszám nincs középre igazítva (Ctrl+E)."); } },
+    { task: 11, label: "d. Vékony vonal: az élőfejben a szöveg alatt, az élőlábban az oldalszám fölött", run: F => {
+        const hs = F.header.paras, hi = hs.findIndex(p => N(p.text));
+        const under = hi >= 0 && (hs[hi].bdr.bottom || (hs[hi + 1] && hs[hi + 1].bdr.top)) || F.header.lines > 0;
+        if (!under) return no("Az élőfejben még nincs vonal a szöveg alatt. Kattints az élőfej szövegébe › Kezdőlap › Szegélyek › Alsó szegély.");
+        const fs = F.footer.paras, fi = fs.findIndex(p => N(p.text) || p.fields.some(f => /\bPAGE\b/.test(f)));
+        const over = fi >= 0 && (fs[fi].bdr.top || (fi > 0 && fs[fi - 1].bdr.bottom)) || F.footer.lines > 0;
+        return over ? ok : no("Az élőlábban még nincs vonal az oldalszám fölött. Kattints az oldalszámra › Kezdőlap › Szegélyek › Felső szegély."); } }
+  ];
+})()
+;
+</script>
+<script src="../../excel/cats.js"></script>
+<script src="../exam.js"></script>
+<script src="../../nav.js?v=334fdffc" defer></script>
+</body>
+</html>

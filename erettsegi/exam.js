@@ -1,13 +1,14 @@
-/* digikult — official érettségi spreadsheet tasks, done in Excel (or any spreadsheet program).
+/* digikult — official érettségi tasks, done in Excel or Word (or any spreadsheet / word processor).
    Every chapter is one részfeladat, shown word for word as on the official feladatlap. The student
-   saves the file in Excel and the page checks that részfeladat in the saved .xlsx (values, formulas,
-   number formats, fonts, borders, alignment, merges, charts). The next részfeladat opens only when
+   saves the file and the page checks that részfeladat in the saved file: an .xlsx (values, formulas,
+   number formats, fonts, borders, alignment, merges, charts) or, when saveAs ends in .docx, a .docx
+   read by word/docx.js (F = that doc, plus F.check(goal) and F.all(...); goal shapes: word/docx.js). The next részfeladat opens only when
    the check passes. In Chrome and Edge the page keeps the chosen file, so after the first pick a click
    on Ellenőrzés re-reads the saved file. The Feladatlap button shows (and prints) the whole sheet.
 
    The page defines EXAM = {
      key, title, number, subject, level, date, code, points, saveAs, sheets,
-     files: [{ name, href }], minta: [{ src, caption, label }],
+     files: [{ name, href, note }], minta: [{ src, caption, label }],
      intro, lead, rules: [html], introFirst,                       word for word
      tasks: [{ n, title, text, before, ctx, tips: [html], hints: [html], done }],
      checks: [{ task, label, run: F => ({ ok, msg, done, total }) }]   task 0 = the whole file only
@@ -15,6 +16,10 @@
 (function () {
   "use strict";
   const X = window.EXAM, T = X.tasks, KEY = X.key;
+  /* the program the task is done in: from the file it is saved as */
+  const DOCX_MODE = /\.docx$/i.test(X.saveAs), EXT = DOCX_MODE ? ".docx" : ".xlsx", EXT_RE = DOCX_MODE ? /\.docx$/i : /\.xlsx$/i;
+  const APP_IN = DOCX_MODE ? "a Wordben" : "az Excelben";
+  const MIME = DOCX_MODE ? "application/vnd.openxmlformats-officedocument.wordprocessingml.document" : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
   const $ = id => document.getElementById(id);
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
   const CH = [{ start: true, title: "A feladat" }].concat(T.map(t => Object.assign({ task: true }, t)), [{ upload: true, title: "A teljes fájl" }]);
@@ -31,7 +36,7 @@
 
   /* ---------- the feladatlap, word for word ---------- */
   const taskHtml = t => `${t.before ? `<div class="pp between">${t.before}</div>` : ""}<div class="pp item"><span class="no">${t.n}.</span><div class="tx">${t.text}</div></div>`;
-  const rulesHtml = () => `<div class="pp">${X.lead}</div><ul class="pp rules">${X.rules.map(r => `<li>${r}</li>`).join("")}</ul>`;
+  const rulesHtml = () => (X.lead ? `<div class="pp">${X.lead}</div>` : "") + (X.rules && X.rules.length ? `<ul class="pp rules">${X.rules.map(r => `<li>${r}</li>`).join("")}</ul>` : "");
   const headHtml = () => X.introFirst ? X.intro + rulesHtml() : rulesHtml() + X.intro;
   const mintaHtml = big => X.minta.map(m => `${m.caption ? `<p class="pp mcap">${m.caption}</p>` : ""}
       <figure class="minta"><button type="button" class="zoom" data-src="${m.src}" aria-label="Minta nagyítása"><img src="${m.src}" alt="${esc(m.alt || "Minta")}" loading="${big ? "eager" : "lazy"}"></button>
@@ -55,7 +60,7 @@
     if (e.target.closest("#lightbox")) $("lightbox").hidden = true;
   });
   $("dlBox").innerHTML = X.files.map(f => `<div class="dlcard"><svg class="ic" viewBox="0 0 40 46" aria-hidden="true"><path d="M4 2h22l10 10v32H4z" fill="#fff" stroke="currentColor" stroke-width="2"/><path d="M26 2v10h10" fill="none" stroke="currentColor" stroke-width="2"/><path d="M10 22h20M10 28h20M10 34h14" stroke="currentColor" stroke-width="2"/></svg>
-      <p><b>${esc(f.name)}</b><br>A hivatalos forrásfájl. Ebből dolgozol.</p><a class="btn primary" href="${f.href}" download>Letöltés</a></div>`).join("");
+      <p><b>${esc(f.name)}</b><br>${f.note || "A hivatalos forrásfájl. Ebből dolgozol."}</p><a class="btn primary" href="${f.href}" download>Letöltés</a></div>`).join("");
 
   /* ---------- chapter strip ---------- */
   function renderSteps() {
@@ -80,12 +85,12 @@
       return `<li class="${r && r.ok ? "ok" : ""}"><span class="gt">${c.upload ? `<span class="tn">${k.task}.</span> ` : ""}${k.label}${r && !r.ok ? `<small>${esc(r.msg || "Ez még nincs meg a fájlban.")}</small>` : ""}</span><span class="cnt">${r && r.total > 1 ? `${r.done} / ${r.total}` : ""}</span></li>`; }).join("");
     return `<div class="checkbox"><h3>${c.upload ? "Az egész fájl ellenőrzése" : "Ellenőrzés: ezt nézi meg az oldal a fájlodban"}</h3>
         <ul class="goals report">${rows}</ul>
-        ${rep && rep.nameOk === false ? `<p class="export-note warn">A fájl neve <b>${esc(rep.name)}</b>, de a feladat szerint <b>${esc(X.saveAs.replace(/\.xlsx$/, ""))}</b> legyen. A vizsgán ezt is pontozzák!</p>` : ""}
-        ${isDone(i) ? "" : `<p class="howcheck">Mentsd el a fájlt az Excelben (<kbd>Ctrl</kbd>+<kbd>S</kbd>), aztán kattints az <b>Ellenőrzés</b> gombra${picked ? "" : ", és válaszd ki a mentett fájlodat"}. A fájlt ide is behúzhatod.</p>
+        ${rep && rep.nameOk === false ? `<p class="export-note warn">A fájl neve <b>${esc(rep.name)}</b>, de a feladat szerint <b>${esc(X.saveAs.replace(EXT_RE, ""))}</b> legyen. A vizsgán ezt is pontozzák!</p>` : ""}
+        ${isDone(i) ? "" : `<p class="howcheck">Mentsd el a fájlt ${APP_IN} (<kbd>Ctrl</kbd>+<kbd>S</kbd>), aztán kattints az <b>Ellenőrzés</b> gombra${picked ? "" : ", és válaszd ki a mentett fájlodat"}. A fájlt ide is behúzhatod.</p>
         <div class="btns"><button type="button" class="btn primary" id="checkBtn">Ellenőrzés${picked ? `: ${esc(picked)}` : ""}</button>
           ${picked ? `<button type="button" class="btn" id="pickBtn">Másik fájl</button>` : ""}
           ${!c.upload && c.hints && (state.hints[i] || 0) < c.hints.length ? `<button type="button" class="btn" id="hintBtn">${state.hints[i] ? "Még egy segítség" : "Segítség"}</button>` : ""}</div>`}
-        <input type="file" id="fileIn" accept=".xlsx" hidden>
+        <input type="file" id="fileIn" accept="${EXT}" hidden>
         <div id="verdict" aria-live="polite"></div></div>`;
   }
   function renderCase() {
@@ -95,12 +100,12 @@
       body = `<p class="chap">${esc(X.subject)} · ${esc(X.level)} · ${esc(X.date)}</p><h2>${X.number}. ${esc(X.title)}</h2>
         <div class="paper inline">${headHtml()}</div>
         <div class="learn"><h3>Hogyan dolgozz ezen az oldalon?</h3><ul>
-          <li>Minden fejezet egy részfeladat, <b>szó szerint</b> a hivatalos feladatlapról. Az Excelben (táblázatkezelőben) oldod meg, sorban.</li>
+          <li>Minden fejezet egy részfeladat, <b>szó szerint</b> a hivatalos feladatlapról. ${DOCX_MODE ? "A Wordben (szövegszerkesztőben)" : "Az Excelben (táblázatkezelőben)"} oldod meg, sorban.</li>
           <li>Ha kész egy részfeladat, mentsd el a fájlt, és kattints az <b>Ellenőrzés</b> gombra: az oldal megnézi a mentett fájlodat. A következő részfeladat csak akkor nyílik meg, ha minden stimmel.</li>
           ${X.strict ? `<li><b>Ennél a feladatnál nincs segítség</b>, és az ellenőrzés sem árulja el a jó eredményt, csak azt, hogy mi nem stimmel. Úgy dolgozol, mint a vizsgán.</li>` : ""}
           <li>Chrome-ban és Edge-ben elég egyszer kiválasztani a fájlt: utána mentés után csak az Ellenőrzésre kell kattintanod.</li>
           <li>A teljes feladatlapot a <b>Feladatlap</b> gombbal egyben is megnézheted vagy kinyomtathatod. A vizsgán ${X.points} pontot ér, nagyjából 45–50 perc jut rá.</li></ul></div>
-        <div class="task"><h3>A forrásfájl</h3><p>${X.files.map(f => `<a class="btn primary" href="${f.href}" download>${esc(f.name)} letöltése</a>`).join(" ")}</p>
+        <div class="task"><h3>A forrásfájl${X.files.length > 1 ? "ok" : ""}</h3><p>${X.files.map(f => `<a class="btn primary" href="${f.href}" download>${esc(f.name)} letöltése</a>`).join(" ")}</p>
           <div class="btns"><button type="button" class="btn primary big" id="startBtn">${solved ? "Tovább az 1. részfeladathoz" : "Elolvastam, kezdjük!"} →</button></div></div>`;
     } else if (c.upload) {
       body = `<p class="chap">Utolsó lépés</p><h2>A teljes fájl ellenőrzése</h2>
@@ -160,7 +165,7 @@
     }
     if (window.showOpenFilePicker) {
       try {
-        const [h] = await showOpenFilePicker({ id: "digikult-exam", types: [{ description: "Excel-munkafüzet", accept: { "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": [".xlsx"] } }] });
+        const [h] = await showOpenFilePicker({ id: "digikult-exam", types: [{ description: DOCX_MODE ? "Word-dokumentum" : "Excel-munkafüzet", accept: { [MIME]: [EXT] } }] });
         handle = h; idb("readwrite", st => st.put(h, KEY)).catch(() => {});
         return await h.getFile();
       } catch (e) { if (e && e.name === "AbortError") return null; }
@@ -179,6 +184,13 @@
   $("case").addEventListener("dragover", e => { const d = e.target.closest(".checkbox"); if (d && !isDone(state.current)) { e.preventDefault(); d.classList.add("over"); } });
   $("case").addEventListener("dragleave", e => { const d = e.target.closest(".checkbox"); if (d) d.classList.remove("over"); });
   $("case").addEventListener("drop", e => { const d = e.target.closest(".checkbox"); if (!d) return; e.preventDefault(); d.classList.remove("over"); const f = e.dataTransfer.files[0]; if (f) runChecks(f); });
+
+  /* ---------- reading a .docx (word/docx.js, next to this folder) ---------- */
+  const DOCX_SRC = (document.currentScript ? document.currentScript.src : "../exam.js").replace(/exam\.js(\?.*)?$/, "../word/docx.js");
+  function makeDocF(doc) {
+    const all = (...rs) => { for (const r of rs) { const x = typeof r === "function" ? r() : r; if (!x.ok) return x; } return { ok: true }; };
+    return Object.assign({}, doc, { doc, all, check: goal => DOCX.check(doc, goal) });
+  }
 
   /* ---------- reading the .xlsx ---------- */
   function loadScript(src) { return new Promise((ok, no) => { const s = document.createElement("script"); s.src = src; s.onload = ok; s.onerror = no; document.head.appendChild(s); }); }
@@ -358,19 +370,19 @@
   async function runChecks(file) {
     const i = state.current, c = CH[i];
     $("verdict").innerHTML = `<p class="export-note">Ellenőrzöm: ${esc(file.name)}…</p>`;
-    if (!/\.xlsx$/i.test(file.name)) { $("verdict").innerHTML = `<div class="verdict no"><b>Ez nem .xlsx fájl.</b><p>A táblázatkezelő saját (alapértelmezett) formátumában mentett fájlt válaszd ki: ${esc(X.saveAs)}.</p></div>`; return; }
-    try { if (!window.XLSX) await loadScript("https://cdn.jsdelivr.net/npm/" + "xlsx@0.18.5/dist/xlsx.full.min.js"); }
+    if (!EXT_RE.test(file.name)) { $("verdict").innerHTML = `<div class="verdict no"><b>Ez nem ${EXT} fájl.</b><p>A ${DOCX_MODE ? "szövegszerkesztő" : "táblázatkezelő"} saját (alapértelmezett) formátumában mentett fájlt válaszd ki: ${esc(X.saveAs)}.</p></div>`; return; }
+    try { if (DOCX_MODE) { if (!window.DOCX) await loadScript(DOCX_SRC); } else if (!window.XLSX) await loadScript("https://cdn.jsdelivr.net/npm/" + "xlsx@0.18.5/dist/xlsx.full.min.js"); }
     catch (e) { $("verdict").innerHTML = `<div class="verdict no"><b>Nincs internet.</b><p>A fájl ellenőrzéséhez internetkapcsolat kell. Próbáld újra később.</p></div>`; return; }
     let F;
-    try { F = makeF(XLSX.read(await file.arrayBuffer(), { type: "array", cellFormula: true, cellNF: true, cellStyles: true, bookFiles: true })); }
+    try { F = DOCX_MODE ? makeDocF(await DOCX.read(await file.arrayBuffer())) : makeF(XLSX.read(await file.arrayBuffer(), { type: "array", cellFormula: true, cellNF: true, cellStyles: true, bookFiles: true })); }
     catch (e) { $("verdict").innerHTML = `<div class="verdict no"><b>Ezt a fájlt nem tudom megnyitni.</b><p>Ha még nyitva van a mentés ablaka, várd meg a végét. Aztán mentsd el újra (<kbd>Ctrl</kbd>+<kbd>S</kbd>), és próbáld újra.</p></div>`; return; }
     const rows = checksOf(c).map(ch => { let r; try { r = ch.run(F) || { ok: false }; } catch (e) { r = { ok: false, msg: "Ezt a részt nem sikerült megnézni a fájlban." }; } return { ok: !!r.ok, msg: r.msg || null, done: r.done, total: r.total }; });
-    const nameOk = new RegExp("^" + X.saveAs.replace(/\.xlsx$/, "").replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "(\\b|[ _-])", "i").test(file.name);
+    const nameOk = new RegExp("^" + X.saveAs.replace(EXT_RE, "").replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "(\\b|[ _-])", "i").test(file.name);
     state.reports[i] = { name: file.name, at: Date.now(), rows, nameOk }; save();
     if (rows.every(r => r.ok)) { solve(i); return; }
     renderCase();
     const left = rows.filter(r => !r.ok).length;
-    $("verdict").innerHTML = `<div class="verdict no"><b>Még nem stimmel.</b><p>${left === 1 ? "Egy dolog még hiányzik" : `${left} dolog még hiányzik`}: nézd meg a pirossal írt megjegyzést fent. Javítsd ki az Excelben, mentsd el, és ellenőrizd újra!</p></div>`;
+    $("verdict").innerHTML = `<div class="verdict no"><b>Még nem stimmel.</b><p>${left === 1 ? "Egy dolog még hiányzik" : `${left} dolog még hiányzik`}: nézd meg a pirossal írt megjegyzést fent. Javítsd ki ${APP_IN}, mentsd el, és ellenőrizd újra!</p></div>`;
     buzz();
   }
 

@@ -605,12 +605,31 @@
       {
         id: "erettsegi",
         accent: "#b9a2ff",
-        title: { hu: "Táblázatkezelés – Érettségi", en: "Spreadsheets – Exam prep" },
+        title: { hu: "Érettségi", en: "Exam prep" },
         blurb: {
-          hu: "Hivatalos érettségi feladatok szó szerint, a forrásfájllal és a mintával. Részfeladatonként segítség, a végén az oldal ellenőrzi a mentett fájlodat.",
-          en: "Official Hungarian school-leaving exam tasks, word for word, with the source file and the sample. Help for every subtask, and the page checks your saved file at the end."
+          hu: "Hivatalos érettségi feladatok szó szerint, a forrásfájllal és a mintával: szövegszerkesztés és táblázatkezelés. Részfeladatonként segítség, és az oldal ellenőrzi a mentett fájlodat.",
+          en: "Official Hungarian school-leaving exam tasks, word for word, with the source files and the sample: word processing and spreadsheets. Help for every subtask, and the page checks your saved file."
         },
         lessons: [
+          {
+            id: "szoveg",
+            title: { hu: "Középszint: hivatalos szövegszerkesztési feladatok", en: "Standard level: official word processing tasks" },
+            pages: [
+              {
+                id: "erettsegi-padel",
+                kind: "exam",
+                minutes: 50,
+                title: { hu: "Padel", en: "Padel" },
+                desc: {
+                  hu: "Digitális kultúra, középszint, 2026. május. Szövegimport, margók, elválasztás, körbefuttatott képek árnyékkal, két hasáb, felsorolás, élőfej és élőláb, a Wordben.",
+                  en: "Digital Culture, standard level, May 2026. Text import, margins, hyphenation, wrapped pictures with shadows, two columns, a list, header and footer, in Word."
+                },
+                files: { hu: "erettsegi/szoveg/padel-hu.html" },
+                cover: "erettsegi/szoveg/img/padel-cover.png",
+                progress: { chapters: 12, keys: { hu: "erettsegi-padel-hu-v1" } }
+              }
+            ]
+          },
           {
             id: "kozep",
             title: { hu: "Középszint: hivatalos táblázatkezelési feladatok", en: "Standard level: official spreadsheet tasks" },

@@ -9,12 +9,18 @@
      doc.images  [{ wrap: inline|square|tight|through|topAndBottom|behind|front, widthCm, heightCm }]
      doc.page    { top, bottom, left, right, width, height (cm), landscape }
      doc.header  { text }   doc.footer { text, page (has a PAGE field) }
+   Also (for the érettségi pages): runs[].font (resolved font name), paras[].bullet / bulletFont (the list
+   mark), bdr {top,bottom,left,right}, colBreak, renderedPageStart; images[].para (index into paras, -1 in
+   header/footer), anchor, posH/posV {rel, align, off (cm)}, dist {t,b,l,r} (cm), wrapText, shadow
+   {dist, blur (pt), dir, sig}, px {w,h} of the picture file; page.header/footer distances (cm);
+   colBreakStart/End, pageBreakStart, hasSect; doc.autoHyphenation; header/footer .paras (same shape as paras) and .lines (drawn lines).
    DOCX.check(doc, goal) → { ok, done, total, msg }   (goal shapes: see the bottom of this file) */
 (function () {
   "use strict";
   const W = "http://schemas.openxmlformats.org/wordprocessingml/2006/main";
   const WP = "http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing";
   const R = "http://schemas.openxmlformats.org/officeDocument/2006/relationships";
+  const A = "http://schemas.openxmlformats.org/drawingml/2006/main";
 
   /* ---------- a small unzip ---------- */
   /* Browsers since 2023 unpack zip data themselves (DecompressionStream "deflate-raw"); older ones
@@ -122,7 +128,13 @@
       const raw = b.subarray(start, start + f.csize);
       return td.decode(f.method === 0 ? raw : await inflate(raw));
     };
-    return { names: Object.keys(files), get };
+    const getBytes = async name => {
+      const f = files[name]; if (!f) return null;
+      const start = f.off + 30 + v.getUint16(f.off + 26, true) + v.getUint16(f.off + 28, true);
+      const raw = b.subarray(start, start + f.csize);
+      return f.method === 0 ? raw : await inflate(raw);
+    };
+    return { names: Object.keys(files), get, getBytes };
   }
 
   /* ---------- XML helpers ---------- */
@@ -137,12 +149,34 @@
   const realColor = c => c && !/^(auto|000000|0{6})$/i.test(c);
   const realFill = c => c && !/^(auto|ffffff)$/i.test(c);
 
+  /* pixel size of a picture file (png, jpeg, gif), or null */
+  function pxSize(b) {
+    if (!b || b.length < 24) return null;
+    const v = new DataView(b.buffer, b.byteOffset, b.byteLength);
+    if (b[0] === 0x89 && b[1] === 0x50) return { w: v.getUint32(16), h: v.getUint32(20) };
+    if (b[0] === 0x47 && b[1] === 0x49) return { w: v.getUint16(6, true), h: v.getUint16(8, true) };
+    if (b[0] === 0xff && b[1] === 0xd8) {
+      for (let i = 2; i + 9 < b.length;) {
+        if (b[i] !== 0xff) { i++; continue; }
+        const m = b[i + 1], len = v.getUint16(i + 2);
+        if (m >= 0xc0 && m <= 0xcf && m !== 0xc4 && m !== 0xc8 && m !== 0xcc) return { w: v.getUint16(i + 7), h: v.getUint16(i + 5) };
+        i += 2 + len;
+      }
+    }
+    return null;
+  }
+
   async function read(buf) {
     const z = await unzip(buf);
     const parse = async name => { const s = await z.get(name); return s ? new DOMParser().parseFromString(s, "application/xml") : null; };
     const docX = await parse("word/document.xml");
     if (!docX || !docX.documentElement || docX.getElementsByTagName("parsererror").length) throw new Error("no document.xml");
     const stylesX = await parse("word/styles.xml"), numX = await parse("word/numbering.xml"), relsX = await parse("word/_rels/document.xml.rels");
+    const themeX = await parse("word/theme/theme1.xml"), settingsX = await parse("word/settings.xml");
+    const themeFont = kind => { const f = themeX && desc(themeX, kind + "Font", A)[0], l = f && Array.from(f.children).find(c => c.localName === "latin"); return l ? l.getAttribute("typeface") : null; };
+    const theme = { major: themeFont("major"), minor: themeFont("minor") };
+    const fontOf = srcs => { for (const s of srcs) { const f = kid(s, "rFonts"); if (!f) continue; const a = attr(f, "ascii") || attr(f, "hAnsi"); if (a) return a;
+      const t = attr(f, "asciiTheme") || attr(f, "hAnsiTheme"); if (t) return /^major/.test(t) ? theme.major : theme.minor; } return theme.minor || null; };
 
     /* styles */
     const styles = {}; let defPara = null, defRPr = null, defPPr = null;
@@ -189,10 +223,11 @@
       /* numbering: direct or from style */
       let numPr = kid(pPr, "numPr");
       if (!numPr) for (const s of sChain) { const np = s.pPr && kid(s.pPr, "numPr"); if (np) { numPr = np; break; } }
-      let list = null, lvl = null;
+      let list = null, lvl = null, bullet = null, bulletFont = null;
       if (numPr) {
         const id = val(kid(numPr, "numId")), il = val(kid(numPr, "ilvl")) || "0";
-        if (id && id !== "0") { lvl = lvlOf(id, il); const fmt = lvl ? val(kid(lvl, "numFmt")) : "decimal"; list = fmt === "bullet" ? "bullet" : fmt === "none" ? null : "number"; }
+        if (id && id !== "0") { lvl = lvlOf(id, il); const fmt = lvl ? val(kid(lvl, "numFmt")) : "decimal"; list = fmt === "bullet" ? "bullet" : fmt === "none" ? null : "number";
+          if (lvl) { bullet = val(kid(lvl, "lvlText")); const lr = kid(lvl, "rPr"), lf = kid(lr, "rFonts"); bulletFont = lf ? (attr(lf, "ascii") || attr(lf, "hAnsi")) : null; } }
       }
       const tbl = ctx.tblStyle ? chain(ctx.tblStyle) : [];
       const condP = ctx.firstRow ? tbl.map(s => s.cond.firstRow && s.cond.firstRow.pPr).filter(Boolean) : [];
@@ -206,6 +241,8 @@
       const before = num(pget("spacing", "before")) || 0, after = num(pget("spacing", "after")) || 0;
       const lineRaw = num(pget("spacing", "line")), rule = pget("spacing", "lineRule") || "auto";
       const bdr = pel("pBdr"), shd = pel("shd");
+      const side = n => { const e = kid(bdr, n); return !!e && !/^(nil|none)$/.test(val(e) || ""); };
+      const bdrs = { top: side("top"), bottom: side("bottom"), left: side("left"), right: side("right") };
       const box = !!(bdr && Array.from(bdr.children).some(c => !/^(nil|none)$/.test(val(c) || ""))) || !!(shd && realFill(attr(shd, "fill")));
       const pb = pel("pageBreakBefore");
       const sp = kid(pPr, "sectPr"), stype = sp && val(kid(sp, "type"));
@@ -223,7 +260,7 @@
       const footnotes = desc(p, "footnoteReference").map(f => attr(f, "id"));
 
       /* runs (skip those inside text boxes / nested paragraphs) */
-      const runs = []; let text = "", drawings = 0, pageBreak = false, pageBreakAt = -1;
+      const runs = []; let text = "", drawings = 0, pageBreak = false, pageBreakAt = -1, colBreak = false, colBreakAt = -1, renderedPageStart = false;
       const rSrcBase = [...sChain.map(s => s.rPr), ...(ctx.firstRow ? tbl.map(s => s.cond.firstRow && s.cond.firstRow.rPr) : []), ...tbl.map(s => s.rPr), defRPr].filter(Boolean);
       desc(p, "r").forEach(r => {
         let a = r.parentNode; while (a && !(a.namespaceURI === W && a.localName === "p")) a = a.parentNode;
@@ -239,28 +276,29 @@
           if (c.localName === "t") t += c.textContent;
           else if (c.localName === "tab") t += "\t";
           else if (c.localName === "noBreakHyphen") t += "-";
-          else if (c.localName === "br") { if (attr(c, "type") === "page") { pageBreak = true; pageBreakAt = text.length + t.length; } else t += "\n"; }
+          else if (c.localName === "br") { const bt = attr(c, "type"); if (bt === "page") { pageBreak = true; pageBreakAt = text.length + t.length; } else if (bt === "column") { colBreak = true; colBreakAt = text.length + t.length; } else t += "\n"; }
+          else if (c.localName === "lastRenderedPageBreak") { if (!(text + t).trim()) renderedPageStart = true; }
           else if (c.localName === "drawing" || c.localName === "pict") drawings++;
         });
         if (t) {
           const u = rget("u"), sz = rget("sz"), col = rget("color");
           runs.push({ text: t, b: !!on(rget("b")), i: !!on(rget("i")), u: !!(u && !/^none$/.test(val(u) || "single")),
-            sz: sz ? num(val(sz)) / 2 : 11, color: col ? val(col) : "auto",
+            sz: sz ? num(val(sz)) / 2 : 11, color: col ? val(col) : "auto", font: fontOf(src),
             box: !!(rget("bdr") && !/^(nil|none)$/.test(val(rget("bdr")) || "")) || !!(rget("shd") && realFill(attr(rget("shd"), "fill"))), hl: !!rget("highlight") || !!(rget("shd") && realFill(attr(rget("shd"), "fill"))) });
           text += t;
         }
       });
-      desc(p, "drawing").forEach(imageInfo);
+      desc(p, "drawing").forEach(d => imageInfo(d, ctx));
       drawings = Math.max(drawings, desc(p, "drawing").length + desc(p, "pict").length);
       const styleNames = sChain.map(x => x.name);
       /* lines of a table of contents repeat the headings' text: they are marked, so text searches skip them */
       const isToc = !!ctx.inToc || styleNames.some(n => /^(toc \d|contents \d|toc heading|contents heading)$/.test(n)) || fields.some(f => /^TOC\b/i.test(f));
       return { text, norm: normText(text), style: sid, styleNames, isToc, fields, footnotes, dropCap: dropCap && dropCap !== "none" ? dropCap : null, tabs, section: ctx.secRef ? ctx.secRef.n : 0, align: jc, ind: { left: cm(left), right: cm(right), firstLine: cm(fl - hg) },
         before: before / 20, after: after / 20, line: rule === "auto" ? (lineRaw || 240) / 240 : (lineRaw || 240) / 20, lineRule: rule,
-        list, runs, box, drawings, pageBreak, sectBreak, pageBreakEnd: pageBreak && pageBreakAt >= text.trimEnd().length, pageBreakBefore: !!on(pb),
+        list, bullet, bulletFont, bdr: bdrs, colBreak, colBreakEnd: colBreak && colBreakAt >= text.trimEnd().length, colBreakStart: colBreak && colBreakAt === 0, pageBreakStart: pageBreak && pageBreakAt === 0, hasSect: !!sp, renderedPageStart, runs, box, drawings, pageBreak, sectBreak, pageBreakEnd: pageBreak && pageBreakAt >= text.trimEnd().length, pageBreakBefore: !!on(pb),
         inTable: !!ctx.inTable, table: ctx.table, row: ctx.row };
     }
-    function imageInfo(d) {
+    function imageInfo(d, ctx = {}) {
       const inl = desc(d, "inline", WP)[0], anc = desc(d, "anchor", WP)[0], box = inl || anc;
       if (!box) return;
       const ext = Array.from(box.children).find(c => c.localName === "extent");
@@ -270,7 +308,19 @@
         wrap = w ? { wrapSquare: "square", wrapTight: "tight", wrapThrough: "through", wrapTopAndBottom: "topAndBottom", wrapNone: "none" }[w.localName] : "none";
         if (wrap === "none") wrap = anc.getAttribute("behindDoc") === "1" ? "behind" : "front";
       }
-      images.push({ wrap, widthCm: ext ? Math.round(+ext.getAttribute("cx") / 3600) / 100 : 0, heightCm: ext ? Math.round(+ext.getAttribute("cy") / 3600) / 100 : 0 });
+      const ch = (el, n) => el ? Array.from(el.children).find(c => c.localName === n) : null;
+      const pos = n => { const el = anc && ch(anc, n); if (!el) return null; const al = ch(el, "align"), of = ch(el, "posOffset");
+        return { rel: el.getAttribute("relativeFrom"), align: al ? al.textContent.trim() : null, off: of ? Math.round(+of.textContent / 3600) / 100 : null }; };
+      const dcm = a => Math.round((+box.getAttribute(a) || 0) / 3600) / 100;
+      const wEl = anc && Array.from(anc.children).find(c => /^wrap(Square|Tight|Through)$/.test(c.localName));
+      const sh = desc(d, "outerShdw", A)[0];
+      const shadow = sh ? { dist: Math.round((+sh.getAttribute("dist") || 0) / 1270) / 10, blur: Math.round((+sh.getAttribute("blurRad") || 0) / 1270) / 10, dir: +sh.getAttribute("dir") || 0,
+        sig: Array.from(sh.attributes).map(a => a.name + "=" + a.value).sort().join(" ") + "|" + new XMLSerializer().serializeToString(sh).replace(/<a:outerShdw[^>]*>/, "").replace(/\s+/g, "") } : null;
+      const blip = desc(d, "blip", A)[0], dp = Array.from(box.children).find(c => c.localName === "docPr");
+      (ctx.images || images).push({ wrap, para: ctx.images ? -1 : paras.length, anchor: !!anc, posH: pos("positionH"), posV: pos("positionV"),
+        dist: { t: dcm("distT"), b: dcm("distB"), l: dcm("distL"), r: dcm("distR") }, wrapText: wEl ? wEl.getAttribute("wrapText") : null, shadow,
+        embed: blip ? (blip.getAttributeNS(R, "embed") || blip.getAttribute("r:embed")) : null, name: dp ? dp.getAttribute("name") || "" : "", descr: dp ? dp.getAttribute("descr") || "" : "",
+        widthCm: ext ? Math.round(+ext.getAttribute("cx") / 3600) / 100 : 0, heightCm: ext ? Math.round(+ext.getAttribute("cy") / 3600) / 100 : 0 });
     }
     function walk(el, ctx) {
       Array.from(el.children).forEach(c => {
@@ -333,6 +383,7 @@
       pg.landscape = attr(sz, "orient") === "landscape" || pg.width > pg.height;
       pg.titlePg = !!on(kid(sp, "titlePg"));
       const cols = kid(sp, "cols"); pg.cols = Math.max(1, num(attr(cols, "num")) || kids(cols, "col").length || 1);
+      pg.header = cm(g(mar, "header", 709)); pg.footer = cm(g(mar, "footer", 709));
       pg.borders = !!kid(sp, "pgBorders") && Array.from(kid(sp, "pgBorders").children).some(c => !/^(nil|none)$/.test(val(c) || ""));
       return pg;
     };
@@ -342,7 +393,7 @@
     const textboxes = [...new Set(desc(docX, "txbxContent").map(x => desc(x, "p").map(q => desc(q, "t").map(t => t.textContent).join("")).join("\n").trim()))].filter(Boolean);
     /* header/footer text and page-number field; the first-page ones ("Első oldal eltérő") are kept apart */
     const hf = async kind => {
-      const out = { text: "", page: false, first: { exists: false, text: "", page: false } };
+      const out = { text: "", page: false, paras: [], lines: 0, images: [], first: { exists: false, text: "", page: false, paras: [], lines: 0, images: [] } };
       const refs = []; sects.forEach(s => kids(s, kind + "Reference").forEach(r => refs.push({ id: r.getAttributeNS(R, "id") || r.getAttribute("r:id"), type: attr(r, "type") || "default" })));
       const seen = new Set();
       for (const ref of refs) {
@@ -353,6 +404,10 @@
         const into = ref.type === "first" ? out.first : out;
         if (ref.type === "first") into.exists = true;
         into.text += desc(x, "p").map(p => desc(p, "t").map(t => t.textContent).join("")).join("\n") + "\n";
+        desc(x, "p").filter(p => !desc(x, "txbxContent").some(t => t.contains(p))).forEach(p => into.paras.push(paraInfo(p, { images: into.images })));
+        /* lines drawn as shapes: a DrawingML line (prstGeom "line" or a connector) or an old VML line */
+        into.lines += desc(x, "prstGeom", A).filter(g => /^(line|straightConnector1)$/.test(g.getAttribute("prst"))).length
+          + Array.from(x.getElementsByTagName("*")).filter(e => e.localName === "line" && /vml/.test(e.namespaceURI || "")).length;
         if (desc(x, "fldSimple").some(f => /\bPAGE\b/.test(attr(f, "instr") || "")) || desc(x, "instrText").some(t => /\bPAGE\b/.test(t.textContent))) into.page = true;
       }
       out.text = out.text.trim(); out.first.text = out.first.text.trim();
@@ -362,7 +417,10 @@
     const fnX = await parse("word/footnotes.xml"), notes = {};
     if (fnX) desc(fnX, "footnote").forEach(f => { const t = attr(f, "type"); if (t && t !== "normal") return; notes[attr(f, "id")] = desc(f, "t").map(x => x.textContent).join("").trim(); });
     const text = paras.filter(p => !p.isToc).map(p => p.text).join("\n");
-    return { paras, tables, images, page, sections, text, notes, textboxes, header: await hf("header"), footer: await hf("footer") };
+    /* pixel size of each picture file, to tell the pictures apart and to see whether they were stretched */
+    for (const im of images) { const t = im.embed && rels[im.embed]; im.px = t ? pxSize(await z.getBytes("word/" + t.replace(/^\/?word\//, "").replace(/^\//, ""))) : null; }
+    const autoHyphenation = !!(settingsX && on(desc(settingsX, "autoHyphenation")[0]));
+    return { paras, tables, images, page, sections, text, notes, textboxes, autoHyphenation, header: await hf("header"), footer: await hf("footer") };
   }
 
   /* ---------- checking ---------- */
