@@ -1,0 +1,1170 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>A Bögre Kávézó honlapja</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Kalam:wght@700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* The shelter office: warm paper, a green awning header, Teri's note beside the to-do list,
+   then the code editor beside a browser window. Committed daytime look. */
+:root{
+  --bg:#f4ecdd; --panel:#fffaf2; --ink:#2b2520; --muted:#6c6157; --line:#e2d4bd; --line-2:#d3c2a5;
+  --green:#2f7a5a; --green-d:#225c43; --green-soft:#dcefe3; --orange:#e07b2c; --orange-d:#b85f17; --orange-soft:#fde5cc;
+  --yellow:#f2d264; --bad:#b3362f; --bad-soft:#fbe3df;
+  --code-bg:#1f2a26; --code-ink:#e9efe9; --gut:#6f857c;
+  --tg:#f2d264; --an:#9cc8e8; --av:#a8dba0; --cm:#8fa39a; --en:#f0a3b8; --pu:#c9d3cc;
+  --f-display:"Fredoka","Atkinson Hyperlegible","Segoe UI",system-ui,sans-serif;
+  --f-body:"Atkinson Hyperlegible","Segoe UI",system-ui,sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  --f-hand:"Kalam","Segoe Print","Comic Sans MS",cursive;
+  --code-size:15px;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+*,*::before,*::after{font-feature-settings:"calt" 0,"liga" 0}
+[hidden]{display:none!important}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.5 var(--f-body);
+  background-image:radial-gradient(circle at 12px 12px,rgba(120,90,50,.07) 2px,transparent 2.5px);background-size:28px 28px}
+a{color:var(--green-d)}
+:focus-visible{outline:3px solid var(--orange);outline-offset:2px;border-radius:6px}
+code{font-family:var(--f-mono);font-size:.9em;background:#f1e7d6;border:1px solid var(--line);border-radius:5px;padding:0 4px}
+button{font:inherit;color:inherit}
+
+/* top rail, same as the other pages */
+.rail{background:linear-gradient(#b07448,#8a5532 45%,#5d3820);box-shadow:0 3px 0 rgba(0,0,0,.2)}
+.rail .in{max-width:1500px;margin:0 auto;padding:0 18px;height:50px;display:flex;align-items:center;gap:14px}
+.rail .home{font:700 19px/1 var(--f-hand);color:#fff6e8;text-decoration:none;white-space:nowrap}
+.rail .crumb{color:#f3dcc4;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.rail .langlink{margin-left:auto;flex:none;font:700 13px var(--f-body);color:#5d3820;background:#fff6e8;border-radius:999px;padding:5px 12px;text-decoration:none}
+
+/* awning header */
+.sign{position:relative;background:var(--green);color:#fff8ea;padding:18px 0 18px}
+.sign::after{content:"";position:absolute;left:0;right:0;bottom:-18px;height:18px;
+  background:radial-gradient(circle at 18px 0,var(--green) 17px,transparent 18px) 0 0/36px 18px repeat-x;}
+.sign .in{max-width:1500px;margin:0 auto;padding:0 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.sign img{width:58px;height:58px;flex:none;border-radius:50%;box-shadow:0 0 0 4px rgba(255,248,234,.25)}
+.sign .tt{min-width:0;flex:1}
+.sign .kick{font:700 13px var(--f-body);letter-spacing:.08em;text-transform:uppercase;color:#bfe6cf}
+.sign h1{margin:2px 0 0;font:600 clamp(26px,3.6vw,40px)/1.1 var(--f-display);letter-spacing:.01em}
+.sign .meta{display:flex;gap:10px 18px;flex-wrap:wrap;font-size:14.5px;color:#d8efe1}
+.sign .meta b{color:#fff}
+
+/* chapter path: paw prints */
+.path{max-width:1500px;margin:30px auto 0;padding:0 20px;display:flex;gap:6px;flex-wrap:wrap;list-style:none}
+.path li{display:flex;align-items:center;gap:6px}
+.path li+li::before{content:"";width:14px;height:3px;border-radius:2px;background:var(--line-2)}
+.paw{display:inline-flex;align-items:center;gap:7px;border:2px solid var(--line-2);background:var(--panel);border-radius:999px;padding:4px 12px 4px 5px;cursor:pointer;font:700 14px var(--f-body);color:var(--ink)}
+.paw .ic{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:#efe4d0;color:var(--muted);font:700 13px var(--f-body)}
+.paw .ic svg{width:16px;height:16px}
+.paw .nm{white-space:nowrap}
+.paw.done{border-color:var(--green)}
+.paw.done .ic{background:var(--green);color:#fff}
+.paw[aria-current="step"]{border-color:var(--orange);box-shadow:0 0 0 3px var(--orange-soft);background:#fff}
+.paw[aria-current="step"] .ic{background:var(--orange);color:#fff}
+.paw:disabled{cursor:not-allowed;opacity:.55}
+@media (max-width:900px){ .paw .nm{display:none} .paw{padding:4px} .path li+li::before{width:8px} }
+
+/* layout */
+.wrap{max-width:1500px;margin:0 auto;padding:16px 20px 60px}
+.band{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:16px;align-items:start}
+.work{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;margin-top:16px;align-items:stretch}
+.work>*{height:min(74vh,720px);min-height:380px}
+@media (max-width:980px){ .work>*{height:62vh} }
+.extra{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;margin-top:16px;align-items:start}
+@media (max-width:980px){ .band,.work,.extra{grid-template-columns:minmax(0,1fr)} }
+.card{background:var(--panel);border:2px solid var(--line-2);border-radius:14px;box-shadow:0 2px 0 rgba(90,60,30,.08)}
+.card-h{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px;border-bottom:2px solid var(--line);font:700 13px var(--f-body);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+
+/* Teri's note */
+.note{display:flex;gap:14px;padding:16px}
+.note .av{flex:none;width:72px;height:72px}
+.note .who{font:700 14px var(--f-body);color:var(--muted)}
+.note .who b{color:var(--ink)}
+.note .ch{font:600 clamp(22px,2.6vw,28px)/1.15 var(--f-display);margin:2px 0 8px}
+.note .msg{position:relative;background:#fff;border:2px solid var(--line);border-radius:4px 14px 14px 14px;padding:12px 14px;font-size:16.5px;line-height:1.55}
+.note .msg p{margin:0 0 8px}.note .msg p:last-child{margin:0}
+.note .msg q{quotes:"„" "”" "‘" "’";font-style:italic}
+.note .msg .quote{display:block;margin:8px 0;padding:8px 12px;background:#fbf4e6;border-left:4px solid var(--orange);border-radius:6px;font-style:italic}
+
+/* to-do list */
+.todo ul{list-style:none;margin:0;padding:10px 12px 12px;display:grid;gap:6px}
+.goal{display:grid;grid-template-columns:28px minmax(0,1fr);gap:4px 10px;align-items:start;padding:8px 10px;border-radius:10px;background:#fff;border:2px solid var(--line)}
+.goal .bx{width:24px;height:24px;border-radius:50%;border:2.5px solid var(--line-2);display:grid;place-items:center;font:700 14px/1 var(--f-body);color:#fff;transition:background .2s,border-color .2s,transform .2s}
+.goal.ok{border-color:#a9d3b6;background:#f3faf5}
+.goal.ok .bx{background:var(--green);border-color:var(--green);transform:scale(1.06)}
+.goal .gt{font-size:15.5px;line-height:1.4;padding-top:1px}
+.goal .gt code{font-size:.88em}
+.goal .tip{grid-column:2;font-size:14px;color:var(--orange-d)}
+.goal.ok .tip{display:none}
+.goal .bonus{display:inline-block;font:700 11px var(--f-body);letter-spacing:.06em;text-transform:uppercase;background:var(--orange-soft);color:var(--orange-d);border-radius:999px;padding:1px 8px;margin-right:6px;vertical-align:1px}
+.todo .count{font:700 13px var(--f-body);color:var(--muted);text-transform:none;letter-spacing:0}
+.win{margin:0 12px 12px;padding:12px 14px;border-radius:12px;background:var(--green);color:#fff;display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;animation:pop .3s ease-out}
+.win .wt{flex:1;min-width:200px}
+.win .wt b{display:block;font:600 20px var(--f-display)}
+.win .wt span{font-size:15px;color:#e1f3e8}
+@keyframes pop{from{transform:scale(.96);opacity:0}to{transform:none;opacity:1}}
+
+.btn{font:700 15px var(--f-body);border:0;border-radius:10px;padding:9px 16px;cursor:pointer;background:var(--ink);color:#fff;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+.btn:hover{background:#000}
+.btn.go{background:var(--orange);color:#fff}
+.btn.go:hover{background:var(--orange-d)}
+.btn.light{background:#fff;color:var(--green-d)}
+.btn.light:hover{background:#eefaf2}
+.btn.ghost{background:transparent;color:var(--ink);border:2px solid var(--line-2);padding:7px 12px}
+.btn.ghost:hover{border-color:var(--ink)}
+.btn:disabled{opacity:.5;cursor:default}
+.mini{font:600 12.5px/1 var(--f-mono);color:var(--code-ink);background:transparent;border:1px solid #3a4a44;border-radius:6px;padding:6px 9px;cursor:pointer}
+.mini:hover{background:rgba(255,255,255,.08)}
+
+/* editor */
+.editor{background:var(--code-bg);border-radius:14px;overflow:hidden;border:2px solid #14201b;display:flex;flex-direction:column}
+.ed-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:7px 8px 7px 0;border-bottom:1px solid #33433c}
+.ed-bar .file{font:600 13px var(--f-mono);color:var(--code-ink);background:#2a3833;border-radius:8px 8px 0 0;padding:7px 12px;margin:-7px 0 -8px;align-self:stretch;display:flex;align-items:center;gap:7px}
+.ed-bar .file::before{content:"";width:10px;height:10px;border-radius:3px;background:var(--orange)}
+.ed-bar .sp{flex:1}
+.edw{position:relative;display:flex;background:var(--code-bg);flex:1;min-height:0;cursor:text}
+.edw .gut{margin:0;flex:none;padding:12px 8px 12px 10px;min-width:44px;text-align:right;font:400 var(--code-size)/1.6 var(--f-mono);color:var(--gut);background:#1a2420;overflow:hidden;user-select:none;border-right:1px solid #2c3a34}
+.edbox{position:relative;flex:1;min-width:0}
+.edw .ov,.edw textarea{position:absolute;inset:0;margin:0;border:0;padding:12px 14px;font:400 var(--code-size)/1.6 var(--f-mono);white-space:pre;tab-size:2;letter-spacing:0;font-variant-ligatures:none}
+.edw .ov{color:var(--code-ink);overflow:hidden;pointer-events:none}
+.edw textarea{width:100%;height:100%;background:transparent;color:transparent;-webkit-text-fill-color:transparent;caret-color:var(--yellow);resize:none;outline:none;overflow:auto}
+.edw textarea:focus{box-shadow:inset 0 0 0 2px rgba(242,210,100,.5)}
+.edw textarea::selection{background:rgba(242,210,100,.35)}
+.ov .tg{color:var(--tg);font-weight:700}.ov .an{color:var(--an)}.ov .av{color:var(--av)}.ov .pu{color:var(--pu)}.ov .cm{color:var(--cm);font-style:italic}.ov .dt{color:var(--en)}.ov .en{color:var(--en)}
+.lint{flex:none;max-height:40%;overflow:auto;border-top:1px solid #33433c;background:#2b2a1d;padding:8px 12px;display:grid;gap:4px}
+.lint p{margin:0;font:14px/1.4 var(--f-body);color:#f6e7a6}
+.lint p::before{content:"⚠ ";}
+.lint code{background:rgba(255,255,255,.1);border-color:transparent;color:#fff}
+
+/* browser */
+.bw{position:relative;border:2px solid var(--ink);border-radius:14px;overflow:hidden;background:#fff;display:flex;flex-direction:column}
+.bw-top{display:flex;align-items:flex-end;gap:10px;background:#dcd3c0;padding:7px 9px 0}
+.bw-top .dots{display:flex;gap:5px;padding-bottom:10px}
+.bw-top .dots i{width:10px;height:10px;border-radius:50%;background:#b3ad99}
+.bw-top .dots i:first-child{background:#e0796b}.bw-top .dots i:nth-child(2){background:#e6c25a}.bw-top .dots i:nth-child(3){background:#7fbf6e}
+.bw-tab{display:flex;align-items:center;gap:7px;background:#fff;border-radius:9px 9px 0 0;padding:7px 14px;font:600 13px var(--f-body);color:var(--ink);max-width:75%;min-width:0}
+.bw-tab .ttl{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bw-tab .fav{flex:none;width:13px;height:13px;border-radius:3px;background:var(--green)}
+.bw-bar{background:#fff;padding:6px 9px;border-bottom:1px solid var(--line)}
+.bw-bar .addr{display:block;background:#f3ede1;border-radius:999px;padding:4px 12px;font:12.5px var(--f-mono);color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bw iframe{display:block;width:100%;border:0;background:#fff;flex:1;min-height:0}
+.bw.flash .bw-tab{animation:flash .9s ease-out}
+@keyframes flash{0%{background:#f8e08e}100%{background:#fff}}
+.bw-note{position:absolute;left:10px;right:10px;bottom:10px;background:var(--ink);color:#fff;font:14px/1.4 var(--f-body);padding:9px 12px;border-radius:9px;opacity:0;transform:translateY(6px);transition:opacity .2s,transform .2s;pointer-events:none}
+.bw-note.on{opacity:1;transform:none}
+
+/* cheat sheet + solution */
+.cheat{padding:12px 14px 14px}
+.cheat p{margin:0 0 8px;font-size:15px;color:var(--muted)}
+pre.code{margin:0;background:var(--code-bg);color:var(--code-ink);border-radius:10px;padding:10px 14px;font:14.5px/1.55 var(--f-mono);white-space:pre-wrap;overflow-wrap:anywhere}
+pre.code .tg{color:var(--tg);font-weight:700}pre.code .an{color:var(--an)}pre.code .av{color:var(--av)}pre.code .pu{color:var(--pu)}pre.code .cm{color:var(--cm);font-style:italic}pre.code .dt{color:var(--en)}pre.code .sl{color:var(--tg);font-weight:700}pre.code .cp{color:var(--an)}pre.code .cv{color:var(--av)}
+.sol{padding:12px 14px 14px;display:grid;gap:10px}
+.sol p{margin:0;font-size:15px;color:var(--muted)}
+.sol pre.code{max-height:340px;overflow:auto;white-space:pre}
+
+/* ending */
+.ending{margin:16px 0;padding:20px;background:var(--green);color:#fff;border-radius:16px;display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:20px;align-items:start;border:0}
+@media (max-width:980px){ .ending{grid-template-columns:minmax(0,1fr)} }
+.ending h2{margin:0 0 6px;font:600 clamp(26px,3.2vw,36px)/1.1 var(--f-display)}
+.ending p{margin:0 0 10px;color:#e1f3e8;font-size:16.5px}
+.ending .stats{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0}
+.ending .stat{background:rgba(255,255,255,.12);border-radius:12px;padding:8px 14px}
+.ending .stat b{display:block;font:600 24px var(--f-display);color:#fff}
+.ending .stat span{font-size:13px;color:#cfe9da}
+.ending .box{background:#fff;color:var(--ink);border-radius:14px;padding:14px;display:grid;gap:10px}
+.ending label{font:700 14px var(--f-body)}
+.ending input{width:100%;font:16px var(--f-body);padding:9px 12px;border:2px solid var(--line-2);border-radius:10px}
+.ending .row{display:flex;flex-wrap:wrap;gap:8px}
+.ending .small{font-size:13.5px;color:var(--muted);margin:0}
+
+/* confetti */
+.confetti{position:fixed;inset:0;pointer-events:none;z-index:50;overflow:hidden}
+.confetti i{position:absolute;top:-20px;width:10px;height:14px;border-radius:2px;animation:fall 1.6s ease-in forwards}
+@keyframes fall{to{transform:translate(var(--dx),110vh) rotate(var(--r));opacity:.9}}
+@media (prefers-reduced-motion:reduce){ .confetti{display:none} .win{animation:none} .goal .bx{transition:none} }
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+footer.end{max-width:1500px;margin:0 auto;padding:0 20px 40px;color:var(--muted);font-size:14px}
+.note .nb{min-width:0;flex:1}
+.kick2{margin:0;font:700 12.5px var(--f-body);letter-spacing:.08em;text-transform:uppercase;color:var(--orange-d)}
+.note .sig{margin:8px 0 0;font:700 17px var(--f-hand);color:var(--green-d)}
+.saved{font:600 12.5px var(--f-body);color:#a8dba0}
+@media (max-width:560px){ .note{flex-direction:column;gap:8px} .note .av{width:56px;height:56px} }
+.cmw{flex:1;min-height:0;position:relative;background:var(--code-bg)}
+.cmw .cm-editor{height:100%}
+.cmw .cm-scroller{overflow:auto}
+
+/* shortcut sheet */
+.editor{position:relative}
+.keys{position:absolute;right:10px;top:46px;z-index:30;width:min(440px,calc(100% - 20px));max-height:calc(100% - 60px);overflow:auto;background:#24312c;color:var(--code-ink);border:1px solid #3a4a44;border-radius:12px;box-shadow:0 14px 30px rgba(0,0,0,.4);padding:10px 14px 12px}
+.keys-h{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px}
+.keys-h b{font:600 16px var(--f-display)}
+.keys dl{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:6px 14px;margin:0;font-size:14px}
+.keys dt{font:600 12.5px/1.6 var(--f-mono);color:var(--yellow);white-space:nowrap}
+.keys dd{margin:0;line-height:1.45;color:#d6e0da}
+.keys code{background:rgba(255,255,255,.08);border-color:transparent;color:#a8dba0}
+.keys-n{margin:10px 0 0;font-size:13px;color:#9fb3aa}
+.mini[aria-pressed="true"],.mini[aria-expanded="true"]{background:#2f7a5a;border-color:#2f7a5a;color:#fff}
+/* focus mode: just the editor and the preview */
+body.focus{overflow:hidden}
+body.focus .work{position:fixed;inset:0;z-index:40;margin:0;padding:10px;gap:10px;background:var(--bg)}
+body.focus .work>*{height:auto;min-height:0}
+@media (max-width:980px){ body.focus .work{grid-template-rows:1fr 1fr} }
+body.focus #digikult-nav{display:none}
+
+.ed-bar{flex-wrap:wrap;row-gap:6px}
+.ed-bar .tools{margin-left:auto;display:flex;flex-wrap:wrap;justify-content:flex-end;gap:5px}
+.ed-bar .mini{padding:6px 8px;font-size:12px}
+.ed-bar .mini.ic{display:inline-grid;place-items:center;padding:4px 7px}
+.ed-bar .mini.ic svg{width:15px;height:15px}
+/* preview: element picking */
+.bw-view{position:relative;min-height:0}
+.bw[data-fixed] .bw-view{flex:1;display:flex;flex-direction:column}
+.bw-bar{display:flex;align-items:center;gap:8px}
+.bw-bar .addr{flex:1;min-width:0}
+.bw-pick{flex:none;display:inline-flex;align-items:center;gap:5px;font:700 12.5px/1 "Atkinson Hyperlegible",system-ui,sans-serif;color:#2b2520;background:#f3ede1;border:1.5px solid #d8ccb4;border-radius:999px;padding:4px 10px 4px 7px;cursor:pointer}
+.bw-pick svg{width:14px;height:14px}
+.bw-pick:hover{border-color:#2b2520}
+.bw-pick[aria-pressed="true"]{background:#e07b2c;border-color:#e07b2c;color:#fff}
+.bw.picking iframe{cursor:crosshair}
+.dk-box{position:absolute;pointer-events:none;border:2px solid #e07b2c;background:rgba(224,123,44,.12);border-radius:3px;z-index:3;transition:left .08s,top .08s,width .08s,height .08s}
+.dk-tag{position:absolute;left:-2px;top:-21px;background:#e07b2c;color:#fff;font:700 11.5px/1 "JetBrains Mono",ui-monospace,monospace;padding:4px 6px;border-radius:4px 4px 4px 0;white-space:nowrap}
+.dk-box.below .dk-tag{top:auto;bottom:-21px;border-radius:0 4px 4px 4px}
+@media (prefers-reduced-motion:reduce){ .dk-box{transition:none} }
+.cm-line.dk-flash,.cm-dk-flash{background:rgba(224,123,44,.28)!important;transition:background .6s}
+
+.sign{--green:#6b3e26}.sign .kick{color:#ffe3a3}.sign img{background:#f6efe6;border-radius:50%}
+.cheat,.sol{-webkit-user-select:none;user-select:none}
+</style>
+</head>
+<body>
+<header class="rail"><div class="in">
+  <a class="home" href="../../index.html">Digitális kultúra</a>
+  <span class="crumb">Weboldalak › Összefoglaló › Küldetés</span>
+</div></header>
+<section class="sign"><div class="in">
+  <img src="img/bogre-logo.svg" alt="">
+  <div class="tt"><div class="kick">Küldetés · HTML és CSS ismétlés</div><h1>A Bögre Kávézó honlapja</h1></div>
+  <div class="meta"><span id="progress"></span><span>⏱ kb. 45 perc</span><span>💾 automatikus mentés</span></div>
+</div></section>
+<nav aria-label="Fejezetek"><ol class="path" id="path"></ol></nav>
+
+<div class="wrap">
+  <section class="ending" id="ending" hidden aria-labelledby="endH">
+    <div>
+      <h2 id="endH">Kész a Bögre Kávézó honlapja! ☕</h2>
+      <p>Minden a helyén van: rendes váz, címsorok, lista, táblázat, kép, link és saját CSS. Töltsd le a munkádat, vagy nyisd meg teljes méretben.</p>
+      <div class="stats" id="endStats"></div>
+    </div>
+    <div class="box">
+      <label for="who">Neved (vezetéknév elöl)</label>
+      <input id="who" type="text" autocomplete="name" spellcheck="false">
+      <div class="row">
+        <button type="button" class="btn go" id="dl">Letöltés (.zip)</button>
+        <button type="button" class="btn ghost" id="openFull">Megnyitás új lapon</button>
+        <button type="button" class="btn ghost" id="copyRep">Jelentés másolása</button>
+        <button type="button" class="btn ghost" id="toEditor">Folytasd a szerkesztőben ↗</button>
+      </div>
+      <p class="small">A fájl neve: <b id="zipName"></b>. Benne van a HTML-fájl (a CSS-sel együtt) és az <code>img</code> mappa a képekkel.</p>
+      <p class="small"><button type="button" class="btn ghost" id="restart">Újrakezdés az elejéről</button></p>
+    </div>
+  </section>
+
+  <div class="band">
+    <section class="card" aria-labelledby="chTitle">
+      <div class="note">
+        <div class="av" id="teri"><img src="img/bogre-logo.svg" alt="" width="72" height="72"></div>
+        <div class="nb">
+          <p class="kick2" id="chk"></p>
+          <h2 class="ch" id="chTitle"></h2>
+          <div class="msg" id="msg"></div>
+          <p class="sig">– Zsófi, a Bögre Kávézó tulajdonosa</p>
+        </div>
+      </div>
+    </section>
+    <section class="card todo" aria-labelledby="todoH">
+      <div class="card-h"><span id="todoH">Teendők</span><span class="count" id="count"></span></div>
+      <ul id="goals"></ul>
+      <div class="win" id="win" hidden><div class="wt" id="winText"></div><button type="button" class="btn light" id="nextBtn"></button></div>
+    </section>
+  </div>
+
+  <div class="work">
+    <section class="editor" aria-label="Kódszerkesztő">
+      <div class="ed-bar"><span class="file">bogre.html</span><span class="saved" id="savedTag" hidden>Mentve ✓</span>
+        <div class="tools">
+          <button type="button" class="mini" id="smaller" title="Kisebb kód" aria-label="Kisebb kód">A−</button><button type="button" class="mini" id="bigger" title="Nagyobb kód" aria-label="Nagyobb kód">A+</button>
+          <button type="button" class="mini ic" id="findBtn" title="Keresés és csere (Ctrl+F)" aria-label="Keresés és csere (Ctrl+F)"><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="6.8" cy="6.8" r="4.6" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M10.3 10.3l4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+          <button type="button" class="mini" id="fmtBtn" title="Behúzás rendezése (Shift+Alt+F)">⇥ Rendezés</button>
+          <button type="button" class="mini" id="keysBtn" aria-expanded="false" aria-controls="keys">⌨ Billentyűk</button>
+          <button type="button" class="mini" id="focusBtn" aria-pressed="false" title="Csak a kód és az előnézet (Esc: vissza)">⛶ Fókusz</button>
+          <button type="button" class="mini" id="resetCh">↺ Fejezet eleje</button>
+        </div></div>
+      <div class="keys" id="keys" hidden><div class="keys-h"><b>Billentyűparancsok, mint a VS Code-ban</b><button type="button" class="mini" id="keysClose" aria-label="Bezárás">×</button></div>
+        <dl><dt>ul&gt;li*3 + Tab</dt><dd>Emmet: rövidítésből kész kód. Próbáld: <code>p</code>, <code>img</code>, <code>table&gt;tr*3&gt;td*3</code>, <code>!</code></dd><dt>Tab vagy Enter</dt><dd>a felajánlott címke vagy attribútum elfogadása</dd><dt>Ctrl + Szóköz</dt><dd>javaslatok megnyitása</dd><dt>Ctrl + B / Ctrl + I</dt><dd>a kijelölt szöveg köré &lt;strong&gt; / &lt;em&gt;</dd><dt>Ctrl + /</dt><dd>megjegyzés be/ki (&lt;!-- --&gt;)</dd><dt>Alt + ↑ / ↓</dt><dd>a sor mozgatása fel / le</dd><dt>Shift + Alt + ↓</dt><dd>a sor megkettőzése</dd><dt>Ctrl + D</dt><dd>a következő ugyanilyen szó kijelölése: több kurzorral egyszerre írsz</dd><dt>Ctrl + kattintás</dt><dd>újabb kurzor</dd><dt>Ctrl + F</dt><dd>keresés és csere</dd><dt>Shift + Alt + F</dt><dd>a behúzás rendezése</dd><dt>Ctrl + Shift + [ / ]</dt><dd>elem összecsukása / kibontása</dd><dt>Ctrl + Z / Ctrl + Y</dt><dd>visszavonás / újra</dd><dt>egér a címke fölött</dt><dd>megmutatja, mire való a címke</dd><dt>Alt + kattintás az előnézetben</dt><dd>a kódban odaugrik az elemhez (vagy a 🎯 Kijelölés gomb)</dd></dl><p class="keys-n">Macen a Ctrl helyett ⌘ (Cmd), az Alt helyett ⌥ (Option).</p></div>
+      <textarea id="code" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off" aria-label="A kávézó honlapjának kódja"></textarea>
+      <div class="lint" id="lint" hidden aria-live="polite"></div>
+    </section>
+    <div id="browser" data-fixed="1"></div>
+  </div>
+
+  <div class="extra">
+    <section class="card"><div class="card-h"><span>Tudnivaló</span></div><div class="cheat"><p id="cheatNote"></p><pre class="code" id="cheat"></pre></div></section>
+    <section class="card"><div class="card-h"><span>Erre figyelj!</span></div><div class="sol" id="sol"></div></section>
+  </div>
+</div>
+<footer class="end">Digitális kultúra · Minden a böngésződben marad, semmit sem küldünk el.</footer>
+<span class="sr" role="status" id="status"></span>
+<script src="../../vendor/codemirror-html.js?v=0cb60699"></script>
+<script>
+const CFG = {"editorUrl": "../../html/editor-hu.html", "key": "bogre-hu-v1", "words": {"file": "bogre.html", "fileBase": "bogre-kavezo", "allImgs": ["img/kave.svg"], "lang": "hu"}, "start": "<html>\n<!DOCTYPE html>\n<head>\n  <meta charset=\"UTF-8\">\n  <h1>Bögre Kávézó<\/h1>\n  <style>\n    <h1> { text-color: #6b3e26, text-align: middle }\n    h2 { color #c8742f }\n  <\/style>\n<\/head>\n<title>Bögre Kávézó<\/title>\n<body>\n  Frissen pörkölt kávé, házi sütemények és csendes sarok a tanuláshoz, két percre az iskolától.\n\n  Itallap\n  Eszpresszó\n  Cappuccino\n  Forró csoki\n  Gyümölcstea\n\n  Nyitvatartás\n  Hétfő–péntek: 7:00–19:00\n  Szombat: 8:00–14:00\n  Vasárnap: zárva\n\n  Napi ajánlat: ma minden süteményhez fél áron adjuk a teát!\n<\/html>\n<\/body>\n", "models": [], "chapters": [{"short": "A váz", "label": "Bemelegítés", "title": "Az oldal váza", "msg": "<p>Szia! Zsófi vagyok, a <b>Bögre Kávézó<\/b> tulajdonosa. Az unokaöcsém, Bence elkezdte a honlapunkat, aztán elment egyetemre, és félkész állapotban itt hagyta. Most minden egyetlen összefolyó szövegtömbként jelenik meg, és a böngészőfülön sem látszik a kávézó neve.<\/p><p>Kezdjük az alapokkal: rakd rendbe az oldal vázát! Gondold végig, mi tartozik a <code>head<\/code>-be (a böngészőnek szóló adatok), és mi a <code>body<\/code>-ba (amit a látogató lát). A sorokat a kódban mozgatnod kell, nem újraírnod.<\/p>", "cheat": "html\n├── head  – a böngészőnek szóló adatok, az oldalon nem látszanak\n│         (karakterkódolás, a fül címe, a stílus)\n└── body  – minden, ami megjelenik az oldalon\n          (címsorok, bekezdések, listák, képek)", "cheatNote": "A DOCTYPE nem címke, hanem jelzés a böngészőnek, ezért mindig a legelső sor. A címkék úgy zárulnak, ahogy egymásba kerültek: amit később nyitottál, azt előbb zárod le.", "pitfall": "A leggyakoribb hiba, hogy a <code>&lt;title&gt;<\/code> a <code>head<\/code>-en kívülre, a <code>&lt;body&gt;<\/code> pedig a <code>&lt;/head&gt;<\/code> elé kerül. A <code>head<\/code> csak akkor záródhat le, ha minden benne van, ami hozzá tartozik.", "success": "Most már a fülön is ott a nevünk. Jöhet a tartalom!", "goals": [{"t": "Az oldal első sora a <code>&lt;!DOCTYPE html&gt;<\/code>", "tip": ""}, {"t": "A <code>&lt;title&gt;<\/code> a <code>head<\/code> elemen belül van", "tip": ""}, {"t": "A <code>&lt;h1&gt;<\/code> a <code>body<\/code> elemben van, nem a <code>head<\/code>-ben", "tip": ""}, {"t": "A záró címkék helyes sorrendben vannak, és a <code>&lt;/html&gt;<\/code> az utolsó", "tip": ""}]}, {"short": "Címsorok", "label": "1. fejezet", "title": "Címsorok és bekezdések", "msg": "<p>A szöveg még egyetlen tömbben folyik. A böngésző nem tudja, melyik rész a cím és melyik a bekezdés: ezt neked kell megmondanod címkékkel.<\/p><p>A kávézó neve maradjon az oldal egyetlen főcíme. Az <b>Itallap<\/b> és a <b>Nyitvatartás<\/b> legyen alcím, a bemutatkozó mondat és a napi ajánlat pedig egy-egy bekezdés. Az italokkal és a nyitvatartás soraival most még ne foglalkozz.<\/p>", "cheat": "h1        – az oldal főcíme, egy oldalon egyszer\nh2        – alcím egy-egy rész elején\nh3 … h6   – egyre kisebb alcímek\np         – bekezdés", "cheatNote": "A <code>head<\/code> és a <code>h1<\/code> nem ugyanaz! A head az oldal láthatatlan része, a h1 (heading 1) a legnagyobb címsor. A <code>title<\/code> pedig a böngészőfül szövege.", "pitfall": "Ha két szöveg között üres sort hagysz a kódban, attól még nem lesz belőlük két bekezdés: a böngésző a sortöréseket és a szóközöket egyetlen szóközzé vonja össze.", "success": "Így már látszik, mi miről szól.", "goals": [{"t": "Pontosan egy főcím van, és az a Bögre Kávézó", "tip": ""}, {"t": "Az Itallap és a Nyitvatartás alcím", "tip": ""}, {"t": "A bemutatkozó mondat egy bekezdés", "tip": ""}, {"t": "A napi ajánlat is külön bekezdés", "tip": ""}]}, {"short": "Itallap", "label": "2. fejezet", "title": "Itallap", "msg": "<p>Az italok még egy sorban folynak egymásba. Készíts belőlük <b>felsorolást<\/b> (pontokkal, nem számozva) az <b>Itallap<\/b> alcím alá!<\/p>", "cheat": "ul   – felsorolás (pöttyös lista)\nol   – számozott lista\nli   – a lista egy eleme, mindig ul vagy ol belsejében", "cheatNote": "Egy listához egyetlen <code>ul<\/code> kell, abba kerül az összes <code>li<\/code>. Minden listaelem a saját záró címkéjével ér véget.", "pitfall": "Figyeld a perjelet! A <code>&lt;li&gt;<\/code> új elemet nyit, a <code>&lt;/li&gt;<\/code> zárja le. Ha a zárás helyére is <code>&lt;li&gt;<\/code>-t írsz, a böngésző néha kijavítja, de a kód hibás marad.", "success": "Végre átlátható az itallap.", "goals": [{"t": "A négy ital egyetlen felsorolás négy eleme", "tip": ""}, {"t": "Minden listaelem le van zárva", "tip": ""}, {"t": "A lista az Itallap alcím alatt van", "tip": ""}]}, {"short": "Nyitvatartás", "label": "3. fejezet", "title": "Nyitvatartás", "msg": "<p>A nyitvatartás táblázatba kívánkozik. Az első sor a fejléc: <b>Nap<\/b> és <b>Nyitva<\/b>. Alatta soronként egy nap: Hétfő–péntek, 7:00–19:00; Szombat, 8:00–14:00; Vasárnap, zárva.<\/p><p>A régi, sima szöveges sorokat töröld!<\/p>", "cheat": "table  – maga a táblázat\ntr     – egy sor (table row)\nth     – fejléccella (table header)\ntd     – sima cella (table data)", "cheatNote": "A cellák mindig egy sor belsejébe kerülnek, a sorok pedig a táblázatba. Minden sorban annyi cella legyen, ahány oszlop van.", "pitfall": "Minden <code>&lt;tr&gt;<\/code>-t zárj le, mielőtt új sort kezdesz, és a táblázat záró címkéje se maradjon le. A fejléc utáni sorokban már nem <code>th<\/code>, hanem <code>td<\/code> kell.", "success": "Most már senki nem jön vasárnap zárt ajtóhoz.", "goals": [{"t": "Van egy táblázat, az első sora két fejléccella: Nap, Nyitva", "tip": ""}, {"t": "Alatta három sor, soronként két sima cellával: a nappal és a nyitvatartással", "tip": "A napot és az időt két külön cellába írd."}, {"t": "Minden sor le van zárva, és a táblázat is", "tip": ""}, {"t": "A régi szöveges nyitvatartás eltűnt", "tip": ""}]}, {"short": "Kép és link", "label": "4. fejezet", "title": "Kép és link", "msg": "<p>Kell egy kép a kávéról, és egy link a teljes étlaphoz. A kép az <code>img<\/code> mappában van, a neve <code>kave.svg<\/code>. A link szövege legyen <b>Teljes étlap<\/b>, és az <code>etlap.html<\/code> oldalra vigyen.<\/p><p>Az ilyen plusz adatokat <b>attribútumok<\/b> adják meg: a nyitó címkében, <code>név=\"érték\"<\/code> alakban.<\/p>", "cheat": "img    – kép (üres elem, nincs záró címkéje)\n   src   – source: a képfájl helye\n   alt   – a kép leírása szövegben\na      – link (anchor)\n   href  – hová vigyen a link", "cheatNote": "Az <code>alt<\/code> nem a fájl neve vagy helye: azt írd bele, ami a képen látszik. Ez jelenik meg, ha a kép nem töltődik be, és ezt olvassa fel a felolvasóprogram.", "pitfall": "<b>src<\/b>, nem scr! A source (forrás) szó rövidítése. Ha elírod, a kép egyszerűen nem jelenik meg, hibaüzenet nélkül. A link szövege a nyitó és a záró címke közé kerül, a cél pedig a nyitó címkébe.", "success": "Már a képtől megkívántam egy kávét.", "goals": [{"t": "Van egy kép, amely az <code>img<\/code> mappában lévő <code>kave.svg<\/code> fájlt mutatja", "tip": ""}, {"t": "A képnek van leírása, amely elmondja, mi látható rajta", "tip": "Nem a fájl neve, hanem a kép tartalma."}, {"t": "A Teljes étlap szöveg egy link, amely az <code>etlap.html<\/code> oldalra visz", "tip": ""}, {"t": "E-mail-link a hello@bogrekavezo.hu címre (a link címe <code>mailto:<\/code>-val kezdődik)", "tip": "", "bonus": true}]}, {"short": "Bence CSS-e", "label": "5. fejezet", "title": "Bence CSS-e", "msg": "<p>Bence írt stílust is, de egyik szabálya sem működik. A <code>head<\/code>-ben, a <code>&lt;style&gt;<\/code> elemben találod. Javítsd ki úgy, hogy a főcím <b>barna<\/b> legyen (<code>#6b3e26<\/code>) és középen álljon, az alcímek pedig <b>narancsszínűek<\/b> legyenek (<code>#c8742f<\/code>).<\/p><p>Nézd meg a szerkesztő alatt megjelenő hibaüzeneteket is!<\/p>", "cheat": "kijelölő {\n  tulajdonság: érték;\n  tulajdonság: érték;\n}", "cheatNote": "A kijelölő a címke neve kacsacsőrök nélkül. A tulajdonság és az érték közé kettőspont kerül, minden sor végére pontosvessző (és nem vessző).", "pitfall": "Nincs <code>text-color<\/code> tulajdonság: a szöveg színe egyszerűen <code>color<\/code>. A vízszintes középre igazítás értéke <code>center<\/code>, nem <code>middle<\/code>.", "success": "Bence büszke lenne… ha ő javította volna ki.", "goals": [{"t": "A főcím barna", "tip": ""}, {"t": "A főcím középen áll", "tip": ""}, {"t": "Az alcímek narancsszínűek", "tip": ""}]}, {"short": "Saját stílus", "label": "6. fejezet", "title": "Saját stílus", "msg": "<p>Most a saját szabályaid jönnek. Az oldal háttere legyen <b>krémszínű<\/b> (<code>#f6efe6<\/code>), a szöveg <b>sötétbarna<\/b> (<code>#3b2a20<\/code>), a betűtípus egy jól olvasható, talpatlan betű, a betűméret pedig <b>18 képpont<\/b>.<\/p><p>Mindez az egész oldalra vonatkozik. Melyik elem tartalmazza az egész látható oldalt?<\/p>", "cheat": "color             – a szöveg színe\nbackground-color  – a háttér színe\nfont-family       – a betűtípus\nfont-size         – a betűméret\nborder-bottom     – vonal az elem alján", "cheatNote": "A betűtípusnál vesszővel tartalékot is megadhatsz. A talpatlan betűk közös neve <code>sans-serif<\/code>.", "pitfall": "A <code>background-color<\/code> egyetlen szó, kötőjellel. A méretekhez mértékegység is kell: nem 18, hanem 18 képpont, azaz <code>px<\/code>.", "success": "Mint egy jó latte: meleg és barátságos.", "goals": [{"t": "Az oldal háttere krémszínű", "tip": ""}, {"t": "A szöveg sötétbarna", "tip": ""}, {"t": "A betűtípus be van állítva", "tip": ""}, {"t": "A betűméret 18 képpont", "tip": ""}, {"t": "Vonal az alcímek alatt", "tip": "", "bonus": true}]}, {"short": "Ajánlat", "label": "7. fejezet", "title": "A napi ajánlat", "msg": "<p>Ma két dolog van akcióban: a <b>napi ajánlat<\/b> bekezdése és a <b>Forró csoki<\/b> az itallapon. Mindkettő kapjon <b>világossárga<\/b> hátteret (<code>#ffe3a3<\/code>) és egy kis belső margót, de csak ez a kettő, semmi más!<\/p><p>Két különböző elemről van szó (egy bekezdésről és egy listaelemről), mégis egyetlen CSS-szabállyal kell megoldanod. Ehhez egy <b>ajanlat<\/b> nevű osztályt használj.<\/p>", "cheat": "HTML:  a nyitó címkébe kerül:   class=\"osztálynév\"\nCSS:   a kijelölő ponttal kezdődik:   .osztálynév", "cheatNote": "Egy osztályt akárhány elem megkaphat, és az elemek típusa is különbözhet. A szabály minden olyan elemre érvényes, amelynek ez az osztálya, de más elemre nem.", "pitfall": "A CSS-ben a pont teszi az osztálynevet osztálykijelölővé: pont nélkül egy nem létező címkét jelentene. A szabály önálló, nem kerül a <code>body { }<\/code> belsejébe.", "success": "Ezt mindenki észre fogja venni.", "goals": [{"t": "A napi ajánlat és a Forró csoki is az <code>ajanlat<\/code> osztályba tartozik", "tip": ""}, {"t": "Az osztály szabálya világossárga hátteret ad nekik", "tip": ""}, {"t": "Belső margó is van bennük", "tip": ""}, {"t": "A többi bekezdés és listaelem nem kapott hátteret", "tip": ""}, {"t": "Lekerekített sarkok", "tip": "", "bonus": true}]}, {"short": "Befejezés", "label": "8. fejezet", "title": "Az utolsó simítások", "msg": "<p>Utolsó simítások: a nyitvatartás táblázatának cellái kapjanak <b>keretet<\/b> CSS-ből, a fejléccellák pedig <b>háttérszínt<\/b>.<\/p><p>Végül írd a neved egy CSS-megjegyzésbe a <code>&lt;style&gt;<\/code> elejére, és ellenőrizd, hogy minden stílus a <code>head<\/code>-ben, a <code>&lt;style&gt;<\/code> elemben van.<\/p>", "cheat": "border:  vastagság  stílus  szín\n         (stílus: solid, dashed, dotted…)\n/* megjegyzés */", "cheatNote": "Ha két kijelölő ugyanazt a szabályt kapja, egy szabályba is írhatod őket, vesszővel elválasztva.", "pitfall": "A CSS-ben a megjegyzés <code>/*<\/code> és <code>*/<\/code> közé kerül; a HTML-es <code>&lt;!-- --&gt;<\/code> ott nem működik.", "success": "Kész a honlap! Holnap kitesszük a kirakatba a QR-kódot. Gyere be egy kávéra, a vendégünk vagy!", "goals": [{"t": "Minden cellának van CSS-kerete", "tip": ""}, {"t": "A fejléccelláknak van háttérszíne", "tip": ""}, {"t": "Egy CSS-megjegyzés a neveddel", "tip": ""}, {"t": "Minden stílus a <code>head<\/code>-ben lévő <code>&lt;style&gt;<\/code> elemben van, sehol nincs <code>style=\"…\"<\/code>", "tip": ""}, {"t": "Összeolvadó keretek a táblázatban", "tip": "", "bonus": true}]}], "ui": {"pick": "Kijelölés", "pickT": "Kattints egy elemre az előnézetben, és a kódban odaugrik. Alt+kattintással mindig működik.", "preview": "Az oldal előnézete", "localTpl": "Ez a link a(z) {h} fájlra vinne, de itt nincs ilyen fájl.", "progress": "{n} / {t} fejezet kész", "doneWord": "kész", "todoWord": "még nincs kész", "bonus": "bónusz", "missing": "Hiányzik: ", "badSrc": "Nem létező kép: ", "winTitle": "Kész!", "nextCh": "Következő fejezet ▸", "startWork": "Indulhat a munka ▸", "toEnd": "Befejezés ▸", "solvedSay": "Kész a fejezet!", "saved": "Mentve.", "solNote": "", "solWait": "Mintamegoldás ({t} múlva)", "solShow": "Mutasd a mintamegoldást", "solLoadNote": "Így nézhet ki a kód ennek a fejezetnek a végén. Hasonlítsd össze a sajátoddal! Ha betöltöd, a szerkesztőben lévő kódod helyére ez kerül.", "solLoad": "Betöltés a szerkesztőbe", "resetConfirm": "Visszaállítod a kódot arra, ahogy a fejezet elején volt?", "restartConfirm": "Biztosan elölről kezded? Minden eddigi munkád törlődik ebből a böngészőből.", "stChapters": "fejezet", "stMinutes": "perc", "stHelped": "", "noName": "nevtelen", "zipping": "Csomagolás…", "zipped": "Letöltve ✓", "zipFail": "Csak a HTML-fájl töltődött le", "copied": "Kimásolva ✓", "repTitle": "A Bögre Kávézó honlapja – jelentés", "repName": "Név", "repStart": "Kezdés", "repEnd": "Befejezés", "repDone": "Kész fejezetek", "repHelped": "Mintamegoldással", "repMin": "perc", "repCode": "--- Az oldal kódja ---"}, "pawSvg": "<svg viewBox=\"0 0 20 20\" aria-hidden=\"true\"><path fill=\"currentColor\" d=\"M3 7h11v4a5 5 0 0 1-5 5H8a5 5 0 0 1-5-5zm11 1h1.5a2.5 2.5 0 0 1 0 5H14v-1.6h1.5a.9.9 0 0 0 0-1.8H14z\"/><\/svg>", "solutionDelay": 240, "live": true};
+const UI = { preview: CFG.ui.preview };
+/* ---------- shared by the HTML explainer and the HTML mission ---------- */
+const $ = (s, el=document) => el.querySelector(s), $$ = (s, el=document) => [...el.querySelectorAll(s)];
+const esc = s => String(s).replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const VOID = new Set(["area","base","br","col","embed","hr","img","input","link","meta","source","track","wbr"]);
+
+/* ---------- editor texts: suggestions, hover help, search panel, mistake messages ---------- */
+const PAGE_LANG = document.documentElement.lang === "en" ? "en" : "hu";
+const ED_TEXT = {
+  hu: {
+    docs: { html: "az egész oldal", head: "fejrész: adatok az oldalról", body: "törzs: ami az oldalon látszik", title: "a böngésző fülén látszó cím",
+      meta: "adat az oldalról (pl. kódolás)", h1: "főcím, a legfontosabb címsor", h2: "alcím", h3: "harmadszintű címsor", h4: "kisebb címsor", h5: "kisebb címsor", h6: "a legkisebb címsor",
+      p: "bekezdés", br: "sortörés (üres elem)", hr: "vízszintes vonal (üres elem)", strong: "fontos szöveg, félkövér", em: "hangsúlyos szöveg, dőlt",
+      b: "félkövér betű", i: "dőlt betű", u: "aláhúzott szöveg", sub: "alsó index, pl. H₂O", sup: "felső index, pl. m²", ul: "felsorolás pontokkal",
+      ol: "számozott lista", li: "a lista egy eleme", a: "hivatkozás (link)", img: "kép (üres elem)", table: "táblázat", tr: "a táblázat egy sora",
+      th: "fejléccella", td: "cella", div: "doboz, részeket csoportosít", span: "szövegrész, csoportosít", "@href": "hová visz a link", "@src": "a képfájl helye",
+      "@alt": "a kép leírása", "@width": "szélesség képpontban", "@height": "magasság képpontban", "@target": "_blank: új lapon nyílik", "@lang": "az oldal nyelve, pl. hu",
+      "@colspan": "hány oszlopon át ér a cella", "@rowspan": "hány soron át ér a cella", "@border": "keret a cellák körül", "@charset": "karakterkódolás",
+      "@title": "súgó, ha fölé viszed az egeret", "#file": "kép a mappában", "#emmet": "Emmet · Tab",
+      "css:color": "a szöveg színe", "css:background-color": "a háttér színe", "css:background": "háttér (szín, kép) egyszerre", "css:font-family": "a betűtípus, pl. Arial, sans-serif", "css:font-size": "a betűméret, pl. 18px", "css:font-weight": "a betű vastagsága, pl. bold", "css:font-style": "dőlt betű: italic", "css:text-align": "igazítás: left, center, right", "css:text-decoration": "aláhúzás: underline, vagy none: nincs", "css:line-height": "sortávolság, pl. 1.5", "css:letter-spacing": "betűköz", "css:text-transform": "uppercase: csupa nagybetű", "css:margin": "külső margó: távolság a többi elemtől", "css:margin-top": "külső margó fent", "css:margin-bottom": "külső margó lent", "css:margin-left": "külső margó balra", "css:margin-right": "külső margó jobbra", "css:padding": "belső margó: távolság a doboz széle és a tartalom között", "css:padding-top": "belső margó fent", "css:padding-bottom": "belső margó lent", "css:padding-left": "belső margó balra", "css:padding-right": "belső margó jobbra", "css:border": "keret: vastagság, stílus, szín, pl. 2px solid green", "css:border-radius": "lekerekített sarkok, pl. 10px vagy 50%", "css:border-collapse": "collapse: a cellák keretei összeolvadnak", "css:border-bottom": "keret csak alul", "css:width": "szélesség", "css:max-width": "legnagyobb szélesség", "css:height": "magasság", "css:box-shadow": "árnyék a doboz körül, pl. 0 2px 6px gray", "css:display": "megjelenés: block, inline, flex, none", "css:list-style-type": "a lista jele: disc, square, none", "css:opacity": "átlátszatlanság 0 és 1 között", "css:cursor": "az egérmutató alakja, pl. pointer", "css:transform": "elforgatás, nagyítás, pl. scale(1.1)", "css:transition": "áttűnés: a változás ideje, pl. 0.3s", "css:vertical-align": "függőleges igazítás", "css:gap": "rés a rugalmas doboz elemei között" },
+    phrases: { "Find": "Keresés", "Replace": "Csere", "next": "következő", "previous": "előző", "all": "mind", "match case": "kis- és nagybetű",
+      "regexp": "regex", "by word": "egész szó", "replace": "csere", "replace all": "mindet cseréli", "close": "bezárás", "current match": "aktuális találat",
+      "replaced $ matches": "$ találat cserélve", "replaced match on line $": "csere a(z) $. sorban", "on line": "sor", "Go to line": "Ugrás sorra", "go": "ugrás",
+      "Folded lines": "Összecsukott sorok", "Unfolded lines": "Kibontott sorok", "to": "–", "folded code": "összecsukott kód", "unfold": "kibontás",
+      "Fold line": "Összecsukás", "Unfold line": "Kibontás", "Diagnostics": "Figyelmeztetések", "No diagnostics": "Nincs figyelmeztetés" },
+    lint: { lintOpen: "{1}. sor: a címke nincs befejezve, hiányzik a > jel: {0}", lintQuote: "{1}. sor: hiányzik egy idézőjel ebben a címkében: {0}",
+      lintVoidClose: "{1}. sor: {0} üres elem, nincs záró címkéje. Töröld a {c0} címkét.", lintStray: "{1}. sor: {c0} lezár valamit, amit nem nyitottál meg.",
+      lintCross: "{3}. sor: keresztbe zárt címkék. Előbb {c0}, utána {c1} jön.", lintUnclosed: "{1}. sor: {0} nincs lezárva. Valahová kell egy {c0}.",
+      cssProp: "{1}. sor: nincs ilyen CSS-tulajdonság: {p0}. Elírtad?", cssVal: "{2}. sor: a(z) {p0} nem érti ezt az értéket: {p1}",
+      cssNoVal: "{1}. sor: a(z) {p0} után hiányzik az érték.", cssNoColon: "{1}. sor: hiányzik a kettőspont ( : ) a(z) {p0} után.",
+      cssSemi: "{1}. sor: a(z) {p0} sora végéről hiányzik a pontosvessző ( ; ).", cssUnclosed: "{1}. sor: a(z) {p0} szabály nincs lezárva: hiányzik a }}.",
+      cssStray: "{0}. sor: ez a }} nem zár le semmit.", cssNoSel: "{0}. sor: a {{ elől hiányzik a kijelölő (pl. h1 vagy .kiemelt).",
+      cssAngle: "{1}. sor: a CSS-ben a címkét kacsacsőrök nélkül írjuk: {p0}", cssBadSel: "{1}. sor: ezt a kijelölőt a böngésző nem érti: {p0}",
+      cssNoBlock: "{1}. sor: a(z) {p0} után hiányzik a {{ … }} rész.",
+      cssHtmlCm: "{0}. sor: ez HTML-megjegyzés, a CSS-ben nem működik. A CSS-ben így írd: /* … */" }
+  },
+  en: {
+    docs: { html: "the whole page", head: "information about the page", body: "everything visible on the page", title: "the title on the browser tab",
+      meta: "page information (e.g. encoding)", h1: "main heading, the most important", h2: "subheading", h3: "third-level heading", h4: "smaller heading", h5: "smaller heading", h6: "the smallest heading",
+      p: "paragraph", br: "line break (empty element)", hr: "horizontal line (empty element)", strong: "important text, bold", em: "stressed text, italic",
+      b: "bold text", i: "italic text", u: "underlined text", sub: "subscript, e.g. H₂O", sup: "superscript, e.g. m²", ul: "bulleted list",
+      ol: "numbered list", li: "one item of a list", a: "link", img: "image (empty element)", table: "table", tr: "one row of a table",
+      th: "header cell", td: "cell", div: "box that groups parts", span: "piece of text, groups", "@href": "where the link goes", "@src": "where the image file is",
+      "@alt": "description of the image", "@width": "width in pixels", "@height": "height in pixels", "@target": "_blank: opens in a new tab", "@lang": "the page's language, e.g. en",
+      "@colspan": "how many columns the cell spans", "@rowspan": "how many rows the cell spans", "@border": "border round the cells", "@charset": "character encoding",
+      "@title": "tooltip on mouse hover", "#file": "image in the folder", "#emmet": "Emmet · Tab",
+      "css:color": "text colour", "css:background-color": "background colour", "css:background": "background (colour, image) in one go", "css:font-family": "the typeface, e.g. Arial, sans-serif", "css:font-size": "text size, e.g. 18px", "css:font-weight": "how bold, e.g. bold", "css:font-style": "italic text: italic", "css:text-align": "alignment: left, center, right", "css:text-decoration": "underline, or none", "css:line-height": "line spacing, e.g. 1.5", "css:letter-spacing": "space between letters", "css:text-transform": "uppercase: all capitals", "css:margin": "outer space: distance from other elements", "css:margin-top": "outer space at the top", "css:margin-bottom": "outer space at the bottom", "css:margin-left": "outer space on the left", "css:margin-right": "outer space on the right", "css:padding": "inner space: between the box edge and its content", "css:padding-top": "inner space at the top", "css:padding-bottom": "inner space at the bottom", "css:padding-left": "inner space on the left", "css:padding-right": "inner space on the right", "css:border": "border: width, style, colour, e.g. 2px solid green", "css:border-radius": "rounded corners, e.g. 10px or 50%", "css:border-collapse": "collapse: cell borders merge", "css:border-bottom": "border at the bottom only", "css:width": "width", "css:max-width": "largest width", "css:height": "height", "css:box-shadow": "shadow round the box, e.g. 0 2px 6px gray", "css:display": "how it shows: block, inline, flex, none", "css:list-style-type": "the list marker: disc, square, none", "css:opacity": "opacity from 0 to 1", "css:cursor": "mouse pointer shape, e.g. pointer", "css:transform": "rotate, scale, e.g. scale(1.1)", "css:transition": "how long a change takes, e.g. 0.3s", "css:vertical-align": "vertical alignment", "css:gap": "gap between items in a flex box" },
+    phrases: {},
+    lint: { lintOpen: "Line {1}: this tag isn't finished, the > is missing: {0}", lintQuote: "Line {1}: a quote mark is missing in this tag: {0}",
+      lintVoidClose: "Line {1}: {0} is an empty element with no closing tag. Delete the {c0}.", lintStray: "Line {1}: {c0} closes something that was never opened.",
+      lintCross: "Line {3}: tags closed crosswise. First {c0}, then {c1}.", lintUnclosed: "Line {1}: {0} is never closed. Add a {c0} somewhere.",
+      cssProp: "Line {1}: there's no CSS property called {p0}. A typo?", cssVal: "Line {2}: {p0} doesn't understand this value: {p1}",
+      cssNoVal: "Line {1}: the value after {p0} is missing.", cssNoColon: "Line {1}: the colon ( : ) after {p0} is missing.",
+      cssSemi: "Line {1}: the semicolon ( ; ) at the end of the {p0} line is missing.", cssUnclosed: "Line {1}: the {p0} rule isn't closed: the }} is missing.",
+      cssStray: "Line {0}: this }} doesn't close anything.", cssNoSel: "Line {0}: the selector in front of {{ is missing (e.g. h1 or .highlight).",
+      cssAngle: "Line {1}: in CSS, write the tag without angle brackets: {p0}", cssBadSel: "Line {1}: the browser doesn't understand this selector: {p0}",
+      cssNoBlock: "Line {1}: the {{ … }} part after {p0} is missing.",
+      cssHtmlCm: "Line {0}: this is an HTML comment, and it doesn't work in CSS. In CSS, write: /* … */" }
+  }
+};
+const LINT_T = {};
+Object.entries(ED_TEXT[PAGE_LANG].lint).forEach(([k, tpl]) => {
+  LINT_T[k] = (...a) => tpl.replace(/\{\{|\}\}|\{([cp]?)(\d)\}/g, (all, c, i) => {
+    if (all === "{{") return "<code>{</code>"; if (all === "}}") return "<code>}</code>";
+    const v = a[+i];
+    if (typeof v === "number") return String(v);
+    return c === "p" ? `<code>${esc(v)}</code>` : `<code>&lt;${c ? "/" : ""}${esc(v)}&gt;</code>`;
+  });
+});
+const IMG_FILES = ["img/morzsa.svg", "img/cirmi.svg", "img/pamacs.svg", "img/bodri.svg", "img/logo.svg"];
+
+/* HTML syntax colouring: tags, attribute names, values, comments, entities */
+function hlTag(t){
+  const m = /^(<\/?)([a-zA-Z][\w-]*)?([\s\S]*?)(\/?>)?$/.exec(t);
+  if (!m) return esc(t);
+  let attrs = "", rest = m[3] || "", last = 0, a;
+  const re = /([^\s=\/>"']+)(\s*=\s*)?("[^"]*"?|'[^']*'?|[^\s>"']+)?/g;
+  while ((a = re.exec(rest))){
+    attrs += esc(rest.slice(last, a.index)) + `<span class="an">${esc(a[1])}</span>`;
+    if (a[2]) attrs += `<span class="pu">${esc(a[2])}</span>`;
+    if (a[3]) attrs += `<span class="av">${esc(a[3])}</span>`;
+    last = re.lastIndex;
+  }
+  attrs += esc(rest.slice(last));
+  return `<span class="pu">${esc(m[1])}</span><span class="tg">${esc(m[2]||"")}</span>${attrs}<span class="pu">${esc(m[4]||"")}</span>`;
+}
+const TOKEN = /<!--[\s\S]*?(?:-->|$)|<!doctype[^>]*>?|<\/?[a-zA-Z][^<>]*>?|&#?[a-zA-Z0-9]+;/gi;
+function hl(src){
+  let o = "", last = 0, m;
+  TOKEN.lastIndex = 0;
+  while ((m = TOKEN.exec(src))){
+    o += esc(src.slice(last, m.index));
+    const t = m[0];
+    if (t.startsWith("<!--")) o += `<span class="cm">${esc(t)}</span>`;
+    else if (/^<!doctype/i.test(t)) o += `<span class="dt">${esc(t)}</span>`;
+    else if (t[0] === "&") o += `<span class="en">${esc(t)}</span>`;
+    else {
+      o += hlTag(t);
+      if (/^<style[\s>]/i.test(t)){                          /* the stylesheet inside is CSS */
+        const end = src.toLowerCase().indexOf("</style", TOKEN.lastIndex);
+        const stop = end < 0 ? src.length : end;
+        o += hlCss(src.slice(TOKEN.lastIndex, stop));
+        TOKEN.lastIndex = stop;
+      }
+    }
+    last = TOKEN.lastIndex;
+  }
+  return o + esc(src.slice(last));
+}
+
+/* CSS colouring: selectors, properties, values, comments */
+function hlCss(src){
+  let o = "", i = 0, inBlock = 0;
+  const re = /\/\*[\s\S]*?(?:\*\/|$)|[{}]|[^{}/]+|\//g;
+  let m;
+  while ((m = re.exec(src))){
+    const t = m[0];
+    if (t.startsWith("/*")) o += `<span class="cm">${esc(t)}</span>`;
+    else if (t === "{"){ inBlock++; o += `<span class="pu">{</span>`; }
+    else if (t === "}"){ inBlock = Math.max(0, inBlock - 1); o += `<span class="pu">}</span>`; }
+    else if (!inBlock) o += `<span class="sl">${esc(t)}</span>`;
+    else o += esc(t).replace(/([\w-]+)(\s*:)([^;]*)(;?)/g, (a, p, c, v, sc) => `<span class="cp">${p}</span><span class="pu">${c}</span><span class="cv">${v}</span><span class="pu">${sc}</span>`);
+  }
+  return o;
+}
+
+/* A tolerant check for beginners' mistakes: unclosed, stray and crossed tags, with line numbers. */
+/* CSS inside <style>: the browser quietly ignores what it doesn't understand, so we say it out loud */
+function cssLint(src, T = LINT_T){
+  const out = [], re = /<style[^>]*>([\s\S]*?)(?:<\/style\s*>|$)/gi;
+  const lineOf = i => src.slice(0, i).split("\n").length;
+  const ok = (p, v) => { try { return typeof CSS === "undefined" || !CSS.supports || CSS.supports(p, v); } catch(e){ return true; } };
+  const decls = (css, from, body, at) => {
+    let off = from;
+    for (const part of body.split(";")){
+      const decl = part.trim(), pos = off + (part.length - part.trimStart().length);
+      off += part.length + 1;
+      if (!decl) continue;
+      const c = decl.indexOf(":");
+      if (c < 0){ out.push({ line: at(pos), html: T.cssNoColon(decl.split(/\s+/)[0], at(pos)) }); continue; }
+      const prop = decl.slice(0, c).trim().toLowerCase(), val = decl.slice(c + 1).replace(/!important\s*$/i, "").trim();
+      if (prop.startsWith("--")) continue;
+      if (/\n\s*[a-z-]+\s*:/i.test(val) || (/\s[a-z-]+\s*:/i.test(val) && !ok(prop, val))){ out.push({ line: at(pos), html: T.cssSemi(prop, at(pos)) }); continue; }
+      if (!/^[a-z-]+$/.test(prop) || !ok(prop, "inherit")){ out.push({ line: at(pos), html: T.cssProp(prop, at(pos)) }); continue; }
+      if (!val){ out.push({ line: at(pos), html: T.cssNoVal(prop, at(pos)) }); continue; }
+      if (!ok(prop, val)) out.push({ line: at(pos), html: T.cssVal(prop, val.length > 30 ? val.slice(0, 30) + "…" : val, at(pos)) });
+    }
+  };
+  let m;
+  while ((m = re.exec(src))){
+    const base = m.index + m[0].indexOf(">") + 1;
+    const at = k => lineOf(base + k);
+    const css = m[1].replace(/\/\*[\s\S]*?(\*\/|$)/g, c => c.replace(/[^\n]/g, " "))
+      .replace(/<!--|-->/g, (c, k) => { out.push({ line: at(k), html: T.cssHtmlCm(at(k)) }); return "    ".slice(0, c.length); });
+    let k = 0, depth = 0, selStart = 0;
+    while (k < css.length){
+      const ch = css[k];
+      if (ch === "{"){
+        const sel = css.slice(selStart, k).trim(), sp = selStart + (css.slice(selStart, k).length - css.slice(selStart, k).trimStart().length);
+        if (sel.startsWith("@")){ depth++; k++; selStart = k; continue; }
+        if (!sel) out.push({ line: at(k), html: T.cssNoSel(at(k)) });
+        else if (sel.includes("<")) out.push({ line: at(sp), html: T.cssAngle(sel.replace(/[<>\/]/g, "").trim(), at(sp)) });
+        else { try { document.createDocumentFragment().querySelector(sel); } catch(e){ out.push({ line: at(sp), html: T.cssBadSel(sel, at(sp)) }); } }
+        let e = k + 1;
+        while (e < css.length && css[e] !== "}" && css[e] !== "{") e++;
+        const body = css.slice(k + 1, e);
+        if (e >= css.length || css[e] === "{"){
+          out.push({ line: at(k), html: T.cssUnclosed(sel || "?", at(k)) });
+          if (e >= css.length){ decls(css, k + 1, body, at); selStart = css.length; break; }
+          const cut = body.lastIndexOf(";");                       /* the next rule's selector starts after the last ; */
+          decls(css, k + 1, cut < 0 ? "" : body.slice(0, cut), at);
+          selStart = cut < 0 ? k + 1 : k + 1 + cut + 1; k = e; continue;
+        }
+        decls(css, k + 1, body, at);
+        k = e + 1; selStart = k; continue;
+      }
+      if (ch === "}"){
+        if (depth > 0) depth--; else out.push({ line: at(k), html: T.cssStray(at(k)) });
+        k++; selStart = k; continue;
+      }
+      k++;
+    }
+    const tail = css.slice(selStart), tt = tail.trim();
+    if (tt) out.push({ line: at(selStart + tail.indexOf(tt[0])), html: T.cssNoBlock(tt.split(/\s+/)[0], at(selStart + tail.indexOf(tt[0]))) });
+  }
+  return out;
+}
+
+function lint(src, T = LINT_T){
+  const out = [], stack = [];
+  const lineOf = i => src.slice(0, i).split("\n").length;
+  const clean = src.replace(/<!--[\s\S]*?-->/g, c => c.replace(/[^\n]/g, " "))
+                   .replace(/(<style[^>]*>)([\s\S]*?)(?=<\/style|$)/gi, (a, t, c) => t + c.replace(/[^\n]/g, " "));
+  const re = /<(\/?)([a-zA-Z][\w-]*)([^<>]*?)(\/?)>|<(\/?)([a-zA-Z][\w-]*)[^<>]*$/g;
+  const skip = new Set(["html","head","body"]);              /* optional end tags: a forgotten </body> is no drama */
+  const lateClose = {};                                        /* closing tags we already explained (crossed pairs) */
+  let m;
+  while ((m = re.exec(clean))){
+    if (m[6] !== undefined && m[2] === undefined){ out.push({ line: lineOf(m.index), html: T.lintOpen(m[6].toLowerCase(), lineOf(m.index)) }); continue; }
+    const close = !!m[1], name = m[2].toLowerCase(), line = lineOf(m.index), attrs = m[3] || "";
+    if ((attrs.split('"').length - 1) % 2) out.push({ line, html: T.lintQuote(name, line) });
+    if (VOID.has(name)){ if (close) out.push({ line, html: T.lintVoidClose(name, line) }); continue; }
+    if (!close){ stack.push({ name, line }); continue; }
+    const at = stack.map(s => s.name).lastIndexOf(name);
+    if (at < 0){
+      if (lateClose[name]) lateClose[name]--; else out.push({ line, html: T.lintStray(name, line) });
+      continue;
+    }
+    const rest = clean.slice(re.lastIndex).toLowerCase();
+    stack.slice(at + 1).reverse().forEach(inner => {
+      if (skip.has(inner.name)) return;
+      const crossed = new RegExp("^\\s*</" + inner.name + "\\s*>").test(rest);
+      if (crossed){ out.push({ line, html: T.lintCross(inner.name, name, inner.line, line) }); lateClose[inner.name] = (lateClose[inner.name] || 0) + 1; }
+      else out.push({ line: inner.line, html: T.lintUnclosed(inner.name, inner.line) });
+    });
+    stack.length = at;
+  }
+  stack.forEach(s => { if (!skip.has(s.name)) out.push({ line: s.line, html: T.lintUnclosed(s.name, s.line) }); });
+  out.push(...cssLint(src, T));
+  out.sort((a, b) => a.line - b.line);
+  const seen = new Set();
+  return out.filter(w => !seen.has(w.html) && seen.add(w.html)).slice(0, 6);
+}
+
+/* Highlighted editor: a coloured copy underneath, a see-through textarea on top, line numbers on the left. */
+function makeEditor(ta, opts={}){
+  if (window.CMHTML){                                     /* CodeMirror: VS Code-style comforts */
+    const w = document.createElement("div"); w.className = "cmw" + (opts.fixed ? " fixed" : ""); ta.before(w); ta.hidden = true;
+    let quiet = false;
+    const T = ED_TEXT[PAGE_LANG];
+    const cm = CMHTML.create({ parent: w, doc: ta.value, lines: !!opts.lines, fit: true, label: ta.getAttribute("aria-label") || "",
+      lang: PAGE_LANG, docs: T.docs, phrases: T.phrases, files: opts.files || IMG_FILES, fold: !!opts.fold,
+      lint: opts.lint === false ? null : (src => lint(src)),
+      onCursor: opts.onCursor || null,
+      onChange: v => { if (quiet) return; ta.value = v; ta.dispatchEvent(new Event("input")); } });
+    w.addEventListener("mousedown", e => { if (e.target === w){ e.preventDefault(); cm.focus(); } });
+    return { refit: () => { quiet = true; cm.set(ta.value); quiet = false; cm.view.requestMeasure(); }, cm, el: w };
+  }
+  const w = document.createElement("div"); w.className = "edw" + (opts.lines ? " numbered" : ""); ta.before(w);
+  const gut = document.createElement("pre"); gut.className = "gut"; gut.setAttribute("aria-hidden", "true");
+  const ov = document.createElement("pre"); ov.className = "ov"; ov.setAttribute("aria-hidden", "true");
+  if (opts.lines) w.append(gut);
+  const box = document.createElement("div"); box.className = "edbox"; box.append(ov, ta); w.append(box);
+  const paint = () => {
+    ov.innerHTML = hl(ta.value) + "\n";
+    if (opts.lines){ const n = ta.value.split("\n").length; gut.textContent = Array.from({length:n}, (_, i) => i + 1).join("\n") + "\n"; }
+  };
+  const fit = () => {
+    if (opts.fixed){ paint(); ov.scrollTop = ta.scrollTop; gut.scrollTop = ta.scrollTop; return; }
+    ta.style.height = "auto"; ta.style.height = (ta.scrollHeight + 2) + "px"; paint();
+  };
+  ta.addEventListener("scroll", () => { ov.scrollTop = ta.scrollTop; ov.scrollLeft = ta.scrollLeft; gut.scrollTop = ta.scrollTop; });
+  ta.addEventListener("input", fit);
+  w.addEventListener("mousedown", e => { if (e.target === w || e.target === box || e.target === gut){ e.preventDefault(); ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length); } });
+  ta.addEventListener("keydown", e => {
+    if (e.key === "Tab" && !e.shiftKey && !e.ctrlKey && !e.metaKey && !e.altKey){
+      e.preventDefault();
+      const s = ta.selectionStart;
+      ta.setRangeText("  ", s, ta.selectionEnd, "end");
+      ta.dispatchEvent(new Event("input"));
+    }
+    if (e.key === "Enter" && !e.shiftKey && !e.ctrlKey && !e.metaKey){       /* keep the indentation of the line above */
+      const s = ta.selectionStart, ls = ta.value.lastIndexOf("\n", s - 1) + 1, ind = /^[ \t]*/.exec(ta.value.slice(ls, s))[0];
+      if (ind){ e.preventDefault(); ta.setRangeText("\n" + ind, s, ta.selectionEnd, "end"); ta.dispatchEvent(new Event("input")); }
+    }
+  });
+  fit();
+  return { refit: fit };
+}
+
+/* A small browser window: the tab shows the page's <title>, the address bar its file name. */
+/* Mark every element with where it sits in the code: data-dk="start,endOfOpeningTag,end".
+   The preview gets these attributes; downloads and "open in a new tab" use the clean code. */
+function instrument(src){
+  const out = [], stack = [], marks = [];
+  const re = /<!--[\s\S]*?(?:-->|$)|<!doctype[^>]*>|<(\/?)([a-zA-Z][\w-]*)((?:[^>"']|"[^"]*"|'[^']*')*)>/gi;
+  let m;
+  while ((m = re.exec(src))){
+    if (m[2] === undefined) continue;
+    const name = m[2].toLowerCase(), at = m.index, endOpen = re.lastIndex;
+    if (m[1]){                                              /* closing tag */
+      const k = stack.map(e => e.name).lastIndexOf(name);
+      if (k >= 0){ for (let j = stack.length - 1; j >= k; j--) stack[j].mark.end = j === k ? endOpen : at; stack.length = k; }
+      continue;
+    }
+    const mark = { pos: at + 1 + m[2].length, start: at, open: endOpen, end: endOpen };
+    marks.push(mark);
+    if (!VOID.has(name) && !/\/\s*$/.test(m[3])) stack.push({ name, mark });
+    if (name === "script" || name === "style"){              /* skip their contents */
+      const close = new RegExp("</" + name + "\\s*>", "i"); close.lastIndex = 0;
+      const rest = src.slice(endOpen), c = close.exec(rest);
+      if (c){ re.lastIndex = endOpen + c.index; }
+    }
+  }
+  stack.forEach(e => e.mark.end = src.length);
+  let last = 0;
+  for (const mk of marks){ out.push(src.slice(last, mk.pos), ` data-dk="${mk.start},${mk.open},${mk.end}"`); last = mk.pos; }
+  out.push(src.slice(last));
+  return out.join("");
+}
+
+/* A small browser window: the tab shows the page's <title>, the address bar its file name.
+   With opts.pick, a target button turns on "pick" mode: hover shows the element, click jumps to its code. */
+function makeBrowser(host, file, T, opts = {}){
+  host.classList.add("bw");
+  const pickBtn = opts.pick ? `<button type="button" class="bw-pick" aria-pressed="false" title="${esc(opts.pick.title)}"><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="5.2" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="8" cy="8" r="1.8" fill="currentColor"/><path d="M8 0.8v3M8 12.2v3M0.8 8h3M12.2 8h3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><span>${esc(opts.pick.label)}</span></button>` : "";
+  host.innerHTML = `<div class="bw-top"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span>
+    <span class="bw-tab"><span class="fav" aria-hidden="true"></span><span class="ttl"></span></span></div>
+    <div class="bw-bar"><span class="addr"><span aria-hidden="true">📄</span> ${esc(file)}</span>${pickBtn}</div>
+    <div class="bw-view"><iframe title="${esc(T.preview)}" sandbox="allow-same-origin allow-popups allow-popups-to-escape-sandbox"></iframe>
+    <div class="dk-box" hidden><span class="dk-tag"></span></div></div>`;
+  const fr = $("iframe", host), ttl = $(".ttl", host), box = $(".dk-box", host), boxTag = $(".dk-tag", host);
+  const nt = document.createElement("div"); nt.className = "bw-note"; nt.setAttribute("role", "status"); host.append(nt);
+  let ntTimer = 0;
+  const note = msg => { nt.textContent = msg; nt.classList.add("on"); clearTimeout(ntTimer); ntTimer = setTimeout(() => nt.classList.remove("on"), 3200); };
+  let timer = 0, pendingScroll = 0, picking = false, boxTimer = 0;
+  const size = () => {
+    if (host.dataset.fixed) return;
+    try {
+      const d = fr.contentDocument; if (!d || !d.documentElement) return;
+      const h = Math.max(d.documentElement.scrollHeight, d.body ? d.body.scrollHeight : 0);
+      fr.style.height = Math.min(host.dataset.max ? +host.dataset.max : 560, Math.max(+host.dataset.min || 110, h + 4)) + "px";
+    } catch(e){}
+  };
+  /* the highlight box lives outside the page, so the student's page is never changed */
+  const showBox = (el, stay) => {
+    if (!el || !el.getBoundingClientRect){ box.hidden = true; return; }
+    const r = el.getBoundingClientRect();
+    if (!r.width && !r.height){ box.hidden = true; return; }
+    box.hidden = false;
+    Object.assign(box.style, { left: r.left + "px", top: r.top + "px", width: r.width + "px", height: r.height + "px" });
+    boxTag.textContent = "<" + el.tagName.toLowerCase() + ">";
+    box.classList.toggle("below", r.top < 22);
+    clearTimeout(boxTimer);
+    if (stay) boxTimer = setTimeout(() => { if (!picking) box.hidden = true; }, stay);
+  };
+  const markOf = el => { const e = el && el.closest && el.closest("[data-dk]"); if (!e) return null; const [a, b, c] = e.dataset.dk.split(",").map(Number); return { el: e, start: a, open: b, end: c }; };
+  const setPick = on => {
+    picking = on; host.classList.toggle("picking", on);
+    const b = $(".bw-pick", host); if (b) b.setAttribute("aria-pressed", String(on));
+    if (!on) box.hidden = true;
+  };
+  if (opts.pick) $(".bw-pick", host).onclick = () => setPick(!picking);
+  fr.addEventListener("load", () => {
+    try {
+      const d = fr.contentDocument;
+      d.documentElement.scrollTop = pendingScroll;
+      d.addEventListener("click", e => {
+        if (opts.pick && (picking || e.altKey)){                  /* jump to the code */
+          const mk = markOf(e.target);
+          if (mk){ e.preventDefault(); e.stopPropagation(); showBox(mk.el, 1600); opts.pick.onPick(mk.start, mk.open, mk.end); }
+          return;
+        }
+        const a = e.target.closest && e.target.closest("a[href]"); if (!a) return;   /* links open in a new tab; #anchors scroll inside */
+        e.preventDefault();
+        const h = a.getAttribute("href") || "";
+        if (h.startsWith("#")){ const t = d.getElementById(h.slice(1)); if (t) t.scrollIntoView({ behavior:"smooth" }); return; }
+        if (/^(https?:|mailto:|tel:)/i.test(h)) window.open(a.href, "_blank", "noopener");
+        else if (!(T.localLink && T.localLink(h))) note(T.localNote(h));
+      }, true);
+      if (opts.pick){
+        d.addEventListener("mousemove", e => { if (picking || e.altKey) showBox(markOf(e.target) && markOf(e.target).el); else if (!boxTimer) box.hidden = true; });
+        d.addEventListener("mouseleave", () => { if (picking) box.hidden = true; });
+        d.addEventListener("scroll", () => { box.hidden = true; }, true);
+        d.addEventListener("keydown", e => { if (e.key === "Escape") setPick(false); });
+      }
+      $$("img", d).forEach(im => im.addEventListener("load", size));
+    } catch(e){}
+    size();
+    if (opts.onLoad) try { opts.onLoad(fr.contentDocument); } catch(e){}
+  });
+  const show = src => {
+    const t = /<title[^>]*>([\s\S]*?)<\/title>/i.exec(src);
+    ttl.textContent = t && t[1].trim() ? t[1].replace(/\s+/g, " ").trim() : file;
+    try { pendingScroll = fr.contentDocument ? fr.contentDocument.documentElement.scrollTop : 0; } catch(e){ pendingScroll = 0; }
+    box.hidden = true;
+    fr.srcdoc = src;
+  };
+  /* the other way round: the element that contains a position in the code */
+  const highlightAt = pos => {
+    if (!picking) return;
+    try {
+      let best = null, size = Infinity;
+      for (const el of fr.contentDocument.querySelectorAll("[data-dk]")){
+        const [a, , c] = el.dataset.dk.split(",").map(Number);
+        if (a <= pos && pos <= c && c - a < size){ best = el; size = c - a; }
+      }
+      if (best && best.tagName !== "HTML" && best.tagName !== "BODY" && best.tagName !== "HEAD"){
+        if (best.scrollIntoView) best.scrollIntoView({ block: "nearest" });
+        showBox(best);
+      } else box.hidden = true;
+    } catch(e){}
+  };
+  return {
+    show: (src, now) => { clearTimeout(timer); if (now) show(src); else timer = setTimeout(() => show(src), 160); },
+    frame: fr, resize: size, note, highlightAt, setPick, get picking(){ return picking; }
+  };
+}
+
+/* ---------- the mission ---------- */
+const W = CFG.words, CH = CFG.chapters, NCH = CH.length - 1;      /* chapter 0 is the warm-up */
+const KEY = CFG.key;
+UI.localNote = h => CFG.ui.localTpl.replace("{h}", h);
+
+let state = { solved: [], current: 0, start: Date.now(), end: null, code: CFG.start, chStart: {}, chOpen: {}, helped: [], doneAt: {}, name: "" };
+try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && Array.isArray(s.solved) && typeof s.code === "string") state = Object.assign(state, s); } catch(e){}
+if (!(state.current >= 0 && state.current < CH.length)) state.current = 0;
+let saveTimer = 0;
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(state)); } catch(e){} }
+const saveSoon = () => { clearTimeout(saveTimer); saveTimer = setTimeout(save, 400); };
+
+/* ---------- reading the student's page ---------- */
+const norm = s => String(s || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[–—]/g, "-").replace(/\s+/g, " ").trim().replace(/[.!?:]+$/, "");
+const parse = src => new DOMParser().parseFromString(src, "text/html");
+const h2named = (d, name) => [...d.querySelectorAll("h2")].find(h => norm(h.textContent) === norm(name));
+function section(d, name){
+  const h = h2named(d, name); if (!h) return null;
+  const out = []; let n = h.nextElementSibling;
+  while (n && !/^H[12]$/.test(n.tagName)){ out.push(n); n = n.nextElementSibling; }
+  return out;
+}
+function afterH1(d){
+  const h = d.querySelector("h1"); if (!h) return [];
+  const out = []; let n = h.nextElementSibling;
+  while (n && !/^H[12]$/.test(n.tagName)){ out.push(n); n = n.nextElementSibling; }
+  return out;
+}
+const within = (sec, sel) => sec ? sec.flatMap(e => [...(e.matches(sel) ? [e] : []), ...e.querySelectorAll(sel)]) : [];
+const sentences = t => (String(t).match(/[.!?…](\s|$)/g) || []).length;
+const before = (a, b) => !!(a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING);
+function comments(d){
+  const out = [], tw = d.createTreeWalker(d, NodeFilter.SHOW_COMMENT); let n;
+  while ((n = tw.nextNode())) out.push(n.nodeValue.trim());
+  return out;
+}
+const nameComment = d => comments(d).find(c => /\p{L}{3,}/u.test(c)) || "";
+const cellCount = r => [...r.children].filter(c => /^T[DH]$/.test(c.tagName)).reduce((s, c) => s + (parseInt(c.getAttribute("colspan"), 10) || 1), 0);
+
+/* Each check returns one entry per goal: true/false, or [ok, extra tip text]. */
+/* Bögre Kávézó: the checks read both the raw code (for the page skeleton and the closing tags,
+   which the browser would silently repair) and the rendered preview (for what really shows). */
+const CS = el => el.ownerDocument.defaultView.getComputedStyle(el);
+function rulesOf(d){
+  const out = [];
+  const walk = list => { for (const r of list){ if (r.selectorText !== undefined) out.push(r); else if (r.cssRules) walk(r.cssRules); } };
+  for (const sh of d.styleSheets){ try { walk(sh.cssRules); } catch(e){} }
+  return out;
+}
+/* the value a stylesheet rule gives this element (inline style="" does not count) */
+function declared(el, prop){
+  if (!el) return "";
+  let v = "";
+  for (const r of rulesOf(el.ownerDocument)){
+    let hit = false;
+    try { hit = el.matches(r.selectorText); } catch(e){}
+    if (hit){ const x = r.style.getPropertyValue(prop); if (x) v = x; }
+  }
+  return v;
+}
+const anyRule = (d, re) => rulesOf(d).some(r => re.test(r.selectorText));
+const px = v => parseFloat(v) || 0;
+const every = (list, f) => list.length > 0 && [...list].every(f);
+const styleText = d => [...d.querySelectorAll("style")].map(s => s.textContent).join("\n");
+const clear = c => /rgba\(0, 0, 0, 0\)|transparent/.test(c);
+/* the code with <style> contents and comments blanked, so "<h1>" inside the CSS is not taken for a tag */
+const bare = src => String(src).replace(/<style[\s\S]*?<\/style\s*>/gi, m => m.replace(/[^\n]/g, " ")).replace(/<!--[\s\S]*?-->/g, m => m.replace(/[^\n]/g, " "));
+const at = (s, re) => { const m = re.exec(s); return m ? m.index : -1; };
+const count = (s, re) => (s.match(re) || []).length;
+const tight = s => norm(s).replace(/\s+/g, "");
+const ps = d => [...d.querySelectorAll("p")];
+const pStarting = (d, w) => ps(d).find(p => norm(p.textContent).startsWith(w));
+const DRINKS = ["eszpresszo", "cappuccino", "forro csoki", "gyumolcstea"];
+const HOURS = [["hetfo-pentek", "7:00-19:00"], ["szombat", "8:00-14:00"], ["vasarnap", "zarva"]];
+const rgb = (d, el, prop) => el ? CS(el)[prop] : "";
+
+const CHECKS = [
+  /* 0: the skeleton, read from the code */
+  (d, src) => {
+    const s = bare(src);
+    const head = at(s, /<head[\s>]/i), title = at(s, /<title[\s>]/i), headEnd = at(s, /<\/head\s*>/i);
+    const body = at(s, /<body[\s>]/i), h1 = at(s, /<h1[\s>]/i), bodyEnd = at(s, /<\/body\s*>/i), html = at(s, /<html[\s>]/i), htmlEnd = at(s, /<\/html\s*>/i);
+    return [
+      /^\s*<!doctype html>/i.test(src),
+      head >= 0 && head < title && title < headEnd,
+      body >= 0 && h1 > body && h1 > headEnd && (bodyEnd < 0 || h1 < bodyEnd),
+      html >= 0 && html < head && headEnd >= 0 && headEnd < body && body < bodyEnd && bodyEnd < htmlEnd && !s.slice(htmlEnd).replace(/<\/html\s*>/i, "").trim()
+    ];
+  },
+  /* 1: headings and paragraphs */
+  d => {
+    const h1s = d.querySelectorAll("h1");
+    return [
+      h1s.length === 1 && norm(h1s[0].textContent) === "bogre kavezo",
+      !!h2named(d, "Itallap") && !!h2named(d, "Nyitvatartás"),
+      !!pStarting(d, "frissen porkolt"),
+      !!pStarting(d, "napi ajanlat")
+    ];
+  },
+  /* 2: the drinks list */
+  (d, src) => {
+    const s = bare(src);
+    const ul = [...d.querySelectorAll("ul")].find(u => {
+      const li = [...u.children].filter(c => c.tagName === "LI").map(l => norm(l.textContent));
+      return li.length === 4 && DRINKS.every(x => li.includes(x));
+    });
+    const opens = count(s, /<li[\s>]/gi), closes = count(s, /<\/li\s*>/gi);
+    const sec = section(d, "Itallap");
+    return [
+      !!ul,
+      opens > 0 && opens === closes ? true : [false, opens > closes ? `Most ${opens} nyitó és ${closes} záró li címke van.` : ""],
+      !!ul && !!sec && sec.some(e => e === ul || e.contains(ul))
+    ];
+  },
+  /* 3: opening hours table */
+  (d, src) => {
+    const s = bare(src), t = d.querySelector("table"), rows = t ? [...t.rows] : [];
+    const cells = r => [...r.cells];
+    const head = rows[0] && cells(rows[0]).length === 2 && cells(rows[0]).every(c => c.tagName === "TH") &&
+      norm(cells(rows[0])[0].textContent) === "nap" && norm(cells(rows[0])[1].textContent) === "nyitva";
+    const body = rows.length === 4 && HOURS.every(([day, time], k) => {
+      const c = cells(rows[k + 1]);
+      return c.length === 2 && c.every(x => x.tagName === "TD") && tight(c[0].textContent).startsWith(day.replace(/\s/g, "")) && tight(c[1].textContent) === time;
+    });
+    const trOk = count(s, /<tr[\s>]/gi) > 0 && count(s, /<tr[\s>]/gi) === count(s, /<\/tr\s*>/gi) && /<\/table\s*>/i.test(s);
+    const outside = [...d.body.querySelectorAll("*")].filter(e => !e.closest("table") && !e.children.length).map(e => e.textContent).join(" ")
+      + [...d.body.childNodes].filter(n => n.nodeType === 3).map(n => n.textContent).join(" ");
+    return [!!head, !!body, trOk, !/19:00|14:00/.test(outside)];
+  },
+  /* 4: image and links */
+  d => {
+    const img = [...d.querySelectorAll("img")].find(i => /^(\.\/)?img\/kave\.svg$/i.test((i.getAttribute("src") || "").trim()));
+    const alt = img ? (img.getAttribute("alt") || "").trim() : "";
+    const a = [...d.querySelectorAll("a")].find(x => norm(x.textContent) === "teljes etlap");
+    const scr = [...d.querySelectorAll("img")].some(i => i.hasAttribute("scr"));
+    return [
+      img ? true : [false, scr ? "A képnél <code>scr</code> szerepel. Nézd meg betűről betűre az attribútum nevét!" : ""],
+      !!img && alt.length >= 5 && !/\.svg|img\//i.test(alt),
+      !!a && (a.getAttribute("href") || "").trim() === "etlap.html",
+      [...d.querySelectorAll("a[href]")].some(x => /^mailto:\s*hello@bogrekavezo\.hu$/i.test(x.getAttribute("href").trim()))
+    ];
+  },
+  /* 5: Bence's broken CSS, fixed */
+  d => {
+    const css = styleText(d), h1 = d.querySelector("h1"), h2s = d.querySelectorAll("h2");
+    const tip = [];
+    if (/text-color/i.test(css)) tip.push("A <code>text-color</code> nem létező tulajdonság.");
+    if (/middle/i.test(css)) tip.push("A <code>middle</code> itt nem érvényes érték.");
+    if (/<\s*h\d\s*>\s*\{/i.test(css)) tip.push("A kijelölőben nincs kacsacsőr.");
+    const t = tip.join(" ");
+    return [
+      h1 && rgb(d, h1, "color") === "rgb(107, 62, 38)" ? true : [false, t],
+      h1 && CS(h1).textAlign === "center" ? true : [false, t],
+      every(h2s, h => rgb(d, h, "color") === "rgb(200, 116, 47)") ? true : [false, /color\s+#/i.test(css) ? "Az egyik szabályból hiányzik a kettőspont." : ""]
+    ];
+  },
+  /* 6: own body styles */
+  d => {
+    const b = d.body, css = styleText(d);
+    return [
+      !!declared(b, "background-color") && CS(b).backgroundColor === "rgb(246, 239, 230)" ? true : [false, /background\s+color/i.test(css) ? "A <code>background-color</code> egy szó, kötőjellel." : ""],
+      !!declared(b, "color") && CS(b).color === "rgb(59, 42, 32)",
+      !!declared(b, "font-family"),
+      CS(b).fontSize === "18px" ? true : [false, /font-size\s*:\s*\d+\s*(;|\}|$)/im.test(css) ? "A számhoz mértékegység is kell." : ""],
+      every(d.querySelectorAll("h2"), h => CS(h).borderBottomStyle !== "none" && px(CS(h).borderBottomWidth) > 0)
+    ];
+  },
+  /* 7: one class on two different elements */
+  d => {
+    const p = pStarting(d, "napi ajanlat"), li = [...d.querySelectorAll("li")].find(x => norm(x.textContent) === "forro csoki");
+    const both = [p, li].filter(Boolean), css = styleText(d);
+    const yellow = el => CS(el).backgroundColor === "rgb(255, 227, 163)";
+    const others = [...d.querySelectorAll("p, li")].filter(e => !both.includes(e));
+    const tip = /body\s*\{[^}]*ajanlat/i.test(css) ? "Az osztály szabálya önálló legyen, ne a <code>body { }</code> belsejében."
+      : /(^|[\s;}])ajanlat\s*\{/im.test(css) ? "A CSS-ben valami hiányzik az osztálynév elől." : "";
+    return [
+      both.length === 2 && both.every(e => e.classList.contains("ajanlat")),
+      both.length === 2 && anyRule(d, /\.ajanlat(?![\w-])/) && both.every(yellow) ? true : [false, tip],
+      both.length === 2 && both.every(e => px(CS(e).paddingTop) > 0 && px(CS(e).paddingLeft) > 0),
+      others.length > 0 && others.every(e => clear(CS(e).backgroundColor)),
+      both.length === 2 && both.every(e => px(CS(e).borderTopLeftRadius) > 0)
+    ];
+  },
+  /* 8: table styles and the finishing touches */
+  d => {
+    const cells = d.querySelectorAll("th, td"), ths = d.querySelectorAll("th"), t = d.querySelector("table");
+    const styles = [...d.querySelectorAll("style")];
+    return [
+      every(cells, c => { const v = declared(c, "border-top-style"); return !!v && v !== "none"; }),
+      every(ths, c => !!declared(c, "background-color")),
+      /\/\*[\s\S]*?\p{L}{3,}[\s\S]*?\*\//u.test(styleText(d)),
+      !d.documentElement.querySelector("[style]") && !d.documentElement.hasAttribute("style") && styles.length > 0 && styles.every(s => !!s.closest("head")),
+      !!t && CS(t).borderCollapse === "collapse"
+    ];
+  }
+];
+
+
+/* ---------- page parts ---------- */
+const ed = $("#code"), editor = makeEditor(ed, { lines: true, fixed: true, fold: true, files: W.allImgs,
+  onCursor: () => { try { if (browser.picking) browser.highlightAt(editor.cm.view.state.selection.main.head); } catch(e){} } });
+const browser = makeBrowser($("#browser"), W.file, UI, { onLoad: () => { if (CFG.live) evaluate(); }, pick: { label: CFG.ui.pick, title: CFG.ui.pickT, onPick: (start, open) => {
+  if (editor.cm){ const v = editor.cm.view; v.dispatch({ selection: { anchor: open, head: start }, scrollIntoView: true }); v.focus(); }
+  else { ed.focus(); ed.setSelectionRange(start, open); }
+} } });
+const TERI = $("#teri").innerHTML;
+
+const unlocked = i => i === 0 || state.solved.includes(i - 1);
+const solvedN = () => state.solved.filter(i => i > 0).length;
+
+function drawPath(){
+  $("#path").innerHTML = CH.map((c, i) => {
+    const done = state.solved.includes(i), cur = i === state.current, ok = unlocked(i);
+    const ic = done ? "✓" : (i === 0 ? CFG.pawSvg : String(i));
+    return `<li><button type="button" class="paw${done ? " done" : ""}" data-i="${i}"${cur ? ' aria-current="step"' : ""}${ok ? "" : " disabled"}
+      aria-label="${esc(c.label)}${done ? " – " + esc(CFG.ui.doneWord) : ""}"><span class="ic">${ic}</span><span class="nm">${esc(c.short)}</span></button></li>`;
+  }).join("");
+  $("#progress").innerHTML = CFG.ui.progress.replace("{n}", `<b>${solvedN()}</b>`).replace("{t}", NCH);
+}
+
+function drawChapter(){
+  const i = state.current, c = CH[i];
+  $("#chk").textContent = c.label;
+  $("#chTitle").textContent = c.title;
+  $("#msg").innerHTML = c.msg;
+  $("#cheatNote").innerHTML = c.cheatNote;
+  $("#cheat").innerHTML = /^\s*</.test(c.cheat) ? hl(c.cheat) : hlCss(c.cheat);
+  drawSolution();
+}
+
+let lastResults = null;
+function evaluate(){
+  const src = ed.value, d = CFG.live ? browser.frame.contentDocument : parse(src), i = state.current, c = CH[i];
+  if (!d || !d.body) return;
+  const res = CHECKS[i](d, src).map(r => Array.isArray(r) ? r : [r, ""]);
+  const req = c.goals.map((g, k) => g.bonus ? true : !!res[k][0]);
+  const okN = c.goals.filter((g, k) => !g.bonus && res[k][0]).length, need = c.goals.filter(g => !g.bonus).length;
+  $("#goals").innerHTML = c.goals.map((g, k) => {
+    const ok = !!res[k][0], tip = [g.tip, res[k][1]].filter(Boolean).join(" ");
+    return `<li class="goal${ok ? " ok" : ""}"><span class="bx" aria-hidden="true">${ok ? "✓" : ""}</span>
+      <span class="gt">${g.bonus ? `<span class="bonus">${esc(CFG.ui.bonus)}</span>` : ""}${g.t}<span class="sr"> – ${ok ? esc(CFG.ui.doneWord) : esc(CFG.ui.todoWord)}</span></span>
+      ${tip && !ok ? `<span class="tip">${tip}</span>` : ""}</li>`;
+  }).join("");
+  $("#count").textContent = `${okN} / ${need}`;
+  if (req.every(Boolean) && !state.solved.includes(i)) solve(i);
+  drawWin();
+  drawLint();
+  lastResults = res;
+}
+function drawLint(){
+  const warn = lint(ed.value);
+  $("#lint").hidden = !warn.length;
+  $("#lint").innerHTML = warn.map(w => `<p>${w.html}</p>`).join("");
+}
+
+function solve(i){
+  state.solved.push(i);
+  state.doneAt[i] = Date.now();
+  const finale = state.solved.filter(k => k > 0).length === NCH && !state.end;
+  if (finale) state.end = Date.now();
+  save(); drawPath();
+  /* a mission may bring its own celebration (window.MISSION_FX); the default is confetti */
+  const fx = window.MISSION_FX;
+  if (fx) { try { finale ? fx.finale() : fx.solve(); } catch (e) { confetti(); } } else confetti();
+  $("#status").textContent = CFG.ui.solvedSay;
+  if (state.end && i === NCH) drawEnding();
+}
+
+function drawWin(){
+  const i = state.current, w = $("#win");
+  if (!state.solved.includes(i)){ w.hidden = true; return; }
+  w.hidden = false;
+  const last = i === NCH;
+  $("#winText").innerHTML = `<b>${esc(CFG.ui.winTitle)}</b><span>${CH[i].success}</span>`;
+  const nb = $("#nextBtn");
+  nb.hidden = last && !state.end;
+  nb.textContent = last ? CFG.ui.toEnd : (i === 0 ? CFG.ui.startWork : CFG.ui.nextCh);
+}
+
+/* ---------- no model solution here: a "watch out" note per chapter instead ---------- */
+function drawSolution(){ $("#sol").innerHTML = `<p>${CH[state.current].pitfall || ""}</p>`; }
+/* the reference cards explain, they are not for pasting */
+["#cheat", "#cheatNote", "#sol", "#msg"].forEach(sel => { const el = $(sel); if (el){ el.addEventListener("copy", e => e.preventDefault()); el.addEventListener("dragstart", e => e.preventDefault()); } });
+
+function setCode(v){
+  ed.value = v; editor.refit(); ed.scrollTop = 0;
+  state.code = v; saveSoon();
+  browser.show(instrument(v), true); evaluate();
+}
+
+function go(i){
+  if (!unlocked(i)) return;
+  state.current = i;
+  if (!state.chOpen[i]) state.chOpen[i] = Date.now();
+  if (!(i in state.chStart)) state.chStart[i] = state.code;
+  save(); drawPath(); drawChapter(); evaluate();
+  try { history.replaceState(null, "", "#" + i); } catch(e){}
+}
+
+/* ---------- ending ---------- */
+const slug = s => norm(s).split(/\s+/)[0].replace(/[^a-z0-9]/g, "") || CFG.ui.noName;
+function guessName(){
+  if (state.name) return state.name;
+  const c = nameComment(parse(state.code));
+  return c.includes(":") ? c.split(":").slice(1).join(":").trim() : c;
+}
+function drawEnding(){
+  const box = $("#ending");
+  if (!state.end){ box.hidden = true; return; }
+  box.hidden = false;
+  const mins = Math.max(1, Math.round((state.end - state.start) / 60000));
+  $("#endStats").innerHTML = `<span class="stat"><b>${NCH} / ${NCH}</b><span>${esc(CFG.ui.stChapters)}</span></span>
+    <span class="stat"><b>${mins}</b><span>${esc(CFG.ui.stMinutes)}</span></span>
+`;
+  const nm = $("#who"); if (!nm.value) nm.value = guessName();
+  $("#zipName").textContent = slug(nm.value) + "_" + W.fileBase + ".zip";
+}
+
+function withBase(src){
+  const base = `<base href="${new URL(".", location.href).href}">`;
+  return /<head[^>]*>/i.test(src) ? src.replace(/<head[^>]*>/i, m => m + base) : base + src;
+}
+
+function loadZip(){
+  return window.JSZip ? Promise.resolve(window.JSZip) : new Promise((ok, no) => {
+    const s = document.createElement("script");
+    s.src = "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js";
+    s.onload = () => ok(window.JSZip); s.onerror = no; document.head.append(s);
+  });
+}
+async function download(){
+  const b = $("#dl"), name = slug($("#who").value), base = name + "_" + W.fileBase;
+  b.disabled = true; const old = b.textContent; b.textContent = CFG.ui.zipping;
+  try {
+    const Z = await loadZip(), zip = new Z();
+    zip.file(base + ".html", state.code);
+    for (const f of W.allImgs) zip.file(f, await (await fetch(f)).blob());
+    const blob = await zip.generateAsync({ type: "blob" });
+    const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = base + ".zip";
+    document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+    b.textContent = CFG.ui.zipped;
+  } catch(e){
+    const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([state.code], { type: "text/html" })); a.download = base + ".html";
+    document.body.append(a); a.click(); a.remove();
+    b.textContent = CFG.ui.zipFail;
+  }
+  setTimeout(() => { b.disabled = false; b.textContent = old; }, 2500);
+}
+
+function report(){
+  const pad = n => String(n).padStart(2, "0"), dt = t => { const d = new Date(t); return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`; };
+  const L = [CFG.ui.repTitle, `${CFG.ui.repName}: ${$("#who").value || guessName() || "?"}`, `${CFG.ui.repStart}: ${dt(state.start)}`];
+  if (state.end) L.push(`${CFG.ui.repEnd}: ${dt(state.end)} (${Math.max(1, Math.round((state.end - state.start) / 60000))} ${CFG.ui.repMin})`);
+  L.push(`${CFG.ui.repDone}: ${solvedN()} / ${NCH}`);
+  L.push("", CFG.ui.repCode, state.code);
+  return L.join("\n");
+}
+
+/* ---------- small joys ---------- */
+function confetti(){
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const c = document.createElement("div"); c.className = "confetti"; c.setAttribute("aria-hidden", "true");
+  const cols = ["#2f7a5a", "#e07b2c", "#f2d264", "#9cc8e8", "#f0a3b8"];
+  for (let k = 0; k < 46; k++){
+    const i = document.createElement("i");
+    i.style.left = (Math.random() * 100) + "vw"; i.style.background = cols[k % cols.length];
+    i.style.setProperty("--dx", (Math.random() * 160 - 80) + "px"); i.style.setProperty("--r", (Math.random() * 720 - 360) + "deg");
+    i.style.animationDelay = (Math.random() * .35) + "s";
+    c.append(i);
+  }
+  document.body.append(c); setTimeout(() => c.remove(), 2400);
+}
+
+/* ---------- wiring ---------- */
+let evalTimer = 0;
+ed.value = state.code; editor.refit();
+ed.addEventListener("input", () => {
+  state.code = ed.value; saveSoon();
+  browser.show(instrument(ed.value));
+  clearTimeout(evalTimer);
+  if (CFG.live) evalTimer = setTimeout(drawLint, 220);       /* the goals are re-checked when the preview has loaded */
+  else evalTimer = setTimeout(evaluate, 220);
+});
+document.addEventListener("keydown", e => {
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "s"){ e.preventDefault(); save(); $("#status").textContent = CFG.ui.saved; flashSaved(); }
+});
+function flashSaved(){ const s = $("#savedTag"); s.hidden = false; clearTimeout(s._t); s._t = setTimeout(() => s.hidden = true, 1400); }
+$("#path").addEventListener("click", e => { const b = e.target.closest(".paw"); if (b && !b.disabled) go(+b.dataset.i); });
+$("#nextBtn").onclick = () => {
+  if (state.current < NCH) go(state.current + 1);
+  else { drawEnding(); $("#ending").scrollIntoView({ behavior: "smooth", block: "start" }); }
+};
+/* editor toolbar: search, format, shortcuts, focus mode */
+const cmApi = editor.cm;
+$("#findBtn").onclick = () => cmApi ? cmApi.search() : ed.focus();
+$("#fmtBtn").onclick = () => { if (cmApi) cmApi.format(); };
+if (!cmApi) { $("#findBtn").hidden = true; $("#fmtBtn").hidden = true; $("#keysBtn").hidden = true; }
+const keys = $("#keys"), keysBtn = $("#keysBtn");
+const showKeys = on => { keys.hidden = !on; keysBtn.setAttribute("aria-expanded", String(on)); };
+keysBtn.onclick = () => showKeys(keys.hidden);
+$("#keysClose").onclick = () => { showKeys(false); keysBtn.focus(); };
+const focusBtn = $("#focusBtn");
+const setFocus = on => {
+  document.body.classList.toggle("focus", on); focusBtn.setAttribute("aria-pressed", String(on));
+  if (cmApi) { cmApi.view.requestMeasure(); cmApi.focus(); }
+};
+focusBtn.onclick = () => setFocus(!document.body.classList.contains("focus"));
+document.addEventListener("keydown", e => {
+  if (e.key !== "Escape") return;
+  if (!keys.hidden) { showKeys(false); return; }
+  if (document.body.classList.contains("focus") && !document.querySelector(".cm-panel, .cm-tooltip-autocomplete")) setFocus(false);
+});
+$("#resetCh").onclick = () => { if (confirm(CFG.ui.resetConfirm)) setCode(state.chStart[state.current] ?? CFG.start); };
+let size = 15;
+try { const s = parseInt(localStorage.getItem("html-mission-size"), 10); if (s >= 12 && s <= 28) size = s; } catch(e){}
+const setSize = n => { size = Math.max(12, Math.min(28, n)); document.documentElement.style.setProperty("--code-size", size + "px"); editor.refit(); try { localStorage.setItem("html-mission-size", String(size)); } catch(e){} };
+setSize(size);
+$("#smaller").onclick = () => setSize(size - 1);
+$("#bigger").onclick = () => setSize(size + 1);
+$("#who").addEventListener("input", () => { state.name = $("#who").value; saveSoon(); $("#zipName").textContent = slug($("#who").value) + "_" + W.fileBase + ".zip"; });
+$("#dl").onclick = download;
+$("#toEditor").onclick = () => {
+  try { localStorage.setItem("digikult-editor-import", JSON.stringify({ code: state.code, name: W.file, at: Date.now() })); } catch(e){}
+  window.open(CFG.editorUrl, "_blank");
+};
+$("#openFull").onclick = () => { const u = URL.createObjectURL(new Blob([withBase(state.code)], { type: "text/html" })); window.open(u, "_blank"); setTimeout(() => URL.revokeObjectURL(u), 60000); };
+$("#copyRep").onclick = async () => {
+  const b = $("#copyRep"), old = b.textContent, txt = report();
+  try { await navigator.clipboard.writeText(txt); b.textContent = CFG.ui.copied; }
+  catch(e){ const t = document.createElement("textarea"); t.value = txt; document.body.append(t); t.select(); document.execCommand("copy"); t.remove(); b.textContent = CFG.ui.copied; }
+  setTimeout(() => b.textContent = old, 1600);
+};
+$("#restart").onclick = () => {
+  if (!confirm(CFG.ui.restartConfirm)) return;
+  state = { solved: [], current: 0, start: Date.now(), end: null, code: CFG.start, chStart: {}, chOpen: {}, helped: [], doneAt: {}, name: "" };
+  save(); ed.value = state.code; editor.refit(); browser.show(instrument(state.code), true); go(0); drawEnding();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+};
+
+const hashCh = parseInt(location.hash.slice(1), 10);
+browser.show(instrument(state.code), true);
+go(hashCh >= 0 && hashCh < CH.length && unlocked(hashCh) ? hashCh : state.current);
+drawEnding();
+
+</script>
+<script src="../../nav.js?v=65501409" defer></script>
+</body>
+</html>

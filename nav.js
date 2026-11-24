@@ -357,6 +357,18 @@
                   en: "About 35 minutes, 40 points, the School Radio website: multiple choice, true or false, ordering, matching, predicting what the browser shows, gap-filling, finding mistakes, and writing your own HTML and CSS. Marked automatically, handed in on Classroom."
                 },
                 files: { en: "css/summary/test.html", hu: "css/summary/test-hu.html" }
+              },
+              {
+                id: "bogre",
+                kind: "story",
+                minutes: 45,
+                title: { hu: "A Bögre Kávézó honlapja", en: "The Bögre Café website" },
+                desc: {
+                  hu: "Ismétlő küldetés a témazáró után: Bence elrontott kávézós oldalát kell rendbe tenni. Váz, címek, lista, táblázat, kép és link, majd CSS: hibás szabályok javítása, saját stílus, osztály és táblázatkeret. Nincs kész megoldás, amit csak be kell másolni.",
+                  en: "A review mission after the test (Hungarian only): fix Bence's broken café page, from the skeleton to lists, tables, images, links and CSS classes."
+                },
+                files: { hu: "css/summary/bogre-hu.html" },
+                progress: { chapters: 8, keys: { hu: "bogre-hu-v1" } }
               }
             ]
           }
