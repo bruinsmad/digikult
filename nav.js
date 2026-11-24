@@ -504,12 +504,25 @@
                 minutes: 35,
                 title: { hu: "UFO a legelő felett", en: "UFO over the Pasture" },
                 desc: {
-                  hu: "Hamis „bizonyíték” négy képből: fehér háttér eltüntetése alfa csatornával, rétegsorrend, átméretezés, forgatás, perspektíva, áttetsző fénysugár és egy megkétszerezett tehén.",
-                  en: "Fake “proof” from four pictures: removing a white background with an alpha channel, layer order, scaling, rotating, perspective, a see-through beam and a duplicated cow."
+                  hu: "Hamis „bizonyíték” négy képből: zöld háttér eltüntetése alfa csatornával, rétegsorrend, átméretezés, forgatás, perspektíva, áttetsző fénysugár és egy megkétszerezett tehén.",
+                  en: "Fake “proof” from four pictures: removing a green background with an alpha channel, layer order, scaling, rotating, perspective, a see-through beam and a duplicated cow."
                 },
                 cover: "gimp/img/ufo/poster.png",
                 files: { en: "gimp/layers/ufo.html", hu: "gimp/layers/ufo-hu.html" },
                 progress: { chapters: 7, keys: { en: "gimp-ufo-v1", hu: "gimp-ufo-v1" } }
+              },
+              {
+                id: "gimp-miau",
+                kind: "story",
+                minutes: 35,
+                title: { hu: "A nagy miaú", en: "The Big Meow" },
+                desc: {
+                  hu: "Filmplakát hat képből: óriásmacska a Parlament mögött. Alfa csatorna, rétegsorrend, átméretezés, forgatás, tükrözés, áttetsző reflektorfény és perspektivikus filmcím.",
+                  en: "A film poster from six pictures: a giant cat behind the Hungarian Parliament. Alpha channel, layer order, scaling, rotating, flipping, a see-through searchlight and a title in perspective."
+                },
+                cover: "gimp/img/miau/hu/poster.jpg",
+                files: { en: "gimp/layers/miau.html", hu: "gimp/layers/miau-hu.html" },
+                progress: { chapters: 7, keys: { en: "gimp-miau-v1", hu: "gimp-miau-v1" } }
               }
             ]
           }

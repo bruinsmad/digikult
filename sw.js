@@ -6,7 +6,7 @@
    The file list below is written by tools/build-sw.py: run it before pushing. */
 
 /* FILES:BEGIN (written by tools/build-sw.py, don't edit by hand) */
-const VERSION = "c748f9bc09";
+const VERSION = "2819274594";
 const CORE = [
 "./",
 "css/basics/first-steps.html",
@@ -63,6 +63,8 @@ const CORE = [
 "excel/sheet.css",
 "excel/sheet.js",
 "favicon.svg",
+"gimp/files/miau-forrasfajlok.zip",
+"gimp/files/miau-source-files.zip",
 "gimp/files/ufo-forrasfajlok.zip",
 "gimp/files/ufo-source-files.zip",
 "gimp/img/common/gimp-map.jpg",
@@ -70,6 +72,8 @@ const CORE = [
 "gimp/img/common/hu/tools.png",
 "gimp/img/common/tools.png",
 "gimp/index.html",
+"gimp/layers/miau-hu.html",
+"gimp/layers/miau.html",
 "gimp/layers/ufo-hu.html",
 "gimp/layers/ufo.html",
 "gimp/mission.css",
@@ -261,6 +265,30 @@ const PAGE_IMAGES = {
 ],
 "erettsegi/tablazat/omega-hu.html": [
 "erettsegi/tablazat/img/omega-minta.png"
+],
+"gimp/layers/miau-hu.html": [
+"gimp/img/miau/hu/bonus.jpg",
+"gimp/img/miau/hu/poster.jpg",
+"gimp/img/miau/hu/save.png",
+"gimp/img/miau/hu/step1.jpg",
+"gimp/img/miau/hu/step2.jpg",
+"gimp/img/miau/hu/step3.jpg",
+"gimp/img/miau/hu/step4.jpg",
+"gimp/img/miau/hu/step5.jpg",
+"gimp/img/miau/hu/step6.jpg",
+"gimp/img/miau/hu/step7.jpg"
+],
+"gimp/layers/miau.html": [
+"gimp/img/miau/bonus.jpg",
+"gimp/img/miau/poster.jpg",
+"gimp/img/miau/save.png",
+"gimp/img/miau/step1.jpg",
+"gimp/img/miau/step2.jpg",
+"gimp/img/miau/step3.jpg",
+"gimp/img/miau/step4.jpg",
+"gimp/img/miau/step5.jpg",
+"gimp/img/miau/step6.jpg",
+"gimp/img/miau/step7.jpg"
 ],
 "gimp/layers/ufo-hu.html": [
 "gimp/img/ufo/hu/bonus.jpg",

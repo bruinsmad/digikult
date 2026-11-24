@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>/* moving between pages: the old page drifts aside and fades, the new one glides in; the rail holds still */@view-transition{navigation:auto}.rail{view-transition-name:rail}::view-transition-group(root){animation:none}::view-transition-old(root){animation:dk-out .2s cubic-bezier(.4,0,1,1) both}::view-transition-new(root){animation:dk-in .38s cubic-bezier(.16,1,.3,1) .06s both}::view-transition-old(rail),::view-transition-new(rail){animation:none}@keyframes dk-out{to{opacity:0;transform:translateX(-18px)}}@keyframes dk-in{from{opacity:0;transform:translateX(26px)}}@media (prefers-reduced-motion:reduce){::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none!important}}</style>
+<title>The Big Meow – GIMP</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap">
+<link rel="stylesheet" href="../mission.css?v=1">
+<style>:root{--accent:#9be3c9}</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+window.MISSION = {
+  "lang": "en",
+  "key": "gimp-miau-v1",
+  "title": "The Big Meow",
+  "story": "This December's disaster film is coming to cinemas: a giant cat peeks out from behind the Hungarian Parliament. The film is finished – only the poster is missing. You build it from six pictures.",
+  "file": "surname_poster",
+  "bgFile": "night.jpg",
+  "files": "../files/miau-source-files.zip",
+  "poster": "../img/miau/poster.jpg",
+  "pdf": "../pdf/miau-worksheet.pdf",
+  "teacherPdf": "../pdf/miau-teacher.pdf",
+  "saveImg": "../img/miau/save.png",
+  "bonusImg": "../img/miau/bonus.jpg",
+  "elements": [
+    [
+      "Six pictures, six layers",
+      "sky, Parliament, cat, helicopter, searchlight, title",
+      "Open as Layers"
+    ],
+    [
+      "Parliament without the green sky",
+      "alpha channel, magic wand, Clear",
+      "alpha channel"
+    ],
+    [
+      "The cat behind the Parliament",
+      "cut out on your own, then drag the layer down",
+      "alpha channel + layer order"
+    ],
+    [
+      "A giant cat peeking out",
+      "shrink, drag upwards",
+      "Scale + Move"
+    ],
+    [
+      "Two helicopters",
+      "shrink, tilt, a copy turned round",
+      "Rotate + Duplicate Layer + Flip"
+    ],
+    [
+      "A see-through searchlight",
+      "tilted, from the embankment onto the cat",
+      "Rotate + Opacity"
+    ],
+    [
+      "The film title at the bottom",
+      "dragged down, pulled apart at the bottom",
+      "Perspective"
+    ]
+  ],
+  "steps": [
+    {
+      "title": "Six pictures, six layers",
+      "img": "../img/miau/step1.jpg",
+      "alt": "Step 1: File ▸ Open as Layers: parliament.jpg, then cat.jpg, helicopter.png, searchlight.png, title.png; the eye of the top four layers switched off",
+      "lead": "Open as Layers puts the new picture on top of the one that's already open – as a separate layer.",
+      "note": "Open one file at a time, in this order – then the layers sit in the panel the way the pictures show.",
+      "stuck": [
+        "The picture opened in its own tab: you used plain <span class='menu'>File ▸ Open…</span>. Close that tab and choose <span class='menu'>File ▸ Open as Layers…</span>.",
+        "You can't see the Layers panel: <span class='menu'>Windows ▸ Dockable Dialogs ▸ Layers</span>."
+      ]
+    },
+    {
+      "title": "Alpha channel: make the green sky vanish",
+      "img": "../img/miau/step2.jpg",
+      "alt": "Step 2: the parliament.jpg layer selected, Layer ▸ Transparency ▸ Add Alpha Channel; magic wand on the green; Edit ▸ Clear, Select ▸ None – the night sky behind the Parliament",
+      "lead": "The alpha channel stores where a layer is transparent. A layer that came from a JPG doesn't have one – so you add it first.",
+      "note": "This layer is exactly as big as the picture: the Parliament is already in place, no need to move it.",
+      "stuck": [
+        "After Clear the green turned white (or another colour) instead of transparent: the layer has no alpha channel. <span class='menu'>Edit ▸ Undo</span>, then <span class='menu'>Layer ▸ Transparency ▸ Add Alpha Channel</span>, and clear again.",
+        "“Add Alpha Channel” is greyed out: the layer already has an alpha channel – carry on.",
+        "The sky vanished, or a piece of the Parliament: the parliament.jpg layer wasn't active, or you didn't click the green. Undo, click the parliament.jpg layer, and click the wand in a green corner.",
+        "You can't find the magic wand: <span class='menu'>Tools ▸ Selection Tools ▸ Fuzzy Select</span>."
+      ]
+    },
+    {
+      "title": "The cat goes behind the Parliament",
+      "img": "../img/miau/step3.jpg",
+      "alt": "Step 3: the cat.jpg layer's eye back on, alpha channel and magic wand; after Clear the cat is in front of the Parliament; the cat.jpg layer dragged below parliament.jpg in the panel",
+      "lead": "The same four moves as before – alpha channel, magic wand, <span class='menu'>Edit ▸ Clear</span>, <span class='menu'>Select ▸ None</span> – and then layer order.",
+      "note": "Layer order decides what covers what: whatever is higher in the panel is in front.",
+      "stuck": [
+        "Nothing happens to the cat: click the cat.jpg layer in the Layers panel first – commands always work on the active layer.",
+        "The cat vanished completely: you dragged it too far down, below night.jpg. Drag it between the sky and the Parliament.",
+        "Later the tools behave strangely (only a piece moves): a selection is still there. <span class='menu'>Select ▸ None</span>."
+      ]
+    },
+    {
+      "title": "A giant cat peeking out",
+      "img": "../img/miau/step4.jpg",
+      "alt": "Step 4: Scale on the cat.jpg layer with the chain closed; Move: the cat's head peeks out from behind the dome",
+      "lead": "Two transform tools on the cat's layer: size, then place. Its body stays hidden behind the Parliament.",
+      "note": "No exact size needed: its head should be roughly as wide as the middle part of the Parliament.",
+      "stuck": [
+        "The cat is squashed or stretched: the chain was open. Undo, and click the chain in the Scale window so it closes.",
+        "You dragged the corner but nothing changed: you have to press the Scale button in the little window.",
+        "The Parliament moved instead of the cat: Move takes the layer you click on. <span class='menu'>Edit ▸ Undo</span>, and click the cat's head where it shows.",
+        "Don't scale up: an enlarged picture goes blurry."
+      ]
+    },
+    {
+      "title": "Helicopters",
+      "img": "../img/miau/step5.jpg",
+      "alt": "Step 5: the helicopter.png layer's eye back on, Scale right down; Move into the sky and Rotate; Duplicate Layer, the copy on the other side, flipped",
+      "lead": "The helicopter is a PNG: its background is already transparent, no cutting out needed. You can make as many copies of a layer as you like.",
+      "note": "In newer GIMP the command is called Duplicate Layers. Same thing.",
+      "stuck": [
+        "Something else changes: click the helicopter.png layer first.",
+        "Still only one helicopter after duplicating: the copy sits exactly on the original. Drag it away with Move.",
+        "Flip turns it upside down: in Tool Options set Direction to Horizontal.",
+        "The rotation didn't stick: press the Rotate button in the little window."
+      ]
+    },
+    {
+      "title": "The searchlight",
+      "img": "../img/miau/step6.jpg",
+      "alt": "Step 6: the searchlight.png layer's eye back on, Rotate; Move: the narrow end on the embankment; Opacity at about half",
+      "lead": "Rotate tilts the cone of light; Opacity makes the whole layer see-through.",
+      "note": "The searchlight's layer is above the Parliament in the panel: the light shows in front of the building.",
+      "stuck": [
+        "Opacity fades something else: the slider always works on the active layer. Click the searchlight.png layer.",
+        "The light is hard to grab with Move: its edge is transparent. Click its middle, where it is brightest.",
+        "It leans the wrong way: grab it again with Rotate and drag the other way."
+      ]
+    },
+    {
+      "title": "The film's title",
+      "img": "../img/miau/step7.jpg",
+      "alt": "Step 7: the title.png layer's eye back on, Move to the bottom of the picture; Perspective: the two bottom corners pulled apart, Transform button",
+      "lead": "Perspective moves each corner separately: pull the bottom ones apart and the title leans towards the viewer.",
+      "stuck": [
+        "You pulled the corners but nothing changed: press the Transform button.",
+        "The title sticks out of the picture: drag it up a little with Move, or pull the corners apart less.",
+        "The title doesn't show: its layer ended up below the Parliament. Drag it to the top of the panel."
+      ]
+    }
+  ],
+  "checklist": [
+    "The poster is built from six source pictures: sky, Parliament, cat, helicopter, searchlight, title",
+    "No green background around the Parliament or the cat (alpha channel)",
+    "The cat is BEHIND the Parliament: its layer is below parliament.jpg in the panel",
+    "The cat is not squashed (chain closed) and its head peeks out from behind the dome",
+    "There are two helicopters: one is a flipped copy of the other, both small and tilted",
+    "The searchlight shines from the embankment onto the cat (Rotate) and is see-through (Opacity)",
+    "The title is at the bottom, wider at the bottom than at the top (Perspective)",
+    "Both the XCF and the PNG are saved, with your surname in the file name"
+  ],
+  "bonus": [
+    [
+      "A second searchlight",
+      "Duplicate the searchlight's layer, flip it and drag it to the other end of the embankment – two beams crossing on the cat."
+    ],
+    [
+      "A helicopter squadron",
+      "Make more copies of the helicopter; give them different sizes and don't let them all face the same way."
+    ],
+    [
+      "A curious cat",
+      "Rotate the cat's layer a little: with its head tilted it's even scarier."
+    ],
+    [
+      "A ghost cat",
+      "Duplicate the cat, push the copy aside, shrink it and fade it with Opacity."
+    ]
+  ]
+};
+</script>
+<script src="../mission.js?v=2"></script>
+<script src="../../nav.js?v=2c8ccf1b" defer></script>
+</body>
+</html>

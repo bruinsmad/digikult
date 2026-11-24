@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="hu">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>/* moving between pages: the old page drifts aside and fades, the new one glides in; the rail holds still */@view-transition{navigation:auto}.rail{view-transition-name:rail}::view-transition-group(root){animation:none}::view-transition-old(root){animation:dk-out .2s cubic-bezier(.4,0,1,1) both}::view-transition-new(root){animation:dk-in .38s cubic-bezier(.16,1,.3,1) .06s both}::view-transition-old(rail),::view-transition-new(rail){animation:none}@keyframes dk-out{to{opacity:0;transform:translateX(-18px)}}@keyframes dk-in{from{opacity:0;transform:translateX(26px)}}@media (prefers-reduced-motion:reduce){::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none!important}}</style>
+<title>A nagy miaú – GIMP</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap">
+<link rel="stylesheet" href="../mission.css?v=1">
+<style>:root{--accent:#9be3c9}</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+window.MISSION = {
+  "lang": "hu",
+  "key": "gimp-miau-v1",
+  "title": "A nagy miaú",
+  "story": "Decemberben mozikba kerül az év katasztrófafilmje: egy óriási macska kukucskál ki a Parlament mögül. A film kész – csak a plakát hiányzik. Azt te rakod össze hat képből.",
+  "file": "vezeteknev_plakat",
+  "bgFile": "ejszaka.jpg",
+  "files": "../files/miau-forrasfajlok.zip",
+  "poster": "../img/miau/hu/poster.jpg",
+  "pdf": "../pdf/miau-feladatlap.pdf",
+  "teacherPdf": "../pdf/miau-tanari.pdf",
+  "saveImg": "../img/miau/hu/save.png",
+  "bonusImg": "../img/miau/hu/bonus.jpg",
+  "elements": [
+    [
+      "Hat kép, hat réteg",
+      "ég, Parlament, macska, helikopter, reflektor, cím",
+      "Megnyitás rétegekként"
+    ],
+    [
+      "Parlament zöld ég nélkül",
+      "alfa csatorna, varázspálca, Törlés",
+      "alfa csatorna"
+    ],
+    [
+      "Macska a Parlament mögött",
+      "kivágás egyedül, aztán a réteg lejjebb húzása",
+      "alfa csatorna + rétegsorrend"
+    ],
+    [
+      "Kikukucskáló óriásmacska",
+      "kicsinyítés, húzás felfelé",
+      "Átméretezés + Áthelyezés"
+    ],
+    [
+      "Két helikopter",
+      "kicsinyítés, döntés, másolat megfordítva",
+      "Forgatás + Réteg kétszerezése + Tükrözés"
+    ],
+    [
+      "Áttetsző reflektorfény",
+      "megdöntve, a rakpartról a macskára",
+      "Forgatás + Átlátszatlanság"
+    ],
+    [
+      "Filmcím a kép alján",
+      "lehúzva, alul széthúzva",
+      "Perspektíva"
+    ]
+  ],
+  "steps": [
+    {
+      "title": "Hat kép, hat réteg",
+      "img": "../img/miau/hu/step1.jpg",
+      "alt": "1. lépés: Fájl ▸ Megnyitás rétegekként: parlament.jpg, majd macska.jpg, helikopter.png, reflektor.png, cim.png; a felső négy réteg szeme kikapcsolva",
+      "lead": "A Megnyitás rétegekként a már megnyitott képre teszi rá az új képet – külön rétegként.",
+      "note": "Egyszerre egy fájlt nyiss meg, ebben a sorrendben – így a rétegek úgy állnak a panelen, ahogy a képeken látod.",
+      "stuck": [
+        "Külön fülön nyílt meg a kép: a sima <span class='menu'>Fájl ▸ Megnyitás…</span> parancsot használtad. Zárd be azt a fület, és válaszd a <span class='menu'>Fájl ▸ Megnyitás rétegekként…</span> parancsot.",
+        "Nem látod a Rétegek panelt: <span class='menu'>Ablakok ▸ Dokkolható párbeszédablakok ▸ Rétegek</span>."
+      ]
+    },
+    {
+      "title": "Alfa csatorna: tűnjön el a zöld ég",
+      "img": "../img/miau/hu/step2.jpg",
+      "alt": "2. lépés: a parlament.jpg réteg kijelölve, Réteg ▸ Átlátszóság ▸ Alfa csatorna hozzáadása; varázspálca a zöld részre; Szerkesztés ▸ Törlés, Kijelölés ▸ Semmit – a Parlament mögött az éjszakai ég",
+      "lead": "Az alfa csatorna tárolja, hol átlátszó a réteg. A JPG-ből jött rétegnek nincs ilyenje – ezért előbb hozzá kell adni.",
+      "note": "Ez a réteg pontosan akkora, mint a kép: a Parlament rögtön a helyén van, nem kell mozgatni.",
+      "stuck": [
+        "A Törlés után a zöld helyén fehér (vagy más szín) lett, nem átlátszó: nincs alfa csatorna a rétegen. <span class='menu'>Szerkesztés ▸ Visszavonás</span>, aztán <span class='menu'>Réteg ▸ Átlátszóság ▸ Alfa csatorna hozzáadása</span>, és törölj újra.",
+        "Az „Alfa csatorna hozzáadása” szürke: a rétegnek már van alfa csatornája – mehetsz tovább.",
+        "Az ég tűnt el, vagy a Parlament egy darabja: nem a parlament.jpg réteg volt aktív, vagy nem a zöldre kattintottál. Vonj vissza, kattints a parlament.jpg rétegre, és a varázspálcával a zöld sarokba kattints.",
+        "Nem találod a varázspálcát: <span class='menu'>Eszközök ▸ Kijelölőeszközök ▸ Varázspálca-kijelölés</span>."
+      ]
+    },
+    {
+      "title": "A macska a Parlament mögé kerül",
+      "img": "../img/miau/hu/step3.jpg",
+      "alt": "3. lépés: a macska.jpg réteg szeme visszakapcsolva, alfa csatorna és varázspálca; Törlés után a macska a Parlament előtt; a macska.jpg réteg a panelen a parlament.jpg alá húzva",
+      "lead": "Ugyanaz a négy mozdulat, mint az előbb – alfa csatorna, varázspálca, <span class='menu'>Szerkesztés ▸ Törlés</span>, <span class='menu'>Kijelölés ▸ Semmit</span> –, aztán a rétegsorrend.",
+      "note": "A rétegsorrend dönti el, mi takar mit: ami a panelen feljebb van, az van elöl.",
+      "stuck": [
+        "Semmi sem történik a macskával: előbb kattints a macska.jpg rétegre a Rétegek panelen – a parancsok mindig az aktív rétegen dolgoznak.",
+        "A macska teljesen eltűnt: túl mélyre húztad, az ejszaka.jpg alá került. Húzd az ég és a Parlament közé.",
+        "Később furcsán viselkednek az eszközök (csak egy darab mozdul): maradt kijelölés. <span class='menu'>Kijelölés ▸ Semmit</span>."
+      ]
+    },
+    {
+      "title": "Kikukucskáló óriásmacska",
+      "img": "../img/miau/hu/step4.jpg",
+      "alt": "4. lépés: a macska.jpg réteg Átméretezése zárt lánccal; Áthelyezés: a macska feje a kupola mögül kukucskál",
+      "lead": "Két átalakítóeszköz a macska rétegén: méret, aztán hely. A teste a Parlament mögött marad.",
+      "note": "Nem kell pontos méret: a feje legyen nagyjából olyan széles, mint a Parlament középső része.",
+      "stuck": [
+        "Torzul a macska (lapos vagy nyúlt lett): nyitva volt a lánc. Vonj vissza, és az Átméretezés ablakban kattints a láncra, hogy összezárjon.",
+        "Húztad a sarkot, mégsem változott semmi: a kis ablakban meg kell nyomni az Átméretezés gombot.",
+        "A Parlament mozdult el a macska helyett: az Áthelyezés azt a réteget viszi, amelyikre kattintasz. <span class='menu'>Szerkesztés ▸ Visszavonás</span>, és a macska fejére kattints, ahol kilátszik.",
+        "Nagyítani ne nagyíts: a felnagyított kép életlen lesz."
+      ]
+    },
+    {
+      "title": "Helikopterek",
+      "img": "../img/miau/hu/step5.jpg",
+      "alt": "5. lépés: a helikopter.png réteg szeme visszakapcsolva, Átméretezés egészen kicsire; Áthelyezés az égre és Forgatás; Réteg kétszerezése, a másolat a túloldalon, tükrözve",
+      "lead": "A helikopter PNG: a háttere eleve átlátszó, nem kell kivágni. Egy rétegből akárhány másolat készülhet.",
+      "note": "Újabb GIMP-ben a parancs neve: Rétegek kétszerezése. Ugyanaz.",
+      "stuck": [
+        "Nem a helikopter változik: kattints előbb a helikopter.png rétegre.",
+        "A kétszerezés után is csak egy helikoptert látsz: a másolat pontosan az eredetin ül. Húzd el az Áthelyezéssel.",
+        "A Tükrözés a feje tetejére állítja: az Eszközbeállításoknál az Irány legyen Vízszintes.",
+        "A forgatás nem lett végleges: a kis ablakban nyomd meg a Forgatás gombot."
+      ]
+    },
+    {
+      "title": "Reflektorfény",
+      "img": "../img/miau/hu/step6.jpg",
+      "alt": "6. lépés: a reflektor.png réteg szeme visszakapcsolva, Forgatás; Áthelyezés: a keskeny vége a rakparton; Átlátszatlanság nagyjából a felén",
+      "lead": "A Forgatás megdönti a fénykúpot, az Átlátszatlanság az egész réteget teszi áttetszővé.",
+      "note": "A reflektor rétege a Parlament fölött van a panelen: a fény az épület előtt látszik.",
+      "stuck": [
+        "Az Átlátszatlanság mást halványít el: a csúszka mindig az aktív rétegre hat. Kattints a reflektor.png rétegre.",
+        "Nehéz megfogni a fényt az Áthelyezéssel: a széle átlátszó. A közepére kattints, ahol a legvilágosabb.",
+        "Rossz irányba dől: fogd meg újra a Forgatással, és húzd a másik irányba."
+      ]
+    },
+    {
+      "title": "A film címe",
+      "img": "../img/miau/hu/step7.jpg",
+      "alt": "7. lépés: a cim.png réteg szeme visszakapcsolva, Áthelyezés a kép aljára; Perspektíva: a két alsó sarok széthúzva, Átalakítás gomb",
+      "lead": "A Perspektíva a sarkokat külön mozgatja: ha alul széthúzod, a cím a néző felé dől.",
+      "stuck": [
+        "Széthúztad a sarkokat, mégsem változott: nyomd meg az Átalakítás gombot.",
+        "A cím kilóg a képből: húzd kicsit feljebb az Áthelyezéssel, vagy kevésbé húzd szét a sarkokat.",
+        "Nem látszik a cím: a rétege a Parlament alá került. Húzd a panelen legfelülre."
+      ]
+    }
+  ],
+  "checklist": [
+    "A plakát hat forrásképből áll: ég, Parlament, macska, helikopter, reflektor, cím",
+    "A Parlament és a macska körül nincs zöld háttér (alfa csatorna)",
+    "A macska a Parlament MÖGÖTT van: a rétege a panelen a parlament.jpg alatt áll",
+    "A macska nem torzult (zárt lánc), a feje kikukucskál a kupola mögül",
+    "Két helikopter van: az egyik a másik tükrözött másolata, mindkettő kicsi és megdöntött",
+    "A reflektor a rakpartról a macskára világít (Forgatás), és áttetsző (Átlátszatlanság)",
+    "A cím a kép alján van, alul szélesebb, mint felül (Perspektíva)",
+    "Az XCF és a PNG is elmentve, a fájlnévben a vezetékneveddel"
+  ],
+  "bonus": [
+    [
+      "Második reflektor",
+      "Kétszerezd meg a reflektor rétegét, tükrözd, és húzd a rakpart másik végére – két fénykúp keresztezi egymást a macskán."
+    ],
+    [
+      "Helikopterraj",
+      "Készíts még másolatokat a helikopterről; legyenek különböző méretűek, és ne egy irányba nézzenek."
+    ],
+    [
+      "Kíváncsi macska",
+      "Forgasd el egy kicsit a macska rétegét: félrebillentett fejjel még ijesztőbb."
+    ],
+    [
+      "Szellemmacska",
+      "Kétszerezd meg a macskát, a másolatot told arrébb, kicsinyítsd le, és halványítsd el az Átlátszatlansággal."
+    ]
+  ]
+};
+</script>
+<script src="../mission.js?v=2"></script>
+<script src="../../nav.js?v=2c8ccf1b" defer></script>
+</body>
+</html>
